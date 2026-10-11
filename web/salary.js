@@ -70,14 +70,14 @@ async function view() {
   await load(); draw();
 }
 const lockCard = (msg) => `<div class="lockcard">${LOCK}<span>${esc(msg)}</span></div>`;
-function statCell(label, val, tone) { return `<div class="stat mk ${tone || ''}"><small>${esc(label)}</small><b>${esc(money(val))}</b></div>`; }
+function statCell(label, val, tone) { return `<div class="stat mk ${tone || ''}"><div class="k">${esc(label)}</div><div class="v">${esc(money(val))}</div></div>`; }
 function draw() {
   const locs = LOCS(), m = (D.err && D.err.message) || '', locked = /not allowed/.test(m);
   const filters = `<div class="stack">
     ${(locs.length > 1 || allLocs()) ? `<select id="sa_loc" aria-label="${esc(T('location'))}">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(locs.map((l) => [l.id, nm(l)]), D.loc === null ? '' : D.loc)}</select>` : ''}
-    <div class="row" style="align-items:center;gap:8px"><button data-act="sa_m" data-v="-1" aria-label="${esc(T('prev'))}" style="min-width:48px">‹</button>
-      <input type="month" id="sa_month" value="${esc(D.month)}" aria-label="${esc(T('month'))}" style="flex:1"><button data-act="sa_m" data-v="1" aria-label="${esc(T('next'))}" style="min-width:48px">›</button>
-      <button id="sa_menu" data-act="sa_menu" aria-label="${esc(T('menu'))}" style="min-width:48px">${DOTS}</button></div></div>`;
+    <div class="row" style="align-items:center;gap:6px;flex-wrap:nowrap"><button data-act="sa_m" data-v="-1" aria-label="${esc(T('prev'))}" style="min-width:44px;padding-inline:0">‹</button>
+      <input type="month" id="sa_month" value="${esc(D.month)}" aria-label="${esc(T('month'))}" style="flex:1;min-width:0"><button data-act="sa_m" data-v="1" aria-label="${esc(T('next'))}" style="min-width:44px;padding-inline:0">›</button>
+      <button id="sa_menu" data-act="sa_menu" aria-label="${esc(T('menu'))}" style="min-width:44px;padding-inline:0">${DOTS}</button></div></div>`;
   let body;
   if (D.err) body = missingFn(D.err) ? `<div class="notice warn mk warn">${esc(T('sqlMissing'))}</div>` : locked ? lockCard(T('lockedPage')) : `<div class="notice warn mk warn">${esc(m || 'error')}</div>`;
   else if (!D.data) body = `<p class="muted">${esc(T('loading'))}</p>`;

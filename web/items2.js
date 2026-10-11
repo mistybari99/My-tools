@@ -41,6 +41,9 @@ const X = {
   appr: L('আপনার বদল অনুমোদনের জন্য গেছে।', 'Your change was sent for approval.', 'আপনার বদল approval-এর জন্য গেছে।'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
   nochange: L('কোনো বদল নেই', 'Nothing changed', 'কোনো বদল নেই'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
   vatoff: L('ভ্যাট সেটিংসে বন্ধ আছে', 'VAT is off in Settings', 'VAT Settings-এ বন্ধ'),
+  details: L('বিবরণ', 'Details', 'Details'), detailsph: L('উপাদান, ওজন, নোট…', 'Ingredients, weight, notes…', 'Ingredients, weight, notes…'),
+  lowNow: L('এখন স্টক কম', 'Low stock now', 'এখন stock কম'), lowNowH: L('শুধু ন্যূনতম স্টকের নিচে থাকা পণ্য (স্টকের হিসাব থেকে)', 'Only products below their minimum stock (from the stock ledger)', 'শুধু minimum stock-এর নিচে থাকা product (stock ledger থেকে)'),
+  lowNoMin: L('ন্যূনতম স্টক না থাকলে কম-স্টক চিহ্ন হয় না', 'A product without a minimum stock is never flagged', 'Minimum stock না থাকলে low-stock চিহ্ন হয় না'), onHand: L('আছে', 'on hand', 'on hand'),
 };
 const T = (k) => lab(X[k]);
 const LEG = { kg: L('কেজি', 'KG', 'KG'), pc: L('পিস', 'Piece', 'Piece'), lb: L('পাউন্ড', 'Pound', 'Pound') };
@@ -52,8 +55,8 @@ const CATLEG = {
 const rl = (r) => ({ bn: r.label_bn, en: r.label_en || undefined, mix: r.label_mix || undefined });
 
 // ---------- state ----------
-const D = { items: [], cost: new Map(), canCost: false, conv: [], ready: false };
-const Fl = { q: '', cat: '', sub: '', source: '', tracked: '', low: false, active: '' };
+const D = { items: [], cost: new Map(), canCost: false, conv: [], ready: false, low: new Map(), lowOk: false };
+const Fl = { q: '', cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '' };
 let shown = PAGE;
 let F = null;                          // the open form: { id, cur, images, vat, ... }
 
@@ -66,16 +69,33 @@ const unitRow = (code) => lists('units').find((r) => r.value_code === code);
 async function load() {
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
   const wantCost = !!(S.ctx.is_owner || (perms().ITEM_COST && perms().ITEM_COST.view));
-  const [it, co, cv] = await Promise.all([sb.from('items').select('*').order('code'), wantCost ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] }),
-    sb.from('unit_conversions').select('*').order('id')]);
+  const [it, co, cv, lv] = await Promise.all([sb.from('items').select('*').order('code'), wantCost ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] }),
+    sb.from('unit_conversions').select('*').order('id'), lowLevels()]);
   if (it.error) throw it.error;
   D.canCost = wantCost && !co.error;
   D.cost = new Map((co.data || []).map((c) => [c.item_id, c.cost_price]));
+  // only the grant view_cost (no ITEM_COST right): the costs come through a small server function instead of the table (phase12)
+  if (!D.canCost) {
+    try {
+      const g = await sb.rpc('has_grant', { p_code: 'view_cost' });
+      if (g && !g.error && g.data === true) { const r = await sb.rpc('items_with_cost'); if (r && !r.error && Array.isArray(r.data)) { D.canCost = true; D.cost = new Map(r.data.map((c) => [c.item_id, c.cost_price])); } }
+    } catch (e) { /* no costs */ }
+  }
+  D.low = lv;
   D.items = it.data || [];
   D.conv = cv.error ? [] : (cv.data || []).filter((c) => c.active !== false);
   D.ready = true;
 }
 
+// items below their minimum stock now: the server's stock_levels (min_stock flag); no minimum = never flagged, nothing is guessed
+async function lowLevels() {
+  const m = new Map(); D.lowOk = false;
+  try {
+    const r = await sb.rpc('stock_levels', { p_loc: null, p_filters: { below_min: true } });
+    if (r && !r.error && Array.isArray(r.data)) { D.lowOk = true; r.data.forEach((x) => { if (x.below_min && (!m.has(x.item_id) || Number(x.qty) < m.get(x.item_id).qty)) m.set(x.item_id, { qty: Number(x.qty), min: x.min_stock, unit: x.base_unit }); }); }
+  } catch (e) { /* stock part not installed: no low-stock marks */ }
+  return m;
+}
 // ---------- option lists (category / sub-category / units) ----------
 function catMap() {
   const m = new Map();
@@ -114,26 +134,28 @@ function matches(i) {
   if (Fl.tracked === 'yes' && !i.tracked) return false;
   if (Fl.tracked === 'no' && i.tracked) return false;
   if (Fl.low && !(i.min_stock !== null && i.min_stock !== undefined)) return false;
+  if (Fl.lowNow && !D.low.has(i.id)) return false;
   if (Fl.active === 'yes' && !i.is_active) return false;
   if (Fl.active === 'no' && i.is_active) return false;
   return true;
 }
-const nFilters = () => ['cat', 'sub', 'source', 'tracked', 'active'].filter((k) => Fl[k]).length + (Fl.low ? 1 : 0);
+const nFilters = () => ['cat', 'sub', 'source', 'tracked', 'active'].filter((k) => Fl[k]).length + (Fl.low ? 1 : 0) + (Fl.lowNow ? 1 : 0);
 function chipsHTML() {
   const c = [];
   if (Fl.cat) c.push(['cat', catLabel(Fl.cat)]); if (Fl.sub) c.push(['sub', subLabel(Fl.sub)]);
   if (Fl.source) c.push(['source', T(Fl.source)]); if (Fl.tracked) c.push(['tracked', Fl.tracked === 'yes' ? T('tracked') : T('untracked')]);
-  if (Fl.low) c.push(['low', T('low')]); if (Fl.active) c.push(['active', Fl.active === 'yes' ? T('active') : T('inactive')]);
+  if (Fl.low) c.push(['low', T('low')]); if (Fl.lowNow) c.push(['lowNow', T('lowNow')]); if (Fl.active) c.push(['active', Fl.active === 'yes' ? T('active') : T('inactive')]);
   return c.map(([k, l]) => `<button type="button" class="chip" data-act="p2_chip_x" data-k="${k}" aria-label="${esc(l)} ✕">${esc(l)} ✕</button>`).join('');
 }
 function rowHTML(i) {
   const cost = D.canCost ? D.cost.get(i.id) : undefined;
   const loss = cost !== undefined && cost !== null && i.sell_price !== null && Number(cost) >= Number(i.sell_price);
   const sub = [i.code, catLabel(i.category) + (i.sub_category ? ' · ' + subLabel(i.sub_category) : ''), unitName(i.unit)].filter(Boolean).join(' · ');
-  const tags = [i.tracked ? `<span class="chip info">${esc(T('tracked'))}</span>` : '', i.is_active ? '' : `<span class="chip bad">${esc(T('inactive'))}</span>`,
+  const lw = D.low.get(i.id);
+  const tags = [lw ? `<span class="chip warn">${esc(T('lowNow'))} · ${fmt(lw.qty)} ${esc(unitName(lw.unit))}</span>` : '', i.tracked ? `<span class="chip info">${esc(T('tracked'))}</span>` : '', i.is_active ? '' : `<span class="chip bad">${esc(T('inactive'))}</span>`,
     i.min_stock !== null && i.min_stock !== undefined ? `<span class="chip warn">${esc(T('lowchip'))}${fmt(i.min_stock)}</span>` : '', loss ? `<span class="chip warn">${esc(t('loss_warn'))}</span>` : ''].join('');
   const act = canEnter() ? `data-act="itemedit" data-v="${esc(i.id)}" role="button" tabindex="0"` : '';
-  return `<div class="card p2-row mk" ${act} data-cat="${esc(i.category || '')}"><div><div class="nm">${esc(nm(i))}</div><div class="sub">${esc(sub)}</div>${tags ? `<div class="tags">${tags}</div>` : ''}</div>
+  return `<div class="card p2-row mk ${lw ? 'warn' : ''}" ${act} data-cat="${esc(i.category || '')}"><div><div class="nm">${esc(nm(i))}</div><div class="sub">${esc(sub)}</div>${tags ? `<div class="tags">${tags}</div>` : ''}</div>
     <div class="pr"><b>${i.sell_price === null || i.sell_price === undefined ? '—' : money(i.sell_price)}</b>
       ${i.wholesale_price !== null && i.wholesale_price !== undefined ? `<small>${esc(T('wholesale'))} ${money(i.wholesale_price)}</small>` : ''}
       ${cost !== undefined ? `<small>${esc(T('cost'))} ${cost === null ? '—' : money(cost)}</small>` : ''}</div></div>`;
@@ -169,6 +191,7 @@ function filterSheet() {
     <div><label>${esc(T('tracked'))}</label>${sel('ff_trk', [['yes', T('yes')], ['no', T('no')]], Fl.tracked)}</div>
     <div><label>${esc(T('active'))}</label>${sel('ff_act', [['yes', T('active')], ['no', T('inactive')]], Fl.active)}</div>
     <div class="row between"><span>${esc(T('low'))}</span><button class="tog ${Fl.low ? 'on' : ''}" id="ff_low" data-act="sheettog">${esc(Fl.low ? t('on') : t('off'))}</button></div>
+    ${D.lowOk ? `<div><div class="row between"><span>${esc(T('lowNow'))}</span><button class="tog ${Fl.lowNow ? 'on' : ''}" id="ff_lownow" data-act="sheettog">${esc(Fl.lowNow ? t('on') : t('off'))}</button></div><div class="hint">${esc(T('lowNowH'))}. ${esc(T('lowNoMin'))}</div></div>` : ''}
     <div class="row"><button class="full" data-act="p2_reset">${esc(T('reset'))}</button><button class="primary full" data-act="p2_apply">${esc(T('apply'))}</button></div></div>`);
 }
 
@@ -229,6 +252,7 @@ async function viewForm(id) {
       <div><label>${esc(T('images'))}</label><div class="photos" id="p_imgs"></div></div>
       <div><label for="p_bc">${esc(T('barcode'))}</label><div class="p2-inl"><input id="p_bc" value="${esc(val(f.barcode))}" autocomplete="off" inputmode="text"><button type="button" data-act="p2_scan">▮▮ ${esc(T('scan'))}</button></div><div class="hint" id="p_bc_h"></div></div>
       <div><label for="p_mix">${esc(T('name_mix'))}</label><input id="p_mix" value="${esc(val(f.name_mix))}" autocomplete="off"></div>
+      <div><label for="p_details">${esc(T('details'))}</label><textarea id="p_details" rows="3" maxlength="2000" placeholder="${esc(T('detailsph'))}">${esc(val(f.details))}</textarea></div>
     </div></details>
     ${cur ? convHTML(cur) : ''}
     ${S.ctx.is_owner ? '' : `<div class="notice warn">${esc(t('needs_approval'))}</div>`}
@@ -290,7 +314,7 @@ async function save() {
   const next = { name_bn: name, name_en: $('#p_en').value.trim() || null, name_mix: $('#p_mix').value.trim() || null, category: cat || null, unit: $('#p_unit').value || null,
     sell_price: sell, is_active: isOn('p_act'), sub_category: sub || null, base_unit: $('#p_base').value || null,
     sell_units: [...document.querySelectorAll('#p_su .tog.on')].map((b) => b.dataset.su), wholesale_price: wh, tracked: isOn('p_trk'), min_stock: mn,
-    barcode: $('#p_bc').value.trim() || null, source: grpVal('src'), images: F.images.slice() };
+    barcode: $('#p_bc').value.trim() || null, source: grpVal('src'), images: F.images.slice(), details: ($('#p_details') ? $('#p_details').value.trim() : '') || null };
   if (cat) next.category_bn = catL ? catL.label_bn : catRow ? catRow.category_bn : undefined; if (next.category_bn === undefined) delete next.category_bn;
   if (F.vat) { const v = grpVal('vat'); next.vat_applicable = v === 'yes' ? true : v === 'no' ? false : null; }
   if (cost !== undefined) next.cost_price = cost;
@@ -314,9 +338,9 @@ Object.assign(H, {
   itemnew: () => go('items/new'),
   itemedit: (a) => go('items/edit/' + a.dataset.v),
   p2_filter: () => filterSheet(),
-  p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.low = isOn('ff_low'); shown = PAGE; closeSheet(); drawList(); },
-  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, active: '' }); shown = PAGE; closeSheet(); drawList(); },
-  p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' ? false : ''; shown = PAGE; drawList(); },
+  p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.low = isOn('ff_low'); Fl.lowNow = isOn('ff_lownow'); shown = PAGE; closeSheet(); drawList(); },
+  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '' }); shown = PAGE; closeSheet(); drawList(); },
+  p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' || k === 'lowNow' ? false : ''; shown = PAGE; drawList(); },
   p2_more: () => { shown += PAGE; drawList(); },
   p2_tg: (a) => {
     const on = !a.classList.contains('on'); a.classList.toggle('on', on); a.setAttribute('aria-pressed', on ? 'true' : 'false'); a.textContent = on ? t('on') : t('off');
@@ -346,6 +370,6 @@ async function view() {
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { items: view, products: view });
 // labels for the approval screen (#/itemreq): the new item fields
 window.BOS_ITEM_LABELS = () => ({ sub_category: T('sub'), base_unit: T('base'), sell_units: T('sellu'), wholesale_price: T('whs'), tracked: T('trk'), min_stock: T('minst'),
-  barcode: T('barcode'), source: T('source'), vat_applicable: T('vat'), images: T('images') });
+  barcode: T('barcode'), source: T('source'), vat_applicable: T('vat'), images: T('images'), details: T('details') });
 B.items2 = { reload: load };
 })();

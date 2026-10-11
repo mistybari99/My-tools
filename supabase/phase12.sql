@@ -680,7 +680,9 @@ begin
   select * into s from public.sales where id = p_sale;
   if not found then raise exception 'not found'; end if;
   if not (public.is_active() and public.can_loc(s.location_id) and (public.can_do('POS', 'view') or public.can_do('POS', 'enter') or public.has_grant('sale_return', s.location_id))) then raise exception 'not allowed'; end if;
-  return jsonb_build_object('sale_id', s.id, 'receipt', s.receipt, 'status', s.status, 'location_id', s.location_id, 'customer_id', s.customer_id,
+  return jsonb_build_object('sale_id', s.id, 'receipt', s.receipt, 'status', s.status, 'location_id', s.location_id, 'customer_id', s.customer_id, 'customer', s.customer,
+    'factor', case when s.subtotal > 0 then round(s.total / s.subtotal, 8) else 1 end, 'due_first', public.rule_on('sale_return_due_first'),
+    'balance', case when s.customer_id is not null then public._cust_bal(s.customer_id) end,
     'can_return', public.has_grant('sale_return', s.location_id) and s.status = 'done',
     'lines', coalesce((select jsonb_agg(jsonb_build_object('item_id', z.iid, 'name', z.nm, 'unit', z.u, 'sold', z.sq, 'returned', z.pq, 'left', z.sq - z.pq, 'price', round(z.samt / nullif(z.sq, 0), 4)) order by z.nm)
       from (select l.iid, max(l.nm) nm, max(l.u) u, sum(l.q) sq, sum(l.a) samt,
@@ -692,14 +694,23 @@ begin
       'reason', r.reason_code, 'note', r.note, 'status', r.status, 'at', r.created_at, 'staff', r.created_staff) order by r.created_at desc) from public.sale_returns r where r.sale_id = s.id), '[]'::jsonb));
 end $$;
 
+-- suppliers that owe US (advance paid, or credit from returns): where a refund can be recorded
+create or replace function public.supplier_credits() returns table (supplier_id uuid, name text, mobile text, credit numeric)
+language plpgsql stable security definer set search_path = public as $$
+#variable_conflict use_column
+begin
+  if not public._pur_ok(null) then raise exception 'not allowed'; end if;
+  return query select z.id, z.name, z.mobile, -z.b from (select s.id, s.name, s.mobile, public._sup_balance(s.id) b from public.suppliers s) z where z.b < 0 order by 4 desc;
+end $$;
+
 -- ---------- privileges for everything new ----------
 revoke all on function public._wastage_post(uuid, int, numeric, text, text, text, bigint, uuid, uuid, text), public._cust_bal(uuid), public._sale_void_guard(),
   public.wastage_decide(uuid, boolean, text), public.wastage_cancel(uuid), public.wastage_pending(int, text),
   public.supplier_refund(uuid, int, numeric, text, text, text, text, text, uuid), public.void_supplier_refund(bigint, text),
-  public.sale_return(uuid, uuid, jsonb, text, text, text, text, text), public.void_sale_return(uuid, text), public.sale_returns_for(uuid) from public, anon, authenticated;
+  public.sale_return(uuid, uuid, jsonb, text, text, text, text, text), public.void_sale_return(uuid, text), public.sale_returns_for(uuid), public.supplier_credits() from public, anon, authenticated;
 grant execute on function public.wastage_decide(uuid, boolean, text), public.wastage_cancel(uuid), public.wastage_pending(int, text),
   public.supplier_refund(uuid, int, numeric, text, text, text, text, text, uuid), public.void_supplier_refund(bigint, text),
-  public.sale_return(uuid, uuid, jsonb, text, text, text, text, text), public.void_sale_return(uuid, text), public.sale_returns_for(uuid) to authenticated;
+  public.sale_return(uuid, uuid, jsonb, text, text, text, text, text), public.void_sale_return(uuid, text), public.sale_returns_for(uuid), public.supplier_credits() to authenticated;
 -- re-created functions keep their old grants (create or replace); make sure they are exactly as before
 revoke all on function public.stock_wastage(uuid, int, numeric, text, text, text, text, uuid, bigint), public.stock_post(uuid, int, numeric, text, text, text, numeric, bigint, timestamptz, text, bigint, text, uuid, uuid),
   public._sup_balance(uuid), public._sup_open(uuid), public.supplier_ledger(uuid, int), public.customer_balance(uuid), public.customer_dues(), public.customer_ledger(uuid) from public, anon;

@@ -22,6 +22,7 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
     const d = days(); return { data: { from: args.p_from, to: args.p_to, loc: args.p_loc, start: M.db.start, opening_known: !!M.db.start, enabled: !M.db.off, salary_hidden: M.db.hidden, days: d,
       totals: { in: Z(340, 150, 200), out: Z(2155, 60, 0), open: M.db.start ? Z(0, 0, 0) : null, close: M.db.start ? Z(-1815, 90, 200) : null }, notes: ['card_as_bank', 'imprest_in_cash', 'bank_deposit_not_dated', 'hub_receipt_not_recorded', 'drafts_excluded'] }, error: null }; }
   if (fn === 'salary_report') { M.calls.push([fn, clone(args || {})]); if (M.db.denied) return { data: null, error: { message: 'not allowed' } }; const r = sal(); if (M.db.empty) { r.rows = []; r.sheets = 0; r.data_needed = true; r.totals = {}; } return { data: r, error: null }; }
+  if (fn === 'report_catalog') return { data: [], error: null };
   if (fn === 'set_daybook_start') { M.calls.push([fn, clone(args || {})]); return { data: null, error: null }; }
   if (fn === 'set_rule') { M.calls.push([fn, clone(args || {})]); return { data: null, error: null }; }
   if (fn === 'log_page_export') { M.calls.push([fn, clone(args || {})]); if (M.db.exportDenied) return { data: null, error: { message: 'not allowed' } }; return { data: null, error: null }; }

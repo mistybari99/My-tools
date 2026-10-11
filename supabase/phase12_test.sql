@@ -139,6 +139,7 @@ insert into suppliers (name, opening_balance) values ('Credit Sup', -500) return
 set role authenticated; select tt.as(:'p');
 select tt.err('T6 purchasing without supplier_pay cannot record a refund', format($$select supplier_refund(%L,1,100,'cash')$$, :'sc'), 'not allowed');
 select tt.as(:'o');
+select tt.chk('T6 credit list shows 500', (select credit from supplier_credits() where supplier_id=:'sc'::uuid)=500);
 select tt.chk('T6 refund 200 of a 500 credit', (supplier_refund(:'sc'::uuid,1,200,'cash',null,null,null,'first',gen_random_uuid()) ->> 'balance')::numeric=-300);
 select tt.err('T6 cannot refund more than the credit left', format($$select supplier_refund(%L,1,400,'cash')$$, :'sc'), 'refund_exceeds_credit');
 select tt.err('T6 NaN / zero refused', format($$select supplier_refund(%L,1,'NaN'::numeric,'cash')$$, :'sc'), 'bad_amount');
@@ -149,6 +150,7 @@ select tt.chk('T6 ledger shows the refunds as debits, balance -250', (select cou
 select save_purchase(null,null,:'sc'::uuid,1,'R-1','2026-01-10'::date,'[{"description":"Gas","qty":1,"unit_cost":1000}]'::jsonb) ->> 'id' as rb \gset
 select post_purchase(:'rb'::uuid);
 select tt.chk('T6 open bills = balance: credit left after the refunds is what clears the new bill (1000-250)', (select sum(open_amt) from supplier_open_bills(:'sc'::uuid))=750 and tt.supbal(:'sc'::uuid)=750);
+select tt.chk('T6 supplier_credits lists only suppliers that owe us', not exists(select 1 from supplier_credits() where supplier_id=:'sc'::uuid));
 select tt.err('T6 a supplier we owe cannot refund', format($$select supplier_refund(%L,1,10,'cash')$$, :'sc'), 'refund_exceeds_credit');
 reset role;
 select id as rf1 from supplier_refunds where supplier_id=:'sc'::uuid order by id limit 1 \gset
@@ -192,6 +194,7 @@ select sale_return(null, :'sa'::uuid, format('[{"item_id":"%s","qty":2}]',:'ic')
 select tt.chk('T7 second return: customer owes nothing now, so the full 520 is refunded', (select credit_amount=0 and refund_amount=520 and refund_mode='mobile' from sale_returns where id=:'sr2'::uuid));
 select tt.err('T7 nothing left to return', format($$select sale_return(null,%L,'[{"item_id":"%s","qty":0.5}]'::jsonb,'damaged',null,'cash')$$, :'sa', :'ic'), 'return_exceeds_sale');
 select tt.chk('T7 sale_returns_for lists both and nothing left', (select jsonb_array_length(sale_returns_for(:'sa'::uuid)->'returns'))=2 and ((sale_returns_for(:'sa'::uuid)->'lines'->0->>'left')::numeric)=0);
+select tt.chk('T7 sale_returns_for carries the discount factor, rule and balance', (sale_returns_for(:'sa'::uuid)->>'factor')::numeric=1 and (sale_returns_for(:'sa'::uuid)->>'due_first')::boolean and (sale_returns_for(:'sa'::uuid)->>'balance')::numeric=0);
 select void_sale_return(:'sr2'::uuid, 'mistake'); select void_sale_return(:'sr1'::uuid, 'mistake');
 reset role;
 select tt.chk('T7 void returns: stock and batch back, due back', (select qty_remaining from stock_batches where id=:bt2)=6 and (select qty from stock_balance where item_id=:'ic'::uuid and location_id=1)=36 and tt.custbal(:'cu'::uuid)=500);

@@ -119,7 +119,7 @@ function errBox(e) {
   return `<div class="notice warn mk warn">${esc(m || 'error')}</div>`;
 }
 function statCell(label, val, tone) {
-  return `<div class="stat mk ${tone || ''}"><small>${esc(label)}</small><b>${val === null || val === undefined ? `<span class="chip warn">${esc(T('need'))}</span>` : esc(money(val))}</b></div>`;
+  return `<div class="stat mk ${tone || ''}"><div class="k">${esc(label)}</div><div class="v">${val === null || val === undefined ? `<span class="chip warn">${esc(T('need'))}</span>` : esc(money(val))}</div></div>`;
 }
 function draw() {
   const locs = LOCS(), locked = !!(D.err && /not allowed|daybook_off/.test(D.err.message || ''));
