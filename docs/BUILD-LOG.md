@@ -4,20 +4,20 @@ One entry per task: what changed, what could NOT be confirmed, manual checks and
 
 ## Carry-over checklist (HANDOVER §8)
 
-- [ ] 1. Items.details + apply_item_patch + Details field on item form
-- [ ] 2. Cost visible on items list for view_cost grant only (RPC gated by has_grant)
-- [ ] 3. Real low-stock status on items list/filter (stock_levels RPC, min_stock flag)
-- [ ] 4. Stock: category label list in stock_levels; purchase/sale unit list per item; item-name search in stock list
-- [ ] 5. Barcode scan on purchase-bill item field and stock actions
+- [x] 1. Items.details + apply_item_patch + Details field on item form
+- [x] 2. Cost visible on items list for view_cost grant only (RPC gated by has_grant)
+- [x] 3. Real low-stock status on items list/filter (stock_levels RPC, min_stock flag)
+- [x] 4. Stock: category label list in stock_levels; purchase/sale unit list per item; item-name search in stock list
+- [x] 5. Barcode scan on purchase-bill item field and stock actions
 - [ ] 6. Home Accounting "Day book" tile
-- [ ] 7. Per-line stock-effect preview in purchase bill editor
-- [ ] 8. Photos for stock/purchase: dedicated STOCK / PURCHASE prefixes or grant-based photo_ok
-- [ ] 9. Emergency-rule keys for stock_count_adjust, stock_transfer, stock_issue, stock_production
-- [ ] 10. Wastage: manager approval above an owner-set limit (maker-checker)
-- [ ] 11. Supplier refund (cash back) alongside return credits; sale_return flow
-- [ ] 12. Expired batches: optional setting to block selling expired stock
+- [x] 7. Per-line stock-effect preview in purchase bill editor
+- [x] 8. Photos for stock/purchase: dedicated STOCK / PURCHASE prefixes or grant-based photo_ok
+- [x] 9. Emergency-rule keys for stock_count_adjust, stock_transfer, stock_issue, stock_production
+- [x] 10. Wastage: manager approval above an owner-set limit (maker-checker)
+- [x] 11. Supplier refund (cash back) alongside return credits; sale_return flow
+- [x] 12. Expired batches: optional setting to block selling expired stock
 - [ ] 13. Salary view / export_data grants: salary report page, server-side export grant
-- [ ] 14. stock_ledger.ref_id column grant leak: revoke column or null via view
+- [x] 14. stock_ledger.ref_id column grant leak: revoke column or null via view
 - [ ] 15. Forms <-> stock/purchase links (04-1, 04-2, 04-3, 03-1, 05-1 post to ledger when approved, switchable, default off; 04-4 / 06-5 as views; 06-5 supplier_pick)
 - [ ] 16. Discount approver stored on sales; brand-level P&L; remaining reports of the 65-report catalogue
 - [ ] 17. Nav leftovers: Year tab follows fiscal_year_start; drawer search; location switcher in drawer footer; staff home "today's sheets"; owner default favourites per role UI
@@ -83,3 +83,32 @@ Checks
 - phase13_test.sql on fresh db (also with phase11 applied): 56 pass / 0 fail, run twice OK. phase10_test.sql fresh with phase13: 0 fail; phase8_test: only the known 'T1 staff direct update rules'.
 - tests/web/daybook_test.js and salary_test.js: errors none / 0 failures. Whole web list re-run: all pass except stock2 'photo stored as <form>/<loc>' which fails because another agent changed photo prefixes (STOCK/...); not related to this task. allforms/items2/purchase hit EADDRINUSE while other agents ran tests, passed on rerun.
 - Manual SQL checks: location isolation (loc 3 data never visible to a loc-1 user), location-limited grants, role grant add/remove, anon refused, absurd/null dates refused.
+
+### W0 carry-over items 1-5, 7-12, 14 (supabase/phase12.sql, supabase/phase12_test.sql, web/items2.js, stock2.js, purchase.js, barcode.js, new web/salereturn.js)
+Changed
+- 1 details: items.details (text, 2000 chars); apply_item_patch is wrapped, not copied (the old function is renamed `_apply_item_patch_base`, the new one calls it, then sets details; marker comment `bos12-details` makes re-runs a no-op and keeps columns another phase added). Item form: "Details" textarea in Advance options; approval screen label added.
+- 2 cost for view_cost only: `items_with_cost()` (definer; owner / ITEM_COST view / has_grant('view_cost'); anon no execute). items2.js asks `has_grant('view_cost')` first, then the RPC; the cost field stays read-only and a save never sends cost. item_costs RLS untouched.
+- 3 low stock: items list/filter use `stock_levels(null, {below_min:true})` (server flag, nothing computed in JS): edge marker + chip "Low stock now · qty unit", filter switch, chip. No min_stock = never flagged. Missing phase10 = no low-stock UI.
+- 4 stock list: category shown by its item_categories label (filter too); per row "Buy: base, converted units · Sell: sell_units" from unit_conversions + items.sell_units (client side, no new numbers); search now covers code, Bangla/English/Bng-Eng name, category label, barcode (Bangla digits ok). Row ⋮ menu (ledger + allowed actions).
+- 5 barcode: `B.barcode.scanItem(items)` / `enabled()`; scan button on the purchase bill line item field and on stock actions (opening, wastage, count, issue, production, transfer). Shown only when a scan option (camera/device) is on; unknown code = "No product has this barcode".
+- 7 purchase line preview: under each line "+12 kg -> stock 35 kg at <location> · new average cost ৳ x" from stock_levels (that location) + unit conversions + the bill discount share; same formula as the server weighted average. Unknown conversion = "Data needed: unit conversion unknown"; stock>0 with the average hidden from this person = "Data needed (average cost not available)"; empty stock = the line cost; return = minus, average unchanged; untracked = "no stock effect".
+- 8 photos: storage prefixes STOCK/<loc>/ and PURCHASE/<loc>/ (photo_ok re-created: STOCK enter = any stock grant, view = anyone at that location; PURCHASE enter = purchase_entry/return/supplier_pay, view = _pur_ok; all other prefixes unchanged). The web tries STOCK / PURCHASE first and falls back to the old form codes (04-1 / 06-4) if the server refuses, so a database without phase12 still works.
+- 9 emergency keys: rules em_stock_count_adjust / em_stock_transfer / em_stock_issue / em_stock_production (+ em_sale_return) default OFF; grant_defs.emergency_rule filled for the four stock grants (only where still empty). The RPCs already used _may -> _use_em, so request / approve / use needs no code change.
+- 10 wastage maker-checker: rule `wastage_approval_limit` (number in base unit, empty = off), grant `wastage_approve` (role management seeded once), table wastage_requests (RLS, audit), stock_wastage re-created (same behaviour + above-limit => pending request, yellow exception `wastage_pending`, result {pending:true}); `wastage_decide` (different person only, reject needs a note, approve posts the ledger rows now), `wastage_cancel`, `wastage_pending`. The owner is never held back. stock2.js: "Approvals" tab (shown to approvers or to a maker with a waiting request) with ⋮ per row (approve / reject / take back).
+- 11a supplier refund: table supplier_refunds (RLS, audit); `supplier_refund` (grant supplier_pay or its emergency, only while balance<0 and never above the credit, idempotent client id), `void_supplier_refund` (purchase_void); `_sup_balance`, `_sup_open`, `supplier_ledger` re-created so a refund raises the balance and re-flows bill allocation; `supplier_credits()` lists suppliers that hold our credit. purchase.js: credit list on #/payables, ⋮ on bill rows / payables rows / credit rows, refund sheet, ledger refund rows with void.
+- 11b sale return: table sale_returns, grant `sale_return` (management + showroom_manager seeded once), rule `sale_return_due_first` (default ON; off = refund everything), `sale_return` (per item <= sold - returned, value = qty x average sale price x sale total/subtotal, first off the customer's due, rest refunded cash/mobile/card, tracked items restocked into the batch they left at the cost they left with; return_reasons list; exception `sale_return`), `void_sale_return` (reverses the restock), `sale_returns_for`. customer_balance / customer_dues / customer_ledger re-created to subtract returns; voiding a sale that has a live return is refused (`sale_has_returns`). UI: new web/salereturn.js, route #/salereturn (+ /<sale id>), B.saleReturn.open(saleId).
+- 12 `block_expired_sale` (switch, default OFF, module stock => appears in the Rules hub with no JS change). stock_post re-created (copy of phase10 + the check): ON refuses a sale that would need an expired batch (`expired_stock_blocked`, whole sale rolls back); a late-synced offline sale is never refused; OFF keeps the red 'sold_expired'.
+- 14 stock_ledger: column privilege on ref_id removed (table SELECT revoked, explicit column list re-granted without ref_id). stock_ledger_rows (definer) unchanged and still gives ref_id to purchase people.
+Decisions
+- apply_item_patch wrapper instead of a copy (phase11 or later phases may add columns to the original; a copy would drop them).
+- wastage limit is a quantity in the item base unit (like wastage_photo_above) because cost is secret.
+- Supplier refund reuses the grant supplier_pay (and purchase_void for voiding) instead of a new grant: fewer switches; owner can still delegate per person.
+- Sale return value = average sale price per item line x sale discount share (no price is invented); refund cash is only recorded on sale_returns (not in sale_payments) so POS / payment reports are not distorted - the cash-out of a refund is NOT yet in the day book or cash reports (see Not confirmed).
+Not confirmed (mock only / open)
+- Real Supabase; photo policy on the real storage.objects (only the mock + photo_ok function were tested); the web fallback to the old prefixes relies on upload returning an error.
+- Sales reports (rpt_*) and sales.due_amount are NOT net of returns; the day book / cash drawer do not subtract cash refunds yet (sale_returns.refund_amount / refund_mode hold the data for the day book).
+- pos.js (not mine) has no ⋮ entry for "Return goods" yet and shows a generic error for `expired_stock_blocked`; the sale-return page is reachable at #/salereturn (no nav tile yet).
+- A sale return cannot be voided after its restocked goods were sold again (batch_short).
+Checks
+- phase12_test.sql: fresh db (phase8 9 10 12) 84 pass / 0 fail; also with phase11 + phase13 in either order; phase12 run twice OK. phase10_test.sql (two T11 lines edited: they read stock_ledger.ref_id as a normal user, which is now correctly refused; they now read it as the table owner) 0 fail with and without phase12; phase11_test / phase13_test 0 fail on a db with phase12; phase8_test only the known T1.
+- web: items3_test, stock3_test, purchase3_test, salereturn_test (new) + items2 / barcode (extended) / stock2 / purchase (photo-path expectation changed to STOCK / PURCHASE) - see the final report for the full list result.
