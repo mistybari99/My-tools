@@ -44,3 +44,26 @@ Defaults to ask nothing about: use judgment; mention choices in the reply.
 
 ## 7. First 10 minutes in the new chat
 1) Read this file, docs/MODULE_MAP.md, docs/AUDIT.md, docs/plan_v2/OWNER_ANSWERS.md, docs/plan_v2/FUNCTIONS_PLAN.md. 2) `git log --oneline | head`, run the web tests once to confirm green. 3) The two input files are in docs/inputs/. 4) Start W1, then W2 as above.
+
+## 8. CARRY-OVER — MUST be done (owner insists: nothing may be silently dropped). Do this as "W0" right after reading, before/with W1; tick each in docs/BUILD-LOG.md
+Items:
+1. `items.details text` + support in apply_item_patch + "Details" field on the item form (items2.js).
+2. Cost visible on the items list for people with only the `view_cost` grant: small RPC gated by has_grant('view_cost') (item_costs RLS stays ITEM_COST-only).
+3. Real low-stock status on items list/filter now that stock_balance exists (use stock_levels RPC; min_stock flag).
+4. Stock: category label list for stock_levels rows; purchase/sale unit list per item in stock_levels; item-name search in stock list.
+5. Barcode scan on the purchase-bill item field (barcode.js) and on stock actions.
+6. Home Accounting "Day book" tile (currently "coming soon") — build the day book (cash in/out by day from sales, collections, expenses 10-2, supplier payments).
+7. Per-line stock-effect preview in the purchase bill editor.
+8. Photos for stock/purchase: dedicated STOCK / PURCHASE storage prefixes or grant-based photo_ok (today they borrow form codes 04-1/06-4).
+9. Emergency-rule keys for stock_count_adjust, stock_transfer, stock_issue, stock_production (so the owner can allow emergency windows).
+10. Wastage: manager approval above an owner-set limit (maker-checker), not only the photo rule.
+11. Supplier refund (cash back from a supplier) alongside credits from returns; sale_return flow (defined in ledger, unused).
+12. Expired batches: optional setting to block selling expired stock (today red exception 'sold_expired' only).
+13. Salary view: export_data/salary_view grants exist with no consumer — build salary report page (owner/grantees) from 02-2/02-3 data; wire export grant server-side.
+14. stock_ledger.ref_id column grant leaks purchase bill ids to location users reading the table directly — revoke column or null via view.
+15. Forms ↔ stock/purchase links: 04-1 GRN, 04-2 issue, 04-3 count, 03-1 transfer, 05-1 factory sheet should post to the ledger when approved (switchable setting, default off); 04-4 store ledger and 06-5 supplier ledger become views over the new data (never a second typing place); 06-5 master-list name column uses supplier_pick.
+16. Discount approver stored on sales (for the discounts report); brand-level P&L; remaining 46 of 65 reports (docs/plan_v2/REPORTS.md catalogue).
+17. Nav leftovers: home "Year" tab must follow fiscal_year_start rules (currently 1 Jan); drawer search over items/customers; location switcher in drawer footer; factory/store staff home "today's sheets to fill"; owner default favourites per role UI.
+18. Run tests/web/smoke.js (selectors updated, never run); real-device checks list for the owner (printer thermal 58/80, camera barcode, offline sale sync, Chrome auto-translate off).
+19. Security backlog: BACKUP_TABLES completeness, server-side PIN lockout + failed-login log, audit_log append-only, immutable codes, option deletes revoked (this is W1).
+20. VAT/Mushak 6.3 receipt line stays OFF until the owner's adviser gives the rate; no number invented.
