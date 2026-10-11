@@ -289,7 +289,7 @@ B.forms['02-6'] = {
   calc(x) {
     const d = x.d, rows = x.rows('handover'), flags = [];
     const net = num(d.final_due) - num(d.final_adv) - num(d.final_other);
-    const pending = rows.filter((r) => r.status !== 'done').length;
+    const pending = HAND.length - rows.slice(0, HAND.length).filter((r) => r && r.status === 'done').length;
     if ((has(d.pay_date) || d.emp_received) && pending > 0) flags.push(flag('clearance_incomplete', 'red', 'হ্যান্ডওভার তালিকার সব ঘর শেষ হয়নি — শেষ বেতন দেওয়া যাবে না (বাকি ঘর)', 'Handover list is not complete — final pay cannot be given (lines pending)', pending, QTY));
     const advRow = rows[0] || {};
     if (num(advRow.qty) > 0 && num(d.final_adv) < num(advRow.qty)) flags.push(flag('exit_adv_not_cleared', 'red', 'বাকি অ্যাডভান্স শেষ বেতন থেকে পুরো কাটা হয়নি — ছাড়পত্র দেওয়া যাবে না', 'Outstanding advance is not fully deducted from the final pay — clearance cannot be given', num(advRow.qty) - num(d.final_adv)));
