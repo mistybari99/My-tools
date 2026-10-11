@@ -196,7 +196,7 @@ async function viewHome() {
       `<button class="tile ${TONE[go_] || ''}" data-act="go" data-v="${go_}">${ICON[go_] || ''}<span>${esc(label)}</span>${badge}</button>`).join('')}</div>
     <div class="orn">${esc(t('forms_title'))}</div>
     ${byArea.length ? byArea.map(([a, l]) => `<div class="card panel"><h3>${esc(t('area_' + a))}</h3>${l.map((f) => {
-      const pr = perms[f.code], live = window.BOS && window.BOS.forms && window.BOS.forms[f.code];
+      const pr = perms[f.code], live = f.code === '0-1' ? owner : (window.BOS && window.BOS.forms && window.BOS.forms[f.code]);
       return `<div class="perm"><div class="row between" ${live ? `data-act="openform" data-v="${f.code}" style="cursor:pointer;min-height:44px"` : 'style="opacity:.6"'}><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="row">${
         live ? '' : `<span class="chip">${esc(t('soon'))}</span>`}${pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${
         pr.approve ? `<span class="chip warn">${esc(t('can_approve'))}</span>` : ''}</span></div></div>`; }).join('')}</div>`).join('')

@@ -387,6 +387,7 @@ async function reloadEntry(id) {
 // ---------- form list ----------
 async function viewFormList() {
   const code = location.hash.replace(/^#\/?/, '').split('/')[1];
+  if (code === '0-1') return (location.hash = '#/locset');
   const spec = B.forms[code]; if (!spec) return location.hash = '#/home';
   await ensureLoaded();
   const perms = S.ctx.perms[code] || {}, locs = myLocs();
