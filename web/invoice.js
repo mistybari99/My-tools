@@ -122,7 +122,7 @@ const CSS = `.ivdoc{background:#fff;color:#000;box-sizing:border-box;font-family
 .ivdoc.ivlabels{font-family:system-ui,sans-serif}.ivdoc .ivlab{box-sizing:border-box;padding:1.2mm 1.5mm;overflow:hidden;text-align:center;border:.1mm dotted #bbb;page-break-inside:avoid;break-inside:avoid}
 .ivdoc .ivln{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ivdoc .ivlb .ivbc{width:100%;height:9mm}.ivdoc .ivlp{font-weight:700}
 .iv-pvw{border:1px solid var(--line);border-radius:12px;background:#d9d2c3;padding:10px;overflow:hidden}.iv-pvi{transform-origin:top left;box-shadow:0 2px 10px rgba(0,0,0,.25);width:max-content}
-.iv-offer{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:30;max-width:616px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--gold);box-shadow:var(--shadow)}
+.iv-offer{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:19;max-width:616px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--gold);box-shadow:var(--shadow)}
 .iv-offer button{min-height:44px}.ivflags{display:flex;flex-wrap:wrap;gap:8px}.ivfs{display:flex;gap:6px;align-items:center}.ivfs input{text-align:center}
 .iv-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}`;
 (() => { const st = document.createElement('style'); st.id = 'iv_css'; st.textContent = CSS; document.head.appendChild(st); })();
