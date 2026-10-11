@@ -66,3 +66,7 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   reversible collections (void_collection), correct FIFO oldest-due, rounding to 2 dp, discount without a written limit needs a manager, safe books-closed date (+validation),
   number-audit digit cap, mobile normaliser, offline-queue poison handling, quick-sale standalone, change maths, collection location picker, credit-limit validation, list reorder in one write.
   Known/accepted: voiding a sale after its dues were collected leaves the customer in credit (shown as negative balance); custom/quick lines have no price control beyond the yellow exception.
+- 2026-10-11 (rules & emergency) · phase7.sql: rules table (switches/numbers/choices), rule_grants + grant_defs (who may do what), emergency_requests with
+  request/decide/cancel/use, can_do/can_loc honour short emergency windows, entry paper-no rule. record_sale2/lock_check/void_* now read rules+grants.
+  web/rules.js (#/rulehub tabs Rules / Who may do what / More; #/emergency owner queue; staff 'ask for emergency approval' sheet). Home regrouped, MODULE_MAP.md written.
+  supabase/ALL_NEW.sql = phase5+6+7 in one paste (builds on a fresh chain; tests test10/11 pass). User declined to run SQL: only they can (no DB access from here).
