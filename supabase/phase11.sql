@@ -69,6 +69,22 @@ create trigger exceptions_no_delete before delete on public.exceptions for each 
 revoke delete on public.option_lists, public.unit_conversions, public.shelf_life_rules, public.invoice_templates,
   public.print_profiles, public.report_brand_map from anon, authenticated;
 
+-- ---------- unit_conversions: retire, never delete (readers such as _unit_hop already filter active) ----------
+create or replace function public.set_unit_conversion(p_item uuid, p_from text, p_to text, p_factor numeric, p_note text default null) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  if p_factor is null then
+    update public.unit_conversions set active = false, updated_at = now(), updated_by = auth.uid()
+      where coalesce(item_id, '00000000-0000-0000-0000-000000000000'::uuid) = coalesce(p_item, '00000000-0000-0000-0000-000000000000'::uuid) and from_unit = p_from and to_unit = p_to;
+    return;
+  end if;
+  if not (p_factor > 0 and p_factor < 1e12) then raise exception 'bad_factor'; end if;
+  insert into public.unit_conversions (item_id, from_unit, to_unit, factor, note, updated_by) values (p_item, p_from, p_to, p_factor, left(p_note, 200), auth.uid())
+    on conflict (coalesce(item_id, '00000000-0000-0000-0000-000000000000'::uuid), from_unit, to_unit)
+    do update set factor = excluded.factor, note = excluded.note, active = true, updated_at = now(), updated_by = auth.uid();
+end $$;
+
 -- ---------- (d) server-side PIN lockout + failed-login log ----------
 insert into public.settings (key, value, label_bn, label_mix, label_en) values
  ('lock_minutes', '10', 'ভুল PIN-এ লক কত মিনিট (এবং গণনার সময়সীমা)', 'ভুল PIN-এ Lock কত মিনিট (ও গণনার সময়)', 'Lock minutes after too many wrong PINs (also the counting window)'),
@@ -117,7 +133,8 @@ end $$;
 
 create or replace function public._login_setting_num(p_key text, p_default numeric) returns numeric
 language sql stable security definer set search_path = public as $$
-  select coalesce((select case when jsonb_typeof(value) = 'number' and (value #>> '{}')::numeric between 1 and 100000 then (value #>> '{}')::numeric end
+  select coalesce((select case when jsonb_typeof(value) = 'number' then
+                            case when (value #>> '{}')::numeric between 1 and 100000 then (value #>> '{}')::numeric end end
                    from public.settings where key = p_key), p_default);
 $$;
 
@@ -126,18 +143,25 @@ language sql stable security definer set search_path = public as $$
   select coalesce((select value = 'true'::jsonb from public.settings where key = 'lockout_auto_release' and value is not null), true);
 $$;
 
+-- auto-release applies when the setting is on, and ALWAYS for an owner account (an owner can never be locked out for good by someone typing wrong PINs)
+create or replace function public._login_auto_release_for(p_staff text) returns boolean
+language sql stable security definer set search_path = public as $$
+  select public._login_auto_release() or exists (
+    select 1 from public.profiles p join public.user_roles ur on ur.user_id = p.id where p.staff_id = lower(btrim(coalesce(p_staff, ''))) and ur.role_code = 'owner');
+$$;
+
 create or replace function public.login_precheck(p_staff text) returns jsonb
 language plpgsql stable security definer set search_path = public as $$
-declare f public.login_failures; mx int := public._login_setting_num('max_fails', 5)::int; sec int := 0; lk boolean := false;
+declare f public.login_failures; sec int := 0; lk boolean := false; s text := lower(btrim(coalesce(p_staff, '')));
 begin
-  select * into f from public.login_failures where staff_id = lower(btrim(coalesce(p_staff, '')));
+  select * into f from public.login_failures where staff_id = s;
   if found and f.locked then
-    if f.locked_until is null or not public._login_auto_release() then lk := true; sec := null;      -- locked until the owner unlocks
+    if f.locked_until is null or not public._login_auto_release_for(s) then lk := true; sec := null;      -- locked until the owner unlocks
     elsif f.locked_until > now() then lk := true; sec := ceil(extract(epoch from (f.locked_until - now())))::int;
     end if;
   end if;
-  return jsonb_build_object('locked', lk, 'seconds_left', sec, 'attempts_left',
-    case when lk then 0 else greatest(0, mx - case when found and f.window_start > now() - make_interval(mins => public._login_setting_num('lock_minutes', 10)::int) then f.fails else 0 end) end);
+  -- same shape for known and unknown ids; no per-id counters are returned (they would reveal which ids exist)
+  return jsonb_build_object('locked', lk, 'seconds_left', sec);
 end $$;
 
 create or replace function public.login_failed(p_staff text) returns void
@@ -148,18 +172,18 @@ begin
   if s = '' then return; end if;
   select exists (select 1 from public.profiles where staff_id = s) into known;
   -- spam guard: unknown ids share ONE global bucket; known ids get 50 log rows per minute each. Unknown/known look the same to the caller.
-  if not public._login_throttle(case when known then 'sid:' || s else 'unknown' end, case when known then 50 else 200 end) then return; end if;
+  if not public._login_throttle(case when known then 'sid:' || s else 'unknown' end, case when known then 20 else 60 end) then return; end if;
   insert into public.login_attempts (staff_id, ok, ip_hint) values (s, false, null);
   if not known then return; end if;
   select * into f from public.login_failures where staff_id = s for update;
   if not found then
     insert into public.login_failures (staff_id, fails, locked, locked_until, window_start, last_fail)
-      values (s, 1, 1 >= mx, case when 1 >= mx and public._login_auto_release() then now() + make_interval(mins => lm) end, now(), now())
+      values (s, 1, 1 >= mx, case when 1 >= mx and public._login_auto_release_for(s) then now() + make_interval(mins => lm) end, now(), now())
     on conflict (staff_id) do nothing;
     return;
   end if;
   if f.locked then
-    if f.locked_until is not null and f.locked_until <= now() and public._login_auto_release() then
+    if f.locked_until is not null and f.locked_until <= now() and public._login_auto_release_for(s) then
       update public.login_failures set fails = 1, locked = (1 >= mx), locked_until = case when 1 >= mx then now() + make_interval(mins => lm) end,
         window_start = now(), last_fail = now() where staff_id = s;
     else
@@ -172,7 +196,7 @@ begin
     fails = nf, last_fail = now(),
     window_start = case when nf = 1 then now() else f.window_start end,
     locked = nf >= mx,
-    locked_until = case when nf >= mx and public._login_auto_release() then now() + make_interval(mins => lm) else null end
+    locked_until = case when nf >= mx and public._login_auto_release_for(s) then now() + make_interval(mins => lm) else null end
   where staff_id = s;
 end $$;
 
@@ -203,3 +227,28 @@ revoke execute on function public._login_throttle(text, int), public._login_sett
 grant execute on function public.login_precheck(text), public.login_failed(text) to anon, authenticated;
 grant execute on function public.login_success(), public.unlock_staff(text) to authenticated;
 revoke execute on function public.login_success(), public.unlock_staff(text) from anon;
+
+-- ---------- OPTIONAL Supabase Auth hook (NOT enabled automatically) ----------
+-- The lockout above guards the app's login screen only; the Auth endpoint itself can still be called directly. To make the lock real, the owner can enable
+-- this function in Supabase Dashboard > Authentication > Hooks > "Password verification attempt" (Postgres function public.hook_password_verification_attempt).
+-- It rejects a sign-in while the account is locked and records a failed attempt on a wrong password. Until enabled it has no effect.
+create or replace function public.hook_password_verification_attempt(event jsonb) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare s text; locked boolean;
+begin
+  select staff_id into s from public.profiles where id = nullif(event ->> 'user_id', '')::uuid;
+  if s is not null then
+    locked := (public.login_precheck(s) ->> 'locked')::boolean;
+    if locked then return jsonb_build_object('decision', 'reject', 'message', 'Account locked, try later or ask the owner'); end if;
+    if not coalesce((event ->> 'valid')::boolean, true) then perform public.login_failed(s); end if;
+  end if;
+  return jsonb_build_object('decision', 'continue');
+end $$;
+revoke execute on function public.hook_password_verification_attempt(jsonb) from public, anon, authenticated;
+revoke execute on function public._login_auto_release_for(text) from public, anon, authenticated;
+do $$ begin
+  if exists (select 1 from pg_roles where rolname = 'supabase_auth_admin') then
+    grant execute on function public.hook_password_verification_attempt(jsonb) to supabase_auth_admin;
+    grant select on public.profiles, public.login_failures to supabase_auth_admin;
+  end if;
+end $$;

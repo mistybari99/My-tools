@@ -80,11 +80,11 @@ select tt.chk('C20 open exceptions can be re-evaluated (delete open ok)', true);
 select tt.chk('D1 settings lock_minutes = 10', (select value from settings where key='lock_minutes') = '10'::jsonb);
 select tt.chk('D2 settings lockout_auto_release = true', (select value from settings where key='lockout_auto_release') = 'true'::jsonb);
 select tt.chk('D3 precheck shape (unlocked)', (select login_precheck(:'sid')) ? 'locked' and (select login_precheck(:'sid')) ? 'seconds_left' and not ((select login_precheck(:'sid')->>'locked')::boolean));
-select tt.chk('D4 unknown id: same shape, no error', (select login_precheck('nobody99')) ?& array['locked','seconds_left','attempts_left']);
+select tt.chk('D4 unknown id: same shape, no error', (select login_precheck('nobody99')) = (select login_precheck(:'sid')) and not (select login_precheck(:'sid')) ? 'attempts_left');
 select login_failed('nobody99'), login_failed('nobody99');
 select tt.chk('D5 unknown id: no lock row, attempt logged', (select count(*) from login_failures where staff_id = 'nobody99') = 0 and (select count(*) from login_attempts where staff_id = 'nobody99' and not ok) = 2);
 select login_failed(:'sid') from generate_series(1, 4);
-select tt.chk('D6 4 fails: still unlocked, 1 attempt left', not (login_precheck(:'sid')->>'locked')::boolean and (login_precheck(:'sid')->>'attempts_left')::int = 1);
+select tt.chk('D6 4 fails: still unlocked, precheck identical to an unknown id', not (login_precheck(:'sid')->>'locked')::boolean and login_precheck(:'sid') = login_precheck('nobody99'));
 select login_failed(:'sid');
 select tt.chk('D7 5th fail locks', (login_precheck(:'sid')->>'locked')::boolean);
 select tt.chk('D8 seconds_left about 600', (login_precheck(:'sid')->>'seconds_left')::int between 590 and 600);
@@ -119,6 +119,13 @@ select tt.err('D22 owner cannot write login_attempts', $$delete from login_attem
 select tt.chk('D23 unlock logged in audit_log', (select count(*) from audit_log where action = 'unlock') >= 1);
 reset role;
 update settings set value = 'true' where key = 'lockout_auto_release';
+-- owner account always auto-releases, even with the switch off
+update settings set value = 'false' where key = 'lockout_auto_release';
+select login_failed(:'oid_') from generate_series(1, 5);
+select tt.chk('D33 owner lock has a time limit although auto_release is off', (login_precheck(:'oid_')->>'locked')::boolean and (login_precheck(:'oid_')->>'seconds_left') is not null);
+update login_failures set locked_until = now() - interval '1 second' where staff_id = :'oid_';
+select tt.chk('D34 owner lock auto-released', not (login_precheck(:'oid_')->>'locked')::boolean);
+update settings set value = 'true' where key = 'lockout_auto_release';
 -- success clears
 select login_failed(:'sid') from generate_series(1, 3);
 set role authenticated; select tt.as(:'s'); select login_success(); reset role;
@@ -135,15 +142,28 @@ reset role;
 truncate login_throttle;
 delete from login_attempts where true;
 select login_failed(:'sid') from generate_series(1, 60);
-select tt.chk('D29 per-staff spam capped at 50 rows/min', (select count(*) from login_attempts where staff_id = :'sid') = 50);
+select tt.chk('D29 per-staff spam capped at 20 rows/min', (select count(*) from login_attempts where staff_id = :'sid') = 20);
 truncate login_throttle;
 select login_failed('ghost' || g) from generate_series(1, 260) g;
-select tt.chk('D30 unknown ids share a global cap (200/min)', (select count(*) from login_attempts where staff_id like 'ghost%') = 200);
+select tt.chk('D30 unknown ids share a global cap (60/min)', (select count(*) from login_attempts where staff_id like 'ghost%') = 60);
 select tt.chk('D31 junk input does not error', (select login_precheck(null)) ? 'locked');
 select login_failed(null), login_failed('');
 update settings set value = '"abc"' where key = 'lock_minutes';
 select tt.chk('D32 garbage setting falls back to default (10 min)', _login_setting_num('lock_minutes', 10) = 10);
 update settings set value = '10' where key = 'lock_minutes';
+
+-- unit_conversions retired, not deleted
+set role authenticated; select tt.as(:'o');
+select set_unit_conversion(null, 'zz1', 'zz2', 3);
+select set_unit_conversion(null, 'zz1', 'zz2', null);
+reset role;
+select tt.chk('E1 set_unit_conversion(null factor) retires the row', (select active from unit_conversions where from_unit='zz1' and to_unit='zz2') = false);
+select tt.chk('E2 hook function exists and rejects a locked account', (select proname from pg_proc where proname='hook_password_verification_attempt') is not null);
+select login_failed(:'sid') from generate_series(1, 5);
+select tt.chk('E3 hook: locked -> reject', (hook_password_verification_attempt(jsonb_build_object('user_id', :'s', 'valid', true)) ->> 'decision') = 'reject');
+select unlock_staff(:'sid') where false;
+delete from login_failures;
+select tt.chk('E4 hook: unlocked -> continue', (hook_password_verification_attempt(jsonb_build_object('user_id', :'s', 'valid', true)) ->> 'decision') = 'continue');
 
 select '--- FAILED: ' || count(*) from tt.res where not ok;
 select '--- TOTAL: ' || count(*) from tt.res;

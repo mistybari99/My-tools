@@ -48,3 +48,16 @@ Not confirmed (mock only)
 - set_unit_conversion (definer) still hard-deletes unit_conversions rows when told to; left as is (not client-direct).
 Checks
 - phase11_test.sql on fresh db: 62 pass / 0 fail. phase10_test.sql fresh with phase11: 307/0. phase8_test.sql: only the known 'T1 staff direct update rules'. phase11 run twice: no errors. Web tests: see task report.
+
+#### W1 fixes after audit
+- login_precheck now returns only {locked, seconds_left} (same shape for known/unknown ids; attempts_left removed). Spam caps lowered: 20 log rows/min per known id, 60/min global for unknown ids (constants). _login_setting_num cast is inside the jsonb_typeof guard.
+- set_unit_conversion now retires (active=false) instead of deleting; readers already filter active.
+- Owner accounts always auto-release their lock after lock_minutes, even if lockout_auto_release is off.
+- BACKUP_TABLES + wastage_requests, supplier_refunds, sale_returns (phase12; phase13 creates no tables).
+- phase8_test.sql: the stale `delete from invoice_templates` now expects 'permission denied'.
+- User removal = retire the profile (profiles.status), never delete; deleting an auth user from the Supabase dashboard is blocked on purpose (profiles delete trigger).
+- login_attempts grows without limit (nothing is deleted by design); at the 20 rows/min cap this is small, review yearly.
+
+#### Known limits (W1)
+1. The lockout guards the app's login screen only: the Supabase Auth endpoint can still be called directly with guessed PINs, and anyone can lock a known staff id by failing on purpose (an owner's lock self-releases after lock_minutes).
+2. Real fix = Auth hook. phase11.sql contains public.hook_password_verification_attempt(event jsonb) (returns {decision: continue|reject}, uses login_failures; granted to supabase_auth_admin when that role exists). It is NOT enabled; the owner enables it in Supabase Dashboard > Authentication > Hooks > Password verification attempt. Not tested against a real Supabase Auth (only the function logic is tested locally).

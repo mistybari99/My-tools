@@ -450,7 +450,7 @@ async function viewLogs() {
 const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_locations', 'forms', 'role_form_perms', 'items', 'item_costs', 'item_changes', 'item_price_history',
   'settings', 'audit_log', 'corrections', 'location_settings', 'entries', 'exceptions', 'release_requests', 'emergency_requests', 'rules', 'rule_grants', 'grant_defs', 'user_grants',
   'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
-  'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts'];
+  'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns'];
 function viewBackup() {
   shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p>
     <button class="primary full" data-act="bk_all">${esc(t('backup_all'))}</button>

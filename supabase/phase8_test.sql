@@ -73,7 +73,7 @@ set role authenticated; select set_config('request.jwt.claim.sub',:'s',false);
 select tt.chk('T2 staff reads template', (select count(*) from invoice_templates)=1);
 update invoice_templates set name='hack';
 select tt.chk('T2 staff update changed nothing', (select name from invoice_templates limit 1)='Shop 80');
-delete from invoice_templates;
+select tt.err('T2 staff delete invoice_templates denied', $$delete from invoice_templates$$, 'permission denied');
 select tt.chk('T2 template still there', (select count(*) from invoice_templates)=1);
 select tt.chk('T2 template_for picks default', (select (template_for('thermal80',1)).name)='Shop 80');
 
