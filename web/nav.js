@@ -33,7 +33,7 @@ const X = {
   period_note: L('বছর = জানুয়ারি থেকে; অর্থবছরের শুরু সেটিংসে বসানো পরে আসবে', 'Year = from 1 January; fiscal-year start in settings comes later', 'Year = January থেকে; Fiscal-year Settings-এ পরে আসবে'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
   modules: L('সব মডিউল', 'All modules', 'সব Module'),
-  em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'),
+  em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
   set2: L('সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'), inv: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'),
 };
 const T = (k) => lab(X[k]);
@@ -69,8 +69,10 @@ const ROUTES = [
   { k: 'releases', g: 'dash', lb: () => t('releases'), ok: () => isOwner(), cnt: 'rel', tone: 'warn' },
   { k: 'emergency', g: 'dash', lb: () => t('emergency'), ok: () => isOwner(), cnt: 'em', tone: 'warn' },
   { k: 'items', g: 'item', lb: () => t('items'), ok: () => P('ITEMS', 'view') },
+  { k: 'items/new', g: 'item', lb: () => T('addprod'), ic: 'plus', ok: () => P('ITEMS', 'enter') },
   { k: 'itemreq', g: 'item', lb: () => t('item_req'), ok: () => P('ITEMS', 'enter') || P('ITEMS', 'approve'), cnt: 'itm', tone: 'info' },
   { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() },
+  { k: 'settings2/units', g: 'item', lb: () => T('unitconv'), ok: () => isOwner() },
   { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
   { k: 'pos', g: 'sale', lb: () => t('pos'), ok: () => canPos() },
   { k: 'reports', g: 'reports', lb: () => T('g_reports'), ic: 'doc', ok: () => true },

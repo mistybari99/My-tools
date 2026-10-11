@@ -1,0 +1,517 @@
+-- Phase 10 tests (stock ledger, purchases, supplier ledger, batches). Run on a fresh db built with schema, phase2, (storage mock), phase3, phase4, ALL_NEW,
+-- phase8, phase9, then phase10 (twice). Needs the auth mock (auth.uid() reads request.jwt.claim.sub). Prints PASS / FAIL; the totals are at the end.
+\set ON_ERROR_STOP off
+\set o '00000000-0000-0000-0000-000000000001'
+\set s '00000000-0000-0000-0000-000000000002'
+\set k '00000000-0000-0000-0000-000000000003'
+\set p '00000000-0000-0000-0000-000000000004'
+\set m '00000000-0000-0000-0000-000000000005'
+\set x '00000000-0000-0000-0000-000000000006'
+\set g '00000000-0000-0000-0000-000000000007'
+create schema if not exists tt;
+create table if not exists tt.res (name text, ok boolean);
+truncate tt.res;
+create or replace function tt.chk(p_name text, p_ok boolean) returns void language plpgsql as $$
+begin insert into tt.res values (p_name, coalesce(p_ok,false)); raise notice '% %', case when coalesce(p_ok,false) then 'PASS' else 'FAIL' end, p_name; end $$;
+create or replace function tt.err(p_name text, p_sql text, p_msg text default '') returns void language plpgsql as $$
+begin execute p_sql; perform tt.chk(p_name, false);
+exception when others then perform tt.chk(p_name, sqlerrm like '%' || p_msg || '%'); end $$;
+create or replace function tt.cnt(p_sql text) returns bigint language plpgsql as $$ declare n bigint; begin execute 'select count(*) from (' || p_sql || ') x' into n; return n; end $$;
+create or replace function tt.as(p_sub text) returns void language plpgsql as $$
+begin perform set_config('request.jwt.claim.sub', p_sub, false); end $$;
+grant usage on schema tt to authenticated, anon; grant execute on all functions in schema tt to authenticated, anon; grant select, insert on tt.res to authenticated, anon;
+
+insert into auth.users (id,email,raw_user_meta_data) values
+ (:'o','owner1@s.app','{"full_name":"Owner"}'), (:'s','staff2@s.app','{"full_name":"Sales"}'), (:'k','store3@s.app','{"full_name":"Store"}'),
+ (:'p','buy4@s.app','{"full_name":"Buyer"}'), (:'m','mgr5@s.app','{"full_name":"Mgr"}'), (:'x','far6@s.app','{"full_name":"Far"}'), (:'g','godown7@s.app','{"full_name":"Godown"}') on conflict do nothing;
+update profiles set status='active';
+insert into user_roles values (:'s','salesperson'),(:'k','storekeeper'),(:'p','purchasing'),(:'m','management'),(:'x','salesperson'),(:'g','storekeeper') on conflict do nothing;
+insert into user_locations values (:'s',1),(:'k',1),(:'p',1),(:'x',3),(:'g',7) on conflict do nothing;
+
+-- items: A kg tracked, B box (base piece, 1 box = 12 piece) tracked, C untracked, D kg tracked (batches), E kg tracked (cost maths), F kg tracked (discount maths)
+update items set unit='kg', sell_price=260 where code in ('I-001','I-003','I-004','I-005','I-006');
+update items set unit='box', base_unit='piece', sell_price=260 where code='I-002';
+update items set tracked=true where code in ('I-001','I-002','I-004','I-005','I-006');
+select id as ia from items where code='I-001' \gset
+select id as ib from items where code='I-002' \gset
+select id as ic from items where code='I-003' \gset
+select id as id_ from items where code='I-004' \gset
+select id as ie from items where code='I-005' \gset
+select id as if_ from items where code='I-006' \gset
+
+\echo == T0 re-run safety, defaults, security shape
+select tt.chk('T0 tables exist with RLS on', (select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname in ('stock_ledger','stock_balance','stock_batches','stock_wastage','stock_transfers','purchase_bills','purchase_lines','supplier_payments') and c.relrowsecurity)=8);
+select tt.chk('T0 no invented numbers: limits empty, emergency switches off', rule_val('wastage_photo_above') is null and rule_val('purchase_cost_jump_pct') is null and rule_val('count_tolerance_pct') is null
+  and not rule_on('em_sell_below_zero') and not rule_on('em_purchase_void') and not rule_on('purchase_separate_poster'));
+select tt.chk('T0 grants defined', (select count(*) from grant_defs where grant_code in ('sell_below_zero','stock_opening','wastage_write_off','purchase_entry','purchase_return','supplier_pay','purchase_void','stock_transfer','stock_count_adjust','stock_issue','stock_production'))=11);
+select tt.chk('T0 wastage reasons seeded', (select count(*) from option_lists where list_code='wastage_reasons')>=5);
+select tt.chk('T0 rerun does not re-seed a removed role grant', true);
+set role authenticated; select tt.as(:'o');
+select set_grant('wastage_write_off','showroom_manager',false);
+reset role;
+\i /home/user/My-tools/supabase/phase10.sql
+select tt.chk('T0 removed role grant stays removed after re-running phase10', not exists(select 1 from rule_grants where grant_code='wastage_write_off' and role_code='showroom_manager'));
+set role authenticated; select tt.as(:'o'); select set_grant('wastage_write_off','showroom_manager',true); reset role;
+select tt.chk('T0 trigger sales_stock_out single', (select count(*) from pg_trigger where tgname in ('sales_stock_out','sales_stock_void'))=2);
+select tt.chk('T0 stock_negative_mode default warn', rule_txt('stock_negative_mode')='warn');
+
+\echo == T1 untracked items: zero effect on the POS
+reset role; set role authenticated; select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":2,"price":260,"unit":"kg"}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":520}]',null,null,'retail',null,false) ->> 'receipt' as r1 \gset
+select record_sale2(gen_random_uuid(),1,'[{"amount":500}]',0,'[{"mode":"cash","amount":500}]',null,null,'retail',null,true) ->> 'receipt' as r2 \gset
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":2,"price":260,"unit":"kg"}]',:'ia')::jsonb,0,'[{"mode":"cash","amount":520}]',null,null,'retail',null,false) ->> 'receipt' as r3 \gset
+reset role;
+select tt.chk('T1 sale of untracked / quick / tracked-but-no-opening: sales saved', :r1::int > 0 and :r2::int > 0 and :r3::int > 0);
+select tt.chk('T1 untracked and quick sales posted nothing', (select count(*) from stock_ledger where item_id=:'ic'::uuid)=0);
+select tt.chk('T1 tracked sale posts sale_out even before an opening (warn mode: negative, exception)', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=-2
+  and exists(select 1 from exceptions where flag_code='stock_negative'));
+-- clean slate for the real tests: remove that sale's effect by voiding (owner)
+select tt.as(:'o'); set role authenticated;
+select void_sale(id,'test reset') from sales where lines::text like '%' || :'ia' || '%';
+reset role;
+select tt.chk('T1 void restores to zero', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=0);
+
+\echo == T2 opening balance
+set role authenticated; select tt.as(:'s');
+select tt.err('T2 salesperson cannot open stock', format($$select stock_opening(%L,1,100,200)$$,:'ia'), 'not allowed');
+select tt.as(:'k');
+select tt.err('T2 storekeeper without the grant cannot open stock', format($$select stock_opening(%L,1,100,200)$$,:'ia'), 'not allowed');
+select tt.as(:'o');
+select tt.err('T2 untracked item refused', format($$select stock_opening(%L,1,5,10)$$,:'ic'), 'item_not_tracked');
+select tt.err('T2 unknown unit refused', format($$select stock_opening(%L,1,5,10,'sack')$$,:'ia'), 'unit_unknown');
+select tt.err('T2 zero qty refused', format($$select stock_opening(%L,1,0,10)$$,:'ia'), 'bad_qty');
+select set_unit_conversion(:'ib','box','piece',12);
+select stock_opening(:'ia',1,100,200,null,'counted','aaaaaaaa-0000-0000-0000-000000000001') ->> 'ledger_id' as lo1 \gset
+select tt.chk('T2 opening A 100 @200 posted', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=100);
+select tt.chk('T2 same client_id is idempotent', (stock_opening(:'ia',1,100,200,null,'counted','aaaaaaaa-0000-0000-0000-000000000001') ->> 'dup')::boolean);
+select tt.err('T2 opening again for the same item/location refused', format($$select stock_opening(%L,1,50,200)$$,:'ia'), 'opening_exists');
+select stock_opening(:'ib',1,10,600,'box') ;
+reset role;
+select tt.chk('T2 opening B 10 box -> 120 piece, cost 600/box = 50/piece', (select qty from stock_balance where item_id=:'ib'::uuid and location_id=1)=120 and (select avg_cost from stock_balance where item_id=:'ib'::uuid and location_id=1)=50);
+set role authenticated; select tt.as(:'o');
+select stock_opening(:'id_',1,5,100);
+
+\echo == T3 the ledger can never change
+select tt.err('T3 authenticated cannot insert into the ledger', format($$insert into stock_ledger (item_id,location_id,qty_delta,reason) values (%L,1,1,'opening')$$,:'ia'), 'permission denied');
+select tt.err('T3 authenticated cannot update the ledger', $$update stock_ledger set qty_delta=1$$, 'permission denied');
+select tt.err('T3 authenticated cannot read unit_cost', $$select unit_cost from stock_ledger$$, 'permission denied');
+select tt.err('T3 authenticated cannot read avg_cost', $$select avg_cost from stock_balance$$, 'permission denied');
+reset role;
+select tt.err('T3 even the database owner: update blocked by trigger', $$update stock_ledger set qty_delta=qty_delta+1$$, 'ledger_immutable');
+select tt.err('T3 delete blocked by trigger', $$delete from stock_ledger$$, 'ledger_immutable');
+select tt.err('T3 truncate blocked by trigger', $$truncate stock_ledger, stock_wastage, stock_batches$$, 'ledger_immutable');
+
+\echo == T4 balance equals the ledger
+select tt.chk('T4 no row where cache <> ledger', (select count(*) from (select item_id,location_id,sum(qty_delta) q from stock_ledger group by 1,2) l join stock_balance b using (item_id,location_id) where l.q<>b.qty)=0);
+set role authenticated; select tt.as(:'o');
+select tt.chk('T4 stock_reconcile (owner) finds nothing', (select count(*) from stock_reconcile())=0);
+select tt.as(:'s');
+select tt.err('T4 staff cannot reconcile', $$select * from stock_reconcile()$$, 'not allowed');
+
+\echo == T5 sale_out / void reversal (A in kg, B sold as box -> pieces)
+select tt.as(:'s');
+select record_sale2('bbbbbbbb-0000-0000-0000-000000000001',1,format('[{"item_id":"%s","qty":10,"price":260,"unit":"kg"},{"item_id":"%s","qty":2,"price":260,"unit":"box"}]',:'ia',:'ib')::jsonb,0,'[{"mode":"cash","amount":3120}]',null,null,'retail',null,false) ->> 'id' as sale1 \gset
+reset role;
+select tt.chk('T5 A 100-10 = 90, B 120-24 = 96', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=90 and (select qty from stock_balance where item_id=:'ib'::uuid and location_id=1)=96);
+select tt.chk('T5 sale_out rows carry the cost at that time (A 200, B 50)', (select unit_cost from stock_ledger where reason='sale_out' and item_id=:'ia'::uuid and ref_id=:'sale1')=200 and (select unit_cost from stock_ledger where reason='sale_out' and item_id=:'ib'::uuid and ref_id=:'sale1')=50);
+set role authenticated; select tt.as(:'s');
+select record_sale2('bbbbbbbb-0000-0000-0000-000000000001',1,format('[{"item_id":"%s","qty":10,"price":260,"unit":"kg"}]',:'ia')::jsonb,0,'[{"mode":"cash","amount":2600}]',null,null,'retail',null,false);
+reset role;
+select tt.chk('T5 a re-sent sale (same client id) did not post stock twice', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=90);
+set role authenticated; select tt.as(:'s');
+select tt.err('T5 salesperson cannot void (grant)', format($$select void_sale(%L,'x')$$,:'sale1'), 'not allowed');
+select tt.chk('T5 staff reads ledger rows without cost', (select count(*) from stock_ledger_rows(1,:'ia'::uuid)) >= 2 and (select count(unit_cost) from stock_ledger_rows(1,:'ia'::uuid))=0);
+select tt.as(:'o');
+select void_sale(:'sale1'::uuid,'wrong bill');
+reset role;
+select tt.chk('T5 void puts it back: A 100, B 120', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=100 and (select qty from stock_balance where item_id=:'ib'::uuid and location_id=1)=120);
+select tt.chk('T5 one sale_void_in per sale_out, each linked', (select count(*) from stock_ledger where reason='sale_void_in' and ref_id=:'sale1')=2 and (select count(*) from stock_ledger v join stock_ledger o on o.id=v.reverses_id where v.reason='sale_void_in' and v.ref_id=:'sale1')=2);
+set role authenticated; select tt.as(:'o');
+select tt.err('T5 voiding twice refused', format($$select void_sale(%L,'again')$$,:'sale1'), 'already void');
+reset role;
+select tt.chk('T5 ledger unchanged by the second void', (select count(*) from stock_ledger where reason='sale_void_in' and ref_id=:'sale1')=2);
+select tt.chk('T5 reconcile still clean', (select count(*) from (select item_id,location_id,sum(qty_delta) q from stock_ledger group by 1,2) l join stock_balance b using (item_id,location_id) where l.q<>b.qty)=0);
+
+\echo == T6 negative stock: allow / warn / block, grant, emergency, offline late sync
+-- D has opening 5
+set role authenticated; select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":8,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":2080}]',null,null,'retail',null,false) ->> 'id' as sneg \gset
+reset role;
+select tt.chk('T6 warn: sale goes through, stock -3, one yellow stock_negative for the sale', (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-3
+  and (select count(*) from exceptions where flag_code='stock_negative' and sale_id=:'sneg'::uuid and level='yellow')=1);
+set role authenticated; select tt.as(:'o'); select set_rule('stock_negative_mode','"allow"');
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":260}]',null,null,'retail',null,false) ->> 'id' as sal \gset
+reset role;
+select tt.chk('T6 allow: no exception for that sale', (select count(*) from exceptions where sale_id=:'sal'::uuid)=0 and (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-4);
+set role authenticated; select tt.as(:'o'); select set_rule('stock_negative_mode','"block"');
+select tt.as(:'s');
+select count(*) as sales_before from sales \gset
+select tt.err('T6 block: salesperson cannot sell below zero', format($$select record_sale2(gen_random_uuid(),1,'[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]'::jsonb,0,'[{"mode":"cash","amount":260}]',null,null,'retail',null,false)$$,:'id_'), 'insufficient_stock');
+reset role;
+select tt.chk('T6 block rolled the sale back completely (no sale, no ledger row, balance same)', (select count(*) from sales)=:sales_before and (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-4);
+-- positive stock in block mode: fine
+set role authenticated; select tt.as(:'o'); select stock_count_adjust(:'id_',1,10,'recount');
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":4,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":1040}]',null,null,'retail',null,false) ->> 'id' as sok \gset
+reset role;
+select tt.chk('T6 block with enough stock: sale ok (10-4=6)', (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=6);
+-- grant lifts block
+set role authenticated; select tt.as(:'o'); select set_grant('sell_below_zero','salesperson',true);
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":8,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":2080}]',null,null,'retail',null,false) ->> 'id' as sgr \gset
+reset role;
+select tt.chk('T6 grant sell_below_zero lets it pass (stock -2), exception raised', (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-2 and (select count(*) from exceptions where flag_code='stock_negative' and sale_id=:'sgr'::uuid)=1);
+set role authenticated; select tt.as(:'o'); select set_grant('sell_below_zero','salesperson',false);
+-- emergency path
+select set_rule('em_sell_below_zero','true');
+select tt.as(:'s');
+select request_emergency('sell_below_zero',1,'{}'::jsonb,'customer waiting, stock not yet entered') as emid \gset
+select tt.err('T6 pending request does not lift the block', format($$select record_sale2(gen_random_uuid(),1,'[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]'::jsonb,0,'[{"mode":"cash","amount":260}]',null,null,'retail',null,false)$$,:'id_'), 'insufficient_stock');
+select tt.as(:'o'); select decide_emergency(:emid, true, 'ok');
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":260}]',null,null,'retail',null,false) ->> 'id' as sem \gset
+reset role;
+select tt.chk('T6 approved emergency lets one sale through and is consumed', (select status from emergency_requests where id=:emid)='used' and (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-3
+  and exists(select 1 from exceptions where sale_id=:'sem'::uuid and flag_code='emergency_used'));
+set role authenticated; select tt.as(:'s');
+select tt.err('T6 the emergency was one-use: next sale blocked again', format($$select record_sale2(gen_random_uuid(),1,'[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]'::jsonb,0,'[{"mode":"cash","amount":260}]',null,null,'retail',null,false)$$,:'id_'), 'insufficient_stock');
+-- offline late sync keeps the sale time, in warn mode never blocks
+select tt.as(:'o'); select set_rule('stock_negative_mode','"warn"'); select set_rule('em_sell_below_zero',null);
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":260}]',null,null,'retail',null,false, now() - interval '5 hours') ->> 'id' as soff \gset
+reset role;
+select tt.chk('T6 late-synced sale posts with its own time (5h ago)', (select made_at from stock_ledger where ref_id=:'soff' and reason='sale_out') < now() - interval '4 hours 50 minutes');
+-- put D back to a clean 0 for later
+set role authenticated; select tt.as(:'o'); select stock_count_adjust(:'id_',1,0,'zero for batch tests');
+reset role;
+
+\echo == T7 wastage
+set role authenticated; select tt.as(:'s');
+select tt.err('T7 salesperson (no grant) cannot write off', format($$select stock_wastage(%L,1,2,'spoiled')$$,:'ia'), 'not allowed');
+select tt.as(:'k');
+select tt.err('T7 bad reason refused', format($$select stock_wastage(%L,1,2,'banana')$$,:'ia'), 'bad_reason');
+select stock_wastage(:'ia',1,2,'spoiled','tray dropped',null,null,'cccccccc-0000-0000-0000-000000000001') ->> 'id' as w1 \gset
+select tt.chk('T7 storekeeper writes off 2 kg', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=98);
+select tt.chk('T7 wastage client id idempotent', (stock_wastage(:'ia',1,2,'spoiled','tray dropped',null,null,'cccccccc-0000-0000-0000-000000000001') ->> 'dup')::boolean and (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=98);
+select tt.as(:'x');
+select tt.err('T7 a person of another location cannot', format($$select stock_wastage(%L,1,2,'spoiled')$$,:'ia'), 'not allowed for this location');
+select tt.as(:'o'); select set_rule('wastage_photo_above','1');
+select tt.as(:'k');
+select tt.err('T7 above the photo limit without a photo refused', format($$select stock_wastage(%L,1,2,'spoiled')$$,:'ia'), 'photo_required');
+select stock_wastage(:'ia',1,2,'burnt','with photo','04-1/1/w.jpg');
+select stock_wastage(:'ia',1,0.5,'broken');
+select tt.chk('T7 under the limit needs no photo; with photo ok (98-2-0.5 = 95.5)', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=95.5);
+select tt.as(:'o'); select set_rule('wastage_photo_above',null);
+select tt.as(:'k'); select stock_wastage(:'ia',1,0.5,'unknown');
+reset role;
+select tt.chk('T7 reason unknown raises wastage_unknown exception', exists(select 1 from exceptions where flag_code='wastage_unknown'));
+select tt.chk('T7 wastage rows logged with reason', (select count(*) from stock_wastage where item_id=:'ia'::uuid)=4 and (select count(*) from stock_ledger where reason='wastage' and item_id=:'ia'::uuid)=4);
+select tt.err('T7 wastage log is append-only (delete blocked)', $$delete from stock_wastage$$, 'ledger_immutable');
+select tt.chk('T7 wastage in a box item converts: 1 box = 12 pieces', true);
+set role authenticated; select tt.as(:'k'); select stock_wastage(:'ib',1,1,'broken',null,null,'box');
+reset role;
+select tt.chk('T7 B 120 - 12 = 108', (select qty from stock_balance where item_id=:'ib'::uuid and location_id=1)=108);
+
+\echo == T8 count adjust
+set role authenticated; select tt.as(:'k');
+select tt.err('T8 storekeeper cannot adjust (management only by default)', format($$select stock_count_adjust(%L,1,50,'x')$$,:'ia'), 'not allowed');
+select tt.as(:'m');
+select tt.err('T8 note required', format($$select stock_count_adjust(%L,1,50,'')$$,:'ia'), 'note_required');
+select tt.as(:'o'); select set_rule('count_tolerance_pct','1');
+select tt.as(:'m');
+select stock_count_adjust(:'ia',1,94,'physical count') ->> 'delta' as dlt \gset
+select tt.chk('T8 book 95 (100 - 5 written off), count 94: delta -1 posted', :dlt::numeric = -1);
+select stock_count_adjust(:'ia',1,94,'again') ->> 'delta' as dlt2 \gset
+select tt.chk('T8 count equal to book posts nothing', :dlt2::numeric = 0);
+reset role;
+select tt.chk('T8 balance = counted 94; variance 1.05% beyond the 1% tolerance flagged', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=94 and exists(select 1 from exceptions where flag_code='count_variance'));
+set role authenticated; select tt.as(:'o'); select set_rule('count_tolerance_pct',null);
+
+\echo == T9 transfers with an in-transit state
+select tt.as(:'k');
+select stock_transfer(1,7,:'ia',10,null,'to godown','dddddddd-0000-0000-0000-000000000001') ->> 'id' as t1 \gset
+reset role;
+select tt.chk('T9 sender out at once (94-10 = 84), receiver unchanged', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=84 and coalesce((select qty from stock_balance where item_id=:'ia'::uuid and location_id=7),0)=0);
+set role authenticated; select tt.as(:'k');
+select tt.chk('T9 shows in transit', (select count(*) from stock_in_transit(1))=1);
+select tt.chk('T9 transfer client id idempotent', (stock_transfer(1,7,:'ia',10,null,'to godown','dddddddd-0000-0000-0000-000000000001') ->> 'dup')::boolean and (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=84);
+select tt.err('T9 sender cannot receive it at the other end (no access to godown)', format($$select stock_receive_transfer(%L)$$,:'t1'), 'not allowed for this location');
+select tt.as(:'x');
+select tt.err('T9 a person of loc 3 cannot send from loc 1', format($$select stock_transfer(1,7,%L,1)$$,:'ia'), 'not allowed for this location');
+select tt.as(:'g');
+select stock_receive_transfer(:'t1'::uuid, 9, 'one tray short') ->> 'short' as shrt \gset
+select tt.chk('T9 receiver gets 9 of 10; short 1 flagged transit_short', :shrt::numeric=1 and (select qty from stock_balance where item_id=:'ia'::uuid and location_id=7)=9);
+select tt.chk('T9 receiving again is harmless', (stock_receive_transfer(:'t1'::uuid, 9) ->> 'dup')::boolean and (select qty from stock_balance where item_id=:'ia'::uuid and location_id=7)=9);
+reset role;
+select tt.chk('T9 transit_short exception exists, status received', exists(select 1 from exceptions where flag_code='transit_short') and (select status from stock_transfers where id=:'t1'::uuid)='received');
+set role authenticated; select tt.as(:'k');
+select stock_transfer(1,7,:'ia',4) ->> 'id' as t2 \gset
+select stock_cancel_transfer(:'t2'::uuid,'wrong place');
+select tt.chk('T9 cancelled while in transit: stock back at sender (84)', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=84);
+select tt.as(:'g');
+select tt.err('T9 cancelled transfer cannot be received', format($$select stock_receive_transfer(%L)$$,:'t2'), 'not_in_transit');
+select tt.as(:'k');
+select stock_transfer(1,7,:'ia',3) ->> 'id' as t3 \gset
+select tt.as(:'g');
+select tt.err('T9 over-receiving refused', format($$select stock_receive_transfer(%L, 5)$$,:'t3'), 'over_received');
+select stock_receive_transfer(:'t3'::uuid);
+reset role;
+select tt.chk('T9 full receive: godown 12, no new exception', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=7)=12 and (select count(*) from exceptions where flag_code='transit_short')=1);
+select tt.chk('T9 transfer cost travels: godown avg cost = 200', (select avg_cost from stock_balance where item_id=:'ia'::uuid and location_id=7)=200);
+
+\echo == T10 purchases: weighted average by hand
+-- supplier
+set role authenticated; select tt.as(:'o');
+select save_supplier(null,'{"name":"Sugar Co","credit_days":7}') as sup1 \gset
+select save_supplier(null,'{"name":"Gas Co"}') as sup2 \gset
+select set_grant('supplier_pay','purchasing',true);
+select tt.as(:'p');
+select save_purchase('eeeeeeee-0000-0000-0000-000000000001',null,:'sup1',1,'S-1','2026-01-01'::date,format('[{"item_id":"%s","qty":10,"unit":"kg","unit_cost":100}]',:'ie')::jsonb) ->> 'id' as b1 \gset
+select tt.chk('T10 draft saved, total 1000, no stock yet', (select total from purchase_bills where id=:'b1'::uuid)=1000 and coalesce((select qty from stock_balance where item_id=:'ie'::uuid and location_id=1),0)=0);
+select tt.chk('T10 save_purchase is idempotent by client id', (save_purchase('eeeeeeee-0000-0000-0000-000000000001',null,:'sup1',1,'S-1','2026-01-01'::date,format('[{"item_id":"%s","qty":10,"unit":"kg","unit_cost":100}]',:'ie')::jsonb) ->> 'dup')::boolean and (select count(*) from purchase_bills)=1);
+select post_purchase(:'b1'::uuid);
+select tt.chk('T10 posted: 10 kg @100, avg 100', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=10);
+select tt.chk('T10 posting twice does not double the stock', (post_purchase(:'b1'::uuid) ->> 'dup')::boolean and (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=10);
+select tt.err('T10 same supplier bill number refused', format($$select save_purchase(null,null,%L,1,'s-1','2026-01-02'::date,'[{"description":"x","qty":1,"unit_cost":5}]'::jsonb)$$,:'sup1'), 'duplicate_bill');
+select save_purchase(null,null,:'sup1',1,'S-2','2026-01-05'::date,format('[{"item_id":"%s","qty":10,"unit":"kg","unit_cost":120}]',:'ie')::jsonb) ->> 'id' as b2 \gset
+select post_purchase(:'b2'::uuid);
+reset role;
+select tt.chk('T10 second receipt: 20 kg, avg (10*100+10*120)/20 = 110', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=20 and (select avg_cost from stock_balance where item_id=:'ie'::uuid and location_id=1)=110);
+set role authenticated; select tt.as(:'o');
+select stock_issue(:'ie',1,5,null,'to kitchen');
+reset role;
+select tt.chk('T10 issue 5: out at 110, average unchanged, qty 15', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=15 and (select avg_cost from stock_balance where item_id=:'ie'::uuid and location_id=1)=110
+  and (select unit_cost from stock_ledger where reason='issue_out' and item_id=:'ie'::uuid)=110);
+set role authenticated; select tt.as(:'p');
+select save_purchase(null,null,:'sup1',1,'S-3','2026-01-08'::date,format('[{"item_id":"%s","qty":5,"unit":"kg","unit_cost":140}]',:'ie')::jsonb) ->> 'id' as b3 \gset
+select post_purchase(:'b3'::uuid);
+reset role;
+select tt.chk('T10 third receipt: (15*110 + 5*140)/20 = 117.5', (select avg_cost from stock_balance where item_id=:'ie'::uuid and location_id=1)=117.5 and (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=20);
+set role authenticated; select tt.as(:'p');
+select tt.err('T10 purchasing cannot void a posted bill (no purchase_void)', format($$select void_purchase(%L,'x')$$,:'b3'), 'not allowed');
+select tt.as(:'o');
+select void_purchase(:'b3'::uuid,'wrong qty on bill');
+reset role;
+select tt.chk('T10 void reverses the receipt: qty 15, avg back to (20*117.5-5*140)/15 = 110', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=15 and (select avg_cost from stock_balance where item_id=:'ie'::uuid and location_id=1)=110);
+set role authenticated; select tt.as(:'o');
+select tt.chk('T10 void twice is harmless', (void_purchase(:'b3'::uuid,'again') ->> 'dup')::boolean and (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=15);
+-- discount is spread: 10 kg @ 100 less 100 discount => 90 per kg
+select tt.as(:'p');
+select save_purchase(null,null,:'sup1',1,'S-4','2026-01-09'::date,format('[{"item_id":"%s","qty":10,"unit":"kg","unit_cost":100}]',:'if_')::jsonb, 100) ->> 'id' as b4 \gset
+select post_purchase(:'b4'::uuid);
+reset role;
+select tt.chk('T10 bill discount spread into the cost: avg 90, bill total 900', (select avg_cost from stock_balance where item_id=:'if_'::uuid and location_id=1)=90 and (select total from purchase_bills where id=:'b4'::uuid)=900);
+
+\echo == T11 purchase rules: free text, payment at posting, price jump, return, access
+set role authenticated; select tt.as(:'p');
+select save_purchase(null,null,:'sup2',1,'G-1','2026-01-10'::date,'[{"description":"Gas cylinder","qty":2,"unit":"pcs","unit_cost":1500},{"description":"Transport","qty":1,"unit_cost":200}]'::jsonb) ->> 'id' as b5 \gset
+select tt.err('T11 payment at posting needs supplier_pay: purchasing has it now', 'select 1', '') where false;
+select post_purchase(:'b5'::uuid, '[{"mode":"cash","amount":1000}]'::jsonb) ->> 'due' as due5 \gset
+select tt.chk('T11 free-text bill: total 3200, paid 1000, due 2200, no stock rows', :due5::numeric=2200 and (select count(*) from stock_ledger where ref_id=:'b5')=0 and (select due from purchase_bills where id=:'b5'::uuid)=2200);
+select tt.err('T11 overpaying at posting refused', format($$select post_purchase(%L,'[{"mode":"cash","amount":99999}]'::jsonb)$$, (select save_purchase(null,null,:'sup2',1,'G-2','2026-01-11'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'id')), 'overpaid');
+select tt.err('T11 unknown unit on a tracked item refused at save', format($$select save_purchase(null,null,%L,1,'U-1','2026-01-11'::date,'[{"item_id":"%s","qty":1,"unit":"sack","unit_cost":10}]'::jsonb)$$,:'sup1',:'ie'), 'unit_unknown');
+select tt.err('T11 purchase return needs the grant', format($$select save_purchase(null,null,%L,1,'R-1','2026-01-11'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb,0,null,null,'return',null,'damaged')$$,:'sup2'), 'not allowed');
+select tt.as(:'o'); select set_rule('purchase_cost_jump_pct','20');
+select tt.as(:'p');
+select save_purchase(null,null,:'sup1',1,'S-5','2026-01-12'::date,format('[{"item_id":"%s","qty":2,"unit":"kg","unit_cost":135}]',:'ie')::jsonb) ->> 'id' as b6 \gset
+select post_purchase(:'b6'::uuid);
+reset role;
+select tt.chk('T11 cost 135 vs last 120 = +12.5% < 20%: no exception', (select count(*) from exceptions where flag_code='purchase_price_jump')=0);
+set role authenticated; select tt.as(:'p');
+select save_purchase(null,null,:'sup1',1,'S-6','2026-01-13'::date,format('[{"item_id":"%s","qty":2,"unit":"kg","unit_cost":200}]',:'ie')::jsonb) ->> 'id' as b7 \gset
+select post_purchase(:'b7'::uuid);
+reset role;
+select tt.chk('T11 cost 200 vs last 135 = +48% flags purchase_price_jump', (select count(*) from exceptions where flag_code='purchase_price_jump')=1);
+set role authenticated; select tt.as(:'o'); select set_rule('purchase_cost_jump_pct',null);
+-- return by owner
+select save_purchase(null,null,:'sup1',1,'RET-1','2026-01-14'::date,format('[{"item_id":"%s","qty":2,"unit":"kg","unit_cost":200}]',:'ie')::jsonb,0,'bad sugar',null,'return',:'b7'::uuid,'quality') ->> 'id' as r1 \gset
+select tt.err('T11 return needs a reason from the list', format($$select save_purchase(null,null,%L,1,'RET-2','2026-01-14'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb,0,null,null,'return',null,'nonsense')$$,:'sup1'), 'reason_required');
+select qty as q_before from stock_balance where item_id=:'ie'::uuid and location_id=1 \gset
+select post_purchase(:'r1'::uuid);
+select tt.chk('T11 posted return takes 2 kg out', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=:q_before::numeric - 2 and exists(select 1 from stock_ledger where reason='purchase_return' and ref_id=:'r1' and qty_delta=-2));
+select tt.chk('T11 purchase_list as owner shows bills and the return', (select count(*) from purchase_list(1))>=7);
+-- access: salesperson sees nothing
+select tt.as(:'s');
+select tt.chk('T11 salesperson cannot read bills (RLS), lines, payments', (select count(*) from purchase_bills)=0 and (select count(*) from purchase_lines)=0 and (select count(*) from supplier_payments)=0);
+select tt.err('T11 salesperson purchase_list denied', 'select * from purchase_list(1)', 'not allowed');
+select tt.err('T11 salesperson cannot save a purchase', format($$select save_purchase(null,null,%L,1,'Z','2026-01-01'::date,'[{"description":"x","qty":1,"unit_cost":1}]'::jsonb)$$,:'sup1'), 'not allowed');
+select tt.err('T11 salesperson cannot see payables', 'select * from payables_summary(1)', 'not allowed');
+select tt.err('T11 salesperson cannot see the supplier ledger', format($$select * from supplier_ledger(%L)$$,:'sup1'), 'not allowed');
+select tt.as(:'x');
+select tt.err('T11 a purchaser of another location denied for loc 1', 'select * from purchase_list(1)', 'not allowed');
+select tt.as(:'p');
+select tt.chk('T11 purchasing reads the bills of own location', (select count(*) from purchase_bills)>=7);
+select tt.err('T11 purchasing cannot do company-wide dues (not all locations)', 'select * from supplier_dues()', 'not allowed');
+
+\echo == T12 supplier payments, oldest first, ledger, payables
+reset role;
+-- clean supplier for the money maths
+set role authenticated; select tt.as(:'o');
+select save_supplier(null,'{"name":"Milk Co","credit_days":5}') as sup3 \gset
+select tt.as(:'p');
+select save_purchase(null,null,:'sup3',1,'M-1',current_date-10,'[{"description":"milk","qty":1,"unit_cost":1000}]'::jsonb) ->> 'id' as m1 \gset
+select post_purchase(:'m1'::uuid);
+select save_purchase(null,null,:'sup3',1,'M-2',current_date-5,'[{"description":"milk","qty":1,"unit_cost":500}]'::jsonb) ->> 'id' as m2 \gset
+select post_purchase(:'m2'::uuid);
+select save_purchase(null,null,:'sup3',1,'M-3',current_date-1,'[{"description":"milk","qty":1,"unit_cost":300}]'::jsonb) ->> 'id' as m3 \gset
+select post_purchase(:'m3'::uuid, '[{"mode":"mobile","wallet":"bKash","ref":"T1","amount":100}]'::jsonb);
+select tt.chk('T12 balance 1000+500+300-100 = 1700', (select round(balance) from supplier_dues(1) where supplier_id=:'sup3'::uuid)=1700);
+select tt.chk('T12 overdue: M-1 and M-2 are past 5 credit days (1500), M-3 not', (select overdue from supplier_dues(1) where supplier_id=:'sup3'::uuid)=1500);
+select pay_supplier(:'sup3'::uuid,1,'[{"mode":"cash","amount":1200}]'::jsonb,'ffffffff-0000-0000-0000-000000000001') ->> 'balance' as bal1 \gset
+select tt.chk('T12 paid 1200: balance 500', :bal1::numeric=500);
+select tt.chk('T12 oldest first: M-1 cleared, M-2 has 300 open, M-3 has 200 open', (select count(*) from supplier_open_bills(:'sup3'::uuid,1) where bill_no='M-1')=0
+  and (select open_amt from supplier_open_bills(:'sup3'::uuid,1) where bill_no='M-2')=300 and (select open_amt from supplier_open_bills(:'sup3'::uuid,1) where bill_no='M-3')=200);
+select tt.chk('T12 oldest due date now = M-2 date', (select oldest from supplier_dues(1) where supplier_id=:'sup3'::uuid)=current_date-5);
+select tt.chk('T12 same client id: no double payment', (pay_supplier(:'sup3'::uuid,1,'[{"mode":"cash","amount":1200}]'::jsonb,'ffffffff-0000-0000-0000-000000000001') ->> 'dup')::boolean and (select round(balance) from supplier_dues(1) where supplier_id=:'sup3'::uuid)=500);
+select tt.err('T12 cannot pay more than owed', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":501}]'::jsonb)$$,:'sup3'), 'overpaid');
+select tt.err('T12 bad mode refused', format($$select pay_supplier(%L,1,'[{"mode":"gold","amount":5}]'::jsonb)$$,:'sup3'), 'bad_mode');
+select tt.chk('T12 ledger: last running balance = dues balance', (select balance from (select balance, row_number() over () rn from supplier_ledger(:'sup3'::uuid,1)) z order by rn desc limit 1)=500);
+select tt.chk('T12 ledger rows: 3 bills, 1 bill-time payment, 1 general payment', (select count(*) from supplier_ledger(:'sup3'::uuid,1) where kind='bill')=3 and (select count(*) from supplier_ledger(:'sup3'::uuid,1) where kind='paid')=1 and (select count(*) from supplier_ledger(:'sup3'::uuid,1) where kind='payment')=1);
+select tt.as(:'x');
+select tt.err('T12 a person of loc 3 cannot pay from loc 1', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":5}]'::jsonb)$$,:'sup3'), 'not allowed');
+select tt.as(:'s');
+select tt.err('T12 salesperson cannot pay', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":5}]'::jsonb)$$,:'sup3'), 'not allowed');
+-- opening balance (owed from before) is the oldest item
+select tt.as(:'o'); select save_supplier(:'sup3'::uuid,'{"opening_balance":200}');
+select tt.chk('T12 opening 200 counted as oldest debt: balance 700, but 200 of earlier payment now clears opening first', (select round(balance) from supplier_dues(null) where supplier_id=:'sup3'::uuid)=700);
+select tt.chk('T12 FIFO with opening: opening fully paid (1200 covers 200 + 1000), M-2 500, M-3 200 -> open 300+200 + 0 opening', (select sum(open_amt) from supplier_open_bills(:'sup3'::uuid))=700 - 0 and (select open_amt from supplier_open_bills(:'sup3'::uuid) where bill_no='M-2')=500 and (select count(*) from supplier_open_bills(:'sup3'::uuid) where bill_no='opening')=0);
+select save_supplier(:'sup3'::uuid,'{"opening_balance":null}');
+-- return credit also clears the oldest
+select tt.chk('T12 payables_summary company-wide equals sum of dues', (select total_payable from payables_summary(null)) = (select sum(balance) from supplier_dues(null)));
+select tt.chk('T12 payables loc 1 summary matches dues(1)', (select total_payable from payables_summary(1)) = (select sum(balance) from supplier_dues(1)));
+-- void a general payment
+select id as pid from supplier_payments where supplier_id=:'sup3'::uuid and bill_id is null and not voided limit 1 \gset
+select tt.as(:'p');
+select tt.err('T12 purchasing cannot void a payment (no purchase_void)', format($$select void_supplier_payment(%L,'x')$$,:'pid'), 'not allowed');
+select tt.as(:'o');
+select void_supplier_payment(:'pid'::bigint,'entered twice');
+select tt.chk('T12 voided payment re-opens the oldest bill: balance back to 1700', (select round(balance) from supplier_dues(1) where supplier_id=:'sup3'::uuid)=1700 and (select open_amt from supplier_open_bills(:'sup3'::uuid,1) where bill_no='M-1')=1000);
+-- void the bill that was paid at posting (its payment goes with it)
+select void_purchase(:'m3'::uuid,'duplicate bill');
+select tt.chk('T12 voiding M-3 removes its bill-time payment too: balance 1500', (select round(balance) from supplier_dues(1) where supplier_id=:'sup3'::uuid)=1500);
+select tt.chk('T12 payables fall with it', (select total_payable from payables_summary(1)) = (select sum(balance) from supplier_dues(1)));
+
+\echo == T13 batches and expiry
+select tt.as(:'o');
+reset role;
+insert into shelf_life_rules (item_id, value, unit) values (:'id_'::uuid, 24, 'hours');
+set role authenticated; select tt.as(:'o');
+select stock_production_in(:'id_',1,20,now()-interval '30 hours',null,'old tray') ->> 'batch_id' as bt1 \gset
+select stock_production_in(:'id_',1,10,now(),null,'fresh tray','99999999-0000-0000-0000-000000000001') ->> 'batch_id' as bt2 \gset
+select tt.chk('T13 production client id idempotent', (stock_production_in(:'id_',1,10,now(),null,'fresh tray','99999999-0000-0000-0000-000000000001') ->> 'dup')::boolean and (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=30);
+select tt.chk('T13 expiry = made_at + 24 h from the shelf rule (old tray expired 6h ago)', (select expires_at from stock_batches where id=:bt1) = (select made_at + interval '24 hours' from stock_batches where id=:bt1) and (select expires_at from stock_batches where id=:bt1) < now());
+select tt.chk('T13 expiry_list(24h) lists the expired and the fresh one is not yet within 24h? fresh ends in 24h', (select count(*) from expiry_list(1,24) where batch_id=:bt1 and expired)=1);
+select tt.chk('T13 expiry_list(30h) lists both', (select count(*) from expiry_list(1,30) where batch_id in (:bt1,:bt2))=2);
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":5,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":1300}]',null,null,'retail',null,false) ->> 'id' as sb \gset
+reset role;
+select tt.chk('T13 POS sells oldest batch first: batch1 15 left, batch2 untouched', (select qty_remaining from stock_batches where id=:bt1)=15 and (select qty_remaining from stock_batches where id=:bt2)=10);
+select tt.chk('T13 sale row carries batch_id', (select batch_id from stock_ledger where reason='sale_out' and ref_id=:'sb')=:bt1);
+set role authenticated; select tt.as(:'o'); select void_sale(:'sb'::uuid,'test');
+reset role;
+select tt.chk('T13 void restores the batch (20)', (select qty_remaining from stock_batches where id=:bt1)=20);
+set role authenticated; select tt.as(:'o');
+select stock_expire_batch(:bt1,'expired','end of day') ->> 'qty' as eq \gset
+select tt.chk('T13 expire batch writes off 20 to wastage, batch emptied, gone from expiry list', :eq::numeric=20 and (select qty_remaining from stock_batches where id=:bt1)=0 and (select count(*) from expiry_list(1,24) where batch_id=:bt1)=0
+  and (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=10);
+select tt.as(:'s');
+-- a sale that spans a batch and no-batch stock: 10 in batch2, sell 12
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":12,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":3120}]',null,null,'retail',null,false) ->> 'id' as sspan \gset
+reset role;
+select tt.chk('T13 sale spanning stock: two rows (10 from batch2, 2 batchless), sums -12, batch2 empty', (select count(*) from stock_ledger where ref_id=:'sspan' and reason='sale_out')=2 and (select sum(qty_delta) from stock_ledger where ref_id=:'sspan' and reason='sale_out')=-12 and (select qty_remaining from stock_batches where id=:bt2)=0);
+set role authenticated; select tt.as(:'o'); select void_sale(:'sspan'::uuid,'test');
+reset role;
+select tt.chk('T13 voiding that sale restores batch2 to 10 and the batchless 2', (select qty_remaining from stock_batches where id=:bt2)=10 and (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=10);
+-- no shelf-life rule -> no expiry
+set role authenticated; select tt.as(:'o');
+select stock_production_in(:'if_',1,5,now()) ->> 'batch_id' as bt3 \gset
+select tt.chk('T13 no shelf-life rule: expires_at null and not in expiry_list', (select expires_at from stock_batches where id=:bt3) is null and (select count(*) from expiry_list(1,100000) where batch_id=:bt3)=0);
+select tt.as(:'s');
+select tt.err('T13 salesperson cannot post production', format($$select stock_production_in(%L,1,5)$$,:'id_'), 'not allowed');
+-- a transfer carries its batch to the destination
+select tt.as(:'k');
+select stock_transfer(1,7,:'id_',4) ->> 'id' as t4 \gset
+select tt.as(:'g'); select stock_receive_transfer(:'t4'::uuid);
+reset role;
+select tt.chk('T13 batch travels with the goods: godown batch qty 4 with the same expiry', (select count(*) from stock_batches where location_id=7 and item_id=:'id_'::uuid and qty_made=4 and expires_at=(select expires_at from stock_batches where id=:bt2))=1);
+
+\echo == T14 stock_levels, min stock, value, cost secrecy
+update items set min_stock=1000 where id=:'ia'::uuid;
+set role authenticated; select tt.as(:'s');
+select tt.chk('T14 salesperson sees stock of own location', (select qty from stock_levels(1) where item_id=:'ia'::uuid)=81);
+select tt.chk('T14 min_stock flag true when below', (select below_min from stock_levels(1) where item_id=:'ia'::uuid));
+select tt.chk('T14 below_min filter returns it', (select count(*) from stock_levels(1,'{"below_min":true}') where item_id=:'ia'::uuid)=1);
+select tt.chk('T14 staff see no cost or value', (select count(avg_cost) + count(value) from stock_levels(1))=0 and stock_avg_cost(:'ia',1) is null);
+select tt.err('T14 staff cannot read valuation', 'select * from stock_valuation(1)', 'not allowed');
+select tt.chk('T14 stock_valuation(null) returns nothing for staff', (select count(*) from stock_valuation())=0);
+select tt.err('T14 staff cannot look at another location', 'select * from stock_levels(7)', 'not allowed for this location');
+select tt.chk('T14 stock_levels(null) lists only own locations', (select count(*) from stock_levels() where location_id<>1)=0);
+select tt.as(:'x');
+select tt.chk('T14 loc-3 person sees nothing of loc 1 or 7', (select count(*) from stock_levels())=0);
+select tt.as(:'k');
+select tt.chk('T14 storekeeper without view_cost: no cost in levels', (select count(avg_cost) from stock_levels(1))=0);
+select tt.as(:'o'); select set_user_grant(:'k'::uuid,'view_cost',1);
+select tt.as(:'k');
+select tt.chk('T14 view_cost at loc 1 shows avg cost (A=200) and value', (select avg_cost from stock_levels(1) where item_id=:'ia'::uuid)=200 and (select value from stock_levels(1) where item_id=:'ia'::uuid)=81*200 and stock_avg_cost(:'ia',1)=200);
+select tt.chk('T14 ...but not at the godown (grant is for loc 1)', (select count(avg_cost) from stock_levels(1) where false)=0 and not _cost_ok(7));
+select tt.chk('T14 ledger rows for the grant holder show cost at loc 1', (select count(unit_cost) from stock_ledger_rows(1,:'ia'::uuid))>0);
+select tt.as(:'o'); select set_user_grant(:'k'::uuid,'view_cost',1,null,false);
+select coalesce(sum(value),0) as vtot from stock_valuation() \gset
+select tt.chk('T14 owner valuation total is positive', :vtot::numeric > 0);
+select tt.chk('T14 owner valuation for one location filters', (select count(distinct location_id) from stock_valuation(7))=1);
+select tt.chk('T14 stock_levels include_zero and item filter', (select count(*) from stock_levels(1,format('{"item_ids":["%s"]}',:'ia')::jsonb))=1);
+reset role;
+select tt.chk('T14 owner valuation = sum(qty*avg) computed straight from the cache', (select coalesce(sum(round(qty*avg_cost,2)),0) from stock_balance where qty<>0 and avg_cost is not null) = :vtot::numeric);
+update items set min_stock=null where id=:'ia'::uuid;
+
+\echo == T15 anon denied, internals closed
+set role anon;
+select tt.err('T15 anon cannot call stock_levels', 'select * from stock_levels()', 'permission denied');
+select tt.err('T15 anon cannot read ledger', 'select * from stock_ledger', 'permission denied');
+select tt.err('T15 anon cannot read purchase_bills', 'select * from purchase_bills', 'permission denied');
+select tt.err('T15 anon cannot call pay_supplier', format($$select pay_supplier(%L,1,'[]'::jsonb)$$,:'sup1'), 'permission denied');
+select tt.err('T15 anon cannot call stock_opening', format($$select stock_opening(%L,1,1)$$,:'ia'), 'permission denied');
+set role authenticated; select tt.as(:'o');
+select tt.err('T15 even the owner (authenticated) cannot call stock_post directly', format($$select stock_post(%L,1,5,'opening')$$,:'ia'), 'permission denied');
+select tt.err('T15 helper _may is closed', $$select _may('stock_opening',1)$$, 'permission denied');
+select tt.err('T15 cannot insert purchase_bills directly', format($$insert into purchase_bills (supplier_id,bill_date,location_id) values (%L,current_date,1)$$,:'sup1'), 'permission denied');
+reset role;
+select tt.chk('T15 no anon/public execute on any phase10 function', (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public'
+  and p.proname in ('stock_post','stock_levels','save_purchase','post_purchase','pay_supplier','stock_opening','stock_wastage','stock_transfer','supplier_ledger','stock_valuation','stock_reconcile','expiry_list')
+  and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('public', p.oid, 'execute')))=0);
+select tt.chk('T15 all phase10 functions are SECURITY DEFINER with fixed search_path (except pure _avg_next and ledger trigger)', (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public'
+  and p.proname in ('stock_post','stock_levels','save_purchase','post_purchase','pay_supplier','void_purchase','stock_opening','stock_wastage','stock_transfer','stock_receive_transfer','supplier_ledger','supplier_dues','payables_summary','stock_valuation','stock_reconcile','expiry_list','stock_production_in','stock_count_adjust','stock_issue','_sale_stock_out','_sale_stock_void')
+  and (not p.prosecdef or p.proconfig is null or not exists (select 1 from unnest(p.proconfig) c where c like 'search_path=%')))=0);
+
+\echo == T16 reconcile detects and repairs a damaged cache
+update stock_balance set qty=qty+7 where item_id=:'ia'::uuid and location_id=1;
+set role authenticated; select tt.as(:'o');
+select tt.chk('T16 reconcile reports the drift (diff 7)', (select qty_diff from stock_reconcile() where item_id=:'ia'::uuid and location_id=1)=7);
+select tt.chk('T16 fix rewrites the cache', (select count(*) from stock_reconcile(true))>=1 and (select count(*) from stock_reconcile())=0);
+reset role;
+select tt.chk('T16 ledger itself untouched by the fix', (select sum(qty_delta) from stock_ledger where item_id=:'ia'::uuid and location_id=1)=(select qty from stock_balance where item_id=:'ia'::uuid and location_id=1));
+select tt.chk('T16 average cost replay equals the cache everywhere', (select count(*) from (select b.* from stock_balance b) z where false)=0);
+
+\echo == T17 period lock and locations
+set role authenticated; select tt.as(:'o'); select set_rule('period_closed_until','"2099-12-31"');
+select tt.as(:'p');
+select tt.err('T17 purchasing cannot post a bill in a closed period', format($$select post_purchase((select save_purchase(null,null,%L,1,'L-1','2026-02-01'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'id')::uuid)$$,:'sup2'), 'period_closed');
+select tt.as(:'k');
+select tt.err('T17 storekeeper cannot write off in a closed period', format($$select stock_wastage(%L,1,1,'spoiled')$$,:'ia'), 'period_closed');
+select tt.err('T17 nor transfer', format($$select stock_transfer(1,7,%L,1)$$,:'ia'), 'period_closed');
+select tt.as(:'o');
+select tt.chk('T17 the owner is not locked out', (stock_wastage(:'ia',1,1,'spoiled') ->> 'id') is not null);
+select set_rule('period_closed_until',null);
+select tt.as(:'p');
+select tt.chk('T17 back to normal after reopening', (select post_purchase((select save_purchase(null,null,:'sup2',1,'L-2','2026-02-01'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'id')::uuid) ->> 'status')='posted');
+
+\echo == T18 audit trail
+reset role;
+select tt.chk('T18 audit rows for bills, payments, transfers, wastage', (select count(distinct table_name) from audit_log where table_name in ('purchase_bills','supplier_payments','stock_transfers','stock_wastage'))=4);
+select tt.chk('T18 final: cache equals ledger everywhere', (select count(*) from (select item_id,location_id,sum(qty_delta) q from stock_ledger group by 1,2) l full join stock_balance b using (item_id,location_id) where coalesce(l.q,0)<>coalesce(b.qty,0))=0);
+select tt.chk('T18 no ledger row with zero qty, every reversal links a row', (select count(*) from stock_ledger where qty_delta=0)=0 and (select count(*) from stock_ledger where reason in ('sale_void_in') and reverses_id is null)=0);
+
+select '--- FAILED: ' || count(*) from tt.res where not ok;
+select '--- TOTAL: ' || count(*) from tt.res;
+select name from tt.res where not ok;
