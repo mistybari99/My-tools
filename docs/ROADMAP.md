@@ -62,3 +62,7 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
 - 2026-10-11 (lists, lock) · web/lists.js (#/lists: expense heads, marketing heads + monthly limit, wallets), location settings show fridges and day tags as one compact table each,
   books-closed date (settings key books_closed_until; only the owner can change anything dated on/before it) in phase6.sql. Full chain schema->phase6 builds and tests pass on a fresh DB.
   Audit of phase6/POS v2 launched. User still has to run phase5.sql + phase6.sql (the app falls back safely until then: full-cash single-mode sales still work, dues page needs SQL).
+- 2026-10-11 (audit 5) · 23 findings on phase5/6 + POS v2; fixed: customer balance is business-wide (credit limit cannot be dodged at another shop), collection idempotency/lock,
+  reversible collections (void_collection), correct FIFO oldest-due, rounding to 2 dp, discount without a written limit needs a manager, safe books-closed date (+validation),
+  number-audit digit cap, mobile normaliser, offline-queue poison handling, quick-sale standalone, change maths, collection location picker, credit-limit validation, list reorder in one write.
+  Known/accepted: voiding a sale after its dues were collected leaves the customer in credit (shown as negative balance); custom/quick lines have no price control beyond the yellow exception.

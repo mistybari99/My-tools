@@ -9,10 +9,11 @@ language plpgsql immutable as $$
 declare d text;
 begin
   if p is null then return null; end if;
+  if p ~ '[A-Za-z]' then raise exception 'bad_mobile'; end if;
   d := translate(p, '০১২৩৪৫৬৭৮৯', '0123456789');
   d := regexp_replace(d, '[^0-9+]', '', 'g');
-  if d like '+880%' then d := '0' || substr(d, 5);
-  elsif d like '880%' and length(d) = 13 then d := '0' || substr(d, 4); end if;
+  d := regexp_replace(d, '^(\+|00)?880', '0');
+  if d ~ '^00[0-9]{10}$' then d := substr(d, 2); end if;
   if d !~ '^01[3-9][0-9]{8}$' then raise exception 'bad_mobile'; end if;
   return d;
 end $$;
@@ -52,8 +53,9 @@ create table public.sale_payments (
   note text,
   voided boolean not null default false, void_note text,
   created_by uuid, created_staff text,
-  client_id uuid unique
+  client_id uuid
 );
+create index sale_payments_client on public.sale_payments (client_id) where client_id is not null;
 create index sale_payments_cust on public.sale_payments (customer_id) where not voided;
 create index sale_payments_day on public.sale_payments (location_id, paid_at);
 create trigger audit_sale_payments after insert or update on public.sale_payments for each row execute function public.log_change('id');
@@ -67,9 +69,9 @@ insert into public.sale_payments (sale_id, location_id, kind, mode, amount, paid
 -- ---------- balance of a customer = what was sold to them - what they paid (voided entries ignored) ----------
 create or replace function public.customer_balance(p_customer uuid) returns numeric
 language sql stable security definer set search_path = public as $$
-  select case when public.is_active() and public.can_do('POS', 'view') then
-    coalesce((select sum(s.total) from public.sales s where s.customer_id = p_customer and s.status = 'done' and public.can_loc(s.location_id)), 0)
-    - coalesce((select sum(p.amount) from public.sale_payments p where p.customer_id = p_customer and not p.voided and public.can_loc(p.location_id)), 0) end;
+  select case when public.is_active() and (public.can_do('POS', 'view') or public.can_do('POS', 'enter')) then
+    coalesce((select sum(s.total) from public.sales s where s.customer_id = p_customer and s.status = 'done'), 0)
+    - coalesce((select sum(p.amount) from public.sale_payments p where p.customer_id = p_customer and not p.voided), 0) end;
 $$;
 
 -- find a customer by mobile (for the sale screen): name, type, limit, current due
@@ -110,6 +112,7 @@ begin
   if stype not in ('retail', 'wholesale') then raise exception 'bad_sale_type'; end if;
   if p_lines is null or jsonb_typeof(p_lines) <> 'array' or jsonb_array_length(p_lines) = 0 then raise exception 'no_lines'; end if;
   if disc = 'NaN'::numeric then raise exception 'bad_discount'; end if;
+  disc := round(disc, 2);
   for ln in select * from jsonb_array_elements(p_lines) loop
     ov := false;
     if nullif(ln->>'item_id', '') is not null then
@@ -146,8 +149,8 @@ begin
   end loop;
   if disc < 0 or disc > sub then raise exception 'bad_discount'; end if;
   select value into lim from public.location_settings where location_id = p_loc and key = 'discount_limit';
-  if disc > 0 and lim is not null and jsonb_typeof(lim) <> 'null' and disc > (lim #>> '{}')::numeric
-     and not (public.is_owner() or public.can_do('POS', 'approve')) then raise exception 'discount_needs_approval'; end if;
+  if disc > 0 and (lim is null or jsonb_typeof(lim) = 'null' or disc > (lim #>> '{}')::numeric)
+     and not (public.is_owner() or public.can_do('POS', 'approve')) then raise exception 'discount_needs_approval'; end if;   -- no limit written = approver needed
   -- payments
   if p_payments is not null and jsonb_typeof(p_payments) <> 'array' then raise exception 'bad_payments'; end if;
   for pay in select * from jsonb_array_elements(coalesce(p_payments, '[]'::jsonb)) loop
@@ -155,7 +158,7 @@ begin
     if pm is null or pm not in ('cash', 'mobile', 'card') then raise exception 'bad_mode'; end if;
     amt := (pay->>'amount')::numeric;
     if amt is null or amt = 'NaN'::numeric or amt <= 0 then raise exception 'bad_amount'; end if;
-    paid_sum := paid_sum + amt;
+    amt := round(amt, 2); paid_sum := paid_sum + amt;
     if not pm = any (modes) then modes := modes || pm; end if;
   end loop;
   if paid_sum > sub - disc then raise exception 'overpaid'; end if;
@@ -196,7 +199,7 @@ begin
   end;
   for pay in select * from jsonb_array_elements(coalesce(p_payments, '[]'::jsonb)) loop
     insert into public.sale_payments (sale_id, customer_id, location_id, kind, mode, wallet, ref, amount, paid_at, created_by, created_staff)
-      values (s.id, cust.id, p_loc, 'sale', pay->>'mode', left(nullif(pay->>'wallet', ''), 30), left(nullif(pay->>'ref', ''), 60), (pay->>'amount')::numeric, at_, auth.uid(), sid);
+      values (s.id, cust.id, p_loc, 'sale', pay->>'mode', left(nullif(pay->>'wallet', ''), 30), left(nullif(pay->>'ref', ''), 60), round((pay->>'amount')::numeric, 2), at_, auth.uid(), sid);
   end loop;
   -- exceptions for the owner (nothing is blocked here except the customer / credit rules above)
   if any_ov or any_drift then
@@ -236,7 +239,8 @@ declare pay jsonb; pm text; amt numeric; tot numeric := 0; bal numeric; sid text
 begin
   if not public.can_do('POS', 'enter') then raise exception 'not allowed'; end if;
   if not public.can_loc(p_loc) then raise exception 'not allowed for this location'; end if;
-  if not exists (select 1 from public.customers where id = p_customer) then raise exception 'customer_not_found'; end if;
+  perform 1 from public.customers where id = p_customer for update;      -- one collection at a time per customer
+  if not found then raise exception 'customer_not_found'; end if;
   if p_client is not null and exists (select 1 from public.sale_payments where client_id = p_client) then
     return jsonb_build_object('dup', true, 'balance', public.customer_balance(p_customer)); end if;
   if p_payments is null or jsonb_typeof(p_payments) <> 'array' or jsonb_array_length(p_payments) = 0 then raise exception 'no_payments'; end if;
@@ -244,15 +248,15 @@ begin
     pm := pay->>'mode'; amt := (pay->>'amount')::numeric;
     if pm is null or pm not in ('cash', 'mobile', 'card') then raise exception 'bad_mode'; end if;
     if amt is null or amt = 'NaN'::numeric or amt <= 0 then raise exception 'bad_amount'; end if;
-    tot := tot + amt;
+    tot := tot + round(amt, 2);
   end loop;
   bal := coalesce(public.customer_balance(p_customer), 0);
   if tot > bal then raise exception 'overpaid'; end if;
   select staff_id into sid from public.profiles where id = auth.uid();
   for pay in select * from jsonb_array_elements(p_payments) loop
     insert into public.sale_payments (sale_id, customer_id, location_id, kind, mode, wallet, ref, amount, note, created_by, created_staff, client_id)
-      values (null, p_customer, p_loc, 'collection', pay->>'mode', left(nullif(pay->>'wallet', ''), 30), left(nullif(pay->>'ref', ''), 60), (pay->>'amount')::numeric,
-              left(nullif(btrim(p_note), ''), 200), auth.uid(), sid, case when jsonb_array_length(p_payments) = 1 then p_client end);
+      values (null, p_customer, p_loc, 'collection', pay->>'mode', left(nullif(pay->>'wallet', ''), 30), left(nullif(pay->>'ref', ''), 60), round((pay->>'amount')::numeric, 2),
+              left(nullif(btrim(p_note), ''), 200), auth.uid(), sid, p_client);
   end loop;
   return jsonb_build_object('collected', tot, 'balance', bal - tot);
 end $$;
@@ -260,28 +264,48 @@ end $$;
 -- ---------- dues list (who owes what, since when) and one customer's ledger ----------
 create or replace function public.customer_dues() returns table (id uuid, name text, mobile text, type text, credit_limit numeric, balance numeric, oldest date)
 language sql stable security definer set search_path = public as $$
+  -- what is still unpaid on each sale = its total - what was paid at the sale; collections then clear the OLDEST unpaid sales first
   with s as (
-    select x.customer_id, x.sale_date, x.total, sum(x.total) over (partition by x.customer_id order by x.sold_at, x.id) cum
-    from public.sales x where x.status = 'done' and x.customer_id is not null and public.can_loc(x.location_id)),
-  p as (select customer_id, sum(amount) paid from public.sale_payments where not voided and customer_id is not null and public.can_loc(location_id) group by 1),
-  t as (select s.customer_id, sum(s.total) sold from s group by 1)
-  select c.id, c.name, c.mobile, c.type, c.credit_limit, t.sold - coalesce(p.paid, 0),
-         (select min(s2.sale_date) from s s2 where s2.customer_id = c.id and s2.cum > coalesce(p.paid, 0))
-  from public.customers c join t on t.customer_id = c.id left join p on p.customer_id = c.id
-  where public.can_do('POS', 'view') and t.sold - coalesce(p.paid, 0) > 0
+    select x.id, x.customer_id, x.sale_date, x.sold_at,
+           x.total - coalesce((select sum(p.amount) from public.sale_payments p where p.sale_id = x.id and not p.voided), 0) rem
+    from public.sales x where x.status = 'done' and x.customer_id is not null),
+  cum as (select s.*, sum(s.rem) over (partition by s.customer_id order by s.sold_at, s.id) cr from s where s.rem > 0),
+  c as (select customer_id, sum(amount) coll from public.sale_payments where kind = 'collection' and not voided and customer_id is not null group by 1),
+  t as (select customer_id, sum(rem) rem from s group by 1)
+  select cu.id, cu.name, cu.mobile, cu.type, cu.credit_limit, t.rem - coalesce(c.coll, 0),
+         (select min(k.sale_date) from cum k where k.customer_id = cu.id and k.cr > coalesce(c.coll, 0))
+  from public.customers cu join t on t.customer_id = cu.id left join c on c.customer_id = cu.id
+  where (public.can_do('POS', 'view') or public.can_do('POS', 'enter')) and t.rem - coalesce(c.coll, 0) > 0
   order by 6 desc;
 $$;
-create or replace function public.customer_ledger(p_customer uuid) returns table (at timestamptz, kind text, ref text, location_id int, debit numeric, credit numeric, balance numeric, note text)
+create or replace function public.customer_ledger(p_customer uuid) returns table (at timestamptz, kind text, ref text, location_id int, debit numeric, credit numeric, balance numeric, note text, pid bigint)
 language sql stable security definer set search_path = public as $$
   with e as (
-    select s.sold_at at, 'sale'::text kind, '#' || s.receipt ref, s.location_id, s.total debit, 0::numeric credit, case when s.sale_type = 'wholesale' then 'wholesale' end note
-      from public.sales s where s.customer_id = p_customer and s.status = 'done' and public.can_loc(s.location_id)
+    select s.sold_at at, 'sale'::text kind, '#' || s.receipt ref, s.location_id, s.total debit, 0::numeric credit, case when s.sale_type = 'wholesale' then 'wholesale' end note, null::bigint pid
+      from public.sales s where s.customer_id = p_customer and s.status = 'done'
     union all
-    select p.paid_at, case when p.kind = 'collection' then 'collection' else 'paid' end, coalesce(p.wallet, p.mode), p.location_id, 0, p.amount, p.note
-      from public.sale_payments p where p.customer_id = p_customer and not p.voided and public.can_loc(p.location_id))
-  select e.at, e.kind, e.ref, e.location_id, e.debit, e.credit, sum(e.debit - e.credit) over (order by e.at, (e.debit > 0) desc, e.kind), e.note
-  from e where public.can_do('POS', 'view') order by e.at, (e.debit > 0) desc, e.kind;
+    select p.paid_at, case when p.kind = 'collection' then 'collection' else 'paid' end, coalesce(p.wallet, p.mode), p.location_id, 0, p.amount, p.note, p.id
+      from public.sale_payments p where p.customer_id = p_customer and not p.voided)
+  select e.at, e.kind, e.ref, e.location_id, e.debit, e.credit, sum(e.debit - e.credit) over (order by e.at, (e.debit > 0) desc, e.kind), e.note, e.pid
+  from e where (public.can_do('POS', 'view') or public.can_do('POS', 'enter')) order by e.at, (e.debit > 0) desc, e.kind;
 $$;
+
+-- ---------- a wrongly entered collection can be reversed (owner or POS approver, with a reason) ----------
+create or replace function public.void_collection(p_id bigint, p_note text) returns void
+language plpgsql security definer set search_path = public as $$
+declare p public.sale_payments;
+begin
+  if not (public.is_owner() or public.can_do('POS', 'approve')) then raise exception 'not allowed'; end if;
+  if p_note is null or length(btrim(p_note)) = 0 then raise exception 'note_required'; end if;
+  select * into p from public.sale_payments where id = p_id and kind = 'collection' for update;
+  if not found then raise exception 'not found'; end if;
+  if p.voided then raise exception 'already void'; end if;
+  perform public.lock_check((p.paid_at at time zone 'Asia/Dhaka')::date);
+  update public.sale_payments set voided = true, void_note = btrim(p_note) where id = p_id;
+  insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+    values (null, null, 'POS', p.location_id, (p.paid_at at time zone 'Asia/Dhaka')::date, 'collection_void', 'yellow', p.amount,
+      jsonb_build_object('bn', 'বাকি আদায় বাতিল: ' || btrim(p_note), 'en', 'A collection was reversed: ' || btrim(p_note)));
+end $$;
 
 -- ---------- void now also voids the sale's payments ----------
 create or replace function public.void_sale(p_id uuid, p_note text) returns void
@@ -399,11 +423,11 @@ grant update (credit_limit, note, active, type, name) on public.customers to aut
 revoke all on function public.norm_mobile(text), public.customer_balance(uuid), public.find_customer(text),
   public.record_sale2(uuid, int, jsonb, numeric, jsonb, text, text, text, text, boolean, timestamptz),
   public.collect_payment(uuid, int, uuid, jsonb, text), public.customer_dues(), public.customer_ledger(uuid), public.payments_summary(date),
-  public.void_sale(uuid, text), public.biz_staff(date, date, int) from public, anon;
+  public.void_sale(uuid, text), public.biz_staff(date, date, int), public.void_collection(bigint, text) from public, anon;
 grant execute on function public.norm_mobile(text), public.customer_balance(uuid), public.find_customer(text),
   public.record_sale2(uuid, int, jsonb, numeric, jsonb, text, text, text, text, boolean, timestamptz),
   public.collect_payment(uuid, int, uuid, jsonb, text), public.customer_dues(), public.customer_ledger(uuid), public.payments_summary(date),
-  public.void_sale(uuid, text), public.biz_staff(date, date, int) to authenticated;
+  public.void_sale(uuid, text), public.biz_staff(date, date, int), public.void_collection(bigint, text) to authenticated;
 
 -- ---------- books-closed date: after the owner closes a period, only the owner can add or change anything dated on or before it ----------
 insert into public.settings (key, value, label_bn, label_mix, label_en)
@@ -416,7 +440,7 @@ begin
   if p_date is null or public.is_owner() then return; end if;
   select value into v from public.settings where key = 'books_closed_until';
   if v is null or jsonb_typeof(v) <> 'string' or (v #>> '{}') !~ '^\d{4}-\d{2}-\d{2}$' then return; end if;
-  d := (v #>> '{}')::date;
+  begin d := (v #>> '{}')::date; exception when others then return; end;      -- an impossible date (2026-02-30) locks nobody out
   if p_date <= d then raise exception 'period_closed'; end if;
 end $$;
 create or replace function public.entries_lock() returns trigger language plpgsql security definer set search_path = public as $$
@@ -433,3 +457,4 @@ begin
   return new;
 end $$;
 create trigger sales_lock before insert or update on public.sales for each row execute function public.sales_lock();
+revoke all on function public.lock_check(date) from public, anon;

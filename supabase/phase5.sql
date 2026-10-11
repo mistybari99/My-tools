@@ -29,7 +29,7 @@ declare lo bigint; hi bigint; cnt bigint; miss bigint[]; miss_n bigint; unnum bi
 begin
   if not (public.is_owner() or (public.can_do(p_form, 'approve') and public.can_loc(p_loc))) then raise exception 'not allowed'; end if;
   with n as (
-    select nullif(substring(btrim(e.data->>'paper_no') from '([0-9]+)\s*$'), '')::bigint v
+    select nullif(substring(btrim(e.data->>'paper_no') from '([0-9]{1,15})\s*$'), '')::bigint v
     from public.entries e where e.form_code = p_form and e.location_id = p_loc and nullif(btrim(e.data->>'paper_no'), '') is not null)
   select min(v), max(v), count(v) into lo, hi, cnt from n;
   select count(*) into unnum from public.entries e where e.form_code = p_form and e.location_id = p_loc and nullif(btrim(e.data->>'paper_no'), '') is null;
@@ -37,11 +37,11 @@ begin
   if hi - lo > 100000 then raise exception 'range too wide'; end if;
   select count(*) into miss_n from generate_series(lo, hi) g where not exists (
     select 1 from public.entries e where e.form_code = p_form and e.location_id = p_loc
-      and substring(btrim(e.data->>'paper_no') from '([0-9]+)\s*$')::bigint = g);
+      and substring(btrim(e.data->>'paper_no') from '([0-9]{1,15})\s*$')::bigint = g);
   select coalesce(array_agg(g order by g), '{}') into miss from (
     select g from generate_series(lo, hi) g where not exists (
       select 1 from public.entries e where e.form_code = p_form and e.location_id = p_loc
-        and substring(btrim(e.data->>'paper_no') from '([0-9]+)\s*$')::bigint = g) order by g limit 200) m;
+        and substring(btrim(e.data->>'paper_no') from '([0-9]{1,15})\s*$')::bigint = g) order by g limit 200) m;
   return jsonb_build_object('entered', cnt, 'first', lo, 'last', hi, 'without_number', unnum, 'missing_count', miss_n, 'missing', to_jsonb(miss));
 end $$;
 
@@ -49,7 +49,7 @@ end $$;
 create or replace function public.number_audit_summary() returns table (form_code text, location_id int, entered bigint, first_no bigint, last_no bigint, missing_count bigint)
 language sql stable security definer set search_path = public as $$
   with n as (
-    select e.form_code, e.location_id, substring(btrim(e.data->>'paper_no') from '([0-9]+)\s*$')::bigint v
+    select e.form_code, e.location_id, substring(btrim(e.data->>'paper_no') from '([0-9]{1,15})\s*$')::bigint v
     from public.entries e where nullif(btrim(e.data->>'paper_no'), '') is not null and e.data->>'paper_no' ~ '[0-9]\s*$'),
   g as (select form_code, location_id, count(distinct v) c, min(v) lo, max(v) hi from n group by 1, 2)
   select g.form_code, g.location_id, g.c, g.lo, g.hi, (g.hi - g.lo + 1) - g.c
