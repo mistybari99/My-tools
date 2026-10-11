@@ -109,8 +109,8 @@ B.forms['04-2'] = {
       TM('ret_time', L('ফেরতের সময়', 'Time of return'), { show: (x) => x.v.has_return }),
       ST('ret_weigher', L('ফেরত ওজনকারী (Return weighed by) — গোডাউন ইনচার্জ', 'Return weighed by — godown in-charge'), { show: (x) => x.v.has_return, req: (x) => x.v.has_return }),
       CK('not_overnight', L('রাতে কারখানায় রাখা হয়নি', 'Not kept in the factory overnight')),
-      NOTE(L('রাখা হলে পুরোটাই ব্যবহৃত ধরা হবে।', 'If kept overnight, the whole quantity counts as used.'), 'warn'),
-      M('staff_value', L('স্টাফ / ব্যক্তিগত হলে — মূল্য ৳', 'Staff / personal — value ৳'), { show: (x) => x.d.purpose === 'staff', req: (x) => x.d.purpose === 'staff' }),
+      NOTE(L('রাখা হলে পুরোটাই ব্যবহৃত ধরা হবে। (টিক না দিলে ফেরত গণ্য হবে না; নিট ব্যবহার = ইস্যু।)', 'If kept overnight, the whole quantity counts as used. (Without the tick, returns do not count: net use = issued.)'), 'warn'),
+      M('staff_value', L('স্টাফ / ব্যক্তিগত হলে — মূল্য ৳', 'Staff / personal — value ৳'), { show: (x) => x.d.purpose === 'staff' }),
       CK('deducted', L('বেতন থেকে কর্তন', 'Deducted from salary'), { show: (x) => x.d.purpose === 'staff', req: (x) => x.d.purpose === 'staff' })] },
     { title: L('উৎপাদন ও লেজারের সাথে যোগ', 'Link to production & ledger'), fields: [
       CK('net_to_report', L('এই স্লিপের নিট ব্যবহারের সংখ্যা উৎপাদন রিপোর্টের ইনপুট ঘরে হুবহু লিখতে হবে', "This slip's net use must be written exactly in the production report input box"), { req: true }),
@@ -122,10 +122,13 @@ B.forms['04-2'] = {
   ],
   calc(x) {
     const rows = x.rows('lines'), flags = [], v = {};
-    const out = rows.map((r) => ({ unit: unitOf(x, r.item), net: has(r.issued) ? num(r.issued) - num(r.ret) : undefined }));
-    v.t_issued = sum(rows.map((r) => r.issued)); v.t_ret = sum(rows.map((r) => r.ret)); v.t_net = v.t_issued - v.t_ret; v.has_return = v.t_ret > 0;
+    const kept = !x.d.not_overnight; // paper: if kept overnight, the whole quantity counts as used
+    const out = rows.map((r) => ({ unit: unitOf(x, r.item), net: has(r.issued) ? num(r.issued) - (kept ? 0 : num(r.ret)) : undefined }));
+    v.t_issued = sum(rows.map((r) => r.issued)); v.t_ret = sum(rows.map((r) => r.ret)); v.t_net = kept ? v.t_issued : v.t_issued - v.t_ret; v.has_return = v.t_ret > 0;
+    if (v.has_return && kept) flags.push(flag('kept_overnight', 'yellow', 'ফেরত লেখা আছে কিন্তু “রাতে রাখা হয়নি” টিক নেই — পুরোটাই ব্যবহৃত ধরা হলো', 'A return is written but “not kept overnight” is not ticked: the whole quantity counts as used', v.t_ret, { unit: 'qty' }));
     if (rows.some((r) => num(r.ret) > num(r.issued))) flags.push(flag('return_exceeds', 'red', 'ফেরত ইস্যুর চেয়ে বেশি', 'Returned more than was issued', undefined));
-    if (x.d.purpose === 'staff') flags.push(flag('issue_staff', 'yellow', 'স্টাফ / ব্যক্তিগত ব্যবহারে ইস্যু — বেতন থেকে কর্তন', 'Issued for staff / personal use: salary deduction', has(x.d.staff_value) ? num(x.d.staff_value) : undefined));
+    if (x.d.purpose === 'staff') { flags.push(flag('issue_staff', 'yellow', 'স্টাফ / ব্যক্তিগত ব্যবহারে ইস্যু — বেতন থেকে কর্তন', 'Issued for staff / personal use: salary deduction', has(x.d.staff_value) ? num(x.d.staff_value) : undefined));
+      if (!has(x.d.staff_value)) flags.push(flag('staff_value_missing', 'yellow', 'স্টাফ / ব্যক্তিগত ইস্যুর মূল্য লেখা নেই', 'Value of the staff / personal issue is not written', undefined)); }
     else if (x.d.purpose === 'sample' || x.d.purpose === 'trial') flags.push(flag('issue_non_production', 'yellow', 'উৎপাদন ছাড়া অন্য কারণে ইস্যু', 'Issued for a reason other than production', undefined));
     return { v, rows: { lines: out }, flags, needs: [] };
   },
@@ -151,7 +154,7 @@ B.forms['04-4'] = {
     { collapsed: true, title: L('মাসের শেষে', 'Month end'), fields: [
       CALC('book', L('লেজারে বাকি', 'Balance in the ledger'), 'num'), N('counted', L('গণনায় প্রাপ্ত', 'Counted')), CALC('diff', L('পার্থক্য (গণনা − লেজার)', 'Difference (count − ledger)'), 'num', { show: (x) => has(x.d.counted) }),
       T('count_sheet', L('স্টক কাউন্ট শিট নং', 'Stock count sheet no.'), { req: (x) => x.v.diff_nonzero }),
-      CALC('value', L('মজুদের মূল্য (Stock Value) = বাকি × শেষ দর', 'Stock value = balance × last rate'), 'money')] },
+      CALC('value', L('মজুদের মূল্য (Stock Value) = বাকি × শেষ দর', 'Stock value = balance × last rate'), 'text')] },
     { who: 'checker', title: L('মাসিক যাচাই ও অনুমোদন (ব্যবস্থাপনা)', 'Monthly check & approval (management)'), fields: [
       ST('monthly_checker', L('মাসিক যাচাই (Checked by — স্টোরকিপার নন)', 'Monthly check (Checked by — not the storekeeper)'), { who: 'checker', req: true }),
       CK('mgmt_approved', L('অনুমোদনকারী (Approved by) — ব্যবস্থাপনা', 'Approved by — management'), { who: 'checker', req: true })] },
@@ -164,7 +167,7 @@ B.forms['04-4'] = {
     if (noPaper.length) flags.push(flag('no_paper', 'red', 'কাগজের নম্বর ছাড়া প্রাপ্তি বা ইস্যু লেখা হয়েছে', 'A receipt or issue is written without a paper number', noPaper.length, { unit: 'qty' }));
     if (rows.some((r) => has(r.other_type) && !has(r.other_no))) flags.push(flag('other_paper_no', 'red', 'অন্য কাগজের ধরন আছে কিন্তু নম্বর নেই', 'Other paper type chosen but its number is missing', undefined));
     if (out.some((o) => o.bal !== undefined && o.bal < 0)) flags.push(flag('negative_balance', 'red', 'বাকি ঋণাত্মক হয়েছে', 'The balance went below zero', Math.min(...out.filter((o) => o.bal !== undefined).map((o) => o.bal)), { unit: 'qty' }));
-    v.value = lastRate === null ? NEED : bal * lastRate;
+    v.value = lastRate === null ? NEED : '৳ ' + fm(bal * lastRate);
     if (has(x.d.counted)) { const d = num(x.d.counted) - bal; v.diff = d; v.diff_nonzero = d !== 0;
       if (d !== 0) { const pct = sv(x, 'count_tol_pct'), max = sv(x, 'count_tol_max'), price = lastRate === null ? 0 : lastRate;
         const p = bal > 0 ? Math.abs(d) / bal * 100 : 100, okP = pct !== null && p <= pct, okM = max !== null && lastRate !== null && Math.abs(d) * price <= max;
@@ -189,7 +192,7 @@ B.forms['06-1'] = {
       TABLE('lines', null, [ITEM('item', L('আইটেম', 'Item'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'), N('stock', L('গোডাউনে মজুদ (Stock)', 'Stock in the godown')),
         N('need', L('প্রয়োজন (Required)', 'Required'), { req: true }), M('last_rate', L('শেষ ক্রয়ের দর', 'Last purchase rate')),
         CALC('est', L('আনুমানিক মূল্য ৳', 'Estimated value ৳'), 'money', { show: (x) => has(x.row.need) && has(x.row.last_rate) }), T('why', L('প্রয়োজনের কারণ', 'Reason for the need'), { wide: true })], { min: 3 }),
-      CALC('est_total', L('আনুমানিক মোট ৳', 'Estimated total ৳'), 'money', { big: true })] },
+      CALC('est_total', L('আনুমানিক মোট ৳', 'Estimated total ৳'), 'money', { big: true, show: (x) => !x.v.est_incomplete })] },
     { title: L('কোটেশন তুলনা', 'Quotation comparison'), fields: [
       CALC('cmp_text', L('সীমা (লোকেশন সেটিংস)', 'Limit (location settings)'), 'text'),
       CH('cmp', L('কোটেশন তুলনা', 'Quotation comparison'), [['within', L('সীমার ভেতরে — প্রয়োজন নেই', 'Within the limit — not needed')], ['outside', L('বাইরে → কোটেশন তুলনা (CS) নং', 'Outside → quotation comparison (CS) no.')]], { req: true }),
@@ -217,8 +220,11 @@ B.forms['06-1'] = {
     const rows = x.rows('lines'), flags = [], needs = [], v = {};
     const out = rows.map((r) => ({ unit: unitOf(x, r.item), est: has(r.need) && has(r.last_rate) ? num(r.need) * num(r.last_rate) : undefined }));
     const est = sum(out.map((o) => o.est)); v.est_total = est;
+    const noRate = rows.some((r) => hasN(r.need) && !has(r.last_rate)); v.est_incomplete = noRate;
     const lim = sv(x, 'quote_over');
+    if (noRate) flags.push(flag('est_incomplete', 'yellow', 'কিছু লাইনে শেষ ক্রয়ের দর নেই — আনুমানিক মূল্য অসম্পূর্ণ, সীমা যাচাই করা যায়নি', 'Some lines have no last rate: the estimate is incomplete and the limit cannot be checked', undefined));
     if (lim === null) { needs.push('quote_over'); v.cmp_text = NEED; }
+    else if (noRate) v.cmp_text = L('সীমা ৳ ' + fm(lim) + ' — দর অসম্পূর্ণ: ' + NEED.bn, 'Limit ৳ ' + fm(lim) + ' — rates incomplete: ' + NEED.en);
     else { const over = est > lim; v.cmp_text = L('সীমা ৳ ' + fm(lim) + ' — ' + (over ? 'আনুমানিক মূল্য সীমার বাইরে: কোটেশন তুলনা লাগবে' : 'সীমার ভেতরে'), 'Limit ৳ ' + fm(lim) + ' — ' + (over ? 'estimate is above it: a quotation comparison is needed' : 'within it'));
       if (over && !(x.d.cmp === 'outside' && has(x.d.cs_no))) flags.push(flag('cs_missing', 'red', 'মূল্য কোটেশন তুলনার সীমার উপরে কিন্তু কোটেশন তুলনা (CS) নং নেই', 'Value is above the quotation limit but there is no CS number', est)); }
     if (x.d.urgency === 'urgent') { flags.push(flag('urgent_purchase', 'yellow', 'জরুরি ক্রয়', 'Urgent purchase', undefined));
@@ -230,6 +236,7 @@ B.forms['06-1'] = {
         if (df !== 0) flags.push(flag('advance_mismatch', 'red', 'অ্যাডভান্স ≠ ফেরত + রসিদ', 'Advance differs from change + receipts', df));
         if (!has(x.d.grn_no)) flags.push(flag('advance_no_grn', 'red', 'মালামাল গ্রহণ রসিদের নম্বর ছাড়া অ্যাডভান্স রিকনসিলিয়েশন', 'Advance reconciliation without a goods received note number', undefined));
         if (has(x.d.adv_checker) && x.d.adv_checker === x.d.adv_to) flags.push(flag('adv_checker_is_buyer', 'red', 'যাচাইকারী ও যিনি ক্রয় করেছেন একই জন', 'The checker is the person who bought', undefined)); } }
+    if (x.c.decision === 'no') flags.push(flag('pr_not_approved', 'red', 'সিদ্ধান্ত “অনুমোদিত নয়” — অনুমোদন করা যাবে না', 'Decision is “Not approved”: it cannot be approved', undefined, { src: 'check' }));
     return { v, rows: { lines: out }, flags, needs };
   },
 };
@@ -244,9 +251,9 @@ B.forms['06-2'] = {
       NOTE(L('দর নেওয়া হবে ক্রয়ের আগে — পরে নয়। একটিমাত্র দর নিয়ে ক্রয় হলে লিখিত কারণ লাগবে।', 'Take quotes before buying, not after. Buying on a single quote needs a written reason.'), 'warn'),
       CALC('limit_text', L('কোটেশন তুলনার সীমা (লোকেশন সেটিংস)', 'Quotation comparison limit (location settings)'), 'text'),
       TABLE('quotes', null, [T('supplier', L('সাপ্লায়ারের নাম (Supplier)', 'Supplier name'), { req: true, wide: true }), M('rate', L('দর ৳ (প্রতি একক)', 'Rate ৳ (per unit)'), { req: true }),
-        CALC('total', L('মোট ৳', 'Total ৳'), 'money', { show: (x) => has(x.row.rate) }), T('delivery', L('সরবরাহের সময়', 'Delivery time')), N('credit', L('বাকির সময় (দিন)', 'Credit period (days)')),
+        CALC('total', L('মোট ৳', 'Total ৳'), 'money', { show: (x) => has(x.row.rate) && num(x.d.qty) > 0 }), T('delivery', L('সরবরাহের সময়', 'Delivery time')), N('credit', L('বাকির সময় (দিন)', 'Credit period (days)')),
         T('quality', L('মান / আগের অভিজ্ঞতা', 'Quality / earlier experience'), { wide: true })], { min: 3 }),
-      CALC('lowest', L('সবচেয়ে কম দর ৳', 'Lowest rate ৳'), 'money')] },
+      CALC('lowest', L('সবচেয়ে কম দর ৳', 'Lowest rate ৳'), 'text')] },
     { title: L('নির্বাচিত সাপ্লায়ার', 'Selected supplier'), fields: [
       T('sel_supplier', L('নির্বাচিত সাপ্লায়ার (Selected)', 'Selected supplier'), { req: true }), M('sel_rate', L('দর ৳', 'Rate ৳'), { req: true }),
       NOTE(L('বেশি দরের সাপ্লায়ার নির্বাচন করলে কারণ লিখতেই হবে।', 'If you pick a supplier with a higher rate, a reason is a must.'), 'warn', { show: (x) => x.v.not_lowest }),
@@ -260,11 +267,11 @@ B.forms['06-2'] = {
   ],
   calc(x) {
     const rows = x.rows('quotes'), flags = [], needs = [], v = {}, q = num(x.d.qty);
-    const out = rows.map((r) => ({ total: has(r.rate) ? num(r.rate) * q : undefined }));
+    const out = rows.map((r) => ({ total: has(r.rate) && q > 0 ? num(r.rate) * q : undefined }));
     const filled = rows.filter((r) => has(r.supplier) || has(r.rate)), rates = rows.filter((r) => hasN(r.rate)).map((r) => num(r.rate));
-    const low = rates.length ? Math.min(...rates) : null; v.lowest = low === null ? NEED : low;
+    const low = rates.length ? Math.min(...rates) : null; v.lowest = low === null ? NEED : '৳ ' + fm(low);
     const lim = sv(x, 'quote_over'); v.limit_text = lim === null ? NEED : L('৳ ' + fm(lim) + ' এর উপরে তুলনা বাধ্যতামূলক', 'Comparison is compulsory above ৳ ' + fm(lim));
-    if (has(x.d.sel_rate) && low !== null && num(x.d.sel_rate) > low) { v.not_lowest = true; flags.push(flag('not_lowest', 'yellow', 'সবচেয়ে কম দরের সাপ্লায়ার নির্বাচিত হয়নি', 'Not the lowest-rate supplier', (num(x.d.sel_rate) - low) * (q || 1))); }
+    if (has(x.d.sel_rate) && low !== null && num(x.d.sel_rate) > low) { v.not_lowest = true; flags.push(flag('not_lowest', 'yellow', 'সবচেয়ে কম দরের সাপ্লায়ার নির্বাচিত হয়নি', 'Not the lowest-rate supplier', q > 0 ? (num(x.d.sel_rate) - low) * q : num(x.d.sel_rate) - low)); }
     const amount = has(x.d.sel_rate) ? num(x.d.sel_rate) * q : 0;
     if (filled.length === 1 && x.d.single !== 'yes') flags.push(flag('single_unmarked', 'red', 'একটিমাত্র দর আছে কিন্তু “একটিমাত্র দর” চিহ্নিত নয়', 'Only one quote but not marked as a single quote', undefined));
     if (x.d.single === 'yes' || filled.length === 1) {
@@ -280,10 +287,10 @@ B.forms['06-2'] = {
 B.forms['06-3'] = {
   title: L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)'),
   head: [T('cs_no', L('সংশ্লিষ্ট কোটেশন তুলনা (CS) নং', 'Related quotation comparison (CS) no.')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase requisition (PR) no.')),
-    T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: true }),
+    T('supplier', L('সাপ্লায়ার', 'Supplier'), { req: (x) => !x.d.cancel }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: (x) => !x.d.cancel }),
     T('place', L('ডেলিভারির স্থান', 'Delivery place')),
-    CH('pay', L('পেমেন্ট', 'Payment'), PAYS, { req: true }), T('pay_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.pay === 'other', req: (x) => x.d.pay === 'other' }),
-    N('credit_days', L('বাকির সময় (দিন)', 'Credit period (days)'), { show: (x) => x.d.pay === 'credit', req: (x) => x.d.pay === 'credit' })],
+    CH('pay', L('পেমেন্ট', 'Payment'), PAYS, { req: (x) => !x.d.cancel }), T('pay_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.pay === 'other', req: (x) => x.d.pay === 'other' && !x.d.cancel }),
+    N('credit_days', L('বাকির সময় (দিন)', 'Credit period (days)'), { show: (x) => x.d.pay === 'credit', req: (x) => x.d.pay === 'credit' && !x.d.cancel })],
   sections: [
     { title: L('বাতিল', 'Cancellation'), collapsed: true, fields: [
       CK('cancel', L('বাতিল', 'Cancelled')),
@@ -293,8 +300,8 @@ B.forms['06-3'] = {
       NOTE(L('বাতিল পাতা বইয়েই রাখা হবে।', 'The cancelled page stays in the book.'), 'ok', { show: (x) => !!x.d.cancel })] },
     { title: L('অর্ডারের আইটেম', 'Order lines'), fields: [
       NOTE(L('পারচেজ অর্ডার ছাড়া মালামাল গ্রহণ করা যাবে না — মালামাল নামানো বন্ধ থাকবে।', 'Goods cannot be accepted without a purchase order: unloading stays stopped.'), 'warn'),
-      TABLE('lines', null, [ITEM('item', L('আইটেম', 'Item'), { req: true, wide: true }), T('desc', L('বিবরণ', 'Description'), { wide: true }), CALC('unit', L('একক', 'Unit'), 'text'),
-        N('qty', L('পরিমাণ (Qty)', 'Quantity (Qty)'), { req: true }), M('rate', L('দর ৳', 'Rate ৳'), { req: true }), CALC('total', L('মোট ৳', 'Total ৳'), 'money', { show: (x) => has(x.row.qty) && has(x.row.rate) })], { min: 3 }),
+      TABLE('lines', null, [ITEM('item', L('আইটেম', 'Item'), { req: (x) => !x.d.cancel, wide: true }), T('desc', L('বিবরণ', 'Description'), { wide: true }), CALC('unit', L('একক', 'Unit'), 'text'),
+        N('qty', L('পরিমাণ (Qty)', 'Quantity (Qty)'), { req: (x) => !x.d.cancel }), M('rate', L('দর ৳', 'Rate ৳'), { req: (x) => !x.d.cancel }), CALC('total', L('মোট ৳', 'Total ৳'), 'money', { show: (x) => has(x.row.qty) && has(x.row.rate) })], { min: 3 }),
       CALC('grand', L('সর্বমোট (Total)', 'Grand total'), 'money', { big: true }), CALC('cs_text', L('কোটেশন তুলনার সীমা', 'Quotation comparison limit'), 'text')] },
     { title: L('শর্ত', 'Terms'), fields: [
       CK('t_short', L('পরিমাণে কম হলে বিল সেই অনুযায়ী', 'If the quantity is short, the bill follows it')), CK('t_return', L('নিম্নমানের হলে ফেরতযোগ্য', 'Returnable if of poor quality')),
@@ -303,7 +310,7 @@ B.forms['06-3'] = {
     { title: L('সম্মতি', 'Acceptance'), fields: [
       CK('accepted', L('সম্মতিদাতা (Accepted by) — সাপ্লায়ার সম্মতি জানিয়েছেন', 'Accepted by the supplier')), T('accepted_name', L('সাপ্লায়ারের পক্ষে নাম', 'Name for the supplier'), { show: (x) => !!x.d.accepted })] },
     { who: 'checker', title: L('অনুমোদন (ব্যবস্থাপনা)', 'Approval (management)'), fields: [
-      CK('po_approved', L('অনুমোদনকারী (Approved by) — অর্ডার অনুমোদিত', 'Approved by — the order is approved'), { who: 'checker', req: true })] },
+      CK('po_approved', L('অনুমোদনকারী (Approved by) — অর্ডার অনুমোদিত', 'Approved by — the order is approved'), { who: 'checker', req: (x) => !x.c.cancel_dummy && !x.d.cancel })] },
   ],
   calc(x) {
     const rows = x.rows('lines'), flags = [], needs = [], v = {};
