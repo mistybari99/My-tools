@@ -15,7 +15,7 @@ const X = {
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
   online: L('অনলাইন', 'Online', 'Online'), offline: L('অফলাইন', 'Offline', 'Offline'), pin: L('প্রিয়তে রাখুন', 'Pin to favourites', 'Favourite-এ রাখুন'), unpin: L('প্রিয় থেকে সরান', 'Unpin', 'Favourite থেকে সরান'),
   g_dash: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard'), g_acc: L('হিসাব', 'Accounting', 'Accounting (হিসাব)'), g_item: L('আইটেম', 'Items', 'Item'), g_cust: L('কাস্টমার', 'Customers', 'Customer'),
-  g_sale: L('বিক্রি', 'Sales', 'Sale (বিক্রি)'), g_purch: L('ক্রয়', 'Purchase', 'Purchase'), g_ops: L('স্টক ও কারখানা', 'Stock & factory', 'Stock ও Factory'),
+  g_supp: L('সরবরাহকারী', 'Suppliers', 'Supplier'), g_sale: L('বিক্রি', 'Sales', 'Sale (বিক্রি)'), g_purch: L('ক্রয়', 'Purchase', 'Purchase'), g_ops: L('স্টক ও কারখানা', 'Stock & factory', 'Stock ও Factory'),
   g_people: L('মানুষ ও স্টাফ', 'People & staff', 'Staff ও মানুষ'), g_reports: L('রিপোর্ট', 'Reports', 'Report'), g_settings: L('সেটিংস', 'Settings', 'Settings'),
   pending: L('অনুমোদনের অপেক্ষায়', 'Awaiting approval', 'Approval-এর অপেক্ষায়'),
   hi: L('স্বাগতম', 'Welcome', 'স্বাগতম'), biz: L('ব্যবসা', 'Business', 'Business'), acc: L('হিসাব', 'Accounting', 'Accounting'),
@@ -60,7 +60,8 @@ const uid = () => (S.ctx && S.ctx.profile && S.ctx.profile.id) || 'anon';
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded yet */ } return m === 'hide' ? 'hide' : 'lock'; };
 
 // ---------- registry: routes + forms ----------
-const GROUPS = ['dash', 'acc', 'item', 'cust', 'sale', 'purch', 'ops', 'people', 'reports', 'settings'];
+const GROUPS = ['dash', 'acc', 'item', 'cust', 'sale', 'purch', 'supp', 'ops', 'people', 'reports', 'settings'];
+const locOk = () => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).length > 0;   // stock / purchase pages: the server decides the rest
 const AREA_G = { cash: 'acc', stock: 'ops', factory: 'ops', assets: 'ops', purchase: 'purch', sales: 'sale', showroom: 'sale', staff: 'people', owner: 'reports' };
 const ROUTES = [
   { k: 'home', g: 'dash', lb: () => t('home'), ic: 'home', ok: () => true },
@@ -74,6 +75,11 @@ const ROUTES = [
   { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() },
   { k: 'settings2/units', g: 'item', lb: () => T('unitconv'), ok: () => isOwner() },
   { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
+  { k: 'stock', g: 'ops', lb: () => lab(L('স্টক', 'Stock', 'Stock')), ic: 'items', ok: () => locOk() },
+  { k: 'purchase', g: 'purch', lb: () => lab(L('ক্রয় বিল', 'Purchase bills', 'Purchase Bill')), ic: 'doc', ok: () => locOk() },
+  { k: 'purchase/new', g: 'purch', lb: () => lab(L('নতুন ক্রয় বিল', 'New purchase bill', 'নতুন Purchase bill')), ic: 'plus', ok: () => locOk() },
+  { k: 'purchase/return', g: 'purch', lb: () => lab(L('ক্রয় ফেরত', 'Purchase return', 'Purchase return')), ic: 'doc', ok: () => locOk() },
+  { k: 'payables', g: 'supp', lb: () => T('payables'), ic: 'dues', ok: () => locOk() },
   { k: 'pos', g: 'sale', lb: () => t('pos'), ok: () => canPos() },
   { k: 'reports', g: 'reports', lb: () => T('g_reports'), ic: 'doc', ok: () => true },
   { k: 'biz', g: 'reports', lb: () => t('biz'), ok: () => isOwner() || P('POS', 'approve') },
@@ -415,8 +421,8 @@ function drawStats() {
 function tileDefs() {
   const f = (code) => ({ key: 'f:' + code });
   return HS.mode === 'biz'
-    ? [{ key: 'r:pos' }, { key: 'r:items' }, { key: 'r:itemreq' }, f('14-1'), f('03-1'), f('04-1'), { key: 'r:reports' }, { soon: 'stockbal' }]
-    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { key: 'r:reports' }, { soon: 'payables' }, { soon: 'daybook' }];
+    ? [{ key: 'r:pos' }, { key: 'r:items' }, { key: 'r:itemreq' }, f('14-1'), f('03-1'), f('04-1'), { key: 'r:reports' }, { key: 'r:stock', label: () => T('stockbal') }]
+    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { key: 'r:reports' }, { key: 'r:payables', label: () => T('payables') }, { soon: 'daybook' }];
 }
 function tile(e, o = {}) {
   const pin = isPinned(e.key), c = e.cnt && CNT && CNT[e.cnt];
