@@ -65,7 +65,8 @@ B.forms['04-1'] = {
       T('ledger_line', L('লেজারের লাইন নং', 'Ledger line no.'), { show: (x) => has(x.d.pay) && x.d.pay !== 'credit' })] },
     { title: L('ছবি ও সই', 'Photos & signatures'), fields: [
       PHOTO('photos', L('মালামাল / মেমো / বিলের ছবি', 'Photos of goods / memo / bill')),
-      T('carrier', L('সাপ্লায়ার / বহনকারী (Supplier / Carrier) — নাম', 'Supplier / carrier — name'))] },
+      T('carrier', L('সাপ্লায়ার / বহনকারী (Supplier / Carrier) — নাম', 'Supplier / carrier — name')),
+      ST('receiver', L('গ্রহণকারী (Received by)', 'Received by'))] },
     { who: 'checker', title: L('যাচাই (ব্যবস্থাপনা পূরণ করবে)', 'Check (management fills)'), fields: [
       CK('mgmt_checked', L('যাচাইকারী (Checked by) — ব্যবস্থাপনা: রসিদ যাচাই করেছি', 'Checked by management: receipt checked'), { who: 'checker', req: true })] },
   ],
@@ -84,7 +85,7 @@ B.forms['04-1'] = {
     if (v.has_hold) { flags.push(flag('grn_hold', 'yellow', 'মালামাল আটক রাখা হয়েছে', 'Goods held back', val('hold') || undefined)); if (!x.d.held_apart) flags.push(flag('hold_not_apart', 'red', 'আটক মালামাল আলাদা রাখা হয়নি', 'Held goods are not kept apart', undefined)); }
     if (rows.some((r) => r.quality === 'return')) flags.push(flag('grn_return', 'yellow', 'মালামাল ফেরত যাচ্ছে', 'Goods going back to the supplier', val('return') || undefined));
     if (v.has_reduced) { flags.push(flag('grn_reduced', 'yellow', 'দর কমিয়ে গ্রহণ', 'Accepted at a lower rate', val('reduced') || undefined));
-      if (has(x.d.rate_approver) && x.d.rate_approver === x.me) flags.push(flag('rate_approver_is_receiver', 'red', 'দর কমানোর অনুমোদনকারী ও গ্রহণকারী একই জন', 'The rate approver and the receiver are the same person', undefined)); }
+      if (has(x.d.rate_approver) && has(x.d.receiver) && x.d.rate_approver === x.d.receiver) flags.push(flag('rate_approver_is_receiver', 'red', 'দর কমানোর অনুমোদনকারী ও গ্রহণকারী একই জন', 'The rate approver and the receiver are the same person', undefined)); }
     if (rows.some((r) => has(r.counted) && !has(r.rate))) flags.push(flag('grn_rate_missing', 'yellow', 'কিছু লাইনে বিল অনুযায়ী দর লেখা নেই — বিল যাচাই করা যাবে না', 'Some lines have no bill rate, so the bill check is impossible', undefined));
     return { v, rows: { lines: out }, flags, needs };
   },
@@ -310,7 +311,7 @@ B.forms['06-3'] = {
     { title: L('সম্মতি', 'Acceptance'), fields: [
       CK('accepted', L('সম্মতিদাতা (Accepted by) — সাপ্লায়ার সম্মতি জানিয়েছেন', 'Accepted by the supplier')), T('accepted_name', L('সাপ্লায়ারের পক্ষে নাম', 'Name for the supplier'), { show: (x) => !!x.d.accepted })] },
     { who: 'checker', title: L('অনুমোদন (ব্যবস্থাপনা)', 'Approval (management)'), fields: [
-      CK('po_approved', L('অনুমোদনকারী (Approved by) — অর্ডার অনুমোদিত', 'Approved by — the order is approved'), { who: 'checker', req: (x) => !x.c.cancel_dummy && !x.d.cancel })] },
+      CK('po_approved', L('অনুমোদনকারী (Approved by) — অর্ডার অনুমোদিত', 'Approved by — the order is approved'), { who: 'checker', req: (x) => !x.d.cancel })] },
   ],
   calc(x) {
     const rows = x.rows('lines'), flags = [], needs = [], v = {};
@@ -334,11 +335,13 @@ B.forms['06-4'] = {
   sections: [
     { title: L('তিন কাগজ মিলিয়ে দেখা', 'Three papers matched'), fields: [
       NOTE(L('তিন কাগজ মিলতেই হবে — পারচেজ অর্ডার · মালামাল গ্রহণ রসিদ · সাপ্লায়ারের বিল। একটিতেও গরমিল থাকলে পেমেন্ট আটকে থাকবে।', 'The three papers must match: purchase order, goods received note, supplier bill. If any one differs, payment stays held.'), 'warn'),
-      T('po_no', L('পারচেজ অর্ডার (PO) নং', 'Purchase order (PO) no.'), { req: true }), T('grn_no', L('মালামাল গ্রহণ রসিদ (GRN) নং', 'Goods received note (GRN) no.'), { req: true }),
-      TABLE('tri', null, [N('po', L('পারচেজ অর্ডারে (PO)', 'On the PO'), { req: true }), N('grn', L('গ্রহণ রসিদে (GRN)', 'On the GRN'), { req: true }), N('bill', L('বিলে (Bill)', 'On the bill'), { req: true }),
-        CALC('ok', L('মিল', 'Match'), 'text')], { rows: [L('পরিমাণ', 'Quantity'), L('দর ৳', 'Rate ৳'), L('মোট ৳', 'Total ৳')] }),
-      CALC('mism_what', L('কোন বিষয়ে গরমিল', 'What differs'), 'text', { show: (x) => x.v.mismatch }), CALC('diff', L('পার্থক্য ৳ (বিল − GRN মোট)', 'Difference ৳ (bill − GRN total)'), 'money', { show: (x) => x.v.mismatch })] },
+      TABLE('tri', null, [T('po', L('পারচেজ অর্ডারে (PO)', 'On the PO')), T('grn', L('গ্রহণ রসিদে (GRN)', 'On the GRN')), T('bill', L('বিলে (Bill)', 'On the bill')),
+        CALC('ok', L('মিল', 'Match'), 'text')], { rows: [L('কাগজের নম্বর (PO নং, তিন কাগজে যেভাবে লেখা)', 'Paper number (PO no. as written on each paper)'), L('পরিমাণ', 'Quantity'), L('দর ৳', 'Rate ৳'), L('মোট ৳', 'Total ৳')] }),
+      NOTE(L('PO নং, GRN নং ও বিল নং যথাক্রমে PO, GRN ও বিলের ঘরে লিখুন; সংখ্যার সারিতে শুধু সংখ্যা।', 'Write the PO, GRN and bill numbers in the PO, GRN and bill boxes of the first row; plain numbers in the other rows.'), 'ok'),
+      T('grn_no', L('মালামাল গ্রহণ রসিদ (GRN) নং', 'Goods received note (GRN) no.')),
+      CALC('diff', L('পার্থক্য ৳ (বিল − GRN মোট)', 'Difference ৳ (bill − GRN total)'), 'money', { show: (x) => x.v.mismatch && x.v.diff !== undefined })] },
     { title: L('গরমিল থাকলে', 'If something differs'), show: (x) => x.v.mismatch, fields: [
+      CH('mism_what', L('কোন বিষয়ে গরমিল', 'What differs'), [['qty', L('পরিমাণ', 'Quantity')], ['rate', L('দর', 'Rate')], ['both', L('দুটোই', 'Both')]], { req: true }),
       CK('held', L('পেমেন্ট আটকে রাখা হলো', 'Payment held'), { req: true }), CK('todo', L('কাজের তালিকায় যোগ', 'Added to the to-do list')),
       CK('told', L('সাপ্লায়ারকে জানানো হয়েছে', 'Supplier informed')), D('told_date', L('জানানোর তারিখ', 'Date informed')), ST('told_by', L('জানানোর দায়িত্বধারী', 'Person responsible for informing'))] },
     { title: L('ঘাটতি / ফেরতের দাবি', 'Shortage / return claim'), fields: [
@@ -359,17 +362,18 @@ B.forms['06-4'] = {
       CK('pay_approved', L('অনুমোদনকারী (Approved by) — পেমেন্ট অনুমোদিত', 'Approved by — payment approved'), { who: 'checker', req: true })] },
   ],
   calc(x) {
-    const r = x.rows('tri'), flags = [], v = {}; let mism = false, qtyBad = false, rateBad = false;
-    const out = [0, 1, 2].map((i) => { const a = r[i] || {}; if (!(has(a.po) && has(a.grn) && has(a.bill))) return { ok: '' };
-      const eq = num(a.po) === num(a.grn) && num(a.grn) === num(a.bill); if (!eq) { mism = true; if (i === 0) qtyBad = true; if (i === 1) rateBad = true; }
-      return { ok: eq ? L('মিল আছে ✓', 'Matches ✓') : L('অমিল ✗', 'Differs ✗') }; });
+    const r = x.rows('tri'), flags = [], v = {}; let mism = false;
+    const norm = (s) => String(s).trim().toLowerCase();
+    const out = [0, 1, 2, 3].map((i) => { const a = r[i] || {}; if (!(has(a.po) && has(a.grn) && has(a.bill))) return { ok: '' };
+      const eq = i === 0 ? norm(a.po) === norm(a.grn) && norm(a.grn) === norm(a.bill) : num(a.po) === num(a.grn) && num(a.grn) === num(a.bill);
+      if (!eq) mism = true; return { ok: eq ? L('মিল আছে ✓', 'Matches ✓') : L('অমিল ✗', 'Differs ✗') }; });
+    const tot = r[3] || {}; v.diff = has(tot.bill) && has(tot.grn) ? num(tot.bill) - num(tot.grn) : undefined;
+    if (has(x.d.bill_amount) && has(tot.grn) && num(x.d.bill_amount) !== num(tot.grn)) { mism = true; if (v.diff === undefined) v.diff = num(x.d.bill_amount) - num(tot.grn); }
     v.mismatch = mism;
-    v.mism_what = qtyBad && rateBad ? L('পরিমাণ ও দর — দুটোই', 'Quantity and rate — both') : qtyBad ? L('পরিমাণ', 'Quantity') : rateBad ? L('দর', 'Rate') : L('মোট', 'Total');
-    const tot = r[2] || {}; v.diff = has(tot.bill) && has(tot.grn) ? num(tot.bill) - num(tot.grn) : undefined;
     if (mism) { const held = !!x.d.held;
       flags.push(flag('bill_mismatch', held ? 'yellow' : 'red', held ? 'তিন কাগজে গরমিল — পেমেন্ট আটকে রাখা হয়েছে' : 'তিন কাগজে গরমিল — পেমেন্ট আটকানো হয়নি', held ? 'Three papers differ: payment is held' : 'Three papers differ: payment is not held', v.diff !== undefined ? Math.abs(v.diff) : undefined));
       if (hasN(x.d.pay_amount)) flags.push(flag('pay_on_mismatch', 'red', 'গরমিল থাকা সত্ত্বেও পেমেন্টের অঙ্ক লেখা হয়েছে', 'A payment amount is written although the papers differ', num(x.d.pay_amount))); }
-    if (has(x.d.bill_amount) && has(tot.bill) && num(x.d.bill_amount) !== num(tot.bill)) flags.push(flag('bill_amount_differs', 'yellow', 'বিলের অঙ্ক ও “বিলে মোট” আলাদা', 'Bill amount differs from the “total on the bill”', num(x.d.bill_amount) - num(tot.bill)));
+    if (has(x.d.bill_amount) && has(tot.bill) && num(x.d.bill_amount) !== num(tot.bill)) flags.push(flag('bill_amount_differs', 'red', 'বিলের অঙ্ক ও “বিলে মোট” আলাদা', 'Bill amount differs from the “total on the bill”', num(x.d.bill_amount) - num(tot.bill)));
     if (x.d.short === 'yes' && !x.d.carrier_signed) flags.push(flag('short_no_carrier', 'yellow', 'ঘাটতি আছে কিন্তু বহনকারীর স্বাক্ষর নেই', 'Shortage but no carrier signature', undefined));
     if (x.d.pay_way === 'owner') flags.push(flag('pay_owner', 'yellow', 'মালিকের ব্যক্তিগত টাকায় পেমেন্ট', "Payment from the owner's personal money", has(x.d.pay_amount) ? num(x.d.pay_amount) : undefined));
     return { v, rows: { tri: out }, flags, needs: [] };
@@ -379,7 +383,7 @@ B.forms['06-4'] = {
 /* ============ 06-5 · Supplier ledger (one page per supplier) ============ */
 B.forms['06-5'] = {
   title: L('সাপ্লায়ার লেজার', 'Supplier ledger'),
-  head: [T('page_no', L('পাতা নং', 'Page no.')), T('supplier', L('সাপ্লায়ারের নাম', 'Supplier name'), { req: true }), T('items', L('সরবরাহের আইটেম (Items Supplied)', 'Items supplied')),
+  head: [T('page_no', L('পাতা নং', 'Page no.')), ST('keeper', L('হিসাবরক্ষক (Ledger Keeper)', 'Ledger keeper')), T('supplier', L('সাপ্লায়ারের নাম', 'Supplier name'), { req: true }), T('items', L('সরবরাহের আইটেম (Items Supplied)', 'Items supplied')),
     CH('kind', L('ধরন', 'Type'), [['supplier', L('সাপ্লায়ার', 'Supplier')], ['outside', L('বাইরের সোর্সিং', 'Outside sourcing')], ['other', L('অন্য', 'Other')]]),
     T('kind_other', L('অন্য — লিখুন', 'Other — write it'), { show: (x) => x.d.kind === 'other' }),
     T('phone', L('ফোন', 'Phone')), T('address', L('ঠিকানা', 'Address')), N('credit_days', L('বাকির সময় (দিন)', 'Credit period (days)')),
@@ -418,9 +422,9 @@ B.forms['06-5'] = {
     const out = rows.map((r) => { if (!(has(r.bill) || has(r.debit) || has(r.pay))) return {}; bal += num(r.bill) - num(r.debit) - num(r.pay); return { bal }; });
     v.due = bal; v.master_total = sum(x.rows('master').map((r) => r.m_due));
     if (out.some((o) => o.bal !== undefined && o.bal < 0)) flags.push(flag('overpaid', 'yellow', 'সাপ্লায়ারকে পাওনার চেয়ে বেশি দেওয়া হয়েছে (বকেয়া ঋণাত্মক)', 'The supplier was paid more than is due (balance below zero)', Math.min(...out.filter((o) => o.bal !== undefined).map((o) => o.bal))));
-    if (has(x.d.verifier) && x.d.verifier === x.me) flags.push(flag('verifier_is_keeper', 'red', 'হিসাবের তথ্যের যাচাইকারী ও হিসাবরক্ষক একই জন', 'The account details checker is the ledger keeper', undefined));
-    if (has(x.d.chg_approver) && x.d.chg_approver === x.me) flags.push(flag('change_approver_is_keeper', 'red', 'তথ্য বদলের অনুমোদনকারী ও হিসাবরক্ষক একই জন', 'The change approver is the ledger keeper', undefined));
-    if (rows.some((r) => num(r.pay) > 0) && !has(x.d.verifier)) flags.push(flag('pay_before_verify', 'yellow', 'হিসাবের তথ্য যাচাই ছাড়াই পেমেন্ট লেখা হয়েছে', 'A payment is written before the account details were checked', undefined));
+    if (has(x.d.verifier) && has(x.d.keeper) && x.d.verifier === x.d.keeper) flags.push(flag('verifier_is_keeper', 'red', 'হিসাবের তথ্যের যাচাইকারী ও হিসাবরক্ষক একই জন', 'The account details checker is the ledger keeper', undefined));
+    if (has(x.d.chg_approver) && has(x.d.keeper) && x.d.chg_approver === x.d.keeper) flags.push(flag('change_approver_is_keeper', 'red', 'তথ্য বদলের অনুমোদনকারী ও হিসাবরক্ষক একই জন', 'The change approver is the ledger keeper', undefined));
+    if (rows.some((r) => num(r.pay) > 0) && !has(x.d.verifier)) flags.push(flag('pay_before_verify', 'red', 'হিসাবের তথ্য যাচাই ছাড়াই পেমেন্ট লেখা হয়েছে', 'A payment is written before the account details were checked', undefined));
     return { v, rows: { lines: out }, flags, needs: [] };
   },
 };
