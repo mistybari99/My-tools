@@ -163,7 +163,7 @@ declare
   any_ov boolean := false; any_drift boolean := false; any_custom boolean := false;
   at_ timestamptz := coalesce(p_sold_at, now()); stype text := coalesce(p_sale_type, 'retail');
   pay jsonb; paid_sum numeric := 0; due numeric; mob text; cust public.customers; tend numeric; modes text[] := '{}'; pm text; lim jsonb; bal numeric;
-  needcust boolean; credit_over boolean := false; em text;
+  needcust boolean; credit_over boolean := false; em text; ov_ok boolean;
 begin
   perform set_config('bos.em_used', '', true);
   if not public.can_do('POS', 'enter') then raise exception 'not allowed'; end if;
@@ -186,7 +186,10 @@ begin
       if qty is null or qty = 'NaN'::numeric or qty <= 0 then raise exception 'bad_qty'; end if;
       pr := it.sell_price;
       if (ln->>'override')::boolean is true then
-        if public.rule_on('pos_override_manager') and not public.rule_ok('price_override', p_loc) then raise exception 'override_needs_approval'; end if;
+        if public.rule_on('pos_override_manager') then
+          if ov_ok is null then ov_ok := public.rule_ok('price_override', p_loc, null, null, 'sale'); end if;      -- one approval covers every price change in this sale
+          if not ov_ok then raise exception 'override_needs_approval'; end if;
+        end if;
         pr := (ln->>'price')::numeric;
         if pr is null or pr = 'NaN'::numeric or pr < 0 then raise exception 'bad_price'; end if;
         if pr is distinct from it.sell_price then ov := true; any_ov := true; end if;
@@ -215,7 +218,7 @@ begin
   if disc < 0 or disc > sub then raise exception 'bad_discount'; end if;
   select value into lim from public.location_settings where location_id = p_loc and key = 'discount_limit';
   if disc > 0 and public.rule_on('pos_discount_manager') and (lim is null or jsonb_typeof(lim) = 'null' or disc > (lim #>> '{}')::numeric)
-     and not public.rule_ok('discount_over_limit', p_loc) then raise exception 'discount_needs_approval'; end if;   -- no limit written = a granted role is needed
+     and not public.rule_ok('discount_over_limit', p_loc, disc, null, 'sale') then raise exception 'discount_needs_approval'; end if;   -- no limit written = a granted role is needed
   -- payments
   if p_payments is not null and jsonb_typeof(p_payments) <> 'array' then raise exception 'bad_payments'; end if;
   for pay in select * from jsonb_array_elements(coalesce(p_payments, '[]'::jsonb)) loop
@@ -231,7 +234,7 @@ begin
   -- customer
   mob := case when nullif(btrim(p_customer_mobile), '') is not null then public.norm_mobile(p_customer_mobile) end;
   needcust := (due > 0 and public.rule_on('pos_customer_on_due')) or (stype = 'wholesale' and public.rule_on('pos_customer_on_wholesale')) or (disc > 0 and public.rule_on('pos_customer_on_discount'));
-  if needcust and mob is null and not public.rule_ok('sale_without_customer', p_loc) then raise exception 'customer_required'; end if;
+  if needcust and mob is null and not public.rule_ok('sale_without_customer', p_loc, null, null, 'sale') then raise exception 'customer_required'; end if;
   if mob is not null then
     select * into cust from public.customers where mobile = mob for update;
     if not found then
@@ -245,7 +248,7 @@ begin
       bal := coalesce(public.customer_balance(cust.id), 0);
       if bal + due > cust.credit_limit then
         credit_over := true;
-        if coalesce(public.rule_txt('pos_credit_mode'), 'block') = 'block' and not public.rule_ok('credit_over_limit', p_loc) then raise exception 'over_credit_limit'; end if;
+        if coalesce(public.rule_txt('pos_credit_mode'), 'block') = 'block' and not public.rule_ok('credit_over_limit', p_loc, due, null, 'sale') then raise exception 'over_credit_limit'; end if;
       end if;
     end if;
   end if;
@@ -292,6 +295,11 @@ begin
         values (null, s.id, 'POS', p_loc, s.sale_date, 'discount_over_limit', 'red', disc,
           jsonb_build_object('bn', 'রসিদ ' || n || ': ডিসকাউন্ট সীমার উপরে', 'en', 'Receipt ' || n || ': discount above the limit'));
     end if;
+  end if;
+  if due > 0 and cust.id is null then
+    insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+      values (null, s.id, 'POS', p_loc, s.sale_date, 'unattributed_due', 'yellow', due,
+        jsonb_build_object('bn', 'রসিদ ' || n || ': বাকি আছে কিন্তু কোনো গ্রাহক নেই — এই বাকি কোনো গ্রাহকের খাতায় নেই', 'en', 'Receipt ' || n || ': an amount is due but there is no customer — it is on nobody’s ledger'));
   end if;
   if credit_over then
     insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
@@ -515,7 +523,7 @@ begin
   if v is null or v !~ '^\d{4}-\d{2}-\d{2}$' then return; end if;
   begin d := v::date; exception when others then return; end;      -- an impossible date (2026-02-30) locks nobody out
   if p_date > d then return; end if;
-  if public.rule_ok('closed_period_edit', null) then return; end if;
+  if public.rule_ok('closed_period_edit', null, null, p_date, 'entry') then return; end if;
   raise exception 'period_closed';
 end $$;
 create or replace function public.entries_lock() returns trigger language plpgsql security definer set search_path = public as $$
@@ -532,7 +540,7 @@ begin
   return new;
 end $$;
 create trigger sales_lock before insert or update on public.sales for each row execute function public.sales_lock();
-revoke all on function public.lock_check(date) from public, anon;
+revoke all on function public.lock_check(date) from public, anon, authenticated;
 -- ============================================================
 -- BOS tool · Phase 7: business RULES the owner can edit, role GRANTS (who may do what), EMERGENCY requests.
 -- Run AFTER phase6 (phase5/6/7 together are in ALL_NEW.sql). Run once.
@@ -551,6 +559,7 @@ create table public.rules (
   value jsonb,                                            -- null = use the default
   default_value jsonb,
   unit text, choices jsonb,                               -- choices: ["block","warn","off"]
+  min_value numeric, max_value numeric,                   -- bounds for a number rule
   label_bn text not null, label_mix text, label_en text,
   hint_bn text, hint_mix text, hint_en text,
   sort int not null default 0,
@@ -588,7 +597,7 @@ begin
   if not found then raise exception 'rule not found'; end if;
   if p_value is not null and jsonb_typeof(p_value) <> 'null' then
     if r.kind = 'switch' and jsonb_typeof(p_value) <> 'boolean' then raise exception 'bad_value'; end if;
-    if r.kind = 'number' and (jsonb_typeof(p_value) <> 'number' or (p_value #>> '{}')::numeric < 0) then raise exception 'bad_value'; end if;
+    if r.kind = 'number' and (jsonb_typeof(p_value) <> 'number' or (p_value #>> '{}')::numeric < coalesce(r.min_value, 0) or (p_value #>> '{}')::numeric > coalesce(r.max_value, 1000000000)) then raise exception 'bad_value'; end if;
     if r.kind = 'choice' and not (r.choices @> jsonb_build_array(p_value #>> '{}')) then raise exception 'bad_value'; end if;
     if r.kind = 'text' and jsonb_typeof(p_value) <> 'string' then raise exception 'bad_value'; end if;
     if p_key = 'period_closed_until' then
@@ -599,25 +608,25 @@ begin
   update public.rules set value = case when p_value is null or jsonb_typeof(p_value) = 'null' then null else p_value end, updated_at = now(), updated_by = auth.uid() where key = p_key;
 end $$;
 
-insert into public.rules (key, module, kind, default_value, unit, choices, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values
- ('pos_customer_on_due', 'pos', 'switch', 'true', null, null, 'বাকি রেখে সেল করলে গ্রাহকের মোবাইল নম্বর ও নাম লাগবে', 'Due রেখে sale করলে Customer এর mobile number ও নাম লাগবে', 'A customer mobile number and name are required when anything is left due', 'বন্ধ করলে বাকির সেল গ্রাহক ছাড়াই হবে — সুপারিশ করা হয় না', 'If off, a due sale can be made without a customer — not recommended', 10),
- ('pos_customer_on_wholesale', 'pos', 'switch', 'true', null, null, 'পাইকারি সেলে গ্রাহক লাগবে', 'Wholesale sale এ Customer লাগবে', 'A customer is required on every wholesale sale', null, null, 11),
- ('pos_customer_on_discount', 'pos', 'switch', 'false', null, null, 'যেকোনো ডিসকাউন্টে গ্রাহক লাগবে (খুচরা সহ)', 'যেকোনো Discount এ Customer লাগবে (retail সহ)', 'A customer is required on any discount, retail included', null, null, 12),
- ('pos_discount_manager', 'pos', 'switch', 'true', null, null, 'ডিসকাউন্ট সীমার উপরে (বা সীমা লেখা না থাকলে) নির্ধারিত ভূমিকা লাগবে', 'Discount limit এর উপরে (বা limit না থাকলে) নির্ধারিত role লাগবে', 'A granted role is needed for a discount above the limit (or when no limit is written)', 'কে পারবে তা নিচের "কে কী পারবে" ছকে ঠিক হয়', 'Who may is set in the "Who may do what" grid below', 13),
- ('pos_override_manager', 'pos', 'switch', 'true', null, null, 'তালিকার দাম বদলাতে নির্ধারিত ভূমিকা লাগবে', 'List এর দাম বদলাতে নির্ধারিত role লাগবে', 'A granted role is needed to change a list price', null, null, 14),
- ('pos_credit_mode', 'pos', 'choice', '"block"', null, '["block","warn","off"]', 'গ্রাহকের বাকির সীমা পার হলে: block = আটকাবে, warn = শুধু জানাবে, off = দেখবে না', 'Customer এর credit limit পার হলে: block = আটকাবে, warn = শুধু জানাবে, off = দেখবে না', 'When a customer’s credit limit is exceeded: block, warn only, or off', null, null, 15),
- ('pos_unlisted', 'pos', 'choice', '"flag"', null, '["allow","flag","block"]', 'তালিকায় নেই এমন আইটেম বিক্রি: allow = চলবে, flag = চলবে আর মালিককে জানাবে, block = আটকাবে', 'List এ নেই এমন item বিক্রি: allow, flag (মালিককে জানাবে), block', 'Selling an item that is not in the list: allow, flag (tell the owner), or block', null, null, 16),
- ('pos_offline_hours', 'pos', 'number', '72', 'ঘণ্টা', null, 'ফোনে জমা থাকা সেল কত ঘণ্টা পর্যন্ত নিজের সময়ে বসবে', 'ফোনে জমা sale কত ঘণ্টা পর্যন্ত নিজের সময়ে বসবে', 'How many hours an offline sale keeps its own time', 'এর পরে পাঠালে সেটা পাঠানোর সময়ে বসে', 'Sent later than this, it takes the time it was sent', 17),
- ('period_closed_until', 'books', 'text', null, 'YYYY-MM-DD', null, 'হিসাব বন্ধের তারিখ — এই তারিখ পর্যন্ত কিছু বদলাতে অনুমতি লাগবে', 'হিসাব বন্ধের date — এই date পর্যন্ত কিছু বদলাতে অনুমতি লাগবে', 'Books closed until — changing anything dated up to this day needs permission', 'যেমন 2026-09-30। ফাঁকা = কিছু বন্ধ নয়। মালিক সবসময় পারেন', 'e.g. 2026-09-30. Empty = nothing closed. The owner always may', 20),
- ('entry_paper_no_required', 'entries', 'switch', 'false', null, null, 'ফর্ম জমা দিতে কাগজের ছাপা নম্বর বাধ্যতামূলক', 'Form জমা দিতে কাগজের ছাপা number বাধ্যতামূলক', 'The printed paper number is required to submit a form', 'কাগজের ফর্ম আর অ্যাপ একসাথে চালালে চালু করুন', 'Turn on when paper forms run alongside the app', 30),
- ('em_enabled', 'emergency', 'switch', 'true', null, null, 'জরুরি অনুরোধ চালু', 'জরুরি request চালু', 'Emergency requests are on', 'বন্ধ করলে স্টাফ আটকে গেলে অনুরোধ পাঠাতে পারবে না', 'If off, a blocked staff member cannot send a request', 40),
- ('em_minutes', 'emergency', 'number', '30', 'মিনিট', null, 'জরুরি অনুমোদন কত মিনিট চলবে', 'জরুরি অনুমোদন কত minute চলবে', 'How many minutes an emergency approval lasts', 'এই সময়ের মধ্যে ব্যবহার না হলে মেয়াদ শেষ', 'It expires if unused in this time', 41),
- ('em_discount', 'emergency', 'switch', 'true', null, null, 'জরুরি অনুরোধ চলবে: সীমার উপরে ডিসকাউন্ট', 'জরুরি request চলবে: limit এর উপরে discount', 'Emergency allowed for: discount above the limit', null, null, 42),
- ('em_price', 'emergency', 'switch', 'true', null, null, 'জরুরি অনুরোধ চলবে: দাম বদল', 'জরুরি request চলবে: দাম বদল', 'Emergency allowed for: price change', null, null, 43),
- ('em_credit', 'emergency', 'switch', 'true', null, null, 'জরুরি অনুরোধ চলবে: বাকির সীমা পার', 'জরুরি request চলবে: credit limit পার', 'Emergency allowed for: credit limit exceeded', null, null, 44),
- ('em_customer', 'emergency', 'switch', 'false', null, null, 'জরুরি অনুরোধ চলবে: গ্রাহকের মোবাইল ছাড়া সেল', 'জরুরি request চলবে: Customer এর mobile ছাড়া sale', 'Emergency allowed for: a sale without the customer mobile', 'ডিফল্টে বন্ধ — মোবাইল নম্বর নিয়ম কড়া রাখতে', 'Off by default — keeps the mobile-number rule strict', 45),
- ('em_period', 'emergency', 'switch', 'true', null, null, 'জরুরি অনুরোধ চলবে: বন্ধ হিসাবের তারিখে এন্ট্রি', 'জরুরি request চলবে: বন্ধ হিসাবের date এ entry', 'Emergency allowed for: an entry in a closed period', null, null, 46),
- ('em_access', 'emergency', 'switch', 'true', null, null, 'জরুরি অনুরোধ চলবে: যে ফর্ম বা লোকেশনে অনুমতি নেই', 'জরুরি request চলবে: যে form বা location এ অনুমতি নেই', 'Emergency allowed for: a form or location the person has no access to', null, null, 47);
+insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values
+ ('pos_customer_on_due', 'pos', 'switch', 'true', null, null, null, null, 'বাকি রেখে সেল করলে গ্রাহকের মোবাইল নম্বর ও নাম লাগবে', 'Due রেখে sale করলে Customer এর mobile number ও নাম লাগবে', 'A customer mobile number and name are required when anything is left due', 'বন্ধ করলে বাকির সেল গ্রাহক ছাড়াই হবে — সুপারিশ করা হয় না', 'If off, a due sale can be made without a customer — not recommended', 10),
+ ('pos_customer_on_wholesale', 'pos', 'switch', 'true', null, null, null, null, 'পাইকারি সেলে গ্রাহক লাগবে', 'Wholesale sale এ Customer লাগবে', 'A customer is required on every wholesale sale', null, null, 11),
+ ('pos_customer_on_discount', 'pos', 'switch', 'false', null, null, null, null, 'যেকোনো ডিসকাউন্টে গ্রাহক লাগবে (খুচরা সহ)', 'যেকোনো Discount এ Customer লাগবে (retail সহ)', 'A customer is required on any discount, retail included', null, null, 12),
+ ('pos_discount_manager', 'pos', 'switch', 'true', null, null, null, null, 'ডিসকাউন্ট সীমার উপরে (বা সীমা লেখা না থাকলে) নির্ধারিত ভূমিকা লাগবে', 'Discount limit এর উপরে (বা limit না থাকলে) নির্ধারিত role লাগবে', 'A granted role is needed for a discount above the limit (or when no limit is written)', 'কে পারবে তা নিচের "কে কী পারবে" ছকে ঠিক হয়', 'Who may is set in the "Who may do what" grid below', 13),
+ ('pos_override_manager', 'pos', 'switch', 'true', null, null, null, null, 'তালিকার দাম বদলাতে নির্ধারিত ভূমিকা লাগবে', 'List এর দাম বদলাতে নির্ধারিত role লাগবে', 'A granted role is needed to change a list price', null, null, 14),
+ ('pos_credit_mode', 'pos', 'choice', '"block"', null, '["block","warn","off"]', null, null, 'গ্রাহকের বাকির সীমা পার হলে: block = আটকাবে, warn = শুধু জানাবে, off = দেখবে না', 'Customer এর credit limit পার হলে: block = আটকাবে, warn = শুধু জানাবে, off = দেখবে না', 'When a customer’s credit limit is exceeded: block, warn only, or off', null, null, 15),
+ ('pos_unlisted', 'pos', 'choice', '"flag"', null, '["allow","flag","block"]', null, null, 'তালিকায় নেই এমন আইটেম বিক্রি: allow = চলবে, flag = চলবে আর মালিককে জানাবে, block = আটকাবে', 'List এ নেই এমন item বিক্রি: allow, flag (মালিককে জানাবে), block', 'Selling an item that is not in the list: allow, flag (tell the owner), or block', null, null, 16),
+ ('pos_offline_hours', 'pos', 'number', '72', 'ঘণ্টা', null, 1, 8760, 'ফোনে জমা থাকা সেল কত ঘণ্টা পর্যন্ত নিজের সময়ে বসবে', 'ফোনে জমা sale কত ঘণ্টা পর্যন্ত নিজের সময়ে বসবে', 'How many hours an offline sale keeps its own time', 'এর পরে পাঠালে সেটা পাঠানোর সময়ে বসে', 'Sent later than this, it takes the time it was sent', 17),
+ ('period_closed_until', 'books', 'text', null, 'YYYY-MM-DD', null, null, null, 'হিসাব বন্ধের তারিখ — এই তারিখ পর্যন্ত কিছু বদলাতে অনুমতি লাগবে', 'হিসাব বন্ধের date — এই date পর্যন্ত কিছু বদলাতে অনুমতি লাগবে', 'Books closed until — changing anything dated up to this day needs permission', 'যেমন 2026-09-30। ফাঁকা = কিছু বন্ধ নয়। মালিক সবসময় পারেন', 'e.g. 2026-09-30. Empty = nothing closed. The owner always may', 20),
+ ('entry_paper_no_required', 'entries', 'switch', 'false', null, null, null, null, 'ফর্ম জমা দিতে কাগজের ছাপা নম্বর বাধ্যতামূলক', 'Form জমা দিতে কাগজের ছাপা number বাধ্যতামূলক', 'The printed paper number is required to submit a form', 'কাগজের ফর্ম আর অ্যাপ একসাথে চালালে চালু করুন', 'Turn on when paper forms run alongside the app', 30),
+ ('em_enabled', 'emergency', 'switch', 'true', null, null, null, null, 'জরুরি অনুরোধ চালু', 'জরুরি request চালু', 'Emergency requests are on', 'বন্ধ করলে স্টাফ আটকে গেলে অনুরোধ পাঠাতে পারবে না', 'If off, a blocked staff member cannot send a request', 40),
+ ('em_minutes', 'emergency', 'number', '30', 'মিনিট', null, 1, 1440, 'জরুরি অনুমোদন কত মিনিট চলবে', 'জরুরি অনুমোদন কত minute চলবে', 'How many minutes an emergency approval lasts', 'এই সময়ের মধ্যে ব্যবহার না হলে মেয়াদ শেষ', 'It expires if unused in this time', 41),
+ ('em_discount', 'emergency', 'switch', 'true', null, null, null, null, 'জরুরি অনুরোধ চলবে: সীমার উপরে ডিসকাউন্ট', 'জরুরি request চলবে: limit এর উপরে discount', 'Emergency allowed for: discount above the limit', null, null, 42),
+ ('em_price', 'emergency', 'switch', 'true', null, null, null, null, 'জরুরি অনুরোধ চলবে: দাম বদল', 'জরুরি request চলবে: দাম বদল', 'Emergency allowed for: price change', null, null, 43),
+ ('em_credit', 'emergency', 'switch', 'true', null, null, null, null, 'জরুরি অনুরোধ চলবে: বাকির সীমা পার', 'জরুরি request চলবে: credit limit পার', 'Emergency allowed for: credit limit exceeded', null, null, 44),
+ ('em_customer', 'emergency', 'switch', 'false', null, null, null, null, 'জরুরি অনুরোধ চলবে: গ্রাহকের মোবাইল ছাড়া সেল', 'জরুরি request চলবে: Customer এর mobile ছাড়া sale', 'Emergency allowed for: a sale without the customer mobile', 'ডিফল্টে বন্ধ — মোবাইল নম্বর নিয়ম কড়া রাখতে', 'Off by default — keeps the mobile-number rule strict', 45),
+ ('em_period', 'emergency', 'switch', 'true', null, null, null, null, 'জরুরি অনুরোধ চলবে: বন্ধ হিসাবের তারিখে এন্ট্রি', 'জরুরি request চলবে: বন্ধ হিসাবের date এ entry', 'Emergency allowed for: an entry in a closed period', null, null, 46),
+ ('em_access', 'emergency', 'switch', 'true', null, null, null, null, 'জরুরি অনুরোধ চলবে: যে ফর্ম বা লোকেশনে অনুমতি নেই', 'জরুরি request চলবে: যে form বা location এ অনুমতি নেই', 'Emergency allowed for: a form or location the person has no access to', null, null, 47);
 
 -- ---------- grants: which role may do a controlled action ----------
 create table public.rule_grants (
@@ -668,6 +677,7 @@ begin
   if not public.is_owner() then raise exception 'not allowed'; end if;
   if not exists (select 1 from public.grant_defs where grant_code = p_code) then raise exception 'unknown grant'; end if;
   if p_role = 'owner' then return; end if;
+  if not exists (select 1 from public.roles where code = p_role) then raise exception 'unknown role'; end if;
   if p_allowed then insert into public.rule_grants (grant_code, role_code) values (p_code, p_role) on conflict (grant_code, role_code) do update set allowed = true;
   else delete from public.rule_grants where grant_code = p_code and role_code = p_role; end if;
 end $$;
@@ -677,7 +687,9 @@ create table public.emergency_requests (
   id bigserial primary key,
   grant_code text not null references public.grant_defs(grant_code),
   requested_by uuid not null, requested_staff text, location_id int,
-  context jsonb not null default '{}',                       -- what was attempted, e.g. {"discount":120} or {"form":"10-2","action":"enter"}
+  context jsonb not null default '{}',                       -- what was attempted, e.g. {"amount":120} or {"form":"10-2","action":"enter"}
+  amount numeric,                                            -- the approval covers at most this amount (discount, credit due ...)
+  for_date date,                                             -- a closed-period approval covers this date only
   reason text not null,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'used', 'expired', 'cancelled')),
   created_at timestamptz not null default now(),
@@ -694,7 +706,7 @@ grant select on public.emergency_requests to authenticated;
 
 create or replace function public.request_emergency(p_grant text, p_loc int, p_context jsonb, p_reason text) returns bigint
 language plpgsql security definer set search_path = public as $$
-declare d public.grant_defs; sid text; nid bigint;
+declare d public.grant_defs; sid text; nid bigint; ctx jsonb := coalesce(p_context, '{}'); amt numeric; fd date; frm text; act text;
 begin
   if not public.is_active() then raise exception 'not allowed'; end if;
   if not public.rule_on('em_enabled') then raise exception 'emergency_off'; end if;
@@ -702,11 +714,29 @@ begin
   if not found or d.emergency_rule is null then raise exception 'emergency_not_available'; end if;
   if not public.rule_on(d.emergency_rule) then raise exception 'emergency_off'; end if;
   if p_reason is null or length(btrim(p_reason)) < 3 then raise exception 'reason_required'; end if;
-  if (select count(*) from public.emergency_requests where requested_by = auth.uid() and status = 'pending') >= 5 then raise exception 'too_many_pending'; end if;
-  if length(coalesce(p_context, '{}')::text) > 2000 then raise exception 'bad_context'; end if;
+  if (select count(*) from public.emergency_requests where requested_by = auth.uid() and status = 'pending' and created_at > now() - interval '1 day') >= 5 then raise exception 'too_many_pending'; end if;
+  if length(ctx::text) > 2000 or jsonb_typeof(ctx) <> 'object' then raise exception 'bad_context'; end if;
+  if p_grant <> 'closed_period_edit' and p_grant <> 'form_access' then
+    if p_loc is null or not exists (select 1 from public.locations where id = p_loc) or not public.can_loc(p_loc) and p_grant <> 'loc_access' then raise exception 'bad_location'; end if;
+  end if;
+  if p_grant = 'loc_access' and (p_loc is null or not exists (select 1 from public.locations where id = p_loc)) then raise exception 'bad_location'; end if;
+  if ctx ? 'amount' then
+    begin amt := (ctx->>'amount')::numeric; exception when others then raise exception 'bad_context'; end;
+    if amt < 0 then raise exception 'bad_context'; end if;
+  end if;
+  if p_grant in ('discount_over_limit', 'credit_over_limit') and amt is null then raise exception 'bad_context'; end if;
+  if p_grant = 'closed_period_edit' then
+    if not (ctx ? 'date') then raise exception 'bad_context'; end if;
+    begin fd := (ctx->>'date')::date; exception when others then raise exception 'bad_context'; end;
+  end if;
+  if p_grant = 'form_access' then
+    frm := ctx->>'form'; act := coalesce(ctx->>'action', 'enter');
+    if frm is null or frm in ('ITEM_COST') or not exists (select 1 from public.forms where code = frm) or act not in ('view', 'enter') then raise exception 'bad_context'; end if;
+    ctx := jsonb_build_object('form', frm, 'action', act);
+  end if;
   select staff_id into sid from public.profiles where id = auth.uid();
-  insert into public.emergency_requests (grant_code, requested_by, requested_staff, location_id, context, reason)
-    values (p_grant, auth.uid(), sid, p_loc, coalesce(p_context, '{}'), left(btrim(p_reason), 300)) returning id into nid;
+  insert into public.emergency_requests (grant_code, requested_by, requested_staff, location_id, context, amount, for_date, reason)
+    values (p_grant, auth.uid(), sid, p_loc, ctx, amt, fd, left(btrim(p_reason), 300)) returning id into nid;
   return nid;
 end $$;
 
@@ -718,6 +748,7 @@ begin
   select * into r from public.emergency_requests where id = p_id for update;
   if not found then raise exception 'not found'; end if;
   if r.status <> 'pending' then raise exception 'already decided'; end if;
+  if r.created_at < now() - interval '1 day' then update public.emergency_requests set status = 'expired' where id = p_id; return; end if;      -- a day-old request is stale: ask again
   if r.requested_by = auth.uid() and not public.is_owner() then raise exception 'own_request'; end if;
   if not p_approve and (p_note is null or length(btrim(p_note)) = 0) then raise exception 'note_required'; end if;
   mins := coalesce(public.rule_num('em_minutes'), 30);
@@ -732,24 +763,35 @@ begin
   update public.emergency_requests set status = 'cancelled' where id = p_id and requested_by = auth.uid() and status = 'pending';
 end $$;
 
--- use an approved request: 'once' grants are consumed, 'window' grants stay valid until they expire
-create or replace function public.use_emergency(p_grant text, p_loc int, p_ref text) returns boolean
+-- use an approved request. It must cover what is being done (amount, date, location); 'once' grants are consumed, 'window' grants stay valid until they expire.
+-- Every use leaves a trace: 'once' keeps used_at/used_ref, a window gets used_at on its first use plus an exception for the owner.
+create or replace function public.use_emergency(p_grant text, p_loc int, p_ref text, p_amount numeric default null, p_date date default null) returns boolean
 language plpgsql security definer set search_path = public as $$
-declare r public.emergency_requests; w text;
+declare r public.emergency_requests; w text; sid text;
 begin
   select * into r from public.emergency_requests
-    where requested_by = auth.uid() and grant_code = p_grant and status = 'approved' and valid_until > now() and (location_id is null or p_loc is null or location_id = p_loc)
+    where requested_by = auth.uid() and grant_code = p_grant and status = 'approved' and valid_until > now()
+      and (location_id is null or p_loc is null or location_id = p_loc)
+      and (amount is null or p_amount is null or p_amount <= amount)
+      and (for_date is null or p_date is null or for_date = p_date)
     order by id limit 1 for update;
   if not found then return false; end if;
   select window_type into w from public.grant_defs where grant_code = p_grant;
-  if w = 'once' then update public.emergency_requests set status = 'used', used_at = now(), used_ref = left(p_ref, 80) where id = r.id; end if;
+  if w = 'once' then update public.emergency_requests set status = 'used', used_at = now(), used_ref = left(p_ref, 80) where id = r.id;
+  elsif r.used_at is null then
+    update public.emergency_requests set used_at = now(), used_ref = left(p_ref, 80) where id = r.id;
+    select staff_id into sid from public.profiles where id = auth.uid();
+    insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+      values (null, null, 'EMERGENCY', coalesce(p_loc, r.location_id, (select min(id) from public.locations)), (now() at time zone 'Asia/Dhaka')::date, 'emergency_window_used', 'yellow', null,
+        jsonb_build_object('bn', 'জরুরি অনুমোদন ব্যবহার হয়েছে: ' || p_grant || ' · ' || coalesce(sid, ''), 'en', 'An emergency approval was used: ' || p_grant || ' · ' || coalesce(sid, '')));
+  end if;
   perform set_config('bos.em_used', coalesce(current_setting('bos.em_used', true), '') || ',' || r.id || ':' || p_grant, true);
   return true;
 end $$;
-create or replace function public.rule_ok(p_grant text, p_loc int) returns boolean
+create or replace function public.rule_ok(p_grant text, p_loc int, p_amount numeric default null, p_date date default null, p_ref text default 'rule') returns boolean
 language plpgsql security definer set search_path = public as $$
 begin
-  return public.can_grant(p_grant) or public.use_emergency(p_grant, p_loc, 'rule');
+  return public.can_grant(p_grant) or public.use_emergency(p_grant, p_loc, p_ref, p_amount, p_date);
 end $$;
 
 -- approved requests that were never used become 'expired' when looked at
@@ -773,7 +815,7 @@ language sql stable security definer set search_path = public as $$
     or (p_action in ('view', 'enter') and exists (
       select 1 from public.emergency_requests e
       where e.requested_by = auth.uid() and e.grant_code = 'form_access' and e.status = 'approved' and e.valid_until > now()
-        and e.context->>'form' = p_form and (e.context->>'action' is null or e.context->>'action' = p_action or p_action = 'view')))));
+        and p_form <> 'ITEM_COST' and e.context->>'form' = p_form and (e.context->>'action' is null or e.context->>'action' = p_action or p_action = 'view')))));
 $$;
 create or replace function public.can_loc(p_loc int) returns boolean
 language sql stable security definer set search_path = public as $$
@@ -782,7 +824,7 @@ language sql stable security definer set search_path = public as $$
     or exists (select 1 from public.user_roles where user_id = auth.uid() and role_code = 'management')
     or exists (select 1 from public.user_locations where user_id = auth.uid() and location_id = p_loc)
     or exists (select 1 from public.emergency_requests e where e.requested_by = auth.uid() and e.grant_code = 'loc_access' and e.status = 'approved' and e.valid_until > now()
-               and (e.context->>'loc')::int = p_loc));
+               and e.location_id = p_loc));
 $$;
 
 -- the printed paper number can be made mandatory for submitting a form
@@ -796,7 +838,7 @@ create trigger entries_paper_required before insert or update on public.entries 
 
 revoke all on function public.rule_val(text), public.rule_on(text), public.rule_num(text), public.rule_txt(text), public.set_rule(text, jsonb), public.can_grant(text),
   public.set_grant(text, text, boolean), public.request_emergency(text, int, jsonb, text), public.decide_emergency(bigint, boolean, text), public.cancel_emergency(bigint),
-  public.use_emergency(text, int, text), public.rule_ok(text, int), public.my_emergency() from public, anon;
+  public.use_emergency(text, int, text, numeric, date), public.rule_ok(text, int, numeric, date, text), public.my_emergency() from public, anon, authenticated;
 grant execute on function public.rule_val(text), public.rule_on(text), public.rule_num(text), public.rule_txt(text), public.set_rule(text, jsonb), public.can_grant(text),
   public.set_grant(text, text, boolean), public.request_emergency(text, int, jsonb, text), public.decide_emergency(bigint, boolean, text), public.cancel_emergency(bigint),
   public.my_emergency() to authenticated;

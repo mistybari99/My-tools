@@ -70,3 +70,9 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   request/decide/cancel/use, can_do/can_loc honour short emergency windows, entry paper-no rule. record_sale2/lock_check/void_* now read rules+grants.
   web/rules.js (#/rulehub tabs Rules / Who may do what / More; #/emergency owner queue; staff 'ask for emergency approval' sheet). Home regrouped, MODULE_MAP.md written.
   supabase/ALL_NEW.sql = phase5+6+7 in one paste (builds on a fresh chain; tests test10/11 pass). User declined to run SQL: only they can (no DB access from here).
+
+## Checkpoint — audit fixes for rules / emergency system
+- Emergency approvals now bound to amount, date and location; form_access cannot target ITEM_COST or unknown forms.
+- Window use leaves an `emergency_window_used` exception; unattributed due leaves `unattributed_due`.
+- Rule number bounds enforced; internal helpers revoked from public roles; one approval covers one sale.
+- Regression tests (forms, POS, rules, lists, biz) all pass. `supabase/ALL_NEW.sql` regenerated (phase5+6+7) — still to be run once by the owner.

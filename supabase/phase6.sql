@@ -101,7 +101,7 @@ declare
   any_ov boolean := false; any_drift boolean := false; any_custom boolean := false;
   at_ timestamptz := coalesce(p_sold_at, now()); stype text := coalesce(p_sale_type, 'retail');
   pay jsonb; paid_sum numeric := 0; due numeric; mob text; cust public.customers; tend numeric; modes text[] := '{}'; pm text; lim jsonb; bal numeric;
-  needcust boolean; credit_over boolean := false; em text;
+  needcust boolean; credit_over boolean := false; em text; ov_ok boolean;
 begin
   perform set_config('bos.em_used', '', true);
   if not public.can_do('POS', 'enter') then raise exception 'not allowed'; end if;
@@ -124,7 +124,10 @@ begin
       if qty is null or qty = 'NaN'::numeric or qty <= 0 then raise exception 'bad_qty'; end if;
       pr := it.sell_price;
       if (ln->>'override')::boolean is true then
-        if public.rule_on('pos_override_manager') and not public.rule_ok('price_override', p_loc) then raise exception 'override_needs_approval'; end if;
+        if public.rule_on('pos_override_manager') then
+          if ov_ok is null then ov_ok := public.rule_ok('price_override', p_loc, null, null, 'sale'); end if;      -- one approval covers every price change in this sale
+          if not ov_ok then raise exception 'override_needs_approval'; end if;
+        end if;
         pr := (ln->>'price')::numeric;
         if pr is null or pr = 'NaN'::numeric or pr < 0 then raise exception 'bad_price'; end if;
         if pr is distinct from it.sell_price then ov := true; any_ov := true; end if;
@@ -153,7 +156,7 @@ begin
   if disc < 0 or disc > sub then raise exception 'bad_discount'; end if;
   select value into lim from public.location_settings where location_id = p_loc and key = 'discount_limit';
   if disc > 0 and public.rule_on('pos_discount_manager') and (lim is null or jsonb_typeof(lim) = 'null' or disc > (lim #>> '{}')::numeric)
-     and not public.rule_ok('discount_over_limit', p_loc) then raise exception 'discount_needs_approval'; end if;   -- no limit written = a granted role is needed
+     and not public.rule_ok('discount_over_limit', p_loc, disc, null, 'sale') then raise exception 'discount_needs_approval'; end if;   -- no limit written = a granted role is needed
   -- payments
   if p_payments is not null and jsonb_typeof(p_payments) <> 'array' then raise exception 'bad_payments'; end if;
   for pay in select * from jsonb_array_elements(coalesce(p_payments, '[]'::jsonb)) loop
@@ -169,7 +172,7 @@ begin
   -- customer
   mob := case when nullif(btrim(p_customer_mobile), '') is not null then public.norm_mobile(p_customer_mobile) end;
   needcust := (due > 0 and public.rule_on('pos_customer_on_due')) or (stype = 'wholesale' and public.rule_on('pos_customer_on_wholesale')) or (disc > 0 and public.rule_on('pos_customer_on_discount'));
-  if needcust and mob is null and not public.rule_ok('sale_without_customer', p_loc) then raise exception 'customer_required'; end if;
+  if needcust and mob is null and not public.rule_ok('sale_without_customer', p_loc, null, null, 'sale') then raise exception 'customer_required'; end if;
   if mob is not null then
     select * into cust from public.customers where mobile = mob for update;
     if not found then
@@ -183,7 +186,7 @@ begin
       bal := coalesce(public.customer_balance(cust.id), 0);
       if bal + due > cust.credit_limit then
         credit_over := true;
-        if coalesce(public.rule_txt('pos_credit_mode'), 'block') = 'block' and not public.rule_ok('credit_over_limit', p_loc) then raise exception 'over_credit_limit'; end if;
+        if coalesce(public.rule_txt('pos_credit_mode'), 'block') = 'block' and not public.rule_ok('credit_over_limit', p_loc, due, null, 'sale') then raise exception 'over_credit_limit'; end if;
       end if;
     end if;
   end if;
@@ -230,6 +233,11 @@ begin
         values (null, s.id, 'POS', p_loc, s.sale_date, 'discount_over_limit', 'red', disc,
           jsonb_build_object('bn', 'রসিদ ' || n || ': ডিসকাউন্ট সীমার উপরে', 'en', 'Receipt ' || n || ': discount above the limit'));
     end if;
+  end if;
+  if due > 0 and cust.id is null then
+    insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+      values (null, s.id, 'POS', p_loc, s.sale_date, 'unattributed_due', 'yellow', due,
+        jsonb_build_object('bn', 'রসিদ ' || n || ': বাকি আছে কিন্তু কোনো গ্রাহক নেই — এই বাকি কোনো গ্রাহকের খাতায় নেই', 'en', 'Receipt ' || n || ': an amount is due but there is no customer — it is on nobody’s ledger'));
   end if;
   if credit_over then
     insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
@@ -453,7 +461,7 @@ begin
   if v is null or v !~ '^\d{4}-\d{2}-\d{2}$' then return; end if;
   begin d := v::date; exception when others then return; end;      -- an impossible date (2026-02-30) locks nobody out
   if p_date > d then return; end if;
-  if public.rule_ok('closed_period_edit', null) then return; end if;
+  if public.rule_ok('closed_period_edit', null, null, p_date, 'entry') then return; end if;
   raise exception 'period_closed';
 end $$;
 create or replace function public.entries_lock() returns trigger language plpgsql security definer set search_path = public as $$
@@ -470,4 +478,4 @@ begin
   return new;
 end $$;
 create trigger sales_lock before insert or update on public.sales for each row execute function public.sales_lock();
-revoke all on function public.lock_check(date) from public, anon;
+revoke all on function public.lock_check(date) from public, anon, authenticated;
