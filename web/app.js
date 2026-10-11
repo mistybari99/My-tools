@@ -44,8 +44,8 @@ function langBar() {
     `<button data-act="lang" data-v="${l}" class="${S.lang === l ? 'on' : ''}">${esc(T['lang_' + l][l])}</button>`).join('') + '</div>';
 }
 function shell(title, body, back) {
-  $('#app').innerHTML = `<header class="top">${back ? `<button data-act="go" data-v="home" aria-label="${esc(t('back'))}">←</button>` : ''}
-    <h1>${esc(title)}</h1>${langBar()}</header>${body}`;
+  const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">';
+  $('#app').innerHTML = `<header class="top">${lead}<h1>${esc(title)}</h1>${langBar()}</header>${body}`;
 }
 function openSheet(html) {
   closeSheet();
@@ -65,9 +65,12 @@ const ICON = {
   rules: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 16.5l4 4 8-9"/></svg>',
   settings: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h24M4 16h24M4 23h24"/><circle cx="11" cy="9" r="3.2" fill="var(--ink)"/><circle cx="21" cy="16" r="3.2" fill="var(--ink)"/><circle cx="13" cy="23" r="3.2" fill="var(--ink)"/></svg>',
   logs: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M10 8h18M10 16h18M10 24h18"/><circle cx="4.5" cy="8" r="1.4" fill="currentColor"/><circle cx="4.5" cy="16" r="1.4" fill="currentColor"/><circle cx="4.5" cy="24" r="1.4" fill="currentColor"/></svg>',
+  exceptions: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4l13 23H3z"/><path d="M16 13v7M16 24h.01"/></svg>',
+  releases: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="14" width="20" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 11-3"/></svg>',
+  locset: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 29s9-8 9-15a9 9 0 0 0-18 0c0 7 9 15 9 15z"/><circle cx="16" cy="14" r="3.2"/></svg>',
   backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
 };
-const TONE = { items: '', itemreq: '', staff: 't-brick', matrix: 't-brick', rules: 't-leaf', settings: 't-ink', logs: 't-ink', backup: 't-ink' };
+const TONE = { items: 't-gold', itemreq: 't-gold', staff: 't-ruby', matrix: 't-ruby', rules: '', settings: 't-ink', logs: 't-ink', backup: 't-ink', exceptions: 't-ruby', releases: 't-gold', locset: 't-ink' };
 const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
 
 // ---------- auth ----------
@@ -83,7 +86,7 @@ function authErr(msg) {
 function viewAuth(mode = 'login', msg = '') {
   const reg = mode === 'register';
   shell(t('app'), `
-    <div class="login-mark">${MARK}<div><b>${esc(t('app'))}</b><span>${esc(t('login_sub'))}</span></div></div>
+    <img class="login-logo" src="logo.webp" alt="${esc(t('app'))}"><p class="muted center" style="margin:0 0 4px">${esc(t('login_sub'))}</p>
     <div class="tabs">
       <button data-act="authmode" data-v="login" class="${reg ? '' : 'on'}">${esc(t('login'))}</button>
       <button data-act="authmode" data-v="register" class="${reg ? 'on' : ''}">${esc(t('register'))}</button>
@@ -136,7 +139,7 @@ async function start() {
 }
 
 // ---------- routing ----------
-const OWNER_ONLY = new Set(['staff', 'matrix', 'rules', 'settings', 'logs', 'backup']);
+const OWNER_ONLY = new Set(['staff', 'matrix', 'rules', 'settings', 'logs', 'backup', 'releases', 'locset']);
 function go(p) { location.hash = '#/' + p; }
 function route() {
   if (!S.ctx) return viewAuth();
@@ -145,10 +148,14 @@ function route() {
   if (st === 'disabled') { sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
   if (OWNER_ONLY.has(page) && !S.ctx.is_owner) return viewHome();
-  ({ home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
-     settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq }[page] || viewHome)();
+  const local = { home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
+     settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq };
+  const extra = window.BOS_PAGES || {};
+  if ((page === 'exceptions' || page === 'releases' || page === 'locset') && !S.ctx.is_owner && !(page === 'exceptions' && Object.values(S.ctx.perms).some((p) => p.approve))) return viewHome();
+  (local[page] || extra[page] || viewHome)();
 }
 window.addEventListener('hashchange', route);
+window.BOS_APP = { sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, H: null };
 
 function viewPending() {
   shell(t('app'), `<div class="card stack center"><h2>${esc(t('pending_title'))}</h2>
@@ -160,31 +167,36 @@ function viewPending() {
 // ---------- home ----------
 async function viewHome() {
   const p = S.ctx.profile, perms = S.ctx.perms || {}, owner = S.ctx.is_owner;
-  shell(t('app'), `<div class="hello"><span>${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b></span><span class="sid">${esc(p.staff_id)}</span></div><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
+  shell(t('app'), `<div class="banner"><div class="roundel"><img src="mark.svg" alt=""></div><div><div class="bn-t">${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b></div><div class="bn-s"><span class="since">Since 1988</span> <span class="sid">${esc(p.staff_id)}</span></div></div></div><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
     <button class="full" style="margin-top:18px" data-act="logout">${esc(t('logout'))}</button>`);
   const canDecide = owner || (perms.ITEMS && perms.ITEMS.approve);
-  const [forms, pend, itemPending] = await Promise.all([
+  const anyApprove = owner || Object.values(perms).some((p) => p.approve);
+  const [forms, pend, itemPending, exOpen, relPend] = await Promise.all([
     sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'),
     owner ? sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
     canDecide ? sb.from('item_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+    anyApprove ? sb.from('exceptions').select('id', { count: 'exact', head: true }).eq('status', 'open') : Promise.resolve({ count: 0 }),
+    owner ? sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
   ]);
   if (forms.error) return fail(forms.error);
   const tiles = [];
   if (perms.ITEMS && perms.ITEMS.view) tiles.push(['items', t('items'), '']);
   if (perms.ITEMS && (perms.ITEMS.enter || perms.ITEMS.approve)) tiles.push(['itemreq', t('item_req'), itemPending.count ? `<span class="badge">${itemPending.count}</span>` : '']);
+  if (anyApprove) tiles.push(['exceptions', t('exceptions'), exOpen.count ? `<span class="badge">${exOpen.count}</span>` : '']);
   if (owner) {
+    tiles.push(['releases', t('releases'), relPend.count ? `<span class="badge">${relPend.count}</span>` : '']);
     tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : '']);
-    tiles.push(['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
+    tiles.push(['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['locset', t('locset'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
   }
   const mine = forms.data.filter((f) => f.area !== 'master' && perms[f.code] && perms[f.code].view);
   const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);
   $('#home').innerHTML = `<div class="grid">${tiles.map(([go_, label, badge]) =>
       `<button class="tile ${TONE[go_] || ''}" data-act="go" data-v="${go_}">${ICON[go_] || ''}<span>${esc(label)}</span>${badge}</button>`).join('')}</div>
-    <h2>${esc(t('forms_title'))}</h2><div class="notice warn">${esc(t('forms_soon'))}</div>
-    ${byArea.length ? byArea.map(([a, l]) => `<div class="card panel"><b>${esc(t('area_' + a))}</b>${l.map((f) => {
-      const pr = perms[f.code];
-      return `<div class="perm"><div class="row between"><span>${esc(f.code)} · ${esc(nm(f))}</span><span class="row">${
-        pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${
+    <div class="orn">${esc(t('forms_title'))}</div>
+    ${byArea.length ? byArea.map(([a, l]) => `<div class="card panel"><h3>${esc(t('area_' + a))}</h3>${l.map((f) => {
+      const pr = perms[f.code], live = window.BOS && window.BOS.forms && window.BOS.forms[f.code];
+      return `<div class="perm"><div class="row between" ${live ? `data-act="openform" data-v="${f.code}" style="cursor:pointer;min-height:44px"` : 'style="opacity:.6"'}><span><b>${esc(f.code)}</b> · ${esc(nm(f))}</span><span class="row">${
+        live ? '' : `<span class="chip">${esc(t('soon'))}</span>`}${pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${
         pr.approve ? `<span class="chip warn">${esc(t('can_approve'))}</span>` : ''}</span></div></div>`; }).join('')}</div>`).join('')
       : `<p class="muted">${esc(t('no_forms'))}</p>`}`;
 }
@@ -480,6 +492,7 @@ const H = {
   setsave: (a) => saveSetting(a.dataset.v),
   bk_all: backupAll, bk_items: backupItems,
 };
+window.BOS_APP.H = H;
 document.addEventListener('click', (e) => {
   const a = e.target.closest('[data-act]'); if (!a || !H[a.dataset.act]) return;
   Promise.resolve(H[a.dataset.act](a)).catch(fail);
@@ -487,5 +500,7 @@ document.addEventListener('click', (e) => {
 document.addEventListener('input', (e) => { if (e.target.id === 'i_q') { S.itemQ = e.target.value; drawItems(); } });
 document.addEventListener('change', (e) => { if (e.target.id === 'l_t') { S.logTable = e.target.value; viewLogs(); } });
 
-start().catch(fail);
+// start after every script (forms.js, entry.js) has loaded
+const boot = () => start().catch(fail);
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

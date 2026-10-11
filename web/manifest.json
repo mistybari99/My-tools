@@ -3,7 +3,7 @@
   "short_name": "BOS",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f7eedc",
-  "theme_color": "#14173a",
+  "background_color": "#fffbf4",
+  "theme_color": "#a1111e",
   "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
 }

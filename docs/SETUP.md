@@ -3,6 +3,7 @@
 1. Supabase project exists (URL and publishable key are in `web/config.js`).
 2. Authentication -> Sign In / Providers -> Email -> turn **Confirm email OFF**, Save.
 3. SQL Editor -> New query -> paste all of `supabase/schema.sql` -> Run (once, on the empty project).
+3b. Run `supabase/phase2.sql` the same way (after schema.sql). It adds form entries, serial numbers, exceptions, release requests and location settings.
 4. Open the app and **register first**: the first account becomes the active owner automatically.
    Everyone after that stays "pending" until the owner approves them in Staff & approval.
 5. Backup: Home -> Backup -> download JSON, keep it in Google Drive (free plan has no auto-backup).
