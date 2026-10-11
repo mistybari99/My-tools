@@ -367,13 +367,13 @@ Object.assign(A.H, {
   iv_logo_none: () => { E.tpl.logo_ref = null; const i = $('#iv_logo'); if (i) i.value = ''; updatePreview(); },
   iv_save: saveTpl,
   iv_test: () => { readForm(); const bad = validTpl(); if (bad) return toast(bad); const tp = E.tpl; printHtml(previewHtml(), Number(tp.paper_width_mm) || 80, tp.kind === 'thermal58' || tp.kind === 'thermal80'); },
-  iv_del: async (a) => { if (!confirm(lab(L('এই টেমপ্লেট মুছবেন?', 'Delete this template?', 'এই template মুছবেন?')))) return; const { error } = await sb.from('invoice_templates').delete().eq('id', idv(a.dataset.id)); if (error) return denied(error); toast(T('saved')); location.hash = '#/invoice'; },
+  iv_del: async (a) => { if (!confirm(lab(L('এই টেমপ্লেট বন্ধ করবেন? (মোছা হয় না)', 'Retire this template? (nothing is deleted)', 'এই template বন্ধ করবেন? (মোছা হয় না)')))) return; const { error } = await sb.from('invoice_templates').update({ active: false, is_default: false }).eq('id', idv(a.dataset.id)); if (error) return denied(error); toast(T('saved')); location.hash = '#/invoice'; },
   iv_prof_new: () => profSheet(null),
   iv_prof_edit: (a) => profSheet(V.profs.find((x) => String(x.id) === a.dataset.id)),
   iv_prof_save: async (a) => { const name = val('#pf_name').trim(); if (!name) return toast(T('e_needname')); const w = pnum(val('#pf_w')); if (Number.isNaN(w) || (w !== null && w <= 0)) return toast(T('e_badw'));
     const row = { name, location_id: val('#pf_loc') === '' ? null : Number(val('#pf_loc')), device_key: val('#pf_dev').trim() || null, printer_type: val('#pf_type'), paper_size: val('#pf_size').trim() || null, paper_width_mm: w, template_id: val('#pf_tpl') === '' ? null : Number(val('#pf_tpl')), active: $('#pf_active').classList.contains('on'), updated_by: S.ctx.profile.id };
     const r = a.dataset.id ? await sb.from('print_profiles').update(row).eq('id', idv(a.dataset.id)) : await sb.from('print_profiles').insert(row); if (r.error) return denied(r.error); closeSheet(); toast(T('saved')); listPage(); },
-  iv_prof_del: async (a) => { const { error } = await sb.from('print_profiles').delete().eq('id', idv(a.dataset.id)); if (error) return denied(error); closeSheet(); listPage(); },
+  iv_prof_del: async (a) => { const { error } = await sb.from('print_profiles').update({ active: false }).eq('id', idv(a.dataset.id)); if (error) return denied(error); closeSheet(); listPage(); },
   iv_lb_print: () => { const items = labItems(); if (!items.length) return toast(T('lb_none')); const tp = labTpl(); printHtml(renderLabels(tp, items, S.lang), Number(tp.paper_width_mm) || 210, false); },
 });
 document.addEventListener('input', (e) => {

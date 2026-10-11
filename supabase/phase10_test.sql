@@ -309,7 +309,8 @@ set role authenticated; select tt.as(:'p');
 select save_purchase(null,null,:'sup2',1,'G-1','2026-01-10'::date,'[{"description":"Gas cylinder","qty":2,"unit":"pcs","unit_cost":1500},{"description":"Transport","qty":1,"unit_cost":200}]'::jsonb) ->> 'id' as b5 \gset
 select tt.err('T11 payment at posting needs supplier_pay: purchasing has it now', 'select 1', '') where false;
 select post_purchase(:'b5'::uuid, '[{"mode":"cash","amount":1000}]'::jsonb) ->> 'due' as due5 \gset
-select tt.chk('T11 free-text bill: total 3200, paid 1000, due 2200, no stock rows', :due5::numeric=2200 and (select count(*) from stock_ledger where ref_id=:'b5')=0 and (select due from purchase_bills where id=:'b5'::uuid)=2200);
+reset role; select tt.chk('T11 free-text bill: total 3200, paid 1000, due 2200, no stock rows', :due5::numeric=2200 and (select count(*) from stock_ledger where ref_id=:'b5')=0 and (select due from purchase_bills where id=:'b5'::uuid)=2200);
+set role authenticated; select tt.as(:'p');
 select tt.err('T11 overpaying at posting refused', format($$select post_purchase(%L,'[{"mode":"cash","amount":99999}]'::jsonb)$$, (select save_purchase(null,null,:'sup2',1,'G-2','2026-01-11'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'id')), 'overpaid');
 select tt.err('T11 unknown unit on a tracked item refused at save', format($$select save_purchase(null,null,%L,1,'U-1','2026-01-11'::date,'[{"item_id":"%s","qty":1,"unit":"sack","unit_cost":10}]'::jsonb)$$,:'sup1',:'ie'), 'unit_unknown');
 select tt.err('T11 purchase return needs the grant', format($$select save_purchase(null,null,%L,1,'R-1','2026-01-11'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb,0,null,null,'return',null,'damaged')$$,:'sup2'), 'not allowed');
@@ -330,7 +331,8 @@ select save_purchase(null,null,:'sup1',1,'RET-1','2026-01-14'::date,format('[{"i
 select tt.err('T11 return needs a reason from the list', format($$select save_purchase(null,null,%L,1,'RET-2','2026-01-14'::date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb,0,null,null,'return',null,'nonsense')$$,:'sup1'), 'reason_required');
 select qty as q_before from stock_balance where item_id=:'ie'::uuid and location_id=1 \gset
 select post_purchase(:'r1'::uuid);
-select tt.chk('T11 posted return takes 2 kg out', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=:q_before::numeric - 2 and exists(select 1 from stock_ledger where reason='purchase_return' and ref_id=:'r1' and qty_delta=-2));
+reset role; select tt.chk('T11 posted return takes 2 kg out', (select qty from stock_balance where item_id=:'ie'::uuid and location_id=1)=:q_before::numeric - 2 and exists(select 1 from stock_ledger where reason='purchase_return' and ref_id=:'r1' and qty_delta=-2));
+set role authenticated; select tt.as(:'o');
 select tt.chk('T11 purchase_list as owner shows bills and the return', (select count(*) from purchase_list(1))>=7);
 -- access: salesperson sees nothing
 select tt.as(:'s');
