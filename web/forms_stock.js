@@ -328,7 +328,7 @@ B.forms['06-4'] = {
     { title: L('তিন কাগজ মিলিয়ে দেখা', 'Three papers matched'), fields: [
       NOTE(L('তিন কাগজ মিলতেই হবে — পারচেজ অর্ডার · মালামাল গ্রহণ রসিদ · সাপ্লায়ারের বিল। একটিতেও গরমিল থাকলে পেমেন্ট আটকে থাকবে।', 'The three papers must match: purchase order, goods received note, supplier bill. If any one differs, payment stays held.'), 'warn'),
       T('po_no', L('পারচেজ অর্ডার (PO) নং', 'Purchase order (PO) no.'), { req: true }), T('grn_no', L('মালামাল গ্রহণ রসিদ (GRN) নং', 'Goods received note (GRN) no.'), { req: true }),
-      TABLE('tri', null, [N('po', L('পারচেজ অর্ডারে (PO)', 'On the PO'), { req: true }), N('grn', L('মালামাল গ্রহণ রসিদে (GRN)', 'On the GRN'), { req: true }), N('bill', L('বিলে (Bill)', 'On the bill'), { req: true }),
+      TABLE('tri', null, [N('po', L('পারচেজ অর্ডারে (PO)', 'On the PO'), { req: true }), N('grn', L('গ্রহণ রসিদে (GRN)', 'On the GRN'), { req: true }), N('bill', L('বিলে (Bill)', 'On the bill'), { req: true }),
         CALC('ok', L('মিল', 'Match'), 'text')], { rows: [L('পরিমাণ', 'Quantity'), L('দর ৳', 'Rate ৳'), L('মোট ৳', 'Total ৳')] }),
       CALC('mism_what', L('কোন বিষয়ে গরমিল', 'What differs'), 'text', { show: (x) => x.v.mismatch }), CALC('diff', L('পার্থক্য ৳ (বিল − GRN মোট)', 'Difference ৳ (bill − GRN total)'), 'money', { show: (x) => x.v.mismatch })] },
     { title: L('গরমিল থাকলে', 'If something differs'), show: (x) => x.v.mismatch, fields: [
