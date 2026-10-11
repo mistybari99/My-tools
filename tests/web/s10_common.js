@@ -16,6 +16,7 @@ function mkData(base, o = {}) {
     ...[['sweet_kg', 'মিষ্টি (কেজি)', 'Sweets (kg)'], ['sweet_pc', 'মিষ্টি (পিস)', 'Sweets (piece)']].map((u, i) => ({ list_code: 'item_categories', value_code: u[0], label_bn: u[1], label_en: u[2], sort: i + 1, active: true }))];
   T.unit_conversions = [{ id: 1, item_id: null, from_unit: 'kg', to_unit: 'gram', factor: 1000, active: true }, { id: 2, item_id: T.items[0].id, from_unit: 'box', to_unit: 'kg', factor: 2, active: true }, { id: 3, item_id: T.items[2].id, from_unit: 'box', to_unit: 'piece', factor: 12, active: true }];
   const it = T.items; Object.assign(it[0], { tracked: true, base_unit: 'kg', min_stock: 5 }); Object.assign(it[1], { tracked: true, base_unit: 'kg' }); Object.assign(it[2], { tracked: true, base_unit: 'piece', unit: 'pc' });
+  if (o.sales) T.sales = o.sales;
   (o.itemPatch || []).forEach((pt, i) => Object.assign(it[i], pt));
   T.suppliers = [{ id: 'sp1', name: 'Dudh Ghor', type_code: 'milk', active: true }, { id: 'sp2', name: 'Chini Mill', type_code: 'sugar', active: true }];
   T.grant_defs = [{ grant_code: 'stock_issue', emergency_rule: 'em_issue_x', sort: 1, label_bn: 'issue', label_en: 'Issue' }];

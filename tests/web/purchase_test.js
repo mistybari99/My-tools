@@ -83,7 +83,7 @@ const base = C.baseData(SP), srv = C.serve(8095);
 
   // ---------- photo path ----------
   p = await open({}, '#/purchase/new'); fs.writeFileSync(SP + '/pic.png', C.PNGBUF); await p.setInputFiles('#pe_file', SP + '/pic.png'); await wait(p, 700);
-  const up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^06-4\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]), 'bill photo path ' + JSON.stringify(up[0] && up[0][0])); await p.close();
+  const up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^PURCHASE\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]), 'bill photo path ' + JSON.stringify(up[0] && up[0][0])); await p.close();
 
   // ---------- payables ----------
   p = await open({}, '#/payables'); ok(/1,100/.test(await p.textContent('.plate')), 'total payable plate'); ok(await p.locator('#py_list .mk.bad').count() === 1, 'overdue edge bar'); ok(/7 credit days/.test(await p.textContent('#py_list')), 'credit days chip'); ok(/Overdue ৳ 600/.test(await p.textContent('#py_list')), 'overdue chip');

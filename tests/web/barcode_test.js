@@ -93,5 +93,16 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   p = await open({}, '#/pos'); await p.waitForTimeout(400); await p.fill('#pos_q', '8902'); await p.press('#pos_q', 'Enter'); await p.waitForTimeout(300); ok((await p.inputValue('#pos_q')) === '8902', 'search Enter does not scan when device mode is off');
   await p.close();
 
+  // ---- scanItem / enabled helpers (used by the purchase bill lines and the stock actions) ----
+  p = await open({ dev: true }, '#/pos'); await p.waitForTimeout(500);
+  ok(await p.evaluate(() => window.BOS.barcode.enabled() === true), 'enabled() true when a scan option is on');
+  await p.evaluate(() => { window.__R = 'wait'; window.BOS.barcode.scanItem([{ id: 'x1', code: 'T-1', barcode: '5551' }, { id: 'x2', code: 'T-2', barcode: '5552' }]).then((it) => { window.__R = it ? it.id : null; }); });
+  await p.waitForTimeout(300); await p.keyboard.type('5552'); await p.keyboard.press('Enter'); await p.waitForTimeout(300); ok((await p.evaluate(() => window.__R)) === 'x2', 'scanItem resolves to the item with that barcode');
+  await p.evaluate(() => { window.__R = 'wait'; window.BOS.barcode.scanItem([{ id: 'x1', code: 'T-1', barcode: '5551' }]).then((it) => { window.__R = it ? it.id : null; }); });
+  await p.waitForTimeout(300); await p.keyboard.type('9999'); await p.keyboard.press('Enter'); await p.waitForTimeout(300); ok((await p.evaluate(() => window.__R)) === null && /No product has this barcode/.test(await p.textContent('#toast')), 'unknown code: null and a message');
+  await p.evaluate(() => { window.__R = 'wait'; window.BOS.barcode.scanItem([{ id: 'x1', barcode: '5551' }]).then((it) => { window.__R = it ? it.id : null; }); });
+  await p.waitForTimeout(300); await p.keyboard.press('Escape'); await p.waitForTimeout(200); ok((await p.evaluate(() => window.__R)) === null, 'cancel resolves to null'); await p.close();
+  p = await open({}, '#/pos'); await p.waitForTimeout(400); ok(await p.evaluate(() => window.BOS.barcode.enabled() === false), 'enabled() false while both options are off'); await p.close();
+
   log('errors:', errors.length ? [...new Set(errors)] : 'none'); log('assert failures:', bad); await br.close(); srv.close();
 } catch (e) { console.log('TEST CRASH:', e.message.split('\n').slice(0,6).join(' | ')); process.exit(1); } })();

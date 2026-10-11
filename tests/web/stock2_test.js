@@ -88,7 +88,7 @@ const base = C.baseData(SP), srv = C.serve(8094);
   await p.selectOption('#a_reason', 'spoiled'); await p.fill('#a_qty', '9'); await p.click('#a_go'); await wait(p, 150); ok(/photo is needed/.test(await toastTxt(p)) && (await calls(p, 'stock_wastage')).length === 0, 'photo precheck above the rule limit');
   fs.writeFileSync(SP + '/pic.png', C.PNGBUF);
   await p.setInputFiles('#a_file', SP + '/pic.png'); await wait(p, 700);
-  const up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^04-1\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]) && up[0][0].length < 300, 'photo stored as <form>/<loc>/<id>.jpg path: ' + JSON.stringify(up[0] && up[0][0]));
+  const up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^STOCK\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]) && up[0][0].length < 300, 'photo stored as <prefix>/<loc>/<id>.jpg path: ' + JSON.stringify(up[0] && up[0][0]));
   await p.click('#a_go'); await wait(p, 400); const wc = await calls(p, 'stock_wastage'); ok(wc.length === 1 && wc[0].p_photo === up[0][0] && wc[0].p_reason === 'spoiled' && wc[0].p_qty === 9 && wc[0].p_batch === null, 'wastage args with photo path');
   await p.close();
   p = await open({}, '#/stock'); await p.click('[data-act=s2_actions]'); await wait(p, 300); await p.click('[data-act=s2_do][data-v=waste]'); await wait(p, 300);
