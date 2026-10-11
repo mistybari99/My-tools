@@ -51,3 +51,5 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   (totals cross-checked). web/biz.js page '#/biz' (Business analysis): margin, break-even (needs setting fixed_cost_month), outlook, ABC, staff indicators
   (flag only if owner sets anomaly_ratio), limit suggestions with an explicit Apply button. Nothing is auto-applied. Run order for user: phase3.sql then phase4.sql.
   Next: audit phase4 + biz.js, P5 hardening (server recompute, PIN lock).
+- 2026-10-11 (live) · User ran phase3.sql + phase4.sql on real Supabase (combined, Success). Public site has all features; temp setup page removed.
+  Next: owner tries POS/forms on phone and sends screenshots; fix issues. P5 hardening still open (server-side recompute, hard PIN lock).
