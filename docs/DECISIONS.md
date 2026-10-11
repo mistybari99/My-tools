@@ -1,0 +1,32 @@
+# BOS Tool: Owner Decisions (log)
+
+Source: owner answers in chat, 11 Oct 2026. Scope: all 42 forms of BOS Build Kit v1.39, mobile-first, zero cost.
+
+## Platform
+- Supabase (free plan, Singapore region) + GitHub Pages. No paid plan, no domain, no SMS.
+- Backup: owner button "download all data" (saved to Google Drive by the owner). No auto-backup on the free plan.
+- Photos: expense voucher, goods receipt (GRN), maintenance request.
+
+## Login and roles
+- Staff ID + PIN (no SMS OTP, it is not free). Staff stays logged in on their phone.
+- Roles are business-common (owner, management, cash controller, showroom manager, salesperson, storekeeper, factory in-charge, purchasing, party coordinator, carrier, HR).
+- Owner has a role x form matrix to switch view / enter / approve on or off, per role. Multiple roles per person allowed.
+
+## Entry rules
+- Draft stays editable by its maker. After submit, a change needs a mandatory note and goes to a separate Correction Log (who, when, what, why), visible to the owner in one place.
+- Self-approval (maker = checker) is blocked by default. Owner can switch it per role in the matrix; every switch is logged.
+
+## Control rules
+- Count-first: handovers (cash, goods) require the counted figure before the system figure is shown. Mandatory by default; owner can configure per form.
+- Red control: day-close is blocked; owner can release it with a written reason (logged). Owner can configure block vs warn per control.
+- Variance auto-creates an item in the owner's exceptions list (who, where, how much). Auto-creation has an on/off switch. A legal / illegal reason can be recorded as a note.
+- Dashboard: problems first, plus a short summary of numbers (sales, expenses, profit, per location).
+
+## Data and language
+- Item list seeded from data/items_seed.csv (56 items), editable at any time. Price change affects only future entries.
+- Languages: Bangla (default, common words in English), English, Banglish (Bangla written in Latin letters). Per-user switch.
+- Form notes shown as info buttons, coloured warning boxes and step-by-step questions.
+- No invented numbers, limits or recipes: everything from settings; empty means "data needed".
+
+## Build order
+- Phase by phase, owner reviews each phase. Phase 1: login, roles, settings, items, audit log. Then core forms, dashboard, rest of the 42 forms.
