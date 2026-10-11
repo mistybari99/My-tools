@@ -74,6 +74,8 @@ const ERR = {
   overpaid: L('টাকা বাকির চেয়ে বেশি হতে পারে না', 'Payment cannot be more than what is owed', 'Payment due-এর বেশি হতে পারে না'), no_payments: L('পেমেন্ট লিখুন', 'Enter a payment', 'Payment লিখুন'), bad_mode: L('পেমেন্টের ধরন ঠিক নয়', 'Payment mode is not valid', 'Payment mode ঠিক নয়'),
   bad_amount: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'), void_the_bill: L('বিলের সাথে দেওয়া পেমেন্ট বিল বাতিল করলে যাবে', 'A payment made with a bill goes when the bill is voided', 'Bill-এর সাথের payment, bill void করলে যাবে'),
   no_payment_on_return: L('ফেরতে পেমেন্ট চলে না', 'A return cannot carry a payment', 'Return-এ payment চলে না'), cannot_change_kind_or_location: L('খসড়ার ধরন বা জায়গা বদলানো যায় না', 'Cannot change the kind or location of a draft', 'Draft-এর kind বা location বদলায় না'),
+  return_needs_bill: L('ফেরতের জন্য মূল বিল বাছুন', 'Choose the original bill for a return', 'Return-এর জন্য মূল bill বাছুন'), return_exceeds_bill: L('ফেরত পরিমাণ মূল বিলের বাকির চেয়ে বেশি', 'The return is more than what is left on the original bill', 'Return quantity মূল bill-এর বাকির চেয়ে বেশি'),
+  return_cost_above_bill: L('ফেরতের দাম মূল বিলের দামের চেয়ে বেশি', 'The return cost is above the bill cost', 'Return-এর দাম মূল bill-এর দামের চেয়ে বেশি'), purchase_return_unreferenced: L('এই ফেরতের মূল বিল নেই', 'This return has no original bill', 'এই return-এর মূল bill নেই'),
   bad_kind: L('ধরন ঠিক নয়', 'Kind is not valid', 'Kind ঠিক নয়'), already_void: L('আগেই বাতিল', 'Already voided', 'আগেই void'),
 };
 const NOPERM = L('এই কাজের অনুমতি নেই', 'You are not allowed to do this', 'এই কাজের permission নেই');
@@ -451,7 +453,9 @@ Object.assign(H, {
 // exception flag codes -> readable titles (3 modes). Shown by the exceptions page next to the server text.
 const FLAGS = {
   stock_negative: L('স্টক ঋণাত্মক', 'Negative stock', 'Stock ঋণাত্মক'), stock_unit_unknown: L('এককের রূপান্তর অজানা', 'Unit conversion unknown', 'Unit conversion অজানা'),
-  wastage_unknown: L('নষ্ট মাল, কারণ অজানা', 'Wastage, reason unknown', 'Wastage, reason অজানা'), count_variance: L('গণনায় পার্থক্য', 'Count variance', 'Count variance'),
+  wastage_unknown: L('নষ্ট মাল, কারণ অজানা', 'Wastage, reason unknown', 'Wastage, reason অজানা'), stock_count_variance: L('গণনায় পার্থক্য', 'Count variance', 'Count variance'),
+  sold_expired: L('মেয়াদোত্তীর্ণ মাল বিক্রি', 'Expired stock was sold', 'মেয়াদোত্তীর্ণ মাল বিক্রি'), emergency_used: L('জরুরি অনুমোদনে কাজ', 'Emergency approval used', 'Emergency approval ব্যবহার'),
+  purchase_return_unreferenced: L('বিল ছাড়া ক্রয় ফেরত', 'Purchase return without a bill', 'Bill ছাড়া purchase return'),
   transit_short: L('পথে মাল কম', 'Short in transit', 'Transit-এ মাল কম'), purchase_price_jump: L('ক্রয়মূল্যে বড় বদল', 'Purchase price jump', 'Purchase price jump'),
   purchase_void: L('ক্রয় বিল বাতিল', 'Purchase voided', 'Purchase void'), supplier_payment_void: L('সাপ্লায়ার পেমেন্ট বাতিল', 'Supplier payment voided', 'Supplier payment void'),
   emergency_window_used: L('জরুরি অনুমোদনে কাজ', 'Emergency window used', 'Emergency window ব্যবহার'),

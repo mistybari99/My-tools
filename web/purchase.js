@@ -26,8 +26,8 @@ const X = {
   none: L('কোনো বিল নেই', 'No bills', 'কোনো bill নেই'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), lockedPage: L('ক্রয়ের হিসাব দেখার অনুমতি আপনার নেই', 'You are not allowed to see purchases', 'Purchase দেখার permission নেই'),
   due: L('বাকি', 'Due', 'Due'), paid: L('দেওয়া', 'Paid', 'Paid'), total: L('মোট', 'Total', 'Total'), subtotal: L('উপমোট', 'Subtotal', 'Subtotal'), discount: L('ছাড় ৳', 'Discount ৳', 'Discount ৳'),
   billNo: L('সাপ্লায়ারের বিল নম্বর', "Supplier's bill no.", 'Supplier-এর bill no.'), date: L('বিলের তারিখ', 'Bill date', 'Bill date'), supPh: L('সাপ্লায়ারের নাম লিখুন বা বাছুন', 'Type or choose a supplier', 'Supplier-এর নাম লিখুন বা বাছুন'),
-  lines: L('মালের লাইন', 'Lines', 'Lines'), addLine: L('লাইন যোগ', 'Add line', 'Line যোগ'), item: L('পণ্য', 'Item', 'Item'), itemph: L('কোড বা নাম (ঐচ্ছিক)', 'Code or name (optional)', 'Code বা নাম (ঐচ্ছিক)'),
-  desc: L('অথবা লিখে বিবরণ (গ্যাস, ভাড়া…)', 'Or a free-text description (gas, transport…)', 'অথবা description (gas, transport…)'), qty: L('পরিমাণ', 'Qty', 'Qty'), unit: L('একক', 'Unit', 'Unit'), itemUnit: L('(পণ্যের এককে)', '(item unit)', '(item-এর unit)'),
+  lines: L('মালের লাইন', 'Lines', 'Lines'), nLines: L('লাইন', 'lines', 'lines'), addLine: L('লাইন যোগ', 'Add line', 'Line যোগ'), item: L('পণ্য', 'Item', 'Item'), itemph: L('কোড বা নাম (ঐচ্ছিক)', 'Code or name (optional)', 'Code বা নাম (ঐচ্ছিক)'),
+  desc: L('অথবা লিখে বিবরণ (গ্যাস, ভাড়া…)', 'Or a free-text description (gas, transport…)', 'অথবা description (gas, transport…)'), qty: L('পরিমাণ', 'Qty', 'Qty'), unit: L('একক', 'Unit', 'Unit'), itemUnit: L('(পণ্যের)', '(item)', '(item-এর)'),
   ucost: L('একক দাম ৳', 'Unit cost ৳', 'Unit cost ৳'), amount: L('টাকা', 'Amount', 'Amount'), note: L('নোট', 'Note', 'Note'), photo: L('বিলের ছবি', 'Bill photo', 'Bill-এর photo'), addPhoto: L('ছবি তুলুন / বাছুন', 'Take / choose photo', 'Photo তুলুন / বাছুন'),
   upl: L('ছবি আপলোড হচ্ছে…', 'Uploading photo…', 'Photo upload হচ্ছে…'), reason: L('ফেরতের কারণ', 'Return reason', 'Return-এর reason'), againstBill: L('কোন বিলের বিপরীতে (ঐচ্ছিক)', 'Against bill (optional)', 'কোন bill-এর বিপরীতে (ঐচ্ছিক)'),
   payNow: L('এখনই পেমেন্ট', 'Pay now', 'Pay now'), payHint: L('কিছু না দিলে পুরো টাকা সাপ্লায়ারের পাওনা থাকবে', 'If you pay nothing the whole amount stays owed to the supplier', 'কিছু না দিলে পুরো amount supplier-এর payable থাকবে'),
@@ -35,7 +35,7 @@ const X = {
   saved: L('খসড়া সংরক্ষিত', 'Draft saved', 'Draft saved'), posted_ok: L('পোস্ট হয়েছে', 'Posted', 'Posted'), dup: L('আগেই সংরক্ষিত — আবার হয়নি', 'Already saved — nothing was added twice', 'আগেই saved — আবার হয়নি'),
   voidBill: L('বিল বাতিল', 'Void bill', 'Bill void'), voidDraft: L('খসড়া বাতিল', 'Cancel draft', 'Draft cancel'), voidWhy: L('বাতিলের কারণ (আবশ্যক)', 'Reason for voiding (required)', 'Void-এর reason (আবশ্যক)'),
   voidWarn: L('মাল স্টক থেকে উল্টে যাবে এবং বিলের সাথের পেমেন্ট বাতিল হবে।', 'The stock is reversed and payments made with the bill are voided.', 'Stock reverse হবে এবং bill-এর payment void হবে।'),
-  voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), edit: L('বদলান', 'Edit', 'Edit'), returnVs: L('এই বিলের মাল ফেরত', 'Return goods of this bill', 'এই bill-এর মাল return'), paySup: L('সাপ্লায়ারকে টাকা দিন', 'Pay the supplier', 'Supplier-কে টাকা দিন'),
+  voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), edit: L('বদলান', 'Edit', 'Edit'), returnVs: L('মাল ফেরত', 'Return goods', 'মাল return'), paySup: L('সাপ্লায়ারকে টাকা দিন', 'Pay the supplier', 'Supplier-কে টাকা দিন'),
   needSup: L('সাপ্লায়ার বাছুন', 'Choose a supplier', 'Supplier বাছুন'), needDate: L('তারিখ লিখুন', 'Enter the date', 'Date লিখুন'), needLine: L('অন্তত একটি পূর্ণ লাইন লিখুন', 'Enter at least one complete line', 'অন্তত একটি complete line লিখুন'),
   badLine: L('লাইনের পরিমাণ বা দাম ঠিক নয়', 'A line has a wrong quantity or cost', 'Line-এর qty বা cost ঠিক নয়'), needReason: L('ফেরতের কারণ বাছুন', 'Choose the return reason', 'Return reason বাছুন'), badDisc: L('ছাড় মোটের বেশি', 'Discount is more than the subtotal', 'Discount subtotal-এর বেশি'),
   needNote: L('কারণ লিখুন', 'Write the reason', 'Reason লিখুন'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), by: L('লিখেছেন', 'By', 'By'), mode: { cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'), bank: L('ব্যাংক', 'Bank', 'Bank') },
@@ -101,9 +101,9 @@ function drawList(ge, gr, missing) {
   shell(T('title'), `<div class="p2-bar"><button id="pl_fb" class="p2-fb" data-act="pu_filter" style="flex:1">⎚ ${esc(T('filter'))}${fc ? `<span class="cnt">${fc}</span>` : ''}</button><button data-act="go" data-v="payables">${esc(T('payables'))}</button></div>
     ${missing ? `<div class="notice bad">${esc(T('sqlMissing'))}</div>` : ''}
     <div id="pl_list">${PL.rows.slice(0, PL.shown).map((b, i) => {
-      const bar = b.status === 'void' ? 'bad' : b.status === 'draft' ? 'info' : Number(b.due) > 0 ? 'warn' : 'ok';
+      const bar = b.status === 'void' ? 'bad' : b.status === 'draft' ? 'info' : b.kind === 'bill' && Number(b.due) > 0 ? 'warn' : 'ok';
       return `<div class="card item mk ${bar}" data-act="pu_open" data-v="${esc(b.id)}" role="button" tabindex="0"><div><div class="nm">${esc(b.supplier_name)}</div>
-        <div class="muted" style="font-size:.85rem">${esc(b.bill_no || '—')} · ${esc(dshort(b.bill_date))}${LOCS().length > 1 ? ' · ' + esc(locName(b.location_id)) : ''} · ${b.n_lines} ${esc(T('lines'))}</div>
+        <div class="muted" style="font-size:.85rem">${esc(b.bill_no || '—')} · ${esc(dshort(b.bill_date))}${LOCS().length > 1 ? ' · ' + esc(locName(b.location_id)) : ''} · ${b.n_lines} ${esc(T('nLines'))}</div>
         <span class="chip ${SB[b.status] || ''}">${esc(stLabel(b.status))}</span>${b.kind === 'return' ? ` <span class="chip">${esc(T('ret'))}</span>` : ''}</div>
         <div class="pr"><b>${esc(money(b.total))}</b>${b.kind === 'bill' && b.status === 'posted' && Number(b.due) > 0 ? `<div class="amt-bad" style="font-size:.85rem">${esc(T('due'))} ${esc(money(b.due))}</div>` : ''}</div></div>`; }).join('')
       || `<p class="muted center">${esc(T('none'))}</p>`}${PL.rows.length > PL.shown ? `<button class="full" data-act="pu_more">…</button>` : ''}</div>
@@ -138,7 +138,7 @@ async function editor(o) {
 }
 const totals = () => { const sub = r2(F.lines.reduce((s, l) => s + (nnum(l.qty) > 0 && nnum(l.cost) >= 0 ? r2(nnum(l.qty) * nnum(l.cost)) : 0), 0)); const d = nnum(F.discount); const disc = d > 0 ? d : 0; return { sub, disc, total: r2(Math.max(0, sub - disc)) }; };
 function lineHTML(l, i) {
-  const items = ITEMS_ALL, it = l.item_id ? items.find((x) => x.id === l.item_id) : null;
+  const items = ITEMS_ALL, it = l.item_id ? items.find((x) => x.id === l.item_id) : null; l._ri = !!it;
   return `<div class="rowcard" data-li="${i}"><div class="rc-h"><b>#${i + 1}</b>${F.lines.length > 1 ? `<button type="button" class="mini" data-act="pu_delline" data-i="${i}" aria-label="✕">✕</button>` : ''}</div><div class="stack">
     <div><label>${esc(T('item'))}</label><input data-ln="${i}.item" list="pu_dl" autocomplete="off" value="${esc(l.item)}" placeholder="${esc(T('itemph'))}"></div>
     ${it ? '' : `<div><label>${esc(T('desc'))}</label><input data-ln="${i}.desc" autocomplete="off" value="${esc(l.desc)}"></div>`}
@@ -226,7 +226,7 @@ async function postBill(id, list, kind, loc) {
 }
 
 // ================= bill detail =================
-let CUR = null; const PS = { st: null, ok: false };
+let redrawing = false, CUR = null; const PS = { st: null, ok: false };
 async function detail(id) {
   shell(T('title'), `<p class="muted">${esc(T('loading'))}</p>`, 'purchase');
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
@@ -250,7 +250,7 @@ async function detail(id) {
       ${Number(b.discount) ? `<div class="row between"><span>${esc(T('discount'))}</span><b>− ${esc(money(b.discount))}</b></div>` : ''}
       <div class="row between"><span>${esc(T('total'))}</span><b class="mnum">${esc(money(b.total))}</b></div>
       ${b.status === 'posted' && !ret ? `<div class="row between"><span>${esc(T('paid'))}</span><b>${esc(money(b.paid))}</b></div><div class="row between"><span>${esc(T('due'))}</span><b class="${Number(b.due) > 0 ? 'amt-bad' : ''}">${esc(money(b.due))}</b></div>` : ''}</div>
-    ${(b.payments || []).length ? `<div class="card"><h3>${esc(T('payNow'))}</h3>${b.payments.map((p) => `<div class="s2-led"><div>${esc(modeL(p.mode))}${p.wallet ? ' · ' + esc(p.wallet) : ''}${p.voided ? ` <span class="chip bad">${esc(T('void_'))}</span>` : ''}<div class="sub">${esc(dt(p.paid_at))}${p.ref ? ' · ' + esc(p.ref) : ''}</div></div><div class="q">${esc(money(p.amount))}</div></div>`).join('')}</div>` : ''}
+    ${(b.payments || []).length ? `<div class="card"><h3>${esc(T('paid'))}</h3>${b.payments.map((p) => `<div class="s2-led"><div>${esc(modeL(p.mode))}${p.wallet ? ' · ' + esc(p.wallet) : ''}${p.voided ? ` <span class="chip bad">${esc(T('void_'))}</span>` : ''}<div class="sub">${esc(dt(p.paid_at))}${p.ref ? ' · ' + esc(p.ref) : ''}</div></div><div class="q">${esc(money(p.amount))}</div></div>`).join('')}</div>` : ''}
     ${b.photo ? `<div class="card"><img id="pd_img" alt="" style="width:100%;border-radius:12px"></div>` : ''}
     <div class="s2-bar" style="flex-wrap:wrap">${bar.join('')}</div>`, 'purchase');
   if (b.photo) U.thumb($('#pd_img'), b.photo);
@@ -371,7 +371,7 @@ document.addEventListener('input', (e) => {
   const el = e.target;
   if (el.dataset && el.dataset.ln && F) {
     const [i, f] = el.dataset.ln.split('.'), l = F.lines[Number(i)]; if (!l) return;
-    if (f === 'item') { l.item = el.value; const it = U.itemFrom(ITEMS_ALL, el.value); const had = l.item_id; l.item_id = it ? it.id : null; if (it && it.id !== had) { if (!l.unit) l.unit = ''; } if ((!!it) !== (!!had)) { const keep = document.activeElement; $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); const n = document.querySelector(`[data-ln="${i}.item"]`); if (n && keep === el) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } } return; }
+    if (f === 'item') { l.item = el.value; const it = U.itemFrom(ITEMS_ALL, el.value); l.item_id = it ? it.id : null; return; }      // the line is redrawn on change (blur), never while typing
     l[f] = el.value;
     const am = document.querySelector(`[data-amt="${i}"]`); if (am) am.textContent = nnum(l.qty) > 0 && nnum(l.cost) >= 0 ? money(r2(nnum(l.qty) * nnum(l.cost))) : '—';
     refreshTot();
@@ -381,7 +381,7 @@ document.addEventListener('input', (e) => {
 });
 document.addEventListener('change', (e) => {
   const el = e.target;
-  if (el.dataset && el.dataset.ln && F) { const [i, f] = el.dataset.ln.split('.'), l = F.lines[Number(i)]; if (l && f !== 'item') l[f] = el.value; if (l && f === 'item') { const it = U.itemFrom(ITEMS_ALL, el.value); l.item_id = it ? it.id : null; if (it) { l.item = U.itemText(it); l.unit = it.unit && lists('units').some((u) => u.value_code === it.unit) ? '' : l.unit; } $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); } }
+  if (el.dataset && el.dataset.ln && F) { const [i, f] = el.dataset.ln.split('.'), l = F.lines[Number(i)]; if (l && f !== 'item') l[f] = el.value; if (l && f === 'item') { const it = U.itemFrom(ITEMS_ALL, el.value); l.item_id = it ? it.id : null; l.item = it ? U.itemText(it) : el.value; if (!!l.item_id !== l._ri) { if (!redrawing) { redrawing = true; try { $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); } finally { redrawing = false; } } } else { el.value = l.item; const us = document.querySelector(`[data-ln="${i}.unit"]`); if (us) us.options[0].textContent = (it && unitLabel(it.unit)) || T('itemUnit'); } } }
   if (el.id === 'py_loc') { PY.loc = el.value === '' ? null : Number(el.value); payables(); }
   if (el.id === 'pe_file' && F) { const f = el.files && el.files[0]; if (f) { toast(T('upl')); U.uploadPhoto(f, ['06-4', '04-1', '06-3'], F.loc).then((p) => { F.photo = p; drawEdPhoto(); }, fail); } }
 });

@@ -11,7 +11,9 @@
 --   * COST IS SECRET: unit_cost / avg_cost / values are not granted on the tables to the app roles. They are shown only by the functions,
 --     and only to the owner, ITEM_COST holders or a holder of the grant view_cost (for that location).
 --   * No business number is invented: every limit is a rule that is empty (= off) until the owner writes it; new emergency switches are off.
---   * Offline POS: a sale that syncs late still posts its stock (made_at = the sale time). With stock_negative_mode = warn / allow it never blocks.
+--   * Offline POS: a sale that syncs late still posts its stock (made_at = the sale time). With stock_negative_mode = warn / allow it never blocks;
+--     a sale older than 2 minutes never blocks in any mode (it already happened). The below-zero approval is used ONCE per whole sale.
+--   * Every number that comes from outside is range-checked with `not (x between lo and hi)`, so NaN / Infinity / absurd values are refused (and CHECK constraints back this up).
 -- ============================================================
 
 -- ---------- (a) settings: rules, grants, lists ----------
@@ -162,6 +164,7 @@ create table if not exists public.purchase_bills (
   due numeric generated always as (total - paid) stored,
   note text, photo text, reason_code text,
   ref_bill_id uuid references public.purchase_bills(id),
+  variance numeric,                                        -- a return: credit given by the supplier minus the stock taken out at average cost (SECRET, a book difference)
   created_by uuid, created_staff text, created_at timestamptz not null default now(),
   posted_by uuid, posted_at timestamptz,
   void_by uuid, void_at timestamptz, void_note text,

@@ -55,6 +55,7 @@ const ERRS = {
   discount_mode_off: L('এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)', 'This kind of discount is switched off (rule)', 'এই ধরনের Discount বন্ধ (নিয়ম)'),
   unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
   period_closed: L('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
+  insufficient_stock: L('মজুতে এত নেই — বিক্রি করা গেল না', 'Not enough stock on hand — the sale was not made', 'Stock-এ এত নেই — বিক্রি হয়নি'),
   wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
 };
 const T2 = (e) => { const m = (e && e.message) || String(e || ''); for (const k of Object.keys(ERRS)) if (m.includes(k)) return lab(ERRS[k]); return null; };
@@ -68,7 +69,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
