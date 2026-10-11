@@ -523,6 +523,350 @@ select tt.chk('T18 audit rows for bills, payments, transfers, wastage', (select 
 select tt.chk('T18 final: cache equals ledger everywhere', (select count(*) from (select item_id,location_id,sum(qty_delta) q from stock_ledger group by 1,2) l full join stock_balance b using (item_id,location_id) where coalesce(l.q,0)<>coalesce(b.qty,0))=0);
 select tt.chk('T18 no ledger row with zero qty, every reversal links a row', (select count(*) from stock_ledger where qty_delta=0)=0 and (select count(*) from stock_ledger where reason in ('sale_void_in') and reverses_id is null)=0);
 
+\echo == T19 audit round: hardening of numbers, returns, permissions, locks, speed, POS rules
+reset role;
+-- a second database connection (dblink, when this server has it) lets the tests prove LOCK behaviour, not only results
+select exists (select 1 from pg_available_extensions where name = 'dblink') as can_dblink \gset
+\if :can_dblink
+create extension if not exists dblink;
+\endif
+select exists (select 1 from pg_extension where extname = 'dblink') as has_dblink \gset
+create or replace function tt.conn() returns text language sql as $$
+  select format('host=%s port=%s dbname=%s user=postgres', split_part(current_setting('unix_socket_directories'), ',', 1), current_setting('port'), current_database()) $$;
+-- p_hold: statements run in a second open transaction (they take locks and keep them). p_run: ONE query returning one text column, run as p_sub (role authenticated).
+-- p_during: statements run in the second transaction while p_run is waiting. Returns 'blocked' / 'ran' (did p_run have to wait?) plus any error text.
+create or replace function tt.probe(p_hold text[], p_run text, p_sub text, p_during text[] default null) returns text language plpgsql as $$
+declare cs text := tt.conn(); st text; busy int; res text := ''; q text; r text;
+begin
+  perform dblink_connect('hb', cs); perform dblink_connect('ra', cs);
+  perform dblink_exec('hb', 'begin');
+  foreach q in array p_hold loop perform dblink_exec('hb', q); end loop;
+  perform dblink_exec('ra', 'set request.jwt.claim.sub = ''' || p_sub || '''');
+  perform dblink_exec('ra', 'set role authenticated');
+  perform dblink_send_query('ra', p_run);
+  perform pg_sleep(0.5);
+  busy := dblink_is_busy('ra');
+  if p_during is not null then
+    begin foreach q in array p_during loop perform dblink_exec('hb', q); end loop;
+    exception when others then res := res || ' [during: ' || sqlerrm || ']'; end;
+  end if;
+  begin perform dblink_exec('hb', 'commit'); exception when others then res := res || ' [commit: ' || sqlerrm || ']'; end;
+  begin select x into r from dblink_get_result('ra') as t(x text); res := res || ' [result: ' || coalesce(left(r, 80), 'null') || ']';
+  exception when others then res := res || ' [run: ' || sqlerrm || ']'; end;
+  perform dblink_disconnect('hb'); perform dblink_disconnect('ra');
+  return case when busy = 1 then 'blocked' else 'ran' end || res;
+exception when others then
+  begin perform dblink_disconnect('hb'); exception when others then null; end;
+  begin perform dblink_disconnect('ra'); exception when others then null; end;
+  return 'probe-error: ' || sqlerrm;
+end $$;
+grant execute on all functions in schema tt to authenticated, anon;
+
+-- fixtures
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N1', 'T19 N1', 'kg', 100, true) returning id) select id as n1 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N2', 'T19 N2', 'kg', 100, true) returning id) select id as n2 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N3', 'T19 N3', 'kg', 100, true) returning id) select id as n3 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N4', 'T19 N4', 'kg', 100, true) returning id) select id as n4 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N5 never opened', 'T19 N5', 'kg', 100, true) returning id) select id as n5 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N6 dear', 'T19 N6', 'kg', 100000, true) returning id) select id as n6 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N7', 'T19 N7', 'kg', 100, true) returning id) select id as n7 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N8', 'T19 N8', 'kg', 100, true) returning id) select id as n8 from i \gset
+with i as (insert into items (name_bn, name_en, unit, sell_price, tracked) values ('T19 N9 dust', 'T19 N9', 'kg', 100, true) returning id) select id as n9 from i \gset
+set role authenticated; select tt.as(:'o');
+select save_supplier(null, '{"name":"T19 Sup"}') as s19 \gset
+select save_supplier(null, '{"name":"T19 Other"}') as s19b \gset
+select save_supplier(null, '{"name":"T19 Credit"}') as s19c \gset
+
+\echo -- 19.1 Infinity / NaN / absurd numbers are refused everywhere (nothing is written)
+select tt.err('T19 opening: qty Infinity', format($$select stock_opening(%L,1,'Infinity',10)$$, :'n1'), 'bad_qty');
+select tt.err('T19 opening: qty NaN', format($$select stock_opening(%L,1,'NaN',10)$$, :'n1'), 'bad_qty');
+select tt.err('T19 opening: qty 1e30', format($$select stock_opening(%L,1,'1e30',10)$$, :'n1'), 'bad_qty');
+select tt.err('T19 opening: qty 0.00001 (under 0.0001)', format($$select stock_opening(%L,1,'0.00001',10)$$, :'n1'), 'bad_qty');
+select tt.err('T19 opening: cost Infinity', format($$select stock_opening(%L,1,5,'Infinity')$$, :'n1'), 'bad_cost');
+select tt.err('T19 opening: cost NaN', format($$select stock_opening(%L,1,5,'NaN')$$, :'n1'), 'bad_cost');
+select tt.err('T19 opening: cost 1e30', format($$select stock_opening(%L,1,5,'1e30')$$, :'n1'), 'bad_cost');
+select tt.chk('T19 opening n1 100 @ 10 ok', (stock_opening(:'n1', 1, 100, 10) ->> 'qty')::numeric = 100);
+select tt.err('T19 wastage: Infinity', format($$select stock_wastage(%L,1,'Infinity','spoiled')$$, :'n1'), 'bad_qty');
+select tt.err('T19 wastage: NaN', format($$select stock_wastage(%L,1,'NaN','spoiled')$$, :'n1'), 'bad_qty');
+select tt.err('T19 wastage: 1e30', format($$select stock_wastage(%L,1,'1e30','spoiled')$$, :'n1'), 'bad_qty');
+select tt.err('T19 issue: Infinity', format($$select stock_issue(%L,1,'Infinity')$$, :'n1'), 'bad_qty');
+select tt.err('T19 production: qty Infinity', format($$select stock_production_in(%L,1,'Infinity')$$, :'n1'), 'bad_qty');
+select tt.err('T19 production: cost Infinity', format($$select stock_production_in(%L,1,5,null,null,null,null,'Infinity')$$, :'n1'), 'bad_cost');
+select tt.err('T19 transfer: Infinity', format($$select stock_transfer(1,7,%L,'Infinity')$$, :'n1'), 'bad_qty');
+select tt.err('T19 count: Infinity', format($$select stock_count_adjust(%L,1,'Infinity','x')$$, :'n1'), 'bad_qty');
+select tt.err('T19 count: 1e30', format($$select stock_count_adjust(%L,1,'1e30','x')$$, :'n1'), 'bad_qty');
+select tt.err('T19 count: NaN', format($$select stock_count_adjust(%L,1,'NaN','x')$$, :'n1'), 'bad_qty');
+select tt.as(:'k');
+select stock_transfer(1, 7, :'n1', 2) ->> 'id' as tx \gset
+select tt.as(:'g');
+select tt.err('T19 receive: Infinity', format($$select stock_receive_transfer(%L,'Infinity')$$, :'tx'), 'bad_qty');
+select tt.err('T19 receive: NaN', format($$select stock_receive_transfer(%L,'NaN')$$, :'tx'), 'bad_qty');
+select tt.err('T19 receive: more than sent', format($$select stock_receive_transfer(%L,3)$$, :'tx'), 'over_received');
+select tt.chk('T19 receive exactly what was sent', (stock_receive_transfer(:'tx'::uuid, 2) ->> 'status') = 'received');
+select tt.as(:'o');
+select tt.err('T19 purchase: qty Infinity', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":"Infinity","unit":"kg","unit_cost":10}]'::jsonb)$$, :'s19', :'n1'), 'bad_qty');
+select tt.err('T19 purchase: qty 1e30', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":1e30,"unit":"kg","unit_cost":10}]'::jsonb)$$, :'s19', :'n1'), 'bad_qty');
+select tt.err('T19 purchase: qty 0.00001', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":0.00001,"unit":"kg","unit_cost":10}]'::jsonb)$$, :'s19', :'n1'), 'bad_qty');
+select tt.err('T19 purchase: cost Infinity', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":"Infinity"}]'::jsonb)$$, :'s19', :'n1'), 'bad_cost');
+select tt.err('T19 purchase: cost 1e300', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":1e300}]'::jsonb)$$, :'s19', :'n1'), 'bad_cost');
+select tt.err('T19 purchase: discount Infinity', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":10}]'::jsonb,'Infinity')$$, :'s19', :'n1'), 'bad_discount');
+select tt.err('T19 purchase: discount NaN', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":10}]'::jsonb,'NaN')$$, :'s19', :'n1'), 'bad_discount');
+select tt.err('T19 purchase: a bill beyond 1e12', format($$select save_purchase(null,null,%L,1,'N-1',current_date,'[{"description":"big","qty":999999999,"unit_cost":999999999}]'::jsonb)$$, :'s19'), 'bad_amount');
+select save_purchase(null, null, :'s19', 1, 'N-PAY', current_date, '[{"description":"x","qty":1,"unit_cost":100}]'::jsonb) ->> 'id' as bpay \gset
+select tt.err('T19 post: payment Infinity', format($$select post_purchase(%L,'[{"mode":"cash","amount":"Infinity"}]'::jsonb)$$, :'bpay'), 'bad_amount');
+select tt.err('T19 post: payment NaN', format($$select post_purchase(%L,'[{"mode":"cash","amount":"NaN"}]'::jsonb)$$, :'bpay'), 'bad_amount');
+select tt.err('T19 post: payment 0.004 (rounds to 0)', format($$select post_purchase(%L,'[{"mode":"cash","amount":0.004}]'::jsonb)$$, :'bpay'), 'bad_amount');
+select tt.err('T19 post: payment 1e30', format($$select post_purchase(%L,'[{"mode":"cash","amount":1e30}]'::jsonb)$$, :'bpay'), 'bad_amount');
+select tt.chk('T19 the bill is still a draft after those refusals', (select status from purchase_bills where id = :'bpay'::uuid) = 'draft');
+select tt.chk('T19 post with a real payment', (post_purchase(:'bpay'::uuid, '[{"mode":"cash","amount":40}]'::jsonb) ->> 'due')::numeric = 60);
+select tt.err('T19 pay_supplier: Infinity', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":"Infinity"}]'::jsonb)$$, :'s19'), 'bad_amount');
+select tt.err('T19 pay_supplier: NaN', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":"NaN"}]'::jsonb)$$, :'s19'), 'bad_amount');
+select tt.err('T19 pay_supplier: 0.004', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":0.004}]'::jsonb)$$, :'s19'), 'bad_amount');
+select tt.err('T19 pay_supplier: 1e30', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":1e30}]'::jsonb)$$, :'s19'), 'bad_amount');
+select tt.as(:'s');
+select count(*) as sales_before from sales \gset
+select tt.err('T19 a sale with qty Infinity is refused (bad_qty) and nothing is saved', format($$select record_sale2(gen_random_uuid(),1,'[{"item_id":"%s","qty":"Infinity","price":100,"unit":"kg"}]'::jsonb,0,'[{"mode":"cash","amount":100}]',null,null,'retail',null,false)$$, :'n1'), '');
+reset role;
+select tt.chk('T19 refused numbers wrote nothing: n1 ledger = the opening + the transfer out, balance 98, no sale saved',
+  (select count(*) from stock_ledger where item_id = :'n1'::uuid) = 3 and (select qty from stock_balance where item_id = :'n1'::uuid and location_id = 1) = 98 and (select count(*) from sales) = :sales_before);
+select tt.chk('T19 CHECK constraints exist on all eight tables', (select count(*) from pg_constraint where conname in ('stock_ledger_finite', 'stock_balance_finite', 'stock_batches_finite', 'stock_wastage_finite', 'stock_transfers_finite', 'purchase_bills_finite', 'purchase_lines_finite', 'supplier_payments_finite')) = 8);
+select tt.err('T19 CHECK: Infinity cannot sit in stock_balance', format($$update stock_balance set qty = 'Infinity' where item_id = %L and location_id = 1$$, :'n1'), 'stock_balance_finite');
+select tt.err('T19 CHECK: NaN cannot sit in a payment', $$update supplier_payments set amount = 'NaN' where id = (select min(id) from supplier_payments)$$, 'supplier_payments_finite');
+select tt.err('T19 CHECK: Infinity cannot be a purchase total', format($$update purchase_bills set total = 'Infinity' where id = %L$$, :'bpay'), 'purchase_bills_finite');
+
+\echo -- 19.2 purchase return: must name the bill, stay inside it, leave the average alone, show a variance
+set role authenticated; select tt.as(:'o'); select set_grant('purchase_return', 'purchasing', true);
+select tt.as(:'p');
+select save_purchase(null, null, :'s19', 1, 'BR-1', current_date, format('[{"item_id":"%s","qty":10,"unit":"kg","unit_cost":100}]', :'n1')::jsonb) ->> 'id' as br1 \gset
+select post_purchase(:'br1'::uuid) ->> 'status' as br1st \gset
+select tt.chk('T19 bill BR-1 posted', :'br1st' = 'posted');
+reset role;
+select qty as q0, avg_cost as a0 from stock_balance where item_id = :'n1'::uuid and location_id = 1 \gset
+set role authenticated; select tt.as(:'p');
+select tt.err('T19 a purchaser cannot write a return without the bill', format($$select save_purchase(null,null,%L,1,'RX-0',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":100}]'::jsonb,0,null,null,'return',null,'damaged')$$, :'s19', :'n1'), 'return_needs_bill');
+select tt.err('T19 return quantity above the bill (11 > 10)', format($$select save_purchase(null,null,%L,1,'RX-0',current_date,'[{"item_id":"%s","qty":11,"unit":"kg","unit_cost":100}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19', :'n1', :'br1'), 'return_exceeds_bill');
+select tt.err('T19 return cost above the bill cost (101 > 100)', format($$select save_purchase(null,null,%L,1,'RX-0',current_date,'[{"item_id":"%s","qty":4,"unit":"kg","unit_cost":101}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19', :'n1', :'br1'), 'return_cost_above_bill');
+select tt.err('T19 return of an item that is not on the bill', format($$select save_purchase(null,null,%L,1,'RX-0',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":10}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19', :'n2', :'br1'), 'return_exceeds_bill');
+select tt.err('T19 a bill of another supplier cannot be the reference', format($$select save_purchase(null,null,%L,1,'RX-0',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":100}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19b', :'n1', :'br1'), 'bad_ref_bill');
+select save_purchase(null, null, :'s19', 1, 'DRAFT-REF', current_date, format('[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":100}]', :'n1')::jsonb) ->> 'id' as bdraft \gset
+select tt.err('T19 a draft bill cannot be the reference', format($$select save_purchase(null,null,%L,1,'RX-0',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":100}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19', :'n1', :'bdraft'), 'bad_ref_bill');
+select save_purchase(null, null, :'s19', 1, 'RX-1', current_date, format('[{"item_id":"%s","qty":4,"unit":"kg","unit_cost":100}]', :'n1')::jsonb, 0, null, null, 'return', :'br1', 'damaged') ->> 'id' as rx1 \gset
+select tt.err('T19 a second draft return of 7 is refused (4 already reserved, only 6 left)', format($$select save_purchase(null,null,%L,1,'RX-X',current_date,'[{"item_id":"%s","qty":7,"unit":"kg","unit_cost":100}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19', :'n1', :'br1'), 'return_exceeds_bill');
+select save_purchase(null, null, :'s19', 1, 'RX-2', current_date, format('[{"item_id":"%s","qty":6,"unit":"kg","unit_cost":100}]', :'n1')::jsonb, 0, null, null, 'return', :'br1', 'damaged') ->> 'id' as rx2 \gset
+select post_purchase(:'rx1'::uuid) ->> 'status' as rx1st \gset
+select tt.chk('T19 return RX-1 (4 of 10) posted', :'rx1st' = 'posted');
+reset role;
+select tt.chk('T19 the return left the stock at the CURRENT average (avg unchanged), qty -4; the ledger row carries the average; the difference to the credit (400) is the variance on the bill',
+  (select qty from stock_balance where item_id = :'n1'::uuid and location_id = 1) = :q0::numeric - 4
+  and (select avg_cost from stock_balance where item_id = :'n1'::uuid and location_id = 1) = :a0::numeric
+  and (select unit_cost from stock_ledger where reason = 'purchase_return' and ref_id = :'rx1') = :a0::numeric
+  and (select variance from purchase_bills where id = :'rx1'::uuid) = round(4 * (100 - :a0::numeric), 2)
+  and (select total from purchase_bills where id = :'rx1'::uuid) = 400);
+set role authenticated; select tt.as(:'p');
+select tt.chk('T19 return RX-2 (6 of 10) posts: exactly the rest of the bill', (post_purchase(:'rx2'::uuid) ->> 'status') = 'posted');
+select tt.err('T19 nothing is left to return on that bill', format($$select save_purchase(null,null,%L,1,'RX-3',current_date,'[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":100}]'::jsonb,0,null,null,'return',%L,'damaged')$$, :'s19', :'n1', :'br1'), 'return_exceeds_bill');
+select tt.as(:'o'); select void_purchase(:'rx2'::uuid, 'wrong return');
+select tt.as(:'p');
+select tt.chk('T19 a VOID return no longer counts: 6 can be returned again', (save_purchase(null, null, :'s19', 1, 'RX-4', current_date, format('[{"item_id":"%s","qty":6,"unit":"kg","unit_cost":100}]', :'n1')::jsonb, 0, null, null, 'return', :'br1', 'damaged') ->> 'status') = 'draft');
+select tt.as(:'o');
+select save_purchase(null, null, :'s19', 1, 'RX-OWN', current_date, format('[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":5}]', :'n1')::jsonb, 0, null, null, 'return', null, 'other') ->> 'id' as rxo \gset
+select tt.chk('T19 the OWNER may write a return without a bill', :'rxo' is not null);
+select post_purchase(:'rxo'::uuid);
+reset role;
+select tt.chk('T19 ... and posting it raises the red exception purchase_return_unreferenced', (select count(*) from exceptions where flag_code = 'purchase_return_unreferenced' and level = 'red') = 1);
+set role authenticated; select tt.as(:'o'); select set_rule('purchase_cost_jump_pct', '20');
+select tt.as(:'p');
+select save_purchase(null, null, :'s19', 1, 'BR-2', current_date, format('[{"item_id":"%s","qty":5,"unit":"kg","unit_cost":100}]', :'n1')::jsonb) ->> 'id' as br2 \gset
+select post_purchase(:'br2'::uuid);
+reset role; select count(*) as jumps0 from exceptions where flag_code = 'purchase_price_jump' \gset
+set role authenticated; select tt.as(:'p');
+select save_purchase(null, null, :'s19', 1, 'RX-5', current_date, format('[{"item_id":"%s","qty":1,"unit":"kg","unit_cost":50}]', :'n1')::jsonb, 0, null, null, 'return', :'br2', 'damaged') ->> 'id' as rx5 \gset
+select post_purchase(:'rx5'::uuid);
+reset role;
+select tt.chk('T19 the price-jump check applies to a return too (50 vs the last bill 100 = -50%)', (select count(*) from exceptions where flag_code = 'purchase_price_jump') = :jumps0 + 1);
+set role authenticated; select tt.as(:'o'); select set_rule('purchase_cost_jump_pct', null);
+
+\echo -- 19.3 the permission is checked BEFORE a duplicate / already-done answer; purchase ids are hidden from non-purchase people
+select tt.as(:'s');
+select tt.err('T19 a salesperson re-posting a posted bill gets "not allowed", not a dup', format($$select post_purchase(%L)$$, :'br1'), 'not allowed');
+select tt.as(:'p');
+select save_purchase(null, null, :'s19', 1, 'VX-1', current_date, '[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'id' as vx \gset
+select void_purchase(:'vx'::uuid, 'cancel draft');
+select tt.chk('T19 the writer may re-send the void: dup', (void_purchase(:'vx'::uuid, 'again') ->> 'dup')::boolean);
+select tt.chk('T19 the poster may re-send the post: dup', (post_purchase(:'br1'::uuid) ->> 'dup')::boolean);
+select tt.as(:'s');
+select tt.err('T19 a salesperson re-voiding a void bill gets "not allowed"', format($$select void_purchase(%L,'x')$$, :'vx'), 'not allowed');
+select tt.as(:'o');
+select pay_supplier(:'s19'::uuid, 1, '[{"mode":"cash","amount":1}]'::jsonb, 'dddddddd-0000-0000-0000-000000000019') ->> 'paid' as paid1 \gset
+select tt.as(:'s');
+select tt.err('T19 a salesperson re-sending a supplier payment (same client id) gets "not allowed", no balance leaks', format($$select pay_supplier(%L,1,'[{"mode":"cash","amount":1}]'::jsonb,'dddddddd-0000-0000-0000-000000000019')$$, :'s19'), 'not allowed');
+select tt.as(:'o');
+select tt.chk('T19 the owner re-sending it gets the dup', (pay_supplier(:'s19'::uuid, 1, '[{"mode":"cash","amount":1}]'::jsonb, 'dddddddd-0000-0000-0000-000000000019') ->> 'dup')::boolean and (select count(*) from supplier_payments where client_id = 'dddddddd-0000-0000-0000-000000000019') = 1);
+select tt.as(:'s');
+select tt.chk('T19 stock_ledger_rows: a salesperson sees purchase rows but NOT their bill id', (select count(*) from stock_ledger_rows(1, :'n1') where ref_type = 'purchase') >= 2
+  and (select count(*) from stock_ledger_rows(1, :'n1') where ref_type = 'purchase' and ref_id is not null) = 0);
+select tt.as(:'p');
+select tt.chk('T19 ... purchasing sees them', (select count(*) from stock_ledger_rows(1, :'n1') where ref_type = 'purchase' and ref_id is not null) >= 2);
+select tt.as(:'o');
+select tt.chk('T19 ... and the owner', (select count(*) from stock_ledger_rows(1, :'n1') where ref_type = 'purchase' and ref_id is not null) >= 2);
+reset role;
+select tt.chk('T19 audit trail now covers the purchase lines', (select count(*) from audit_log where table_name = 'purchase_lines') > 0);
+
+\echo -- 19.4 locks: the supplier row is locked by post / void / void payment; stock_opening cannot deadlock; reconcile(fix) locks the balance
+select tt.chk('T19 stock_opening takes NO KEY UPDATE on the item, not UPDATE', (select prosrc from pg_proc where proname = 'stock_opening') like '%for no key update%'
+  and (select prosrc from pg_proc where proname = 'stock_opening') not like '%from public.items where id = p_item for update%');
+\if :has_dblink
+select tt.as(:'o');
+-- supplier row lock: while another transaction holds the supplier, post / void / void-payment wait (they all lock the supplier first)
+set role authenticated; select tt.as(:'o');
+select save_purchase(null, null, :'s19c', 1, 'C-A', current_date - 10, '[{"description":"a","qty":1,"unit_cost":100}]'::jsonb) ->> 'id' as ca \gset
+select save_purchase(null, null, :'s19c', 3, 'C-B', current_date - 2, '[{"description":"b","qty":1,"unit_cost":100}]'::jsonb) ->> 'id' as cb \gset
+reset role;
+select tt.chk('T19 post_purchase waits for the supplier row lock', tt.probe(array[format('update suppliers set name = name where id = %L', :'s19c')], format($$select (post_purchase(%L))->>'status'$$, :'ca'), :'o') like 'blocked%');
+select tt.chk('T19 ... and then completes (posted)', (select status from purchase_bills where id = :'ca'::uuid) = 'posted');
+select tt.chk('T19 void_purchase waits for the supplier row lock', tt.probe(array[format('update suppliers set name = name where id = %L', :'s19c')], format($$select (void_purchase(%L,'probe'))->>'status'$$, :'ca'), :'o') like 'blocked%');
+select tt.chk('T19 ... and then completes (void)', (select status from purchase_bills where id = :'ca'::uuid) = 'void');
+set role authenticated; select tt.as(:'o');
+select save_purchase(null, null, :'s19c', 1, 'C-A2', current_date - 10, '[{"description":"a","qty":1,"unit_cost":100}]'::jsonb) ->> 'id' as ca2 \gset
+select post_purchase(:'ca2'::uuid); select post_purchase(:'cb'::uuid);
+select pay_supplier(:'s19c'::uuid, 3, '[{"mode":"cash","amount":10}]'::jsonb) ->> 'paid' as pp \gset
+reset role;
+select id as pid from supplier_payments where supplier_id = :'s19c'::uuid and bill_id is null limit 1 \gset
+select tt.chk('T19 void_supplier_payment waits for the supplier row lock', tt.probe(array[format('update suppliers set name = name where id = %L', :'s19c')], format($$select void_supplier_payment(%s,'probe')::text$$, :'pid'), :'o') like 'blocked%');
+select tt.chk('T19 ... and then completes (voided)', (select voided from supplier_payments where id = :pid));
+-- the deadlock the audit found: B holds a balance row and then writes a ledger row (KEY SHARE on the item); A (stock_opening) used to hold the item FOR UPDATE and wait for that balance row
+select tt.chk('T19 stock_opening vs a sale-like writer: no deadlock (both finish, no error)',
+  tt.probe(array[format('insert into stock_balance (item_id, location_id) values (%L, 7) on conflict do nothing', :'n2'), format('update stock_balance set updated_at = now() where item_id = %L and location_id = 7', :'n2')],
+           format($$select (stock_opening(%L,7,10,10))->>'qty'$$, :'n2'), :'o',
+           array[format('insert into stock_ledger (item_id, location_id, qty_delta, reason) values (%L, 7, -1, ''sale_out'')', :'n2')]) = 'blocked [result: 10]');
+select tt.chk('T19 stock_reconcile(false) does not lock', tt.probe(array[format('update stock_balance set updated_at = now() where item_id = %L and location_id = 1', :'n1')], $$select count(*)::text from stock_reconcile(false)$$, :'o') like 'ran%');
+select tt.chk('T19 stock_reconcile(true) waits for the balance row it is recounting', tt.probe(array[format('update stock_balance set updated_at = now() where item_id = %L and location_id = 1', :'n1')], $$select count(*)::text from stock_reconcile(true)$$, :'o') like 'blocked%');
+\else
+select tt.chk('T19 lock probes skipped: no dblink on this server', true);
+\endif
+set role authenticated; select tt.as(:'o');
+select tt.chk('T19 reconcile is clean after the probes', (select count(*) from stock_reconcile()) = 0);
+
+\echo -- 19.5 supplier credit: a payment made at a location clears that location first, the rest spills to the oldest
+select pay_supplier(:'s19c'::uuid, 3, '[{"mode":"cash","amount":100}]'::jsonb) ->> 'balance' as bal19 \gset
+select tt.chk('T19 paid 100 at location 3 (the 10 paid before was voided by the lock probe): bill C-B (loc 3) is cleared, C-A2 (loc 1, older) still open 100', (select count(*) from supplier_open_bills(:'s19c'::uuid) where bill_no = 'C-B') = 0
+  and (select open_amt from supplier_open_bills(:'s19c'::uuid) where bill_no = 'C-A2') = 100);
+select pay_supplier(:'s19c'::uuid, 3, '[{"mode":"cash","amount":40}]'::jsonb);
+select tt.chk('T19 another 40 at location 3 (nothing left there) spills to the oldest: C-A2 open 60', (select open_amt from supplier_open_bills(:'s19c'::uuid) where bill_no = 'C-A2') = 60 and (select round(balance) from supplier_dues(null) where supplier_id = :'s19c'::uuid) = 60);
+
+\echo -- 19.6 speed: 5000 tracked items for a salesperson
+reset role;
+insert into items (code, name_bn, unit, sell_price, tracked) select 'T19-P' || g, 'T19 P' || g, 'kg', 10, true from generate_series(1, 5000) g;
+insert into stock_ledger (item_id, location_id, qty_delta, unit_cost, reason) select id, 1, 5, 3, 'opening' from items where name_bn like 'T19 P%';
+insert into stock_batches (item_id, location_id, made_at, qty_made, qty_remaining, expires_at) select id, 1, now(), 5, 5, now() + interval '5 hours' from items where name_bn like 'T19 P%' and right(name_bn, 1) = '7';
+set role authenticated; select tt.as(:'s');
+select clock_timestamp() as t0 \gset
+select count(*) as nlev from stock_levels(1) \gset
+select extract(epoch from clock_timestamp() - :'t0'::timestamptz) as el1 \gset
+select tt.chk('T19 stock_levels(1) for a salesperson, 5000+ items: ' || round(:el1::numeric, 3) || ' s (< 1 s)', :el1::numeric < 1 and :nlev::int >= 5000);
+select clock_timestamp() as t0 \gset
+select count(*) as nlev2 from stock_levels(null, '{"include_zero":true}') \gset
+select extract(epoch from clock_timestamp() - :'t0'::timestamptz) as el2 \gset
+select tt.chk('T19 stock_levels(all locations, include zero): ' || round(:el2::numeric, 3) || ' s (< 1 s)', :el2::numeric < 1 and :nlev2::int >= 5000);
+select tt.chk('T19 the salesperson sees quantities but no cost in them', (select count(*) from stock_levels(1) where avg_cost is not null or value is not null) = 0);
+select clock_timestamp() as t0 \gset
+select count(*) as nexp from expiry_list(1, 24) \gset
+select extract(epoch from clock_timestamp() - :'t0'::timestamptz) as el3 \gset
+select tt.chk('T19 expiry_list ' || round(:el3::numeric, 3) || ' s (< 1 s), the salesperson sees the batches', :el3::numeric < 1 and :nexp::int >= 500);
+select tt.as(:'o');
+select clock_timestamp() as t0 \gset
+select count(*) as nval from stock_valuation(1) \gset
+select extract(epoch from clock_timestamp() - :'t0'::timestamptz) as el4 \gset
+select tt.chk('T19 stock_valuation(1) as owner, 5000+ items: ' || round(:el4::numeric, 3) || ' s (< 1 s)', :el4::numeric < 1 and :nval::int >= 5000);
+select clock_timestamp() as t0 \gset
+select count(*) as npl from purchase_list(null, null, null, null, null, 500) \gset
+select extract(epoch from clock_timestamp() - :'t0'::timestamptz) as el5 \gset
+select tt.chk('T19 purchase_list ' || round(:el5::numeric, 3) || ' s (< 1 s)', :el5::numeric < 1 and :npl::int > 0);
+select tt.as(:'k');
+select tt.chk('T19 a storekeeper (no cost right) sees quantities only', (select count(*) from stock_levels(1) where avg_cost is not null) = 0);
+
+\echo -- 19.7 POS: late sale never blocks, one approval per sale, never-opened items, tiny quantities, expired
+select tt.as(:'o');
+select set_rule('stock_negative_mode', '"block"');
+select stock_opening(:'n3', 1, 3, 10) ->> 'qty'; select stock_opening(:'n4', 1, 3, 10) ->> 'qty';
+select tt.as(:'s');
+select tt.err('T19 block: a fresh sale of 5 with 3 on hand is refused', format($$select record_sale2(gen_random_uuid(),1,'[{"item_id":"%s","qty":5,"price":100,"unit":"kg"}]'::jsonb,0,'[{"mode":"cash","amount":500}]',null,null,'retail',null,false)$$, :'n3'), 'insufficient_stock');
+select record_sale2(gen_random_uuid(), 1, format('[{"item_id":"%s","qty":5,"price":100,"unit":"kg"},{"item_id":"%s","qty":5,"price":100,"unit":"kg"}]', :'n3', :'n4')::jsonb, 0, '[{"mode":"cash","amount":1000}]', null, null, 'retail', null, false, now() - interval '10 minutes') ->> 'id' as slate \gset
+reset role;
+select tt.chk('T19 a LATE synced sale (10 min old) is recorded in block mode: both items go to -2', (select qty from stock_balance where item_id = :'n3'::uuid and location_id = 1) = -2 and (select qty from stock_balance where item_id = :'n4'::uuid and location_id = 1) = -2);
+select tt.chk('T19 ... the owner still gets a yellow line per item for that sale', (select count(*) from exceptions where flag_code = 'stock_negative' and sale_id = :'slate'::uuid and level = 'yellow') = 2);
+set role authenticated; select tt.as(:'o');
+select stock_count_adjust(:'n3', 1, 3, 'recount'); select stock_count_adjust(:'n4', 1, 3, 'recount');
+select set_rule('em_sell_below_zero', 'true');
+select tt.as(:'s');
+select request_emergency('sell_below_zero', 1, '{}'::jsonb, 'two items short, customer waiting') as em19 \gset
+select tt.as(:'o'); select decide_emergency(:em19, true, 'ok');
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(), 1, format('[{"item_id":"%s","qty":5,"price":100,"unit":"kg"},{"item_id":"%s","qty":5,"price":100,"unit":"kg"}]', :'n3', :'n4')::jsonb, 0, '[{"mode":"cash","amount":1000}]', null, null, 'retail', null, false) ->> 'id' as s2l \gset
+reset role;
+select tt.chk('T19 ONE emergency approval covers both short lines of ONE sale (approval used, both items -2)', (select status from emergency_requests where id = :em19) = 'used'
+  and (select qty from stock_balance where item_id = :'n3'::uuid and location_id = 1) = -2 and (select qty from stock_balance where item_id = :'n4'::uuid and location_id = 1) = -2
+  and (select count(*) from exceptions where flag_code = 'emergency_used' and sale_id = :'s2l'::uuid) = 1);
+set role authenticated; select tt.as(:'s');
+select tt.err('T19 ... and the next short sale is blocked again', format($$select record_sale2(gen_random_uuid(),1,'[{"item_id":"%s","qty":1,"price":100,"unit":"kg"}]'::jsonb,0,'[{"mode":"cash","amount":100}]',null,null,'retail',null,false)$$, :'n3'), 'insufficient_stock');
+select tt.as(:'o'); select set_rule('stock_negative_mode', '"warn"'); select set_rule('em_sell_below_zero', null);
+reset role; select count(*) as exc0 from exceptions where flag_code = 'stock_negative' \gset
+set role authenticated; select tt.as(:'s');
+select record_sale2(gen_random_uuid(), 1, format('[{"item_id":"%s","qty":1,"price":100,"unit":"kg"}]', :'n5')::jsonb, 0, '[{"mode":"cash","amount":100}]', null, null, 'retail', null, false) ->> 'id' as s5 \gset
+select record_sale2(gen_random_uuid(), 1, format('[{"item_id":"%s","qty":1,"price":100,"unit":"kg"}]', :'n3')::jsonb, 0, '[{"mode":"cash","amount":100}]', null, null, 'retail', null, false) ->> 'id' as s3b \gset
+reset role;
+select tt.chk('T19 an item that was never opened (no balance, no stock-in) goes -1 WITHOUT a stock_negative exception', (select qty from stock_balance where item_id = :'n5'::uuid and location_id = 1) = -1
+  and not exists (select 1 from exceptions where sale_id = :'s5'::uuid and flag_code = 'stock_negative'));
+select tt.chk('T19 an opened item already flagged today (n3) is not flagged again (once per item / location / day)', (select qty from stock_balance where item_id = :'n3'::uuid and location_id = 1) = -3
+  and not exists (select 1 from exceptions where sale_id = :'s3b'::uuid and flag_code = 'stock_negative')
+  and (select count(*) from exceptions where flag_code = 'stock_negative') = :exc0::int);
+set role authenticated; select tt.as(:'o'); select stock_opening(:'n6', 1, 5, 1) ->> 'qty'; select tt.as(:'s');
+select tt.chk('T19 tiny quantity: 0.00001 kg sells (no error), takes nothing out of the stock', (record_sale2(gen_random_uuid(), 1, format('[{"item_id":"%s","qty":0.00001,"price":100000,"unit":"kg"}]', :'n6')::jsonb, 0, '[{"mode":"cash","amount":1}]', null, null, 'retail', null, false) ->> 'receipt') is not null);
+reset role;
+select tt.chk('T19 ... the stock of n6 is untouched and there is no ledger row for that line', (select qty from stock_balance where item_id = :'n6'::uuid and location_id = 1) = 5 and (select count(*) from stock_ledger where item_id = :'n6'::uuid) = 1);
+
+\echo -- 19.8 cost is secret: who may not see cost may not write it; production cost jump; batch dust
+set role authenticated; select tt.as(:'o'); select set_grant('stock_opening', 'storekeeper', true); select set_grant('stock_production', 'storekeeper', true);
+select tt.as(:'k');
+select tt.err('T19 a storekeeper without the cost right cannot write an opening COST', format($$select stock_opening(%L,1,5,12)$$, :'n7'), 'not allowed');
+select tt.chk('T19 ... but can open without a cost', (stock_opening(:'n7', 1, 5) ->> 'qty')::numeric = 5);
+select tt.err('T19 nor a production COST', format($$select stock_production_in(%L,1,5,null,null,null,null,40)$$, :'n8'), 'not allowed');
+select tt.chk('T19 ... production without a cost is fine', (stock_production_in(:'n8', 1, 5) ->> 'qty')::numeric = 5);
+select tt.as(:'o');
+select set_rule('purchase_cost_jump_pct', '20');
+select stock_production_in(:'n7', 1, 10, null, null, null, null, 12) ->> 'qty';
+select stock_production_in(:'n7', 1, 10, null, null, null, null, 90) ->> 'qty';
+select set_rule('purchase_cost_jump_pct', null);
+reset role;
+select tt.chk('T19 a production cost far from the average is flagged production_cost_jump (once: 90 vs ~12; the first 12 vs 12 is not)', (select count(*) from exceptions where flag_code = 'production_cost_jump') = 1);
+set role authenticated; select tt.as(:'o');
+select stock_production_in(:'n9', 1, 1) ->> 'batch_id' as b9 \gset
+select tt.as(:'s');
+select record_sale2(gen_random_uuid(), 1, format('[{"item_id":"%s","qty":0.9997,"price":100,"unit":"kg"}]', :'n9')::jsonb, 0, '[{"mode":"cash","amount":99.97}]', null, null, 'retail', null, false) ->> 'id' as s9 \gset
+reset role;
+select tt.chk('T19 conversion dust: after selling 0.9997 of a 1 kg batch the 0.0003 left closes the batch (balance keeps 0.0003)', (select qty_remaining from stock_batches where id = :b9) = 0 and (select qty from stock_balance where item_id = :'n9'::uuid and location_id = 1) = 0.0003);
+
+\echo -- 19.9 idempotency: the same client id twice
+set role authenticated; select tt.as(:'o');
+select save_purchase('c1111111-0000-0000-0000-000000000019', null, :'s19', 1, 'IDEM-1', current_date, '[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'id' as idm \gset
+select tt.chk('T19 editing a draft with its own client id APPLIES the edit (not a dup)', (save_purchase('c1111111-0000-0000-0000-000000000019', :'idm'::uuid, :'s19', 1, 'IDEM-1', current_date, '[{"description":"x","qty":3,"unit_cost":10}]'::jsonb) ->> 'total')::numeric = 30);
+select tt.chk('T19 ... the stored bill has the new total', (select total from purchase_bills where id = :'idm'::uuid) = 30);
+select tt.chk('T19 re-sending the create (no p_id) is still the dup, total 30', (save_purchase('c1111111-0000-0000-0000-000000000019', null, :'s19', 1, 'IDEM-1', current_date, '[{"description":"x","qty":9,"unit_cost":10}]'::jsonb) ->> 'dup')::boolean);
+select tt.err('T19 a different request with the same bill number is still a duplicate_bill', format($$select save_purchase('c2222222-0000-0000-0000-000000000019',null,%L,1,'IDEM-1',current_date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb)$$, :'s19'), 'duplicate_bill');
+select tt.err('T19 ... also without any client id', format($$select save_purchase(null,null,%L,1,'idem-1',current_date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb)$$, :'s19'), 'duplicate_bill');
+select stock_wastage(:'n1', 1, 1, 'spoiled', null, null, null, 'c3333333-0000-0000-0000-000000000019') ->> 'id' as w1 \gset
+select tt.chk('T19 wastage with the same client id: dup', (stock_wastage(:'n1', 1, 1, 'spoiled', null, null, null, 'c3333333-0000-0000-0000-000000000019') ->> 'dup')::boolean);
+select stock_transfer(1, 7, :'n1', 1, null, null, 'c4444444-0000-0000-0000-000000000019') ->> 'id' as tr1 \gset
+select tt.chk('T19 transfer with the same client id: dup, one transfer', (stock_transfer(1, 7, :'n1', 1, null, null, 'c4444444-0000-0000-0000-000000000019') ->> 'dup')::boolean and (select count(*) from stock_transfers where client_id = 'c4444444-0000-0000-0000-000000000019') = 1);
+reset role;
+select tt.chk('T19 ... and exactly one write-off was written', (select count(*) from stock_wastage where id = :'w1'::uuid) = 1 and (select count(*) from stock_ledger where client_id = 'c3333333-0000-0000-0000-000000000019') = 1);
+select tt.chk('T19 stock_post with the same client id twice: the same ledger id', stock_post(:'n1'::uuid, 1, -1, 'wastage', 'wastage', 'x', null, null, null, null, null, 'none', null, 'c5555555-0000-0000-0000-000000000019')
+  = stock_post(:'n1'::uuid, 1, -1, 'wastage', 'wastage', 'x', null, null, null, null, null, 'none', null, 'c5555555-0000-0000-0000-000000000019'));
+select tt.chk('T19 ... and one ledger row', (select count(*) from stock_ledger where client_id = 'c5555555-0000-0000-0000-000000000019') = 1);
+select tt.err('T19 stock_post refuses NaN / Infinity / zero quantity', format($$select stock_post(%L,1,'Infinity','wastage')$$, :'n1'), 'bad_qty');
+select tt.err('T19 stock_post refuses an absurd cost', format($$select stock_post(%L,1,1,'count_adjust',null,null,'1e30')$$, :'n1'), 'bad_cost');
+select tt.chk('T19 reconcile is still clean at the end of the round', (select count(*) from (select item_id, location_id, sum(qty_delta) q from stock_ledger group by 1, 2) l full join stock_balance b using (item_id, location_id) where coalesce(l.q, 0) <> coalesce(b.qty, 0)) = 0);
+
 select '--- FAILED: ' || count(*) from tt.res where not ok;
 select '--- TOTAL: ' || count(*) from tt.res;
 select name from tt.res where not ok;
