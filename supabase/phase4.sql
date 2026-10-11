@@ -10,6 +10,8 @@
 --   Quick sales have no item, so they carry no cost: they are reported as "uncosted".
 -- ============================================================
 
+create index if not exists sales_date_loc on public.sales (sale_date, location_id);
+
 -- who may look at sales analytics: owner, or a role with approve on the POS form
 create or replace function public.biz_ok() returns boolean
 language sql stable security definer set search_path = public as $$
@@ -32,12 +34,14 @@ begin
   return query
   with s as (
     select * from public.sales x
-    where x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and public.can_loc(x.location_id)),
+    where x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and x.location_id in (select l.id from public.locations l where public.can_loc(l.id))),
   ok as (select * from s where s.status = 'done'),
   ln as (
     select o.sale_date, o.location_id, (case when o.subtotal > 0 then o.total / o.subtotal else 1 end) f,
-           (e->>'amount')::numeric amt, (e->>'qty')::numeric qty, nullif(e->>'item_id', '')::uuid iid
-    from ok o, jsonb_array_elements(o.lines) e),
+           case when e->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'amount')::numeric end amt,
+           case when e->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'qty')::numeric end qty,
+           case when e->>'item_id' ~ '^[0-9a-f-]{36}$' then (e->>'item_id')::uuid end iid
+    from ok o, jsonb_array_elements(case when jsonb_typeof(o.lines) = 'array' then o.lines else '[]'::jsonb end) e),
   lc as (select l.*, c.cost_price from ln l left join public.item_costs c on c.item_id = l.iid),
   ag as (
     select lc.sale_date, lc.location_id,
@@ -48,7 +52,7 @@ begin
   vd as (select s.sale_date, s.location_id, count(*) vn, sum(s.total) va from s where s.status = 'void' group by 1, 2)
   select coalesce(t.sale_date, v.sale_date), coalesce(t.location_id, v.location_id),
          coalesce(t.n, 0), coalesce(t.rev, 0), coalesce(t.disc, 0), coalesce(v.vn, 0), coalesce(v.va, 0),
-         case when cost_ok then coalesce(a.cr, 0) end, case when cost_ok then coalesce(a.cg, 0) end
+         case when cost_ok then round(coalesce(a.cr, 0), 2) end, case when cost_ok then round(coalesce(a.cg, 0), 2) end
   from tot t
   full join vd v on v.sale_date = t.sale_date and v.location_id = t.location_id
   left join ag a on a.sale_date = coalesce(t.sale_date, v.sale_date) and a.location_id = coalesce(t.location_id, v.location_id)
@@ -69,10 +73,12 @@ begin
   return query
   with ok as (
     select * from public.sales x
-    where x.status = 'done' and x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and public.can_loc(x.location_id)),
+    where x.status = 'done' and x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and x.location_id in (select l.id from public.locations l where public.can_loc(l.id))),
   ln as (
-    select nullif(e->>'item_id', '')::uuid iid, (e->>'qty')::numeric qty, round((e->>'amount')::numeric * (case when o.subtotal > 0 then o.total / o.subtotal else 1 end), 2) amt
-    from ok o, jsonb_array_elements(o.lines) e),
+    select case when e->>'item_id' ~ '^[0-9a-f-]{36}$' then (e->>'item_id')::uuid end iid,
+           case when e->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'qty')::numeric end qty,
+           case when e->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then round((e->>'amount')::numeric * (case when o.subtotal > 0 then o.total / o.subtotal else 1 end), 2) end amt
+    from ok o, jsonb_array_elements(case when jsonb_typeof(o.lines) = 'array' then o.lines else '[]'::jsonb end) e),
   by_item as (select l.iid, sum(l.qty) q, sum(l.amt) r from ln l where l.iid is not null group by 1),
   tot as (select coalesce(sum(r), 0) t from by_item),
   j as (
@@ -90,7 +96,7 @@ begin
   from r order by r.r desc, r.code;
 end $$;
 
--- ---------- 3. staff control indicators vs the location's own peers ----------
+-- ---------- 3. staff control indicators vs peers (pass ONE location: with null the peers of all shops are pooled) ----------
 -- Indicators only (not proof): each ratio is shown next to the peer MEDIAN. Whether a ratio counts as unusual is
 -- the owner's call (setting `anomaly_ratio` in the app); no threshold is built in here.
 create or replace function public.biz_staff(p_from date, p_to date, p_loc int default null)
@@ -104,8 +110,8 @@ begin
   return query
   with s as (
     select * from public.sales x
-    where x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and public.can_loc(x.location_id)),
-  ovr as (select s.id, bool_or(coalesce((e->>'override')::boolean, false)) o from s, jsonb_array_elements(s.lines) e group by s.id),
+    where x.sale_date between p_from and p_to and (p_loc is null or x.location_id = p_loc) and x.location_id in (select l.id from public.locations l where public.can_loc(l.id))),
+  ovr as (select s.id, bool_or(e->>'override' = 'true') o from s, jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) e group by s.id),
   per as (
     select s.created_staff st,
            count(*) filter (where s.status = 'done') n,
@@ -135,36 +141,42 @@ begin
 end $$;
 
 -- ---------- 4. purchase outlook: what the coming days are likely to need, from actual sales ----------
--- Expected revenue for each coming day = average of the same weekday over the look-back (when at least 2 such days
--- exist, otherwise the plain daily average). Cost ratio = actual COGS / costed revenue over the look-back.
--- Estimated purchase need = expected revenue x cost ratio. It is an estimate for planning, not a limit.
+-- Every calendar day of the look-back counts (a closed or zero-sales day counts as 0, so the average is honest).
+-- Expected revenue for a coming day = average of the same weekday over the look-back (needs at least 2 such days,
+-- otherwise the plain daily average). Cost ratio = actual COGS / costed revenue. The purchase estimate is a RANGE:
+--   low  = expected revenue x costed share x ratio   (only the item-wise part, which has a known cost)
+--   high = expected revenue x ratio                   (assuming quick sales carry the same cost ratio)
+-- It is a planning estimate, not a limit.
 create or replace function public.biz_outlook(p_loc int, p_ahead int default 7, p_lookback int default 28)
 returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare
-  td date := (now() at time zone 'Asia/Dhaka')::date; fr date; ndays int; rev numeric; costed numeric; cg numeric;
+  td date := (now() at time zone 'Asia/Dhaka')::date; fr date; trading int; rev numeric; costed numeric; cg numeric;
   avg_d numeric; exp_rev numeric; wd_used int; ratio numeric; share numeric;
 begin
   if not public.biz_ok() then raise exception 'not allowed'; end if;
   if p_ahead < 1 or p_ahead > 31 or p_lookback < 7 or p_lookback > 120 then raise exception 'bad_range'; end if;
   fr := td - p_lookback;
-  select count(distinct b.sale_date), coalesce(sum(b.revenue), 0), sum(b.costed_rev), sum(b.cogs)
-    into ndays, rev, costed, cg from public.biz_daily(fr, td - 1, p_loc) b;
-  if ndays = 0 then return jsonb_build_object('lookback_days', p_lookback, 'sale_days', 0, 'enough', false); end if;
-  avg_d := rev / ndays;
-  with d as (select b.sale_date, sum(b.revenue) r from public.biz_daily(fr, td - 1, p_loc) b group by 1),
-       wd as (select extract(dow from d.sale_date)::int dw, count(*) n, avg(d.r) a from d group by 1),
-       fut as (select td + g dt from generate_series(0, p_ahead - 1) g)
-  select coalesce(sum(case when wd.n >= 2 then wd.a else avg_d end), 0), count(*) filter (where wd.n >= 2)
-    into exp_rev, wd_used
-  from fut left join wd on wd.dw = extract(dow from fut.dt)::int;
+  with d as materialized (select * from public.biz_daily(fr, td - 1, p_loc)),
+       cal as (select g::date dt, coalesce(sum(d.revenue), 0) r, coalesce(sum(d.n), 0) n from generate_series(fr, td - 1, interval '1 day') g left join d on d.sale_date = g::date group by g),
+       wd as (select extract(dow from dt)::int dw, count(*) cnt, avg(r) a from cal group by 1),
+       fut as (select td + g dt from generate_series(0, p_ahead - 1) g),
+       tot as (select count(*) filter (where n > 0) trading, avg(r) avg_d, sum(r) rev from cal),
+       cs as (select sum(costed_rev) costed, sum(cogs) cg from d)
+  select tot.trading, tot.rev, tot.avg_d, cs.costed, cs.cg,
+         (select sum(case when wd.cnt >= 2 then wd.a else tot.avg_d end) from fut left join wd on wd.dw = extract(dow from fut.dt)::int),
+         (select count(*) filter (where wd.cnt >= 2) from fut left join wd on wd.dw = extract(dow from fut.dt)::int)
+    into trading, rev, avg_d, costed, cg, exp_rev, wd_used
+  from tot, cs;
+  if trading = 0 then return jsonb_build_object('lookback_days', p_lookback, 'trading_days', 0, 'enough', false); end if;
   if costed is not null and costed > 0 then ratio := cg / costed; share := costed / nullif(rev, 0); end if;
-  return jsonb_build_object('lookback_days', p_lookback, 'sale_days', ndays, 'avg_daily_revenue', round(avg_d, 2),
+  return jsonb_build_object('lookback_days', p_lookback, 'trading_days', trading, 'avg_daily_revenue', round(avg_d, 2),
     'ahead_days', p_ahead, 'weekday_pattern_days', wd_used, 'expected_revenue', round(exp_rev, 2),
     'cost_ratio', case when ratio is not null then round(ratio, 4) end,
     'costed_share', case when share is not null then round(share, 4) end,
-    'est_purchase_need', case when ratio is not null then round(exp_rev * ratio, 2) end,
-    'enough', ndays >= 7);
+    'est_purchase_low', case when ratio is not null then round(exp_rev * share * ratio, 2) end,
+    'est_purchase_high', case when ratio is not null then round(exp_rev * ratio, 2) end,
+    'enough', trading >= 7);
 end $$;
 
 -- ---------- 5. limit suggestions from history (owner only; nothing is applied here) ----------
@@ -177,7 +189,7 @@ begin
   if not public.is_owner() then raise exception 'not allowed'; end if;
   if p_days < 14 or p_days > 365 then raise exception 'bad_range'; end if;
   with l as (
-    select e.entry_date d, case when x->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (x->>'amount')::numeric end amt
+    select e.entry_date d, case when translate(x->>'amount', '০১২৩৪৫৬৭৮৯,', '0123456789') ~ '^[0-9]+(\.[0-9]+)?$' then translate(x->>'amount', '০১২৩৪৫৬৭৮৯,', '0123456789')::numeric end amt, (x->>'amount') raw
     from public.entries e, jsonb_array_elements(case when jsonb_typeof(e.data->'lines') = 'array' then e.data->'lines' else '[]'::jsonb end) x
     where e.form_code = '10-2' and e.location_id = p_loc and e.status in ('submitted', 'approved')
       and e.entry_date >= (now() at time zone 'Asia/Dhaka')::date - p_days),
@@ -185,7 +197,7 @@ begin
   a as (select count(amt) n, (percentile_cont(0.5) within group (order by amt))::numeric med, (percentile_cont(0.9) within group (order by amt))::numeric p90, max(amt) mx from l where amt is not null),
   b as (select count(*) n, (percentile_cont(0.5) within group (order by t))::numeric med, (percentile_cont(0.9) within group (order by t))::numeric p90, max(t) mx from dd)
   select jsonb_build_object('window_days', p_days,
-      'expense', jsonb_build_object('n', a.n, 'median', round(a.med, 2), 'p90', round(a.p90, 2), 'max', a.mx),
+      'expense', jsonb_build_object('n', a.n, 'skipped', (select count(*) from l where amt is null and raw is not null and raw <> ''), 'median', round(a.med, 2), 'p90', round(a.p90, 2), 'max', a.mx),
       'daily_total', jsonb_build_object('days', b.n, 'median', round(b.med, 2), 'p90', round(b.p90, 2), 'max', b.mx))
     into res from a, b;
   return res || jsonb_build_object(
@@ -193,6 +205,7 @@ begin
     'current_imprest', (select value from public.location_settings where location_id = p_loc and key = 'imprest'));
 end $$;
 
+revoke all on function public.biz_ok(), public.biz_cost_ok(), public.biz_daily(date, date, int), public.biz_items(date, date, int), public.biz_staff(date, date, int), public.biz_outlook(int, int, int), public.biz_suggest(int, int) from public, anon;
 grant execute on function public.biz_ok(), public.biz_cost_ok(),
   public.biz_daily(date, date, int), public.biz_items(date, date, int), public.biz_staff(date, date, int),
   public.biz_outlook(int, int, int), public.biz_suggest(int, int) to authenticated;
