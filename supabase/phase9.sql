@@ -1,7 +1,9 @@
 -- ============================================================
 -- BOS tool · Phase 9: REPORT ENGINE core + the P1 reports that need no new data capture.
 -- Run AFTER phase3/4/5/6/7 (ALL_NEW.sql). Additive and idempotent: safe to run again. Nothing existing is changed or dropped.
--- Does not depend on phase8: optional phase8 columns (discount kind / percent) are detected and used only if they exist.
+-- Does not depend on phase8, and works in EITHER order: optional phase8 columns (sales.discount_kind / discount_input) and grants
+-- (has_grant, view_cost, view_reports ...) are detected when used. The two views that show the discount kind are (re)built by
+-- rpt_views_refresh(); phase8 calls it at its end when phase9 is already there, and phase9 calls it below, so the order does not matter.
 --
 -- What is here
 --   report_brand_map   location -> brand (owner editable; brand is not stored on sales)
@@ -12,12 +14,14 @@
 --                      (keys are looked up in a fixed whitelist; values are quoted with %L after type checks)
 --
 -- Security
---   * every call needs the grant report_<group> (owner always may; the owner edits it in "Who may do what")
+--   * every call needs the grant report_<group> or the phase8 grant view_reports (owner always may; the owner edits them in "Who may do what")
 --   * rows are limited to can_loc() locations, always
 --   * cost columns (cogs, gp, gp_pct, uncosted_pct) are not even computed unless owner / ITEM_COST view / grant view_cost
 --   * customer mobile numbers are masked unless owner / POS approve / grant view_customer_mobile
---   * thresholds (fiscal year start, week start, aging buckets, near-limit %, page size) are RULES with no built-in value:
---     missing -> the result says "data needed" instead of guessing
+--   * thresholds are RULES with no invented value. Fiscal year start (month + day) and week start are the phase8 settings
+--     fiscal_year_start_month / fiscal_year_start_day / week_start (sun..sat) and use exactly the fallbacks phase8 documents
+--     (calendar year, Saturday); the old phase9 draft rule week_start_dow is read only when week_start is empty. Aging buckets,
+--     near-limit % and page size have no value: missing -> the result says "data needed" (page size: documented 50).
 -- ============================================================
 
 create index if not exists sales_date_loc on public.sales (sale_date, location_id);
@@ -52,28 +56,42 @@ insert into public.report_brand_map (location_id, brand_code, brand_bn, brand_en
     ('al_cakes', 'al_cakiz', 'AL-CAKIZ', 'AL-CAKIZ')) v(code, b, bn, en) on v.code = l.code
   on conflict (location_id) do nothing;
 
--- ---------- rules (no built-in values: empty = "data needed") ----------
+-- ---------- rules ----------
+-- The three settings below are IDENTICAL to the rows phase8 inserts (same module, labels, hints), so "on conflict do nothing" is harmless in either order.
+insert into public.rules (key, module, kind, default_value, choices, min_value, max_value, label_bn, label_mix, label_en, hint_en, sort) values
+ ('fiscal_year_start_month', 'settings', 'number', null, null, 1, 12, 'অর্থবছর শুরুর মাস (১-১২)', 'Fiscal year শুরুর মাস (1-12)', 'Fiscal year start month (1-12)', 'Empty = calendar year', 60),
+ ('fiscal_year_start_day', 'settings', 'number', null, null, 1, 31, 'অর্থবছর শুরুর দিন', 'Fiscal year শুরুর দিন', 'Fiscal year start day', 'Empty = day 1', 61),
+ ('week_start', 'settings', 'choice', null, '["sat","sun","mon","tue","wed","thu","fri"]', null, null, 'সপ্তাহ শুরু হয় যে দিনে', 'Week শুরু হয় যে দিনে', 'Week starts on', 'Empty = Saturday in reports', 62)
+ on conflict (key) do nothing;
 insert into public.rules (key, module, kind, default_value, unit, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values
- ('fiscal_year_start_month', 'reports', 'number', null, 'মাস (১-১২)', 1, 12, 'অর্থবছর শুরুর মাস (১=জানুয়ারি … ১২=ডিসেম্বর)', 'অর্থবছর শুরুর মাস (1-12)', 'Fiscal year starts in month (1-12)', 'ফাঁকা থাকলে অর্থবছর রিপোর্ট ও প্রিসেট বন্ধ থাকে', 'Empty = fiscal-year presets and grouping are unavailable', 60),
- ('week_start_dow', 'reports', 'number', null, 'বার (০=রবি … ৬=শনি)', 0, 6, 'সপ্তাহ শুরুর বার (০=রবি, ১=সোম … ৬=শনি)', 'সপ্তাহ শুরুর বার (0=Sun … 6=Sat)', 'Week starts on (0=Sunday … 6=Saturday)', 'ফাঁকা থাকলে সাপ্তাহিক প্রিসেট বন্ধ; সপ্তাহ-ওয়াইজ ভাগে সোমবার ধরা হয় (নোটসহ)', 'Empty = week presets unavailable; weekly grouping uses Monday and says so', 61),
  ('report_aging_buckets', 'reports', 'text', null, 'দিন', null, null, 'বাকির বয়স ভাগ (দিন, কমা দিয়ে, যেমন 7,30,60)', 'বাকির বয়স bucket (দিন, comma দিয়ে)', 'Receivable aging buckets in days, comma separated (e.g. 7,30,60)', 'ফাঁকা থাকলে বয়স ভাগ দেখাবে না', 'Empty = no aging buckets are shown', 62),
  ('report_near_limit_pct', 'reports', 'number', null, '%', 1, 1000, 'ক্রেডিট সীমার কত % হলে "সীমার কাছে" ধরা হবে', 'Credit limit এর কত % হলে "কাছাকাছি"', 'Share of the credit limit that counts as "near the limit"', 'ফাঁকা থাকলে "কাছাকাছি" দেখানো হবে না', 'Empty = no "near" status is shown', 63),
  ('report_page_size', 'reports', 'number', null, 'সারি', 10, 200, 'রিপোর্টের এক পাতায় কত সারি (ফাঁকা = ৫০)', 'Report এক পাতায় কত row (ফাঁকা = 50)', 'Rows per report page (empty = 50)', null, null, 64)
  on conflict (key) do nothing;
+-- the first phase9 draft had its own week_start_dow rule; it is replaced by week_start. An unused row is removed; one the owner filled stays as a fallback only.
+delete from public.rules where key = 'week_start_dow' and value is null;
 
 -- ---------- grants: who may open which report group (owner always may; the owner edits these) ----------
-insert into public.grant_defs (grant_code, module, sort, label_bn, label_mix, label_en, window_type, emergency_rule) values
- ('report_sales', 'reports', 60, 'রিপোর্ট: বিক্রি', 'Report: Sales', 'Reports: Sales', 'once', null),
- ('report_pos', 'reports', 61, 'রিপোর্ট: POS (দিনশেষ, বাতিল, কুইক)', 'Report: POS (day close, voids, quick)', 'Reports: POS (day close, voids, quick sales)', 'once', null),
- ('report_cash', 'reports', 62, 'রিপোর্ট: পেমেন্ট ও ওয়ালেট', 'Report: Payments & wallets', 'Reports: Payments and wallets', 'once', null),
- ('report_customers', 'reports', 63, 'রিপোর্ট: গ্রাহক ও বাকি', 'Report: Customers & dues', 'Reports: Customers and dues', 'once', null)
- on conflict (grant_code) do nothing;
--- start the same as today: whoever may approve on the POS form gets the report grants (the owner can change this at any time)
-insert into public.rule_grants (grant_code, role_code)
-  select g.grant_code, p.role_code from public.role_form_perms p
-  cross join (values ('report_sales'), ('report_pos'), ('report_cash'), ('report_customers')) g(grant_code)
-  where p.form_code = 'POS' and p.can_approve
-  on conflict do nothing;
+-- Seeded ONLY when the grant does not exist yet: running this file again never brings back a grant the owner removed from a role.
+do $$
+declare r record;
+begin
+  for r in select * from (values
+    ('report_sales', 60, 'রিপোর্ট: বিক্রি', 'Report: Sales', 'Reports: Sales'),
+    ('report_pos', 61, 'রিপোর্ট: POS (দিনশেষ, বাতিল, কুইক)', 'Report: POS (day close, voids, quick)', 'Reports: POS (day close, voids, quick sales)'),
+    ('report_cash', 62, 'রিপোর্ট: পেমেন্ট ও ওয়ালেট', 'Report: Payments & wallets', 'Reports: Payments and wallets'),
+    ('report_customers', 63, 'রিপোর্ট: গ্রাহক ও বাকি', 'Report: Customers & dues', 'Reports: Customers and dues')) v(code, sort, bn, mix, en)
+  loop
+    if not exists (select 1 from public.grant_defs where grant_code = r.code) then
+      insert into public.grant_defs (grant_code, module, sort, label_bn, label_mix, label_en, window_type, emergency_rule)
+        values (r.code, 'reports', r.sort, r.bn, r.mix, r.en, 'once', null);
+      -- start the same as today: whoever may approve on the POS form gets the report grants (the owner can change this at any time)
+      insert into public.rule_grants (grant_code, role_code)
+        select r.code, p.role_code from public.role_form_perms p where p.form_code = 'POS' and p.can_approve
+        on conflict do nothing;
+    end if;
+  end loop;
+end $$;
 
 -- one row per sale LINE, kept by a trigger (the json is parsed once, when the sale is written, not on every report).
 -- The bill discount is spread over the lines in proportion to their amount (net). NO cost columns anywhere in here.
@@ -83,7 +101,7 @@ create table if not exists public.sales_fact_t (
   staff text, status text, sale_type text, pay_mode text, customer_id uuid,
   item_id uuid, line_name text, line_unit text, line_kind text,
   qty numeric, price numeric, gross numeric, net numeric, disc numeric, override boolean,
-  sale_total numeric, sale_discount numeric, discount_kind text, discount_pct numeric,
+  sale_total numeric, sale_discount numeric,      -- (older drafts also stored discount_kind / discount_pct here: no longer filled, the views read them from sales)
   first_of_item boolean,      -- first line of this item (or custom name) in its sale: makes "bills per item" a cheap count
   primary key (sale_id, line_no)
 );
@@ -94,13 +112,23 @@ create index if not exists sales_fact_t_item on public.sales_fact_t (item_id, da
 alter table public.sales_fact_t enable row level security;     -- no policy: nobody reads it directly
 revoke all on public.sales_fact_t from public, anon, authenticated;
 
--- ---------- fact views (columns are fixed; optional phase8 columns are appended only when they exist) ----------
-do $v$
+-- ---------- fact views ----------
+-- rpt_bill and sales_fact show the discount kind / percent of a sale. Those come from the phase8 columns sales.discount_kind and
+-- sales.discount_input, read LIVE from sales (nothing is copied into the facts, so old facts are never stale and no rebuild is needed).
+--   kind    = 'none' when the sale has no discount, else its stored kind (a discount from before phase8 is 'amount')
+--   percent = the typed percent when kind is 'percent', else null
+-- If phase8 is not there yet the two columns are null ('n/a' in the report). rpt_views_refresh() (re)builds the two views; it is called
+-- here and at the end of phase8, so applying the files in either order (or again) gives the same result.
+create or replace function public.rpt_views_refresh() returns void
+language plpgsql set search_path = public as $v$
 declare dk text := 'null::text'; dp text := 'null::numeric';
 begin
-  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_kind') then dk := 's.discount_kind::text'; end if;
-  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_pct') then dp := 's.discount_pct::numeric';
-  elsif exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_percent') then dp := 's.discount_percent::numeric'; end if;
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_kind') then
+    dk := 'case when s.discount > 0 then coalesce(s.discount_kind, ''amount'') else ''none'' end';
+    if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_input') then
+      dp := 'case when s.discount > 0 and s.discount_kind = ''percent'' then s.discount_input end';
+    end if;
+  end if;
 
   -- one row per sale (all statuses). Money columns bills/gross/discount/net/paid/due count only done sales; *_raw / total are as stored.
   execute $q$
@@ -140,53 +168,74 @@ begin
            count(*) filter (where nullif(e->>'item_id', '') is null and coalesce(e->>'custom', '') <> 'true') as qk
     from jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) e) x on true $q$;
 
-  -- the day x location x staff x payment mode x sale type rollup (a plain grouped view: no lines, no customer, fast on a phone)
   execute $q$
-  create or replace view public.rpt_daily as
-  select s.sale_date as day, s.location_id, lo.name_bn as location_bn, coalesce(lo.name_en, lo.name_bn) as location_en,
-    bm.brand_code, bm.brand_bn, bm.brand_en, s.created_staff as staff, s.pay_mode, s.sale_type,
-    count(*) filter (where s.status = 'done') as bills,
-    count(*) filter (where s.status = 'void') as void_bills,
-    coalesce(sum(s.subtotal) filter (where s.status = 'done'), 0) as gross,
-    coalesce(sum(s.discount) filter (where s.status = 'done'), 0) as discount,
-    coalesce(sum(s.total) filter (where s.status = 'done'), 0) as net,
-    coalesce(sum(s.paid) filter (where s.status = 'done'), 0) as paid,
-    coalesce(sum(s.due_amount) filter (where s.status = 'done'), 0) as due,
-    count(*) filter (where s.status = 'done' and s.quick) as quick_bills,
-    coalesce(sum(s.total) filter (where s.status = 'void'), 0) as void_amt,
-    count(*) filter (where s.status = 'done' and s.discount > 0) as disc_bills
-  from public.sales s
-  join public.locations lo on lo.id = s.location_id
-  left join public.report_brand_map bm on bm.location_id = s.location_id
-  group by s.sale_date, s.location_id, lo.name_bn, lo.name_en, bm.brand_code, bm.brand_bn, bm.brand_en, s.created_staff, s.pay_mode, s.sale_type $q$;
-
-
-  -- loads the line facts of one sale (or, with null, of every sale that has none yet). Cast-safe: bad json gives null/0, never an error.
-  execute $q$
-  create or replace function public.rpt_fact_load(p_sale uuid) returns void
-  language sql security definer set search_path = public as $f$
-    insert into public.sales_fact_t (sale_id, line_no, receipt, day, sold_at, location_id, staff, status, sale_type, pay_mode, customer_id,
-      item_id, line_name, line_unit, line_kind, qty, price, gross, net, disc, override, sale_total, sale_discount, discount_kind, discount_pct, first_of_item)
-    select s.id, e.ord::int, s.receipt, s.sale_date, s.sold_at, s.location_id, s.created_staff, s.status, s.sale_type, s.pay_mode, s.customer_id,
-      it.id, nullif(e.v->>'name', ''), nullif(e.v->>'unit', ''),
-      case when it.id is not null then 'listed' when e.v->>'custom' = 'true' then 'unlisted' else 'quick' end,
-      q.qty, q.price, q.amount, q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end,
-      q.amount - q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end,
-      (e.v->>'override' = 'true'), s.total, s.discount, $q$ || dk || $q$, $q$ || dp || $q$,
-      (row_number() over (partition by s.id, q.iid, e.v->>'name' order by e.ord) = 1)
-    from public.sales s
-    cross join lateral jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) with ordinality as e(v, ord)
-    cross join lateral (select
-        case when e.v->>'item_id' ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then (e.v->>'item_id')::uuid end as iid,
-        case when e.v->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'qty')::numeric end as qty,
-        case when e.v->>'price' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'price')::numeric end as price,
-        case when e.v->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'amount')::numeric else 0 end as amount) q
-    left join public.items it on it.id = q.iid
-    where (p_sale is not null and s.id = p_sale)
-       or (p_sale is null and not exists (select 1 from public.sales_fact_t t where t.sale_id = s.id))
-    on conflict (sale_id, line_no) do nothing;
-  $f$ $q$;
+  create or replace view public.sales_fact as
+  select t.sale_id, t.line_no, t.receipt, t.day, t.sold_at,
+    extract(hour from t.sold_at at time zone 'Asia/Dhaka')::int as hour,
+    extract(dow from t.day)::int as dow,
+    t.location_id, lo.name_bn as location_bn, coalesce(lo.name_en, lo.name_bn) as location_en,
+    bm.brand_code, bm.brand_bn, bm.brand_en,
+    t.staff, t.status, t.sale_type, t.pay_mode, t.customer_id,
+    t.item_id, it.code as item_code,
+    coalesce(it.name_bn, t.line_name, 'Quick sale') as item_name,
+    coalesce(it.name_en, it.name_bn, t.line_name, 'Quick sale') as item_name_en,
+    it.category, coalesce(it.unit, t.line_unit) as unit,
+    t.line_kind, t.qty, t.price, t.gross, t.net, t.disc, t.override, t.sale_total, t.sale_discount,
+    $q$ || dk || $q$ as discount_kind, $q$ || dp || $q$ as discount_pct, t.first_of_item
+  from public.sales_fact_t t
+  left join public.sales s on s.id = t.sale_id
+  join public.locations lo on lo.id = t.location_id
+  left join public.report_brand_map bm on bm.location_id = t.location_id
+  left join public.items it on it.id = t.item_id $q$;
+  revoke all on public.rpt_bill, public.sales_fact from public, anon, authenticated;      -- a rebuilt view must never be readable by the app
 end $v$;
+revoke all on function public.rpt_views_refresh() from public, anon, authenticated;
+do $$ begin perform public.rpt_views_refresh(); end $$;
+
+-- the day x location x staff x payment mode x sale type rollup (a plain grouped view: no lines, no customer, fast on a phone)
+create or replace view public.rpt_daily as
+select s.sale_date as day, s.location_id, lo.name_bn as location_bn, coalesce(lo.name_en, lo.name_bn) as location_en,
+  bm.brand_code, bm.brand_bn, bm.brand_en, s.created_staff as staff, s.pay_mode, s.sale_type,
+  count(*) filter (where s.status = 'done') as bills,
+  count(*) filter (where s.status = 'void') as void_bills,
+  coalesce(sum(s.subtotal) filter (where s.status = 'done'), 0) as gross,
+  coalesce(sum(s.discount) filter (where s.status = 'done'), 0) as discount,
+  coalesce(sum(s.total) filter (where s.status = 'done'), 0) as net,
+  coalesce(sum(s.paid) filter (where s.status = 'done'), 0) as paid,
+  coalesce(sum(s.due_amount) filter (where s.status = 'done'), 0) as due,
+  count(*) filter (where s.status = 'done' and s.quick) as quick_bills,
+  coalesce(sum(s.total) filter (where s.status = 'void'), 0) as void_amt,
+  count(*) filter (where s.status = 'done' and s.discount > 0) as disc_bills
+from public.sales s
+join public.locations lo on lo.id = s.location_id
+left join public.report_brand_map bm on bm.location_id = s.location_id
+group by s.sale_date, s.location_id, lo.name_bn, lo.name_en, bm.brand_code, bm.brand_bn, bm.brand_en, s.created_staff, s.pay_mode, s.sale_type;
+
+
+-- loads the line facts of one sale (or, with null, of every sale that has none yet). Cast-safe: bad json gives null/0, never an error.
+create or replace function public.rpt_fact_load(p_sale uuid) returns void
+language sql security definer set search_path = public as $f$
+  insert into public.sales_fact_t (sale_id, line_no, receipt, day, sold_at, location_id, staff, status, sale_type, pay_mode, customer_id,
+    item_id, line_name, line_unit, line_kind, qty, price, gross, net, disc, override, sale_total, sale_discount, first_of_item)
+  select s.id, e.ord::int, s.receipt, s.sale_date, s.sold_at, s.location_id, s.created_staff, s.status, s.sale_type, s.pay_mode, s.customer_id,
+    it.id, nullif(e.v->>'name', ''), nullif(e.v->>'unit', ''),
+    case when it.id is not null then 'listed' when e.v->>'custom' = 'true' then 'unlisted' else 'quick' end,
+    q.qty, q.price, q.amount, q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end,
+    q.amount - q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end,
+    (e.v->>'override' = 'true'), s.total, s.discount,
+    (row_number() over (partition by s.id, q.iid, e.v->>'name' order by e.ord) = 1)
+  from public.sales s
+  cross join lateral jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) with ordinality as e(v, ord)
+  cross join lateral (select
+      case when e.v->>'item_id' ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then (e.v->>'item_id')::uuid end as iid,
+      case when e.v->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'qty')::numeric end as qty,
+      case when e.v->>'price' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'price')::numeric end as price,
+      case when e.v->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'amount')::numeric else 0 end as amount) q
+  left join public.items it on it.id = q.iid
+  where (p_sale is not null and s.id = p_sale)
+     or (p_sale is null and not exists (select 1 from public.sales_fact_t t where t.sale_id = s.id))
+  on conflict (sale_id, line_no) do nothing;
+$f$;
 
 create or replace function public.rpt_fact_trg() returns trigger
 language plpgsql security definer set search_path = public as $$
@@ -200,8 +249,14 @@ begin
   return null;
 end $$;
 drop trigger if exists rpt_fact on public.sales;
-create trigger rpt_fact after insert or update of lines, status, subtotal, discount, total, location_id, sale_date, sold_at, created_staff, customer_id, sale_type, pay_mode
-  on public.sales for each row execute function public.rpt_fact_trg();
+do $t$      -- the discount columns are in the 'update of' list when they exist (phase8); the facts do not store them, so this is only to be complete
+declare extra text := '';
+begin
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_kind') then extra := extra || ', discount_kind'; end if;
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'sales' and column_name = 'discount_input') then extra := extra || ', discount_input'; end if;
+  execute 'create trigger rpt_fact after insert or update of lines, status, subtotal, discount, total, location_id, sale_date, sold_at, created_staff, customer_id, sale_type, pay_mode'
+    || extra || ' on public.sales for each row execute function public.rpt_fact_trg()';
+end $t$;
 
 -- the owner can rebuild the facts from the sales at any time (derived data only; sales are never touched)
 create or replace function public.report_fact_rebuild() returns jsonb
@@ -216,23 +271,6 @@ begin
 end $$;
 
 do $$ begin perform public.rpt_fact_load(null); end $$;      -- back-fill existing sales (does nothing for sales that already have facts)
-
-create or replace view public.sales_fact as
-select t.sale_id, t.line_no, t.receipt, t.day, t.sold_at,
-  extract(hour from t.sold_at at time zone 'Asia/Dhaka')::int as hour,
-  extract(dow from t.day)::int as dow,
-  t.location_id, lo.name_bn as location_bn, coalesce(lo.name_en, lo.name_bn) as location_en,
-  bm.brand_code, bm.brand_bn, bm.brand_en,
-  t.staff, t.status, t.sale_type, t.pay_mode, t.customer_id,
-  t.item_id, it.code as item_code,
-  coalesce(it.name_bn, t.line_name, 'Quick sale') as item_name,
-  coalesce(it.name_en, it.name_bn, t.line_name, 'Quick sale') as item_name_en,
-  it.category, coalesce(it.unit, t.line_unit) as unit,
-  t.line_kind, t.qty, t.price, t.gross, t.net, t.disc, t.override, t.sale_total, t.sale_discount, t.discount_kind, t.discount_pct, t.first_of_item
-from public.sales_fact_t t
-join public.locations lo on lo.id = t.location_id
-left join public.report_brand_map bm on bm.location_id = t.location_id
-left join public.items it on it.id = t.item_id;
 
 -- one row per payment (sale payments and later collections)
 create or replace view public.rpt_pay as
@@ -254,20 +292,27 @@ revoke all on function public.report_fact_rebuild() from public, anon;
 grant execute on function public.report_fact_rebuild() to authenticated;
 
 -- ---------- permission helpers ----------
+-- rpt_grant: the phase8 has_grant(code) (owner, role grant, personal grant, approved emergency window) when phase8 is installed, else the role grant
+-- can_grant(code). A grant code that does not exist is simply false.
+create or replace function public.rpt_grant(p text) returns boolean
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if to_regprocedure('public.has_grant(text,integer)') is not null then return public.has_grant(p); end if;
+  return public.can_grant(p);
+end $$;
+-- a report group is open to: the owner, a holder of report_<group>, or a holder of view_reports (the same grant that opens biz_ok)
 create or replace function public.rpt_access(p_group text) returns boolean
 language sql stable security definer set search_path = public as $$
-  select public.is_active() and (public.is_owner() or public.can_grant('report_' || p_group));
+  select public.is_active() and (public.is_owner() or public.rpt_grant('report_' || p_group) or public.rpt_grant('view_reports'));
 $$;
--- cost: owner, ITEM_COST view, or (if the grants exist) the grant view_cost
+-- cost: owner, ITEM_COST view, or the grants view_cost / view_profit (same as phase8 biz_cost_ok)
 create or replace function public.rpt_cost_ok() returns boolean
 language sql stable security definer set search_path = public as $$
-  select public.is_active() and (public.is_owner() or public.can_do('ITEM_COST', 'view')
-    or (exists (select 1 from public.grant_defs where grant_code = 'view_cost') and public.can_grant('view_cost')));
+  select public.is_active() and (public.is_owner() or public.can_do('ITEM_COST', 'view') or public.rpt_grant('view_cost') or public.rpt_grant('view_profit'));
 $$;
 create or replace function public.rpt_mobile_ok() returns boolean
 language sql stable security definer set search_path = public as $$
-  select public.is_active() and (public.is_owner() or public.can_do('POS', 'approve')
-    or (exists (select 1 from public.grant_defs where grant_code = 'view_customer_mobile') and public.can_grant('view_customer_mobile')));
+  select public.is_active() and (public.is_owner() or public.can_do('POS', 'approve') or public.rpt_grant('view_customer_mobile'));
 $$;
 
 -- ---------- small parsers: bad input raises 'bad_filter' and never reaches SQL as text ----------
@@ -318,16 +363,44 @@ begin
 exception when others then raise exception 'bad_filter';
 end $$;
 
--- ---------- date presets (null when the needed rule is missing: nothing is invented) ----------
+-- ---------- week / fiscal-year settings: the phase8 rules, with the fallbacks phase8 documents ----------
+--   week_start (sun..sat)            -> day of week 0..6.  Empty -> the old draft rule week_start_dow (only if the owner filled it) -> Saturday
+--   fiscal_year_start_month / _day   -> Empty month = calendar year (1), empty day = 1.  A day past the month end is cut to the last day.
+-- The fiscal start is passed around as ONE int: month * 100 + day (e.g. 701 = 1 July). src tells whether a fallback was used.
+create or replace function public.rpt_week_cfg() returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare i int := array_position(array['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], lower(btrim(coalesce(public.rule_txt('week_start'), ''))));
+        n numeric;
+begin
+  if i is not null then return jsonb_build_object('dow', i - 1, 'src', 'rule'); end if;
+  n := public.rule_num('week_start_dow');
+  if n is not null and n between 0 and 6 and n = trunc(n) then return jsonb_build_object('dow', n::int, 'src', 'legacy'); end if;
+  return jsonb_build_object('dow', 6, 'src', 'fallback');
+end $$;
+create or replace function public.rpt_fy_cfg() returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare m numeric := public.rule_num('fiscal_year_start_month'); d numeric := public.rule_num('fiscal_year_start_day'); mm int; dd int;
+begin
+  mm := case when m between 1 and 12 and m = trunc(m) then m::int end;
+  dd := case when d between 1 and 31 and d = trunc(d) then d::int end;
+  return jsonb_build_object('code', coalesce(mm, 1) * 100 + coalesce(dd, 1), 'src', case when mm is null then 'fallback' else 'rule' end);
+end $$;
+-- first day of the fiscal year that contains p_date (p_code = month * 100 + day)
+create or replace function public.rpt_fy_start(p_date date, p_code int) returns date
+language sql immutable set search_path = public as $$
+  select case when p_date < a.s then b.s else a.s end
+  from (select extract(year from p_date)::int as y, (p_code / 100) as m, (p_code % 100) as d) v
+  cross join lateral (select make_date(v.y, v.m, least(v.d, extract(day from (make_date(v.y, v.m, 1) + interval '1 month - 1 day'))::int)) as s) a
+  cross join lateral (select make_date(v.y - 1, v.m, least(v.d, extract(day from (make_date(v.y - 1, v.m, 1) + interval '1 month - 1 day'))::int)) as s) b;
+$$;
+
+-- ---------- date presets ----------
 create or replace function public.report_presets() returns jsonb
 language plpgsql stable security definer set search_path = public as $$
-declare t date := (now() at time zone 'Asia/Dhaka')::date; ws numeric := public.rule_num('week_start_dow'); fm numeric := public.rule_num('fiscal_year_start_month');
-  wk date; fs date; ms date := date_trunc('month', t)::date;
+declare t date := (now() at time zone 'Asia/Dhaka')::date; ws int := (public.rpt_week_cfg() ->> 'dow')::int; fc int := (public.rpt_fy_cfg() ->> 'code')::int;
+  wk date := t - ((extract(dow from t)::int - ws + 7) % 7); fs date := public.rpt_fy_start(t, fc); ms date := date_trunc('month', t)::date;
 begin
   if not public.is_active() then raise exception 'not allowed'; end if;
-  if ws is not null and ws between 0 and 6 and ws = trunc(ws) then wk := t - ((extract(dow from t)::int - ws::int + 7) % 7); end if;
-  if fm is not null and fm between 1 and 12 and fm = trunc(fm) then
-    fs := make_date(extract(year from t)::int - case when extract(month from t) < fm then 1 else 0 end, fm::int, 1); end if;
   return jsonb_build_object(
     'today', jsonb_build_object('from', t, 'to', t),
     'yesterday', jsonb_build_object('from', t - 1, 'to', t - 1),
@@ -335,15 +408,15 @@ begin
     'last_30', jsonb_build_object('from', t - 29, 'to', t),
     'this_month', jsonb_build_object('from', ms, 'to', t),
     'last_month', jsonb_build_object('from', (ms - interval '1 month')::date, 'to', ms - 1),
-    'this_week', case when wk is not null then jsonb_build_object('from', wk, 'to', t) end,
-    'last_week', case when wk is not null then jsonb_build_object('from', wk - 7, 'to', wk - 1) end,
-    'this_fy', case when fs is not null then jsonb_build_object('from', fs, 'to', t) end,
-    'last_fy', case when fs is not null then jsonb_build_object('from', (fs - interval '1 year')::date, 'to', fs - 1) end);
+    'this_week', jsonb_build_object('from', wk, 'to', t),
+    'last_week', jsonb_build_object('from', wk - 7, 'to', wk - 1),
+    'this_fy', jsonb_build_object('from', fs, 'to', t),
+    'last_fy', jsonb_build_object('from', public.rpt_fy_start(fs - 1, fc), 'to', fs - 1));
 end $$;
 
 -- ============================================================
 -- THE WHITELIST CATALOGUE. Every expression that can ever appear in a report query is written here, once.
--- Tokens: {T} table alias, {D} the (possibly shifted) day, {WS} week start, {FYM} fiscal start month, {MOBOK} mobile visible.
+-- Tokens: {T} table alias, {D} the (possibly shifted) day, {WS} week start (0=Sun), {FYC} fiscal start (month * 100 + day), {MOBOK} mobile visible.
 -- ============================================================
 create or replace function public.rpt_dims(p_src text) returns jsonb
 language sql immutable set search_path = public as $j$
@@ -351,7 +424,7 @@ language sql immutable set search_path = public as $j$
    "day":{"time":1,"daily":1,"cols":[["day","{D}","দিন","Day","date"]]},
    "week":{"time":1,"daily":1,"need":"ws","cols":[["week","({D} - ((extract(dow from {D})::int - {WS} + 7) % 7))::date","সপ্তাহ (শুরুর দিন)","Week starting","date"]]},
    "month":{"time":1,"daily":1,"cols":[["month","date_trunc('month', {D})::date","মাস","Month","date"]]},
-   "fy":{"time":1,"daily":1,"need":"fy","cols":[["fiscal_year","(extract(year from {D})::int - case when extract(month from {D}) < {FYM} then 1 else 0 end)","অর্থবছর (শুরুর সাল)","Fiscal year (start year)","int"]]},
+   "fy":{"time":1,"daily":1,"need":"fy","cols":[["fiscal_year","extract(year from public.rpt_fy_start({D}, {FYC}))::int","অর্থবছর (শুরুর সাল)","Fiscal year (start year)","int"]]},
    "location":{"daily":1,"cols":[["location_id","{T}.location_id","","","id"],["location_bn","{T}.location_bn","লোকেশন","Location","text"],["location_en","{T}.location_en","Location (EN)","Location (EN)","text"]]},
    "brand":{"daily":1,"cols":[["brand_code","coalesce({T}.brand_code, 'none')","","","id"],["brand_bn","coalesce({T}.brand_bn, 'ব্র্যান্ড ঠিক করা নেই')","ব্র্যান্ড","Brand","text"],["brand_en","coalesce({T}.brand_en, 'No brand set')","Brand (EN)","Brand (EN)","text"]]},
    "staff":{"daily":1,"cols":[["staff","coalesce({T}.staff, '-')","কর্মী","Staff","text"]]},
@@ -502,12 +575,12 @@ language sql immutable set search_path = public as $j$
 $j$;
 
 create or replace function public.rpt_keys() returns text[]
-language sql immutable as $$ select array['sales_summary','sales_trend','sales_combined','item_sales','category_sales','receipt_register','hour_weekday','retail_wholesale','discounts',
+language sql immutable set search_path = public as $$ select array['sales_summary','sales_trend','sales_combined','item_sales','category_sales','receipt_register','hour_weekday','retail_wholesale','discounts',
   'pos_day_close','voids','quick_unlisted','payment_modes','wallet_recon','collections','best_customers','customer_dues','receivable_aging','credit_limit_use']; $$;
 
 -- which filters each source can apply
 create or replace function public.rpt_filters_for(p_src text) returns text[]
-language sql immutable as $$
+language sql immutable set search_path = public as $$
   select case p_src
     when 'bill' then array['locations','brands','staff','modes','sale_type','customer','min_amount','max_amount']
     when 'line' then array['locations','brands','staff','modes','sale_type','customer','min_amount','max_amount','items','categories']
@@ -516,8 +589,8 @@ $$;
 
 -- token replacement
 create or replace function public.rpt_tok(p_expr text, p_al text, p_dexpr text, p_ws int, p_fym int, p_mobok boolean) returns text
-language sql immutable as $$
-  select replace(replace(replace(replace(replace(p_expr, '{D}', p_dexpr), '{T}', p_al), '{WS}', coalesce(p_ws, 1)::text), '{FYM}', coalesce(p_fym, 1)::text),
+language sql immutable set search_path = public as $$
+  select replace(replace(replace(replace(replace(p_expr, '{D}', p_dexpr), '{T}', p_al), '{WS}', coalesce(p_ws, 6)::text), '{FYC}', coalesce(p_fym, 101)::text),
                  '{MOBOK}', case when p_mobok then 'true' else 'false' end);
 $$;
 
@@ -635,7 +708,7 @@ end $$;
 -- raw (non-grouped) reports: fixed SQL, only validated literals are inserted
 -- ============================================================
 create or replace function public.rpt_mobx(p_col text, p_ok boolean) returns text
-language sql immutable as $$
+language sql immutable set search_path = public as $$
   select case when p_ok then p_col else 'left(' || p_col || ', 3) || ''****'' || right(' || p_col || ', 2)' end;
 $$;
 
@@ -776,7 +849,7 @@ begin
         dl := dl || jsonb_build_array(jsonb_build_object('key', g, 'time', coalesce((dims -> g ->> 'time')::int = 1, false),
               'label_bn', dims -> g -> 'cols' -> (case when jsonb_array_length(dims -> g -> 'cols') > 1 then 1 else 0 end) ->> 2,
               'label_en', dims -> g -> 'cols' -> (case when jsonb_array_length(dims -> g -> 'cols') > 1 then 1 else 0 end) ->> 3,
-              'needs_rule', dims -> g ->> 'need'));
+              'needs_rule', null));      -- week / fiscal grouping always work now (phase8 rules, documented fallbacks): nothing to set first
       end loop;
       for mk in select jsonb_array_elements_text(d -> 'measures') loop
         if cost_ok or coalesce((meas -> mk ->> 'cost')::int, 0) = 0 then
@@ -809,8 +882,8 @@ language plpgsql stable security definer set search_path = public as $$
 -- role timeout (Supabase sets 8s on the authenticated role) plus the hard limits here: 366-day range, 500-group cap, 200-row pages.
 declare
   def jsonb; flt jsonb; notes jsonb := '[]'::jsonb; today date := (now() at time zone 'Asia/Dhaka')::date;
-  cost_ok boolean; mob_ok boolean; allowed int[]; d1 date; d2 date; fm numeric; wsn numeric; fym int; ws int;
-  pgsize int; pg int := greatest(coalesce(p_page, 1), 1); off int; lim int; cap constant int := 500;
+  cost_ok boolean; mob_ok boolean; allowed int[]; d1 date; d2 date; wcfg jsonb; fcfg jsonb; fym int; ws int; fgap_s bigint; fgap_f bigint;
+  pgsize int; pg int := least(greatest(coalesce(p_page, 1), 1), 1000); off int; lim int; cap constant int := 500;
   kind text; src text; dims jsonb; meas jsonb; gl text[] := '{}'; tok text; g text; mk text; mkeys text[] := '{}'; gtxt text;
   cols jsonb := '[]'::jsonb; allowkeys text[] := '{}'; sk text; sd text; sraw text; sparts text[]; ordr text; dsort text;
   b jsonb; t text; tot text; rows_ jsonb; totals_ jsonb; ngroups bigint := 0; cmp_ jsonb := null; ign jsonb; c jsonb; pr jsonb; preset text;
@@ -828,8 +901,8 @@ begin
   if cardinality(allowed) = 0 then notes := notes || jsonb_build_array(jsonb_build_object('code', 'no_location', 'text_en', 'No location is open to you')); end if;
   select count(*) into nloc from public.locations;
   if cardinality(allowed) < nloc then notes := notes || jsonb_build_array(jsonb_build_object('code', 'location_scope', 'text_en', 'Only your locations are included', 'text_bn', 'শুধু আপনার লোকেশনের হিসাব')); end if;
-  fm := public.rule_num('fiscal_year_start_month'); fym := case when fm between 1 and 12 and fm = trunc(fm) then fm::int end;
-  wsn := public.rule_num('week_start_dow'); ws := case when wsn between 0 and 6 and wsn = trunc(wsn) then wsn::int end;
+  wcfg := public.rpt_week_cfg(); ws := (wcfg ->> 'dow')::int;      -- phase8 rules week_start / fiscal_year_start_month + _day, with phase8's documented fallbacks
+  fcfg := public.rpt_fy_cfg(); fym := (fcfg ->> 'code')::int;
   pgsize := least(greatest(coalesce(public.rule_num('report_page_size'), 50), 10), 200)::int;
   off := (pg - 1) * pgsize; lim := greatest(least(pgsize, cap - off), 0);
 
@@ -841,8 +914,8 @@ begin
       if pr is null or jsonb_typeof(pr) = 'null' then
         return jsonb_build_object('report', p_key, 'columns', '[]'::jsonb, 'rows', '[]'::jsonb, 'totals', null, 'compare', null, 'has_more', false, 'data_needed', true,
           'page', jsonb_build_object('n', pg, 'size', pgsize, 'groups', 0, 'cap', cap),
-          'notes', jsonb_build_array(jsonb_build_object('code', 'data_needed', 'what', left(preset, 30), 'text_en', 'This date preset needs a rule that is not set (fiscal year start / week start) or the preset name is unknown',
-            'text_bn', 'এই তারিখের প্রিসেটের জন্য দরকারি নিয়ম সেট করা নেই (অর্থবছর শুরু / সপ্তাহ শুরু) বা প্রিসেটের নাম ভুল')));
+          'notes', jsonb_build_array(jsonb_build_object('code', 'data_needed', 'what', left(preset, 30), 'text_en', 'Unknown date preset',
+            'text_bn', 'তারিখের প্রিসেটের নাম ভুল')));
       end if;
       d1 := (pr ->> 'from')::date; d2 := (pr ->> 'to')::date;
     else
@@ -869,14 +942,12 @@ begin
       end loop;
       if cardinality(gl) = 0 then gl := coalesce(string_to_array(nullif(def ->> 'gdef', ''), ','), '{}'); end if;
     end if;
-    -- dims that need a rule
+    -- dims that use a setting: say so when a documented fallback (calendar year / Saturday) is used
     foreach g in array gl loop
-      if dims -> g ->> 'need' = 'fy' and fym is null then
-        gl := array_remove(gl, g);
-        notes := notes || jsonb_build_array(jsonb_build_object('code', 'data_needed', 'what', 'fiscal_year_start_month', 'text_en', 'Fiscal-year grouping needs the rule fiscal_year_start_month', 'text_bn', 'অর্থবছর অনুযায়ী ভাগের জন্য নিয়ম fiscal_year_start_month লিখুন'));
-      elsif dims -> g ->> 'need' = 'ws' and ws is null then
-        ws := 1;
-        notes := notes || jsonb_build_array(jsonb_build_object('code', 'week_default', 'text_en', 'Week start rule not set: weeks start on Monday', 'text_bn', 'সপ্তাহ শুরুর নিয়ম নেই: সোমবার ধরা হয়েছে'));
+      if dims -> g ->> 'need' = 'fy' and fcfg ->> 'src' = 'fallback' then
+        notes := notes || jsonb_build_array(jsonb_build_object('code', 'fy_default', 'what', 'fiscal_year_start_month', 'text_en', 'Fiscal-year start rule not set: the calendar year (from 1 January) is used', 'text_bn', 'অর্থবছর শুরুর নিয়ম নেই: জানুয়ারি থেকে বছর ধরা হয়েছে'));
+      elsif dims -> g ->> 'need' = 'ws' and wcfg ->> 'src' = 'fallback' then
+        notes := notes || jsonb_build_array(jsonb_build_object('code', 'week_default', 'what', 'week_start', 'text_en', 'Week start rule not set: weeks start on Saturday', 'text_bn', 'সপ্তাহ শুরুর নিয়ম নেই: শনিবার ধরা হয়েছে'));
       end if;
     end loop;
     -- measures
@@ -927,6 +998,17 @@ begin
     hm := (off + pgsize) < least(ngroups, cap);
     if ngroups > cap then notes := notes || jsonb_build_array(jsonb_build_object('code', 'truncated', 'cap', cap, 'groups', ngroups, 'text_en', 'More than 500 groups: only the first 500 (in the chosen order) can be paged; narrow the filters', 'text_bn', '৫০০-র বেশি গ্রুপ: বাছাই অনুযায়ী প্রথম ৫০০টি দেখা যাবে; ফিল্টার ছোট করুন')); end if;
     if jsonb_array_length(ign) > 0 then notes := notes || jsonb_build_array(jsonb_build_object('code', 'filter_ignored', 'what', ign)); end if;
+    -- line reports read the facts: if some done sales in this range have no fact rows (a failed fact write), say so (the owner runs report_fact_rebuild())
+    if src = 'line' then
+      select count(*) into fgap_s from public.sales gs where gs.status = 'done' and gs.sale_date between d1 and d2 and gs.location_id = any (allowed)
+        and jsonb_typeof(gs.lines) = 'array' and jsonb_array_length(gs.lines) > 0;
+      select count(distinct t.sale_id) into fgap_f from public.sales_fact_t t where t.status = 'done' and t.day between d1 and d2 and t.location_id = any (allowed);
+      if fgap_s <> fgap_f then
+        notes := notes || jsonb_build_array(jsonb_build_object('code', 'fact_gap', 'sales', fgap_s, 'facts', fgap_f,
+          'text_en', 'Some sales in this period are missing from the line facts (' || fgap_s || ' sales, ' || fgap_f || ' with facts): totals may be low until the owner runs report_fact_rebuild()',
+          'text_bn', 'এই সময়ের কিছু বিক্রির লাইন-হিসাব তৈরি হয়নি (' || fgap_s || ' বিক্রি, ' || fgap_f || ' টির হিসাব আছে): মালিক report_fact_rebuild() চালানো পর্যন্ত যোগফল কম দেখাতে পারে'));
+      end if;
+    end if;
 
     -- compare with an earlier period (same length, same weekday last week, or last year)
     if p_compare and coalesce((def ->> 'cmp')::int, 0) = 1 and d1 is not null then
@@ -1009,12 +1091,30 @@ begin
     'meta', jsonb_build_object('from', d1, 'to', d2, 'group', to_jsonb(gl), 'sort', sk, 'dir', sd, 'cost_shown', cost_ok, 'mobile_masked', not mob_ok, 'today', today));
 end $$;
 
+-- ---------- export log: the app calls this after it builds a CSV / print so the owner can see who took which data out ----------
+-- Needs the owner or the grant export_data (role / personal / emergency window, see rpt_grant). It only WRITES one audit_log row; it does not
+-- return data and is not what stops an export: the report data itself is already limited by report_run.
+create or replace function public.log_report_export(p_key text, p_kind text, p_filters jsonb, p_rows int) returns void
+language plpgsql security definer set search_path = public as $$
+declare sid text; f jsonb := coalesce(p_filters, '{}'::jsonb);
+begin
+  if not public.is_active() or not (public.is_owner() or public.rpt_grant('export_data')) then raise exception 'not allowed'; end if;
+  if p_key is null or not (p_key = any (public.rpt_keys())) then raise exception 'unknown_report'; end if;
+  if p_kind is null or lower(p_kind) !~ '^[a-z0-9_]{1,20}$' then raise exception 'bad_kind'; end if;
+  if length(f::text) > 4000 then f := jsonb_build_object('truncated', true); end if;
+  select staff_id into sid from public.profiles where id = auth.uid();
+  insert into public.audit_log (user_id, staff_id, action, table_name, record_id, detail)
+    values (auth.uid(), sid, 'export', 'report', p_key, jsonb_build_object('kind', lower(p_kind), 'rows', least(greatest(coalesce(p_rows, 0), 0), 100000000), 'filters', f));
+end $$;
+
 -- ---------- privileges: nobody anonymous; signed-in users reach data only through the functions above ----------
-revoke all on function public.rpt_access(text), public.rpt_cost_ok(), public.rpt_mobile_ok(), public.rpt_arr_text(jsonb), public.rpt_arr_int(jsonb), public.rpt_arr_uuid(jsonb),
+revoke all on function public.rpt_grant(text), public.rpt_week_cfg(), public.rpt_fy_cfg(), public.rpt_fy_start(date, int), public.rpt_access(text), public.rpt_cost_ok(), public.rpt_mobile_ok(), public.rpt_arr_text(jsonb), public.rpt_arr_int(jsonb), public.rpt_arr_uuid(jsonb),
   public.rpt_num(jsonb), public.rpt_date(text), public.rpt_dims(text), public.rpt_meas(text), public.rpt_def(text), public.rpt_keys(), public.rpt_filters_for(text),
   public.rpt_tok(text, text, text, int, int, boolean), public.rpt_where(text, text, jsonb, int[], date, date, text[], boolean),
   public.rpt_agg_sql(text, text, text, text[], text[], text, text, text, text, int, int, boolean, boolean, boolean),
   public.rpt_agg_build(jsonb, text[], text[], jsonb, int[], date, date, text, int, int, boolean, boolean), public.rpt_mobx(text, boolean),
   public.rpt_raw(text, jsonb, int[], date, date, boolean, int[], numeric, date),
-  public.report_presets(), public.report_catalog(), public.report_run(text, jsonb, text, text, int, boolean) from public, anon, authenticated;
-grant execute on function public.report_presets(), public.report_catalog(), public.report_run(text, jsonb, text, text, int, boolean) to authenticated;
+  public.report_presets(), public.report_catalog(), public.report_run(text, jsonb, text, text, int, boolean), public.log_report_export(text, text, jsonb, int) from public, anon, authenticated;
+grant execute on function public.report_presets(), public.report_catalog(), public.report_run(text, jsonb, text, text, int, boolean), public.log_report_export(text, text, jsonb, int) to authenticated;
+
+notify pgrst, 'reload schema';

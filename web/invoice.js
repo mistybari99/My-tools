@@ -197,7 +197,7 @@ async function view() {
   if (!(await canEdit())) return shell(T('title'), `<div class="notice bad">${esc(T('noacc'))}</div>`, true);
   await B.loadStatic(); if (!B.ENV.rules) await B.reloadRules();
   const p = location.hash.replace(/^#\/?/, '').split('/');
-  if (p[1] === 'edit' || p[1] === 'new') return editorPage(p[1] === 'edit' ? p[2] : null, p[3]);
+  if (p[1] === 'edit' || p[1] === 'new') return editorPage(p[1] === 'edit' ? p[2] : null, p[1] === 'new' ? p[2] : null);
   if (p[1] === 'labels') return labelsPage();
   return listPage();
 }
@@ -277,8 +277,8 @@ function previewHtml() {
 function updatePreview() {
   const i = $('#iv_pvi'), w = $('#iv_pvw'); if (!i || !E.tpl) return;
   i.innerHTML = previewHtml();
-  const doc = i.firstElementChild, avail = w.clientWidth - 20, nat = doc ? doc.getBoundingClientRect().width : 0, sc = nat > avail && nat > 0 ? avail / nat : 1;
-  i.style.transform = `scale(${sc})`; w.style.height = (doc ? doc.getBoundingClientRect().height * sc + 20 : 40) + 'px';
+  const doc = i.firstElementChild, avail = w.clientWidth - 20, nat = doc ? doc.offsetWidth : 0, sc = nat > avail && nat > 0 ? avail / nat : 1;
+  i.style.transform = `scale(${sc})`; w.style.height = (doc ? doc.offsetHeight * sc + 20 : 40) + 'px';
   const info = $('#iv_pvinfo'); if (info) info.textContent = `${E.tpl.paper_width_mm || ''} mm`;
 }
 function readForm() {
@@ -346,8 +346,8 @@ function drawLabelPreview() {
   const items = labItems(), i = $('#iv_pvi'), w = $('#iv_pvw'); if (!i) return;
   const c = $('#lb_cnt'); if (c) c.textContent = `${Object.values(LB.sel).filter(Boolean).length} ${T('lb_sel')}`;
   i.innerHTML = renderLabels(labTpl(), items.length ? items.slice(0, 24) : sampleItems().slice(0, 8), S.lang);
-  const doc = i.firstElementChild, avail = w.clientWidth - 20, nat = doc.getBoundingClientRect().width, sc = nat > avail ? avail / nat : 1;
-  i.style.transform = `scale(${sc})`; w.style.height = doc.getBoundingClientRect().height * sc + 20 + 'px';
+  const doc = i.firstElementChild, avail = w.clientWidth - 20, nat = doc.offsetWidth, sc = nat > avail ? avail / nat : 1;
+  i.style.transform = `scale(${sc})`; w.style.height = doc.offsetHeight * sc + 20 + 'px';
 }
 
 // ---------- handlers ----------

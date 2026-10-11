@@ -241,8 +241,8 @@ const seasonText = (r) => (r.start_month ? `${r.season_label ? r.season_label + 
 function shelfCard(r) {
   return `<div class="card stack" id="sh_${r.id}" style="${r.active ? '' : 'opacity:.6'}"><div class="row between"><b>${esc(scopeText(r))}</b>${tg(r.active, 's2_sh_act', `data-id="${r.id}"`)}</div>
     <div class="muted" style="font-size:.88rem">${esc(seasonText(r))}</div>
-    <div class="row"><button class="mini" data-act="s2_sh_step" data-id="${r.id}" data-d="-1" aria-label="−">−</button><b style="min-width:110px;text-align:center">${esc(String(r.value))} ${esc(T('sh_' + r.unit))}</b><button class="mini" data-act="s2_sh_step" data-id="${r.id}" data-d="1" aria-label="+">＋</button>
-      <span style="flex:1"></span><button data-act="s2_sh_edit" data-id="${r.id}">${esc(T('edit'))}</button><button class="mini" data-act="s2_sh_del" data-id="${r.id}" aria-label="${esc(T('remove'))}">✕</button></div></div>`;
+    <div class="row wrap"><button class="mini" data-act="s2_sh_step" data-id="${r.id}" data-d="-1" aria-label="−">−</button><b style="min-width:96px;text-align:center">${esc(String(r.value))} ${esc(T('sh_' + r.unit))}</b><button class="mini" data-act="s2_sh_step" data-id="${r.id}" data-d="1" aria-label="+">＋</button>
+      <button data-act="s2_sh_edit" data-id="${r.id}" style="padding:0 12px">${esc(T('edit'))}</button><button class="mini" data-act="s2_sh_del" data-id="${r.id}" aria-label="${esc(T('remove'))}">✕</button></div></div>`;
 }
 function drawShelf() {
   frame('c_shelf', `${cache.shelf.map(shelfCard).join('') || `<div class="notice warn">${esc(T('sh_empty'))}</div>`}

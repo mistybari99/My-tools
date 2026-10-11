@@ -83,7 +83,13 @@ begin
 end $$;
 
 -- may the caller do p_code (at location p_loc, or anywhere when null)?  owner · role grant · personal grant · approved emergency WINDOW (read only: nothing is consumed)
--- With p_loc null only grants that cover every location count; give a location to include location-limited personal grants / window approvals.
+-- With p_loc null only personal grants that cover every location count; give a location to include location-limited personal grants.
+-- KNOWN, DELIBERATE: an approved emergency WINDOW still counts when p_loc is null, even though request_emergency always ties a window to one
+-- location (the only location-less requests are closed_period_edit / form_access, which are not windows). Making p_loc null require a
+-- location-less window would switch every window approval off (supplier_manage, settings_invoice and the biz_ok / biz_cost_ok checks, whose callers
+-- and RLS policies have no location to pass), so the approver's choice to open a window is what limits it: it is time boxed (em_minutes), needs the
+-- em_* rule on, is decided by a second person and leaves a trace. Callers that DO have a location should pass it: has_grant(code, loc) then
+-- accepts only a window for that location (or for all locations).
 create or replace function public.has_grant(p_code text, p_loc int default null) returns boolean
 language sql stable security definer set search_path = public as $$
   select public.is_owner() or (public.is_active() and (
@@ -585,7 +591,12 @@ begin
     end if;
     sub := sub + amt;
   end loop;
-  if dkind = 'percent' then disc := round(sub * dinput / 100, 2); end if;
+  if dkind = 'percent' then
+    disc := round(sub * dinput / 100, 2);
+    -- the phone shows the discount it computed from the percent; a half-cent case can round the other way here. Within one paisa (0.01) the amount the
+    -- customer was shown wins, so the bill never asks for a paisa more or less than the screen said (never beyond 0.01, never outside 0..subtotal).
+    if p_discount is not null and abs(p_discount - disc) <= 0.01 and p_discount between 0 and sub then disc := round(p_discount, 2); end if;
+  end if;
   if disc < 0 or disc > sub then raise exception 'bad_discount'; end if;
   if disc > 0 and not public.rule_on(case dkind when 'percent' then 'discount_mode_percent_on' else 'discount_mode_amount_on' end) then raise exception 'discount_mode_off'; end if;
   select value into lim from public.location_settings where location_id = p_loc and key = 'discount_limit';
@@ -706,3 +717,10 @@ grant execute on function public.set_user_grant(uuid, text, int, timestamptz, bo
   public.template_for(text, int), public.touch_favourite(text, text), public.set_pin(text, text, boolean),
   public.record_sale2(uuid, int, jsonb, numeric, jsonb, text, text, text, text, boolean, timestamptz, text, numeric) to authenticated;
 -- apply_item_patch and _unit_hop stay internal (called by other security-definer functions only)
+
+-- phase9 (reports) shows the discount kind of a sale through two views; rebuild them now that the discount columns exist, whichever file ran first
+do $$ begin
+  if to_regprocedure('public.rpt_views_refresh()') is not null then perform public.rpt_views_refresh(); end if;
+end $$;
+
+notify pgrst, 'reload schema';
