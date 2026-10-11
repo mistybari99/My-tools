@@ -144,3 +144,43 @@ button.mini { min-height: 36px; min-width: 36px; padding: 0; border-radius: 18px
 .banner .bn-t { font: 600 1rem/1.4 var(--display); } .banner .bn-t b { font-weight: 800; font-size: 1.2rem; color: #fff; }
 .banner .bn-s { margin-top: 4px; display: flex; gap: 8px; align-items: center; } .banner .sid { font: 600 .85rem var(--text-font); color: #f0d6b0; }
 .banner .since { background: rgba(255,251,244,.14); color: var(--gold-lt); border-color: var(--gold-lt); }
+
+/* ---------- POS ---------- */
+.pos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.pos-item { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; min-height: 84px; padding: 10px 12px; text-align: left;
+  border-radius: 14px; border: 1.5px solid var(--line); background: var(--card); color: inherit; font: inherit; }
+.pos-item .pn { font-weight: 600; line-height: 1.25; }
+.pos-item .pp { color: var(--ruby); font-weight: 700; }
+.pos-item .pp small { color: var(--muted, #7a6a60); font-weight: 400; }
+.pos-item.in { border-color: var(--gold); background: linear-gradient(135deg, #fff6dc, #f7e3a8); }
+.pos-item .pq { position: absolute; top: -8px; right: -6px; min-width: 26px; padding: 1px 7px; border-radius: 13px; background: var(--ruby); color: #fff; font-weight: 700; font-size: .85rem; text-align: center; }
+.pos-item:active { transform: scale(.97); }
+.pos-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: var(--card); border-top: 2px solid var(--gold); box-shadow: 0 -6px 18px rgba(80,20,20,.12); }
+.pos-bar .primary { min-width: 140px; }
+.cart-line { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.stepper { display: flex; align-items: center; gap: 4px; }
+.stepper button { width: 38px; height: 38px; padding: 0; border-radius: 10px; font-size: 1.2rem; }
+.stepper .qv { width: auto; min-width: 48px; font-weight: 700; }
+@media (min-width: 640px) { .pos-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* ---------- dashboard ---------- */
+.dash { margin-bottom: 14px; }
+.dash-row { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 2px; border-bottom: 1px dashed var(--line); cursor: pointer; }
+.dash-row:last-child { border-bottom: 0; }
+.dash-row .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--gold); }
+.dash-row.bad .dot { background: #b3121f; box-shadow: 0 0 0 4px rgba(179,18,31,.15); } .dash-row.warn .dot { background: #d79a1f; } .dash-row.info .dot { background: #8a7a70; }
+.dash-row .dl { flex: 1; min-width: 0; } .dash-row .dn { font-size: 1.2rem; color: var(--ruby); } .dash-row .dc { color: var(--gold-dk, #a57a1f); font-size: 1.4rem; }
+.dash-ok { padding: 10px 2px; color: #1c6b46; font-weight: 600; }
+.dbig { font-size: 1.6rem; color: var(--ruby); }
+.bars { display: flex; align-items: flex-end; gap: 8px; height: 92px; margin-top: 6px; }
+.bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 4px; }
+.bar i { display: block; width: 100%; min-height: 3px; border-radius: 6px 6px 2px 2px; background: linear-gradient(180deg, var(--gold), var(--ruby)); }
+.bar small { font-size: .72rem; color: var(--muted, #7a6a60); }
+
+/* ---------- photos ---------- */
+.photos { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.photos .ph { position: relative; }
+.photos img { width: 84px; height: 84px; object-fit: cover; border-radius: 12px; border: 1.5px solid var(--gold); background: #f3e9d6; display: block; }
+.photos .ph .mini { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; padding: 0; border-radius: 50%; }
+.phadd { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 16px; border-radius: 14px; border: 1.5px dashed var(--gold); color: var(--ruby); font-weight: 600; cursor: pointer; }
