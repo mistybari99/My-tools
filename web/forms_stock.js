@@ -81,9 +81,9 @@ B.forms['04-1'] = {
     if (short > 0) flags.push(flag('grn_short', 'yellow', 'মেমোর চেয়ে কম পাওয়া গেছে — সেদিনই সাপ্লায়ারের ডেবিট নোট ও বহনকারীর সই', 'Received less than the memo: debit note and carrier signature the same day', short, { unit: 'qty' }));
     if (excess > 0) flags.push(flag('grn_excess', 'yellow', 'মেমোর চেয়ে বেশি পাওয়া গেছে', 'Received more than the memo', excess, { unit: 'qty' }));
     const val = (q) => sum(rows.map((r) => (r.quality === q && has(r.counted) && has(r.rate) ? num(r.counted) * num(r.rate) : 0)));
-    if (v.has_hold) { flags.push(flag('grn_hold', 'yellow', 'মালামাল আটক রাখা হয়েছে', 'Goods held back', val('hold'))); if (!x.d.held_apart) flags.push(flag('hold_not_apart', 'red', 'আটক মালামাল আলাদা রাখা হয়নি', 'Held goods are not kept apart', undefined)); }
-    if (rows.some((r) => r.quality === 'return')) flags.push(flag('grn_return', 'yellow', 'মালামাল ফেরত যাচ্ছে', 'Goods going back to the supplier', val('return')));
-    if (v.has_reduced) { flags.push(flag('grn_reduced', 'yellow', 'দর কমিয়ে গ্রহণ', 'Accepted at a lower rate', val('reduced')));
+    if (v.has_hold) { flags.push(flag('grn_hold', 'yellow', 'মালামাল আটক রাখা হয়েছে', 'Goods held back', val('hold') || undefined)); if (!x.d.held_apart) flags.push(flag('hold_not_apart', 'red', 'আটক মালামাল আলাদা রাখা হয়নি', 'Held goods are not kept apart', undefined)); }
+    if (rows.some((r) => r.quality === 'return')) flags.push(flag('grn_return', 'yellow', 'মালামাল ফেরত যাচ্ছে', 'Goods going back to the supplier', val('return') || undefined));
+    if (v.has_reduced) { flags.push(flag('grn_reduced', 'yellow', 'দর কমিয়ে গ্রহণ', 'Accepted at a lower rate', val('reduced') || undefined));
       if (has(x.d.rate_approver) && x.d.rate_approver === x.me) flags.push(flag('rate_approver_is_receiver', 'red', 'দর কমানোর অনুমোদনকারী ও গ্রহণকারী একই জন', 'The rate approver and the receiver are the same person', undefined)); }
     if (rows.some((r) => has(r.counted) && !has(r.rate))) flags.push(flag('grn_rate_missing', 'yellow', 'কিছু লাইনে বিল অনুযায়ী দর লেখা নেই — বিল যাচাই করা যাবে না', 'Some lines have no bill rate, so the bill check is impossible', undefined));
     return { v, rows: { lines: out }, flags, needs };

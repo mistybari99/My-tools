@@ -79,7 +79,7 @@ B.forms['10-3'] = {
     if (on.abs1 > 0) flags.push(flag('app_ledger_diff', 'red', 'কুরিয়ার/ফুড অ্যাপ: লেজারের প্রাপ্য ও স্টেটমেন্ট মেলেনি', 'Courier / food app: ledger due differs from the statement', on.abs1));
     if (on.abs2 > 0) flags.push(flag('app_bank_diff', 'red', 'কুরিয়ার/ফুড অ্যাপ: স্টেটমেন্ট − চার্জ প্রাপ্তির সমান নয়', 'Courier / food app: statement − charge differs from the money received', on.abs2));
     if (x.d.no_statement) flags.push(flag('no_statement', 'red', 'স্টেটমেন্ট পাওয়া যায়নি — রিকনসিলিয়েশন আটক', 'No statement obtained — reconciliation on hold'));
-    if (x.d.personal === 'yes') flags.push(flag('personal_number', 'red', 'ব্যক্তিগত নম্বরে টাকা এসেছে — ব্যবস্থাপনাকে জানান', 'Money arrived on a personal number — inform management', num(x.d.personal_amt)));
+    if (x.d.personal === 'yes') flags.push(flag('personal_number', 'red', 'ব্যক্তিগত নম্বরে টাকা এসেছে — ব্যবস্থাপনাকে জানান', 'Money arrived on a personal number — inform management', has(x.d.personal_amt) ? num(x.d.personal_amt) : undefined));
     if (num(x.d.only_st_amt) > 0) flags.push(flag('only_on_statement', 'yellow', 'স্টেটমেন্টে আছে কিন্তু আমাদের কাগজে নেই', 'On the statement but not on our paper', num(x.d.only_st_amt)));
     if (num(x.d.only_us_amt) > 0) flags.push(flag('only_on_paper', 'yellow', 'আমাদের কাগজে আছে কিন্তু স্টেটমেন্টে নেই', 'On our paper but not on the statement', num(x.d.only_us_amt)));
     return { v, rows: { showroom: sh.out, online: on.out }, flags, needs: [] };
