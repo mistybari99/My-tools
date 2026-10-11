@@ -46,3 +46,8 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   engine bug fixed (sparse table rows). allforms_test.js: every form opens in bn/mix/en with no JS errors.
   Pending: user runs supabase/phase3.sql once; open owner decisions are listed in the chat summary (leave includes paid leave?, 18-1 limit monthly or per expense?, 20-1 discount limit reuse, flag colours chosen by authors).
   Next: P5 hardening (server-side recompute of key equations, hard PIN lock), real-device test by owner.
+- 2026-10-11 (business logic) · supabase/phase4.sql: read-only analytics functions (biz_daily, biz_items ABC, biz_staff vs peer median,
+  biz_outlook purchase estimate from same-weekday sales x actual cost ratio, biz_suggest limit suggestions from history). Tested on synthetic data
+  (totals cross-checked). web/biz.js page '#/biz' (Business analysis): margin, break-even (needs setting fixed_cost_month), outlook, ABC, staff indicators
+  (flag only if owner sets anomaly_ratio), limit suggestions with an explicit Apply button. Nothing is auto-applied. Run order for user: phase3.sql then phase4.sql.
+  Next: audit phase4 + biz.js, P5 hardening (server recompute, PIN lock).
