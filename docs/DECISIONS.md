@@ -30,3 +30,8 @@ Source: owner answers in chat, 11 Oct 2026. Scope: all 42 forms of BOS Build Kit
 
 ## Build order
 - Phase by phase, owner reviews each phase. Phase 1: login, roles, settings, items, audit log. Then core forms, dashboard, rest of the 42 forms.
+
+## Update 12 Oct 2026
+- Hosting: web/ goes to a separate PUBLIC repo (free GitHub Pages). This private repo keeps schema, data, docs. Costs/prices never go in the public repo.
+- Cost price is a separate permission (ITEM_COST view / enter). Owner switches it per role in the matrix. Hidden roles cannot read it even through the API.
+- Item and price changes by anyone except the owner are requests: they wait for the owner or a role with ITEMS "approve". The requester cannot approve own request unless the owner allows it for that role. Owner's own changes apply at once. All changes are logged.

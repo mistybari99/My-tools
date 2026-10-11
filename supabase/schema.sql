@@ -70,17 +70,35 @@ create table public.items (
   category text, category_bn text,
   unit text,
   sell_price numeric(12,2) check (sell_price >= 0),
-  cost_price numeric(12,2) check (cost_price >= 0),
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   updated_by uuid
 );
 
+-- Cost price lives apart so it can be hidden from roles without the ITEM_COST permission.
+create table public.item_costs (
+  item_id uuid primary key references public.items(id) on delete cascade,
+  cost_price numeric(12,2) check (cost_price >= 0),
+  updated_at timestamptz not null default now(),
+  updated_by uuid
+);
+
+-- Every item/price change by anyone but the owner waits here for final approval.
+create table public.item_changes (
+  id bigserial primary key,
+  item_id uuid references public.items(id),     -- null = proposal to create a new item
+  patch jsonb not null,
+  note text,
+  status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  requested_by uuid not null, requested_staff text, requested_at timestamptz not null default now(),
+  decided_by uuid, decided_staff text, decided_at timestamptz, decision_note text
+);
+
 create table public.item_price_history (
   id bigserial primary key,
   item_id uuid not null references public.items(id),
-  sell_price numeric(12,2), cost_price numeric(12,2),
+  sell_price numeric(12,2), cost_price numeric(12,2),   -- one of them per row (the one that changed)
   changed_at timestamptz not null default now(),
   changed_by uuid
 );
@@ -192,6 +210,8 @@ begin
 end $$;
 
 create trigger audit_items after insert or update on public.items for each row execute function public.log_change('id');
+create trigger audit_item_costs after insert or update on public.item_costs for each row execute function public.log_change('item_id');
+create trigger audit_item_changes after insert or update on public.item_changes for each row execute function public.log_change('id');
 create trigger audit_roles after insert or update on public.roles for each row execute function public.log_change('code');
 create trigger audit_forms after insert or update on public.forms for each row execute function public.log_change('code');
 create trigger audit_locations after insert or update on public.locations for each row execute function public.log_change('id');
@@ -217,14 +237,33 @@ create trigger items_before before insert or update on public.items
 create or replace function public.items_price_history() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if tg_op = 'INSERT' or new.sell_price is distinct from old.sell_price or new.cost_price is distinct from old.cost_price then
-    insert into public.item_price_history (item_id, sell_price, cost_price, changed_by)
-      values (new.id, new.sell_price, new.cost_price, auth.uid());
+  if tg_op = 'INSERT' or new.sell_price is distinct from old.sell_price then
+    insert into public.item_price_history (item_id, sell_price, changed_by) values (new.id, new.sell_price, auth.uid());
   end if;
   return new;
 end $$;
 create trigger items_price_history after insert or update on public.items
   for each row execute function public.items_price_history();
+
+create or replace function public.item_costs_history() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.updated_at := now(); new.updated_by := auth.uid();
+  return new;
+end $$;
+create trigger item_costs_before before insert or update on public.item_costs
+  for each row execute function public.item_costs_history();
+
+create or replace function public.item_costs_history_after() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' or new.cost_price is distinct from old.cost_price then
+    insert into public.item_price_history (item_id, cost_price, changed_by) values (new.item_id, new.cost_price, auth.uid());
+  end if;
+  return new;
+end $$;
+create trigger item_costs_history_after after insert or update on public.item_costs
+  for each row execute function public.item_costs_history_after();
 
 -- Never leave the business without an active owner
 create or replace function public.guard_last_owner() returns trigger
@@ -306,6 +345,71 @@ begin
   delete from public.login_failures where staff_id = lower(p_staff);
 end $$;
 
+-- ---------- Item change workflow ----------
+-- Apply a patch to items (+ item_costs). Internal helper, not exposed to the app.
+create or replace function public.apply_item_patch(p_item uuid, p_patch jsonb) returns uuid
+language plpgsql security definer set search_path = public as $$
+declare iid uuid := p_item; cp numeric;
+begin
+  if iid is null then
+    insert into public.items (name_bn, name_en, name_mix, category, category_bn, unit, sell_price, is_active)
+    values (p_patch->>'name_bn', p_patch->>'name_en', p_patch->>'name_mix', p_patch->>'category', p_patch->>'category_bn',
+            p_patch->>'unit', nullif(p_patch->>'sell_price','')::numeric, coalesce((p_patch->>'is_active')::boolean, true))
+    returning id into iid;
+  else
+    update public.items set
+      name_bn = coalesce(p_patch->>'name_bn', name_bn),
+      name_en = case when p_patch ? 'name_en' then p_patch->>'name_en' else name_en end,
+      name_mix = case when p_patch ? 'name_mix' then p_patch->>'name_mix' else name_mix end,
+      category = case when p_patch ? 'category' then p_patch->>'category' else category end,
+      category_bn = case when p_patch ? 'category_bn' then p_patch->>'category_bn' else category_bn end,
+      unit = case when p_patch ? 'unit' then p_patch->>'unit' else unit end,
+      sell_price = case when p_patch ? 'sell_price' then nullif(p_patch->>'sell_price','')::numeric else sell_price end,
+      is_active = case when p_patch ? 'is_active' then (p_patch->>'is_active')::boolean else is_active end
+    where id = iid;
+  end if;
+  if p_patch ? 'cost_price' then
+    cp := nullif(p_patch->>'cost_price','')::numeric;
+    insert into public.item_costs (item_id, cost_price) values (iid, cp)
+      on conflict (item_id) do update set cost_price = excluded.cost_price;
+  end if;
+  return iid;
+end $$;
+
+-- Anyone allowed to enter ITEMS submits here. Owner's change is applied at once;
+-- everyone else's waits for an approver.  Changing cost needs ITEM_COST 'enter'.
+create or replace function public.submit_item_change(p_item uuid, p_patch jsonb, p_note text default null) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare sid text; cid bigint;
+begin
+  if not public.can_do('ITEMS', 'enter') then raise exception 'not allowed'; end if;
+  if p_patch ? 'cost_price' and not public.can_do('ITEM_COST', 'enter') then raise exception 'not allowed to change cost'; end if;
+  select staff_id into sid from public.profiles where id = auth.uid();
+  if public.is_owner() then
+    return jsonb_build_object('status', 'applied', 'item_id', public.apply_item_patch(p_item, p_patch));
+  end if;
+  insert into public.item_changes (item_id, patch, note, requested_by, requested_staff)
+    values (p_item, p_patch, p_note, auth.uid(), sid) returning id into cid;
+  return jsonb_build_object('status', 'pending', 'id', cid);
+end $$;
+
+create or replace function public.decide_item_change(p_id bigint, p_approve boolean, p_note text default null) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare c public.item_changes; sid text; self_ok boolean;
+begin
+  if not (public.is_owner() or public.can_do('ITEMS', 'approve')) then raise exception 'not allowed'; end if;
+  select * into c from public.item_changes where id = p_id for update;
+  if not found or c.status <> 'pending' then raise exception 'request is not pending'; end if;
+  self_ok := public.is_owner() or exists (select 1 from public.user_roles ur join public.roles r on r.code = ur.role_code
+              where ur.user_id = auth.uid() and r.allow_self_approve);
+  if c.requested_by = auth.uid() and not self_ok then raise exception 'you cannot approve your own request'; end if;
+  select staff_id into sid from public.profiles where id = auth.uid();
+  if p_approve then perform public.apply_item_patch(c.item_id, c.patch); end if;
+  update public.item_changes set status = case when p_approve then 'approved' else 'rejected' end,
+    decided_by = auth.uid(), decided_staff = sid, decided_at = now(), decision_note = p_note where id = p_id;
+  return jsonb_build_object('status', case when p_approve then 'approved' else 'rejected' end);
+end $$;
+
 -- ---------- Privileges (Data API: nothing is open by default) ----------
 revoke all on all tables in schema public from anon, authenticated;
 revoke all on all functions in schema public from public;
@@ -313,15 +417,16 @@ grant usage on schema public to anon, authenticated;
 
 grant select on public.profiles, public.roles, public.user_roles, public.locations, public.user_locations,
   public.forms, public.role_form_perms, public.items, public.item_price_history, public.settings,
-  public.audit_log, public.corrections, public.login_failures to authenticated;
+  public.audit_log, public.corrections, public.login_failures, public.item_costs, public.item_changes to authenticated;
 grant update on public.profiles to authenticated;
 grant insert, update, delete on public.user_roles, public.user_locations, public.role_form_perms to authenticated;
-grant insert, update on public.roles, public.locations, public.forms, public.settings, public.items to authenticated;
+grant insert, update on public.roles, public.locations, public.forms, public.settings to authenticated;
 grant insert on public.corrections to authenticated;
-grant usage on sequence public.item_code_seq, public.audit_log_id_seq, public.corrections_id_seq to authenticated;
+grant usage on sequence public.audit_log_id_seq, public.corrections_id_seq to authenticated;
 
 grant execute on function public.is_active(), public.is_owner(), public.can_do(text, text),
-  public.my_context(), public.set_my_lang(text), public.login_success(), public.unlock_staff(text) to authenticated;
+  public.my_context(), public.set_my_lang(text), public.login_success(), public.unlock_staff(text),
+  public.submit_item_change(uuid, jsonb, text), public.decide_item_change(bigint, boolean, text) to authenticated;
 grant execute on function public.login_precheck(text), public.login_failed(text) to anon, authenticated;
 
 -- ---------- Row Level Security ----------
@@ -334,6 +439,8 @@ alter table public.forms enable row level security;
 alter table public.role_form_perms enable row level security;
 alter table public.items enable row level security;
 alter table public.item_price_history enable row level security;
+alter table public.item_costs enable row level security;
+alter table public.item_changes enable row level security;
 alter table public.settings enable row level security;
 alter table public.audit_log enable row level security;
 alter table public.corrections enable row level security;
@@ -361,10 +468,12 @@ create policy perms_read on public.role_form_perms for select to authenticated u
 create policy perms_owner_write on public.role_form_perms for all to authenticated using (public.is_owner()) with check (public.is_owner());
 
 create policy items_read on public.items for select to authenticated using (public.is_active());
-create policy items_insert on public.items for insert to authenticated with check (public.can_do('ITEMS', 'enter'));
-create policy items_update on public.items for update to authenticated using (public.can_do('ITEMS', 'enter')) with check (public.can_do('ITEMS', 'enter'));
+-- items are written only through submit_item_change / decide_item_change (no direct insert/update)
 
-create policy price_history_read on public.item_price_history for select to authenticated using (public.is_active());
+create policy item_costs_read on public.item_costs for select to authenticated using (public.can_do('ITEM_COST', 'view'));
+create policy item_changes_read on public.item_changes for select to authenticated
+  using (requested_by = auth.uid() or public.is_owner() or public.can_do('ITEMS', 'approve'));
+create policy price_history_read on public.item_price_history for select to authenticated using (public.can_do('ITEM_COST', 'view'));
 
 create policy settings_read on public.settings for select to authenticated using (public.is_active());
 create policy settings_owner_write on public.settings for all to authenticated using (public.is_owner()) with check (public.is_owner());
@@ -400,7 +509,8 @@ insert into public.locations (code, name_bn, name_mix, name_en, sort) values
   ('godown','গোডাউন','Godown','Godown',7);
 
 insert into public.forms (code, area, name_bn, name_mix, name_en, version, sort) values
-  ('ITEMS','master','আইটেম তালিকা','Item তালিকা','Item List','',0),
+  ('ITEMS','master','আইটেম তালিকা ও দাম','Item তালিকা ও Price','Item List & Prices','',0),
+  ('ITEM_COST','master','ক্রয়মূল্য (দেখা ও বদলানো)','Cost Price (দেখা ও বদলানো)','Cost Price (view & change)','',0),
   ('14-1','showroom','দৈনিক শোরুম শিট','দৈনিক Showroom Sheet','Daily Showroom Sheet','v2.18',1),
   ('03-1','stock','ট্রান্সফার চালান','Transfer Challan','Transfer Challan (IBT)','v2.10',2),
   ('20-1','sales','কাস্টমার অর্ডার ফরম','কাস্টমার Order Form','Customer Order Form','v3.6',3),
@@ -445,7 +555,8 @@ insert into public.forms (code, area, name_bn, name_mix, name_en, version, sort)
   ('05-5','factory','নতুন প্রোডাক্ট সিদ্ধান্ত শিট','নতুন Product Decision Sheet','New Product Decision Sheet','v1.4',42)
 ;
 
-insert into public.items (code, name_bn, name_en, category, category_bn, unit, sell_price, cost_price) values
+create temp table seed_items (code text, name_bn text, name_en text, category text, category_bn text, unit text, sell_price numeric, cost_price numeric);
+insert into seed_items values
   ('I-001','সাদা মিষ্টি – কেজি','White Misti KG','sweet_kg','মিষ্টি (কেজি)','kg',260,230),
   ('I-002','কালো মিষ্টি – কেজি','Black Misti KG','sweet_kg','মিষ্টি (কেজি)','kg',260,230),
   ('I-003','পোড়াবাড়ি – কেজি','Porabari KG','sweet_kg','মিষ্টি (কেজি)','kg',350,320),
@@ -504,6 +615,10 @@ insert into public.items (code, name_bn, name_en, category, category_bn, unit, s
   ('I-056','অরেঞ্জ স্লাইস( ৮ পিস)','Orange স্লাইস(৮ pcs)','cake_pc','কেক (পিস)','pc',80,50),
   ('I-057','জার কেক','Jar Cake','cake_pc','কেক (পিস)','pc',100,80)
 ;
+insert into public.items (code, name_bn, name_en, category, category_bn, unit, sell_price)
+  select code, name_bn, name_en, category, category_bn, unit, sell_price from seed_items order by code;
+insert into public.item_costs (item_id, cost_price)
+  select i.id, s.cost_price from seed_items s join public.items i on i.code = s.code;
 select setval('public.item_code_seq', 57);
 
 insert into public.settings (key, value, label_bn, label_mix, label_en) values
@@ -555,6 +670,7 @@ insert into public.role_form_perms (role_code, form_code, can_view, can_enter, c
   ('management','20-6',true,false,true),
   ('management','05-5',true,false,true),
   ('management','ITEMS',true,true,true),
+  ('management','ITEM_COST',true,true,true),
   ('cash_controller','14-1',true,false,false),
   ('cash_controller','10-1',true,true,true),
   ('cash_controller','10-2',true,true,true),
@@ -605,7 +721,8 @@ insert into public.role_form_perms (role_code, form_code, can_view, can_enter, c
   ('purchasing','06-3',true,true,false),
   ('purchasing','06-4',true,false,false),
   ('purchasing','06-5',true,false,false),
-  ('purchasing','ITEMS',true,false,false),
+  ('purchasing','ITEMS',true,true,false),
+  ('purchasing','ITEM_COST',true,false,false),
   ('party_coordinator','20-1',true,true,false),
   ('party_coordinator','20-2',true,true,false),
   ('party_coordinator','20-4',true,true,false),

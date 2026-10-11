@@ -132,7 +132,7 @@ function route() {
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
   if (OWNER_ONLY.has(page) && !S.ctx.is_owner) return viewHome();
   ({ home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
-     settings: viewSettings, logs: viewLogs, backup: viewBackup }[page] || viewHome)();
+     settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq }[page] || viewHome)();
 }
 window.addEventListener('hashchange', route);
 
@@ -148,18 +148,21 @@ async function viewHome() {
   const p = S.ctx.profile, perms = S.ctx.perms || {}, owner = S.ctx.is_owner;
   shell(t('app'), `<p class="muted">${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b> · ${esc(p.staff_id)}</p><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
     <button class="full" style="margin-top:18px" data-act="logout">${esc(t('logout'))}</button>`);
-  const [forms, pend] = await Promise.all([
+  const canDecide = owner || (perms.ITEMS && perms.ITEMS.approve);
+  const [forms, pend, itemPending] = await Promise.all([
     sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'),
     owner ? sb.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+    canDecide ? sb.from('item_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending') : Promise.resolve({ count: 0 }),
   ]);
   if (forms.error) return fail(forms.error);
   const tiles = [];
   if (perms.ITEMS && perms.ITEMS.view) tiles.push(['items', t('items'), '']);
+  if (perms.ITEMS && (perms.ITEMS.enter || perms.ITEMS.approve)) tiles.push(['itemreq', t('item_req'), itemPending.count ? `<span class="badge">${itemPending.count}</span>` : '']);
   if (owner) {
     tiles.push(['staff', t('staff'), pend.count ? `<span class="badge">${pend.count}</span>` : '']);
     tiles.push(['matrix', t('matrix'), ''], ['rules', t('rules'), ''], ['settings', t('settings'), ''], ['logs', t('logs'), ''], ['backup', t('backup'), '']);
   }
-  const mine = forms.data.filter((f) => f.code !== 'ITEMS' && perms[f.code] && perms[f.code].view);
+  const mine = forms.data.filter((f) => f.area !== 'master' && perms[f.code] && perms[f.code].view);
   const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);
   $('#home').innerHTML = `<div class="grid">${tiles.map(([go_, label, badge]) =>
       `<button class="tile" data-act="go" data-v="${go_}">${esc(label)}${badge}</button>`).join('')}</div>
@@ -178,9 +181,16 @@ async function viewItems() {
   shell(t('items'), `<div class="notice ok">${esc(t('price_note'))}</div>
     <div class="row"><input id="i_q" placeholder="${esc(t('search'))}" value="${esc(S.itemQ)}">${can.enter ? `<button class="primary" data-act="itemnew">＋</button>` : ''}</div>
     <div id="i_cats" class="row wrap" style="margin:10px 0"></div><div id="i_list"><p class="muted">${esc(t('loading'))}</p></div>`, true);
-  const { data, error } = await sb.from('items').select('*').order('code');
-  if (error) return fail(error);
-  S.items = data; drawItems();
+  await loadItems(); drawItems();
+}
+const canCostView = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view);
+const canCostEnter = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.enter);
+async function loadItems() {
+  const [it, co] = await Promise.all([sb.from('items').select('*').order('code'), canCostView() ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] })]);
+  if (it.error) return fail(it.error);
+  if (co.error) return fail(co.error);
+  const cm = new Map((co.data || []).map((c) => [c.item_id, c.cost_price]));
+  S.items = it.data.map((i) => ({ ...i, cost_price: canCostView() ? (cm.has(i.id) ? cm.get(i.id) : null) : undefined }));
 }
 function drawItems() {
   const can = S.ctx.perms.ITEMS || {};
@@ -191,12 +201,12 @@ function drawItems() {
   $('#i_cats').innerHTML = [['', t('all')], ...cats.map((c) => [c, catName(S.items.find((i) => i.category === c))])].map(([c, l]) =>
     `<button class="tog ${S.itemCat === c ? 'on' : ''}" data-act="itemcat" data-v="${esc(c)}">${esc(l)}</button>`).join('');
   $('#i_list').innerHTML = list.map((i) => {
-    const loss = i.cost_price !== null && i.sell_price !== null && Number(i.cost_price) >= Number(i.sell_price);
+    const loss = i.cost_price != null && i.sell_price != null && Number(i.cost_price) >= Number(i.sell_price);
     return `<div class="card item" ${can.enter ? `data-act="itemedit" data-v="${i.id}"` : ''}>
       <div><div class="nm">${esc(nm(i))} ${i.is_active ? '' : `<span class="chip bad">${esc(t('inactive'))}</span>`}</div>
         <div class="muted" style="font-size:.85rem">${esc(i.code)} · ${esc(catName(i))} · ${esc(unitName(i.unit))}</div>
         ${loss ? `<div class="chip warn" style="margin-top:4px">${esc(t('loss_warn'))}</div>` : ''}</div>
-      <div class="pr"><div><b>৳ ${fmt(i.sell_price)}</b></div><div class="muted" style="font-size:.85rem">${fmt(i.cost_price)}</div></div></div>`;
+      <div class="pr"><div><b>৳ ${fmt(i.sell_price)}</b></div>${i.cost_price === undefined ? '' : `<div class="muted" style="font-size:.85rem">${fmt(i.cost_price)}</div>`}</div></div>`;
   }).join('') || `<p class="muted center">—</p>`;
 }
 function itemSheet(it) {
@@ -210,26 +220,56 @@ function itemSheet(it) {
     <div class="row"><div style="flex:1"><label>${esc(t('category'))}</label><select id="f_cat">${cats.map((c) => opt(c, f.category, catName(S.items.find((i) => i.category === c)))).join('')}</select></div>
       <div style="flex:1"><label>${esc(t('unit'))}</label><select id="f_unit">${Object.keys(UNIT).map((u) => opt(u, f.unit, unitName(u))).join('')}</select></div></div>
     <div class="row"><div style="flex:1"><label>${esc(t('sell_price'))}</label><input id="f_sell" inputmode="decimal" value="${esc(f.sell_price)}"></div>
-      <div style="flex:1"><label>${esc(t('cost_price'))}</label><input id="f_cost" inputmode="decimal" value="${esc(f.cost_price)}"></div></div>
+      ${canCostView() ? `<div style="flex:1"><label>${esc(t('cost_price'))}</label><input id="f_cost" inputmode="decimal" value="${esc(f.cost_price)}" ${canCostEnter() ? '' : 'readonly'}></div>` : ''}</div>
     <div class="row between"><span>${esc(t('active'))}</span>${tog(f.is_active, 'sheettog', 'id="f_act"')}</div>
+    ${S.ctx.is_owner ? '' : `<div class="notice warn">${esc(t('needs_approval'))}</div>`}
+    <div><label>${esc(t('reason_note'))}</label><input id="f_note"></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(t('cancel'))}</button>
       <button class="primary full" data-act="itemsave" data-v="${it ? it.id : ''}">${esc(t('save'))}</button></div></div>`);
 }
 async function saveItem(id) {
   const num = (v) => (v === '' ? null : Number(v));
-  const row = { name_bn: val('#f_bn'), name_en: val('#f_en') || null, name_mix: val('#f_mix') || null,
-    category: val('#f_cat') || null, unit: val('#f_unit') || null, sell_price: num(val('#f_sell')), cost_price: num(val('#f_cost')),
+  const cur = id ? S.items.find((i) => i.id === id) : null;
+  const next = { name_bn: val('#f_bn'), name_en: val('#f_en') || null, name_mix: val('#f_mix') || null,
+    category: val('#f_cat') || null, unit: val('#f_unit') || null, sell_price: num(val('#f_sell')),
     is_active: $('#f_act').classList.contains('on') };
-  if (!row.name_bn) return toast(t('err_item_name'));
-  for (const k of ['sell_price', 'cost_price']) if (row[k] !== null && (!Number.isFinite(row[k]) || row[k] < 0)) return toast(t('err_price'));
-  const cat = S.items.find((i) => i.category === row.category);
-  if (cat) row.category_bn = cat.category_bn;
-  const q = id ? sb.from('items').update(row).eq('id', id).select() : sb.from('items').insert(row).select();
-  const { data, error } = await q;
+  if ($('#f_cost') && canCostEnter()) next.cost_price = num(val('#f_cost'));
+  if (!next.name_bn) return toast(t('err_item_name'));
+  for (const k of ['sell_price', 'cost_price']) if (k in next && next[k] !== null && (!Number.isFinite(next[k]) || next[k] < 0)) return toast(t('err_price'));
+  const cat = S.items.find((i) => i.category === next.category);
+  if (cat) next.category_bn = cat.category_bn;
+  const same = (a, b) => (a ?? null) === (b ?? null) || (typeof a === 'number' || typeof b === 'number') && Number(a) === Number(b);
+  const patch = {};
+  for (const k of Object.keys(next)) if (!cur || !same(cur[k], next[k])) patch[k] = next[k];
+  if (cur && !Object.keys(patch).length) return closeSheet();
+  const { data, error } = await sb.rpc('submit_item_change', { p_item: id || null, p_patch: patch, p_note: val('#f_note') || null });
   if (error) return fail(error);
-  if (!data || !data.length) return toast(t('err_perm'));
-  closeSheet(); toast(t('saved'));
-  const r = await sb.from('items').select('*').order('code'); if (!r.error) { S.items = r.data; drawItems(); }
+  closeSheet();
+  toast(data && data.status === 'applied' ? t('saved') : t('sent_for_approval'));
+  await loadItems(); drawItems();
+}
+
+// ---------- item change requests ----------
+async function viewItemReq() {
+  shell(t('item_req'), `<div id="ir_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
+  const [ch] = await Promise.all([sb.from('item_changes').select('*').order('id', { ascending: false }).limit(60), loadItems()]);
+  if (ch.error) return fail(ch.error);
+  const canDecide = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.approve);
+  const label = { name_bn: t('name_bn'), name_en: t('name_en'), name_mix: t('name_mix'), category: t('category'), unit: t('unit'),
+    sell_price: t('sell_price'), cost_price: t('cost_price'), is_active: t('active'), category_bn: null };
+  const showVal = (k, v) => (v === null || v === undefined ? '—' : k === 'is_active' ? (v ? t('yes') : t('no')) : v);
+  const body = ch.data.map((c) => {
+    const it = c.item_id ? S.items.find((i) => i.id === c.item_id) : null;
+    const rows = Object.entries(c.patch).filter(([k]) => label[k]).map(([k, v]) => {
+      const was = it ? (k === 'cost_price' && it.cost_price === undefined ? '' : showVal(k, it[k])) : null;
+      return `<div class="row between"><span class="muted">${esc(label[k])}</span><span>${was === null || was === '' ? '' : esc(was) + ' → '}<b>${esc(showVal(k, v))}</b></span></div>`; }).join('');
+    const cls = c.status === 'approved' ? 'ok' : c.status === 'rejected' ? 'bad' : 'warn';
+    return `<div class="card stack"><div class="row between"><b>${esc(it ? nm(it) + ' · ' + it.code : t('add_item') + ' · ' + (c.patch.name_bn || ''))}</b><span class="chip ${cls}">${esc(t('req_' + c.status))}</span></div>
+      ${rows}<div class="muted" style="font-size:.82rem">${esc(c.requested_staff || '')} · ${esc(new Date(c.requested_at).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka' }))}${c.note ? ' · ' + esc(c.note) : ''}</div>
+      ${c.status !== 'pending' ? `<div class="muted" style="font-size:.82rem">${esc(c.decided_staff || '')}${c.decision_note ? ' · ' + esc(c.decision_note) : ''}</div>` : ''}
+      ${c.status === 'pending' && canDecide ? `<input id="dn_${c.id}" placeholder="${esc(t('reason_note'))}"><div class="row"><button class="danger full" data-act="itemdecide" data-v="${c.id}" data-ok="0">${esc(t('reject'))}</button><button class="primary full" data-act="itemdecide" data-v="${c.id}" data-ok="1">${esc(t('approve'))}</button></div>` : ''}</div>`;
+  }).join('');
+  $('#ir_body').innerHTML = body || `<p class="muted center">${esc(t('no_requests'))}</p>`;
 }
 
 // ---------- staff (owner) ----------
@@ -406,6 +446,9 @@ const H = {
   itemnew: () => itemSheet(null),
   itemedit: (a) => itemSheet(S.items.find((i) => i.id === a.dataset.v)),
   itemsave: (a) => saveItem(a.dataset.v),
+  itemdecide: async (a) => { const id = Number(a.dataset.v), ok = a.dataset.ok === '1';
+    const { error } = await sb.rpc('decide_item_change', { p_id: id, p_approve: ok, p_note: val('#dn_' + id) || null });
+    if (error) return /own request/.test(error.message) ? toast(t('err_own_request')) : fail(error); toast(t('saved')); viewItemReq(); },
   staffopen: (a) => staffSheet(a.dataset.v),
   setstatus: async (a) => { const { error } = await sb.from('profiles').update({ status: a.dataset.s }).eq('id', a.dataset.v); if (error) return fail(error); toast(t('saved')); await drawStaff(); },
   unlock: async (a) => { const { error } = await sb.rpc('unlock_staff', { p_staff: a.dataset.v }); if (error) return fail(error); toast(t('saved')); await drawStaff(); },
