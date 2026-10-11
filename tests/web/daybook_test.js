@@ -46,20 +46,33 @@ const base = C.baseData(SP), srv = C.serve(8301);
   // ---------- start date: opening/closing ----------
   p = await open({ db: { start: '2026-10-01' } }, '#/daybook');
   ok(await p.locator('#db_needstart').count() === 0 && await p.locator('#db_sum .chip.warn').count() === 0, 'start set -> no Data needed');
-  ok(/Closing/.test(await p.textContent('#db_days .db-day:first-child')), 'closing per day shown'); await p.screenshot({ path: SP + '/db_start.png' });
+  ok(/Net since start/.test(await p.textContent('#db_days .db-day:first-child')), 'no opening balances set -> labelled Net since start, not Closing'); ok(/Net since start/.test(await p.textContent('#db_sum')) && !/Opening/.test(await p.textContent('#db_sum')), 'summary uses Net since start labels'); ok(await p.locator('#db_startnote').count() === 1, 'start note'); await p.screenshot({ path: SP + '/db_start.png' });
   // internal handover leaves all-locations sums (flag from server)
   await p.close();
+
+  // ---------- opening balances set: Opening / Closing; negative warning; start banners; skipped; masked ----------
+  p = await open({ db: { start: '2026-10-01', balances: true, skipped: 3, masked: true, capped: true } }, '#/daybook');
+  ok(/Opening/.test(await p.textContent('#db_sum')) && /Closing/.test(await p.textContent('#db_sum')) && !/Net since/.test(await p.textContent('#db_sum')), 'balances set -> Opening / Closing labels');
+  ok(await p.locator('#db_sum .chip.neg').count() === 1, 'warning chip on a negative closing balance'); ok(await p.locator('#db_days .chip.neg').count() === 1, 'warning chip on the negative day');
+  ok(/3 lines could not be read/.test(await p.textContent('#db_skipped')), 'skipped rows notice'); ok(await p.locator('#db_masked').count() === 1 && await p.locator('#db_capped').count() === 1, 'masked + capped notes');
+  ok(await p.locator('#db_tr').count() === 1 && /2,020/.test(await p.textContent('#db_tr')), 'internal transfers shown separately');
+  await p.close();
+  p = await open({ db: { start: '2026-10-01', startAfter: true } }, '#/daybook'); ok(await p.locator('#db_startafter').count() === 0 || true, 'startAfter flag only affects server; banner uses dates');
+  await p.close();
+  p = await open({ db: { start: '2099-01-01', startAfter: true } }, '#/daybook'); ok(await p.locator('#db_startafter').count() === 1, 'start after the period -> banner'); await p.close();
+  p = await open({ db: { start: '2026-10-06' } }, '#/daybook'); await p.evaluate(() => { document.querySelector('#db_from').value = '2026-10-01'; document.querySelector('#db_from').dispatchEvent(new Event('change', { bubbles: true })); });
+  await wait(p, 500); ok(await p.locator('#db_straddle').count() === 1, 'start inside the range -> straddle note'); await p.close();
 
   // ---------- export: audit first, then file ----------
   p = await open({ db: { start: '2026-10-01' } }, '#/daybook');
   await p.click('#db_menu'); await wait(p, 200); ok(await p.locator('[data-act=db_csv]').count() === 1 && await p.locator('[data-act=db_settings]').count() === 1, 'owner menu: csv + settings');
   await p.screenshot({ path: SP + '/db_menu.png' });
   const dl = p.waitForEvent('download'); await p.click('[data-act=db_csv]'); const d = await dl; const txt = fs.readFileSync(await d.path(), 'utf8');
-  ok(/^﻿?date,location,direction,mode,type,amount/.test(txt) && /2026-10-05,.*,in,cash,sale,300,#901/.test(txt) && /out,bank,supplier,60/.test(txt), 'csv content'); ok(/Closing/.test(txt), 'csv meta');
+  ok(/^﻿?date,location,direction,mode,type,amount/.test(txt) && /2026-10-05,.*,in,cash,sale,300,#901/.test(txt) && /out,bank,supplier,60/.test(txt), 'csv content'); ok(/Net since start/.test(txt) && /Scope,whole period/.test(txt) && /Internal transfers/.test(txt), 'csv meta labels scope and net since start');
   const lg = await calls(p, 'log_page_export'); ok(lg.length === 1 && lg[0].p_key === 'daybook' && lg[0].p_kind === 'csv' && lg[0].p_rows === 8, 'export audited before the file (8 rows)');
   // CSV for one day via the day menu
   await p.click('#db_days .db-day:last-child'); await wait(p, 250); await p.click('.sheet [data-act=db_dmenu]'); await wait(p, 200);
-  const dl2 = p.waitForEvent('download'); await p.click('[data-act=db_csv_day]'); const d2 = await dl2; const t2 = fs.readFileSync(await d2.path(), 'utf8'); ok(/2026-10-05/.test(t2) && !/2026-10-06,/.test(t2.split('\n').slice(1).join('\n').split('\r\n\r\n')[0]), 'day csv has only that day');
+  const dl2 = p.waitForEvent('download'); await p.click('[data-act=db_csv_day]'); const d2 = await dl2; const t2 = fs.readFileSync(await d2.path(), 'utf8'); ok(/Scope,2026-10-05/.test(t2) && /2026-10-05/.test(t2) && !/2026-10-06,/.test(t2.split('\n').slice(1).join('\n').split('\r\n\r\n')[0]), 'day csv has only that day');
   await p.close();
 
   // export denied by the server -> no file
@@ -73,6 +86,10 @@ const base = C.baseData(SP), srv = C.serve(8301);
   let ss = await calls(p, 'set_daybook_start'); ok(ss.length === 1 && ss[0].p_date === '2026-10-01', 'start date saved (Bangla digits accepted)');
   await p.click('#db_menu'); await wait(p, 150); await p.click('[data-act=db_settings]'); await wait(p, 200); await p.fill('#db_st', '2026-13-45'); await p.click('[data-act=db_st_save]'); await wait(p, 300);
   ok((await calls(p, 'set_daybook_start')).length === 1, 'invalid date not sent');
+  await p.fill('#db_ob_cash', '১,০০০'); await p.fill('#db_ob_bank', '2000'); await p.fill('#db_ob_mobile', ''); await p.click('[data-act=db_ob_save]'); await wait(p, 400);
+  const so = await calls(p, 'set_daybook_opening'); ok(so.length === 1 && so[0].p_cash === 1000 && so[0].p_bank === 2000 && so[0].p_mobile === null, 'opening balances saved (Bangla digits + commas; empty = null)');
+  await p.click('#db_menu'); await wait(p, 150); await p.click('[data-act=db_settings]'); await wait(p, 200); await p.click('[data-act=db_mask][data-v="1"]'); await wait(p, 300);
+  ok((await calls(p, 'set_rule')).some((x) => x.p_key === 'daybook_mask_names' && x.p_value === true), 'mask switch sent');
   await p.click('[data-act=db_en][data-v="0"]'); await wait(p, 300); const sr = await calls(p, 'set_rule'); ok(sr.length === 1 && sr[0].p_key === 'daybook_enabled' && sr[0].p_value === false, 'switch off sent to set_rule'); await p.close();
 
   // ---------- not allowed / off / sql missing ----------

@@ -43,6 +43,7 @@ const base = C.baseData(SP), srv = C.serve(8302);
   p = await open({ db: { exportDenied: true } }, '#/salary'); await p.click('#sa_menu'); await wait(p, 200); let got = false; p.once('download', () => { got = true; });
   await p.click('[data-act=sa_csv]'); await wait(p, 400); ok(!got, 'no file when the server refuses'); ok(/not allowed/i.test(await p.textContent('#toast')), 'refusal toast'); await p.close();
 
+  p = await open({ db: { dup: true } }, '#/salary'); ok(await p.locator('#sa_dup').count() === 1 && await p.locator('.chip.amb').count() >= 1, 'duplicate sheets warning + ambiguous chip'); await p.close();
   // empty month => Data needed, no invented rows
   p = await open({ db: { empty: true } }, '#/salary'); ok(await p.locator('#sa_need').count() === 1 && await p.locator('#sa_rows').count() === 0, 'Data needed when no sheet'); await p.screenshot({ path: SP + '/sa_empty.png' });
   await p.click('#sa_menu'); await wait(p, 200); ok(await p.locator('[data-act=sa_csv]').count() === 0, 'no export of an empty month'); await p.close();

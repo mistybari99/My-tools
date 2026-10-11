@@ -34,6 +34,8 @@ const X = {
   openForm: L('ফর্ম খুলুন', 'Open the form', 'Form খুলুন'), expLock: L('এক্সপোর্টের অনুমতি নেই', 'Export not allowed', 'Export-এর permission নেই'), expDone: L('ফাইল তৈরি হয়েছে', 'File created', 'File তৈরি হয়েছে'),
   noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), lockedPage: L('বেতন রিপোর্ট দেখার অনুমতি নেই — মালিক "বেতন দেখা" অনুমতি দিতে পারেন', 'You may not see salaries — the owner can give you the "See salaries" permission', 'Salary report দেখার permission নেই — Owner "Salary দেখা" permission দিতে পারেন'),
   sqlMissing: L('বেতন রিপোর্টের ডেটাবেস অংশ এখনও চালু হয়নি (phase13)', 'The salary report database part is not installed yet (phase13)', 'Salary report-এর database অংশ এখনও চালু হয়নি (phase13)'),
+  dupSheets: L('একই লোকেশনে এই মাসের একাধিক বেতন শিট আছে — সংখ্যা আলাদা লাইনে আছে, নিজে থেকে মেলানো হয়নি', 'More than one salary sheet exists for the same location and month — every line is listed; nothing was merged or de-duplicated', 'একই location-এ এই মাসের একাধিক salary sheet — প্রতিটি line আলাদা; নিজে থেকে মেলানো হয়নি'),
+  ambiguous: L('একই নাম একাধিকবার', 'Same name more than once', 'একই নাম একাধিকবার'), ambHint: L('একই নামের একাধিক লাইন — প্রাপ্তি/স্বাক্ষর আন্দাজে মেলানো হয়নি', 'Same name on several lines — receipt / signature not guessed', 'একই নামের একাধিক line — receipt/signature আন্দাজে মেলানো হয়নি'),
   by: L('কে', 'By', 'By'), at: L('সময়', 'Time', 'Time'), name: L('নাম', 'Name', 'Name'), none: L('কিছু নেই', 'Nothing', 'Nothing'),
 };
 const T = (k) => lab(X[k]);
@@ -88,10 +90,11 @@ function content() {
   const d = D.data, t = d.totals || {};
   if (d.data_needed) return `<div class="notice warn mk warn" id="sa_need"><b>${esc(T('need'))}</b> — ${esc(T('noSheet'))}</div>${extra(d)}<p class="muted" style="font-size:.85rem">${esc(T('note'))}</p>`;
   D.shown = d.rows || [];
-  return `<div class="stats" id="sa_sum">${statCell(T('gross'), t.gross, '')}${statCell(T('ded'), t.deductions, 'warn')}${statCell(T('netL'), t.net, 'ok')}</div>
+  const dup = (d.duplicate_sheets || []).length ? `<div class="notice warn mk warn" id="sa_dup">${esc(T('dupSheets'))} (${d.duplicate_sheets.map((x) => esc(locName(x.loc)) + ': ' + Number(x.n)).join(', ')})</div>` : '';
+  return `${dup}<div class="stats" id="sa_sum">${statCell(T('gross'), t.gross, '')}${statCell(T('ded'), t.deductions, 'warn')}${statCell(T('netL'), t.net, 'ok')}</div>
     <div class="hsec">${esc(T('secSheet'))}<small>${Number(t.people || 0)} ${esc(T('people'))}</small></div>
     <div class="card" style="padding:4px 12px" id="sa_rows">${D.shown.map((r, i) => `<button class="rp-row mk ${Number(r.net) < 0 ? 'bad' : 'info'} sa-row" data-act="sa_row" data-i="${i}" style="display:flex;width:100%;align-items:center;gap:8px;text-align:start;min-height:56px">
-      <span class="nm" style="flex:1">${esc(r.name)}<small style="display:block">${esc(T('gross'))} ${esc(money(r.gross))} · ${esc(T('ded'))} ${esc(money(r.deductions))}${D.loc === null ? ' · ' + esc(locName(r.loc)) : ''}</small></span>
+      <span class="nm" style="flex:1">${esc(r.name)}${r.ambiguous ? ` <span class="chip warn amb">${esc(T('ambiguous'))}</span>` : ''}<small style="display:block">${esc(T('gross'))} ${esc(money(r.gross))} · ${esc(T('ded'))} ${esc(money(r.deductions))}${D.loc === null ? ' · ' + esc(locName(r.loc)) : ''}</small></span>
       <b>${esc(money(r.net))}</b><span class="cv">›</span></button>`).join('')}</div>
     ${extra(d)}<p class="muted" style="font-size:.85rem">${esc(T('note'))}</p>`;
 }
@@ -111,7 +114,7 @@ function rowSheet(i) {
     ${kv('due', esc(money(r.due)))}${kv('ot', esc(money(r.overtime)))}${kv('other', esc(money(r.other)))}${kv('gross', esc(money(r.gross)))}
     ${kv('advDed', esc(money(r.adv_ded)))}${kv('otherDed', esc(money(r.other_ded)))}${kv('netL', esc(money(r.net)))}
     ${kv('paid', esc(money(r.paid)))}${kv('signed', r.signed === null || r.signed === undefined ? esc('—') : esc(r.signed ? T('yes') : T('no')))}
-    ${r.remark ? kv('remark', esc(r.remark)) : ''}${kv('sheet', '#' + esc(String(r.serial)) + ' · ' + esc(locName(r.loc)))}</div>
+    ${r.ambiguous ? `<p class="muted" style="font-size:.85rem">${esc(T('ambHint'))}</p>` : ''}${r.remark ? kv('remark', esc(r.remark)) : ''}${kv('sheet', '#' + esc(String(r.serial)) + ' · ' + esc(locName(r.loc)))}</div>
     <button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('close'))}</button>`);
 }
 
@@ -124,8 +127,8 @@ const csvCell = (v) => {
 };
 function buildCSV() {
   const d = D.data, line = (a) => a.map(csvCell).join(',');
-  const out = [line(['sheet', 'location', 'name', 'monthly_salary', 'working_days', 'absent_days', 'leave_days', 'salary_due', 'overtime', 'other', 'gross', 'advance_deduction', 'other_deduction', 'net', 'receipt_net', 'signed', 'remark'])];
-  (d.rows || []).forEach((r) => out.push(line([r.serial, locName(r.loc), r.name, r.salary, r.work_days, r.absent, r.leave, r.due, r.overtime, r.other, r.gross, r.adv_ded, r.other_ded, r.net, r.paid, r.signed === null || r.signed === undefined ? '' : (r.signed ? 'yes' : 'no'), r.remark])));
+  const out = [line(['sheet', 'location', 'name', 'monthly_salary', 'working_days', 'absent_days', 'leave_days', 'salary_due', 'overtime', 'other', 'gross', 'advance_deduction', 'other_deduction', 'net', 'receipt_net', 'signed', 'remark', 'same_name_more_than_once'])];
+  (d.rows || []).forEach((r) => out.push(line([r.serial, locName(r.loc), r.name, r.salary, r.work_days, r.absent, r.leave, r.due, r.overtime, r.other, r.gross, r.adv_ded, r.other_ded, r.net, r.paid, r.signed === null || r.signed === undefined ? '' : (r.signed ? 'yes' : 'no'), r.remark, r.ambiguous ? 'yes' : ''])));
   const t = d.totals || {}; out.push(line(['TOTAL', '', '', '', '', '', '', t.due, t.overtime, t.other, t.gross, t.adv_ded, t.other_ded, t.net]));
   if ((d.advances || []).length) { out.push(''); out.push(line(['advances (02-3)', 'location', 'name', 'post', 'given_this_month', 'deducted_this_month', 'outstanding']));
     d.advances.forEach((a) => out.push(line([a.serial, locName(a.loc), a.name, a.post, a.given, a.deducted, a.outstanding]))); }

@@ -76,10 +76,17 @@ select tt.chk('T1 all-locations: cash in 410, internal handover excluded from ou
 select set_daybook_start('2026-10-01');
 select day_book(1,'2026-10-06','2026-10-06') as jb \gset
 -- cash balance before 10-06 = 300 - 1135 = -835 ; bank: -9500 ; mobile 200 ; (negative is real: nothing before the start date is counted)
-select tt.chk('T1 opening = running total from the start date', (:'jb'::jsonb#>>'{days,0,open,cash}')::numeric=-835 and (:'jb'::jsonb#>>'{days,0,open,bank}')::numeric=-9500 and (:'jb'::jsonb#>>'{days,0,open,mobile}')::numeric=200);
-select tt.chk('T1 closing = opening + day', (:'jb'::jsonb#>>'{days,0,close,cash}')::numeric=-835+40-2020 and (:'jb'::jsonb#>>'{totals,close,total}')::numeric=(:'jb'::jsonb#>>'{totals,open,total}')::numeric + (:'jb'::jsonb#>>'{totals,in,total}')::numeric - (:'jb'::jsonb#>>'{totals,out,total}')::numeric);
+select tt.chk('T1 net since start = running total from the start date (cash 300-1135 = -835 before 10-06)', (:'jb'::jsonb#>>'{days,0,net_open,cash}')::numeric=-835 and (:'jb'::jsonb#>>'{days,0,net_open,bank}')::numeric=-9500 and (:'jb'::jsonb#>>'{days,0,net_open,mobile}')::numeric=200);
+select tt.chk('T1 no opening balances set => open/close null (Data needed), balances false', jsonb_typeof(:'jb'::jsonb#>'{days,0,open}')='null' and not (:'jb'::jsonb->>'balances')::boolean);
+select tt.chk('T1 net close = net open + day', (:'jb'::jsonb#>>'{days,0,net_close,cash}')::numeric=-835+40-2020 and (:'jb'::jsonb#>>'{totals,net_close,total}')::numeric=(:'jb'::jsonb#>>'{totals,net_open,total}')::numeric + (:'jb'::jsonb#>>'{totals,in,total}')::numeric - (:'jb'::jsonb#>>'{totals,out,total}')::numeric);
 select day_book(1,'2026-09-28','2026-10-06') as jc \gset
-select tt.chk('T1 day before the start has no opening; first day on/after has 0 cash opening', (:'jc'::jsonb#>>'{totals,open,total}')::numeric=0 and (:'jc'::jsonb#>>'{days,0,open,cash}')::numeric=0);
+select tt.chk('T1 range straddling the start: first day on/after start has 0 net opening', (:'jc'::jsonb#>>'{totals,net_open,total}')::numeric=0 and (:'jc'::jsonb#>>'{days,0,net_open,cash}')::numeric=0);
+-- D1: start date INSIDE the data range: movements before it never enter the running total
+select set_daybook_start('2026-10-06');
+select day_book(1,'2026-10-05','2026-10-06') as jd \gset
+select tt.chk('D1 day before the start has no net_open; 10-06 starts from 0 (10-05 rows ignored)', jsonb_typeof(:'jd'::jsonb#>'{days,0,net_open}')='null' and (:'jd'::jsonb#>>'{days,1,net_open,total}')::numeric=0
+   and (:'jd'::jsonb#>>'{totals,net_close,cash}')::numeric=40-2020 and (:'jd'::jsonb#>>'{totals,net_open,total}')::numeric=0);
+select set_daybook_start('2026-10-01');
 select tt.err('T1 start date validated', $q$select set_daybook_start('1999-01-01')$q$, 'bad_date');
 select tt.err('T1 range validated (to < from)', $q$select day_book(1,'2026-10-06','2026-10-05')$q$, 'bad_range');
 select tt.err('T1 range validated (over a year)', $q$select day_book(1,'2020-01-01','2026-10-05')$q$, 'bad_range');
@@ -170,6 +177,75 @@ select tt.err('T3 unknown report key', $q$select log_page_export('zzz','csv','{}
 select tt.err('T3 bad kind', $q$select log_page_export('salary','c;sv','{}',2)$q$, 'bad_kind');
 reset role;
 
+\echo == T5 audit fixes
+reset role; set role authenticated; select tt.as(:'o');
+-- D10 range / infinity
+select tt.err('D10 366 days ok, 367 refused', $q$select day_book(1,'2025-10-01','2026-10-02')$q$, 'bad_range');
+select tt.chk('D10 exactly 366 days accepted', (select day_book(1,'2025-10-01','2026-09-30') is not null));
+select tt.err('D10 infinity refused', $q$select day_book(1,'-infinity','2026-10-02')$q$, 'bad_range');
+select tt.err('D10 infinity (to) refused', $q$select day_book(1,'2026-10-02','infinity')$q$, 'bad_range');
+-- D9 future dates capped at today
+reset role;
+insert into entries (form_code,location_id,serial,entry_date,status,data,created_by) values ('10-2',1,9100,(now() at time zone 'Asia/Dhaka')::date + 5,'approved','{"lines":[{"amount":77}]}',:'s');
+set role authenticated; select tt.as(:'o');
+select day_book(1,(now() at time zone 'Asia/Dhaka')::date,(now() at time zone 'Asia/Dhaka')::date + 10) as jf \gset
+select tt.chk('D9 future-dated voucher not shown; to capped to today', (:'jf'::jsonb->>'capped')::boolean and (:'jf'::jsonb->>'to')::date=(now() at time zone 'Asia/Dhaka')::date and jsonb_array_length(:'jf'::jsonb->'days')=0);
+-- D6 numbers
+reset role;
+select tt.chk('D6 parser: commas, leading/trailing dot, currency, Bangla digits', _db_num('"1,250.50"')=1250.5 and _db_num('".5"')=0.5 and _db_num('"5."')=5 and _db_num('"৳ 1,000"')=1000 and _db_num('"Tk 300"')=300 and _db_num('"১২৩"')=123 and _db_num('"-.5"')=-0.5 and _db_num('"1.2.3"') is null and _db_num('"12abc"') is null);
+insert into entries (form_code,location_id,serial,entry_date,status,data,created_by) values ('10-2',1,9101,'2026-10-07','approved','{"lines":[{"amount":"1,000"},{"amount":"12x"},{"amount":""}]}',:'s');
+set role authenticated; select tt.as(:'o');
+select day_book(1,'2026-10-07','2026-10-07') as jg \gset
+select tt.chk('D6 "1,000" counted, unreadable "12x" counted in skipped_rows, empty ignored', (:'jg'::jsonb#>>'{days,0,out,cash}')::numeric=1000 and (:'jg'::jsonb->>'skipped_rows')::int=1);
+-- D3 opening balances (owner setter)
+select tt.err('D3 setter owner-only / bounds', $q$select set_daybook_opening(1e15,0,0)$q$, 'bad_amount');
+select set_daybook_start('2026-10-01');
+select set_daybook_opening(1000,2000,3000);
+select day_book(null,'2026-10-06','2026-10-06') as jh \gset
+select tt.chk('D3 all-locations with all three balances: open = balance + net since start', (:'jh'::jsonb->>'balances')::boolean and (:'jh'::jsonb#>>'{days,0,open,cash}')::numeric=1000+(:'jh'::jsonb#>>'{days,0,net_open,cash}')::numeric and (:'jh'::jsonb#>>'{days,0,close,total}')::numeric=6000+(:'jh'::jsonb#>>'{days,0,net_close,total}')::numeric);
+select day_book(1,'2026-10-06','2026-10-06') as ji \gset
+select tt.chk('D3 single-location view never shows business-wide balances', not (:'ji'::jsonb->>'balances')::boolean and jsonb_typeof(:'ji'::jsonb#>'{days,0,open}')='null');
+select set_daybook_opening(1000,null,3000);
+select tt.chk('D3 one balance empty => no balances at all', not (day_book(null,'2026-10-06','2026-10-06')->>'balances')::boolean);
+select set_daybook_opening(null,null,null);
+reset role; set role authenticated; select tt.as(:'s');
+select tt.err('D3 non-owner cannot set balances', $q$select set_daybook_opening(1,1,1)$q$, 'not allowed');
+-- D5 handover: own line, summed separately, out in the single view only
+reset role; set role authenticated; select tt.as(:'o');
+select tt.chk('D5 transfers total shown in both views; counted in cash out only in the single-location view', (day_book(1,'2026-10-06','2026-10-06')#>>'{days,0,transfers}')::numeric=2020 and (day_book(null,'2026-10-06','2026-10-06')#>>'{days,0,transfers}')::numeric=2020
+   and (day_book(1,'2026-10-06','2026-10-06')#>>'{days,0,out,cash}')::numeric=2020 and (day_book(null,'2026-10-06','2026-10-06')#>>'{days,0,out,cash}')::numeric=0);
+-- D4 phase12 flows (only when phase12 is installed)
+reset role;
+select to_regclass('public.sale_returns') is not null as has12 \gset
+\if :has12
+insert into sale_returns (sale_id,location_id,lines,amount,credit_amount,refund_amount,refund_mode,reason_code,status,created_at) values (:'s1',1,'[]',80,0,80,'cash','damaged','done','2026-10-08 10:00+06');
+insert into sale_returns (sale_id,location_id,lines,amount,credit_amount,refund_amount,refund_mode,reason_code,status,created_at) values (:'s1',1,'[]',50,50,0,null,'damaged','done','2026-10-08 11:00+06');
+insert into supplier_refunds (supplier_id,location_id,mode,amount,refunded_at) values (:'su',1,'bank',90,'2026-10-08 12:00+06');
+insert into supplier_refunds (supplier_id,location_id,mode,amount,refunded_at,voided) values (:'su',1,'cash',999,'2026-10-08 12:00+06',true);
+set role authenticated; select tt.as(:'o');
+select day_book(1,'2026-10-08','2026-10-08') as jr \gset
+select tt.chk('D4 customer refund = cash OUT 80 (credit-only return ignored); supplier refund = bank IN 90 (voided ignored)', (:'jr'::jsonb#>>'{days,0,out,cash}')::numeric=80 and (:'jr'::jsonb#>>'{days,0,in,bank}')::numeric=90 and (:'jr'::jsonb#>>'{days,0,in,total}')::numeric=90);
+reset role;
+\endif
+-- D12 masking
+set role authenticated; select tt.as(:'o');
+select set_rule('daybook_mask_names','true'::jsonb);
+select tt.chk('D12 owner still sees names when masking is on', exists (select 1 from jsonb_array_elements(day_book(1,'2026-10-05','2026-10-05')#>'{days,0,lines}') l where l->>'text' is not null));
+reset role; set role authenticated; select tt.as(:'s');
+select day_book(1,'2026-10-05','2026-10-05') as jm \gset
+select tt.chk('D12 grant holder gets names/refs masked when the switch is on', (:'jm'::jsonb->>'names_masked')::boolean and not exists (select 1 from jsonb_array_elements(:'jm'::jsonb#>'{days,0,lines}') l where l->>'text' is not null or l->>'ref' is not null));
+reset role; set role authenticated; select tt.as(:'o');
+select set_rule('daybook_mask_names','false'::jsonb);
+-- D9 two sheets for the same location+month, same-name people
+reset role;
+insert into entries (form_code,location_id,serial,entry_date,status,data,created_by) values
+ ('02-2',1,9010,'2026-10-20','approved','{"month":"10","year":"2026","pay":[{"name":"Karim","due":500}],"receipts":[{"name":"Karim","net":500,"signed":true}]}',:'s');
+set role authenticated; select tt.as(:'o');
+select salary_report(1,'2026-10-02') as jz \gset
+select tt.chk('D9 duplicate sheets reported for loc 1', (:'jz'::jsonb#>>'{duplicate_sheets,0,loc}')::int=1 and (:'jz'::jsonb#>>'{duplicate_sheets,0,n}')::int=2);
+select tt.chk('D9 same name twice => ambiguous, paid/signed not guessed, totals still add every line', (select count(*) from jsonb_array_elements(:'jz'::jsonb->'rows') r where (r->>'ambiguous')::boolean and r->>'name'='Karim')=2
+   and not exists (select 1 from jsonb_array_elements(:'jz'::jsonb->'rows') r where r->>'name'='Karim' and r->'paid'<>'null'::jsonb) and (:'jz'::jsonb#>>'{totals,gross}')::numeric=19100);
+reset role;
 \echo == T4 re-run safety
 \i /home/user/My-tools/supabase/phase13.sql
 select tt.chk('T4 re-run keeps one grant def, rules not reset', (select count(*) from grant_defs where grant_code='view_daybook')=1 and (select count(*) from rules where key in ('daybook_enabled','daybook_start'))=2);

@@ -47,11 +47,25 @@ const X = {
   startLbl: L('শুরুর তারিখ (YYYY-MM-DD)', 'Start date (YYYY-MM-DD)', 'Start date (YYYY-MM-DD)'), save: L('সংরক্ষণ', 'Save', 'Save'), clear: L('তারিখ মুছুন', 'Clear date', 'Date মুছুন'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
   on: L('চালু', 'On', 'On'), off_: L('বন্ধ', 'Off', 'Off'), by: L('কে', 'By', 'By'), at: L('সময়', 'Time', 'Time'), period: L('সময়', 'Period', 'Period'),
   sum: L('সারাংশ', 'Summary', 'Summary'), internal: L('অভ্যন্তরীণ (হিসাবে ধরা হয়নি)', 'Internal (not in totals)', 'Internal (total-এ নেই)'),
+  netOpen: L('শুরু থেকে নিট (শুরুতে)', 'Net since start (at day start)', 'Net since start (day start)'), netClose: L('শুরু থেকে নিট (শেষে)', 'Net since start (at day end)', 'Net since start (day end)'),
+  neg: L('ঋণাত্মক', 'Negative', 'Negative'), transfers: L('অভ্যন্তরীণ ট্রান্সফার (ক্যাশ হ্যান্ডওভার)', 'Internal transfers (cash handover)', 'Internal transfer (cash handover)'),
+  trNote: L('সব-জায়গার যোগফলে ধরা হয় না; এক জায়গার দেখায় নগদ আউট ধরা হয়', 'Not in the all-locations totals; counted as cash out in a single-location view', 'সব-location total-এ ধরা হয় না; এক location-এ cash out'),
+  skipped: L('টি লাইনের টাকার অঙ্ক পড়া যায়নি (বাদ গেছে)', 'lines could not be read (left out)', 'lines পড়া যায়নি (বাদ গেছে)'),
+  startAfter: L('শুরুর তারিখ এই সময়ের পরে — তাই কোনো জের নেই, শুধু লেনদেন', 'The start date is after this period — no balances, movements only', 'Start date এই period-এর পরে — কোনো জের নেই, শুধু movement'),
+  straddle: L('শুরুর তারিখ এই সময়ের মাঝখানে — তার আগের দিনগুলোতে জের নেই', 'The start date falls inside this period — days before it have no balances', 'Start date period-এর মাঝে — তার আগের দিনে জের নেই'),
+  netOnly: L('জের গোনা হয় শুরুর তারিখ থেকে (নিট) — শুরুর নগদ/ব্যাংক/মোবাইল জের বসানো নেই, তাই "শুরু/শেষ জের" নয়, "শুরু থেকে নিট"', 'Net movement counted from the start date — opening balances are not set, so this is "Net since start", not Opening/Closing', 'Start date থেকে net — opening balance বসানো নেই, তাই "Net since start"'),
+  masked: L('নাম ও রেফারেন্স লুকানো আছে', 'Names and references are masked', 'নাম ও reference লুকানো'), capped: L('আজকের পরের তারিখ দেখানো হয় না', 'Dates after today are not shown', 'আজকের পরের date দেখানো হয় না'),
+  scope: L('পরিধি', 'Scope', 'Scope'), wholePeriod: L('পুরো সময়', 'whole period', 'পুরো period'),
+  openBal: L('শুরুর তারিখে জের (৳) — খালি = দেখানো হবে না', 'Opening balances at the start date (৳) — empty = not shown', 'Start date-এ জের (৳) — খালি = দেখানো হবে না'), balHint: L('শুধু "সব জায়গা" দেখায় ব্যবহৃত হয়; তিনটিই লাগবে', 'Used in the all-locations view only; all three are needed', 'শুধু "সব জায়গা" view-এ; তিনটিই লাগবে'),
+  maskNames: L('মালিক ছাড়া অন্যদের জন্য নাম/রেফারেন্স লুকান', 'Mask names / references for non-owners', 'Owner ছাড়া অন্যদের জন্য নাম/ref লুকান'), bad_amount: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'),
+  t_sale_return: L('বিক্রি ফেরতে টাকা ফেরত', 'Sale return refund', 'Sale return refund'), t_supplier_refund: L('সাপ্লায়ারের ফেরত টাকা', 'Supplier refund', 'Supplier refund'),
+  n_refunds_included: L('বিক্রি ফেরতের নগদ ফেরত (আউট) ও সাপ্লায়ারের ফেরত টাকা (ইন) ধরা হয় (phase12 থাকলে)', 'Customer refunds paid (out) and supplier refunds received (in) are included when phase12 is installed', 'Customer refund (out) ও supplier refund (in) ধরা হয় (phase12 থাকলে)'),
+  n_future_dates_capped: L('আজকের পরের তারিখের লেনদেন ধরা হয় না', 'Movements dated after today are not counted', 'আজকের পরের date-এর movement ধরা হয় না'),
   t_sale: L('বিক্রি', 'Sale', 'Sale'), t_collection: L('বাকি আদায়', 'Due collected', 'Due আদায়'), t_supplier: L('সাপ্লায়ারকে', 'Supplier paid', 'Supplier-কে'), t_bill: L('ক্রয় বিলের টাকা', 'Bill payment', 'Bill payment'),
   t_expense: L('খরচ ভাউচার', 'Expense voucher', 'Expense voucher'), t_handover: L('ক্যাশ হ্যান্ডওভার', 'Cash handover', 'Cash handover'), t_advance: L('স্টাফ অ্যাডভান্স', 'Staff advance', 'Staff advance'), t_salary: L('বেতন', 'Salary', 'Salary'),
 };
 const T = (k) => lab(X[k]);
-const TYPE_TONE = { sale: 'ok', collection: 'info', supplier: 'warn', bill: 'warn', expense: 'warn', handover: 'info', advance: 'warn', salary: 'warn' };
+const TYPE_TONE = { sale_return: 'warn', supplier_refund: 'ok', sale: 'ok', collection: 'info', supplier: 'warn', bill: 'warn', expense: 'warn', handover: 'info', advance: 'warn', salary: 'warn' };
 const typeLabel = (t) => (X['t_' + t] ? T('t_' + t) : t);
 const modeLabel = (m) => (X[m] ? T(m) : m);
 
@@ -88,16 +102,17 @@ async function load() {
 
 // ---------- per-mode view of the server answer (a filter, no new maths on balances) ----------
 const pick = (o, mode) => (o ? (mode ? o[mode] : o.total) : null);
+const bal = () => !!(D.data && D.data.balances);
 function dayView(d) {
   const m = D.mode, lines = (d.lines || []).filter((l) => !m || l.mode === m);
   const counted = lines.filter((l) => !l.internal);
   const inn = pick(d.in, m), out = pick(d.out, m);
   return { date: d.date, lines, nin: counted.filter((l) => l.dir === 'in').length, nout: counted.filter((l) => l.dir === 'out').length,
-    open: pick(d.open, m), close: pick(d.close, m), in: inn, out, has: lines.length > 0 };
+    open: pick(bal() ? d.open : d.net_open, m), close: pick(bal() ? d.close : d.net_close, m), in: inn, out, tr: Number(d.transfers || 0), has: lines.length > 0 };
 }
 function totalsView() {
   const t = (D.data && D.data.totals) || {}, m = D.mode;
-  return { open: pick(t.open, m), in: pick(t.in, m), out: pick(t.out, m), close: pick(t.close, m) };
+  return { open: pick(bal() ? t.open : t.net_open, m), in: pick(t.in, m), out: pick(t.out, m), close: pick(bal() ? t.close : t.net_close, m), tr: Number(t.transfers || 0) };
 }
 
 // ---------- main view ----------
@@ -118,8 +133,8 @@ function errBox(e) {
   if (/bad_range/.test(m)) return `<div class="notice warn mk warn">${esc(T('bad_range'))}</div>`;
   return `<div class="notice warn mk warn">${esc(m || 'error')}</div>`;
 }
-function statCell(label, val, tone) {
-  return `<div class="stat mk ${tone || ''}"><div class="k">${esc(label)}</div><div class="v">${val === null || val === undefined ? `<span class="chip warn">${esc(T('need'))}</span>` : esc(money(val))}</div></div>`;
+function statCell(label, val, tone, chkNeg) {
+  return `<div class="stat mk ${tone || ''}"><div class="k">${esc(label)}</div><div class="v">${val === null || val === undefined ? `<span class="chip warn">${esc(T('need'))}</span>` : esc(money(val))}${chkNeg && Number(val) < 0 ? ` <span class="chip warn neg">${esc(T('neg'))}</span>` : ''}</div></div>`;
 }
 function draw() {
   const locs = LOCS(), locked = !!(D.err && /not allowed|daybook_off/.test(D.err.message || ''));
@@ -139,11 +154,24 @@ function draw() {
   else body = `<p class="muted">${esc(T('loading'))}</p>`;
   shell(T('title'), `${locked ? '' : filters}<div id="db_body">${body}</div>`, true);
 }
+function startBanner() {
+  const d = D.data, st = d.start;
+  if (!st) return `<div class="notice warn mk warn" id="db_needstart">${esc(T('needStart'))}</div>`;
+  if (st > d.to) return `<div class="notice warn mk warn" id="db_startafter">${esc(T('startAfter'))}</div>`;
+  let h = '';
+  if (st > d.from) h += `<p class="muted" style="font-size:.85rem" id="db_straddle">${esc(T('straddle'))}</p>`;
+  h += `<p class="muted" style="font-size:.85rem" id="db_startnote">${esc(bal() ? T('startNote') + st + (S.lang === 'bn' ? ')' : '') : T('netOnly') + ' (' + st + ')')}</p>`;
+  return h;
+}
 function summary() {
-  const v = totalsView(), known = D.data.opening_known;
-  return `<div class="stats" id="db_sum">${statCell(T('open'), known ? v.open : null)}${statCell(T('in'), v.in, 'ok')}${statCell(T('out'), v.out, 'warn')}${statCell(T('close_'), known ? v.close : null)}</div>
-    ${known ? `<p class="muted" style="font-size:.85rem">${esc(T('startNote'))}${esc(D.data.start)}${S.lang === 'bn' ? ')' : ''}</p>` : `<div class="notice warn mk warn" id="db_needstart">${esc(T('needStart'))}</div>`}
-    ${D.data.salary_hidden ? `<p class="muted" style="font-size:.85rem" id="db_salhid">${esc(T('salHidden'))}</p>` : ''}`;
+  const v = totalsView(), known = D.data.opening_known, ob = bal();
+  return `<div class="stats" id="db_sum">${statCell(ob ? T('open') : T('netOpen'), known ? v.open : null, '', true)}${statCell(T('in'), v.in, 'ok')}${statCell(T('out'), v.out, 'warn')}${statCell(ob ? T('close_') : T('netClose'), known ? v.close : null, '', true)}</div>
+    ${startBanner()}
+    ${v.tr > 0 ? `<p class="muted" style="font-size:.85rem" id="db_tr"><span class="chip info">${esc(T('transfers'))}</span> ${esc(money(v.tr))} · ${esc(T('trNote'))}</p>` : ''}
+    ${D.data.skipped_rows > 0 ? `<div class="notice warn mk warn" id="db_skipped">${esc(String(D.data.skipped_rows))} ${esc(T('skipped'))}</div>` : ''}
+    ${D.data.salary_hidden ? `<p class="muted" style="font-size:.85rem" id="db_salhid">${esc(T('salHidden'))}</p>` : ''}
+    ${D.data.names_masked ? `<p class="muted" style="font-size:.85rem" id="db_masked">${esc(T('masked'))}</p>` : ''}
+    ${D.data.capped ? `<p class="muted" style="font-size:.85rem" id="db_capped">${esc(T('capped'))}</p>` : ''}`;
 }
 function dayList() {
   const days = (D.data.days || []).map(dayView).filter((d) => d.has).reverse();
@@ -151,8 +179,8 @@ function dayList() {
   return `<div class="card" style="padding:4px 12px" id="db_days">${days.map((d) => {
     const net = (d.in || 0) - (d.out || 0), tone = net < 0 ? 'warn' : 'ok';
     return `<button class="rp-row mk ${tone} db-day" data-act="db_day" data-v="${esc(d.date)}" style="display:flex;width:100%;align-items:center;gap:8px;text-align:start">
-      <span class="nm" style="flex:1">${esc(fd(d.date))}<small style="display:block">${esc(T('in'))} ${esc(money(d.in))} · ${esc(T('out'))} ${esc(money(d.out))}${d.close !== null && d.close !== undefined && D.data.opening_known ? ' · ' + esc(T('close_')) + ' ' + esc(money(d.close)) : ''}</small></span>
-      <span class="chip ${tone}">${esc((net < 0 ? '− ' : '+ ') + money(Math.abs(net)))}</span><span class="cv">›</span></button>`;
+      <span class="nm" style="flex:1">${esc(fd(d.date))}<small style="display:block">${esc(T('in'))} ${esc(money(d.in))} · ${esc(T('out'))} ${esc(money(d.out))}${d.close !== null && d.close !== undefined && D.data.opening_known ? ' · ' + esc(bal() ? T('close_') : T('netClose')) + ' ' + esc(money(d.close)) : ''}</small></span>
+      ${d.close < 0 && D.data.opening_known ? `<span class="chip warn neg">${esc(T('neg'))}</span>` : ''}<span class="chip ${tone}">${esc((net < 0 ? '− ' : '+ ') + money(Math.abs(net)))}</span><span class="cv">›</span></button>`;
   }).join('')}</div>`;
 }
 function notesBox() {
@@ -183,7 +211,8 @@ function daySheet(date) {
   const d = (D.data.days || []).find((x) => x.date === date); if (!d) return;
   const v = dayView(d); D.openDay = date; D.shown = v.lines;
   openSheet(`${sheetBar(esc(fd(date)), `<button data-act="db_dmenu" aria-label="${esc(T('menu'))}" style="min-width:48px">${DOTS}</button>`)}
-    <div class="stats" style="margin:8px 0">${statCell(T('open'), D.data.opening_known ? v.open : null)}${statCell(T('in'), v.in, 'ok')}${statCell(T('out'), v.out, 'warn')}${statCell(T('close_'), D.data.opening_known ? v.close : null)}</div>
+    <div class="stats" style="margin:8px 0">${statCell(bal() ? T('open') : T('netOpen'), D.data.opening_known ? v.open : null, '', true)}${statCell(T('in'), v.in, 'ok')}${statCell(T('out'), v.out, 'warn')}${statCell(bal() ? T('close_') : T('netClose'), D.data.opening_known ? v.close : null, '', true)}</div>
+    ${v.tr > 0 ? `<p class="muted" style="font-size:.85rem"><span class="chip info">${esc(T('transfers'))}</span> ${esc(money(v.tr))}</p>` : ''}
     <div class="card" style="padding:4px 12px" id="db_lines">${v.lines.map(lineRow).join('')}</div>
     <button class="full" style="margin-top:12px" data-act="closesheet">${esc(T('close'))}</button>`);
 }
@@ -209,14 +238,20 @@ function exportRows(dates) {
     (d.lines || []).filter((l) => !D.mode || l.mode === D.mode).forEach((l) => rows.push({ date: d.date, ...l })); });
   return rows;
 }
-function buildCSV(rows) {
+function scopeTotals(dates) {
+  if (!dates) return Object.assign({}, totalsView(), { label: T('wholePeriod') });
+  const ds = (D.data.days || []).filter((d) => dates.includes(d.date)).sort((a, z) => (a.date < z.date ? -1 : 1)), m = D.mode, f = ds[0], l = ds[ds.length - 1];
+  const sum = (k) => ds.reduce((a, d) => a + Number(pick(d[k], m) || 0), 0);
+  return { in: sum('in'), out: sum('out'), open: f ? pick(bal() ? f.open : f.net_open, m) : null, close: l ? pick(bal() ? l.close : l.net_close, m) : null, tr: ds.reduce((a, d) => a + Number(d.transfers || 0), 0), label: dates.join(', ') };
+}
+function buildCSV(rows, dates) {
   const head = ['date', 'location', 'direction', 'mode', 'type', 'amount', 'reference', 'details', 'by', 'time', 'internal'];
   const out = [head.join(',')];
   rows.forEach((r) => out.push([r.date, locName(r.loc), r.dir, r.mode, r.type, Number(r.amount), r.ref, r.text, r.who, r.at ? new Date(r.at).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka' }) : '', r.internal ? 'yes' : ''].map(csvCell).join(',')));
-  const p = (S.ctx && S.ctx.profile) || {}, tv = totalsView();
+  const p = (S.ctx && S.ctx.profile) || {}, tv = scopeTotals(dates), ob = bal();
   out.push('');
   [[T('title')], [T('period'), D.from + ' - ' + D.to], [T('location'), D.loc === null ? T('allLoc') : locName(D.loc)], [T('cash') + '/' + T('bank') + '/' + T('mobile'), D.mode ? T(D.mode) : T('all')],
-    [T('in'), tv.in], [T('out'), tv.out], [T('open'), D.data.opening_known ? tv.open : T('need')], [T('close_'), D.data.opening_known ? tv.close : T('need')],
+    [T('scope'), tv.label], [T('in'), tv.in], [T('out'), tv.out], [T('transfers'), tv.tr], [ob ? T('open') : T('netOpen'), D.data.opening_known && tv.open !== null ? tv.open : T('need')], [ob ? T('close_') : T('netClose'), D.data.opening_known && tv.close !== null ? tv.close : T('need')],
     [T('by'), p.full_name || p.staff_id || ''], [T('at'), new Date().toLocaleString('en-GB', { timeZone: 'Asia/Dhaka' }) + ' (Asia/Dhaka)']].forEach((m) => out.push(m.map(csvCell).join(',')));
   return '﻿' + out.join('\r\n') + '\r\n';
 }
@@ -233,17 +268,17 @@ async function auditExport(kind, n) {
 async function doCSV(dates) {
   if (!D.data) return; const rows = exportRows(dates);
   if (!(await auditExport('csv', rows.length))) return;
-  download(`daybook-${D.from}${D.to !== D.from ? '_' + D.to : ''}${dates ? '-day' : ''}.csv`, buildCSV(rows), 'text/csv;charset=utf-8'); toast(T('expDone'));
+  download(`daybook-${D.from}${D.to !== D.from ? '_' + D.to : ''}${dates ? '-day' : ''}.csv`, buildCSV(rows, dates), 'text/csv;charset=utf-8'); toast(T('expDone'));
 }
 async function doPrint(dates) {
   if (!D.data) return; const rows = exportRows(dates);
   if (!(await auditExport('print', rows.length))) return;
   const old = $('#rp_print'); if (old) old.remove();
-  const tv = totalsView(), d = document.createElement('div'); d.id = 'rp_print';
+  const tv = scopeTotals(dates), ob = bal(), d = document.createElement('div'); d.id = 'rp_print';
   d.innerHTML = `<h1>${esc(T('title'))}</h1><p class="pm">${esc(D.from + ' – ' + D.to)} · ${esc(D.loc === null ? T('allLoc') : locName(D.loc))} · ${esc(D.mode ? T(D.mode) : T('all'))}
-    · ${esc(T('in'))} ${esc(money(tv.in))} · ${esc(T('out'))} ${esc(money(tv.out))}${D.data.opening_known ? ' · ' + esc(T('open')) + ' ' + esc(money(tv.open)) + ' · ' + esc(T('close_')) + ' ' + esc(money(tv.close)) : ''}</p>
+    · ${esc(T('scope'))}: ${esc(tv.label)} · ${esc(T('in'))} ${esc(money(tv.in))} · ${esc(T('out'))} ${esc(money(tv.out))}${D.data.opening_known && tv.open !== null ? ' · ' + esc(ob ? T('open') : T('netOpen')) + ' ' + esc(money(tv.open)) + ' · ' + esc(ob ? T('close_') : T('netClose')) + ' ' + esc(money(tv.close)) : ''}</p>
     <table><thead><tr><th>${esc(T('period'))}</th><th>${esc(T('location'))}</th><th></th><th></th><th>${esc(T('ref'))}</th><th class="n">${esc(T('total'))}</th></tr></thead>
-    <tbody>${rows.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(locName(r.loc))}</td><td>${esc(typeLabel(r.type))}</td><td>${esc(modeLabel(r.mode))}</td><td>${esc([r.ref, r.text].filter(Boolean).join(' · '))}</td><td class="n">${esc(signed(r.dir, r.amount))}</td></tr>`).join('')}</tbody></table>`;
+    <tbody>${rows.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(locName(r.loc))}</td><td>${esc(typeLabel(r.type))}</td><td>${esc(modeLabel(r.mode))}</td><td>${esc([r.ref, r.text].filter(Boolean).join(' · '))}${r.internal ? ' (' + esc(T('internal')) + ')' : ''}</td><td class="n">${esc(signed(r.dir, r.amount))}</td></tr>`).join('')}</tbody></table>`;
   document.body.appendChild(d);
   const clean = () => { const e = $('#rp_print'); if (e) e.remove(); window.removeEventListener('afterprint', clean); };
   window.addEventListener('afterprint', clean);
@@ -269,14 +304,19 @@ function dayMenu() {
 }
 async function settingsSheet() {
   if (!owner()) return;
-  const on = D.data ? D.data.enabled !== false : true, st = (D.data && D.data.start) || '';
+  const on = D.data ? D.data.enabled !== false : true, st = (D.data && D.data.start) || '', maskOn = D.mask !== undefined ? D.mask : (ruleVal('daybook_mask_names') === 'true');
   openSheet(`<h2 style="margin-top:0">${esc(T('settings'))}</h2><div class="stack">
     <div class="card stack"><b>${esc(T('enabled'))}</b><small class="muted">${esc(T('enabledHint'))}</small>
       <div class="row wrap"><button class="tog ${on ? 'on' : ''}" id="db_en" data-act="db_en" data-v="1" aria-pressed="${on}">${esc(T('on'))}</button><button class="tog ${on ? '' : 'on'}" data-act="db_en" data-v="0" aria-pressed="${!on}">${esc(T('off_'))}</button></div></div>
     <div class="card stack"><label for="db_st">${esc(T('startLbl'))}</label><input id="db_st" inputmode="numeric" autocomplete="off" value="${esc(st)}" placeholder="2026-10-01">
       <div class="row"><button class="primary full" data-act="db_st_save">${esc(T('save'))}</button><button class="full" data-act="db_st_clear">${esc(T('clear'))}</button></div></div>
+    <div class="card stack"><b>${esc(T('openBal'))}</b><small class="muted">${esc(T('balHint'))}</small>
+      ${['cash', 'bank', 'mobile'].map((k) => `<label for="db_ob_${k}">${esc(T(k))}</label><input id="db_ob_${k}" inputmode="decimal" autocomplete="off" value="${esc(ruleVal('daybook_open_' + k))}">`).join('')}
+      <button class="primary full" data-act="db_ob_save">${esc(T('save'))}</button></div>
+    <div class="card stack"><b>${esc(T('maskNames'))}</b><div class="row wrap"><button class="tog ${maskOn ? 'on' : ''}" data-act="db_mask" data-v="1" aria-pressed="${maskOn}">${esc(T('on'))}</button><button class="tog ${maskOn ? '' : 'on'}" data-act="db_mask" data-v="0" aria-pressed="${!maskOn}">${esc(T('off_'))}</button></div></div>
     <button class="full" data-act="closesheet">${esc(T('close'))}</button></div>`);
 }
+const ruleVal = (k) => { try { const v = B.rule(k, null); return v === null || v === undefined ? '' : String(v); } catch (e) { return ''; } };
 
 Object.assign(H, {
   db_q: async (a) => { const v = a.dataset.v; D.to = todayS(); D.from = v === 'today' ? D.to : v === '7' ? addDays(D.to, -6) : monthStart(); await reload(); },
@@ -294,6 +334,12 @@ Object.assign(H, {
   db_en: async (a) => { const r = await sb.rpc('set_rule', { p_key: 'daybook_enabled', p_value: a.dataset.v === '1' }); if (r.error) return fail(r.error); toast(T('saved')); if (D.data) D.data.enabled = a.dataset.v === '1'; settingsSheet(); },
   db_st_save: async () => { const v = norm($('#db_st').value); if (!isDate(v)) return toast(T('bad_date'));
     const r = await sb.rpc('set_daybook_start', { p_date: v }); if (r.error) return /bad_date/.test(r.error.message || '') ? toast(T('bad_date')) : fail(r.error); toast(T('saved')); closeSheet(); await reload(); },
+  db_mask: async (a) => { const r = await sb.rpc('set_rule', { p_key: 'daybook_mask_names', p_value: a.dataset.v === '1' }); if (r.error) return fail(r.error); D.mask = a.dataset.v === '1'; toast(T('saved')); settingsSheet(); },
+  db_ob_save: async () => {
+    const v = (k) => { const x = norm($('#db_ob_' + k).value).replace(/,/g, ''); if (x === '') return null; const n = Number(x); return Number.isFinite(n) ? n : NaN; };
+    const c = v('cash'), b = v('bank'), m = v('mobile'); if ([c, b, m].some((x) => Number.isNaN(x))) return toast(T('bad_amount'));
+    const r = await sb.rpc('set_daybook_opening', { p_cash: c, p_bank: b, p_mobile: m });
+    if (r.error) return /bad_amount/.test(r.error.message || '') ? toast(T('bad_amount')) : fail(r.error); toast(T('saved')); closeSheet(); await reload(); },
   db_st_clear: async () => { const r = await sb.rpc('set_daybook_start', { p_date: null }); if (r.error) return fail(r.error); toast(T('saved')); closeSheet(); await reload(); },
 });
 async function reload() { await load(); draw(); }
