@@ -34,6 +34,7 @@ const X = {
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
   modules: L('সব মডিউল', 'All modules', 'সব Module'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'),
+  set2: L('সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'), inv: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'),
 };
 const T = (k) => lab(X[k]);
 
@@ -72,6 +73,7 @@ const ROUTES = [
   { k: 'lists', g: 'item', lb: () => t('lists'), ok: () => isOwner() },
   { k: 'dues', g: 'cust', lb: () => t('dues'), ok: () => canPos() },
   { k: 'pos', g: 'sale', lb: () => t('pos'), ok: () => canPos() },
+  { k: 'reports', g: 'reports', lb: () => T('g_reports'), ic: 'doc', ok: () => true },
   { k: 'biz', g: 'reports', lb: () => t('biz'), ok: () => isOwner() || P('POS', 'approve') },
   { k: 'numaudit', g: 'reports', lb: () => t('numaudit'), ok: () => anyApprove() },
   { k: 'logs', g: 'reports', lb: () => t('logs'), ok: () => isOwner() },
@@ -80,6 +82,8 @@ const ROUTES = [
   { k: 'rules', g: 'settings', lb: () => t('rules'), ok: () => isOwner() },
   { k: 'matrix', g: 'settings', lb: () => t('matrix'), ok: () => isOwner() },
   { k: 'settings', g: 'settings', lb: () => t('settings'), ok: () => isOwner() },
+  { k: 'settings2', g: 'settings', lb: () => T('set2'), ok: () => isOwner() },
+  { k: 'invoice', g: 'settings', lb: () => T('inv'), ok: () => isOwner() },
   { k: 'locset', g: 'settings', lb: () => t('locset'), ok: () => isOwner() },
   { k: 'backup', g: 'settings', lb: () => t('backup'), ok: () => isOwner() },
 ];
@@ -98,6 +102,7 @@ function keyOfHash() {
   const page = p[0] || 'home';
   if (page === 'form' && p[1]) return 'f:' + p[1];
   if (page === 'entry' && p[1] === 'new' && p[2]) return 'f:' + p[2];
+  if (page === 'report') return 'r:reports';
   return 'r:' + page;
 }
 
@@ -107,13 +112,45 @@ const pins = () => jget('bos_pins_' + uid(), []);
 const usage = () => jget('bos_use_' + uid(), {});
 const setPins = (a) => store.set('bos_pins_' + uid(), JSON.stringify(a));
 const isPinned = (k) => pins().includes(k);
-function bump(k) { if (!k || k === 'r:home' || !S.ctx) return; const u = usage(); u[k] = (u[k] || 0) + 1; store.set('bos_use_' + uid(), JSON.stringify(u)); }
+function bump(k) { if (!k || k === 'r:home' || !S.ctx) return; const u = usage(); u[k] = (u[k] || 0) + 1; store.set('bos_use_' + uid(), JSON.stringify(u)); pushUse(k); }
 let lastCounted = null;
 function countRoute() {
   const h = location.hash;
   if (h === lastCounted) return; lastCounted = h;
   const k = keyOfHash(); if (k && byKey(k)) bump(k);
 }
+
+// ---------- server sync: user_favourites / role_favourites. localStorage stays the offline fallback; changes made offline wait in a small queue ----------
+const fkOf = (key) => (key.startsWith('f:') ? { kind: 'form', key: key.slice(2) } : { kind: 'route', key: key.replace(/^r:/, '') });
+const keyOfFav = (r) => (r.kind === 'form' ? 'f:' : 'r:') + r.key;
+const favQ = () => jget('bos_favq_' + uid(), []);
+const setFavQ = (a) => store.set('bos_favq_' + uid(), JSON.stringify(a));
+const okRes = (p) => Promise.resolve(p).then((r) => (r && r.error ? Promise.reject(r.error) : r));
+let RF = [], favSynced = null;
+function pushPin(key, pinned) {
+  if (!S.ctx) return; const k = fkOf(key);
+  okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: pinned })).catch(() => { setFavQ([...favQ().filter((x) => x.key !== key), { key, pinned }]); });
+}
+function pushUse(key) { if (!S.ctx || navigator.onLine === false) return; const k = fkOf(key); okRes(sb.rpc('touch_favourite', { p_kind: k.kind, p_key: k.key })).catch(() => {}); }
+async function syncFavs() {
+  if (!S.ctx || favSynced === uid()) return; const me = uid(); favSynced = me;
+  try {
+    for (const q of favQ()) { const k = fkOf(q.key); await okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: q.pinned })); }
+    setFavQ([]);
+    if (store.get('bos_favmig_' + me) !== '1') { for (const key of pins()) { const k = fkOf(key); await okRes(sb.rpc('set_pin', { p_kind: k.kind, p_key: k.key, p_pinned: true })); } store.set('bos_favmig_' + me, '1'); }   // pins made before the sync existed go up once
+    const [r, rf] = await Promise.all([sb.from('user_favourites').select('kind,key,pinned,uses'), sb.from('role_favourites').select('role_code,kind,key,sort')]);
+    if (rf && !rf.error) RF = rf.data || [];
+    if (r && !r.error) {
+      const rows = r.data || [], sp = rows.filter((x) => x.pinned).map(keyOfFav), loc = pins(), u = usage();
+      setPins([...loc.filter((k) => sp.includes(k)), ...sp.filter((k) => !loc.includes(k))]);
+      rows.forEach((x) => { const k = keyOfFav(x); u[k] = Math.max(u[k] || 0, Number(x.uses) || 0); });
+      store.set('bos_use_' + me, JSON.stringify(u));
+    }
+    afterPin();
+  } catch (e) { favSynced = null; /* offline or tables missing: local copy keeps working, try again later */ }
+}
+const roleDefaults = () => { const mine = new Set((S.ctx && S.ctx.roles) || []); return [...new Set(RF.filter((x) => mine.has(x.role_code)).sort((a, b) => a.sort - b.sort).map(keyOfFav))]; };
+const effPins = () => { const p = pins(); return p.length ? p : roleDefaults(); };
 
 // ---------- attention counts ----------
 let CNT = null, cntAt = 0;
@@ -133,6 +170,7 @@ function ensureStatic() {
     try { await B.loadStatic(); } catch (e) { /* rules fall back to defaults */ }
     if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
     try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
+    syncFavs();
   })();
   return staticP;
 }
@@ -270,7 +308,7 @@ function sync(live) {
 function togglePin(k) {
   const p = pins(), i = p.indexOf(k);
   if (i >= 0) p.splice(i, 1); else p.push(k);
-  setPins(p); afterPin();
+  setPins(p); afterPin(); pushPin(k, i < 0);
 }
 function afterPin() {
   updatePinBtn(); if ($('#nav_body')) dr_body();
@@ -375,8 +413,8 @@ function drawStats() {
 function tileDefs() {
   const f = (code) => ({ key: 'f:' + code });
   return HS.mode === 'biz'
-    ? [{ key: 'r:pos' }, { key: 'r:items' }, { key: 'r:itemreq' }, f('14-1'), f('03-1'), f('04-1'), { soon: 'stockbal' }]
-    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { soon: 'payables' }, { soon: 'daybook' }];
+    ? [{ key: 'r:pos' }, { key: 'r:items' }, { key: 'r:itemreq' }, f('14-1'), f('03-1'), f('04-1'), { key: 'r:reports' }, { soon: 'stockbal' }]
+    : [f('10-1'), f('10-2'), f('10-4'), { key: 'r:dues' }, { key: 'r:biz', label: () => T('pl') }, { key: 'r:reports' }, { soon: 'payables' }, { soon: 'daybook' }];
 }
 function tile(e, o = {}) {
   const pin = isPinned(e.key), c = e.cnt && CNT && CNT[e.cnt];
@@ -398,7 +436,7 @@ function drawTiles() {
 }
 function drawFav() {
   const box = $('#hv_fav'); if (!box) return;
-  const pinned = pins().map(byKey).filter((e) => e && e.ok && e.live);
+  const pinned = effPins().map(byKey).filter((e) => e && e.ok && e.live);
   const u = usage(), pk = new Set(pinned.map((e) => e.key));
   const used = Object.keys(u).filter((k) => !pk.has(k)).sort((a, b) => u[b] - u[a]).map(byKey).filter((e) => e && e.ok && e.live && e.key !== 'r:home').slice(0, Math.max(4, 8 - pinned.length));
   const add = `<div class="qt"><button class="qm" data-act="nav_picker">${IC.plus}<span class="lb">${esc(T('add'))}</span></button></div>`;
@@ -407,7 +445,7 @@ function drawFav() {
 function drawMods() {
   const box = $('#hv_mods'); if (!box) return;
   const cn = CNT || {}, mode = npMode();
-  const order = ['pos', 'dues', 'biz', 'items', 'itemreq', 'exceptions', 'numaudit', 'emergency', 'releases', 'staff', 'rulehub'];
+  const order = ['pos', 'dues', 'reports', 'biz', 'items', 'itemreq', 'exceptions', 'numaudit', 'emergency', 'releases', 'staff', 'rulehub'];
   const lockable = new Set(['pos', 'dues', 'biz', 'items']);
   box.innerHTML = order.map((k) => {
     const e = byKey('r:' + k); if (!e) return '';
@@ -441,7 +479,7 @@ Object.assign(H, {
   nav_pin: (a) => togglePin(a.dataset.v),
   nav_picker: pickerSheet,
   nav_me: meSheet,
-  nav_reset: () => { store.set('bos_pins_' + uid(), '[]'); store.set('bos_use_' + uid(), '{}'); closeSheet(); afterPin(); },
+  nav_reset: () => { store.set('bos_pins_' + uid(), '[]'); store.set('bos_use_' + uid(), '{}'); setFavQ([]); okRes(sb.from('user_favourites').delete().eq('user_id', uid())).catch(() => {}); closeSheet(); afterPin(); },
   hv_mode: (a) => { HS.mode = a.dataset.v; store.set('bos_hmode_' + uid(), HS.mode); document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === HS.mode)); drawTiles(); drawStats(); },
   hv_period: (a) => { HS.period = a.dataset.v; store.set('bos_hper_' + uid(), HS.period); drawPeriod(); loadStats(); },
 });
@@ -449,5 +487,5 @@ Object.assign(H, {
 const prevLang = H.lang;
 H.lang = (a) => { sig = ''; return prevLang(a); };
 
-window.BOS_NAV = { menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin };
+window.BOS_NAV = { menuBtn, headExtra, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, entries: () => entries().filter((e) => e.live), syncFavs };
 })();
