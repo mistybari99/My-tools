@@ -34,7 +34,7 @@ async function render() {
   const canItems = owner || (perms.ITEMS && perms.ITEMS.approve);
   const td = dhaka(), from = addDays(td, -6);
   await B.loadStatic();
-  const q = (x) => x.then((r) => r, () => ({ data: [], count: 0 }));
+  const q = (x) => x.then((r) => (r && r.error ? { data: null, count: 0 } : r), () => ({ data: null, count: 0 }));
   const [ex, rel, stf, itm, sub, dr, sales, sheets, ls] = await Promise.all([
     anyApprove ? q(sb.from('exceptions').select('level').eq('status', 'open')) : { data: [] },
     owner ? q(sb.from('release_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
@@ -42,15 +42,16 @@ async function render() {
     canItems ? q(sb.from('item_changes').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     anyApprove ? q(sb.from('entries').select('id,form_code,created_by').eq('status', 'submitted').limit(200)) : { data: [] },
     q(sb.from('entries').select('id', { count: 'exact', head: true }).eq('status', 'draft').eq('created_by', me)),
-    canPos ? q(sb.from('sales').select('location_id,sale_date,total,discount,pay_mode,status').gte('sale_date', from).limit(5000)) : { data: [] },
+    canPos ? q(sb.rpc('sales_summary', { p_from: from })) : { data: [] },
     (owner || (perms['14-1'] && perms['14-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '14-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
     owner ? q(sb.from('location_settings').select('location_id,value')) : { data: null },
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;
-  const sd = (sales.data || []);
-  const sToday = sd.filter((s) => s.sale_date === td && s.status === 'done'), voids = sd.filter((s) => s.sale_date === td && s.status === 'void').length;
+  const sd = (sales.data || []).map((r) => ({ ...r, total: Number(r.total || 0), discount: Number(r.discount || 0), n: Number(r.n || 0) }));
+  const sToday = sd.filter((s) => s.sale_date === td && s.status === 'done'), voids = sd.filter((s) => s.sale_date === td && s.status === 'void').reduce((a, r) => a + r.n, 0);
   const sum = (a, k = 'total') => a.reduce((s, x) => s + Number(x[k] || 0), 0);
+  const cnt = (a) => a.reduce((s, x) => s + x.n, 0);
   const locs = (B.ENV.locs || []).filter((l) => owner || S.ctx.roles.includes('management') || S.ctx.locations.includes(l.id));
   let missingLoc = 0;
   if (ls.data && B.SETTING_DEFS) missingLoc = Math.max(0, B.SETTING_DEFS.length * (B.ENV.locs || []).length - ls.data.filter((x) => x.value !== null && x.value !== undefined && x.value !== '').length);
@@ -70,7 +71,7 @@ async function render() {
     const mode = (m) => sum(sToday.filter((s) => s.pay_mode === m));
     html += `<div class="card panel dash"><h3>${esc(T('numbers'))}</h3>
       <div class="row between"><span>${esc(T('sales'))}</span><b class="dbig">${money(sum(sToday))}</b></div>
-      <div class="muted">${sToday.length} ${esc(T('count'))} · ${esc(T('yday'))} ${money(y)}</div>
+      <div class="muted">${cnt(sToday)} ${esc(T('count'))} · ${esc(T('yday'))} ${money(y)}</div>
       <div class="row wrap" style="margin:8px 0">${['cash', 'mobile', 'card', 'due'].map((m) => `<span class="chip">${esc(T(m === 'due' ? 'duem' : m))} ${money(mode(m))}</span>`).join('')}</div>
       ${sum(sToday, 'discount') ? `<div class="muted">${esc(T('disc'))}: ${money(sum(sToday, 'discount'))}</div>` : ''}
       ${locs.length > 1 ? `<div class="muted" style="margin-top:8px">${esc(T('perloc'))}</div>${locs.map((l) => `<div class="row between"><span>${esc(nm(l))}</span><b>${money(sum(sToday.filter((s) => s.location_id === l.id)))}</b></div>`).join('')}` : ''}

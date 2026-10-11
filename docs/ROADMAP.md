@@ -37,3 +37,8 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
 - 2026-10-11 (later) · P3a/b/c coded + locally tested (DB test4.sql all pass; UI pos_test.js, photo_test.js pass). `supabase/phase3.sql`
   NOT yet run on real Supabase, so the public site (islamia-bos-app) is NOT updated with POS/dashboard/photos yet.
   Next: audit agent on phase3, fix findings, then ask user to run phase3.sql once and push web/ to the public repo. Then P4 forms.
+- 2026-10-11 (audit round) · Audit agent found 14 issues in phase 3; fixed: offline queue (per-user, no lost/dropped sales, failed list),
+  offline sale keeps its own time, price-drift flag, storage policies scoped by form+location+size+jpeg, exception location scope,
+  dashboard uses `sales_summary` RPC (no 1000-row cap), digits normalised, POS can't be saved as a generic entry, input validation.
+  Left as owner decision: any POS-enter user may override a price (it creates a yellow exception) — tell owner.
+  Running now: 5 form-building agents (files web/forms_stock|cash|sales|factory|staff.js). Next: audit each, add script tags to index.html, run phase3.sql with user, push web/ to public repo.

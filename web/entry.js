@@ -417,7 +417,7 @@ async function drawExceptions(st) {
   $('#ex_body').innerHTML = r.data.map((x) => { const e = em.get(x.entry_id) || {};
     return `<div class="card stack"><div class="row between"><span class="chip ${x.level === 'red' ? 'bad' : 'warn'}">${x.level === 'red' ? '●' : '▲'} ${esc(x.level)}</span><span class="muted" style="font-size:.82rem">${esc(x.entry_date)} · ${esc(locName(x.location_id))}</span></div>
       <div><b>${esc(lab(x.text) || x.flag_code)}</b>${x.amount !== null ? ' · ' + esc(money(x.amount)) : ''}</div>
-      <div class="muted" style="font-size:.85rem">${esc(x.form_code)}-${esc((ENV.locs.find((l) => l.id === e.location_id) || {}).code || '')}-${e.serial || ''}</div>
+      <div class="muted" style="font-size:.85rem">${x.entry_id ? `${esc(x.form_code)}-${esc((ENV.locs.find((l) => l.id === e.location_id) || {}).code || '')}-${e.serial || ''}` : esc(x.form_code)}</div>
       ${x.status === 'open' ? `<div class="row">${x.entry_id ? `<button class="full" data-act="openentry" data-v="${x.entry_id}">${esc(t('open_entry'))}</button>` : `<button class="full" data-act="go" data-v="pos">POS</button>`}<button class="primary full" data-act="ex_resolve" data-v="${x.id}">${esc(t('resolve'))}</button></div>`
         : `<div class="muted" style="font-size:.85rem">${esc(staffName(x.resolved_staff))} · ${esc(x.resolved_note || '')}</div>`}</div>`; }).join('') || `<p class="muted center">${esc(t('ex_none'))}</p>`;
 }
