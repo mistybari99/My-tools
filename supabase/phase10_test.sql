@@ -14,8 +14,8 @@ truncate tt.res;
 create or replace function tt.chk(p_name text, p_ok boolean) returns void language plpgsql as $$
 begin insert into tt.res values (p_name, coalesce(p_ok,false)); raise notice '% %', case when coalesce(p_ok,false) then 'PASS' else 'FAIL' end, p_name; end $$;
 create or replace function tt.err(p_name text, p_sql text, p_msg text default '') returns void language plpgsql as $$
-begin execute p_sql; perform tt.chk(p_name, false);
-exception when others then perform tt.chk(p_name, sqlerrm like '%' || p_msg || '%'); end $$;
+begin execute p_sql; perform tt.chk(p_name, false); raise notice '  (it did not fail)';
+exception when others then perform tt.chk(p_name, sqlerrm like '%' || p_msg || '%'); if sqlerrm not like '%' || p_msg || '%' then raise notice '  (got: %)', sqlerrm; end if; end $$;
 create or replace function tt.cnt(p_sql text) returns bigint language plpgsql as $$ declare n bigint; begin execute 'select count(*) from (' || p_sql || ') x' into n; return n; end $$;
 create or replace function tt.as(p_sub text) returns void language plpgsql as $$
 begin perform set_config('request.jwt.claim.sub', p_sub, false); end $$;
@@ -63,8 +63,8 @@ select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":2,"price"
 reset role;
 select tt.chk('T1 sale of untracked / quick / tracked-but-no-opening: sales saved', :r1::int > 0 and :r2::int > 0 and :r3::int > 0);
 select tt.chk('T1 untracked and quick sales posted nothing', (select count(*) from stock_ledger where item_id=:'ic'::uuid)=0);
-select tt.chk('T1 tracked sale posts sale_out even before an opening (warn mode: negative, exception)', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=-2
-  and exists(select 1 from exceptions where flag_code='stock_negative'));
+select tt.chk('T1 tracked sale posts sale_out even before an opening (warn mode: negative) but NO stock_negative exception: the item was never opened', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=-2
+  and not exists(select 1 from exceptions where flag_code='stock_negative'));
 -- clean slate for the real tests: remove that sale's effect by voiding (owner)
 select tt.as(:'o'); set role authenticated;
 select void_sale(id,'test reset') from sales where lines::text like '%' || :'ia' || '%';
@@ -161,7 +161,8 @@ set role authenticated; select tt.as(:'o'); select set_grant('sell_below_zero','
 select tt.as(:'s');
 select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":8,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":2080}]',null,null,'retail',null,false) ->> 'id' as sgr \gset
 reset role;
-select tt.chk('T6 grant sell_below_zero lets it pass (stock -2), exception raised', (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-2 and (select count(*) from exceptions where flag_code='stock_negative' and sale_id=:'sgr'::uuid)=1);
+select tt.chk('T6 grant sell_below_zero lets it pass (stock -2); the yellow line is once per item / location / day (already written by the earlier sale today)', (select qty from stock_balance where item_id=:'id_'::uuid and location_id=1)=-2 and (select count(*) from exceptions where flag_code='stock_negative' and sale_id=:'sgr'::uuid)=0
+  and (select count(*) from exceptions where flag_code='stock_negative' and location_id=1 and entry_date=(now() at time zone 'Asia/Dhaka')::date and text->>'en' like '%' || (select code from items where id=:'id_'::uuid) || '%')=1);
 set role authenticated; select tt.as(:'o'); select set_grant('sell_below_zero','salesperson',false);
 -- emergency path
 select set_rule('em_sell_below_zero','true');
@@ -225,7 +226,7 @@ select tt.chk('T8 book 95 (100 - 5 written off), count 94: delta -1 posted', :dl
 select stock_count_adjust(:'ia',1,94,'again') ->> 'delta' as dlt2 \gset
 select tt.chk('T8 count equal to book posts nothing', :dlt2::numeric = 0);
 reset role;
-select tt.chk('T8 balance = counted 94; variance 1.05% beyond the 1% tolerance flagged', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=94 and exists(select 1 from exceptions where flag_code='count_variance'));
+select tt.chk('T8 balance = counted 94; variance 1.05% beyond the 1% tolerance flagged', (select qty from stock_balance where item_id=:'ia'::uuid and location_id=1)=94 and exists(select 1 from exceptions where flag_code='stock_count_variance') and not exists(select 1 from exceptions where flag_code='count_variance'));
 set role authenticated; select tt.as(:'o'); select set_rule('count_tolerance_pct',null);
 
 \echo == T9 transfers with an in-transit state
@@ -375,7 +376,7 @@ select tt.err('T12 salesperson cannot pay', format($$select pay_supplier(%L,1,'[
 -- opening balance (owed from before) is the oldest item
 select tt.as(:'o'); select save_supplier(:'sup3'::uuid,'{"opening_balance":200}');
 select tt.chk('T12 opening 200 counted as oldest debt: balance 700, but 200 of earlier payment now clears opening first', (select round(balance) from supplier_dues(null) where supplier_id=:'sup3'::uuid)=700);
-select tt.chk('T12 FIFO with opening: opening fully paid (1200 covers 200 + 1000), M-2 500, M-3 200 -> open 300+200 + 0 opening', (select sum(open_amt) from supplier_open_bills(:'sup3'::uuid))=700 - 0 and (select open_amt from supplier_open_bills(:'sup3'::uuid) where bill_no='M-2')=500 and (select count(*) from supplier_open_bills(:'sup3'::uuid) where bill_no='opening')=0);
+select tt.chk('T12 the payment was made AT location 1: it clears location 1 bills first (M-1 1000, M-2 200), the opening (no location) stays open: opening 200 + M-2 300 + M-3 200', (select sum(open_amt) from supplier_open_bills(:'sup3'::uuid))=700 and (select open_amt from supplier_open_bills(:'sup3'::uuid) where bill_no='M-2')=300 and (select open_amt from supplier_open_bills(:'sup3'::uuid) where bill_no='opening')=200);
 select save_supplier(:'sup3'::uuid,'{"opening_balance":null}');
 -- return credit also clears the oldest
 select tt.chk('T12 payables_summary company-wide equals sum of dues', (select total_payable from payables_summary(null)) = (select sum(balance) from supplier_dues(null)));
@@ -406,11 +407,21 @@ select tt.chk('T13 expiry_list(30h) lists both', (select count(*) from expiry_li
 select tt.as(:'s');
 select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":5,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":1300}]',null,null,'retail',null,false) ->> 'id' as sb \gset
 reset role;
-select tt.chk('T13 POS sells oldest batch first: batch1 15 left, batch2 untouched', (select qty_remaining from stock_batches where id=:bt1)=15 and (select qty_remaining from stock_batches where id=:bt2)=10);
-select tt.chk('T13 sale row carries batch_id', (select batch_id from stock_ledger where reason='sale_out' and ref_id=:'sb')=:bt1);
+select tt.chk('T13 POS sells the NOT-expired batch first: fresh batch 5 left, the expired old tray untouched (20)', (select qty_remaining from stock_batches where id=:bt1)=20 and (select qty_remaining from stock_batches where id=:bt2)=5);
+select tt.chk('T13 sale row carries batch_id of the fresh batch, no sold_expired exception', (select batch_id from stock_ledger where reason='sale_out' and ref_id=:'sb')=:bt2 and not exists(select 1 from exceptions where flag_code='sold_expired' and sale_id=:'sb'::uuid));
 set role authenticated; select tt.as(:'o'); select void_sale(:'sb'::uuid,'test');
 reset role;
-select tt.chk('T13 void restores the batch (20)', (select qty_remaining from stock_batches where id=:bt1)=20);
+select tt.chk('T13 void restores the batch (fresh 10, old 20)', (select qty_remaining from stock_batches where id=:bt1)=20 and (select qty_remaining from stock_batches where id=:bt2)=10);
+-- expired stock is sold LAST, and when it is sold the owner gets a RED line
+set role authenticated; select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":25,"price":260,"unit":"kg"}]',:'id_')::jsonb,0,'[{"mode":"cash","amount":6500}]',null,null,'retail',null,false) ->> 'id' as sexp \gset
+reset role;
+select tt.chk('T13 a sale of 25: fresh 10 first, then 15 from the expired tray (5 left); red exception sold_expired once for the sale', (select qty_remaining from stock_batches where id=:bt2)=0 and (select qty_remaining from stock_batches where id=:bt1)=5
+  and (select count(*) from exceptions where flag_code='sold_expired' and sale_id=:'sexp'::uuid and level='red')=1
+  and (select min(id) from stock_ledger where reason='sale_out' and ref_id=:'sexp') = (select id from stock_ledger where reason='sale_out' and ref_id=:'sexp' and batch_id=:bt2));
+set role authenticated; select tt.as(:'o'); select void_sale(:'sexp'::uuid,'test');
+reset role;
+select tt.chk('T13 void of that sale restores both batches', (select qty_remaining from stock_batches where id=:bt1)=20 and (select qty_remaining from stock_batches where id=:bt2)=10);
 set role authenticated; select tt.as(:'o');
 select stock_expire_batch(:bt1,'expired','end of day') ->> 'qty' as eq \gset
 select tt.chk('T13 expire batch writes off 20 to wastage, batch emptied, gone from expiry list', :eq::numeric=20 and (select qty_remaining from stock_batches where id=:bt1)=0 and (select count(*) from expiry_list(1,24) where batch_id=:bt1)=0

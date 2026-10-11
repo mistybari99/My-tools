@@ -219,6 +219,31 @@ drop trigger if exists audit_supplier_payments on public.supplier_payments;
 create trigger audit_supplier_payments after insert or update on public.supplier_payments for each row execute function public.log_change('id');
 drop trigger if exists audit_stock_wastage on public.stock_wastage;
 create trigger audit_stock_wastage after insert on public.stock_wastage for each row execute function public.log_change('id');
+drop trigger if exists audit_purchase_lines on public.purchase_lines;      -- the lines carry the costs: every change of a draft is on record
+create trigger audit_purchase_lines after insert or update or delete on public.purchase_lines for each row execute function public.log_change('id');
+
+-- a column added after the first release of this file
+alter table public.purchase_bills add column if not exists variance numeric;
+
+-- defence in depth: no NaN / Infinity / absurd number can ever sit in these tables (the functions refuse them first; this is the last wall).
+-- `between` is false for NaN and Infinity, and a NULL passes (NOT NULL columns say so themselves).
+do $$
+declare c record;
+begin
+  for c in select * from (values
+    ('stock_ledger',     'stock_ledger_finite',     'qty_delta between -1000000000000 and 1000000000000 and unit_cost between 0 and 1000000000000'),
+    ('stock_balance',    'stock_balance_finite',    'qty between -1000000000000 and 1000000000000 and avg_cost between 0 and 1000000000000'),
+    ('stock_batches',    'stock_batches_finite',    'qty_made between 0 and 1000000000000 and qty_remaining between 0 and 1000000000000'),
+    ('stock_wastage',    'stock_wastage_finite',    'qty between 0 and 1000000000000'),
+    ('stock_transfers',  'stock_transfers_finite',  'qty between 0 and 1000000000000 and received_qty between 0 and 1000000000000'),
+    ('purchase_bills',   'purchase_bills_finite',   'subtotal between 0 and 1000000000000 and discount between 0 and 1000000000000 and total between 0 and 1000000000000 and paid between 0 and 1000000000000 and variance between -1000000000000 and 1000000000000'),
+    ('purchase_lines',   'purchase_lines_finite',   'qty between 0 and 1000000000000 and unit_cost between 0 and 1000000000000 and amount between 0 and 1000000000000 and base_qty between 0 and 1000000000000 and unit_cost_base between 0 and 1000000000000'),
+    ('supplier_payments','supplier_payments_finite','amount between 0 and 1000000000000')) v(t, n, e) loop
+    if not exists (select 1 from pg_constraint where conname = c.n and conrelid = ('public.' || c.t)::regclass) then
+      execute format('alter table public.%I add constraint %I check (%s)', c.t, c.n, c.e);
+    end if;
+  end loop;
+end $$;
 
 -- ---------- (c) helpers (internal) ----------
 -- management and the owner can work at every location
@@ -231,7 +256,24 @@ $$;
 create or replace function public._may(p_code text, p_loc int, p_ref text default 'stock', p_amount numeric default null) returns boolean
 language plpgsql security definer set search_path = public as $$
 begin
-  return public.has_grant(p_code, p_loc) or public.use_emergency(p_code, p_loc, p_ref, p_amount, null);
+  return public.has_grant(p_code, p_loc) or public._use_em(p_code, p_loc, p_ref, p_amount);
+end $$;
+
+-- an emergency approval used inside the stock / purchase functions: use_emergency consumes it, and the owner gets a yellow line every time
+create or replace function public._use_em(p_grant text, p_loc int, p_ref text, p_amount numeric default null) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  if not public.use_emergency(p_grant, p_loc, p_ref, p_amount, null) then return false; end if;
+  perform public._stock_exc(p_loc, 'emergency_used', 'yellow', 'জরুরি অনুমোদনে কাজ হয়েছে: ' || p_grant || ' (' || left(coalesce(p_ref, ''), 60) || ')',
+    'An emergency approval was used: ' || p_grant || ' (' || left(coalesce(p_ref, ''), 60) || ')', null, null, 'EMERGENCY', p_amount);
+  return true;
+end $$;
+
+-- two requests with the same client id (a phone retry racing the first try) queue here, so the second one sees the first one's rows
+create or replace function public._client_lock(p_client uuid) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if p_client is not null then perform pg_advisory_xact_lock(hashtextextended('bos10:' || p_client::text, 0)); end if;
 end $$;
 
 -- may the caller see cost figures for this location?
@@ -273,7 +315,8 @@ end $$;
 
 -- weighted-average cost: the one rule used by the trigger and by the replay in stock_reconcile
 --   in with a cost  -> (old_qty * old_avg + qty * cost) / (old_qty + qty)   (old stock <= 0 or unknown cost: the new cost)
---   out             -> average unchanged, except a reversal / purchase return of a costed receipt, which takes its cost back out
+--   out             -> average unchanged, except a reversal of a costed receipt, which takes its cost back out
+--                      (a purchase return leaves the stock at the CURRENT average, so it never moves the average)
 create or replace function public._avg_next(p_qty numeric, p_avg numeric, p_delta numeric, p_cost numeric, p_reason text) returns numeric
 language plpgsql immutable as $$
 declare r numeric;
@@ -283,18 +326,18 @@ begin
     if p_avg is null or p_qty <= 0 then return round(p_cost, 6); end if;
     return round((p_qty * p_avg + p_delta * p_cost) / (p_qty + p_delta), 6);
   end if;
-  if p_reason in ('reversal', 'purchase_return') and p_cost is not null and p_avg is not null and p_qty + p_delta > 0 then
+  if p_reason = 'reversal' and p_cost is not null and p_avg is not null and p_qty + p_delta > 0 then
     r := (p_qty * p_avg + p_delta * p_cost) / (p_qty + p_delta);
     if r >= 0 then return round(r, 6); end if;
   end if;
   return p_avg;
 end $$;
 
--- one yellow / red line for the owner in the exceptions list (once per sale and flag)
+-- one yellow / red line for the owner in the exceptions list (once per sale, flag and text)
 create or replace function public._stock_exc(p_loc int, p_flag text, p_level text, p_bn text, p_en text, p_sale uuid default null, p_date date default null, p_form text default 'STOCK', p_amount numeric default null) returns void
 language plpgsql security definer set search_path = public as $$
 begin
-  if p_sale is not null and exists (select 1 from public.exceptions where sale_id = p_sale and flag_code = p_flag) then return; end if;
+  if p_sale is not null and exists (select 1 from public.exceptions where sale_id = p_sale and flag_code = p_flag and text->>'en' = p_en) then return; end if;
   insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
     values (null, p_sale, p_form, p_loc, coalesce(p_date, (now() at time zone 'Asia/Dhaka')::date), p_flag, p_level, p_amount, jsonb_build_object('bn', p_bn, 'en', p_en));
 end $$;
@@ -330,45 +373,67 @@ create trigger stock_ledger_balance after insert on public.stock_ledger for each
 
 -- THE ONLY WRITER of the ledger. Internal (no app role may call it).  p_qty is in the BASE unit.
 --   p_neg: 'full' = stock_negative_mode applies (allow / warn / block, block lifted by grant or emergency 'sell_below_zero')
---          'soft' = warn only (never blocks: reversals)   'none' = no check (opening, count adjustments, receipts)
--- A stock-out is taken from the oldest open batches first (a batch row per batch), the rest without a batch.  Returns the first ledger id.
+--          'soft' = warn only (never blocks: reversals, late-synced sales)   'none' = no check (opening, count adjustments, receipts)
+-- A stock-out is taken from the open batches: NOT-expired ones first (oldest expiry first), expired ones last (and a sale from an expired batch is a RED
+-- exception 'sold_expired'); the rest without a batch.  Returns the first ledger id.
+-- The same p_client (a re-sent request) returns the first ledger id again and writes nothing (checked under the balance row lock, so a race is safe).
 create or replace function public.stock_post(p_item uuid, p_loc int, p_qty numeric, p_reason text, p_ref_type text default null, p_ref_id text default null,
   p_unit_cost numeric default null, p_batch bigint default null, p_made_at timestamptz default null, p_note text default null,
   p_reverses bigint default null, p_neg text default 'full', p_sale uuid default null, p_client uuid default null) returns bigint
 language plpgsql security definer set search_path = public as $$
 declare q numeric := round(p_qty, 4); bal public.stock_balance; mode text; cost numeric; lid bigint; first_id bigint; b record; rem numeric; take numeric;
-        ic text; nm text; at_ timestamptz := coalesce(p_made_at, now()); ref text := coalesce(p_ref_type, '') || ':' || coalesce(p_ref_id, '');
+        ic text; nm text; ne text; en text; at_ timestamptz := coalesce(p_made_at, now()); ref text := coalesce(p_ref_type, '') || ':' || coalesce(p_ref_id, '');
+        d date := (coalesce(p_made_at, now()) at time zone 'Asia/Dhaka')::date; form text := case when p_sale is not null then 'POS' else 'STOCK' end;
 begin
-  if q is null or q = 'NaN'::numeric or q = 0 then raise exception 'bad_qty'; end if;
+  if q is null or not (abs(q) between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;            -- false for NaN and Infinity too
+  if p_unit_cost is not null and not (p_unit_cost between 0 and 1000000000000) then raise exception 'bad_cost'; end if;
   if p_neg not in ('full', 'soft', 'none') then raise exception 'bad_neg_mode'; end if;
   insert into public.stock_balance (item_id, location_id) values (p_item, p_loc) on conflict do nothing;
   select * into bal from public.stock_balance where item_id = p_item and location_id = p_loc for update;      -- serialises everyone touching this item here
+  if p_client is not null then
+    select id into lid from public.stock_ledger where client_id = p_client and reason = p_reason order by id limit 1;
+    if found then return lid; end if;
+  end if;
   -- negative stock
   if q < 0 and p_neg <> 'none' and bal.qty + q < 0 then
     mode := coalesce(public.rule_txt('stock_negative_mode'), 'warn');
     if mode <> 'allow' then
-      select code, name_bn into ic, nm from public.items where id = p_item;
+      select code, name_bn, name_en into ic, nm, ne from public.items where id = p_item;
       if mode = 'block' and p_neg = 'full' then
-        if not public._may('sell_below_zero', p_loc, ref) then
-          raise exception 'insufficient_stock' using detail = coalesce(ic, '') || ' ' || coalesce(nm, ''), hint = 'on hand ' || bal.qty::text;
+        -- the approval is asked ONCE per whole sale: when one line was let through, the other lines of the same sale are too
+        if p_sale is null or coalesce(current_setting('bos.neg_ok', true), '') <> p_sale::text then
+          -- (a POS sale already writes its own 'emergency_used' line for the sale, so the helper that writes one is used only outside a sale)
+          if not (public.has_grant('sell_below_zero', p_loc)
+                  or case when p_sale is not null then public.use_emergency('sell_below_zero', p_loc, ref, null, null) else public._use_em('sell_below_zero', p_loc, ref, null) end) then
+            raise exception 'insufficient_stock' using detail = coalesce(ic, '') || ' ' || coalesce(nm, ''), hint = 'on hand ' || bal.qty::text;
+          end if;
+          if p_sale is not null then perform set_config('bos.neg_ok', p_sale::text, true); end if;
         end if;
       end if;
-      perform public._stock_exc(p_loc, 'stock_negative', 'yellow',
-        coalesce(nm, '') || ' (' || coalesce(ic, '') || '): স্টকের চেয়ে বেশি বের হয়েছে — হিসাবে স্টক ঋণাত্মক',
-        coalesce(nm, '') || ' (' || coalesce(ic, '') || '): more went out than the stock on hand — the stock is now negative',
-        p_sale, (at_ at time zone 'Asia/Dhaka')::date, case when p_sale is not null then 'POS' else 'STOCK' end);
+      -- a yellow line for the owner, once per item / location / day, and only for an item that has been opened (a tracked item never opened is not "negative", it is not started)
+      en := coalesce(ne, nm, '') || ' (' || coalesce(ic, '') || '): more went out than the stock on hand — the stock is now negative';
+      if exists (select 1 from public.stock_ledger where item_id = p_item and location_id = p_loc and qty_delta > 0)
+         and not exists (select 1 from public.exceptions where flag_code = 'stock_negative' and location_id = p_loc and entry_date = d and text->>'en' = en) then
+        perform public._stock_exc(p_loc, 'stock_negative', 'yellow', coalesce(nm, '') || ' (' || coalesce(ic, '') || '): স্টকের চেয়ে বেশি বের হয়েছে — হিসাবে স্টক ঋণাত্মক', en, p_sale, d, form);
+      end if;
     end if;
   end if;
   cost := coalesce(p_unit_cost, case when q < 0 then bal.avg_cost end);
   if q < 0 and p_batch is null and p_reason in ('sale_out', 'issue_out', 'wastage', 'transfer_out', 'count_adjust', 'purchase_return') then
     rem := -q;
-    for b in select id, qty_remaining from public.stock_batches where item_id = p_item and location_id = p_loc and qty_remaining > 0
-             order by expires_at nulls last, made_at, id for update loop
+    for b in select id, qty_remaining, expires_at from public.stock_batches where item_id = p_item and location_id = p_loc and qty_remaining > 0
+             order by (expires_at is not null and expires_at <= at_), expires_at nulls last, made_at, id for update loop
       take := least(b.qty_remaining, rem);
       insert into public.stock_ledger (item_id, location_id, qty_delta, unit_cost, reason, ref_type, ref_id, batch_id, reverses_id, client_id, made_at, note, created_by)
         values (p_item, p_loc, -take, cost, p_reason, p_ref_type, p_ref_id, b.id, p_reverses, case when first_id is null then p_client end, at_, p_note, auth.uid()) returning id into lid;
-      update public.stock_batches set qty_remaining = qty_remaining - take where id = b.id;
+      -- a rest under 0.0005 of a base unit is conversion dust: the batch closes
+      update public.stock_batches set qty_remaining = case when qty_remaining - take < 0.0005 then 0 else qty_remaining - take end where id = b.id;
       first_id := coalesce(first_id, lid); rem := rem - take;
+      if p_reason = 'sale_out' and b.expires_at is not null and b.expires_at <= at_ then
+        select code, name_bn, name_en into ic, nm, ne from public.items where id = p_item;
+        perform public._stock_exc(p_loc, 'sold_expired', 'red', coalesce(nm, '') || ' (' || coalesce(ic, '') || '): মেয়াদ শেষ হওয়া মাল বিক্রি হয়েছে',
+          coalesce(ne, nm, '') || ' (' || coalesce(ic, '') || '): stock past its expiry was sold', p_sale, d, form);
+      end if;
       exit when rem <= 0;
     end loop;
     if rem > 0 then
@@ -382,7 +447,7 @@ begin
     values (p_item, p_loc, q, cost, p_reason, p_ref_type, p_ref_id, p_batch, p_reverses, p_client, at_, p_note, auth.uid()) returning id into lid;
   if p_batch is not null then
     if q < 0 then
-      update public.stock_batches set qty_remaining = qty_remaining + q where id = p_batch and qty_remaining + q >= 0;
+      update public.stock_batches set qty_remaining = case when qty_remaining + q < 0.0005 then 0 else qty_remaining + q end where id = p_batch and qty_remaining + q >= 0;
       if not found then raise exception 'batch_short'; end if;
     elsif p_reason in ('sale_void_in', 'reversal') then
       update public.stock_batches set qty_remaining = least(qty_made, qty_remaining + q) where id = p_batch;
@@ -394,15 +459,18 @@ end $$;
 -- ---------- (e) POS hook: sale_out when a sale is saved, sale_void_in when it is voided (tracked items only; record_sale2 is NOT changed) ----------
 create or replace function public._sale_stock_out() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare ln jsonb; it public.items; q numeric; bq numeric;
+declare ln jsonb; it public.items; q numeric; bq numeric; neg text;
 begin
   if new.status <> 'done' or new.lines is null or jsonb_typeof(new.lines) <> 'array' then return new; end if;
+  -- a sale that syncs late (an offline phone) has already happened: it is recorded, it never blocks (a yellow line still tells the owner)
+  neg := case when new.sold_at < now() - interval '2 minutes' then 'soft' else 'full' end;
   -- items in a fixed order, so two sales that share items can never wait on each other in a circle
   for ln in select x from jsonb_array_elements(new.lines) x where nullif(x->>'item_id', '') is not null order by x->>'item_id' loop
     select * into it from public.items where id = (ln->>'item_id')::uuid;
     if not found or not it.tracked then continue; end if;
     q := nullif(ln->>'qty', '')::numeric;
     if q is null or q <= 0 then continue; end if;
+    if not (q <= 999999999) then raise exception 'bad_qty'; end if;                    -- Infinity / NaN / absurd: the sale is refused
     bq := public._base_qty(it.id, q, ln->>'unit');
     if bq is null then
       perform public._stock_exc(new.location_id, 'stock_unit_unknown', 'yellow',
@@ -410,7 +478,9 @@ begin
         'Receipt ' || new.receipt || ': ' || coalesce(it.name_en, it.name_bn) || ' — the unit conversion is unknown, stock was NOT reduced', new.id, new.sale_date, 'POS');
       continue;
     end if;
-    perform public.stock_post(it.id, new.location_id, -bq, 'sale_out', 'sale', new.id::text, null, null, new.sold_at, null, null, 'full', new.id);
+    if not (bq <= 999999999) then raise exception 'bad_qty'; end if;
+    if round(bq, 4) = 0 then continue; end if;                                          -- under 0.00005 of a base unit: nothing to take out
+    perform public.stock_post(it.id, new.location_id, -bq, 'sale_out', 'sale', new.id::text, null, null, new.sold_at, null, null, neg, new.id);
   end loop;
   return new;
 end $$;
@@ -452,15 +522,18 @@ language plpgsql security definer set search_path = public as $$
 declare it public.items; bq numeric; f numeric; cost numeric; lid bigint;
 begin
   it := public._stock_guard(p_item, p_loc, 'stock_opening', (now() at time zone 'Asia/Dhaka')::date);
+  perform public._client_lock(p_client);
   if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'opening'; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
-  if p_qty is null or p_qty = 'NaN'::numeric or p_qty <= 0 then raise exception 'bad_qty'; end if;
-  if p_unit_cost is not null and (p_unit_cost = 'NaN'::numeric or p_unit_cost < 0) then raise exception 'bad_cost'; end if;
+  if p_qty is null or not (p_qty between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
+  if p_unit_cost is not null and not (p_unit_cost between 0 and 999999999) then raise exception 'bad_cost'; end if;
+  if p_unit_cost is not null and not public._cost_ok(p_loc) then raise exception 'not allowed'; end if;      -- cost is secret: only who may see it may write it
   if not public._may('stock_opening', p_loc, 'opening:' || p_item::text) then raise exception 'not allowed'; end if;
-  perform 1 from public.items where id = p_item for update;                       -- two people entering the same opening wait here
+  perform 1 from public.items where id = p_item for no key update;                -- two people entering the same opening wait here (NO KEY UPDATE: ledger inserts take a KEY SHARE lock on the item, so this can never deadlock with them)
   if exists (select 1 from public.stock_ledger where item_id = p_item and location_id = p_loc and reason = 'opening') then raise exception 'opening_exists'; end if;
   bq := public._base_qty(p_item, p_qty, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
   f := public._unit_factor_base(p_item, p_unit);
+  if f is null or not (f > 0) then raise exception 'unit_unknown'; end if;
   cost := case when p_unit_cost is null then null else p_unit_cost / f end;       -- cost given per p_unit -> per base unit
   lid := public.stock_post(p_item, p_loc, bq, 'opening', 'opening', null, cost, null, now(), left(p_note, 200), null, 'none', null, p_client);
   return jsonb_build_object('ledger_id', lid, 'qty', bq);
@@ -473,8 +546,9 @@ language plpgsql security definer set search_path = public as $$
 declare it public.items; bq numeric; lid bigint; wid uuid := gen_random_uuid(); lim numeric; sid text; nm text;
 begin
   it := public._stock_guard(p_item, p_loc, 'wastage_write_off', (now() at time zone 'Asia/Dhaka')::date);
-  if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'wastage'; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
-  if p_qty is null or p_qty = 'NaN'::numeric or p_qty <= 0 then raise exception 'bad_qty'; end if;
+  perform public._client_lock(p_client);
+  if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'wastage' order by id limit 1; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
+  if p_qty is null or not (p_qty between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
   if p_reason is null or not exists (select 1 from public.option_lists where list_code = 'wastage_reasons' and value_code = p_reason and active) then raise exception 'bad_reason'; end if;
   bq := public._base_qty(p_item, p_qty, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
@@ -483,10 +557,16 @@ begin
   if length(coalesce(p_photo, '')) > 300 then raise exception 'bad_photo'; end if;
   if not public._may('wastage_write_off', p_loc, 'wastage:' || p_item::text, bq) then raise exception 'not allowed'; end if;
   if p_batch is not null and not exists (select 1 from public.stock_batches where id = p_batch and item_id = p_item and location_id = p_loc) then raise exception 'batch_not_found'; end if;
-  lid := public.stock_post(p_item, p_loc, -bq, 'wastage', 'wastage', wid::text, null, p_batch, now(), left(p_note, 200), null, 'full', null, p_client);
-  select staff_id into sid from public.profiles where id = auth.uid();
-  insert into public.stock_wastage (id, item_id, location_id, qty, reason_code, note, photo, batch_id, ledger_id, created_by, created_staff)
-    values (wid, p_item, p_loc, bq, p_reason, left(p_note, 200), nullif(btrim(p_photo), ''), p_batch, lid, auth.uid(), sid);
+  begin
+    lid := public.stock_post(p_item, p_loc, -bq, 'wastage', 'wastage', wid::text, null, p_batch, now(), left(p_note, 200), null, 'full', null, p_client);
+    select staff_id into sid from public.profiles where id = auth.uid();
+    insert into public.stock_wastage (id, item_id, location_id, qty, reason_code, note, photo, batch_id, ledger_id, created_by, created_staff)
+      values (wid, p_item, p_loc, bq, p_reason, left(p_note, 200), nullif(btrim(p_photo), ''), p_batch, lid, auth.uid(), sid);
+  exception when unique_violation then          -- the same client id arrived twice at once: the first one wins, this one is the duplicate
+    select id into lid from public.stock_ledger where p_client is not null and client_id = p_client and reason = 'wastage' order by id limit 1;
+    if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if;
+    raise;
+  end;
   if p_reason = 'unknown' then
     nm := it.name_bn;
     perform public._stock_exc(p_loc, 'wastage_unknown', 'yellow', nm || ': নষ্ট মাল বাদ দেওয়া হয়েছে কিন্তু কারণ অজানা', coalesce(it.name_en, nm) || ': stock was written off with an unknown reason');
@@ -511,11 +591,13 @@ language plpgsql security definer set search_path = public as $$
 declare it public.items; bq numeric; bal public.stock_balance; d numeric; lid bigint; tol numeric;
 begin
   it := public._stock_guard(p_item, p_loc, 'stock_count_adjust', (now() at time zone 'Asia/Dhaka')::date);
-  if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'count_adjust'; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
-  if p_counted is null or p_counted = 'NaN'::numeric or p_counted < 0 then raise exception 'bad_qty'; end if;
+  perform public._client_lock(p_client);
+  if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'count_adjust' order by id limit 1; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
+  if p_counted is null or not (p_counted between 0 and 999999999) then raise exception 'bad_qty'; end if;
   if p_note is null or length(btrim(p_note)) = 0 then raise exception 'note_required'; end if;
   bq := public._base_qty(p_item, p_counted, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
+  if not (bq between 0 and 999999999) then raise exception 'bad_qty'; end if;
   if not public._may('stock_count_adjust', p_loc, 'count:' || p_item::text) then raise exception 'not allowed'; end if;
   insert into public.stock_balance (item_id, location_id) values (p_item, p_loc) on conflict do nothing;
   select * into bal from public.stock_balance where item_id = p_item and location_id = p_loc for update;
@@ -524,7 +606,7 @@ begin
   lid := public.stock_post(p_item, p_loc, d, 'count_adjust', 'count', null, null, null, now(), left(p_note, 200), null, 'none', null, p_client);
   tol := public.rule_num('count_tolerance_pct');
   if tol is not null and (bal.qty = 0 or abs(d) / abs(bal.qty) * 100 > tol) then
-    perform public._stock_exc(p_loc, 'count_variance', 'yellow', it.name_bn || ': গণনায় ' || d::text || ' পার্থক্য', coalesce(it.name_en, it.name_bn) || ': the count differs from the book by ' || d::text);
+    perform public._stock_exc(p_loc, 'stock_count_variance', 'yellow', it.name_bn || ': গণনায় ' || d::text || ' পার্থক্য', coalesce(it.name_en, it.name_bn) || ': the count differs from the book by ' || d::text);
   end if;
   return jsonb_build_object('ledger_id', lid, 'delta', d, 'qty', bq);
 end $$;
@@ -535,8 +617,9 @@ language plpgsql security definer set search_path = public as $$
 declare it public.items; bq numeric; lid bigint;
 begin
   it := public._stock_guard(p_item, p_loc, 'stock_issue', (now() at time zone 'Asia/Dhaka')::date);
-  if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'issue_out'; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
-  if p_qty is null or p_qty = 'NaN'::numeric or p_qty <= 0 then raise exception 'bad_qty'; end if;
+  perform public._client_lock(p_client);
+  if p_client is not null then select id into lid from public.stock_ledger where client_id = p_client and reason = 'issue_out' order by id limit 1; if found then return jsonb_build_object('dup', true, 'ledger_id', lid); end if; end if;
+  if p_qty is null or not (p_qty between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
   bq := public._base_qty(p_item, p_qty, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
   if not public._may('stock_issue', p_loc, 'issue:' || p_item::text, bq) then raise exception 'not allowed'; end if;
@@ -548,17 +631,32 @@ end $$;
 create or replace function public.stock_production_in(p_item uuid, p_loc int, p_qty numeric, p_made_at timestamptz default null, p_unit text default null,
   p_note text default null, p_client uuid default null, p_unit_cost numeric default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare it public.items; bq numeric; lid bigint; at_ timestamptz := coalesce(p_made_at, now()); sl jsonb; exp timestamptz; bid bigint; f numeric;
+declare it public.items; bq numeric; lid bigint; at_ timestamptz := coalesce(p_made_at, now()); sl jsonb; exp timestamptz; bid bigint; f numeric; ucb numeric; pct numeric; av numeric;
 begin
+  if at_ is null or at_ = 'infinity'::timestamptz or at_ = '-infinity'::timestamptz then raise exception 'bad_date'; end if;
   it := public._stock_guard(p_item, p_loc, 'stock_production', (at_ at time zone 'Asia/Dhaka')::date);
-  if p_client is not null then select id, batch_id into lid, bid from public.stock_ledger where client_id = p_client and reason = 'production_in'; if found then return jsonb_build_object('dup', true, 'ledger_id', lid, 'batch_id', bid); end if; end if;
-  if p_qty is null or p_qty = 'NaN'::numeric or p_qty <= 0 then raise exception 'bad_qty'; end if;
+  perform public._client_lock(p_client);
+  if p_client is not null then select id, batch_id into lid, bid from public.stock_ledger where client_id = p_client and reason = 'production_in' order by id limit 1; if found then return jsonb_build_object('dup', true, 'ledger_id', lid, 'batch_id', bid); end if; end if;
+  if p_qty is null or not (p_qty between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
   if at_ > now() + interval '10 minutes' then raise exception 'bad_date'; end if;
-  if p_unit_cost is not null and (p_unit_cost = 'NaN'::numeric or p_unit_cost < 0) then raise exception 'bad_cost'; end if;
+  if p_unit_cost is not null and not (p_unit_cost between 0 and 999999999) then raise exception 'bad_cost'; end if;
+  if p_unit_cost is not null and not public._cost_ok(p_loc) then raise exception 'not allowed'; end if;      -- cost is secret: only who may see it may write it
   bq := public._base_qty(p_item, p_qty, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
   if not public._may('stock_production', p_loc, 'production:' || p_item::text, bq) then raise exception 'not allowed'; end if;
   f := public._unit_factor_base(p_item, p_unit);
+  if f is null or not (f > 0) then raise exception 'unit_unknown'; end if;
+  -- the cost of what was made against the average cost already in stock: a big move is told to the owner (same limit as purchases, rule purchase_cost_jump_pct)
+  pct := public.rule_num('purchase_cost_jump_pct');
+  if p_unit_cost is not null and pct is not null then
+    ucb := p_unit_cost / f;
+    select avg_cost into av from public.stock_balance where item_id = p_item and location_id = p_loc;
+    if av is not null and av > 0 and abs(ucb - av) / av * 100 > pct then
+      perform public._stock_exc(p_loc, 'production_cost_jump', 'yellow',
+        it.name_bn || ': উৎপাদন খরচ গড় খরচের চেয়ে ' || round((ucb - av) / av * 100, 1)::text || '% বদলেছে',
+        coalesce(it.name_en, it.name_bn) || ': production cost moved ' || round((ucb - av) / av * 100, 1)::text || '% from the average cost in stock', null, (at_ at time zone 'Asia/Dhaka')::date, 'STOCK');
+    end if;
+  end if;
   sl := public.shelf_life_for(p_item, (at_ at time zone 'Asia/Dhaka')::date);
   exp := case when sl is null then null else at_ + ((sl->>'hours')::float8 * interval '1 hour') end;
   insert into public.stock_batches (item_id, location_id, made_at, qty_made, qty_remaining, expires_at, shelf_rule, note, created_by)
@@ -573,18 +671,26 @@ language plpgsql security definer set search_path = public as $$
 declare it public.items; bq numeric; tid uuid := gen_random_uuid(); sid text; t public.stock_transfers; lid bigint;
 begin
   it := public._stock_guard(p_item, p_from, 'stock_transfer', (now() at time zone 'Asia/Dhaka')::date);
+  perform public._client_lock(p_client);
   if p_client is not null then
     select * into t from public.stock_transfers where client_id = p_client;
     if found then return jsonb_build_object('dup', true, 'id', t.id, 'status', t.status); end if;
   end if;
   if p_to is null or p_to = p_from or not exists (select 1 from public.locations where id = p_to) then raise exception 'bad_location'; end if;
-  if p_qty is null or p_qty = 'NaN'::numeric or p_qty <= 0 then raise exception 'bad_qty'; end if;
+  if p_qty is null or not (p_qty between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
   bq := public._base_qty(p_item, p_qty, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
+  if not (bq between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
   if not public._may('stock_transfer', p_from, 'transfer:' || p_item::text, bq) then raise exception 'not allowed'; end if;
   select staff_id into sid from public.profiles where id = auth.uid();
-  insert into public.stock_transfers (id, client_id, from_location_id, to_location_id, item_id, qty, note, sent_by, sent_staff)
-    values (tid, p_client, p_from, p_to, p_item, bq, left(p_note, 200), auth.uid(), sid);
+  begin
+    insert into public.stock_transfers (id, client_id, from_location_id, to_location_id, item_id, qty, note, sent_by, sent_staff)
+      values (tid, p_client, p_from, p_to, p_item, bq, left(p_note, 200), auth.uid(), sid);
+  exception when unique_violation then          -- the same client id arrived twice at once: the first one wins
+    select * into t from public.stock_transfers where p_client is not null and client_id = p_client;
+    if found then return jsonb_build_object('dup', true, 'id', t.id, 'status', t.status); end if;
+    raise;
+  end;
   lid := public.stock_post(p_item, p_from, -bq, 'transfer_out', 'transfer', tid::text, null, null, now(), left(p_note, 200), null, 'full');
   return jsonb_build_object('id', tid, 'status', 'sent', 'qty', bq);
 end $$;
@@ -601,7 +707,7 @@ begin
   it := public._stock_guard(t.item_id, t.to_location_id, 'stock_transfer', (now() at time zone 'Asia/Dhaka')::date);
   if not public._may('stock_transfer', t.to_location_id, 'receive:' || p_id::text, t.qty) then raise exception 'not allowed'; end if;
   rq := coalesce(p_received_qty, t.qty);
-  if rq = 'NaN'::numeric or rq < 0 then raise exception 'bad_qty'; end if;
+  if not (rq between 0 and 999999999) then raise exception 'bad_qty'; end if;
   if rq > t.qty then raise exception 'over_received'; end if;
   rem := rq;
   for o in select * from public.stock_ledger where ref_type = 'transfer' and ref_id = t.id::text and reason = 'transfer_out' order by id loop
@@ -650,22 +756,25 @@ create or replace function public.stock_levels(p_loc int default null, p_filters
 returns table (item_id uuid, code text, name_bn text, name_en text, category text, base_unit text, location_id int, qty numeric, min_stock numeric, below_min boolean, avg_cost numeric, value numeric)
 language plpgsql stable security definer set search_path = public as $$
 #variable_conflict use_column
-declare f jsonb := coalesce(p_filters, '{}'::jsonb); ids uuid[];
+declare f jsonb := coalesce(p_filters, '{}'::jsonb); ids uuid[]; locs int[]; clocs int[];
 begin
   if not public.is_active() then raise exception 'not allowed'; end if;
   if p_loc is not null and not public.can_loc(p_loc) then raise exception 'not allowed for this location'; end if;
+  -- who may see which location is worked out ONCE (a few locations), never per row (thousands of items)
+  select coalesce(array_agg(x.id), '{}') into locs from public.locations x where public.can_loc(x.id);
+  select coalesce(array_agg(x.id), '{}') into clocs from public.locations x where x.id = any (locs) and public._cost_ok(x.id);
   if f ? 'item_ids' and jsonb_typeof(f->'item_ids') = 'array' then select array_agg(x::uuid) into ids from jsonb_array_elements_text(f->'item_ids') x; end if;
   return query
     select i.id, i.code, i.name_bn, i.name_en, i.category, public._item_base(i.id), l.id,
            coalesce(b.qty, 0), i.min_stock,
            (i.min_stock is not null and coalesce(b.qty, 0) < i.min_stock),
-           case when public._cost_ok(l.id) then b.avg_cost end,
-           case when public._cost_ok(l.id) and b.avg_cost is not null then round(b.qty * b.avg_cost, 2) end
+           case when l.id = any (clocs) then b.avg_cost end,
+           case when l.id = any (clocs) and b.avg_cost is not null then round(b.qty * b.avg_cost, 2) end
     from public.items i
     cross join public.locations l
     left join public.stock_balance b on b.item_id = i.id and b.location_id = l.id
     where i.tracked and i.is_active
-      and public.can_loc(l.id) and (p_loc is null or l.id = p_loc)
+      and l.id = any (locs) and (p_loc is null or l.id = p_loc)
       and (b.item_id is not null or p_loc is not null)
       and (coalesce((f->>'include_zero')::boolean, false) or p_loc is not null or coalesce(b.qty, 0) <> 0)
       and (f->>'category' is null or i.category = f->>'category')
@@ -686,10 +795,14 @@ create or replace function public.stock_ledger_rows(p_loc int, p_item uuid defau
 returns table (id bigint, item_id uuid, location_id int, qty_delta numeric, unit_cost numeric, reason text, ref_type text, ref_id text, batch_id bigint, made_at timestamptz, note text, created_by uuid, reverses_id bigint)
 language plpgsql stable security definer set search_path = public as $$
 #variable_conflict use_column
+declare ck boolean; pk boolean;
 begin
   if not public.can_loc(p_loc) then raise exception 'not allowed for this location'; end if;
+  ck := public._cost_ok(p_loc); pk := public._pur_ok(p_loc);             -- once: every row here is at p_loc
   return query
-    select l.id, l.item_id, l.location_id, l.qty_delta, case when public._cost_ok(l.location_id) then l.unit_cost end, l.reason, l.ref_type, l.ref_id, l.batch_id, l.made_at, l.note, l.created_by, l.reverses_id
+    select l.id, l.item_id, l.location_id, l.qty_delta, case when ck then l.unit_cost end, l.reason, l.ref_type,
+           case when l.ref_type = 'purchase' and not pk then null else l.ref_id end,          -- a purchase id would open the bill (costs): only the purchase people get it
+           l.batch_id, l.made_at, l.note, l.created_by, l.reverses_id
     from public.stock_ledger l
     where l.location_id = p_loc and (p_item is null or l.item_id = p_item)
       and (p_from is null or (l.made_at at time zone 'Asia/Dhaka')::date >= p_from) and (p_to is null or (l.made_at at time zone 'Asia/Dhaka')::date <= p_to)
@@ -710,53 +823,66 @@ $$;
 -- batches that expire within p_hours_ahead hours (already expired ones included). No shelf-life rule -> the batch has no expiry and never shows here.
 create or replace function public.expiry_list(p_loc int default null, p_hours_ahead numeric default 24)
 returns table (batch_id bigint, item_id uuid, code text, name_bn text, name_en text, location_id int, made_at timestamptz, expires_at timestamptz, qty_remaining numeric, hours_left numeric, expired boolean)
-language sql stable security definer set search_path = public as $$
-  select b.id, b.item_id, i.code, i.name_bn, i.name_en, b.location_id, b.made_at, b.expires_at, b.qty_remaining,
-         round((extract(epoch from (b.expires_at - now())) / 3600)::numeric, 2), b.expires_at <= now()
-  from public.stock_batches b join public.items i on i.id = b.item_id
-  where b.qty_remaining > 0 and b.expires_at is not null and public.can_loc(b.location_id)
-    and (p_loc is null or b.location_id = p_loc)
-    and b.expires_at <= now() + (coalesce(p_hours_ahead, 24)::float8 * interval '1 hour')
-  order by b.expires_at, b.id;
-$$;
+language plpgsql stable security definer set search_path = public as $$
+#variable_conflict use_column
+declare locs int[]; hrs numeric := coalesce(p_hours_ahead, 24);
+begin
+  if not (hrs between -1000000 and 1000000) then hrs := 24; end if;     -- NaN / Infinity / absurd -> the default
+  select coalesce(array_agg(x.id), '{}') into locs from public.locations x where public.can_loc(x.id);
+  return query
+    select b.id, b.item_id, i.code, i.name_bn, i.name_en, b.location_id, b.made_at, b.expires_at, b.qty_remaining,
+           round((extract(epoch from (b.expires_at - now())) / 3600)::numeric, 2), b.expires_at <= now()
+    from public.stock_batches b join public.items i on i.id = b.item_id
+    where b.qty_remaining > 0 and b.expires_at is not null and b.location_id = any (locs)
+      and (p_loc is null or b.location_id = p_loc)
+      and b.expires_at <= now() + (hrs::float8 * interval '1 hour')
+    order by b.expires_at, b.id;
+end $$;
 
 -- stock value at average cost (cost-gated: only locations where the caller may see cost)
 create or replace function public.stock_valuation(p_loc int default null)
 returns table (location_id int, item_id uuid, code text, name_bn text, qty numeric, avg_cost numeric, value numeric)
 language plpgsql stable security definer set search_path = public as $$
 #variable_conflict use_column
+declare clocs int[];
 begin
   if not public.is_active() then raise exception 'not allowed'; end if;
   if p_loc is not null and not (public.can_loc(p_loc) and public._cost_ok(p_loc)) then raise exception 'not allowed'; end if;
+  select coalesce(array_agg(x.id), '{}') into clocs from public.locations x where public.can_loc(x.id) and public._cost_ok(x.id);     -- once, not per row
   return query
     select b.location_id, b.item_id, i.code, i.name_bn, b.qty, b.avg_cost, round(b.qty * b.avg_cost, 2)
     from public.stock_balance b join public.items i on i.id = b.item_id
     where b.qty <> 0 and b.avg_cost is not null and (p_loc is null or b.location_id = p_loc)
-      and public.can_loc(b.location_id) and public._cost_ok(b.location_id)
+      and b.location_id = any (clocs)
     order by b.location_id, i.code;
 end $$;
 
 -- owner: does the cache equal the ledger?  p_fix = true rewrites the CACHE (never the ledger) from the ledger.
+-- With p_fix every balance row is locked while its ledger is replayed, so a sale that is being posted can never be overwritten by a stale recount.
 create or replace function public.stock_reconcile(p_fix boolean default false)
 returns table (item_id uuid, location_id int, ledger_qty numeric, cached_qty numeric, qty_diff numeric, cached_avg numeric, replay_avg numeric)
 language plpgsql security definer set search_path = public as $$
 #variable_conflict use_column
-declare r record; l record; q numeric; a numeric;
+declare r record; l record; q numeric; a numeric; bq numeric; bavg numeric;
 begin
   if not public.is_owner() then raise exception 'not allowed'; end if;
   for r in
-    select coalesce(s.item_id, b.item_id) iid, coalesce(s.location_id, b.location_id) lid, coalesce(s.sq, 0) sq, coalesce(b.qty, 0) bq, b.avg_cost bavg
-    from (select item_id, location_id, sum(qty_delta) sq from public.stock_ledger group by 1, 2) s
-    full join public.stock_balance b on b.item_id = s.item_id and b.location_id = s.location_id loop
+    select k.iid, k.lid from (select x.item_id iid, x.location_id lid from public.stock_ledger x group by 1, 2
+                              union select y.item_id, y.location_id from public.stock_balance y) k order by 1, 2 loop
+    if p_fix then
+      insert into public.stock_balance (item_id, location_id) values (r.iid, r.lid) on conflict do nothing;
+      perform 1 from public.stock_balance z where z.item_id = r.iid and z.location_id = r.lid for update;     -- nobody can post to this pair until we are done
+    end if;
+    select z.qty, z.avg_cost into bq, bavg from public.stock_balance z where z.item_id = r.iid and z.location_id = r.lid;
+    bq := coalesce(bq, 0);
     q := 0; a := null;
-    for l in select qty_delta, unit_cost, reason from public.stock_ledger x where x.item_id = r.iid and x.location_id = r.lid order by x.id loop
+    for l in select x.qty_delta, x.unit_cost, x.reason from public.stock_ledger x where x.item_id = r.iid and x.location_id = r.lid order by x.id loop
       a := public._avg_next(q, a, l.qty_delta, l.unit_cost, l.reason); q := q + l.qty_delta;
     end loop;
-    if r.sq <> r.bq or r.bavg is distinct from a then
-      item_id := r.iid; location_id := r.lid; ledger_qty := r.sq; cached_qty := r.bq; qty_diff := r.bq - r.sq; cached_avg := r.bavg; replay_avg := a;
+    if q <> bq or bavg is distinct from a then
+      item_id := r.iid; location_id := r.lid; ledger_qty := q; cached_qty := bq; qty_diff := bq - q; cached_avg := bavg; replay_avg := a;
       if p_fix then
-        insert into public.stock_balance (item_id, location_id, qty, avg_cost) values (r.iid, r.lid, r.sq, a)
-          on conflict (item_id, location_id) do update set qty = excluded.qty, avg_cost = excluded.avg_cost, updated_at = now();
+        update public.stock_balance z set qty = q, avg_cost = a, updated_at = now() where z.item_id = r.iid and z.location_id = r.lid;
       end if;
       return next;
     end if;
@@ -765,25 +891,36 @@ end $$;
 
 -- ---------- (h) purchases and the supplier ledger ----------
 -- Supplier balance = opening + posted bills - returns - payments (positive = we owe). Payments made with a bill are tied to it; later (general)
--- payments and returns clear the OLDEST open bills first, the same idea as customer dues. The allocation is computed, never stored, so a void just re-flows.
+-- payments and returns clear open bills like customer dues, in two steps: (1) a payment / return made AT a location clears the oldest open bills OF THAT
+-- LOCATION first; (2) what is left over (a location with nothing open, or more credit than bills there, or a credit opening balance) clears the
+-- oldest open bills of the supplier anywhere. The allocation is computed, never stored, so a void just re-flows.
 create or replace function public._sup_open(p_supplier uuid default null)
 returns table (supplier_id uuid, bill_id uuid, bill_no text, bill_date date, location_id int, rem numeric, open_amt numeric)
 language sql stable security definer set search_path = public as $$
   with bills as (
-    select b.supplier_id, b.id bill_id, b.bill_no, b.bill_date, b.location_id, b.total - b.paid rem, coalesce(b.posted_at, b.created_at) ord_at
+    select b.supplier_id, b.id bill_id, b.bill_no, b.bill_date, b.location_id, b.total - b.paid rem, coalesce(b.posted_at, b.created_at) ord_at, coalesce(b.location_id, -1) lk
     from public.purchase_bills b where b.status = 'posted' and b.kind = 'bill' and b.total - b.paid > 0 and (p_supplier is null or b.supplier_id = p_supplier)
     union all
-    select s.id, null, 'opening', null, null, s.opening_balance, '-infinity'::timestamptz
+    select s.id, null::uuid, 'opening', null::date, null::int, s.opening_balance, '-infinity'::timestamptz, -1
     from public.suppliers s where s.opening_balance > 0 and (p_supplier is null or s.id = p_supplier)),
-  cr as (
-    select supplier_id, sum(x) credit from (
-      select p.supplier_id, p.amount x from public.supplier_payments p where not p.voided and p.bill_id is null and (p_supplier is null or p.supplier_id = p_supplier)
-      union all select b.supplier_id, b.total from public.purchase_bills b where b.status = 'posted' and b.kind = 'return' and (p_supplier is null or b.supplier_id = p_supplier)
-      union all select s.id, -s.opening_balance from public.suppliers s where s.opening_balance < 0 and (p_supplier is null or s.id = p_supplier)) z group by 1),
-  cum as (select bills.*, sum(rem) over (partition by bills.supplier_id order by bills.bill_date nulls first, bills.ord_at, bills.bill_id) c from bills)
-  select cum.supplier_id, cum.bill_id, cum.bill_no, cum.bill_date, cum.location_id, cum.rem,
-         cum.rem - least(cum.rem, greatest(0, coalesce(cr.credit, 0) - (cum.c - cum.rem)))
-  from cum left join cr on cr.supplier_id = cum.supplier_id;
+  lc as (                                                                                     -- credit made at a location
+    select z.supplier_id, z.lk, sum(z.x) credit from (
+      select p.supplier_id, p.location_id lk, p.amount x from public.supplier_payments p where not p.voided and p.bill_id is null and (p_supplier is null or p.supplier_id = p_supplier)
+      union all select b.supplier_id, b.location_id, b.total from public.purchase_bills b where b.status = 'posted' and b.kind = 'return' and (p_supplier is null or b.supplier_id = p_supplier)) z
+    group by 1, 2),
+  oc as (select s.id supplier_id, -s.opening_balance credit from public.suppliers s where s.opening_balance < 0 and (p_supplier is null or s.id = p_supplier)),
+  c1 as (select bills.*, sum(bills.rem) over (partition by bills.supplier_id, bills.lk order by bills.bill_date nulls first, bills.ord_at, bills.bill_id) c from bills),
+  a1 as (                                                                                     -- step 1: same location
+    select c1.supplier_id, c1.bill_id, c1.bill_no, c1.bill_date, c1.location_id, c1.rem, c1.ord_at,
+           c1.rem - least(c1.rem, greatest(0, coalesce(lc.credit, 0) - (c1.c - c1.rem))) rem2
+    from c1 left join lc on lc.supplier_id = c1.supplier_id and lc.lk = c1.lk),
+  pool as (                                                                                   -- what step 1 did not use
+    select z.supplier_id, sum(z.credit) - coalesce((select sum(a1.rem - a1.rem2) from a1 where a1.supplier_id = z.supplier_id), 0) spill
+    from (select lc.supplier_id, lc.credit from lc union all select oc.supplier_id, oc.credit from oc) z group by 1),
+  c2 as (select a1.*, sum(a1.rem2) over (partition by a1.supplier_id order by a1.bill_date nulls first, a1.ord_at, a1.bill_id) cc from a1)
+  select c2.supplier_id, c2.bill_id, c2.bill_no, c2.bill_date, c2.location_id, c2.rem,
+         c2.rem2 - least(c2.rem2, greatest(0, coalesce(pool.spill, 0) - (c2.cc - c2.rem2)))
+  from c2 left join pool on pool.supplier_id = c2.supplier_id;
 $$;
 
 create or replace function public._sup_balance(p_supplier uuid) returns numeric
@@ -793,18 +930,53 @@ language sql stable security definer set search_path = public as $$
        - coalesce((select sum(amount) from public.supplier_payments where supplier_id = p_supplier and not voided), 0);
 $$;
 
+-- A return must stay inside the bill it points to: per item, quantity <= the bill's quantity minus what earlier (non-void) returns already took back,
+-- and the unit cost <= the bill's unit cost. p_lines: [{"item_id","description","qty","unit","unit_cost"}] (unit already resolved). p_exclude = the return itself.
+-- p_posted_only: at posting only POSTED earlier returns count (two drafts must not block each other).
+create or replace function public._return_check(p_ref uuid, p_exclude uuid, p_lines jsonb, p_posted_only boolean default false) returns void
+language plpgsql stable security definer set search_path = public as $$
+declare r record;
+begin
+  for r in
+    with rl as (
+      select z.k, sum(z.bq) q, max(z.ucb) uc from (
+        select case when nullif(e->>'item_id', '') is not null then e->>'item_id' else 'd:' || lower(btrim(coalesce(e->>'description', ''))) end k,
+               coalesce(public._base_qty(nullif(e->>'item_id', '')::uuid, (e->>'qty')::numeric, nullif(e->>'unit', '')), (e->>'qty')::numeric) bq,
+               (e->>'unit_cost')::numeric / coalesce(nullif(public._unit_factor_base(nullif(e->>'item_id', '')::uuid, nullif(e->>'unit', '')), 0), 1) ucb
+        from jsonb_array_elements(p_lines) e) z group by z.k),
+    bl as (
+      select z.k, sum(z.bq) q, max(z.ucb) uc from (
+        select case when pl.item_id is not null then pl.item_id::text else 'd:' || lower(btrim(coalesce(pl.description, ''))) end k,
+               coalesce(public._base_qty(pl.item_id, pl.qty, pl.unit), pl.qty) bq,
+               pl.unit_cost / coalesce(nullif(public._unit_factor_base(pl.item_id, pl.unit), 0), 1) ucb
+        from public.purchase_lines pl where pl.bill_id = p_ref) z group by z.k),
+    dn as (
+      select z.k, sum(z.bq) q from (
+        select case when pl.item_id is not null then pl.item_id::text else 'd:' || lower(btrim(coalesce(pl.description, ''))) end k,
+               coalesce(public._base_qty(pl.item_id, pl.qty, pl.unit), pl.qty) bq
+        from public.purchase_lines pl join public.purchase_bills x on x.id = pl.bill_id
+        where x.ref_bill_id = p_ref and x.kind = 'return' and x.id is distinct from p_exclude
+          and (x.status = 'posted' or (x.status = 'draft' and not p_posted_only))) z group by z.k)
+    select rl.k, rl.q rq, rl.uc ruc, bl.q bq, bl.uc buc, coalesce(dn.q, 0) dq
+    from rl left join bl on bl.k = rl.k left join dn on dn.k = rl.k loop
+    if r.bq is null or r.rq > r.bq - r.dq + 0.00005 then raise exception 'return_exceeds_bill'; end if;
+    if r.ruc > r.buc * 1.000001 + 0.000001 then raise exception 'return_cost_above_bill'; end if;
+  end loop;
+end $$;
+
 -- write (or change, while it is still a draft) a purchase bill / return. Lines: [{"item_id":uuid | "description":"gas cylinder","qty":10,"unit":"kg","unit_cost":120}]
 -- p_client makes a re-sent request return the same bill. Totals are computed here.
+-- A RETURN must name the bill it returns from (p_ref_bill); only the owner may write one without (it then shows as a red exception when posted).
 create or replace function public.save_purchase(p_client uuid, p_id uuid, p_supplier uuid, p_loc int, p_bill_no text, p_bill_date date, p_lines jsonb,
   p_discount numeric default 0, p_note text default null, p_photo text default null, p_kind text default 'bill', p_ref_bill uuid default null, p_reason text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare pb public.purchase_bills; ln jsonb; it public.items; n int := 0; qty numeric; uc numeric; amt numeric; sub numeric := 0; disc numeric := coalesce(p_discount, 0);
-        un text; bid uuid := p_id; sid text; ref public.purchase_bills; gcode text;
+        un text; bid uuid := p_id; sid text; ref public.purchase_bills; gcode text; norm jsonb := '[]'::jsonb;
 begin
   if p_kind not in ('bill', 'return') then raise exception 'bad_kind'; end if;
   gcode := case p_kind when 'return' then 'purchase_return' else 'purchase_entry' end;
   if not public.is_active() or not public.can_loc(p_loc) then raise exception 'not allowed'; end if;
-  if p_client is not null then
+  if p_client is not null and p_id is null then          -- editing a draft (p_id) is never a "duplicate"
     select * into pb from public.purchase_bills where client_id = p_client;
     if found then
       if pb.created_by is distinct from auth.uid() then raise exception 'client_id_taken'; end if;
@@ -817,37 +989,45 @@ begin
     if pb.status <> 'draft' then raise exception 'not_draft'; end if;
     if pb.kind <> p_kind or pb.location_id <> p_loc then raise exception 'cannot_change_kind_or_location'; end if;
   end if;
-  if not (public.has_grant(gcode, p_loc) or public.use_emergency(gcode, p_loc, 'save_purchase', null, null)) then raise exception 'not allowed'; end if;
-  if p_bill_date is null or p_bill_date > (now() at time zone 'Asia/Dhaka')::date + 1 then raise exception 'bad_date'; end if;
+  if not (public.has_grant(gcode, p_loc) or public._use_em(gcode, p_loc, 'save_purchase', null)) then raise exception 'not allowed'; end if;
+  if p_bill_date is null or not (p_bill_date <= (now() at time zone 'Asia/Dhaka')::date + 1) then raise exception 'bad_date'; end if;
   if not exists (select 1 from public.suppliers where id = p_supplier and active) then raise exception 'supplier_not_found'; end if;
   if p_lines is null or jsonb_typeof(p_lines) <> 'array' or jsonb_array_length(p_lines) = 0 then raise exception 'no_lines'; end if;
-  if disc = 'NaN'::numeric or disc < 0 then raise exception 'bad_discount'; end if;
+  if not (disc between 0 and 999999999999) then raise exception 'bad_discount'; end if;      -- false for NaN / Infinity
   if length(coalesce(p_photo, '')) > 300 then raise exception 'bad_photo'; end if;
   if p_kind = 'return' then
     if p_reason is null or not exists (select 1 from public.option_lists where list_code = 'return_reasons' and value_code = p_reason and active) then raise exception 'reason_required'; end if;
-    if p_ref_bill is not null then
+    if p_ref_bill is null then
+      if not public.is_owner() then raise exception 'return_needs_bill'; end if;
+    else
       select * into ref from public.purchase_bills where id = p_ref_bill;
-      if not found or ref.supplier_id <> p_supplier or ref.kind <> 'bill' then raise exception 'bad_ref_bill'; end if;
+      if not found or ref.supplier_id <> p_supplier or ref.kind <> 'bill' or ref.status <> 'posted' then raise exception 'bad_ref_bill'; end if;
     end if;
   elsif p_ref_bill is not null then raise exception 'bad_ref_bill';
   end if;
-  if nullif(btrim(p_bill_no), '') is not null and exists (select 1 from public.purchase_bills where supplier_id = p_supplier and lower(bill_no) = lower(btrim(p_bill_no)) and kind = p_kind and status <> 'void' and id is distinct from bid) then
+  if nullif(btrim(p_bill_no), '') is not null and exists (select 1 from public.purchase_bills where supplier_id = p_supplier and lower(bill_no) = lower(btrim(p_bill_no)) and kind = p_kind and status <> 'void'
+       and id is distinct from bid and (p_client is null or client_id is distinct from p_client)) then
     raise exception 'duplicate_bill';
   end if;
   -- validate lines first (nothing is written if one is wrong)
   for ln in select * from jsonb_array_elements(p_lines) loop
     qty := nullif(ln->>'qty', '')::numeric; uc := nullif(ln->>'unit_cost', '')::numeric;
-    if qty is null or qty = 'NaN'::numeric or qty <= 0 then raise exception 'bad_qty'; end if;
-    if uc is null or uc = 'NaN'::numeric or uc < 0 then raise exception 'bad_cost'; end if;
+    if qty is null or not (qty between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
+    if uc is null or not (uc between 0 and 999999999) then raise exception 'bad_cost'; end if;
+    it := null; un := nullif(ln->>'unit', '');
     if nullif(ln->>'item_id', '') is not null then
       select * into it from public.items where id = (ln->>'item_id')::uuid;
       if not found or not it.is_active then raise exception 'item_not_found'; end if;
-      if it.tracked and public._base_qty(it.id, 1, coalesce(nullif(ln->>'unit', ''), it.unit)) is null then raise exception 'unit_unknown'; end if;
+      un := coalesce(un, it.unit);
+      if it.tracked and public._base_qty(it.id, 1, un) is null then raise exception 'unit_unknown'; end if;
     elsif nullif(btrim(ln->>'description'), '') is null then raise exception 'description_required';
     end if;
     sub := sub + round(qty * uc, 2);
+    if not (sub <= 999999999999) then raise exception 'bad_amount'; end if;
+    norm := norm || jsonb_build_array(jsonb_build_object('item_id', it.id, 'description', nullif(btrim(ln->>'description'), ''), 'qty', qty, 'unit', un, 'unit_cost', uc));
   end loop;
   if disc > sub then raise exception 'bad_discount'; end if;
+  if p_kind = 'return' and p_ref_bill is not null then perform public._return_check(p_ref_bill, bid, norm); end if;
   select staff_id into sid from public.profiles where id = auth.uid();
   if bid is null then
     begin
@@ -855,7 +1035,7 @@ begin
         values (p_client, p_kind, p_supplier, nullif(btrim(p_bill_no), ''), p_bill_date, p_loc, 'draft', sub, round(disc, 2), sub - round(disc, 2), left(p_note, 300), nullif(btrim(p_photo), ''), p_reason, p_ref_bill, auth.uid(), sid)
         returning id into bid;
     exception when unique_violation then
-      select * into pb from public.purchase_bills where client_id = p_client;
+      select * into pb from public.purchase_bills where p_client is not null and client_id = p_client;
       if found and pb.created_by = auth.uid() then return jsonb_build_object('id', pb.id, 'status', pb.status, 'total', pb.total, 'dup', true); end if;
       raise exception 'duplicate_bill';
     end;
@@ -864,36 +1044,52 @@ begin
       note = left(p_note, 300), photo = nullif(btrim(p_photo), ''), reason_code = p_reason, ref_bill_id = p_ref_bill where id = bid;
     delete from public.purchase_lines where bill_id = bid;
   end if;
-  for ln in select * from jsonb_array_elements(p_lines) loop
-    n := n + 1; qty := (ln->>'qty')::numeric; uc := (ln->>'unit_cost')::numeric; amt := round(qty * uc, 2); un := null; it := null;
-    if nullif(ln->>'item_id', '') is not null then
-      select * into it from public.items where id = (ln->>'item_id')::uuid;
-      un := coalesce(nullif(ln->>'unit', ''), it.unit);
-    else un := nullif(ln->>'unit', '');
-    end if;
+  for ln in select * from jsonb_array_elements(norm) loop
+    n := n + 1; qty := (ln->>'qty')::numeric; uc := (ln->>'unit_cost')::numeric; amt := round(qty * uc, 2);
     insert into public.purchase_lines (bill_id, line_no, item_id, description, qty, unit, unit_cost, amount)
-      values (bid, n, it.id, left(nullif(btrim(ln->>'description'), ''), 120), qty, left(un, 20), uc, amt);
+      values (bid, n, nullif(ln->>'item_id', '')::uuid, left(nullif(btrim(ln->>'description'), ''), 120), qty, left(nullif(ln->>'unit', ''), 20), uc, amt);
   end loop;
   return jsonb_build_object('id', bid, 'status', 'draft', 'total', sub - round(disc, 2), 'lines', n);
 end $$;
 
 -- post a draft: stock IN (or OUT for a return) for tracked items with the weighted-average update, the payable, and optional payments made at once
 -- p_payments: [{"mode":"cash","wallet":null,"ref":null,"amount":500}]  (needs the grant supplier_pay)
+-- A return takes the goods out at the CURRENT average cost (the average never moves); the difference to the credit the supplier gives is kept on the bill as `variance`.
 create or replace function public.post_purchase(p_id uuid, p_payments jsonb default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare pb public.purchase_bills; ln record; it public.items; gcode text; f numeric; bq numeric; ucb numeric; net numeric; last_c numeric; jump numeric; pct numeric; sid text;
-        pay jsonb; pm text; amt numeric; psum numeric := 0; jumped boolean := false; nm text;
+declare pb public.purchase_bills; ln record; it public.items; gcode text; f numeric; bq numeric; ucb numeric; net numeric; last_c numeric; pct numeric; sid text;
+        pay jsonb; pm text; amt numeric; psum numeric := 0; jumped boolean := false; nm text; lid bigint; av numeric; var numeric := 0; norm jsonb;
 begin
-  select * into pb from public.purchase_bills where id = p_id for update;
+  select * into pb from public.purchase_bills where id = p_id;          -- no lock yet: who is asking comes first
   if not found then raise exception 'not found'; end if;
+  if not public.can_loc(pb.location_id) then raise exception 'not allowed for this location'; end if;
+  gcode := case pb.kind when 'return' then 'purchase_return' else 'purchase_entry' end;
+  if pb.status = 'posted' then          -- a re-sent request: answered only to someone who may see purchases (or who posted it)
+    if not (public._pur_ok(pb.location_id) or pb.posted_by = auth.uid()) then raise exception 'not allowed'; end if;
+    return jsonb_build_object('id', pb.id, 'status', 'posted', 'total', pb.total, 'dup', true);
+  end if;
+  if not (public.has_grant(gcode, pb.location_id) or public._use_em(gcode, pb.location_id, 'post_purchase:' || p_id::text, pb.total)) then raise exception 'not allowed'; end if;
+  if pb.status <> 'draft' then raise exception 'not_draft'; end if;
+  perform 1 from public.suppliers where id = pb.supplier_id for update;      -- one posting / payment / void at a time per supplier
+  select * into pb from public.purchase_bills where id = p_id for update;
   if pb.status = 'posted' then return jsonb_build_object('id', pb.id, 'status', 'posted', 'total', pb.total, 'dup', true); end if;
   if pb.status <> 'draft' then raise exception 'not_draft'; end if;
-  gcode := case pb.kind when 'return' then 'purchase_return' else 'purchase_entry' end;
-  if not public.can_loc(pb.location_id) then raise exception 'not allowed for this location'; end if;
-  if not (public.has_grant(gcode, pb.location_id) or public.use_emergency(gcode, pb.location_id, 'post_purchase:' || p_id::text, pb.total, null)) then raise exception 'not allowed'; end if;
   if public.rule_on('purchase_separate_poster') and pb.created_by = auth.uid() and not public.is_owner() then raise exception 'poster_must_differ'; end if;
   perform public.lock_check(pb.bill_date);
   if pb.subtotal = 0 and pb.total = 0 and not exists (select 1 from public.purchase_lines where bill_id = pb.id) then raise exception 'no_lines'; end if;
+  if pb.kind = 'return' then
+    if pb.ref_bill_id is null then
+      if not public.is_owner() then raise exception 'return_needs_bill'; end if;
+      perform public._stock_exc(pb.location_id, 'purchase_return_unreferenced', 'red', 'বিল ছাড়া ক্রয় ফেরত (বিল ' || coalesce(pb.bill_no, '-') || ')',
+        'A purchase return was posted without the original bill (return ' || coalesce(pb.bill_no, '-') || ')', null, pb.bill_date, 'PURCHASE', pb.total);
+    else
+      perform 1 from public.purchase_bills where id = pb.ref_bill_id for update;
+      select coalesce(jsonb_agg(jsonb_build_object('item_id', l.item_id, 'description', l.description, 'qty', l.qty, 'unit', l.unit, 'unit_cost', l.unit_cost)), '[]'::jsonb) into norm
+        from public.purchase_lines l where l.bill_id = pb.id;
+      if not exists (select 1 from public.purchase_bills where id = pb.ref_bill_id and status = 'posted') then raise exception 'bad_ref_bill'; end if;
+      perform public._return_check(pb.ref_bill_id, pb.id, norm, true);
+    end if;
+  end if;
   pct := public.rule_num('purchase_cost_jump_pct');
   net := case when pb.subtotal > 0 then (pb.subtotal - pb.discount) / pb.subtotal else 1 end;         -- the bill discount is spread over the lines
   for ln in select * from public.purchase_lines where bill_id = pb.id order by item_id nulls last, line_no loop
@@ -906,40 +1102,43 @@ begin
     end if;
     bq := ln.qty * f; ucb := ln.unit_cost / f;
     update public.purchase_lines set base_qty = bq, unit_cost_base = ucb where id = ln.id;
-    -- price jump against the last posted bill of this item (before this one)
-    if pb.kind = 'bill' and pct is not null then
+    -- price jump against the last posted bill of this item (before this one); a return is checked the same way
+    if pct is not null then
       select pl.unit_cost_base into last_c from public.purchase_lines pl join public.purchase_bills x on x.id = pl.bill_id
         where pl.item_id = ln.item_id and x.status = 'posted' and x.kind = 'bill' and x.id <> pb.id and pl.unit_cost_base is not null order by x.posted_at desc, pl.id desc limit 1;
       if last_c is not null and last_c > 0 and abs(ucb - last_c) / last_c * 100 > pct and not jumped then
         jumped := true; nm := it.name_bn;
         perform public._stock_exc(pb.location_id, 'purchase_price_jump', 'yellow',
-          nm || ': ক্রয়মূল্য আগের চেয়ে ' || round((ucb - last_c) / last_c * 100, 1)::text || '% বদলেছে (বিল ' || coalesce(pb.bill_no, '-') || ')',
-          coalesce(it.name_en, nm) || ': unit cost moved ' || round((ucb - last_c) / last_c * 100, 1)::text || '% from the last purchase (bill ' || coalesce(pb.bill_no, '-') || ')', null, pb.bill_date, 'PURCHASE');
+          nm || ': ' || case when pb.kind = 'return' then 'ফেরতের' else 'ক্রয়' end || 'মূল্য আগের চেয়ে ' || round((ucb - last_c) / last_c * 100, 1)::text || '% বদলেছে (বিল ' || coalesce(pb.bill_no, '-') || ')',
+          coalesce(it.name_en, nm) || ': ' || case when pb.kind = 'return' then 'return ' else '' end || 'unit cost moved ' || round((ucb - last_c) / last_c * 100, 1)::text || '% from the last purchase (bill ' || coalesce(pb.bill_no, '-') || ')', null, pb.bill_date, 'PURCHASE');
       end if;
     end if;
     if it.tracked then
       if pb.kind = 'bill' then
         perform public.stock_post(ln.item_id, pb.location_id, bq, 'purchase_in', 'purchase', pb.id::text, round(ucb * net, 6), null, now(), null, null, 'none');
       else
-        perform public.stock_post(ln.item_id, pb.location_id, -bq, 'purchase_return', 'purchase', pb.id::text, round(ucb * net, 6), null, now(), null, null, 'full');
+        -- out at the current average cost (cost null = the average); what the supplier credits beyond / below that is the variance of this return
+        lid := public.stock_post(ln.item_id, pb.location_id, -bq, 'purchase_return', 'purchase', pb.id::text, null, null, now(), null, null, 'full');
+        select unit_cost into av from public.stock_ledger where id = lid;
+        var := var + round(bq * (round(ucb * net, 6) - coalesce(av, round(ucb * net, 6))), 2);
       end if;
     end if;
   end loop;
   select staff_id into sid from public.profiles where id = auth.uid();
   if p_payments is not null and jsonb_typeof(p_payments) = 'array' and jsonb_array_length(p_payments) > 0 then
     if pb.kind <> 'bill' then raise exception 'no_payment_on_return'; end if;
-    if not (public.has_grant('supplier_pay', pb.location_id) or public.use_emergency('supplier_pay', pb.location_id, 'post_purchase:' || p_id::text, null, null)) then raise exception 'not allowed'; end if;
+    if not (public.has_grant('supplier_pay', pb.location_id) or public._use_em('supplier_pay', pb.location_id, 'post_purchase:' || p_id::text, null)) then raise exception 'not allowed'; end if;
     for pay in select * from jsonb_array_elements(p_payments) loop
       pm := pay->>'mode'; amt := nullif(pay->>'amount', '')::numeric;
       if pm is null or pm not in ('cash', 'mobile', 'card', 'bank') then raise exception 'bad_mode'; end if;
-      if amt is null or amt = 'NaN'::numeric or amt <= 0 then raise exception 'bad_amount'; end if;
+      if amt is null or not (amt between 0.01 and 999999999999) or round(amt, 2) <= 0 then raise exception 'bad_amount'; end if;
       amt := round(amt, 2); psum := psum + amt;
       insert into public.supplier_payments (supplier_id, location_id, bill_id, mode, wallet, ref, amount, created_by, created_staff)
         values (pb.supplier_id, pb.location_id, pb.id, pm, left(nullif(pay->>'wallet', ''), 30), left(nullif(pay->>'ref', ''), 60), amt, auth.uid(), sid);
     end loop;
     if psum > pb.total then raise exception 'overpaid'; end if;
   end if;
-  update public.purchase_bills set status = 'posted', paid = psum, posted_by = auth.uid(), posted_at = now() where id = pb.id;
+  update public.purchase_bills set status = 'posted', paid = psum, posted_by = auth.uid(), posted_at = now(), variance = case when pb.kind = 'return' then var end where id = pb.id;
   return jsonb_build_object('id', pb.id, 'status', 'posted', 'total', pb.total, 'paid', psum, 'due', pb.total - psum);
 end $$;
 
@@ -949,16 +1148,24 @@ language plpgsql security definer set search_path = public as $$
 declare pb public.purchase_bills; r public.stock_ledger;
 begin
   if p_note is null or length(btrim(p_note)) = 0 then raise exception 'note_required'; end if;
-  select * into pb from public.purchase_bills where id = p_id for update;
+  select * into pb from public.purchase_bills where id = p_id;          -- no lock yet: who is asking comes first
   if not found then raise exception 'not found'; end if;
   if not public.can_loc(pb.location_id) then raise exception 'not allowed for this location'; end if;
-  if pb.status = 'void' then return jsonb_build_object('id', pb.id, 'status', 'void', 'dup', true); end if;
+  if pb.status = 'void' then          -- a re-sent request: answered only to someone who may see purchases (or who voided it)
+    if not (public._pur_ok(pb.location_id) or pb.void_by = auth.uid()) then raise exception 'not allowed'; end if;
+    return jsonb_build_object('id', pb.id, 'status', 'void', 'dup', true);
+  end if;
   if pb.status = 'draft' then
     if not (public.has_grant(case pb.kind when 'return' then 'purchase_return' else 'purchase_entry' end, pb.location_id)) then raise exception 'not allowed'; end if;
+  elsif not (public.has_grant('purchase_void', pb.location_id) or public._use_em('purchase_void', pb.location_id, 'void_purchase:' || p_id::text, pb.total)) then raise exception 'not allowed';
+  end if;
+  perform 1 from public.suppliers where id = pb.supplier_id for update;      -- one posting / payment / void at a time per supplier
+  select * into pb from public.purchase_bills where id = p_id for update;
+  if pb.status = 'void' then return jsonb_build_object('id', pb.id, 'status', 'void', 'dup', true); end if;
+  if pb.status = 'draft' then
     update public.purchase_bills set status = 'void', void_by = auth.uid(), void_at = now(), void_note = left(btrim(p_note), 300) where id = pb.id;
     return jsonb_build_object('id', pb.id, 'status', 'void');
   end if;
-  if not (public.has_grant('purchase_void', pb.location_id) or public.use_emergency('purchase_void', pb.location_id, 'void_purchase:' || p_id::text, pb.total, null)) then raise exception 'not allowed'; end if;
   perform public.lock_check(pb.bill_date);
   for r in select * from public.stock_ledger o where o.ref_type = 'purchase' and o.ref_id = pb.id::text and o.reason in ('purchase_in', 'purchase_return')
            and not exists (select 1 from public.stock_ledger v where v.reverses_id = o.id) order by o.item_id, o.id loop
@@ -973,23 +1180,32 @@ end $$;
 -- pay a supplier: one or more payments, allocated to the oldest open bills. Not more than the balance.
 create or replace function public.pay_supplier(p_supplier uuid, p_loc int, p_payments jsonb, p_client uuid default null, p_note text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare pay jsonb; pm text; amt numeric; tot numeric := 0; bal numeric; sid text;
+declare pay jsonb; pm text; amt numeric; tot numeric := 0; bal numeric; sid text; dupby uuid;
 begin
   if not public.is_active() or not public.can_loc(p_loc) then raise exception 'not allowed'; end if;
   if not exists (select 1 from public.locations where id = p_loc) then raise exception 'bad_location'; end if;
+  if p_payments is null or jsonb_typeof(p_payments) <> 'array' or jsonb_array_length(p_payments) = 0 then raise exception 'no_payments'; end if;
+  for pay in select * from jsonb_array_elements(p_payments) loop
+    pm := pay->>'mode'; amt := nullif(pay->>'amount', '')::numeric;
+    if pm is null or pm not in ('cash', 'mobile', 'card', 'bank') then raise exception 'bad_mode'; end if;
+    if amt is null or not (amt between 0.01 and 999999999999) or round(amt, 2) <= 0 then raise exception 'bad_amount'; end if;
+    tot := tot + round(amt, 2);
+  end loop;
+  if not (tot between 0.01 and 999999999999) then raise exception 'bad_amount'; end if;
+  -- a re-sent request is answered before anything is locked or consumed, but only to someone who may see supplier money (or who made it)
+  if p_client is not null then
+    select created_by into dupby from public.supplier_payments where client_id = p_client order by id limit 1;
+    if found then
+      if not (public.has_grant('supplier_pay', p_loc) or public._pur_ok(p_loc) or dupby = auth.uid()) then raise exception 'not allowed'; end if;
+      return jsonb_build_object('dup', true, 'balance', public._sup_balance(p_supplier));
+    end if;
+  end if;
+  if not (public.has_grant('supplier_pay', p_loc) or public._use_em('supplier_pay', p_loc, 'pay_supplier:' || p_supplier::text, tot)) then raise exception 'not allowed'; end if;
   perform 1 from public.suppliers where id = p_supplier for update;           -- one payment at a time per supplier
   if not found then raise exception 'supplier_not_found'; end if;
   if p_client is not null and exists (select 1 from public.supplier_payments where client_id = p_client) then
     return jsonb_build_object('dup', true, 'balance', public._sup_balance(p_supplier));
   end if;
-  if p_payments is null or jsonb_typeof(p_payments) <> 'array' or jsonb_array_length(p_payments) = 0 then raise exception 'no_payments'; end if;
-  for pay in select * from jsonb_array_elements(p_payments) loop
-    pm := pay->>'mode'; amt := nullif(pay->>'amount', '')::numeric;
-    if pm is null or pm not in ('cash', 'mobile', 'card', 'bank') then raise exception 'bad_mode'; end if;
-    if amt is null or amt = 'NaN'::numeric or amt <= 0 then raise exception 'bad_amount'; end if;
-    tot := tot + round(amt, 2);
-  end loop;
-  if not (public.has_grant('supplier_pay', p_loc) or public.use_emergency('supplier_pay', p_loc, 'pay_supplier:' || p_supplier::text, tot, null)) then raise exception 'not allowed'; end if;
   perform public.lock_check((now() at time zone 'Asia/Dhaka')::date);
   bal := public._sup_balance(p_supplier);
   if tot > bal then raise exception 'overpaid'; end if;
@@ -1007,10 +1223,12 @@ language plpgsql security definer set search_path = public as $$
 declare p public.supplier_payments;
 begin
   if p_note is null or length(btrim(p_note)) = 0 then raise exception 'note_required'; end if;
-  select * into p from public.supplier_payments where id = p_id for update;
+  select * into p from public.supplier_payments where id = p_id;
   if not found then raise exception 'not found'; end if;
   if not public.can_loc(p.location_id) then raise exception 'not allowed for this location'; end if;
-  if not (public.has_grant('purchase_void', p.location_id) or public.use_emergency('purchase_void', p.location_id, 'void_payment:' || p_id::text, p.amount, null)) then raise exception 'not allowed'; end if;
+  if not (public.has_grant('purchase_void', p.location_id) or public._use_em('purchase_void', p.location_id, 'void_payment:' || p_id::text, p.amount)) then raise exception 'not allowed'; end if;
+  perform 1 from public.suppliers where id = p.supplier_id for update;       -- one posting / payment / void at a time per supplier
+  select * into p from public.supplier_payments where id = p_id for update;
   if p.voided then raise exception 'already void'; end if;
   if p.bill_id is not null then raise exception 'void_the_bill'; end if;     -- a payment made with a bill goes with the bill
   perform public.lock_check((p.paid_at at time zone 'Asia/Dhaka')::date);
@@ -1086,13 +1304,15 @@ create or replace function public.purchase_list(p_loc int default null, p_from d
 returns table (id uuid, kind text, supplier_id uuid, supplier_name text, bill_no text, bill_date date, location_id int, status text, total numeric, discount numeric, paid numeric, due numeric, photo text, created_staff text, n_lines bigint)
 language plpgsql stable security definer set search_path = public as $$
 #variable_conflict use_column
+declare locs int[];
 begin
   if not public._pur_ok(p_loc) then raise exception 'not allowed'; end if;
+  select coalesce(array_agg(x.id), '{}') into locs from public.locations x where public.can_loc(x.id);        -- once, not per row
   return query
     select b.id, b.kind, b.supplier_id, s.name, b.bill_no, b.bill_date, b.location_id, b.status, b.total, b.discount, b.paid, b.due, b.photo, b.created_staff,
            (select count(*) from public.purchase_lines l where l.bill_id = b.id)
     from public.purchase_bills b join public.suppliers s on s.id = b.supplier_id
-    where (p_loc is null or b.location_id = p_loc) and public.can_loc(b.location_id)
+    where (p_loc is null or b.location_id = p_loc) and b.location_id = any (locs)
       and (p_from is null or b.bill_date >= p_from) and (p_to is null or b.bill_date <= p_to)
       and (p_supplier is null or b.supplier_id = p_supplier) and (p_status is null or b.status = p_status)
     order by b.bill_date desc, b.created_at desc limit least(greatest(coalesce(p_limit, 100), 1), 500);
@@ -1153,7 +1373,8 @@ revoke all on function public._all_locs(), public._may(text, int, text, numeric)
   public._stock_exc(int, text, text, text, text, uuid, date, text, numeric), public._ledger_immutable(), public._ledger_to_balance(),
   public.stock_post(uuid, int, numeric, text, text, text, numeric, bigint, timestamptz, text, bigint, text, uuid, uuid),
   public._sale_stock_out(), public._sale_stock_void(), public._stock_guard(uuid, int, text, date),
-  public._sup_open(uuid), public._sup_balance(uuid),
+  public._sup_open(uuid), public._sup_balance(uuid), public._use_em(text, int, text, numeric), public._client_lock(uuid),
+  public._return_check(uuid, uuid, jsonb, boolean),
   public.stock_opening(uuid, int, numeric, numeric, text, text, uuid), public.stock_wastage(uuid, int, numeric, text, text, text, text, uuid, bigint),
   public.stock_expire_batch(bigint, text, text, text), public.stock_count_adjust(uuid, int, numeric, text, text, uuid),
   public.stock_issue(uuid, int, numeric, text, text, uuid), public.stock_production_in(uuid, int, numeric, timestamptz, text, text, uuid, numeric),
