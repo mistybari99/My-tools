@@ -59,3 +59,6 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   Rules decided from research: hide expected cash from cashier (already blind count), manager approval for discount above limit / price override, credit limit with manager override,
   void keeps reason, sequential receipt numbers. Still TODO: editable lists UI (#/lists) + forms reading lists, marketing-head limits & fridges as compact tables, books-closed date lock,
   stock write-off reasons, receipt VAT/Mushak question for owner.
+- 2026-10-11 (lists, lock) · web/lists.js (#/lists: expense heads, marketing heads + monthly limit, wallets), location settings show fridges and day tags as one compact table each,
+  books-closed date (settings key books_closed_until; only the owner can change anything dated on/before it) in phase6.sql. Full chain schema->phase6 builds and tests pass on a fresh DB.
+  Audit of phase6/POS v2 launched. User still has to run phase5.sql + phase6.sql (the app falls back safely until then: full-cash single-mode sales still work, dues page needs SQL).

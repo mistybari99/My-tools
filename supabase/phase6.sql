@@ -404,3 +404,32 @@ grant execute on function public.norm_mobile(text), public.customer_balance(uuid
   public.record_sale2(uuid, int, jsonb, numeric, jsonb, text, text, text, text, boolean, timestamptz),
   public.collect_payment(uuid, int, uuid, jsonb, text), public.customer_dues(), public.customer_ledger(uuid), public.payments_summary(date),
   public.void_sale(uuid, text), public.biz_staff(date, date, int) to authenticated;
+
+-- ---------- books-closed date: after the owner closes a period, only the owner can add or change anything dated on or before it ----------
+insert into public.settings (key, value, label_bn, label_mix, label_en)
+  values ('books_closed_until', null, 'হিসাব বন্ধের তারিখ (এই তারিখ পর্যন্ত শুধু মালিক বদলাতে পারবেন) — যেমন 2026-09-30', 'হিসাব বন্ধের তারিখ (এই date পর্যন্ত শুধু Owner বদলাতে পারবেন) — যেমন 2026-09-30', 'Books closed until (only the owner can change anything up to this date), e.g. 2026-09-30')
+  on conflict (key) do nothing;
+create or replace function public.lock_check(p_date date) returns void
+language plpgsql stable security definer set search_path = public as $$
+declare v jsonb; d date;
+begin
+  if p_date is null or public.is_owner() then return; end if;
+  select value into v from public.settings where key = 'books_closed_until';
+  if v is null or jsonb_typeof(v) <> 'string' or (v #>> '{}') !~ '^\d{4}-\d{2}-\d{2}$' then return; end if;
+  d := (v #>> '{}')::date;
+  if p_date <= d then raise exception 'period_closed'; end if;
+end $$;
+create or replace function public.entries_lock() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE' then perform public.lock_check(old.entry_date); end if;
+  perform public.lock_check(new.entry_date);
+  return new;
+end $$;
+create trigger entries_lock before insert or update on public.entries for each row execute function public.entries_lock();
+create or replace function public.sales_lock() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE' then perform public.lock_check(old.sale_date); end if;
+  perform public.lock_check(new.sale_date);
+  return new;
+end $$;
+create trigger sales_lock before insert or update on public.sales for each row execute function public.sales_lock();
