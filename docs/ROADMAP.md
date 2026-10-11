@@ -14,7 +14,7 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
 - [x] P3a POS / running sales page (`phase3.sql`: `sales`, `record_sale`, `void_sale`) — items, quick sale, rush mode
 - [x] P3b Owner dashboard (problems first + short numbers; uses POS sales, entries, exceptions)
 - [x] P3c Photos (engine + 10-2; 04-1/08-1 when built) (Storage bucket `photos`) on 10-2, 04-1, 08-1 — SQL goes in the same `phase3.sql`
-- [ ] P4 Remaining forms in batches (see list below), each audited
+- [x] P4 Remaining forms (all 41 form specs live; audited by 3 independent agents, findings fixed) in batches (see list below), each audited
 - [ ] P5 Hardening: server-side recompute of key equations, offline queue, hard PIN lock
 
 ## Remaining forms (37) — batch order
@@ -42,3 +42,7 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   dashboard uses `sales_summary` RPC (no 1000-row cap), digits normalised, POS can't be saved as a generic entry, input validation.
   Left as owner decision: any POS-enter user may override a price (it creates a yellow exception) — tell owner.
   Running now: 5 form-building agents (files web/forms_stock|cash|sales|factory|staff.js). Next: audit each, add script tags to index.html, run phase3.sql with user, push web/ to public repo.
+- 2026-10-11 (forms) · All 41 forms live in web/ (forms_stock/cash/sales/factory/staff.js, index.html wired). 3 audit rounds done and fixed;
+  engine bug fixed (sparse table rows). allforms_test.js: every form opens in bn/mix/en with no JS errors.
+  Pending: user runs supabase/phase3.sql once; open owner decisions are listed in the chat summary (leave includes paid leave?, 18-1 limit monthly or per expense?, 20-1 discount limit reuse, flag colours chosen by authors).
+  Next: P5 hardening (server-side recompute of key equations, hard PIN lock), real-device test by owner.
