@@ -43,7 +43,7 @@ B.forms['05-1'] = {
       T('safety_defect', L('ত্রুটির বিবরণ', 'Defect details'), { show: (x) => x.d.safety === 'defect', req: (x) => x.d.safety === 'defect' }),
       TABLE('machines', L('যন্ত্রপাতি চেক (মিক্সার · চুলা · ওভেন · ফ্রিজ)', 'Equipment check (mixer · stove · oven · fridge)'),
         [T('name', L('যন্ত্র', 'Equipment'), { req: true, wide: true }), CH('state', L('অবস্থা', 'State'), [['ok', L('ঠিক', 'OK')], ['defect', L('ত্রুটি', 'Defect')]], { req: true })], { min: 3 }),
-      CK('machines_done', L('যন্ত্রপাতি চেক সম্পন্ন', 'Equipment check done'), { req: true }),
+      CK('machines_done', L('যন্ত্রপাতি চেক সম্পন্ন', 'Equipment check done')),
       CALC('scale_info', L('পাল্লা যাচাইয়ের বস্তু ও সীমা (লোকেশন সেটিংস থেকে)', 'Scale check object and limit (from settings)'), 'text'),
       CH('scale', L('পাল্লা — জানা ওজনের বস্তু দিয়ে চেক', 'Scale: checked with a known-weight object'), [['ok', L('ঠিক', 'OK')], ['off', L('গরমিল', 'Off')]], { req: true }),
       NOTE(L('গরমিল হলে পাল্লা ব্যবহার বন্ধ, আর কাজের তালিকায় যোগ করতে হবে।', 'If the scale is off, stop using it and add it to the work list.'), 'warn', { show: (x) => x.d.scale === 'off' }),
@@ -92,13 +92,14 @@ B.forms['05-1'] = {
     const d = x.d, flags = [], needs = [], v = {};
     const st = sv(x, 'scale_test'); v.scale_info = st === null ? NEED : st; if (st === null) needs.push('scale_test');
     const f1 = fridgeCalc(x, 'fridges', 'temp_out_', flags, needs), f2 = fridgeCalc(x, 'fridges2', 'temp2_out_', flags, needs);
-    if (d.safety === 'defect') flags.push(flag('safety_defect', 'red', 'গ্যাস/বিদ্যুৎ/আগুনের নিরাপত্তায় ত্রুটি', 'Gas / power / fire safety defect'));
+    if (d.safety === 'defect') flags.push(flag('safety_defect', 'yellow', 'গ্যাস/বিদ্যুৎ/আগুনের নিরাপত্তায় ত্রুটি', 'Gas / power / fire safety defect'));
+    if (!x.rows('machines').some((r) => has(r.name))) flags.push(flag('machines_not_recorded', 'yellow', 'যন্ত্রপাতি চেকে কোনো যন্ত্র লেখা হয়নি', 'No equipment recorded in the equipment check'));
     const mdef = x.rows('machines').filter((r) => r.state === 'defect').length;
     if (mdef) flags.push(flag('machine_defect', 'yellow', 'যন্ত্রপাতিতে ত্রুটি', 'Equipment defect', mdef, { unit: 'qty' }));
-    if (d.scale === 'off') flags.push(flag('scale_off', 'red', 'পাল্লায় গরমিল — ব্যবহার বন্ধ', 'Scale is off: stop using it'));
+    if (d.scale === 'off') flags.push(flag('scale_off', 'yellow', 'পাল্লায় গরমিল — ব্যবহার বন্ধ', 'Scale is off: stop using it'));
     if (d.unplanned === 'yes') flags.push(flag('unplanned_production', 'yellow', 'পরিকল্পনার বাইরে উৎপাদন', 'Unplanned production'));
     if (d.breakdown === 'yes') flags.push(flag('breakdown', 'yellow', 'যন্ত্র বিকল', 'Equipment breakdown'));
-    if (has(d.yield_approver) && (d.yield_approver === x.me || d.yield_approver === d.in_charge)) flags.push(flag('self_yield_approval', 'red', 'ফলনের পার্থক্য উৎপাদনকারী নিজে অনুমোদন করেছেন', 'Yield difference approved by the producer'));
+    if (has(d.yield_approver) && d.yield_approver === d.in_charge) flags.push(flag('self_yield_approval', 'red', 'ফলনের পার্থক্য উৎপাদনকারী নিজে অনুমোদন করেছেন', 'Yield difference approved by the producer'));
     if ([['pots_by', 'pots_verify'], ['clean_by', 'clean_verify']].some(([a, b]) => has(d[a]) && d[a] === d[b])) flags.push(flag('same_person_check', 'yellow', 'সম্পাদনকারী ও যাচাইকারী একই জন', 'Doer and checker are the same person'));
     const open = x.rows('incidents').filter((r) => has(r.what) && !r.solved).length;
     if (open) flags.push(flag('incident_open', 'yellow', 'অমীমাংসিত ঘটনা আছে', 'Unresolved incident', open, { unit: 'qty' }));
@@ -208,7 +209,7 @@ const AVG_KEYS = [['input', L('গড় — মূল উপকরণ', 'Averag
   ['headcount', L('গড় — কর্মী সংখ্যা', 'Average: headcount'), 'num'], ['minutes', L('গড় — মোট সময় (মিনিট)', 'Average: total time (minutes)'), 'num']];
 B.forms['05-4'] = {
   title: L('ফলন টেস্ট শিট', 'Yield test sheet'),
-  head: [ITEM('item', L('আইটেম কোড ও পণ্যের নাম', 'Item code & product name'), { req: true }), T('recipe_no', L('রেসিপি কার্ড নং', 'Recipe card no.'), { req: true }), T('recipe_ver', L('রেসিপির সংস্করণ (Version)', 'Recipe version'), { req: true })],
+  head: [ITEM('item', L('আইটেম কোড ও পণ্যের নাম', 'Item code & product name'), { req: true }), SEL('family', L('পরিবার', 'Family'), FAMILIES), T('family_other', L('অন্য (লিখুন)', 'Other (write it)'), { show: (x) => x.d.family === 'other' }), T('recipe_no', L('রেসিপি কার্ড নং', 'Recipe card no.'), { req: true }), T('recipe_ver', L('রেসিপির সংস্করণ (Version)', 'Recipe version'), { req: true })],
   sections: [
     { title: L('তিন ব্যাচের মাপ', 'Three-batch measurements'), fields: [
       NOTE(L('তিনটি আলাদা দিনের তিনটি ব্যাচ মাপতে হবে। প্রতিটি সংখ্যা পাল্লায় মেপে বা গণনা করে, অনুমানে নয়। যিনি মাপবেন, তিনি ওই ব্যাচের কারিগর নন। যে ঘর পণ্যের সাথে খাটে না, সেখানে খালি রাখুন।',
@@ -217,15 +218,16 @@ B.forms['05-4'] = {
       CH('out_unit', L('পণ্যের একক', 'Product unit'), [['kg', L('কেজি', 'kg')], ['pc', L('পিস', 'pc')]], { req: true }),
       TABLE('b', null, [D('date', L('1 · তারিখ', '1 · Date'), { req: true }),
         N('input', L('2 · ব্যবহৃত মূল উপকরণ (Input) — দুধ / ময়দা / অন্য', '2 · Main input used: milk / flour / other'), { req: true }),
-        N('base', L('3 · প্রাপ্ত বেস (ছানা / খোয়া / খামির / ব্যাটার)', '3 · Base obtained (chhana / khoa / dough / batter)')),
+        N('base', L('3 · প্রাপ্ত বেস (ছানা / খোয়া / খামির / ব্যাটার)', '3 · Base obtained (chhana / khoa / dough / batter)'), { req: (x) => !x.row.dash }),
         CALC('base_pct', L('4 · বেস রূপান্তর % = (3) ÷ (2) × 100', '4 · Base conversion % = (3) ÷ (2) × 100'), 'num'),
-        N('base_use', L('5 · বেস ব্যবহার', '5 · Base used')), N('sugar', L('6 · চিনি / সিরা / অন্য উপকরণ', '6 · Sugar / syrup / other')), N('mid', L('7 · মাঝের ওজন — ভাজা বা বেকের পর', '7 · Mid weight after frying or baking')),
-        N('good', L('8 · ভালো পণ্য (১ম গ্রেড)', '8 · Good product (1st grade)'), { req: true }), N('second', L('9 · ২য় গ্রেড', '9 · 2nd grade')), N('waste', L('10 · নষ্ট / জমাট না বাঁধা', '10 · Wasted / failed to set')),
+        N('base_use', L('5 · বেস ব্যবহার', '5 · Base used'), { req: (x) => !x.row.dash }), N('sugar', L('6 · চিনি / সিরা / অন্য উপকরণ', '6 · Sugar / syrup / other'), { req: (x) => !x.row.dash }), N('mid', L('7 · মাঝের ওজন — ভাজা বা বেকের পর', '7 · Mid weight after frying or baking'), { req: (x) => !x.row.dash }),
+        N('good', L('8 · ভালো পণ্য (১ম গ্রেড)', '8 · Good product (1st grade)'), { req: true }), N('second', L('9 · ২য় গ্রেড', '9 · 2nd grade'), { req: (x) => !x.row.dash }), N('waste', L('10 · নষ্ট / জমাট না বাঁধা', '10 · Wasted / failed to set'), { req: (x) => !x.row.dash }),
         CALC('total', L('11 · মোট উৎপাদন = (8) + (9) + (10)', '11 · Total output = (8) + (9) + (10)'), 'num'),
         CALC('per_unit', L('12 · মূল উপকরণের প্রতি ১ একক থেকে ভালো পণ্য = (8) ÷ (2)', '12 · Good product per 1 unit of input = (8) ÷ (2)'), 'num'),
         CALC('second_pct', L('13 · ২য় গ্রেড % = (9) ÷ (11) × 100', '13 · 2nd grade % = (9) ÷ (11) × 100'), 'num'),
         CALC('waste_pct', L('14 · নষ্ট % = (10) ÷ (11) × 100', '14 · Wastage % = (10) ÷ (11) × 100'), 'num'),
-        N('headcount', L('15 · কর্মী সংখ্যা (Headcount)', '15 · Headcount')), N('minutes', L('16 · মোট সময় (মিনিট)', '16 · Total time (minutes)')),
+        N('headcount', L('15 · কর্মী সংখ্যা (Headcount)', '15 · Headcount'), { req: (x) => !x.row.dash }), N('minutes', L('16 · মোট সময় (মিনিট)', '16 · Total time (minutes)'), { req: (x) => !x.row.dash }),
+        CK('dash', L('খালি ঘরগুলো এই পণ্যে খাটে না (দাগ দেওয়া)', 'Empty boxes do not apply to this product (dashed)')),
         ST('craftsman', L('ওই ব্যাচের কারিগর', 'Craftsman of this batch'), { req: true }), ST('measurer', L('17 · পরিমাপকারী (Measured by)', '17 · Measured by'), { req: true })], { rows: BATCH_ROWS })] },
     { title: L('তিন ব্যাচের গড়', 'Three-batch average'), fields: [
       NOTE(L('অনুমোদিত গড় — (12), (13), (14) — উৎপাদন রিপোর্টে টার্গেট ফলন হিসেবে বসবে।', 'Approved averages (12), (13), (14) become the target yield in the production report.'), 'ok'),
@@ -246,7 +248,6 @@ B.forms['05-4'] = {
     const dates = rs.map((r) => r.date).filter(has);
     if (new Set(dates).size < dates.length) flags.push(flag('same_day_batches', 'yellow', 'দুটি ব্যাচ একই দিনের — তিনটি আলাদা দিন লাগবে', 'Two batches fall on the same day: three different days are needed'));
     if (rs.some((r) => has(r.measurer) && (r.measurer === r.craftsman))) flags.push(flag('measurer_is_craftsman', 'red', 'পরিমাপকারী ও ওই ব্যাচের কারিগর একই জন', 'The person who measured also made the batch'));
-    if (rs.some((r) => has(r.good) && has(r.input) && num(r.input) > 0 && num(r.good) > num(r.input) && x.d.in_unit === x.d.out_unit && x.d.in_unit)) flags.push(flag('good_over_input', 'yellow', 'ভালো পণ্য মূল উপকরণের চেয়ে বেশি — মাপ আবার দেখুন', 'Good product is more than the input: check the measures'));
     return { v, rows: { b: out }, flags, needs: [] };
   },
 };
@@ -283,6 +284,7 @@ B.forms['05-5'] = {
       N('repeat', L('পুনরায় ক্রয়কারী কাস্টমার', 'Repeat customers'))] },
     { title: L('প্রস্তুতকারী ও যাচাইকারী', 'Prepared & checked by'), fields: [
       NOTE(L('যাচাইকারী হবেন যিনি পণ্যটি তৈরি করেননি, প্রস্তুতকারীও নন।', 'The checker is someone who did not make the product and is not the preparer.'), 'warn'),
+      ST('preparer', L('প্রস্তুতকারী (Prepared by)', 'Prepared by'), { req: true }),
       ST('verifier', L('যাচাইকারী (Checked by) (প্রস্তুতকারী নন)', 'Checked by (not the preparer)'), { req: true })] },
     { who: 'checker', title: L('সিদ্ধান্ত ও স্বাক্ষর (মালিক ও প্রধান ব্যবস্থাপনা)', 'Decision & signatures (owner and chief management)'), fields: [
       ST('chief_mgmt', L('প্রধান ব্যবস্থাপনা', 'Chief management'), { who: 'checker', req: true }),
@@ -301,7 +303,7 @@ B.forms['05-5'] = {
     const it = (x.env.byCode && x.env.byCode.get(d.new_code)) || null; const price = it && num(it.sell_price) > 0 ? num(it.sell_price) : (has(d.est_price) ? num(d.est_price) : undefined);
     v.price_used = price; v.margin = price !== undefined && has(d.unit_cost) ? price - num(d.unit_cost) : undefined;
     if (v.margin !== undefined && v.margin < 0) flags.push(flag('negative_margin', 'yellow', 'প্রতি এককে মার্জিন ঋণাত্মক', 'Margin per unit is negative', v.margin));
-    if (has(d.verifier) && d.verifier === x.me) flags.push(flag('verifier_is_preparer', 'red', 'যাচাইকারী ও প্রস্তুতকারী একই জন', 'Checker and preparer are the same person'));
+    if (has(d.verifier) && d.verifier === d.preparer) flags.push(flag('verifier_is_preparer', 'red', 'যাচাইকারী ও প্রস্তুতকারী একই জন', 'Checker and preparer are the same person'));
     return { v, rows: { trial: out }, flags, needs };
   },
 };

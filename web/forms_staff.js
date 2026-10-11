@@ -11,6 +11,7 @@ B.forms = B.forms || {};
 const flag = (code, level, bn, en, amount, o = {}) => ({ code, level, text: L(bn, en), amount, ...o });
 const fm = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 const QTY = { unit: 'qty' };
+function tol(diff, limit) { if (diff === 0) return null; if (limit === null || limit === undefined) return 'red'; return Math.abs(diff) <= limit ? 'yellow' : 'red'; }
 const anyRow = (r) => Object.values(r || {}).some(has);
 const MONTHS = [['1', L('জানুয়ারি', 'January')], ['2', L('ফেব্রুয়ারি', 'February')], ['3', L('মার্চ', 'March')], ['4', L('এপ্রিল', 'April')], ['5', L('মে', 'May')], ['6', L('জুন', 'June')],
   ['7', L('জুলাই', 'July')], ['8', L('আগস্ট', 'August')], ['9', L('সেপ্টেম্বর', 'September')], ['10', L('অক্টোবর', 'October')], ['11', L('নভেম্বর', 'November')], ['12', L('ডিসেম্বর', 'December')]];
@@ -30,6 +31,7 @@ B.forms['02-1'] = {
       NOTE(L('হাজিরা প্রতিদিন লেখা হবে — মাস শেষে মনে করে নয়। বেতন ও অনুপস্থিতির হিসাব এই রেজিস্টার থেকেই আসবে; অন্য কোনো উৎস থেকে নয়।', 'Attendance is written every day — not from memory at month end. Salary and absence figures come from this register and nowhere else.'), 'warn'),
       NOTE(L('চিহ্ন: উ = উপস্থিত · অ = অনুপস্থিত · ছ = ছুটি (বিনা বেতনের) · স = সবেতন ছুটি · দ = দেরিতে উপস্থিত · শ 1 / শ 2 = কোন শিফট · ও = ওভারটাইম (ঘণ্টা) · ল = অন্য লোকেশনে কাজ। ছুটির চিহ্ন আসে ছুটির আবেদন ফরম (02-5) থেকে। নিচে প্রতিটি চিহ্নের দিন-সংখ্যা লিখুন।',
         'Marks: P = present · A = absent · U = unpaid leave · PL = paid leave · Late = present but late · S1 / S2 = shift · OT = overtime (hours) · OL = worked at another location. Leave marks come from the Leave Application (02-5). Enter the number of days for each mark below.'), 'ok'),
+      NOTE(L('অনুপস্থিতি, ওভারটাইম বা অন্য লোকেশনে কাজ থাকলে কোন কোন তারিখে — তা অবশ্যই লিখুন; দিন-সংখ্যা একা প্রমাণ নয়। অনুপস্থিতি বা ছুটি থাকলে দায়িত্বধারী (Delegate) লিখতে হবে।', 'If there is absence, overtime or other-location work, the dates must be written — day counts alone are not evidence. If there is absence or leave, a delegate must be named.'), 'warn'),
       NOTE(L('উপস্থিত + অনুপস্থিত + ছুটি = মোট দিন = মাসের দিন সংখ্যা', 'Present + Absent + Leave = Total days = number of days in the month'), 'warn')] },
     { title: L('কর্মীদের হাজিরা (প্রতি কর্মীর জন্য একটি কার্ড)', 'Staff attendance (one card per person)'), fields: [
       TABLE('staff', null, [T('name', L('নাম ও পদ', 'Name & post'), { req: true, wide: true }),
@@ -38,9 +40,9 @@ B.forms['02-1'] = {
         CALC('total', L('মোট দিন', 'Total days'), 'num'), CALC('sum_ok', L('মাসের দিনের সাথে মিল', 'Match with days in month'), 'text'),
         N('shift1', L('শিফট 1 (শ 1) — দিন', 'Shift 1 — days'), {}), N('shift2', L('শিফট 2 (শ 2) — দিন', 'Shift 2 — days'), {}),
         N('ot_hours', L('ওভারটাইম (ও) — মোট ঘণ্টা', 'Overtime — total hours'), {}), N('other_loc', L('অন্য লোকেশনে কাজ (ল) — দিন', 'Other-location work — days'), {}),
-        T('dates_note', L('অনুপস্থিতি / ওভারটাইম / ল-এর তারিখ ও মন্তব্য', 'Dates & remarks for absence / overtime / other-location'), { wide: true })], { min: 3 })] },
+        T('dates_note', L('অনুপস্থিতি / ওভারটাইম / ল-এর তারিখ ও মন্তব্য', 'Dates & remarks for absence / overtime / other-location'), { wide: true, req: (x) => num(x.row.absent) > 0 || num(x.row.ot_hours) > 0 || num(x.row.other_loc) > 0 })], { min: 3 })] },
     { title: L('অনুপস্থিতি ও দায়িত্ব', 'Absence & cover'), fields: [
-      TABLE('delegates', L('অনুপস্থিতিতে দায়িত্বধারী (Delegate)', 'Delegate during absence'), [D('date', L('তারিখ', 'Date'), { req: true }), T('person', L('কর্মী (দায়িত্বধারী)', 'Staff (delegate)'), { req: true, wide: true })], { min: 1 }),
+      TABLE('delegates', L('অনুপস্থিতিতে দায়িত্বধারী (Delegate) — অনুপস্থিতি বা ছুটি থাকলে বাধ্যতামূলক', 'Delegate during absence — required when there is absence or leave'), [D('date', L('তারিখ', 'Date'), { req: true }), T('person', L('কর্মী (দায়িত্বধারী)', 'Staff (delegate)'), { req: true, wide: true })], { min: 1 }),
       CH('leave_informed', L('ছুটি আগে জানানো হয়েছিল?', 'Was leave informed in advance?'), YN),
       N('not_informed_n', L('না হলে — কতবার', 'If not — how many times'), { show: (x) => x.d.leave_informed === 'no' }),
       TABLE('other_loc', L('অন্য লোকেশনে কাজ (ল)', 'Work at another location (OL)'), [D('date', L('তারিখ', 'Date')), T('person', L('কর্মী', 'Staff')), T('place', L('স্থান', 'Place'))], { min: 1 }),
@@ -67,6 +69,7 @@ B.forms['02-1'] = {
     });
     if (bad) flags.push(flag('att_total_mismatch', 'red', 'উপস্থিত + অনুপস্থিত + ছুটি মাসের দিন সংখ্যার সমান নয় (কর্মীর সংখ্যা)', 'Present + absent + leave differs from the days in the month (staff count)', bad, QTY));
     if (lateBad) flags.push(flag('late_over_present', 'red', 'দেরিতে উপস্থিতের দিন উপস্থিতের চেয়ে বেশি', 'Late days are more than present days', lateBad, QTY));
+    if (rows.some((r) => num(r.absent) + num(r.leave_unpaid) + num(r.leave_paid) > 0) && !x.rows('delegates').some((r) => has(r.person))) flags.push(flag('delegate_missing', 'red', 'অনুপস্থিতি / ছুটি আছে কিন্তু দায়িত্বধারী (Delegate) লেখা নেই', 'Absence / leave recorded but no delegate named'));
     if (num(x.d.sudden_n) > 0) flags.push(flag('sudden_absence', 'yellow', 'এ মাসে হঠাৎ অনুপস্থিতি আছে (বার)', 'Sudden absences this month (times)', num(x.d.sudden_n), QTY));
     const temps = x.rows('temps'), tt = sum(temps.map((r) => r.wage));
     if (temps.some((r) => num(r.wage) > 0 && !r.signed)) flags.push(flag('temp_unsigned', 'yellow', 'অস্থায়ী শ্রমিকের স্বাক্ষর নেই', 'A temporary worker has not signed'));
@@ -77,7 +80,7 @@ B.forms['02-1'] = {
 /* ============ 02-2 · Monthly salary sheet ============ */
 B.forms['02-2'] = {
   title: L('মাসিক বেতন শিট', 'Monthly salary sheet'),
-  head: [...monthHead(), T('attendance_no', L('মাসিক হাজিরা রেজিস্টার নং', 'Monthly attendance register no.'), { req: true })],
+  head: [...monthHead(), T('attendance_no', L('মাসিক হাজিরা রেজিস্টার নং', 'Monthly attendance register no.'))],
   init: monthInit,
   sections: [
     { title: L('নিয়ম', 'Rules'), fields: [
@@ -167,24 +170,24 @@ B.forms['02-3'] = {
 /* ============ 02-4 · Appointment letter — terms & duties ============ */
 B.forms['02-4'] = {
   title: L('নিয়োগপত্র — শর্ত ও দায়িত্ব', 'Appointment letter — terms & duties'),
-  head: [T('reg_no', L('কর্মী রেজিস্ট্রেশন ফরম নং', 'Employee registration form no.'), { req: true }), ST('staff', L('কর্মীর নাম', 'Employee'), { req: true }), T('post', L('পদ', 'Post'), { req: true }),
+  head: [T('reg_no', L('কর্মী রেজিস্ট্রেশন ফরম নং', 'Employee registration form no.')), ST('staff', L('কর্মীর নাম', 'Employee'), { req: true }), T('post', L('পদ', 'Post'), { req: true }),
     LOC('staff_loc', L('লোকেশন', 'Location'), { req: true }), D('join_date', L('যোগদানের তারিখ', 'Joining date'), { req: true })],
   sections: [
     { title: L('নিয়ম', 'Rule'), fields: [
       NOTE(L('এই পত্র ছাড়া নিয়োগ সম্পূর্ণ নয়। শর্তগুলো একজনই ব্যাখ্যা করবেন। কর্মী ও প্রতিষ্ঠান দুজনেই এক কপি রাখবেন।', 'Appointment is not complete without this letter. One person alone explains the terms. Both the employee and the business keep a copy.'), 'warn'),
       NOTE(L('বেতন, পেমেন্টের মাধ্যম ও আইনি ঘোষণা কর্মী রেজিস্ট্রেশন ফরমে (Employee Registration Form) আছে। এখানে আবার লেখা হবে না।', 'Salary, payment method and legal declaration are on the Employee Registration Form. They are not written again here.'), 'ok')] },
     { title: L('Section A · নিয়োগের শর্ত (Terms of Appointment)', 'Section A · Terms of appointment'), fields: [
-      N('probation_months', L('শিক্ষানবিশকাল (Probation) — মাস', 'Probation — months'), { req: true }), N('probation_notice', L('শিক্ষানবিশকালে নোটিশ — দিন', 'Notice during probation — days')),
+      N('probation_months', L('শিক্ষানবিশকাল (Probation) — মাস', 'Probation — months')), N('probation_notice', L('শিক্ষানবিশকালে নোটিশ — দিন', 'Notice during probation — days')),
       CK('ack_probation', L('কর্মী অবগত — শিক্ষানবিশকাল', 'Employee acknowledged — probation')),
-      TA('confirm_terms', L('স্থায়ী হওয়ার শর্ত', 'Conditions for confirmation'), { req: true }), CK('ack_confirm', L('কর্মী অবগত — স্থায়ী হওয়ার শর্ত', 'Employee acknowledged — confirmation')),
+      TA('confirm_terms', L('স্থায়ী হওয়ার শর্ত', 'Conditions for confirmation')), CK('ack_confirm', L('কর্মী অবগত — স্থায়ী হওয়ার শর্ত', 'Employee acknowledged — confirmation')),
       CK('off_friday', L('সাপ্তাহিক ছুটি — শুক্রবার', 'Weekly off — Friday')), T('off_other', L('সাপ্তাহিক ছুটি — অন্য দিন', 'Weekly off — other day')), N('off_per_month', L('মাসে ছুটির দিন', 'Off days per month')),
       CK('ack_weekly', L('কর্মী অবগত — সাপ্তাহিক ছুটি', 'Employee acknowledged — weekly off')),
       N('festival_days', L('উৎসব ছুটি — বছরে কত দিন', 'Festival holidays — days per year')), T('festival_dates', L('উৎসব ছুটির তারিখ', 'Festival holiday dates')), CK('ack_festival', L('কর্মী অবগত — উৎসব ছুটি', 'Employee acknowledged — festival holidays')),
       N('annual_days', L('বার্ষিক ছুটি (সবেতন) — বছরে কত দিন', 'Annual leave (paid) — days per year')), CK('ack_annual', L('কর্মী অবগত — বার্ষিক ছুটি', 'Employee acknowledged — annual leave')),
-      N('notice_emp', L('নোটিশ (Notice Period) — কর্মীর পক্ষে দিন', 'Notice period — by the employee (days)'), { req: true }), N('notice_org', L('নোটিশ — প্রতিষ্ঠানের পক্ষে দিন', 'Notice period — by the business (days)'), { req: true }),
+      N('notice_emp', L('নোটিশ (Notice Period) — কর্মীর পক্ষে দিন', 'Notice period — by the employee (days)')), N('notice_org', L('নোটিশ — প্রতিষ্ঠানের পক্ষে দিন', 'Notice period — by the business (days)')),
       CK('ack_notice', L('কর্মী অবগত — চাকরির অবসানের নোটিশ', 'Employee acknowledged — notice period')),
       TA('bonus', L('উৎসব বোনাস (Festival Bonus)', 'Festival bonus')), CK('ack_bonus', L('কর্মী অবগত — উৎসব বোনাস', 'Employee acknowledged — festival bonus')),
-      CH('lodging', L('থাকা / খাওয়া', 'Lodging / meals'), [['na', L('প্রযোজ্য নয়', 'Not applicable')], ['yes', L('আছে', 'Provided')]], { req: true }),
+      CH('lodging', L('থাকা / খাওয়া', 'Lodging / meals'), [['na', L('প্রযোজ্য নয়', 'Not applicable')], ['yes', L('আছে', 'Provided')]]),
       T('lodging_detail', L('থাকা / খাওয়ার বিবরণ', 'Lodging / meals details'), { show: (x) => x.d.lodging === 'yes', req: (x) => x.d.lodging === 'yes' }), CK('ack_lodging', L('কর্মী অবগত — থাকা / খাওয়া', 'Employee acknowledged — lodging / meals'))] },
     { title: L('Section B · এই পদের দায়িত্ব (Duties)', 'Section B · Duties of this post'), fields: [
       TABLE('duties', null, [T('duty', L('এই পদের দায়িত্ব', 'Duty of this post'), { req: true, wide: true }), T('forms', L('ব্যবহারের ফর্ম (Forms Handled)', 'Forms handled'), { wide: true })], { min: 4 }),
@@ -198,7 +201,15 @@ B.forms['02-4'] = {
   ],
   calc(x) {
     const flags = [];
-    const acks = ['ack_probation', 'ack_confirm', 'ack_weekly', 'ack_festival', 'ack_annual', 'ack_notice', 'ack_bonus', 'ack_lodging'];
+    const d = x.d, acks = [];
+    if (has(d.probation_months) || has(d.probation_notice)) acks.push('ack_probation');
+    if (has(d.confirm_terms)) acks.push('ack_confirm');
+    if (d.off_friday || has(d.off_other) || has(d.off_per_month)) acks.push('ack_weekly');
+    if (has(d.festival_days) || has(d.festival_dates)) acks.push('ack_festival');
+    if (has(d.annual_days)) acks.push('ack_annual');
+    if (has(d.notice_emp) || has(d.notice_org)) acks.push('ack_notice');
+    if (has(d.bonus)) acks.push('ack_bonus');
+    if (d.lodging === 'yes') acks.push('ack_lodging');
     if (x.d.emp_signed && acks.some((k) => !x.d[k])) flags.push(flag('terms_not_acknowledged', 'yellow', 'কর্মী সব শর্তে "অবগত" টিক পাননি', 'Some terms are not ticked as acknowledged by the employee'));
     if (has(x.d.explained_by) && x.d.explained_by === x.d.staff) flags.push(flag('explained_by_self', 'red', 'ব্যাখ্যাকারী ও কর্মী একই জন', 'The person who explained and the employee are the same'));
     return { v: {}, flags, needs: [] };
@@ -219,7 +230,7 @@ B.forms['02-5'] = {
       TA('reason', L('কারণ', 'Reason'), { req: true }),
       CK('phoned', L('জরুরি অবস্থায় ফোনে জানানো হয়েছিল', 'Informed by phone in the emergency'), { show: (x) => x.d.type === 'emergency' })] },
     { title: L('অনুপস্থিতিতে দায়িত্ব', 'Cover during leave'), fields: [
-      T('delegate', L('অনুপস্থিতিতে দায়িত্বধারী (Delegate) — নাম / পদ', 'Delegate — name / post'), { req: true }), CK('delegate_agreed', L('তিনি সম্মত', 'The delegate agrees')),
+      T('delegate', L('অনুপস্থিতিতে দায়িত্বধারী (Delegate) — নাম / পদ', 'Delegate — name / post'), { req: true }), CK('delegate_agreed', L('তিনি সম্মত', 'The delegate agrees')), CK('delegate_signed', L('তাঁর স্বাক্ষর (দায়িত্বধারী)', "Delegate's signature")),
       TA('handover_items', L('অসম্পন্ন কাজ / হ্যান্ডওভারের বিষয়', 'Pending work / handover items')),
       CK('applicant_signed', L('আবেদনকারীর স্বাক্ষর (Applicant)', "Applicant's signature"), { req: true })] },
     { who: 'checker', title: L('সিদ্ধান্ত (ম্যানেজার)', 'Decision (manager)'), fields: [
@@ -236,7 +247,7 @@ B.forms['02-5'] = {
     if (has(d.apply_date) && has(d.from) && d.apply_date > d.from && d.type !== 'emergency') flags.push(flag('leave_late', 'yellow', 'ছুটি শুরুর পরে আবেদন — আগে না জানালে ছুটি নয়, অনুপস্থিতি', 'Applied after the leave started — leave not asked in advance counts as absence'));
     if (d.type === 'emergency' && !d.phoned) flags.push(flag('emergency_not_phoned', 'yellow', 'জরুরি ছুটি — ফোনে জানানোর টিক নেই', 'Emergency leave — no tick that it was phoned in'));
     if (has(d.delegate) && !d.delegate_agreed) flags.push(flag('delegate_not_agreed', 'yellow', 'দায়িত্বধারীর সম্মতি টিক নেই', "The delegate's agreement is not ticked"));
-    if (x.c.decision === 'no') flags.push(flag('leave_declined', 'yellow', 'ছুটি অনুমোদিত নয় — অনুপস্থিতি হিসেবে গণ্য হবে', 'Leave not approved — counts as absence'));
+    if (x.c.decision === 'no') flags.push(flag('leave_declined', 'yellow', 'ছুটি অনুমোদিত নয় — অনুপস্থিতি হিসেবে গণ্য হবে', 'Leave not approved — counts as absence', undefined, { src: 'check' }));
     if (x.c.decision === 'part' && days && num(x.c.part_days) > days) flags.push(flag('part_over', 'red', 'আংশিক অনুমোদিত দিন আবেদনের দিনের চেয়ে বেশি', 'Partly approved days exceed the days applied for', num(x.c.part_days), { ...QTY, src: 'check' }));
     if (has(x.c.approver) && x.c.approver === d.applicant) flags.push(flag('leave_self_approved', 'red', 'আবেদনকারী নিজেই অনুমোদনকারী', 'The applicant is also the approver', undefined, { src: 'check' }));
     return { v: { days }, flags, needs: [] };
@@ -266,7 +277,7 @@ B.forms['02-6'] = {
       NOTE(L('সব ঘর শেষ না হওয়া পর্যন্ত শেষ বেতনের পেমেন্ট হবে না। ক্লিয়ারেন্স সম্পূর্ণ না হলে এক্সিট (Exit) সম্পন্ন হবে না। অ্যাডভান্স বাকি থাকলে ছাড়পত্র দেওয়া যাবে না।', 'No final pay until every line is done. The exit is not complete until clearance is complete. No clearance while an advance is outstanding.'), 'warn')] },
     { title: L('হ্যান্ডওভার তালিকা (Handover List)', 'Handover list'), fields: [
       TABLE('handover', null, [CH('status', L('অবস্থা', 'Status'), [['done', L('হয়েছে', 'Done')], ['pending', L('বাকি', 'Pending')]], { req: true }),
-        N('qty', L('পরিমাণ / নং', 'Amount / no.')), T('detail', L('বিবরণ', 'Details'), { wide: true }), ST('received', L('গ্রহণকারী (Received by)', 'Received by'))], { rows: HAND.map((h) => h[1]) })] },
+        N('qty', L('পরিমাণ / নং', 'Amount / no.')), T('detail', L('বিবরণ', 'Details'), { wide: true }), ST('received', L('গ্রহণকারী (Received by)', 'Received by'))], { rows: HAND.map((h) => L(h[1].bn + ' — ' + h[2].bn, h[1].en + ' — ' + h[2].en)) })] },
     { title: L('না জানিয়ে চলে গেলে (Absconded)', 'Left without notice (Absconded)'), collapsed: true, fields: [
       CK('absconded', L('বিনা নোটিশে অনুপস্থিত (Absconded)', 'Absent without notice (Absconded)')),
       D('last_seen', L('শেষ দেখা', 'Last seen'), { show: (x) => x.d.absconded, req: (x) => x.d.absconded }), M('abs_adv', L('বাকি অ্যাডভান্স ৳', 'Outstanding advance ৳'), { show: (x) => x.d.absconded, req: (x) => x.d.absconded }),
@@ -296,7 +307,7 @@ B.forms['02-6'] = {
     if (rows.some((r) => r.status === 'done' && has(r.received) && r.received === d.staff)) flags.push(flag('self_received', 'red', 'কর্মী নিজেই নিজের হ্যান্ডওভার গ্রহণ করেছেন', 'The employee received their own handover'));
     if (has(d.pay_date) || has(d.final_due)) { if (net < 0) flags.push(flag('net_negative', 'red', 'নিট প্রদেয় ঋণাত্মক', 'Net payable is negative', net)); }
     if (d.notice === 'no' && !has(d.notice_ded)) flags.push(flag('notice_ded_missing', 'yellow', 'নোটিশ দেওয়া হয়নি কিন্তু কর্তনের অঙ্ক লেখা নেই', 'No notice was given but the deduction amount is not written'));
-    if (d.absconded) flags.push(flag('absconded', 'red', 'কর্মী বিনা নোটিশে চলে গেছেন', 'Employee left without notice', has(d.abs_adv) ? num(d.abs_adv) : undefined));
+    if (d.absconded) flags.push(flag('absconded', 'yellow', 'কর্মী বিনা নোটিশে চলে গেছেন', 'Employee left without notice', has(d.abs_adv) ? num(d.abs_adv) : undefined));
     return { v: { net }, flags, needs: [] };
   },
 };
@@ -317,7 +328,7 @@ const SLOT_I = [L('কোটেশন সংগ্রহ ও পারচেজ 
   L('নকল চাবির দায়িত্বে', 'Duplicate-key holder')];
 const slotCols = () => [
   ST('name', L('দায়িত্বধারীর নাম', 'Holder name'), { req: (x) => !x.row.vacant, wide: true }), CK('vacant', L('স্লট খালি', 'Slot is vacant')),
-  D('start', L('শুরুর তারিখ', 'Start date'), { req: (x) => !x.row.vacant, show: (x) => !x.row.vacant }),
+  D('start', L('শুরুর তারিখ (জানা থাকলে)', 'Start date (if known)'), { show: (x) => !x.row.vacant }),
   CH('skill', L('স্কিল চেকলিস্ট', 'Skill checklist'), [['full', L('সম্পূর্ণ', 'Complete')], ['part', L('আংশিক', 'Partial')]], { req: (x) => !x.row.vacant, show: (x) => !x.row.vacant }),
   N('part_n', L('আংশিক — বাকি কাজ (টি)', 'Partial — tasks left'), { show: (x) => !x.row.vacant && x.row.skill === 'part' }),
   CK('holder_sig', L('দায়িত্বধারীর স্বাক্ষর', "Holder's signature"), { show: (x) => !x.row.vacant }), CK('appr', L('অনুমোদনকারীর স্বাক্ষর', "Approver's signature"), { who: 'checker', show: (x) => !x.row.vacant })];
@@ -451,11 +462,11 @@ const SK_TITLES = {
   F: L('Section F · রাতের ক্যাশ গ্রহণকারী — যাচাইকারী: দৈনিক হিসাব রিকনসিলিয়েশনের কর্মী', 'Section F · Night cash receiver — checker: the daily-reconciliation staff'),
   G: L('Section G · অনলাইন ও মার্কেটিং — যাচাইকারী: মালিক', 'Section G · Online & marketing — checker: the owner'),
 };
-const skTable = (k) => TABLE('sk' + k, null, [CK('done', L('নিজে সম্পাদিত', 'Done by the holder personally')), D('date', L('তারিখ', 'Date'), { req: (x) => !!x.row.done }),
-  ST('verifier', L('যাচাইকারীর স্বাক্ষর', "Checker's signature"), { req: (x) => !!x.row.done })], { rows: SK[k].map((r) => r[0]) });
+const skTable = (k) => TABLE('sk' + k, null, [...(k === 'A' ? [CK('na', L('প্রযোজ্য নয় (শুধু ১২ নম্বর — যেখানে জিলাপি কাউন্টার নেই)', 'Not applicable (task 12 only — where there is no jalebi counter)'))] : []), CK('done', L('নিজে সম্পাদিত', 'Done by the holder personally'), { show: (x) => !x.row.na }), D('date', L('তারিখ', 'Date'), { req: (x) => !!x.row.done, show: (x) => !x.row.na }),
+  ST('verifier', L('যাচাইকারীর স্বাক্ষর', "Checker's signature"), { req: (x) => !!x.row.done, show: (x) => !x.row.na })], { rows: SK[k].map((r) => r[0]) });
 B.forms['02-8'] = {
   title: L('স্কিল চেকলিস্ট', 'Skill checklist'),
-  head: [T('slot', L('ডিউটি স্লট', 'Duty slot'), { req: true }), T('initials', L('ব্যক্তির নামের আদ্যক্ষর (Initials)', "Person's initials"), { req: true }), ST('holder', L('স্লটের দায়িত্বধারী', 'Slot holder')),
+  head: [T('slot', L('ডিউটি স্লট', 'Duty slot'), { req: true }), T('initials', L('ব্যক্তির নামের আদ্যক্ষর (Initials)', "Person's initials"), { req: true }), ST('holder', L('স্লটের দায়িত্বধারী', 'Slot holder'), { req: true }),
     LOC('place', L('লোকেশন', 'Location')), D('start', L('শুরুর তারিখ', 'Start date')), D('end', L('শেষের তারিখ', 'End date'))],
   sections: [
     { title: L('নিয়ম', 'Rule'), fields: [
@@ -475,7 +486,7 @@ B.forms['02-8'] = {
   calc(x) {
     const flags = []; let n = 0, incomplete = 0, selfV = 0;
     Object.keys(SK).forEach((k) => { const rows = x.rows('sk' + k).slice(0, SK[k].length); const done = rows.filter((r) => r.done).length; n += rows.filter((r) => r.done && has(r.verifier)).length;
-      if (done > 0) incomplete += SK[k].length - done; selfV += rows.filter((r) => r.done && has(r.verifier) && r.verifier === x.d.holder).length; });
+      const na = rows.filter((r) => r.na).length; if (done > 0) incomplete += SK[k].length - done - na; selfV += rows.filter((r) => r.done && has(r.verifier) && r.verifier === x.d.holder).length; });
     if (selfV) flags.push(flag('verifier_is_holder', 'red', 'স্লটের দায়িত্বধারী নিজেই যাচাইকারী (কাজের সংখ্যা)', 'The slot holder is their own checker (tasks)', selfV, QTY));
     if (x.d.all_done && incomplete > 0) flags.push(flag('not_all_done', 'red', '"সব কাজ সম্পূর্ণ" টিক দেওয়া, কিন্তু শুরু করা অংশে কাজ বাকি (কাজের সংখ্যা)', '"All tasks complete" is ticked but started sections still have tasks left (tasks)', incomplete, QTY));
     if (has(x.d.start) && has(x.d.end) && x.d.end < x.d.start) flags.push(flag('skill_dates', 'red', 'শেষের তারিখ শুরুর তারিখের আগে', 'End date is before start date'));
@@ -494,7 +505,7 @@ B.forms['11-1'] = {
     { title: L('হ্যান্ডওভারের লাইন', 'Handover lines'), fields: [
       TABLE('lines', null, [TM('time', L('সময়', 'Time'), { req: true }), ST('from', L('প্রদানকারী (Handed over by)', 'Handed over by'), { req: true }), ST('to', L('গ্রহণকারী (Received by)', 'Received by'), { req: true }),
         M('cash', L('ড্রয়ারে গণনায় প্রাপ্ত নগদ ৳', 'Cash counted in the drawer ৳'), { req: true }), N('pending', L('পেন্ডিং অর্ডার (সংখ্যা)', 'Pending orders (number)')),
-        CK('keys', L('চাবি হ্যান্ডওভার', 'Keys handed over')), CH('display', L('ডিসপ্লের মালামাল — দুজনের গণনা', 'Display goods — counted by both'), [['match', L('মিল আছে', 'Matches')], ['short', L('ঘাটতি', 'Short')]], { req: true }),
+        CK('keys', L('চাবি হ্যান্ডওভার', 'Keys handed over')), CK('from_signed', L('প্রদানকারী — স্বাক্ষর', "Giver's signature")), CK('to_signed', L('গ্রহণকারী — স্বাক্ষর', "Receiver's signature")), CH('display', L('ডিসপ্লের মালামাল — দুজনের গণনা', 'Display goods — counted by both'), [['match', L('মিল আছে', 'Matches')], ['short', L('ঘাটতি', 'Short')]], { req: true }),
         N('short_qty', L('ঘাটতি (পরিমাণ)', 'Shortage (quantity)'), { show: (x) => x.row.display === 'short', req: (x) => x.row.display === 'short' }),
         T('open_issues', L('অমীমাংসিত বিষয় / বিশেষ নির্দেশ', 'Open issues / special instructions'), { wide: true })], { min: 2 }),
       CALC('lines_n', L('মোট লাইন', 'Lines on this register'), 'num')] },
@@ -515,14 +526,16 @@ B.forms['11-1'] = {
     const filled = rows.filter(anyRow);
     if (filled.some((r) => has(r.from) && r.from === r.to)) flags.push(flag('same_person_handover', 'red', 'প্রদানকারী ও গ্রহণকারী একই জন', 'Giver and receiver are the same person'));
     const sh = sum(filled.filter((r) => r.display === 'short').map((r) => r.short_qty));
-    if (filled.some((r) => r.display === 'short')) flags.push(flag('display_short', 'yellow', 'ডিসপ্লের মালামালে ঘাটতি', 'Shortage in the display goods', sh, QTY));
+    if (filled.some((r) => r.display === 'short')) flags.push(flag('display_short', 'red', 'ডিসপ্লের মালামালে ঘাটতি', 'Shortage in the display goods', sh, QTY));
+    if (filled.some((r) => (r.from || r.to) && (!r.from_signed || !r.to_signed))) flags.push(flag('handover_unsigned', 'yellow', 'হ্যান্ডওভার লাইনে দুই স্বাক্ষর নেই', 'A handover line is missing one of the two signatures'));
     if (filled.some((r) => has(r.cash) && !has(r.to))) flags.push(flag('no_receiver', 'red', 'গ্রহণকারীর নাম ছাড়া নগদ হ্যান্ডওভার', 'Cash handed over without a named receiver'));
     const last = filled.length ? filled[filled.length - 1] : null;
     const lastCash = d.place === 'shop' ? d.shop_cash : null;
-    if (last && has(lastCash) && num(lastCash) !== num(last.cash)) flags.push(flag('last_cash_mismatch', 'yellow', 'দিন শেষের নগদ শেষ লাইনের নগদের সমান নয়', 'End-of-day cash differs from the last line\'s cash', num(lastCash) - num(last.cash)));
+    const needs = [];
+    if (last && has(lastCash)) { const df = num(lastCash) - num(last.cash), lv = tol(df, x.s.cash_tol); if (lv) flags.push(flag('last_cash_mismatch', lv, 'দিন শেষের নগদ শেষ লাইনের নগদের সমান নয়', 'End-of-day cash differs from the last line\'s cash', df)); if (df !== 0 && (x.s.cash_tol === undefined || x.s.cash_tol === null)) needs.push('cash_tol'); }
     const ls = d.place === 'shop' ? d.shop_last : d.place === 'factory' ? d.fac_last : null;
     if (has(ls) && num(ls) !== filled.length) flags.push(flag('last_serial_mismatch', 'yellow', 'শেষ লাইনের ক্রম নং লাইন-সংখ্যার সাথে মেলে না (পৃষ্ঠা আলাদা হলে ঠিক আছে)', 'Last serial no. differs from the number of lines (fine if the register runs over several pages)', undefined));
-    return { v: { lines_n: filled.length }, flags, needs: [] };
+    return { v: { lines_n: filled.length }, flags, needs };
   },
 };
 })();
