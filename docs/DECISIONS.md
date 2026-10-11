@@ -13,18 +13,18 @@ Source: owner answers in chat, 11 Oct 2026. Scope: all 42 forms of BOS Build Kit
 - Owner has a role x form matrix to switch view / enter / approve on or off, per role. Multiple roles per person allowed.
 
 ## Entry rules
-- Draft stays editable by its maker. After submit, a change needs a mandatory note and goes to a separate Correction Log (who, when, what, why), visible to the owner in one place.
+- Any change to a draft needs a note first; the maker writes the note, makes the change, then submits. Every change goes to a separate Correction Log (who, when, what, why, note), visible to the owner in one place.
 - Self-approval (maker = checker) is blocked by default. Owner can switch it per role in the matrix; every switch is logged.
 
 ## Control rules
 - Count-first: handovers (cash, goods) require the counted figure before the system figure is shown. Mandatory by default; owner can configure per form.
-- Red control: day-close is blocked; owner can release it with a written reason (logged). Owner can configure block vs warn per control.
+- Red control: day-close is blocked. Staff applies for release with a note/reason. Owner accepts (day can proceed) or rejects (stays blocked). All requests and decisions are logged. Owner can configure block vs warn per control.
 - Variance auto-creates an item in the owner's exceptions list (who, where, how much). Auto-creation has an on/off switch. A legal / illegal reason can be recorded as a note.
 - Dashboard: problems first, plus a short summary of numbers (sales, expenses, profit, per location).
 
 ## Data and language
 - Item list seeded from data/items_seed.csv (56 items), editable at any time. Price change affects only future entries.
-- Languages: Bangla (default, common words in English), English, Banglish (Bangla written in Latin letters). Per-user switch.
+- Languages, per-user switch, three modes: (1) Bangla, (2) Banglish = Bangla text with simple everyday English words mixed in (NOT Bangla transliterated into Latin letters), (3) full English. All form labels exist in all three.
 - Form notes shown as info buttons, coloured warning boxes and step-by-step questions.
 - No invented numbers, limits or recipes: everything from settings; empty means "data needed".
 
