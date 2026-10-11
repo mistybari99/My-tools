@@ -712,6 +712,21 @@ select tt.chk('T19 ... and the owner', (select count(*) from stock_ledger_rows(1
 reset role;
 select tt.chk('T19 audit trail now covers the purchase lines', (select count(*) from audit_log where table_name = 'purchase_lines') > 0);
 
+-- an emergency approval used inside a purchase function leaves a yellow 'emergency_used' line for the owner
+set role authenticated; select tt.as(:'o'); select set_rule('em_purchase_entry', 'true');
+select tt.as(:'s');
+select request_emergency('purchase_entry', 1, '{}'::jsonb, 'supplier at the door, buyer absent') as em20 \gset
+select tt.as(:'o'); select decide_emergency(:em20, true, 'ok');
+reset role; select count(*) as emx0 from exceptions where flag_code = 'emergency_used' and form_code = 'EMERGENCY' \gset
+set role authenticated; select tt.as(:'s');
+select tt.chk('T19 a salesperson with an approved purchase_entry emergency can write ONE bill', (save_purchase(null, null, :'s19', 1, 'EM-1', current_date, '[{"description":"x","qty":1,"unit_cost":10}]'::jsonb) ->> 'status') = 'draft');
+reset role;
+select tt.chk('T19 ... the approval is used up and the owner got a yellow emergency_used line', (select status from emergency_requests where id = :em20) = 'used'
+  and (select count(*) from exceptions where flag_code = 'emergency_used' and form_code = 'EMERGENCY' and level = 'yellow') = :emx0::int + 1);
+set role authenticated; select tt.as(:'s');
+select tt.err('T19 ... and a second bill is refused again', format($$select save_purchase(null,null,%L,1,'EM-2',current_date,'[{"description":"x","qty":1,"unit_cost":10}]'::jsonb)$$, :'s19'), 'not allowed');
+select tt.as(:'o'); select set_rule('em_purchase_entry', null);
+
 \echo -- 19.4 locks: the supplier row is locked by post / void / void payment; stock_opening cannot deadlock; reconcile(fix) locks the balance
 select tt.chk('T19 stock_opening takes NO KEY UPDATE on the item, not UPDATE', (select prosrc from pg_proc where proname = 'stock_opening') like '%for no key update%'
   and (select prosrc from pg_proc where proname = 'stock_opening') not like '%from public.items where id = p_item for update%');
@@ -735,8 +750,9 @@ select id as pid from supplier_payments where supplier_id = :'s19c'::uuid and bi
 select tt.chk('T19 void_supplier_payment waits for the supplier row lock', tt.probe(array[format('update suppliers set name = name where id = %L', :'s19c')], format($$select void_supplier_payment(%s,'probe')::text$$, :'pid'), :'o') like 'blocked%');
 select tt.chk('T19 ... and then completes (voided)', (select voided from supplier_payments where id = :pid));
 -- the deadlock the audit found: B holds a balance row and then writes a ledger row (KEY SHARE on the item); A (stock_opening) used to hold the item FOR UPDATE and wait for that balance row
+insert into stock_balance (item_id, location_id) values (:'n2', 7) on conflict do nothing;      -- the balance row exists (an item already sold here), so the writer below holds ONLY the balance lock
 select tt.chk('T19 stock_opening vs a sale-like writer: no deadlock (both finish, no error)',
-  tt.probe(array[format('insert into stock_balance (item_id, location_id) values (%L, 7) on conflict do nothing', :'n2'), format('update stock_balance set updated_at = now() where item_id = %L and location_id = 7', :'n2')],
+  tt.probe(array[format('update stock_balance set updated_at = now() where item_id = %L and location_id = 7', :'n2')],
            format($$select (stock_opening(%L,7,10,10))->>'qty'$$, :'n2'), :'o',
            array[format('insert into stock_ledger (item_id, location_id, qty_delta, reason) values (%L, 7, -1, ''sale_out'')', :'n2')]) = 'blocked [result: 10]');
 select tt.chk('T19 stock_reconcile(false) does not lock', tt.probe(array[format('update stock_balance set updated_at = now() where item_id = %L and location_id = 1', :'n1')], $$select count(*)::text from stock_reconcile(false)$$, :'o') like 'ran%');

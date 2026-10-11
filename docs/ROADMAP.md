@@ -80,3 +80,7 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
 ## Checkpoint — Plan v2 build (UI v2, phase8 masters/settings, phase9 report engine, reports/settings/invoice UI)
 - All JS regression tests + new tests pass; phase8 106/106, phase9 125/125 SQL tests; independent audit done, fixes applied.
 - supabase/ALL_NEW2.sql = phase8 + phase9 — to be run once by owner (off-hours; brief lock on sales).
+
+## Checkpoint — items v2, barcode, supplier picker, stock ledger + purchases (phase10)
+- Web: items2, barcode, supplier picker in forms, stock2, purchase/payables; 14 test suites green.
+- phase10.sql: audit found 13 issues, all fixed; phase10_test 307/307. ALL_NEW3.sql = phase10 (phase8/9 already live).
