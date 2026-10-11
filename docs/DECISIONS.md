@@ -23,7 +23,7 @@ Source: owner answers in chat, 11 Oct 2026. Scope: all 42 forms of BOS Build Kit
 - Dashboard: problems first, plus a short summary of numbers (sales, expenses, profit, per location).
 
 ## Data and language
-- Item list seeded from data/items_seed.csv (56 items), editable at any time. Price change affects only future entries.
+- Item list seeded from data/items_seed.csv (57 items), editable at any time. Price change affects only future entries.
 - Languages, per-user switch, three modes: (1) Bangla, (2) Banglish = Bangla text with simple everyday English words mixed in (NOT Bangla transliterated into Latin letters), (3) full English. All form labels exist in all three.
 - Form notes shown as info buttons, coloured warning boxes and step-by-step questions.
 - No invented numbers, limits or recipes: everything from settings; empty means "data needed".
