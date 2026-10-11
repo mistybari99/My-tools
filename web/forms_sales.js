@@ -13,6 +13,8 @@ const UNITS = { kg: L('কেজি', 'kg'), pc: L('পিস', 'pc'), lb: L('�
 const fm = (n) => Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
 const itemOf = (x, code) => (x.env.byCode && x.env.byCode.get(code)) || null;
 const unitOf = (x, code) => { const it = itemOf(x, code); return it ? (UNITS[it.unit] || L(it.unit || '', it.unit || '')) : ''; };
+const r2 = (n) => Math.round(n * 100) / 100;
+const noItems = (rows) => !rows.some((r) => has(r.item));
 const NEED = L('তথ্য লাগবে', 'Data needed');
 const sv = (x, k) => (x.s[k] === undefined || x.s[k] === null ? null : x.s[k]);
 const money2 = (n) => '৳ ' + fm(n);
@@ -21,7 +23,7 @@ const money2 = (n) => '৳ ' + fm(n);
 const CHANNELS = [['counter', L('কাউন্টার', 'Counter')], ['phone', L('ফোন', 'Phone')], ['message', L('মেসেজ', 'Message')], ['party', L('পার্টি', 'Party')], ['other', L('অন্য', 'Other')]];
 const ONLINE = [['fb', L('ফেসবুক', 'Facebook')], ['ig', L('ইনস্টাগ্রাম', 'Instagram')], ['tt', L('টিকটক', 'TikTok')], ['wa', L('হোয়াটসঅ্যাপ', 'WhatsApp')], ['foodapp', L('ফুড অ্যাপ', 'Food app')], ['other', L('অন্য', 'Other')]];
 const DELIV = [['pickup', L('দোকান থেকে সংগ্রহ', 'Pick up from the shop')], ['own', L('নিজস্ব', 'Own delivery')], ['courier', L('কুরিয়ার', 'Courier')], ['foodapp', L('ফুড অ্যাপ', 'Food app')], ['other', L('অন্য', 'Other')]];
-const PAYMODES = [['cash', L('নগদ', 'Cash')], ['bkash', L('বিকাশ', 'bKash')], ['nagad', L('নগদ (Nagad)', 'Nagad')], ['card', L('কার্ড', 'Card')], ['other', L('অন্য', 'Other')]];
+const PAYMODES = [['cash', L('নগদ', 'Cash')], ['bkash', L('বিকাশ', 'bKash')], ['nagad', L('Nagad (নগদ)', 'Nagad', 'Nagad (নগদ)')], ['card', L('কার্ড', 'Card')], ['other', L('অন্য', 'Other')]];
 const notCol = (x) => x.d.not_collected;
 const handover = (x) => !x.d.not_collected;
 B.forms['20-1'] = {
@@ -35,11 +37,11 @@ B.forms['20-1'] = {
       T('cust_name', L('নাম', 'Name'), { req: true }), T('cust_phone', L('ফোন', 'Phone'), { req: true }),
       CH('deliv_mode', L('ডেলিভারি', 'Delivery'), [['pickup', L('শোরুম থেকে সংগ্রহ', 'Pick up from the showroom')], ['home', L('হোম ডেলিভারি', 'Home delivery')]], { req: true }),
       T('address', L('ঠিকানা (ডেলিভারি হলে)', 'Address (if delivered)'), { wide: true, show: (x) => x.d.deliv_mode === 'home', req: (x) => x.d.deliv_mode === 'home' }),
-      CH('deliv_by', L('ডেলিভারি মাধ্যম', 'Delivery by'), DELIV, { show: (x) => x.d.deliv_mode === 'home' }),
+      CH('deliv_by', L('ডেলিভারি মাধ্যম', 'Delivery by'), DELIV), T('deliv_other', L('অন্য ডেলিভারি মাধ্যম', 'Other delivery mode'), { show: (x) => x.d.deliv_by === 'other' }),
       D('deliv_date', L('ডেলিভারির তারিখ', 'Delivery date'), { req: true }), TM('deliv_time', L('সময়', 'Time'), { req: true })] },
     { title: L('অর্ডারের পণ্য', 'Order items'), fields: [
       TABLE('items', null, [ITEM('item', L('আইটেম কোড', 'Item code'), { req: true, wide: true }), T('desc', L('পণ্যের বিবরণ · আকার · ফ্লেভার', 'Description · size · flavour'), { wide: true }),
-        CALC('unit', L('একক', 'Unit'), 'text'), N('qty', L('পরিমাণ', 'Quantity'), { req: true }),
+        N('qty', L('পরিমাণ', 'Quantity'), { req: true }),
         T('msg', L('কেকে লিখিত বার্তা (বানানসহ)', 'Message on the cake (with spelling)'), { wide: true }), T('design', L('ডিজাইন · রং', 'Design · colour')), T('special', L('বিশেষ নির্দেশ', 'Special instruction'), { wide: true })], { min: 1 })] },
     { title: L('টাকা', 'Money'), fields: [
       M('total', L('মোট', 'Total'), { req: true }),
@@ -77,20 +79,21 @@ B.forms['20-1'] = {
   ],
   calc(x) {
     const d = x.d, flags = [], needs = [], v = {};
-    const bal = num(d.total) - num(d.discount) - num(d.advance); v.balance = bal;
+    const bal = r2(num(d.total) - num(d.discount) - num(d.advance)); v.balance = bal;
     if (has(d.total) && bal < 0) flags.push(flag('adv_over_total', 'red', 'অ্যাডভান্স ও ডিসকাউন্ট মোটের চেয়ে বেশি', 'Advance and discount exceed the total', bal));
     if (has(d.deliv_date) && d.deliv_date < x.date) flags.push(flag('delivery_past', 'red', 'ডেলিভারির তারিখ অর্ডারের তারিখের আগে', 'Delivery date is before the order date'));
     const dl = sv(x, 'discount_limit');
     if (num(d.discount) > 0) {
       if (dl === null) needs.push('discount_limit');
-      if (dl === null || num(d.discount) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (20-2) needed', num(d.discount)));
+      if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (20-2) needed', num(d.discount)));
     }
     if (d.order_type === 'custom' && d.adv_fate === 'refund') flags.push(flag('custom_refund', 'yellow', 'কাস্টম-মেইড অর্ডারের অ্যাডভান্স সাধারণত ফেরত নয়', 'Advance on a custom-made order is normally not refunded', num(d.advance)));
     const hd = sv(x, 'order_hold_days'); v.hold_text = hd === null ? NEED : L(fm(hd) + ' দিন', fm(hd) + ' days');
     if (d.not_collected && hd === null) needs.push('order_hold_days');
     if (d.not_collected) flags.push(flag('order_not_collected', 'yellow', 'অর্ডার নেওয়া হয়নি / বাতিল', 'Order not collected / cancelled', num(d.advance) > 0 ? num(d.advance) : undefined));
-    if (has(d.board_checker) && d.board_checker === x.me) flags.push(flag('board_checker_is_maker', 'yellow', 'বোর্ড যাচাইকারী ও লেখক একই জন', 'Board checker and writer are the same person'));
-    return { v, rows: { items: x.rows('items').map((r) => ({ unit: unitOf(x, r.item) })) }, flags, needs };
+    if (has(d.board_checker) && d.board_checker === d.taker) flags.push(flag('board_checker_is_maker', 'yellow', 'বোর্ড যাচাইকারী ও অর্ডার গ্রহণকারী একই জন', 'Board checker and order taker are the same person'));
+    if (noItems(x.rows('items'))) flags.push(flag('no_items', 'red', 'অর্ডারে কোনো পণ্য লেখা নেই', 'No item lines on the order'));
+    return { v, flags, needs };
   },
 };
 
@@ -101,7 +104,7 @@ B.forms['20-2'] = {
   sections: [
     { title: L('ডিসকাউন্টের পণ্য', 'Discounted items'), fields: [
       NOTE(L('ডিসকাউন্টের পরের বিক্রয় মূল্যই দিনের মোট বিক্রিতে যাবে। ডিসকাউন্টের মোট অঙ্ক ক্লোজিং রিপোর্টের নোটে লিখুন।', 'The sale price after discount is what goes into the day’s total sales. Write the total discount in the closing report note.'), 'ok'),
-      TABLE('lines', null, [ITEM('item', L('আইটেম কোড', 'Item code'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'), N('qty', L('পরিমাণ', 'Quantity'), { req: true }),
+      TABLE('lines', null, [ITEM('item', L('আইটেম কোড', 'Item code'), { req: true, wide: true }), T('desc', L('পণ্যের বিবরণ', 'Product description'), { wide: true }), N('qty', L('পরিমাণ', 'Quantity'), { req: true }),
         M('list_price', L('তালিকা মূল্য ৳ (প্রতি একক)', 'List price ৳ (per unit)'), { req: true }), M('disc', L('ডিসকাউন্ট ৳', 'Discount ৳'), { req: true }), CALC('sale', L('বিক্রয় মূল্য ৳', 'Sale price ৳'), 'money')], { min: 3 }),
       CALC('tot_list', L('মোট তালিকা মূল্য', 'Total list price'), 'money'), CALC('tot_disc', L('মোট ডিসকাউন্ট', 'Total discount'), 'money', { big: true }), CALC('tot_sale', L('মোট বিক্রয় মূল্য', 'Total sale price'), 'money')] },
     { title: L('কারণ ও অনুমোদন', 'Reason & approval'), fields: [
@@ -116,15 +119,16 @@ B.forms['20-2'] = {
   ],
   calc(x) {
     const rows = x.rows('lines'), flags = [], needs = [], v = {};
-    const out = rows.map((r) => { const list = num(r.qty) * num(r.list_price); return { unit: unitOf(x, r.item), sale: list - num(r.disc) }; });
-    v.tot_list = sum(rows.map((r) => num(r.qty) * num(r.list_price))); v.tot_disc = sum(rows.map((r) => r.disc)); v.tot_sale = v.tot_list - v.tot_disc;
+    const out = rows.map((r) => ({ sale: r2(num(r.qty) * num(r.list_price) - num(r.disc)) }));
+    if (noItems(rows)) flags.push(flag('no_items', 'red', 'কোনো পণ্যের লাইন নেই', 'No item lines'));
+    v.tot_list = r2(sum(rows.map((r) => num(r.qty) * num(r.list_price)))); v.tot_disc = r2(sum(rows.map((r) => r.disc))); v.tot_sale = r2(v.tot_list - v.tot_disc);
     const lim = sv(x, 'discount_limit'), disc = v.tot_disc;
     if (lim === null) needs.push('discount_limit');
     const over = disc > 0 && (lim === null || disc > lim); v.over_limit = over;
     v.limit_text = disc <= 0 ? '' : lim === null ? NEED : over ? L('সীমার উপরে — অনুমোদন নেওয়া হয়েছে কি?', 'Over the limit — approval needed') : L('নির্ধারিত সীমার ভেতরে — অনুমোদন লাগবে না', 'Within the fixed limit — no approval needed');
     if (over) flags.push(flag('discount_over_limit', has(x.d.approved_by) ? 'yellow' : 'red', has(x.d.approved_by) ? 'ডিসকাউন্ট সীমার উপরে (অনুমোদিত)' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদনকারী নেই', has(x.d.approved_by) ? 'Discount above the limit (approved)' : 'Discount above the limit — no approver', disc));
-    if (has(x.d.approved_by) && x.d.approved_by === x.me) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও লেখক একই জন', 'Approver and writer are the same person'));
-    if (rows.some((r) => num(r.disc) > num(r.qty) * num(r.list_price) && has(r.list_price))) flags.push(flag('disc_over_price', 'red', 'কোনো লাইনে ডিসকাউন্ট তালিকা মূল্যের চেয়ে বেশি', 'A line has a discount above its list price'));
+    if (has(x.d.approved_by) && x.d.approved_by === x.d.seller) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও বিক্রয়কারী একই জন', 'Approver and seller are the same person'));
+    if (rows.some((r) => r2(num(r.disc)) > r2(num(r.qty) * num(r.list_price)) && has(r.list_price))) flags.push(flag('disc_over_price', 'red', 'কোনো লাইনে ডিসকাউন্ট তালিকা মূল্যের চেয়ে বেশি', 'A line has a discount above its list price'));
     rows.forEach((r) => { const it = itemOf(x, r.item); if (it && has(r.list_price) && num(it.sell_price) > 0 && num(it.sell_price) !== num(r.list_price) && !flags.some((f) => f.code === 'list_price_diff')) flags.push(flag('list_price_diff', 'yellow', 'তালিকা মূল্য মূল্য-তালিকার সাথে মেলেনি', 'List price differs from the price list')); });
     return { v, rows: { lines: out }, flags, needs };
   },
@@ -137,7 +141,7 @@ B.forms['20-3'] = {
   head: [TM('time', L('সময়', 'Time')), T('cust_name', L('কাস্টমারের নাম', "Customer's name"), { req: true }), T('cust_phone', L('ফোন', 'Phone')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
     { title: L('পণ্য', 'Item'), fields: [
-      ITEM('item', L('আইটেম কোড ও নাম', 'Item code and name'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'), N('qty', L('পরিমাণ', 'Quantity'), { req: true }),
+      ITEM('item', L('আইটেম কোড ও নাম', 'Item code and name'), { req: true, wide: true }), N('qty', L('পরিমাণ', 'Quantity'), { req: true }),
       D('buy_date', L('ক্রয়ের তারিখ', 'Date of purchase')), T('memo_no', L('মেমো / অর্ডার নং', 'Memo / order no.')), T('tag_prod', L('ট্যাগ রং / উৎপাদন তারিখ', 'Tag colour / production date'))] },
     { title: L('অভিযোগের বিবরণ (Complaint)', 'Complaint'), fields: [
       ...COMPLAINTS.map(([id, l]) => CK('c_' + id, l)), CK('c_sick', L('খেয়ে অসুস্থ', 'Fell ill after eating')),
@@ -164,7 +168,7 @@ B.forms['20-3'] = {
       N('prev_count', L('এ মাসে এই পণ্যে আগের অভিযোগ (টি)', 'Earlier complaints on this product this month'), { who: 'checker' }), T('prev_reg', L('রিটার্ন ও অভিযোগ রেজিস্টার নং', 'Return & complaint register no.'), { who: 'checker' }),
       TA('root_cause', L('মূল কারণ', 'Root cause'), { who: 'checker', req: true }),
       NOTE(L('মূল কারণ না লিখে ফাইল বন্ধ করা যাবে না।', 'The file cannot be closed without writing the root cause.'), 'warn', { who: 'checker' }),
-      TA('action', L('গৃহীত ব্যবস্থা (Action Taken)', 'Action taken'), { who: 'checker' }), ST('responsible', L('দায়িত্ব', 'Responsible'), { who: 'checker' }), D('deadline', L('সময়সীমা', 'Deadline'), { who: 'checker' }),
+      TA('action', L('গৃহীত ব্যবস্থা (Action Taken)', 'Action taken'), { who: 'checker' }), ST('investigated_by', L('তদন্তকারী (Investigated by) — হাব', 'Investigated by — hub'), { who: 'checker' }), ST('responsible', L('দায়িত্ব', 'Responsible'), { who: 'checker' }), D('deadline', L('সময়সীমা', 'Deadline'), { who: 'checker' }),
       CK('in_worklist', L('কাজের তালিকায় যোগ হয়েছে', 'Added to the work list'), { who: 'checker', req: true }),
       TM('call_time', L('কাস্টমারকে ফোন — সময়', 'Call to the customer — time'), { who: 'checker' }),
       CH('feedback', L('মতামত', 'Feedback'), [['happy', L('সন্তুষ্ট', 'Satisfied')], ['unhappy', L('অসন্তুষ্ট', 'Not satisfied')]], { who: 'checker' }), T('unhappy_why', L('অসন্তুষ্ট হলে কারণ', 'Reason if not satisfied'), { who: 'checker', show: (x) => x.c.feedback === 'unhappy' }),
@@ -178,12 +182,11 @@ B.forms['20-3'] = {
     const over = !!d.d_refund && amt > 0 && (lim === null || amt > lim); v.over_limit = over;
     v.limit_text = !d.d_refund ? '' : lim === null ? NEED : over ? L('সীমার বাইরে — অনুমোদন লাগবে', 'Over the limit — approval needed') : L('সীমার ভেতরে', 'Within the limit');
     if (over) flags.push(flag('refund_over_limit', has(d.approved_by) ? 'yellow' : 'red', has(d.approved_by) ? 'টাকা ফেরত সীমার বাইরে (অনুমোদিত)' : 'টাকা ফেরত সীমার বাইরে — অনুমোদনকারী নেই', has(d.approved_by) ? 'Refund over the limit (approved)' : 'Refund over the limit — no approver', amt));
-    if (has(d.approved_by) && d.approved_by === x.me) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও লেখক একই জন', 'Approver and writer are the same person'));
+    if (has(d.approved_by) && (d.approved_by === d.received_by || d.approved_by === d.handed_by)) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও গ্রহণকারী/প্রদানকারী একই জন', 'Approver is the receiver / giver'));
     if (d.c_sick) flags.push(flag('illness_complaint', 'yellow', 'খেয়ে অসুস্থ হওয়ার অভিযোগ — সেদিনই ব্যবস্থাপনাকে জানাতে হবে', 'Complaint of illness after eating — management must be told the same day'));
     if (has(d.item) && !d.d_replace && !d.d_refund && !d.d_adjust && !d.d_sorry) flags.push(flag('no_customer_decision', 'yellow', 'কাস্টমারের জন্য কোনো সিদ্ধান্ত টিক দেওয়া হয়নি', 'No decision ticked for the customer'));
     if (has(d.item) && !d.taken_back) flags.push(flag('product_not_taken', 'red', 'পণ্যটি জমা নেওয়া হয়নি', 'The product was not taken in'));
     if (x.c.resolved === undefined || !x.c.resolved) { if (Object.values(x.c).some(has)) flags.push(flag('complaint_open', 'yellow', 'অভিযোগ এখনো সমাধান হয়নি', 'Complaint is not resolved yet', undefined, { src: 'check' })); }
-    v.unit = unitOf(x, d.item);
     return { v, rows: {}, flags, needs };
   },
 };
@@ -205,7 +208,7 @@ B.forms['20-4'] = {
       M('prev_dues', L('আগের বকেয়া', 'Earlier dues'))] },
     { title: L('মালামাল', 'Goods'), fields: [
       NOTE(L('পার্টির দর প্রতিষ্ঠানের অনুমোদিত দরেই হবে — মৌখিক নির্দেশে নয়। ক্রেডিট সীমার বাইরে গেলে নতুন বাকিতে মালামাল যাবে না।', 'The party’s rate must be the rate approved by the business, never on verbal instruction. If over the credit limit, no new goods on credit.'), 'warn'),
-      TABLE('lines', null, [ITEM('item', L('আইটেম কোড', 'Item code'), { req: true, wide: true }), CALC('unit', L('একক', 'Unit'), 'text'), N('qty', L('পরিমাণ', 'Quantity'), { req: true }), M('rate', L('দর ৳', 'Rate ৳'), { req: true }), CALC('line_total', L('মোট ৳', 'Total ৳'), 'money')], { min: 3 }),
+      TABLE('lines', null, [ITEM('item', L('আইটেম কোড', 'Item code'), { req: true, wide: true }), T('desc', L('পণ্যের বিবরণ', 'Product description'), { wide: true }), T('unit', L('একক', 'Unit')), N('qty', L('পরিমাণ', 'Quantity'), { req: true }), M('rate', L('দর ৳', 'Rate ৳'), { req: true }), CALC('line_total', L('মোট ৳', 'Total ৳'), 'money')], { min: 3 }),
       CALC('grand', L('সর্বমোট (Grand Total)', 'Grand total'), 'money', { big: true })] },
     { title: L('টাকা', 'Money'), show: isInv, fields: [
       M('discount', L('(−) ডিসকাউন্ট', '(−) Discount')), T('disc_slip', L('ডিসকাউন্ট স্লিপ নং', 'Discount slip no.'), { show: (x) => num(x.d.discount) > 0 }),
@@ -214,7 +217,7 @@ B.forms['20-4'] = {
       T('cash_other', L('অন্য মাধ্যম', 'Other mode'), { show: (x) => num(x.d.cash_today) > 0 && x.d.cash_mode === 'other' }),
       CALC('inv_due', L('এই ইনভয়েসের বাকি', 'Balance of this invoice'), 'money', { big: true }), CALC('all_due', L('মোট বকেয়া (আগের + আজকের)', 'Total outstanding (earlier + today)'), 'money', { big: true })] },
     { title: L('যাচাই ও এন্ট্রি', 'Checks & posting'), show: isInv, fields: [
-      M('party_limit', L('পার্টির ক্রেডিট সীমা (পার্টি ও পাইকারি লেজার থেকে)', 'Party credit limit (from the party & wholesale ledger)')),
+      M('party_limit', L('পার্টির ক্রেডিট সীমা (পার্টি ও পাইকারি লেজার থেকে)', 'Party credit limit (from the party & wholesale ledger)'), { req: (x) => isInv(x) && x.d.credit_ok === 'inside' }),
       CH('credit_ok', L('ক্রেডিট সীমা', 'Credit limit'), [['inside', L('সীমার ভেতরে', 'Inside the limit')], ['outside', L('সীমার বাইরে — অনুমোদন', 'Outside — approved')]], { req: isInv }),
       ST('approved_by', L('সীমার বাইরে হলে অনুমোদনকারী (Approved by)', 'Approver (if outside the limit)'), { show: (x) => x.d.credit_ok === 'outside', req: (x) => x.d.credit_ok === 'outside' }),
       CK('posted_ledger', L('পার্টি ও পাইকারি লেজারে এন্ট্রি (Posting)', 'Posted in the party & wholesale ledger'), { req: isInv }), T('ledger_line', L('পাতা / লাইন নং', 'Page / line no.')),
@@ -225,19 +228,21 @@ B.forms['20-4'] = {
   ],
   calc(x) {
     const d = x.d, rows = x.rows('lines'), flags = [], needs = [], v = {};
-    const out = rows.map((r) => ({ unit: unitOf(x, r.item), line_total: num(r.qty) * num(r.rate) }));
-    v.grand = sum(rows.map((r) => num(r.qty) * num(r.rate)));
-    v.inv_total = v.grand - num(d.discount); v.inv_due = v.inv_total - num(d.cash_today); v.all_due = num(d.prev_dues) + v.inv_due;
+    const out = rows.map((r) => ({ line_total: r2(num(r.qty) * num(r.rate)) }));
+    if (noItems(rows)) flags.push(flag('no_items', 'red', 'কোনো পণ্যের লাইন নেই', 'No item lines'));
+    v.grand = r2(sum(rows.map((r) => num(r.qty) * num(r.rate))));
+    v.inv_total = r2(v.grand - num(d.discount)); v.inv_due = r2(v.inv_total - num(d.cash_today)); v.all_due = r2(num(d.prev_dues) + v.inv_due);
     if (isInv(x)) {
-      if (num(d.cash_today) > v.inv_total) flags.push(flag('cash_over_total', 'red', 'আজকের নগদ ইনভয়েসের মোটের চেয়ে বেশি', "Today's cash is more than the invoice total", num(d.cash_today) - v.inv_total));
+      if (num(d.cash_today) > v.inv_total) flags.push(flag('cash_over_total', 'red', 'আজকের নগদ ইনভয়েসের মোটের চেয়ে বেশি', "Today's cash is more than the invoice total", r2(num(d.cash_today) - v.inv_total)));
       if (d.pay === 'cash' && v.inv_due > 0) flags.push(flag('cash_but_due', 'yellow', 'পেমেন্ট "নগদ" কিন্তু বাকি আছে', 'Payment is "cash" but a balance remains', v.inv_due));
       if (d.pay === 'credit' && v.inv_due > 0 && !has(d.credit_days)) flags.push(flag('credit_days_missing', 'yellow', 'বাকির সময় লেখা নেই', 'Credit period is not written', v.inv_due));
       if (d.credit_ok === 'outside') flags.push(flag('credit_outside', has(d.approved_by) ? 'yellow' : 'red', has(d.approved_by) ? 'ক্রেডিট সীমার বাইরে (অনুমোদিত)' : 'ক্রেডিট সীমার বাইরে — অনুমোদনকারী নেই', has(d.approved_by) ? 'Over the credit limit (approved)' : 'Over the credit limit — no approver', v.all_due));
-      if (d.credit_ok === 'inside' && has(d.party_limit) && v.all_due > num(d.party_limit)) flags.push(flag('credit_over_limit', 'red', 'মোট বকেয়া পার্টির ক্রেডিট সীমার উপরে, অথচ "সীমার ভেতরে" টিক', 'Total outstanding is over the party credit limit but "inside the limit" is ticked', v.all_due - num(d.party_limit)));
+      if (d.credit_ok === 'inside' && !has(d.party_limit)) flags.push(flag('credit_limit_missing', 'red', 'ক্রেডিট সীমা লেখা নেই — "সীমার ভেতরে" যাচাই করা যায়নি', 'Credit limit not entered — cannot confirm "inside the limit"'));
+      if (d.credit_ok === 'inside' && has(d.party_limit) && v.all_due > num(d.party_limit)) flags.push(flag('credit_over_limit', 'red', 'মোট বকেয়া পার্টির ক্রেডিট সীমার উপরে, অথচ "সীমার ভেতরে" টিক', 'Total outstanding is over the party credit limit but "inside the limit" is ticked', r2(v.all_due - num(d.party_limit))));
       const dl = sv(x, 'discount_limit');
       if (num(d.discount) > 0) { if (dl === null) needs.push('discount_limit');
-        if (dl === null || num(d.discount) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (20-2) needed', num(d.discount))); }
-      if (has(d.approved_by) && d.approved_by === x.me) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও লেখক একই জন', 'Approver and writer are the same person'));
+        if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (20-2) needed', num(d.discount))); }
+      if (has(d.approved_by) && d.approved_by === d.prepared_by) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও প্রস্তুতকারী একই জন', 'Approver and preparer are the same person'));
     }
     return { v, rows: { lines: out }, flags, needs };
   },
@@ -248,7 +253,7 @@ const PROBLEMS = [['p_stop', L('চলছে না', 'Not running')], ['p_cool'
 B.forms['08-1'] = {
   title: L('মেইনটেন্যান্স অনুরোধ ও রেকর্ড', 'Maintenance request & record'),
   head: [T('machine', L('যন্ত্রের নাম', 'Machine name'), { req: true }), T('machine_id', L('যন্ত্রের নং / পরিচয়', 'Machine no. / ID'), { req: true }),
-    D('found_date', L('সমস্যা শনাক্তের তারিখ', 'Date problem found'), { req: true }), TM('found_time', L('সময়', 'Time'), { req: true }), ST('reported_by', L('রিপোর্টকারী (Reported by)', 'Reported by'), { req: true })],
+    D('found_date', L('সমস্যা শনাক্তের তারিখ', 'Date problem found'), { req: true }), TM('found_time', L('সময়', 'Time'), { req: true }), ST('reported_by', L('রিপোর্টকারী (Reported by)', 'Reported by'), { req: true }), ST('requested_by', L('অনুরোধকারী (Requested by)', 'Requested by'))],
   sections: [
     { title: L('সমস্যা', 'Problem'), fields: [
       NOTE(L('যন্ত্র বিকল হলে শুধু মেরামত নয় — ভেতরে রাখা পণ্যের অবস্থাও যাচাই করতে হবে। বিকল অবস্থায় কত সময় ছিল, তা লিখতে হবে।', 'When a machine fails it is not only a repair: check the condition of the goods inside. Write how long it stayed out of order.'), 'warn'),
@@ -278,12 +283,12 @@ B.forms['08-1'] = {
       v.downtime = Number.isFinite(h) ? Math.round(h * 10) / 10 : undefined;
       if (Number.isFinite(h) && h < 0) flags.push(flag('done_before_found', 'red', 'মেরামত শেষের সময় শনাক্তের সময়ের আগে', 'Repair finish time is before the time found'));
     }
-    if (has(d.actual_cost) && has(d.est_cost) && num(d.actual_cost) > num(d.est_cost)) flags.push(flag('cost_over_estimate', 'yellow', 'প্রকৃত খরচ অনুমোদিত আনুমানিক খরচের চেয়ে বেশি', 'Actual cost is above the approved estimate', num(d.actual_cost) - num(d.est_cost)));
+    if (has(d.actual_cost) && has(d.est_cost) && num(d.actual_cost) > num(d.est_cost)) flags.push(flag('cost_over_estimate', 'yellow', 'প্রকৃত খরচ অনুমোদিত আনুমানিক খরচের চেয়ে বেশি', 'Actual cost is above the approved estimate', r2(num(d.actual_cost) - num(d.est_cost))));
     const em = sv(x, 'expense_max');
     if (d.pay === 'imprest' && num(d.actual_cost) > 0) { if (em === null) needs.push('expense_max'); else if (num(d.actual_cost) > em) flags.push(flag('imprest_over_limit', 'yellow', 'ইমপ্রেস্ট থেকে খরচ এককালীন সীমার উপরে', 'Imprest payment above the single-expense limit', num(d.actual_cost))); }
     if (num(d.actual_cost) > 0 && !d.receipt) flags.push(flag('no_receipt', 'yellow', 'রসিদ সংযুক্ত নেই', 'No receipt attached', num(d.actual_cost)));
     if (d.pay === 'owner') flags.push(flag('owner_personal', 'yellow', 'মালিকের ব্যক্তিগত টাকায় পেমেন্ট', "Paid from the owner's personal money", num(d.actual_cost) || undefined));
-    if (has(d.approved_by) && (d.approved_by === x.me || d.approved_by === d.reported_by)) flags.push(flag('approver_same', 'red', 'অনুমোদনকারী ও রিপোর্টকারী/লেখক একই জন', 'Approver is the reporter / writer'));
+    if (has(d.approved_by) && (d.approved_by === d.reported_by || d.approved_by === d.requested_by)) flags.push(flag('approver_same', 'red', 'অনুমোদনকারী ও রিপোর্টকারী/অনুরোধকারী একই জন', 'Approver is the reporter / requester'));
     return { v, flags, needs };
   },
 };
@@ -309,6 +314,7 @@ B.forms['01-1'] = {
       TABLE('fac', null, [N('yield_diff', L('ফলনের পার্থক্য', 'Yield difference')), N('chhana_short', L('ছানার ঘাটতি', 'Chhana shortage')), M('supplier_due', L('সাপ্লায়ারের বকেয়া ৳', 'Supplier dues ৳')), M('receivable', L('প্রাপ্য ৳', 'Receivable ৳')), M('open_adv', L('খোলা অ্যাডভান্স ৳', 'Open advance ৳'))],
         { rows: [L('মিষ্টি কারখানা', 'Sweets factory'), L('কেক কারখানা', 'Cake factory'), L('অন্য', 'Other'), L('হাব', 'Hub')] }),
       M('owner_liab', L('হাব: মালিকের কাছে ব্যবসার দায় (Liability) ৳', 'Hub: business liability to the owner ৳')), M('outside_debt', L('হাব: বাইরের ঋণ ৳', 'Hub: outside debt ৳')),
+      CK('split_seen', L('দেখা হয়েছে (সপ্তাহের সব ব্যয় ভাউচার)', 'Checked (all expense vouchers of the week)'), { req: true }),
       CH('split', L('সীমার নিচে ভাগ করা খরচ বা পেমেন্ট — সপ্তাহের সব ব্যয় ভাউচার দেখে: একই খাতে বা একই জনকে সীমার নিচে একাধিক?', 'Split expenses or payments below the limit — after checking all expense vouchers of the week: several below the limit on the same head or to the same person?'),
         [['no', L('না', 'No')], ['yes', L('হ্যাঁ', 'Yes')]], { req: true }),
       CK('split_in_decisions', L('হ্যাঁ হলে সিদ্ধান্তে যোগ করা হয়েছে', 'If yes, added to the decisions'), { show: (x) => x.d.split === 'yes', req: (x) => x.d.split === 'yes' })] },
@@ -330,7 +336,7 @@ B.forms['01-1'] = {
     const d = x.d, flags = [], needs = [];
     if (has(d.week_from) && has(d.week_to) && d.week_to < d.week_from) flags.push(flag('week_range', 'red', 'সপ্তাহের শেষ তারিখ শুরুর আগে', 'Week end is before its start'));
     if (d.split === 'yes') flags.push(flag('split_expenses', 'yellow', 'সীমার নিচে ভাগ করা খরচ ধরা পড়েছে', 'Split expenses below the limit found'));
-    if (has(d.prev_total) && has(d.prev_done) && has(d.prev_open) && num(d.prev_done) + num(d.prev_open) !== num(d.prev_total)) flags.push(flag('prev_mismatch', 'yellow', 'গত সপ্তাহের সিদ্ধান্ত: সম্পন্ন + বাকি ≠ মোট', "Last week's decisions: done + open ≠ total", num(d.prev_done) + num(d.prev_open) - num(d.prev_total), { unit: 'qty' }));
+    if (has(d.prev_total) && has(d.prev_done) && has(d.prev_open) && r2(num(d.prev_done) + num(d.prev_open)) !== r2(num(d.prev_total))) flags.push(flag('prev_mismatch', 'yellow', 'গত সপ্তাহের সিদ্ধান্ত: সম্পন্ন + বাকি ≠ মোট', "Last week's decisions: done + open ≠ total", r2(num(d.prev_done) + num(d.prev_open) - num(d.prev_total)), { unit: 'qty' }));
     return { v: {}, flags, needs };
   },
 };
@@ -364,7 +370,7 @@ B.forms['01-2'] = {
       CALC('net', L('৭ · নিট লাভ = ৩ − ৪ − ৫ − ৬', '7 · Net profit = 3 − 4 − 5 − 6'), 'money', { big: true }),
       N('reinvest_pct', L('মালিকের ঠিক করা ভাগ (%) — পুনর্বিনিয়োগ', "Owner's chosen share (%) — reinvestment"), { req: true }),
       CALC('reinvest', L('৮ · পুনর্বিনিয়োগ ফান্ডে = নিট লাভ × ভাগ', '8 · To the reinvestment fund = net profit × share'), 'money')] },
-    { title: L('B · KPI-এর উৎস সংখ্যা', 'B · Source numbers for the KPIs'), fields: [
+    { title: L('KPI-এর উৎস সংখ্যা (কাগজ থেকে)', 'Source numbers for the KPIs (from the papers)'), fields: [
       TABLE('sales_by', L('বিক্রি — লোকেশন ও ব্র্যান্ড ধরে', 'Sales — by location and brand'), [T('name', L('লোকেশন · ব্র্যান্ড', 'Location · brand'), { wide: true }), M('amt', L('বিক্রি ৳', 'Sales ৳'))], { min: 2 }),
       N('headcount', L('কর্মী-সংখ্যা (মাসিক হাজিরা রেজিস্টার)', 'Headcount (monthly attendance register)')), M('wastage', L('অপচয় (Wastage) ৳', 'Wastage ৳')), M('discount', L('ডিসকাউন্ট ৳', 'Discount ৳')),
       M('cash_short', L('ক্যাশ কম ৳ (পজিটিভ সংখ্যা)', 'Cash short ৳ (positive number)')), M('gm_unexplained', L('মালামাল বনাম টাকার অব্যাখ্যাত ৳', 'Unexplained goods-vs-money ৳')), M('count_short', L('স্টক কাউন্টের ঘাটতি ৳', 'Stock count shortfall ৳')),
@@ -385,31 +391,35 @@ B.forms['01-2'] = {
       CK('rec_salary', L('লাইন ৫ = মাসিক বেতন শিট', 'Line 5 = monthly salary sheet'), { req: true }),
       CK('rec_leak', L('লিক ৳ শূন্য না হলে কারণ কাজের তালিকায়', 'If leak ৳ is not zero, the reason is in the work list'), { show: (x) => x.v.leak_nonzero, req: (x) => x.v.leak_nonzero }),
       ST('prepared_by', L('প্রস্তুতকারী (Prepared by) — ব্যবস্থাপনা', 'Prepared by — management'), { req: true }),
-      ST('checked_by', L('যাচাইকারী (Checked by) — অন্য কেউ, প্রস্তুতকারী নন', 'Checked by — someone else, not the preparer'), { req: true }), ST('owner', L('মালিক', 'Owner'))] },
+      ST('owner', L('মালিক', 'Owner'))] },
+    { who: 'checker', title: L('যাচাই (অন্য কেউ, প্রস্তুতকারী নন)', 'Check (someone else, not the preparer)'), fields: [
+      ST('checked_by', L('যাচাইকারী (Checked by) — অন্য কেউ, প্রস্তুতকারী নন', 'Checked by — someone else, not the preparer'), { who: 'checker', req: true })] },
   ],
   calc(x) {
     const d = x.d, flags = [], needs = [], v = {};
-    const sales = num(d.sales), cogs = num(d.open_stock) + num(d.purchases) - num(d.close_stock); v.cogs = cogs;
-    const gross = sales - cogs; v.gross = gross;
-    const exp = sum(XHEADS.map(([id]) => d['x_' + id])); v.expenses = exp;
-    const net = gross - exp - num(d.salary) - num(d.bank_charges); v.net = net;
-    v.reinvest = net * num(d.reinvest_pct) / 100;
+    const sales = num(d.sales), cogs = r2(num(d.open_stock) + num(d.purchases) - num(d.close_stock)); v.cogs = cogs;
+    const gross = r2(sales - cogs); v.gross = gross;
+    const exp = r2(sum(XHEADS.map(([id]) => d['x_' + id]))); v.expenses = exp;
+    const net = r2(gross - exp - num(d.salary) - num(d.bank_charges)); v.net = net;
+    v.reinvest = r2(net * num(d.reinvest_pct) / 100);
     const dim = daysInMonth(d.month); v.days_text = dim === null ? L('মাস লিখুন (যেমন 2026-10)', 'Enter the month (e.g. 2026-10)') : String(dim);
-    const leak = num(d.cash_short) + num(d.gm_unexplained) + num(d.count_short); v.leak = leak; v.leak_nonzero = leak !== 0;
+    const leak = r2(num(d.cash_short) + num(d.gm_unexplained) + num(d.count_short)); v.leak = leak; v.leak_nonzero = leak !== 0;
     const pc = (a, b) => (b > 0 ? (a / b * 100).toFixed(1) + ' %' : '—');
     const stockDays = dim && cogs > 0 ? (num(d.close_stock) / (cogs / dim)).toFixed(1) : '—';
     const payDays = dim && num(d.purchases) > 0 ? (num(d.payables) / (num(d.purchases) / dim)).toFixed(1) : '—';
-    const salesBy = sum(x.rows('sales_by').map((r) => r.amt));
+    const salesBy = r2(sum(x.rows('sales_by').map((r) => r.amt)));
     const cur = [has(d.sales) || salesBy ? money2(salesBy || sales) : '—', pc(gross, sales), pc(net, sales), pc(num(d.salary), sales), num(d.headcount) > 0 ? money2(sales / num(d.headcount)) : '—', pc(num(d.wastage), sales), pc(num(d.discount), sales),
       money2(leak), stockDays, payDays, money2(num(d.receivables)), '', money2(num(d.new_prod)),
       (num(d.on_orders) + ' · ' + money2(num(d.on_sales)) + ' · ' + money2(num(d.on_cpo))), pc(num(d.emerg), num(d.purchases))];
     cur[11] = x.rows('raw').some((r) => has(r.p_start) || has(r.p_end)) ? x.rows('raw').filter((r) => has(r.name)).map((r) => r.name + ' ' + (num(r.p_end) - num(r.p_start) >= 0 ? '+' : '') + fm(num(r.p_end) - num(r.p_start))).join(', ') || '—' : '—';
     const raw = x.rows('raw').map((r) => ({ chg: has(r.p_start) && has(r.p_end) ? (num(r.p_end) - num(r.p_start) >= 0 ? '+' : '') + fm(num(r.p_end) - num(r.p_start)) : '' }));
-    if (has(d.checked_by) && (d.checked_by === d.prepared_by || d.checked_by === x.me)) flags.push(flag('checker_is_preparer', 'red', 'যাচাইকারী ও প্রস্তুতকারী একই জন', 'Checker and preparer are the same person'));
+    if (has(x.c.checked_by) && has(d.prepared_by) && x.c.checked_by === d.prepared_by) flags.push(flag('checker_is_preparer', 'red', 'যাচাইকারী ও প্রস্তুতকারী একই জন', 'Checker and preparer are the same person', undefined, { src: 'check' }));
     if (leak !== 0) flags.push(flag('leak_nonzero', 'yellow', 'লিক ৳ শূন্য নয়', 'Leak ৳ is not zero', leak));
+    if (has(d.month) && dim === null) flags.push(flag('month_format', 'red', 'মাসের ফরম্যাট ভুল — বছর-মাস লিখুন (যেমন 2026-10)', 'Month format is wrong — write year-month (e.g. 2026-10)'));
+    if (net < 0 && num(d.reinvest_pct) > 0) flags.push(flag('reinvest_on_loss', 'yellow', 'নিট ক্ষতি — পুনর্বিনিয়োগের অঙ্ক ঋণাত্মক দেখাচ্ছে', 'Net is a loss — the reinvestment figure is negative', v.reinvest));
     if (has(d.sales) && net < 0) flags.push(flag('net_loss', 'yellow', 'এ মাসে নিট ক্ষতি', 'Net loss this month', net));
     if (cogs < 0 && has(d.close_stock)) flags.push(flag('cogs_negative', 'red', 'বিক্রি হওয়া মালামালের খরচ ঋণাত্মক — মজুদ/ক্রয় যাচাই করুন', 'Cost of goods sold is negative — check stock/purchases', cogs));
-    if (salesBy > 0 && has(d.sales) && salesBy !== sales) flags.push(flag('sales_by_gap', 'yellow', 'লোকেশন-ব্র্যান্ড বিক্রির যোগ লাইন ১-এর সমান নয়', 'Sales by location/brand do not add up to line 1', salesBy - sales));
+    if (salesBy > 0 && has(d.sales) && salesBy !== sales) flags.push(flag('sales_by_gap', 'yellow', 'লোকেশন-ব্র্যান্ড বিক্রির যোগ লাইন ১-এর সমান নয়', 'Sales by location/brand do not add up to line 1', r2(salesBy - sales)));
     return { v, rows: { kpi: cur.map((c) => ({ cur: c })), raw }, flags, needs };
   },
 };
