@@ -1,0 +1,11 @@
+set role authenticated; select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
+select save_entry(null,'10-1',1,'2026-10-12','{"paper_no":"A-0005"}','[]');
+select save_entry(null,'10-1',1,'2026-10-12','{"paper_no":"A-0006"}','[]');
+select save_entry(null,'10-1',1,'2026-10-12','{"paper_no":"A-0009"}','[]');
+select save_entry(null,'10-1',1,'2026-10-12','{"paper_no":" A-0009 "}','[]');
+select save_entry(null,'10-1',2,'2026-10-12','{"paper_no":"A-0009"}','[]');
+select save_entry(null,'10-1',1,'2026-10-12','{}','[]');
+select number_audit('10-1',1);
+select * from number_audit_summary();
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000003',false);
+select number_audit('10-1',1);

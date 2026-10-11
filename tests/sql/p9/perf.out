@@ -1,0 +1,31 @@
+Pager usage is off.
+Output format is unaligned.
+CREATE FUNCTION
+CREATE FUNCTION
+SET
+summary year 2.02s rows=1 groups=1 more=false
+summary year compare 2.15s rows=1 groups=1 more=false
+trend day year 1.16s rows=50 groups=365 more=true
+trend day+loc cmp 1.08s rows=50 groups=2555 more=true
+combined year 2.26s rows=7 groups=7 more=false
+item year 0.77s rows=5 groups=5 more=false
+item year cmp day 1.65s rows=38 groups=38 more=false
+category year 1.38s rows=2 groups=2 more=false
+register year 0.73s rows=50 groups=300009 more=true
+register page 10 0.67s rows=50 groups=300009 more=false
+hour 0.33s rows=16 groups=16 more=false
+discounts year (bill view) 1.03s rows=22 groups=22 more=false
+day close year 1.93s rows=50 groups=2555 more=true
+voids 1.04s rows=21 groups=21 more=false
+quick 0.16s rows=2 groups=2 more=false
+payment modes 0.29s rows=3 groups=3 more=false
+best customers 0.21s rows=3 groups=3 more=false
+dues 0.98s rows=2 groups=2 more=false
+credit 0.19s rows=3 groups=3 more=false
+cap: item,day (items x 365) 1.23s rows=50 groups=1098 more=true
+cap: page 10 of 500 (last page) 1.30s rows=50 groups=1098 more=false
+cap: page 11 beyond cap 0.34s rows=0 groups=0 more=false
+summary by day,location,staff (cap) 9.95s rows=50 groups=10229 more=true
+["no_data"]
+["truncated"]|1098
+50

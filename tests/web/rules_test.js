@@ -1,0 +1,54 @@
+const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const fs = require('fs'), path = require('path'), http = require('http');
+const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
+const R = (key, module, kind, def, bn, extra = {}) => ({ key, module, kind, value: null, default_value: def, label_bn: bn, label_en: bn, label_mix: bn, hint_bn: null, sort: 1, ...extra });
+data.tables.rules = [R('pos_customer_on_due', 'pos', 'switch', true, 'বাকিতে গ্রাহক লাগবে'), R('pos_credit_mode', 'pos', 'choice', 'block', 'বাকির সীমা', { choices: ['block', 'warn', 'off'] }), R('pos_offline_hours', 'pos', 'number', 72, 'অফলাইন ঘণ্টা', { unit: 'ঘণ্টা' }),
+  R('period_closed_until', 'books', 'text', null, 'হিসাব বন্ধ', { unit: 'YYYY-MM-DD' }), R('em_enabled', 'emergency', 'switch', true, 'জরুরি চালু'), R('em_discount', 'emergency', 'switch', true, 'জরুরি ডিসকাউন্ট'), R('em_minutes', 'emergency', 'number', 30, 'মিনিট')];
+data.tables.grant_defs = [{ grant_code: 'discount_over_limit', module: 'pos', sort: 1, label_bn: 'সীমার উপরে ডিসকাউন্ট', label_en: 'Discount above limit', window_type: 'once', emergency_rule: 'em_discount' }, { grant_code: 'closed_period_edit', module: 'books', sort: 7, label_bn: 'বন্ধ হিসাবে এন্ট্রি', label_en: 'Closed period', window_type: 'window', emergency_rule: 'em_period' }];
+data.tables.rule_grants = [{ grant_code: 'discount_over_limit', role_code: 'showroom_manager', allowed: true }];
+data.tables.emergency_requests = [{ id: 1, grant_code: 'discount_over_limit', requested_by: 'u2', requested_staff: 'karim02', location_id: 1, context: { discount: 80 }, reason: 'customer waiting', status: 'pending', created_at: '2026-10-11T10:00:00Z' }];
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8086);
+const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; window.__CALLS = [];
+ c.rpc = async (fn, args) => { window.__CALLS.push([fn, args]);
+  if (fn === 'set_rule') return { data: null, error: null };
+  if (fn === 'set_grant') return { data: null, error: null };
+  if (fn === 'request_emergency') return { data: 5, error: null };
+  if (fn === 'decide_emergency') return { data: null, error: null };
+  if (fn === 'my_emergency') return { data: [{ id: 5, grant_code: 'discount_over_limit', status: 'approved', reason: 'x', valid_until: '2026-10-11T12:00:00Z', created_at: '2026-10-11T10:00:00Z' }], error: null };
+  if (fn === 'record_sale2') return { data: null, error: { message: window.__FAIL || 'x' } };
+  return rpc(fn, args); }; return c; }; })();`;
+(async () => {
+  const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const errors = []; const log = (...a) => console.log(...a);
+  const ctx = await br.newContext({ viewport: { width: 390, height: 800 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
+  p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
+  await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
+  await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
+  await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','bn');}catch(e){}`);
+  await p.goto('http://localhost:8086/#/home'); await p.waitForTimeout(900);
+  log('home tiles:', (await p.locator('.tile span').allTextContents()).join(' | '));
+  await p.click('.tile >> text=নিয়ম ও অপশন'); await p.waitForTimeout(500);
+  log('rules cards:', await p.locator('#rh_body .card').count()); await p.screenshot({ path: SP + '/r_rules.png', fullPage: true });
+  await p.click('[data-act=rh_switch][data-k=pos_customer_on_due]'); await p.waitForTimeout(300);
+  log('switch call:', JSON.stringify((await p.evaluate(() => window.__CALLS)).filter((c) => c[0] === 'set_rule')));
+  await p.fill('#rh_period_closed_until', '2026-02-30'); await p.click('[data-act=rh_save][data-k=period_closed_until]'); log('bad date ->', (await p.textContent('#toast')).trim().slice(0, 40));
+  await p.fill('#rh_period_closed_until', '2026-09-30'); await p.click('[data-act=rh_save][data-k=period_closed_until]'); await p.waitForTimeout(300);
+  await p.click('[data-act=rh_tab][data-v=grants]'); await p.waitForTimeout(300); await p.screenshot({ path: SP + '/r_grants.png', fullPage: true });
+  log('grant chips:', await p.locator('[data-act=rh_grant]').count());
+  await p.click('[data-act=rh_tab][data-v=more]'); await p.waitForTimeout(200); log('more links:', await p.locator('#rh_body .card').count());
+  // emergency queue
+  await p.goto('http://localhost:8086/#/emergency'); await p.waitForTimeout(700); log('pending cards:', await p.locator('.card.stack').count()); await p.screenshot({ path: SP + '/r_queue.png' });
+  await p.click('[data-act=em_decide][data-ok="0"]'); log('reject w/o note ->', (await p.textContent('#toast')).trim().slice(0, 30));
+  await p.click('[data-act=em_decide][data-ok="1"]'); await p.waitForTimeout(300); log('decide call:', JSON.stringify((await p.evaluate(() => window.__CALLS)).filter((c) => c[0] === 'decide_emergency').pop()));
+  // staff blocked in POS -> offer
+  await p.goto('http://localhost:8086/#/pos'); await p.waitForTimeout(800);
+  const pc = data.tables.items.find((i) => i.unit === 'pc');
+  await p.evaluate(() => { window.__FAIL = 'discount_needs_approval'; });
+  await p.click(`.pos-item[data-v="${pc.id}"]`); await p.click('[data-act=pos_cart]'); await p.waitForTimeout(200); await p.fill('#cart_disc', '10'); await p.click('#cart_ok'); await p.waitForTimeout(400);
+  log('offer sheet:', (await p.locator('.sheet').textContent()).replace(/\s+/g, ' ').slice(0, 110)); await p.screenshot({ path: SP + '/r_offer.png' });
+  await p.click('[data-act=em_send]'); log('short reason ->', (await p.textContent('#toast')).trim().slice(0, 30));
+  await p.fill('#em_reason', 'customer is waiting'); await p.click('[data-act=em_send]'); await p.waitForTimeout(300);
+  log('request call:', JSON.stringify((await p.evaluate(() => window.__CALLS)).filter((c) => c[0] === 'request_emergency').pop()));
+  log('errors:', errors.length ? [...new Set(errors)] : 'none'); await br.close(); srv.close();
+})();
