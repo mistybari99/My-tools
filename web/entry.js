@@ -96,7 +96,7 @@ const FIELD_ID = (() => { let n = 0; return () => 'x' + (n++); })();
 
 function ctxFor() {
   return { d: E.data, c: E.check, s: E.settings, env: ENV, v: (E.calc && E.calc.v) || {}, cf: !!E.formRow.count_first, num, has, sum, den: (k) => denTotal(getp(E.data, k)), denC: (k) => denTotal(getp(E.check, k)),
-    rows: (id) => E.data[id] || [], rowsC: (id) => E.check[id] || [], me: S.ctx.profile.staff_id, date: E.date, loc: E.loc, wd: weekday(E.date),
+    rows: (id) => (E.data[id] || []).map((r) => r || {}), rowsC: (id) => (E.check[id] || []).map((r) => r || {}), me: S.ctx.profile.staff_id, date: E.date, loc: E.loc, wd: weekday(E.date),
     L, lab, money, needs: [] };
 }
 function recompute() {
@@ -276,12 +276,12 @@ document.addEventListener('toggle', (e) => { if (E && e.target.dataset && e.targ
 // ---------- validation ----------
 function missingRequired() {
   const x = ctxFor(), miss = [];
-  const check = (f, obj, path, ctx) => {
+  const check = (f, obj, path, ctx, pre = '') => {
     if (f.type === 'note' || f.type === 'calc') return;
     const vis = (!f.show || f.show(ctx)); if (!vis) return;
     const req = typeof f.req === 'function' ? f.req(ctx) : f.req; if (!req) return;
     const v = getp(obj, path);
-    if (!has(v) || (f.type === 'denoms' && denTotal(v) === 0)) miss.push(lab(f.label));
+    if (!has(v) || (f.type === 'denoms' && denTotal(v) === 0)) miss.push(pre + lab(f.label));
   };
   E.spec.head && E.spec.head.forEach((f) => check(f, E.data, f.id, x));
   E.spec.sections.forEach((sec) => {
@@ -294,7 +294,7 @@ function missingRequired() {
           const row = (E.data[f.id] || [])[i] || {}, rowC = (E.check[f.id] || [])[i] || {};
           const any = Object.values(row).some(has) || Object.values(rowC).some(has);
           if (!any && !f.rows) continue;
-          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }); });
+          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }, (f.rows ? lab(f.rows[i]) : String(i + 1)) + ' · '); });
         }
       } else if ((E.mode === 'check') === ((f.who || sec.who) === 'checker')) check(f, f.who === 'checker' || sec.who === 'checker' ? E.check : E.data, f.id, x);
     });
