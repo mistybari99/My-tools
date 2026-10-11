@@ -4,6 +4,7 @@ window.BOS_T = {
   lang_bn: { bn: "বাংলা", mix: "Banglish", en: "বাংলা" },
   lang_mix: { bn: "Banglish", mix: "Banglish", en: "Banglish" },
   lang_en: { bn: "English", mix: "English", en: "English" },
+  login_sub: { bn: "স্টাফ আইডি আর পিন দিয়ে ঢুকুন", mix: "Staff ID আর PIN দিয়ে ঢুকুন", en: "Sign in with your staff ID and PIN" },
   login: { bn: "লগইন", mix: "Login", en: "Log in" },
   register: { bn: "নতুন অ্যাকাউন্ট", mix: "নতুন Account", en: "New account" },
   logout: { bn: "লগআউট", mix: "Logout", en: "Log out" },

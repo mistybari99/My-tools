@@ -57,6 +57,19 @@ function openSheet(html) {
 function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
 
+const ICON = {
+  items: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="16" cy="16" r="4.6" fill="currentColor"/></svg>',
+  itemreq: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h20l-5-5M27 21H7l5 5"/></svg>',
+  staff: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="5"/><circle cx="23" cy="13" r="3.4"/><path d="M3 27c0-5 4-8 9-8s9 3 9 8M21 20c4 0 8 2 8 7"/></svg>',
+  matrix: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="12.5" y="4" width="7" height="7" rx="1.5" opacity=".45"/><rect x="21" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="12.5" width="7" height="7" rx="1.5" opacity=".45"/><rect x="12.5" y="12.5" width="7" height="7" rx="1.5"/><rect x="21" y="12.5" width="7" height="7" rx="1.5" opacity=".45"/><rect x="4" y="21" width="7" height="7" rx="1.5"/><rect x="12.5" y="21" width="7" height="7" rx="1.5" opacity=".45"/><rect x="21" y="21" width="7" height="7" rx="1.5"/></svg>',
+  rules: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M10 16.5l4 4 8-9"/></svg>',
+  settings: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h24M4 16h24M4 23h24"/><circle cx="11" cy="9" r="3.2" fill="var(--ink)"/><circle cx="21" cy="16" r="3.2" fill="var(--ink)"/><circle cx="13" cy="23" r="3.2" fill="var(--ink)"/></svg>',
+  logs: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M10 8h18M10 16h18M10 24h18"/><circle cx="4.5" cy="8" r="1.4" fill="currentColor"/><circle cx="4.5" cy="16" r="1.4" fill="currentColor"/><circle cx="4.5" cy="24" r="1.4" fill="currentColor"/></svg>',
+  backup: '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4v16M9 14l7 7 7-7M5 27h22"/></svg>',
+};
+const TONE = { items: '', itemreq: '', staff: 't-brick', matrix: 't-brick', rules: 't-leaf', settings: 't-ink', logs: 't-ink', backup: 't-ink' };
+const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#14173a"/><circle cx="32" cy="29" r="16.5" fill="none" stroke="#f2a900" stroke-width="3"/><circle cx="32" cy="29" r="8.8" fill="#f2a900"/><path d="M12 51h40" stroke="#f7eedc" stroke-width="3.2" stroke-linecap="round"/></svg>';
+
 // ---------- auth ----------
 const emailOf = (sid) => `${sid.toLowerCase()}@${C.emailDomain}`;
 const pwOf = (pin) => `${pin}-bos`;            // lets a 4-digit PIN meet Supabase's minimum password length
@@ -70,12 +83,13 @@ function authErr(msg) {
 function viewAuth(mode = 'login', msg = '') {
   const reg = mode === 'register';
   shell(t('app'), `
+    <div class="login-mark">${MARK}<div><b>${esc(t('app'))}</b><span>${esc(t('login_sub'))}</span></div></div>
     <div class="tabs">
       <button data-act="authmode" data-v="login" class="${reg ? '' : 'on'}">${esc(t('login'))}</button>
       <button data-act="authmode" data-v="register" class="${reg ? 'on' : ''}">${esc(t('register'))}</button>
     </div>
     ${msg ? `<div class="notice bad" id="a_err">${esc(msg)}</div>` : ''}
-    <div class="card stack">
+    <div class="card panel stack">
       ${reg ? `<div><label>${esc(t('full_name'))}</label><input id="a_name" autocomplete="name"></div>` : ''}
       <div><label>${esc(t('staff_id'))}</label><input id="a_sid" autocapitalize="none" autocomplete="username" inputmode="latin"><div class="muted" style="font-size:.8rem">${esc(t('staff_id_hint'))}</div></div>
       <div><label>${esc(t('pin'))}</label><input id="a_pin" type="password" inputmode="numeric" maxlength="6" autocomplete="${reg ? 'new-password' : 'current-password'}"></div>
@@ -146,7 +160,7 @@ function viewPending() {
 // ---------- home ----------
 async function viewHome() {
   const p = S.ctx.profile, perms = S.ctx.perms || {}, owner = S.ctx.is_owner;
-  shell(t('app'), `<p class="muted">${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b> · ${esc(p.staff_id)}</p><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
+  shell(t('app'), `<div class="hello"><span>${esc(t('hello'))}, <b>${esc(p.full_name || p.staff_id)}</b></span><span class="sid">${esc(p.staff_id)}</span></div><div id="home"><p class="muted">${esc(t('loading'))}</p></div>
     <button class="full" style="margin-top:18px" data-act="logout">${esc(t('logout'))}</button>`);
   const canDecide = owner || (perms.ITEMS && perms.ITEMS.approve);
   const [forms, pend, itemPending] = await Promise.all([
@@ -165,9 +179,9 @@ async function viewHome() {
   const mine = forms.data.filter((f) => f.area !== 'master' && perms[f.code] && perms[f.code].view);
   const byArea = AREAS.map((a) => [a, mine.filter((f) => f.area === a)]).filter(([, l]) => l.length);
   $('#home').innerHTML = `<div class="grid">${tiles.map(([go_, label, badge]) =>
-      `<button class="tile" data-act="go" data-v="${go_}">${esc(label)}${badge}</button>`).join('')}</div>
+      `<button class="tile ${TONE[go_] || ''}" data-act="go" data-v="${go_}">${ICON[go_] || ''}<span>${esc(label)}</span>${badge}</button>`).join('')}</div>
     <h2>${esc(t('forms_title'))}</h2><div class="notice warn">${esc(t('forms_soon'))}</div>
-    ${byArea.length ? byArea.map(([a, l]) => `<div class="card"><b>${esc(t('area_' + a))}</b>${l.map((f) => {
+    ${byArea.length ? byArea.map(([a, l]) => `<div class="card panel"><b>${esc(t('area_' + a))}</b>${l.map((f) => {
       const pr = perms[f.code];
       return `<div class="perm"><div class="row between"><span>${esc(f.code)} · ${esc(nm(f))}</span><span class="row">${
         pr.enter ? `<span class="chip ok">${esc(t('can_enter'))}</span>` : `<span class="chip">${esc(t('can_view'))}</span>`}${
