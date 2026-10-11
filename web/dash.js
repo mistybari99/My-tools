@@ -70,13 +70,13 @@ async function render() {
     const mx = Math.max(1, ...days.map((d) => d[1]));
     const mode = (m) => sum(sToday.filter((s) => s.pay_mode === m));
     html += `<div class="card panel dash"><h3>${esc(T('numbers'))}</h3>
-      <div class="row between"><span>${esc(T('sales'))}</span><b class="dbig">${money(sum(sToday))}</b></div>
-      <div class="muted">${cnt(sToday)} ${esc(T('count'))} · ${esc(T('yday'))} ${money(y)}</div>
+      <div class="plate"><div class="pl-k">${esc(T('sales'))}</div><div class="pl-v"><span class="cur">৳</span>${fmt(sum(sToday))}</div>
+        <div class="pl-s">${cnt(sToday)} ${esc(T('count'))} · ${esc(T('yday'))} ${money(y)}</div></div>
       <div class="row wrap" style="margin:8px 0">${['cash', 'mobile', 'card', 'due'].map((m) => `<span class="chip">${esc(T(m === 'due' ? 'duem' : m))} ${money(mode(m))}</span>`).join('')}</div>
       ${sum(sToday, 'discount') ? `<div class="muted">${esc(T('disc'))}: ${money(sum(sToday, 'discount'))}</div>` : ''}
       ${locs.length > 1 ? `<div class="muted" style="margin-top:8px">${esc(T('perloc'))}</div>${locs.map((l) => `<div class="row between"><span>${esc(nm(l))}</span><b>${money(sum(sToday.filter((s) => s.location_id === l.id)))}</b></div>`).join('')}` : ''}
       <div class="muted" style="margin-top:10px">${esc(T('week'))}</div>
-      <div class="bars">${days.map(([d, v]) => `<div class="bar"><i style="height:${Math.round(v / mx * 100)}%"></i><small>${S.lang === 'en' ? dayLetterEn(d) : dayLetter(d)}</small></div>`).join('')}</div></div>`;
+      <div class="bars">${days.map(([d, v]) => `<div class="bar ${d === td ? 'now' : ''}"><em>${v ? fmt(Math.round(v)) : ''}</em><i style="height:${Math.round(v / mx * 100)}%"></i><small>${S.lang === 'en' ? dayLetterEn(d) : dayLetter(d)}</small></div>`).join('')}</div></div>`;
   }
   el.innerHTML = html;
 }

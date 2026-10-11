@@ -109,8 +109,8 @@ function visibleItems() {
 function drawItems(can) {
   const inCart = new Map(P.cart.map((l) => [l.item_id, l.qty]));
   const l = visibleItems();
-  $('#pos_items').innerHTML = l.map((i) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
-      <span class="pn">${esc(nm(i))}</span><span class="pp">${money(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`).join('')
+  $('#pos_items').innerHTML = l.map((i) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-cat="${esc(i.category || '')}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
+      <span class="pn">${esc(nm(i))}</span><span class="pp"><span class="cur">৳</span>${fmt(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`).join('')
     || `<p class="muted center">—</p>`;
 }
 function drawBar(can) {
