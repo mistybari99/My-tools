@@ -53,3 +53,9 @@ Workflow per phase: code → local test (Postgres mock + Playwright stub) → au
   Next: audit phase4 + biz.js, P5 hardening (server recompute, PIN lock).
 - 2026-10-11 (live) · User ran phase3.sql + phase4.sql on real Supabase (combined, Success). Public site has all features; temp setup page removed.
   Next: owner tries POS/forms on phone and sends screenshots; fix issues. P5 hardening still open (server-side recompute, hard PIN lock).
+- 2026-10-11 (POS v2, research) · Research (Odoo/ERPNext/Zoho/Loyverse/Square/Lightspeed/QuickBooks/Xero + Bangladesh products; sources partly secondary).
+  Built: phase6.sql (customers by mobile, split/partial payment, baki ledger + collections, wholesale rule, option_lists table, discount/price-override need a manager,
+  credit limit per customer) + web/pay.js, pos.js v2, dues.js. Bng-Eng suffix bug fixed (Count-এর). Not yet run on real DB: phase5.sql, phase6.sql (user will run later).
+  Rules decided from research: hide expected cash from cashier (already blind count), manager approval for discount above limit / price override, credit limit with manager override,
+  void keeps reason, sequential receipt numbers. Still TODO: editable lists UI (#/lists) + forms reading lists, marketing-head limits & fridges as compact tables, books-closed date lock,
+  stock write-off reasons, receipt VAT/Mushak question for owner.
