@@ -21,7 +21,9 @@
 -- ============================================================
 
 create index if not exists sales_date_loc on public.sales (sale_date, location_id);
+create index if not exists exceptions_sale on public.exceptions (sale_id) where sale_id is not null;
 create index if not exists sale_payments_paid_at on public.sale_payments (paid_at);
+create index if not exists sale_payments_sale on public.sale_payments (sale_id) where sale_id is not null;
 
 -- ---------- brand of a location (sales do not store a brand; the owner maps locations to brands) ----------
 create table if not exists public.report_brand_map (
@@ -73,6 +75,25 @@ insert into public.rule_grants (grant_code, role_code)
   where p.form_code = 'POS' and p.can_approve
   on conflict do nothing;
 
+-- one row per sale LINE, kept by a trigger (the json is parsed once, when the sale is written, not on every report).
+-- The bill discount is spread over the lines in proportion to their amount (net). NO cost columns anywhere in here.
+create table if not exists public.sales_fact_t (
+  sale_id uuid not null references public.sales(id) on delete cascade, line_no int not null,
+  receipt int, day date not null, sold_at timestamptz not null, location_id int not null,
+  staff text, status text, sale_type text, pay_mode text, customer_id uuid,
+  item_id uuid, line_name text, line_unit text, line_kind text,
+  qty numeric, price numeric, gross numeric, net numeric, disc numeric, override boolean,
+  sale_total numeric, sale_discount numeric, discount_kind text, discount_pct numeric,
+  first_of_item boolean,      -- first line of this item (or custom name) in its sale: makes "bills per item" a cheap count
+  primary key (sale_id, line_no)
+);
+alter table public.sales_fact_t add column if not exists first_of_item boolean;
+delete from public.sales_fact_t where first_of_item is null;      -- facts of an older draft are derived data: reloaded below
+create index if not exists sales_fact_t_day on public.sales_fact_t (day, location_id);
+create index if not exists sales_fact_t_item on public.sales_fact_t (item_id, day) where item_id is not null;
+alter table public.sales_fact_t enable row level security;     -- no policy: nobody reads it directly
+revoke all on public.sales_fact_t from public, anon, authenticated;
+
 -- ---------- fact views (columns are fixed; optional phase8 columns are appended only when they exist) ----------
 do $v$
 declare dk text := 'null::text'; dp text := 'null::numeric';
@@ -104,11 +125,15 @@ begin
     case when s.status = 'done' then coalesce(x.ov, 0) else 0 end as override_lines,
     case when s.status = 'done' then coalesce(x.cu_, 0) else 0 end as custom_lines,
     case when s.status = 'done' then coalesce(x.qk, 0) else 0 end as quick_lines,
-    $q$ || dk || $q$ as discount_kind, $q$ || dp || $q$ as discount_pct
+    $q$ || dk || $q$ as discount_kind, $q$ || dp || $q$ as discount_pct,
+    case when s.status = 'done' and coalesce(ex.ol, false) then 1 else 0 end as over_limit_bills,
+    case when s.status = 'done' and coalesce(ex.nl, false) then 1 else 0 end as no_limit_bills
   from public.sales s
   join public.locations lo on lo.id = s.location_id
   left join public.report_brand_map bm on bm.location_id = s.location_id
   left join public.customers cu on cu.id = s.customer_id
+  left join (select sale_id, bool_or(flag_code = 'discount_over_limit') as ol, bool_or(flag_code = 'discount_no_limit') as nl
+             from public.exceptions where sale_id is not null group by sale_id) ex on ex.sale_id = s.id
   left join lateral (
     select count(*) filter (where e->>'override' = 'true') as ov,
            count(*) filter (where e->>'custom' = 'true') as cu_,
@@ -135,37 +160,79 @@ begin
   left join public.report_brand_map bm on bm.location_id = s.location_id
   group by s.sale_date, s.location_id, lo.name_bn, lo.name_en, bm.brand_code, bm.brand_bn, bm.brand_en, s.created_staff, s.pay_mode, s.sale_type $q$;
 
-  -- one row per sale LINE. The bill discount is spread over the lines in proportion to their amount (net). NO cost columns here.
+
+  -- loads the line facts of one sale (or, with null, of every sale that has none yet). Cast-safe: bad json gives null/0, never an error.
   execute $q$
-  create or replace view public.sales_fact as
-  select s.id as sale_id, e.ord::int as line_no, s.receipt, s.sale_date as day, s.sold_at,
-    extract(hour from s.sold_at at time zone 'Asia/Dhaka')::int as hour,
-    extract(dow from s.sale_date)::int as dow,
-    s.location_id, lo.name_bn as location_bn, coalesce(lo.name_en, lo.name_bn) as location_en,
-    bm.brand_code, bm.brand_bn, bm.brand_en,
-    s.created_staff as staff, s.status, s.sale_type, s.pay_mode, s.customer_id,
-    it.id as item_id, it.code as item_code,
-    coalesce(it.name_bn, nullif(e.v->>'name', ''), 'Quick sale') as item_name,
-    coalesce(it.name_en, it.name_bn, nullif(e.v->>'name', ''), 'Quick sale') as item_name_en,
-    it.category, coalesce(it.unit, nullif(e.v->>'unit', '')) as unit,
-    case when it.id is not null then 'listed' when e.v->>'custom' = 'true' then 'unlisted' else 'quick' end as line_kind,
-    q.qty, q.price, q.amount as gross,
-    q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end as net,
-    q.amount - q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end as disc,
-    (e.v->>'override' = 'true') as override,
-    s.total as sale_total, s.discount as sale_discount,
-    $q$ || dk || $q$ as discount_kind, $q$ || dp || $q$ as discount_pct
-  from public.sales s
-  join public.locations lo on lo.id = s.location_id
-  left join public.report_brand_map bm on bm.location_id = s.location_id
-  cross join lateral jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) with ordinality as e(v, ord)
-  cross join lateral (select
-      case when e.v->>'item_id' ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then (e.v->>'item_id')::uuid end as iid,
-      case when e.v->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'qty')::numeric end as qty,
-      case when e.v->>'price' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'price')::numeric end as price,
-      case when e.v->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'amount')::numeric else 0 end as amount) q
-  left join public.items it on it.id = q.iid $q$;
+  create or replace function public.rpt_fact_load(p_sale uuid) returns void
+  language sql security definer set search_path = public as $f$
+    insert into public.sales_fact_t (sale_id, line_no, receipt, day, sold_at, location_id, staff, status, sale_type, pay_mode, customer_id,
+      item_id, line_name, line_unit, line_kind, qty, price, gross, net, disc, override, sale_total, sale_discount, discount_kind, discount_pct, first_of_item)
+    select s.id, e.ord::int, s.receipt, s.sale_date, s.sold_at, s.location_id, s.created_staff, s.status, s.sale_type, s.pay_mode, s.customer_id,
+      it.id, nullif(e.v->>'name', ''), nullif(e.v->>'unit', ''),
+      case when it.id is not null then 'listed' when e.v->>'custom' = 'true' then 'unlisted' else 'quick' end,
+      q.qty, q.price, q.amount, q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end,
+      q.amount - q.amount * case when s.subtotal > 0 then s.total / s.subtotal else 1 end,
+      (e.v->>'override' = 'true'), s.total, s.discount, $q$ || dk || $q$, $q$ || dp || $q$,
+      (row_number() over (partition by s.id, q.iid, e.v->>'name' order by e.ord) = 1)
+    from public.sales s
+    cross join lateral jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) with ordinality as e(v, ord)
+    cross join lateral (select
+        case when e.v->>'item_id' ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then (e.v->>'item_id')::uuid end as iid,
+        case when e.v->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'qty')::numeric end as qty,
+        case when e.v->>'price' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'price')::numeric end as price,
+        case when e.v->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (e.v->>'amount')::numeric else 0 end as amount) q
+    left join public.items it on it.id = q.iid
+    where (p_sale is not null and s.id = p_sale)
+       or (p_sale is null and not exists (select 1 from public.sales_fact_t t where t.sale_id = s.id))
+    on conflict (sale_id, line_no) do nothing;
+  $f$ $q$;
 end $v$;
+
+create or replace function public.rpt_fact_trg() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  begin      -- a problem here must never stop a sale from being saved; report_fact_rebuild() repairs the facts
+    if tg_op = 'UPDATE' then delete from public.sales_fact_t where sale_id = new.id; end if;
+    perform public.rpt_fact_load(new.id);
+  exception when others then
+    raise warning 'rpt_fact: % (sale %)', sqlerrm, new.id;
+  end;
+  return null;
+end $$;
+drop trigger if exists rpt_fact on public.sales;
+create trigger rpt_fact after insert or update of lines, status, subtotal, discount, total, location_id, sale_date, sold_at, created_staff, customer_id, sale_type, pay_mode
+  on public.sales for each row execute function public.rpt_fact_trg();
+
+-- the owner can rebuild the facts from the sales at any time (derived data only; sales are never touched)
+create or replace function public.report_fact_rebuild() returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare n bigint;
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  delete from public.sales_fact_t;
+  perform public.rpt_fact_load(null);
+  select count(*) into n from public.sales_fact_t;
+  return jsonb_build_object('fact_rows', n, 'sales', (select count(*) from public.sales));
+end $$;
+
+do $$ begin perform public.rpt_fact_load(null); end $$;      -- back-fill existing sales (does nothing for sales that already have facts)
+
+create or replace view public.sales_fact as
+select t.sale_id, t.line_no, t.receipt, t.day, t.sold_at,
+  extract(hour from t.sold_at at time zone 'Asia/Dhaka')::int as hour,
+  extract(dow from t.day)::int as dow,
+  t.location_id, lo.name_bn as location_bn, coalesce(lo.name_en, lo.name_bn) as location_en,
+  bm.brand_code, bm.brand_bn, bm.brand_en,
+  t.staff, t.status, t.sale_type, t.pay_mode, t.customer_id,
+  t.item_id, it.code as item_code,
+  coalesce(it.name_bn, t.line_name, 'Quick sale') as item_name,
+  coalesce(it.name_en, it.name_bn, t.line_name, 'Quick sale') as item_name_en,
+  it.category, coalesce(it.unit, t.line_unit) as unit,
+  t.line_kind, t.qty, t.price, t.gross, t.net, t.disc, t.override, t.sale_total, t.sale_discount, t.discount_kind, t.discount_pct, t.first_of_item
+from public.sales_fact_t t
+join public.locations lo on lo.id = t.location_id
+left join public.report_brand_map bm on bm.location_id = t.location_id
+left join public.items it on it.id = t.item_id;
 
 -- one row per payment (sale payments and later collections)
 create or replace view public.rpt_pay as
@@ -182,6 +249,9 @@ left join public.report_brand_map bm on bm.location_id = p.location_id
 left join public.customers cu on cu.id = p.customer_id;
 
 revoke all on public.rpt_bill, public.rpt_daily, public.sales_fact, public.rpt_pay from public, anon, authenticated;
+revoke all on function public.rpt_fact_load(uuid), public.rpt_fact_trg() from public, anon, authenticated;
+revoke all on function public.report_fact_rebuild() from public, anon;
+grant execute on function public.report_fact_rebuild() to authenticated;
 
 -- ---------- permission helpers ----------
 create or replace function public.rpt_access(p_group text) returns boolean
@@ -332,6 +402,8 @@ language sql immutable set search_path = public as $j$
    "avg_discount":{"expr":"round(sum({T}.discount) / nullif(sum({T}.disc_bills), 0), 2)","bn":"ছাড়ের বিলে গড় ছাড়","en":"Avg discount per discounted bill","type":"money"},
    "share_pct":{"expr":"round(100 * sum({T}.net) / nullif(sum(sum({T}.net)) over (), 0), 2)","tot":"100","bn":"অংশ %","en":"Share %","type":"pct"},
    "override_lines":{"expr":"coalesce(sum({T}.override_lines), 0)","bn":"দাম বদলের লাইন","en":"Price-override lines","type":"int","daily":0},
+   "over_limit_bills":{"expr":"coalesce(sum({T}.over_limit_bills), 0)","bn":"ছাড়ের সীমা পার বিল","en":"Bills over the discount limit","type":"int","daily":0},
+   "no_limit_bills":{"expr":"coalesce(sum({T}.no_limit_bills), 0)","bn":"সীমা লেখা ছাড়া ছাড়ের বিল","en":"Discounts with no limit set","type":"int","daily":0},
    "custom_lines":{"expr":"coalesce(sum({T}.custom_lines), 0)","bn":"তালিকা-বহির্ভূত লাইন","en":"Unlisted lines","type":"int","daily":0},
    "customers":{"expr":"count(distinct {T}.customer_id)","bn":"গ্রাহক","en":"Customers","type":"int","daily":0},
    "first_sale":{"expr":"min({T}.day) filter (where {T}.bills = 1)","bn":"প্রথম কেনা","en":"First purchase","type":"date","daily":0},
@@ -397,7 +469,7 @@ language sql immutable set search_path = public as $j$
      "measures":["bills","gross","discount","net","avg_bill","share_pct","due"],"sort":"net:desc","cmp":1},
    "discounts":{"group":"sales","kind":"agg","src":"bill","bn":"ডিসকাউন্ট ও দাম বদল","en":"Discounts and price overrides","mix":"Discount ও দাম বদল","only_bill":1,
      "dims":["staff","location","brand","day","week","month","fy","discount_kind","sale_type"],"gdef":"staff",
-     "measures":["bills","disc_bills","gross","discount","discount_pct","avg_discount","override_lines","net"],"sort":"discount:desc","cmp":1},
+     "measures":["bills","disc_bills","gross","discount","discount_pct","avg_discount","over_limit_bills","no_limit_bills","override_lines","net"],"sort":"discount:desc","cmp":1},
    "pos_day_close":{"group":"pos","kind":"raw","bn":"দিনশেষ রিপোর্ট (POS)","en":"POS day close","mix":"দিনশেষ (POS) report","nocompare":1,
      "allow":["locations","brands","staff"],"sort":"day:desc",
      "columns":[["day","দিন","Day","date"],["location_id","","","id"],["location_bn","লোকেশন","Location","text"],["location_en","Location (EN)","Location (EN)","text"],["bills","বিল","Bills","int"],["net","বিক্রি","Sales","money"],["discount","ছাড়","Discount","money"],["void_bills","বাতিল বিল","Voided bills","int"],["void_amt","বাতিল টাকা","Voided amount","money"],["due_created","নতুন বাকি","New due","money"],["cash_in","ক্যাশ (সেল)","Cash at sale","money"],["mobile_in","মোবাইল (সেল)","Mobile at sale","money"],["card_in","কার্ড (সেল)","Card at sale","money"],["cash_collections","ক্যাশ আদায়","Cash collections","money"],["mobile_collections","মোবাইল আদায়","Mobile collections","money"],["card_collections","কার্ড আদায়","Card collections","money"],["total_in","মোট জমা","Total received","money"],["expected_cash","ড্রয়ারে থাকার কথা (ক্যাশ)","Expected cash in drawer","money"]]},
@@ -506,6 +578,10 @@ begin
   end if;
   foreach mk in array p_mkeys loop
     ex := case when p_nodim and meas -> mk ? 'tot' then meas -> mk ->> 'tot' else meas -> mk ->> 'expr' end;
+    if p_src = 'line' and mk = 'bills' then      -- exact bill count without a slow count(distinct) when the grouping allows it
+      if not p_nodim and 'item' = any (p_gl) then ex := 'count(*) filter (where {T}.first_of_item)';
+      elsif (p_nodim or not (p_gl && array['item', 'category', 'line_kind'])) and p_where !~ '\.(item_id|category) = any' and coalesce(p_base, '') !~ 'line_kind' then ex := 'count(*) filter (where {T}.line_no = 1)'; end if;
+    end if;
     sel := sel || (public.rpt_tok(ex, p_al, p_dexpr, p_ws, p_fym, p_mobok) || ' as ' || quote_ident(mk));
   end loop;
   sql := 'select ' || array_to_string(sel, ', ') || ' from ' || p_rel || ' ' || p_al
@@ -544,7 +620,7 @@ begin
     if not nodim then
       foreach g in array p_gl loop
         for c in select * from jsonb_array_elements(dims -> g -> 'cols') loop
-          conds := conds || format('bq.%I is not distinct from cq.%I', c ->> 0, c ->> 0);
+          conds := conds || format('bq.%I = cq.%I', c ->> 0, c ->> 0);      -- dimension columns are never null, so this can be a hash join
         end loop;
       end loop;
     end if;
@@ -616,8 +692,9 @@ begin
     alist := format('%L::int[]', p_allowed);
     if p_key = 'customer_dues' then
       sql := format($f$with s as (select x.id, x.customer_id, x.sale_date, x.sold_at,
-          x.total - coalesce((select sum(p.amount) from public.sale_payments p where p.sale_id = x.id and not p.voided), 0) as rem
-          from public.sales x where x.status = 'done' and x.customer_id is not null and x.location_id = any (%s)),
+          x.total - coalesce(pp.v, 0) as rem
+          from public.sales x left join (select sale_id, sum(amount) as v from public.sale_payments where not voided and sale_id is not null group by 1) pp on pp.sale_id = x.id
+          where x.status = 'done' and x.customer_id is not null and x.location_id = any (%s)),
         cum as (select s.*, sum(s.rem) over (partition by s.customer_id order by s.sold_at, s.id) as cr from s where s.rem > 0),
         c as (select p.customer_id, sum(p.amount) as coll from public.sale_payments p where p.kind = 'collection' and not p.voided and p.customer_id is not null and p.location_id = any (%s) group by 1),
         t as (select customer_id, sum(rem) as rem from s group by 1)
@@ -637,8 +714,9 @@ begin
         end loop;
       end if;
       sql := format($f$with s as (select x.id, x.customer_id, x.sale_date, x.sold_at,
-          x.total - coalesce((select sum(p.amount) from public.sale_payments p where p.sale_id = x.id and not p.voided), 0) as rem
-          from public.sales x where x.status = 'done' and x.customer_id is not null and x.location_id = any (%s)),
+          x.total - coalesce(pp.v, 0) as rem
+          from public.sales x left join (select sale_id, sum(amount) as v from public.sale_payments where not voided and sale_id is not null group by 1) pp on pp.sale_id = x.id
+          where x.status = 'done' and x.customer_id is not null and x.location_id = any (%s)),
         cum as (select s.*, sum(s.rem) over (partition by s.customer_id order by s.sold_at, s.id) as cr from s where s.rem > 0),
         c as (select p.customer_id, sum(p.amount) as coll from public.sale_payments p where p.kind = 'collection' and not p.voided and p.customer_id is not null and p.location_id = any (%s) group by 1),
         pt as (select k.customer_id, %L::date - k.sale_date as age, greatest(0, least(k.rem, k.cr - coalesce(c.coll, 0))) as portion from cum k left join c on c.customer_id = k.customer_id)
@@ -726,7 +804,9 @@ end $$;
 -- ============================================================
 create or replace function public.report_run(p_key text, p_filters jsonb default '{}'::jsonb, p_group text default null, p_sort text default null,
   p_page int default 1, p_compare boolean default false) returns jsonb
-language plpgsql stable security definer set search_path = public set statement_timeout = '8s' as $$
+language plpgsql stable security definer set search_path = public as $$
+-- Time guard: a function-level SET statement_timeout does NOT cancel the statement that is already running (tested), so the real guard is the
+-- role timeout (Supabase sets 8s on the authenticated role) plus the hard limits here: 366-day range, 500-group cap, 200-row pages.
 declare
   def jsonb; flt jsonb; notes jsonb := '[]'::jsonb; today date := (now() at time zone 'Asia/Dhaka')::date;
   cost_ok boolean; mob_ok boolean; allowed int[]; d1 date; d2 date; fm numeric; wsn numeric; fym int; ws int;
