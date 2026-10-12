@@ -73,8 +73,8 @@ const PL = { f: { loc: '', supplier: '', status: '', from: '', to: '' }, rows: [
 let ITEMS_ALL = null, F = null;
 async function allItems() {
   if (ITEMS_ALL) return ITEMS_ALL;
-  let r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active,item_type,hidden').order('code');
-  if (r.error) r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active').order('code');      // database without the item master
+  let r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active,item_type,hidden').order('code'));
+  if (r.error) r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active').order('code'));      // database without the item master
   ITEMS_ALL = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && !i.hidden); return ITEMS_ALL;
 }
 const sups = () => (B.ENV && B.ENV.sup) || [];

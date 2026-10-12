@@ -74,7 +74,7 @@ async function load() {
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
   try { if (B.itemMaster) await B.itemMaster.init(); } catch (e) { /* item master not installed */ }
   const wantCost = !!(S.ctx.is_owner || (perms().ITEM_COST && perms().ITEM_COST.view));
-  const [it, co, cv, lv] = await Promise.all([sb.from('items').select('*').order('code'), wantCost ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] }),
+  const [it, co, cv, lv] = await Promise.all([window.BOS_ALL(sb.from('items').select('*').order('code')), wantCost ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] }),
     sb.from('unit_conversions').select('*').order('id'), lowLevels()]);
   if (it.error) throw it.error;
   D.canCost = wantCost && !co.error;

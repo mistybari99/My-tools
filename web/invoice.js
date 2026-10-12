@@ -150,7 +150,7 @@ const BUILTIN = (kind) => ({ id: null, name: 'built-in', kind, header: {}, foote
 // ---------- sale -> document ----------
 async function docOfSale(id) {
   const sr = await sb.from('sales').select('*').eq('id', id).maybeSingle(); const s = sr.data; if (sr.error || !s) throw new Error('sale');
-  const [pr, cu, ir] = await Promise.all([sb.from('sale_payments').select('mode,wallet,amount,voided').eq('sale_id', id), s.customer_id ? sb.from('customers').select('name,mobile').eq('id', s.customer_id).maybeSingle() : { data: null }, sb.from('items').select('id,code')]);
+  const [pr, cu, ir] = await Promise.all([sb.from('sale_payments').select('mode,wallet,amount,voided').eq('sale_id', id), s.customer_id ? sb.from('customers').select('name,mobile').eq('id', s.customer_id).maybeSingle() : { data: null }, window.BOS_ALL(sb.from('items').select('id,code'))]);
   await B.loadStatic();
   const loc = (B.ENV.locs || []).find((l) => l.id === s.location_id) || {}, codes = new Map(((ir && ir.data) || []).map((i) => [i.id, i.code]));
   const lines = (s.lines || []).map((x) => ({ code: x.item_id ? codes.get(x.item_id) || '' : '', name: x.name || '', qty: Number(x.qty) || 1, unit: x.unit || '', price: Number(x.price !== undefined ? x.price : x.amount), amount: Number(x.amount) }));
@@ -325,7 +325,7 @@ function pickLogo(file) {
 const LB = { tpl: null, sel: {}, q: '', items: [], tpls: [] };
 async function labelsPage() {
   await loadAll(); if (V.err) return shell(T('title'), `<div class="notice bad">${esc(T('sql'))}</div>`, true);
-  const ir = await sb.from('items').select('id,code,name_bn,name_en,name_mix,sell_price,barcode,is_active').eq('is_active', true).order('code');
+  const ir = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,sell_price,barcode,is_active').eq('is_active', true).order('code'));
   LB.items = (ir.data || []); LB.tpls = V.tpls.filter((x) => x.kind === 'label' && x.active);
   const d = LB.tpls.find((x) => x.is_default) || LB.tpls[0]; LB.tpl = d || null; LB.sel = {}; LB.q = '';
   drawLabels();

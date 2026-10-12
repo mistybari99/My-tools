@@ -375,7 +375,7 @@ async function viewMap() {
   await init(); if (!M.master) return shell(T('mp_title'), `<div class="notice bad">${esc(T('i_sql'))}</div>`, 'items');
   if (!(isOwner() || M.grant)) return go('home');
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
-  const [r, it] = await Promise.all([sb.from('item_mapping_review').select('*').order('id'), sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,item_type,control_class,import_batch,is_active,hidden,master_code,category')]);
+  const [r, it] = await Promise.all([sb.from('item_mapping_review').select('*').order('id'), window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,sell_price,item_type,control_class,import_batch,is_active,hidden,master_code,category'))]);
   if (r.error) return fail(r.error);
   MP.rows = r.data || []; MP.items = it.data || []; B.__mpItems = MP.items; drawMap();
 }
@@ -437,7 +437,7 @@ const condLabel = (c) => { const r = lists('asset_conditions').find((x) => x.val
 async function viewAssets() {
   shell(T('as_title'), `<p class="muted">${esc(T('loading'))}</p>`, 'home');
   await init(); try { await B.loadStatic(); } catch (e) { /* defaults */ }
-  const [a, it, co] = await Promise.all([sb.from('assets').select('*').order('tag'), sb.from('items').select('id,code,name_bn,name_en,name_mix,item_type').eq('item_type', 'asset'), sb.from('asset_costs').select('*')]);
+  const [a, it, co] = await Promise.all([sb.from('assets').select('*').order('tag'), window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,item_type').eq('item_type', 'asset')), sb.from('asset_costs').select('*')]);
   if (a.error) return shell(T('as_title'), `<div class="notice bad">${esc(T('i_sql'))}</div>`, 'home');
   AS.rows = a.data || []; AS.items = it.data || []; AS.costs = new Map((co.data || []).map((c) => [c.asset_id, c.cost])); AS.canCost = !co.error && (isOwner() || AS.costs.size > 0 || ctxPerms().ITEM_COST);
   drawAssets();

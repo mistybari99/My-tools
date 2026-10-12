@@ -232,7 +232,7 @@ async function viewItems() {
 const canCostView = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view);
 const canCostEnter = () => !!(S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.enter);
 async function loadItems() {
-  const [it, co] = await Promise.all([sb.from('items').select('*').order('code'), canCostView() ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] })]);
+  const [it, co] = await Promise.all([window.BOS_ALL(sb.from('items').select('*').order('code')), canCostView() ? sb.from('item_costs').select('*') : Promise.resolve({ data: [] })]);
   if (it.error) return fail(it.error);
   if (co.error) return fail(co.error);
   const cm = new Map((co.data || []).map((c) => [c.item_id, c.cost_price]));

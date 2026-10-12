@@ -184,7 +184,7 @@ function pgDisc() {
 
 // ---------- shared data ----------
 async function loadItems() {
-  const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,category,category_bn').order('code');
+  const r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,category,category_bn').order('code'));
   cache.items = r.data || []; return cache.items;
 }
 const itemName = (id) => { const i = (cache.items || []).find((x) => x.id === id); return i ? i.code + ' · ' + nm(i) : id; };

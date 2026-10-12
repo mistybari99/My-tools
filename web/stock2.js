@@ -165,8 +165,8 @@ let ITEMS = null;
 async function trackedItems() {
   if (ITEMS) return ITEMS;
   // item master: only items counted in the business can be tracked (the server forces tracked off for assets, consumables, tools ...); hidden items stay out of the pickers
-  let r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active,count_in_business,hidden').eq('tracked', true).order('code');
-  if (r.error) r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active').eq('tracked', true).order('code');
+  let r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active,count_in_business,hidden').eq('tracked', true).order('code'));
+  if (r.error) r = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active').eq('tracked', true).order('code'));
   ITEMS = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && i.tracked !== false && i.count_in_business !== false && !i.hidden);
   return ITEMS;
 }

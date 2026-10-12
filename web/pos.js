@@ -89,8 +89,8 @@ const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
 async function load() {
   await B.loadStatic();
   // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
-  let it = await sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code');
-  if (it.error) it = await sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code');
+  let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
+  if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
   if (it.error) throw it.error;
   P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
   const all = B.ENV.locs;
