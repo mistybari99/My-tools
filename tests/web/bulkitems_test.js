@@ -18,7 +18,7 @@ function mkData() {
   T.items[0].locked = true;
   for (let n = 1; n <= 120; n++) {
     const code = '14-' + String(n).padStart(3, '0');
-    T.items.push({ id: 'dict' + n, code, name_bn: 'ডিক ' + n, name_en: 'Dict item ' + n, name_mix: null, category: 'c14', unit: 'kg', sell_price: n <= 20 ? 100 + n : null, wholesale_price: null, tracked: false, min_stock: null, is_active: true,
+    T.items.push({ id: 'dict' + n, code, name_bn: 'ডিক ' + n, name_en: n === 5 ? '=SUM(1)' : 'Dict item ' + n, name_mix: null, category: 'c14', unit: 'kg', sell_price: n <= 20 ? 100 + n : null, wholesale_price: null, tracked: false, min_stock: null, is_active: true,
       item_type: n % 5 === 0 ? 'resale' : 'finished_good', count_in_business: true, sellable: true, hidden: false, locked: false, import_batch: 'dict-1', master_code: null, retired_at: null, control_class: 'Finished Good' });
   }
   const leg = T.items.filter((i) => !i.import_batch);
@@ -104,6 +104,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.uncheck('#bk_cost'); await p.waitForTimeout(300);
   const dl = p.waitForEvent('download'); await p.click('[data-act=bk_export]'); await dl; const csv = await p.evaluate(() => window.__LASTCSV);
   ok(/^﻿code,name_bn,name_en,category,item_type,unit,sell_price,wholesale_price,tracked,min_stock,count_in_business,sellable,is_active\n/.test(csv) && !/cost/i.test(csv.split('\n')[0]), 'export header has no cost column'); ok(csv.split('\n').length > 90 && csv.split('\n').slice(1).every((l) => l.startsWith('14-0')), 'export = ALL rows of the current filter (more than one page of 50): ' + csv.split('\n').length);
+  ok(csv.includes(",'=SUM(1),") , 'export: a cell starting with = is prefixed with a quote (formula safety)');
   // CSV paste
   await p.click('[data-act=bk_tab][data-v=csv]'); await p.waitForTimeout(200);
   await p.fill('#bk_ta', 'code,price\n14-001,120\nbad,abc\n14-002,৯৫.৫,kg,yes,5\n14-003,,pc,no\nnope,1'); await p.click('[data-act=bk_csv_go]'); await p.waitForTimeout(500);
@@ -128,6 +129,10 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};window.__GRANT=false;' }, '#/bulkitems');
   ok(/do not have access/.test(await p.textContent('#app')), 'view-only user has no access'); await p.close();
 
+  p = await open({ init: 'window.__OWNER=false;window.__GRANT=true;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};window.__DATA.tables.item_mapping_review[0].status="replaced";' }, '#/itemmap');
+  await p.click('[data-act=mp_tab][data-v=repl]'); await p.waitForTimeout(200);
+  ok(await p.locator('.mp2').count() === 1 && await p.locator('[data-act=mp_undo]').count() === 0, 'non-owner sees a replaced row but no Undo button');
+  await p.click('.mp2 .im-dots'); await p.waitForTimeout(200); ok(await p.locator('.sheet [data-act=mp_undo]').count() === 0, 'and no Undo in the menu'); await p.close();
   // ---------- old item decisions ----------
   p = await open({}, '#/itemmap');
   ok(/1 \/ 4 decided/.test(await p.textContent('#mp_prog')), 'progress counter 1 / 4'); ok(await p.locator('.mp2').count() === 3, 'three to decide');

@@ -55,6 +55,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'item_mapping_load') return { data: { loaded: args.p_rows.length, skipped: 0 }, error: null };
   if (fn === 'item_mapping_autolink') return { data: 1, error: null };
   if (fn === 'item_mapping_decide') { let r = T.item_mapping_review.find((x) => x.item_id === args.p_item); if (!r) { r = { id: 99, item_id: args.p_item, status: 'pending' }; T.item_mapping_review.push(r); } r.status = args.p_status; const it = T.items.find((x) => x.id === args.p_item); it.master_code = args.p_status === 'linked' ? args.p_dict : null; return { data: { status: args.p_status }, error: null }; }
+  if (fn === 'item_map_decide2') { const r = T.item_mapping_review.find((x) => x.item_id === args.p_item); const st = { link: 'linked', keep: 'rejected', later: 'later', undo: 'pending', use_dict: 'replaced' }[args.p_action]; r.status = st; const it = T.items.find((x) => x.id === args.p_item); it.master_code = st === 'linked' ? args.p_dict : null; return { data: { status: st }, error: null }; }
   if (fn === 'set_rule') { const r = T.rules.find((x) => x.key === args.p_key); r.value = args.p_value; return { data: null, error: null }; }
   if (fn === 'item_type_set') { const t = T.item_types.find((x) => x.code === args.p_code); Object.assign(t, args.p_patch); return { data: null, error: null }; }
   if (fn === 'item_class_map_set') { const t = T.item_class_map.find((x) => x.control_class === args.p_class); t.item_type = args.p_type; return { data: null, error: null }; }
@@ -173,15 +174,15 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
 
   // ---------- needs-decision list ----------
   p = await open({}, '#/itemmap');
-  ok(await p.locator('#app .card').count() === 2, 'two pending rows'); ok(/14-028/.test(await p.textContent('#app')) && /90%/.test(await p.textContent('#app')), 'suggestion and confidence shown');
-  await p.click('#app .card >> nth=0 >> .im-dots'); await wait(p, 250); ok(await menuHas(p, 'im_mp_use') && await menuHas(p, 'im_mp_other') && await menuHas(p, 'im_mp_rej'), 'menu: use / other / keep apart');
-  await p.click('.sheet [data-act=im_mp_use]'); await wait(p, 500);
-  dc = await calls(p, 'item_mapping_decide'); ok(dc.length === 1 && dc[0].p_status === 'linked' && dc[0].p_dict === '14-028', 'use suggestion -> linked');
-  ok(await p.locator('#app .card').count() === 1, 'one pending left');
-  await p.click('#app .card >> nth=0 >> .im-dots'); await wait(p, 250); await p.click('.sheet [data-act=im_mp_rej]'); await wait(p, 500);
-  dc = await calls(p, 'item_mapping_decide'); ok(dc[1].p_status === 'rejected', 'keep apart -> rejected'); ok(/Nothing waiting/.test(await p.textContent('#app')), 'list empty');
-  await p.click('[data-act=im_mp_tab][data-v=linked]'); await wait(p, 200); ok(await p.locator('#app .card').count() === 2, 'linked tab: the auto one and the one just linked');
-  await p.click('#app .card >> nth=0 >> .im-dots'); await wait(p, 250); ok(await menuHas(p, 'im_mp_undo'), 'linked row can be undone'); await noOverflow(p, 'map'); await p.close();
+  ok(await p.locator('#app .mp2').count() === 2, 'two rows to decide'); ok(/14-028/.test(await p.textContent('#app')) && /90%/.test(await p.textContent('#app')), 'suggestion and confidence shown');
+  await p.click('#app .mp2 >> nth=0 >> .im-dots'); await wait(p, 250); ok(await menuHas(p, 'mp_link') && await menuHas(p, 'mp_find') && await menuHas(p, 'mp_keep') && await menuHas(p, 'mp_use'), 'menu: link / find / keep apart / use dictionary');
+  await p.click('.sheet [data-act=mp_link]'); await wait(p, 500);
+  dc = await calls(p, 'item_map_decide2'); ok(dc.length === 1 && dc[0].p_action === 'link' && dc[0].p_dict === '14-028', 'link suggestion -> item_map_decide2 link');
+  ok(await p.locator('#app .mp2').count() === 1, 'one left to decide');
+  await p.click('#app .mp2 >> nth=0 >> [data-act=mp_keep]'); await wait(p, 500);
+  dc = await calls(p, 'item_map_decide2'); ok(dc[1].p_action === 'keep', 'keep apart'); ok(/None|Nothing/i.test(await p.textContent('#app')), 'list empty');
+  await p.click('[data-act=mp_tab][data-v=linked]'); await wait(p, 200); ok(await p.locator('#app .mp2').count() === 2, 'linked tab: the auto one and the one just linked');
+  await p.click('#app .mp2 >> nth=0 >> .im-dots'); await wait(p, 250); ok(await menuHas(p, 'mp_undo'), 'linked row can be undone'); await noOverflow(p, 'map'); await p.close();
 
   // ---------- types page ----------
   p = await open({}, '#/itemtypes');

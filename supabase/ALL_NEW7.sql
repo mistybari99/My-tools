@@ -1,4 +1,4 @@
--- ALL_NEW7 = phase22 (bulk item editor, old-item decisions). Safe to re-run.
+-- ALL_NEW7 = phase22
 -- ============================================================
 -- PHASE 22 (item master P1): bulk item editor + old-item decision tools. Additive and idempotent (paste twice = no error).
 -- Needs phase14 (item master). Run after phase8..phase21.
