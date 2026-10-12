@@ -138,8 +138,8 @@ const base = C.baseData(SP), srv = C.serve(8094);
   p = await open({}, '#/home'); await p.click('[data-act=hv_mode][data-v=acc]'); await wait(p, 300);
   ok(await p.locator('#hv_tiles [data-act=go][data-v=payables]').count() === 1, 'Supplier payables tile is a real link'); await p.click('[data-act=hv_mode][data-v=biz]'); await wait(p, 300); ok(await p.locator('#hv_tiles [data-act=go][data-v=stock]').count() === 1, 'Stock balance tile is a real link');
   await p.click('#hv_tiles [data-v=stock]'); await wait(p, 800); ok((await p.evaluate(() => location.hash)) === '#/stock', 'tile navigates to #/stock');
-  await p.click('header.top [data-act=nav_open]'); await wait(p, 500); const gl = await p.locator('.dr-g .gl').allTextContents(); ok(gl.some((x) => /Suppliers/.test(x)) && gl.some((x) => /Purchase/.test(x)) && gl.some((x) => /Stock/.test(x)), 'drawer groups: ' + gl.join('|'));
-  await p.click('.dr-g[data-v=ops]'); await p.click('.dr-g[data-v=supp]'); await wait(p, 200); await p.screenshot({ path: SP + '/st_drawer.png' });
+  await p.click('header.top [data-act=nav_open]'); await wait(p, 500); const gl = await p.locator('.dr-g .gl').allTextContents(); ok(gl.some((x) => /Suppliers/.test(x)) && gl.some((x) => /Purchas/.test(x)) && gl.some((x) => /Stock/.test(x)), 'drawer groups: ' + gl.join('|'));
+  await p.click('.dr-g[data-v=stock]'); await p.click('.dr-g[data-v=purch]'); await wait(p, 200); await p.screenshot({ path: SP + '/st_drawer.png' });
   ok(await p.locator('.dr-it[data-v=stock]').count() === 1 && await p.locator('.dr-it[data-v=payables]').count() === 1, 'drawer entries'); await p.close();
 
   log('errors:', errors.length ? [...new Set(errors)] : 'none'); log('assert failures:', bad); await br.close(); srv.close();

@@ -24,7 +24,7 @@ const base = C.baseData(SP), PORT = 8322, srv = C.serve(PORT);
   let p = await open({}, '#/control');
   ok(await p.locator('[data-tile]').count() === 12, 'owner sees 12 tiles');
   ok(await p.locator('.grid[data-group]').count() === 4, 'four groups');
-  ok(await p.locator('[data-tile].soon').count() === 2, 'Rollout board and Print & books are shown as Soon (not built yet)');
+  ok(await p.locator('[data-tile].soon').count() === 1, 'Print & books is the only Soon tile (Rollout board now opens #/rollout)');
   ok(await p.locator('[data-tile=locations] .badge').textContent() === '1', 'Locations tile shows places being set up');
   ok(await p.locator('[data-tile=locset] .badge').textContent() === '1' && await p.locator('[data-tile=lists] .badge').textContent() === '4' && await p.locator('[data-tile=items] .badge').textContent() === '2' && await p.locator('[data-tile=staff] .badge').textContent() === '1', 'tile counts from the server');
   ok(await p.locator('#cc_needs [data-need]').count() === 7, 'merged Needs you: 7 rows with a count (releases/emergency are 0)');
@@ -42,7 +42,7 @@ const base = C.baseData(SP), PORT = 8322, srv = C.serve(PORT);
   ok(/Control Center/.test(await p.textContent('#hv_ctl')) && await p.locator('#hv_ctl .badge').count() === 1, 'tile with total count');
   ok(await p.locator('.hrow[data-v=locations]').count() === 1 && await p.locator('.hrow[data-v=locset]').count() === 1, 'Needs you on Home lists location setup and settings drafts');
   await p.screenshot({ path: SP + '/cc_home.png' }); await noOverflow(p, 'home');
-  await p.click('header.top [data-act=nav_open]'); await wait(p, 400); await p.click('.dr-g[data-v=settings]'); await wait(p, 200);
+  await p.click('header.top [data-act=nav_open]'); await wait(p, 400); await p.click('.dr-g[data-v=settings]'); await p.click('.dr-g[data-v=loc]'); await wait(p, 200);
   ok(await p.locator('.dr-it[data-v=control]').count() === 1 && await p.locator('.dr-it[data-v=locations]').count() === 1, 'drawer has Control Center and Locations'); await p.context().close();
 
   // ---------- head management ----------
