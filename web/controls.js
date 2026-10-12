@@ -206,7 +206,7 @@ function enhanceGroup(container, btns, multiMode) {
     } else {
       const cur = items.find((i) => i.on); let txt = cur ? cur.l : (g.cur ? String(g.cur).replace(/^other:/, '') : '');
       const first = items[0];
-      setTrg(t, txt || T('none'), !!txt && !(cur && !g.isPick && cur === first), g.ro); if (!txt) t.classList.add('ctl-empty');
+      setTrg(t, (container.dataset.title && txt ? container.dataset.title + ': ' : '') + (txt || T('none')), !!txt && !(cur && !g.isPick && cur === first), g.ro); if (!txt) t.classList.add('ctl-empty');
       const clearable = !g.reqFld && (g.isPick || btns[0].dataset.act === 'fl_one');
       t.addEventListener('click', () => { const os = items.map((i) => ({ v: i.v, l: i.l, disabled: i.disabled }));
         openSheet({ title: g.title, options: os, value: cur ? cur.v : '', search: os.length > 8, trg: t, onPick: (v) => {

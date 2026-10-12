@@ -58,3 +58,9 @@ input[type="checkbox"] { accent-color: var(--accent, var(--ruby, #a1111e)); }
 .ctl-seg > .tog:only-child, .ctl-segc > .tog:only-child { border-radius: var(--ctl-r); }
 html[data-ctl="off"] .ctl-segc { gap: revert !important; flex-wrap: revert !important; }
 .fld, .ctl-wrap, .ctl-grp { min-width: 0; } .ctl-trg { max-width: 100%; }
+
+/* beat the theme's pill radius on joined segments */
+html body .ctl-seg > .tog, html body .ctl-segc > .tog { border-radius: 0 !important; }
+html body .ctl-seg > .tog:first-child, html body .ctl-segc > .tog:first-child { border-radius: var(--ctl-r) 0 0 var(--ctl-r) !important; }
+html body .ctl-seg > .tog:last-child, html body .ctl-segc > .tog:last-child { border-radius: 0 var(--ctl-r) var(--ctl-r) 0 !important; }
+html body .ctl-seg > .tog:only-child, html body .ctl-segc > .tog:only-child { border-radius: var(--ctl-r) !important; }
