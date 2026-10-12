@@ -47,9 +47,9 @@ const base = C.baseData(SP), PORT = 8322, srv = C.serve(PORT);
 
   // ---------- head management ----------
   p = await open(asDeleg(['head_management']), '#/control');
-  ok(await p.locator('[data-tile]').count() === 4, 'head management sees 4 tiles (Lists needs the list_manage grant: the server decides the queue by it)');
+  ok(await p.locator('[data-tile]').count() === 3, 'head management sees 3 tiles (Lists needs the list_manage grant: the server decides the queue by it)');
   const hk = await p.locator('[data-tile]').evaluateAll((els) => els.map((e) => e.dataset.tile).sort().join(','));
-  ok(hk === 'locations,locset,printbooks,rollout', 'the right four: ' + hk);
+  ok(hk === 'locations,locset,printbooks', 'the right four: ' + hk);
   ok(await p.locator('[data-tile=items], [data-tile=staff], [data-tile=backup], [data-tile=logs]').count() === 0, 'no costs / staff / backup tiles');
   ok(/Head management/.test(await p.textContent('#cc_tier')), 'tier chip head');
   await p.screenshot({ path: SP + '/cc_head.png' }); await noOverflow(p, 'control head');

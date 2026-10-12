@@ -163,7 +163,7 @@ const ROUTE_GRANTS = {
   locset: ['settings_approve', 'head_management', 'location_manage'],
   locsheet: ['settings_approve', 'head_management', 'location_manage'],
   locations: ['location_manage', 'head_management'],
-  control: ['head_management', 'location_manage', 'settings_approve', 'list_manage'],
+  control: ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage'],
 };
 function go(p) { location.hash = '#/' + p; }
 // does the signed-in person hold any of these grants (role grant, personal grant, emergency window)?  Cached per person for the session.

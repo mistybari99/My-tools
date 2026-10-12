@@ -38,7 +38,7 @@ const X = {
   locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
   s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
-  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
+  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
   ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
   n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
@@ -68,7 +68,7 @@ const uid = () => (S.ctx && S.ctx.profile && S.ctx.profile.id) || 'anon';
 const npMode = () => { let m = 'lock'; try { m = B.rule('ui_noperm_mode', 'lock'); } catch (e) { /* rules not loaded yet */ } return m === 'hide' ? 'hide' : 'lock'; };
 
 // ---------- registry: routes + forms ----------
-const ctlOk = () => isOwner() || GF.head_management === true || GF.location_manage === true || GF.settings_approve === true || GF.list_manage === true;
+const ctlOk = () => isOwner() || GF.rollout_manage === true || GF.head_management === true || GF.location_manage === true || GF.settings_approve === true || GF.list_manage === true;
 let GF = {};   // grants that open the day book / salary report for non-owners (server still decides on every call)
 const GROUPS = B.ia.GID;   // the 13 categories live in ia.js
 const locOk = () => isOwner() || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).length > 0;   // stock / purchase pages: the server decides the rest
@@ -238,7 +238,7 @@ async function searchMore(qq) {
   if (P('ITEMS', 'view') && window.BOS_ALL) jobs.push(itemsAll().then((a) => a.filter((it) => [it.code, it.name_bn, it.name_en, it.name_mix, it.barcode].some((v) => normQ(v).includes(ql))).slice(0, 8), () => []));
   else jobs.push(Promise.resolve([]));
   if (canPos()) {
-    const safe = ql.replace(/[^\p{L}\p{N} ]/gu, ' ').trim();
+    const safe = ql.replace(/[^\p{L}\p{M}\p{N} ]/gu, ' ').trim();
     jobs.push(safe.length < 2 ? Promise.resolve([]) : (async () => { try { const r = await sb.from('customers').select('id,name,mobile').or(`name.ilike.%${safe}%,mobile.ilike.%${safe}%`).order('name').limit(6); return r && !r.error ? r.data || [] : []; } catch (e) { return []; } })());
   } else jobs.push(Promise.resolve([]));
   const [it, cu] = await Promise.all(jobs);
@@ -316,15 +316,15 @@ function dr_body() {
   }
   const rc = B.ia.recent(uid()).map((r) => all.find((e) => e.key === 'r:' + r)).filter((e) => e && e.ok && e.live && e.key !== cur);
   const recent = rc.length ? `<div class="hsec">${esc(T('recent'))}</div>${rc.map((e) => row(e, true, 'dr-rc')).join('')}` : '';
+  let lockLines = 0;
   body.innerHTML = recent + GROUPS.map((g) => {
     const list = all.filter((e) => e.g === g && e.live && e.drawer);
     const okL = list.filter((e) => e.ok), bad = list.filter((e) => !e.ok);
     const core = (e) => e.kind === 'r' && e.rec && (e.rec.mod || (e.rec.mob >= 1 && e.rec.mob <= 2));
-    if (!okL.length && !(mode === 'lock' && bad.some(core))) return '';
+    if (!okL.length) return '';
     const open = !!og[g] || okL.some((e) => e.key === cur), attn = okL.some((e) => e.cnt && cn[e.cnt]);
-    // locked core routes are listed one by one; every other locked screen / form collapses to one summary line
-    const rest = bad.filter((e) => !core(e));
-    const locks = mode === 'lock' ? [...bad.filter(core).map((e) => lockRow(e.label + ' · ' + T('noperm'))), ...(rest.length ? [lockRow(T('noperm') + ' (' + rest.length + ')')] : [])] : [];
+    // lock mode: ONE summary line per category (at most 8 lines in the whole drawer)
+    const locks = mode === 'lock' && bad.length && lockLines++ < 8 ? [lockRow(T('noperm') + ' (' + bad.length + ')')] : [];
     return `<div class="dr-grp"><button class="rb dr-g" data-act="nav_grp" data-v="${g}" aria-expanded="${open}"><span class="gl">${esc(B.ia.groupLabel(g))}${attn ? '<span class="dot warn"></span>' : ''}${!okL.length ? IC.lock.replace('<svg', '<svg width="16" height="16"') : ''}</span>${IC.cv.replace('<svg', '<svg class="cv"')}</button>
       <div class="dr-list" ${open ? '' : 'hidden'}>${okL.map((e) => row(e)).join('')}${okL.length ? `<div class="dr-i"><button class="rb dr-rc" data-act="go_group" data-v="${g}" data-grp="${g}" style="opacity:.8"><span class="lb"><small>${esc(T('all_in'))} ›</small></span></button></div>` : ''}${locks.join('')}</div></div>`;
   }).join('');
@@ -339,7 +339,7 @@ async function openDrawer() {
   mount(); await ensureStatic(); q = ''; sig = ''; renderDrawer();
   try { history.pushState({ bosNav: 1 }, '', location.href); } catch (e) { /* ignore */ }
   setDrawer(true);
-  const cb = $('.dr-head button', el.drawer); if (cb) cb.focus();
+  requestAnimationFrame(() => { const cb = $('.dr-head button', el.drawer); if (cb) cb.focus(); });
   counts().then((c) => { if (drawerOpen) dr_body(); return c; }, () => {});
 }
 function closeDrawer() {
@@ -406,14 +406,17 @@ function crumb() {
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
   if (page === 'home' || page === 'group') return '';
   const e = byKey(keyOfHash()); if (!e || !e.ok) return '';
-  return `<nav class="crumb muted" aria-label="breadcrumb" style="font-size:.82rem;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><button data-act="go_group" data-v="${esc(e.g)}" style="background:none;border:0;padding:0 2px;min-height:32px;color:inherit;text-decoration:underline">${esc(B.ia.groupLabel(e.g))}</button><span aria-hidden="true">›</span><span>${esc(e.label)}</span></nav>`;
+  return `<nav class="crumb muted" aria-label="breadcrumb" style="font-size:.82rem;margin:2px 0 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center"><button data-act="go_group" data-v="${esc(e.g)}" style="background:none;border:0;padding:0 2px;min-height:44px;color:inherit;text-decoration:underline">${esc(B.ia.groupLabel(e.g))}</button><span aria-hidden="true">›</span><span>${esc(e.label)}</span></nav>`;
 }
 function updatePinBtn() {
   const b = $('#hd_pin'); if (!b) return; const pin = isPinned(b.dataset.v);
   b.setAttribute('aria-pressed', pin); b.setAttribute('aria-label', pin ? T('unpin') : T('pin')); b.innerHTML = pin ? IC.starF : IC.star;
 }
+let syncUid = null;
 function sync(live) {
   mount();
+  const who0 = live ? uid() : null;
+  if (who0 !== syncUid) { syncUid = who0; ITEMS_ALL = null; ITEMS_AT = 0; SR.items = []; SR.cust = []; SR.q = ''; CNT = null; }   // other person / logged out: no cached item list
   if (!live) { setDrawer(false); document.body.classList.remove('has-bnav'); return; }
   countRoute();
   if (!FORMS) ensureStatic().then(() => { renderDrawer(); }, () => {});
@@ -476,7 +479,7 @@ async function home() {
     <div id="hv_main"><p class="muted">${esc(t('loading'))}</p></div>`);
   await ensureStatic();
   if (!$('#hv_main')) return;
-  const cn = await counts(true).catch(() => ({}));
+  const cn = await counts().catch(() => ({}));   // 45 s cache; the refresh button forces
   if (!$('#hv_main')) return;
   const rows = [];
   if (own) rows.push(['em', cn.em, 'warn', t('emergency'), 'emergency']);
@@ -492,7 +495,7 @@ async function home() {
   if (V2 && ap) rows.push(['pend', cn.pend, 'info', T('n_pend') + (cn.pendOld ? ' · ' + cn.pendOld : ''), 'pending']);
   if (V2 && locOk()) rows.push(['low', cn.low, 'warn', T('n_low'), 'stock']);
   const hot = rows.filter((r) => r[1]).slice(0, V2 ? 5 : 8);
-  const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}</div>
+  const attn = ap || own || ctlOk() ? `<div class="hsec">${esc(T('attn'))}${hot.length ? `<small>${hot.reduce((s, r) => s + r[1], 0)}</small>` : ''}${V2 ? `<button class="mini" data-act="hv_refresh" aria-label="${esc(T('refresh'))}">↻</button>` : ''}</div>
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
   const posBtn = P('POS', 'enter') ? `<button class="primary hbig" data-act="go" data-v="pos">${esc(t('pos'))}</button>` : '';
@@ -690,6 +693,7 @@ Object.assign(H, {
   nav_grp: (a) => { const og = groupOpen(), g = a.dataset.v; og[g] = !og[g]; store.set('bos_navg_' + uid(), JSON.stringify(og)); dr_body(); },
   nav_pin: (a) => togglePin(a.dataset.v),
   go_group: (a) => { const r = 'group/' + a.dataset.v; if (drawerOpen) H.nav_go({ dataset: { v: r } }); else location.hash = '#/' + r; },
+  hv_refresh: () => { CNT = null; HS.data = null; home(); },
   ia_retry: () => window.dispatchEvent(new HashChangeEvent('hashchange')),
   nav_picker: pickerSheet,
   nav_me: meSheet,

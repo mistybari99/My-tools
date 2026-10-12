@@ -37,7 +37,7 @@ const NEEDS = [['exceptions', 'exceptions'], ['releases', 'releases'], ['emergen
 // tiles: g group, k key, route (null = not built yet), cnt = server count key, who: owner | head | grant code(s) that also show it
 const TILES = [
   { g: 'places', k: 'locations', route: 'locations', cnt: 'location_setup', head: true, grants: ['location_manage'] },
-  { g: 'places', k: 'rollout', route: 'rollout', head: true, grants: ['rollout_manage'] },
+  { g: 'places', k: 'rollout', route: 'rollout', head: false, grants: ['rollout_manage'] },
   { g: 'places', k: 'locset', route: 'locset', cnt: 'settings_drafts', head: true, grants: ['settings_approve'] },
   { g: 'lists', k: 'lists', route: 'lists', cnt: 'lists', head: false, grants: ['list_manage'] },   // the Lists screen and its queue are decided by the list_manage grant on the server
   { g: 'lists', k: 'items', route: 'items', cnt: 'item_requests', head: false, grants: [] },
@@ -52,9 +52,9 @@ const TILES = [
 const GROUPS = ['places', 'lists', 'people', 'rules'];
 
 async function who() {
-  if (isOwner()) return { tier: 'owner', head: true, g: { location_manage: true, settings_approve: true, list_manage: true } };
-  const [head, lm, sa, lg] = await Promise.all(['head_management', 'location_manage', 'settings_approve', 'list_manage'].map((c) => A.hasAnyGrant([c])));
-  return { tier: head ? 'head' : (lm || sa || lg) ? 'delegate' : 'none', head, g: { location_manage: lm, settings_approve: sa, list_manage: lg } };
+  if (isOwner()) return { tier: 'owner', head: true, g: { location_manage: true, settings_approve: true, list_manage: true, rollout_manage: true } };
+  const [head, lm, sa, lg, rm] = await Promise.all(['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage'].map((c) => A.hasAnyGrant([c])));
+  return { tier: head ? 'head' : (lm || sa || lg || rm) ? 'delegate' : 'none', head, g: { location_manage: lm, settings_approve: sa, list_manage: lg, rollout_manage: rm } };
 }
 const visible = (tl, w) => w.tier === 'owner' || (w.head && tl.head) || tl.grants.some((g) => w.g[g]);
 

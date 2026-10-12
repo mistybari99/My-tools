@@ -51,6 +51,8 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
   p = await open({ owner: false, perms: { POS: { view: true, enter: true } }, m: { grants: [], ctx: staffCtx(['salesperson']) } }, '#/home'); await openDrawer(p);
   const staffSees = await p.locator('#nav_body .dr-it').evaluateAll((e) => e.map((x) => x.dataset.v));
   ok(staffSees.includes('pos') && staffSees.includes('dues'), 'cashier sees POS + dues: ' + staffSees);
+  ok(await p.locator('#nav_body .dr-i.lock').count() <= 8, 'lock mode: at most 8 summary lines: ' + await p.locator('#nav_body .dr-i.lock').count());
+  ok(await p.evaluate(() => 'রহিম আলী'.replace(/[^\p{L}\p{M}\p{N} ]/gu, ' ') === 'রহিম আলী') && fs.readFileSync(SP + '/../../web/nav.js', 'utf8').includes('\\p{L}\\p{M}\\p{N}'), 'Bangla marks survive the customer-search sanitiser (রহিম আলী)');
   ok(!['staff', 'matrix', 'rules', 'settings', 'backup', 'control', 'locations', 'bulkitems', 'rulehub', 'logs', 'releases', 'emergency'].some((r) => staffSees.includes(r)), 'cashier sees no owner-only screens: ' + staffSees);
   await p.context().close();
 
@@ -96,7 +98,7 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
   ok(await p.locator('#hv_main [data-v=staff], #hv_main [data-v=releases], #hv_main [data-v=emergency]').count() === 0, 'A1: no owner-only row on cashier Home');
   ok(await p.locator('#bnav button').count() === 4, 'A5: bottom bar has exactly 4 slots: ' + await p.locator('#bnav button').count()); ok(await p.locator('#bnav [data-slot=pos]').count() === 1, 'cashier slot 1 is Sell');
   await noOverflow(p, 'cashier home'); await p.context().close();
-  p = await open({}, '#/home'); ok(await p.locator('#bnav button').count() === 4, 'A5: owner 4 slots'); await noOverflow(p, 'owner home');
+  p = await open({}, '#/home'); ok(await p.locator('#bnav button').count() === 4 && await p.locator('#bnav [data-slot=control]').count() === 1 && await p.locator('#bnav [data-slot=reports]').count() === 1, 'A5: owner bar = Home, Control, Reports, Me'); await noOverflow(p, 'owner home');
   const before = await p.evaluate(() => window.BOS_NAV.entries().filter((e) => e.kind === 'r').map((e) => e.route).sort().join());
   await p.evaluate(() => localStorage.setItem('bos_ia_home_v2', 'off')); await p.reload(); await wait(p, 1300);
   ok(await p.locator('#bnav [data-act=nav_open]').count() === 1 && await p.locator('#hv_qa .qt').count() === 0, 'switch OFF: old bottom bar + no quick actions');

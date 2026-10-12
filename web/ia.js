@@ -152,7 +152,7 @@ const SLOTS_BY = {
 };
 const slotTarget = (id, c) => {   // id -> {route,label,icon} when this person may open it
   if (id === 'ctl') { const r = byRoute.get('control'); if (r && visible(r, c)) return { route: 'control', label: labelOf(r), icon: r.icon }; const p = byRoute.get('pending'); return p && visible(p, c) ? { route: 'pending', label: labelOf(p), icon: p.icon } : null; }
-  const d = doRecs().find((x) => x.id === id); if (!d) return null; let ok = false; try { ok = !!d.ok(c); } catch (e) { ok = false; }
+  const d = doRecs().find((x) => x.id === id) || (byRoute.get(id) ? { id, route: id, rec: byRoute.get(id), icon: byRoute.get(id).icon, ok: byRoute.get(id).ok } : null); if (!d) return null; let ok = false; try { ok = !!d.ok(c); } catch (e) { ok = false; }
   return ok ? { route: d.route, label: doLabel(d), icon: d.icon } : null;
 };
 function quickActions(c) {
