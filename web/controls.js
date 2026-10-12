@@ -247,9 +247,8 @@ function enhanceChecks(root) {
 // rows with 3+ secondary inline buttons -> ⋮ (the .primary / first button stays)
 function enhanceRows(root) {
   const seen = new Set();
-  root.querySelectorAll('.card button:not(.tog):not(.primary):not(.ctl-trg)[data-act], li button:not(.tog):not(.primary)[data-act]').forEach((b) => {
-    const p = b.parentElement; if (!p || seen.has(p) || p.closest('.ctl-bg,[data-ctl="off"],header,.actionbar,.sheet,nav,.numpad,.pad,table')) return; seen.add(p);
-    if (p.dataset.ctl === 'off' || p.dataset.ctl === 'rowdone') return;
+  root.querySelectorAll('[data-ctl="menu"] > button[data-act]:not(.tog):not(.primary)').forEach((b) => {
+    const p = b.parentElement; if (!p || seen.has(p)) return; seen.add(p);
     const all = [...p.children].filter((c) => c.tagName === 'BUTTON' && c.dataset.act && !c.classList.contains('tog') && !c.classList.contains('ctl-trg') && !c.classList.contains('mini') && c.id !== 'e_notsent');
     if (all.length < 3) return;
     const keep = all.find((c) => c.classList.contains('primary')) || all[0]; const rest = all.filter((c) => c !== keep);
@@ -270,11 +269,10 @@ function enhance(root) {
     if (!byParent.has(p)) byParent.set(p, new Map()); const m = byParent.get(p); if (!m.has(b.dataset.act)) m.set(b.dataset.act, []); m.get(b.dataset.act).push(b); });
   byParent.forEach((m, p) => m.forEach((btns, act) => {
     if (act === 'pick') { const all = [...p.children].filter((c) => c.dataset && c.dataset.act === 'pick'); if (all.every((b) => b.disabled)) return readonlyValue(p, all); if (all.length > 3) return enhanceGroup(p, all, false); return enhanceSeg(p); }
-    if (SKIP_ACT.test(act) && !btns.some((b) => b.dataset.su !== undefined)) { if (btns.length >= 2 && btns.length <= 3) enhanceSeg(p); return; }
-    if (btns.length >= 2 && (act === 'fl_t' || btns.every((b) => b.dataset.su !== undefined))) return enhanceGroup(p, btns, true);
-    if (btns.length < 4) { if (btns.length >= 2 && btns.every((b) => b.dataset.v !== undefined)) enhanceSeg(p); return; }
-    const multiMode = act === 'fl_t' || btns.every((b) => b.dataset.su !== undefined);
-    if (multiMode) return enhanceGroup(p, btns, true);
+    const mk = p.dataset.ctl, fl = p.classList.contains('fl-chipset');
+    if (btns.length >= 2 && (act === 'fl_t' || btns.every((b) => b.dataset.su !== undefined) || mk === 'multi')) return enhanceGroup(p, btns, true);
+    if (!(fl || mk === 'select') || SKIP_ACT.test(act)) return;          // generic button rows are actions/navigation: never converted
+    if (btns.length < 4) { if (btns.every((b) => b.dataset.v !== undefined)) enhanceSeg(p); return; }
     if (!btns.every((b) => b.dataset.v !== undefined) || btns.filter(isOn).length > 1) return;
     enhanceGroup(p, btns, false);
   }));
