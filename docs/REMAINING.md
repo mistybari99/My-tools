@@ -6,10 +6,10 @@ Status of the owner's scope (HANDOVER §4,§5,§8,§9). "Built" = code + local S
 W0 carry-over 1-20 · W1 hardening · W2 item master (1,312 imported by owner) + assets register · W3 list add-rules/Other queue/shared control (5 screens wired) · W4 locations + Control Center + settings sheet versions · W5a rollout Paper/Parallel/App, entered-later, change requests/revisions, offline form outbox, owner_self_approve switch · W5b blind count + PIN signatures (14-1, 10-1) · W6 recipes/BOM/packaging/production · W7 forms→ledger, discount approver, brand P&L, 12 new reports, nav leftovers, device checklist.
 
 ## STILL TO BUILD (priority order, by value for the owner)
-P1 (needed to actually use the 1,312 items)
-1. Bulk item editor: set selling price / unit / track-stock / min-stock / Bangla name for many items (inline grid or CSV paste, with dry-run + approval). Today imported items have NO price → "Data needed", not sellable.
-2. Needs-decision list UX for the 43 old sweets (docs/inputs/seed_item_mapping.csv): bulk "link / keep separate" + hide dictionary twins.
-3. Item list filters by type/class/category count badges; Bangla category names (label_bn empty).
+P1 (needed to actually use the 1,312 items) -- BUILT in phase22 (needs the owner to paste supabase/phase22.sql; not tried on real Supabase / phone)
+1. DONE: Bulk item editor `#/bulkitems` (grid 50 rows/page, filters, inline edit, Preview then Apply through `items_bulk_apply`, CSV paste `code,price[,unit,track,min_stock]`, CSV export without costs, bulk hide / inactivate with reason). Still manual: the owner must type the ~1,255 prices (or paste a CSV).
+2. DONE: `#/itemmap` rebuilt: per old item link / use the dictionary item instead (copies price + unit, retires the old item, undoable) / keep separate / decide later, search box, accept-all-high-confidence, progress counter. The owner still has to decide the real 57 (or 43) items.
+3. PARTLY: legacy categories are labelled "Old list" and sorted after the 25 dictionary ones; "Unpriced finished goods / resale" chip in the item list; Bangla names of the 25 categories are typed by the owner on the Bangla names tab of the bulk editor (label_bn is still empty until then). Count badges per type/class on the list are NOT built.
 
 P2 (rule 4 / consistency)
 4. ~50 pickers still plain selects (purchase unit/return reasons, sale-return reasons, stock unit, wallets, asset condition, itemmaster type/class, unit-conversion selects) → wire B.listctl.
