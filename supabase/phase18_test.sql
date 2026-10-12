@@ -17,7 +17,8 @@ create or replace function tt.err(p_name text, p_sql text, p_msg text default ''
 begin execute p_sql; perform tt.chk(p_name, false); raise notice '  (it did not fail)';
 exception when others then perform tt.chk(p_name, sqlerrm like '%' || p_msg || '%'); if sqlerrm not like '%' || p_msg || '%' then raise notice '  (got: %)', sqlerrm; end if; end $$;
 create or replace function tt.as(p_sub text) returns void language plpgsql as $$
-begin perform set_config('request.jwt.claim.sub', p_sub, false); end $$;
+begin perform set_config('request.jwt.claim.sub', p_sub, false); perform set_config('request.jwt.claim.iat', extract(epoch from now())::bigint::text, false); end $$;
+
 grant usage on schema tt to authenticated, anon; grant execute on all functions in schema tt to authenticated, anon; grant select, insert on tt.res to authenticated, anon;
 
 insert into auth.users (id,email,raw_user_meta_data) values
@@ -64,28 +65,45 @@ select tt.err('T2 a count that differs from the typed entry is refused', format(
 select tt.as(:'w'); select tt.err('T2 another person cannot count the maker''s drawer', format($$select count_save('%s','drawer','{"n1000":9,"n100":3}')$$, :'e1'), 'not allowed');
 select tt.as(:'s');
 select count_save(:'e1'::uuid,'drawer','{"n1000":9,"n100":3}') as r2 \gset
-select tt.chk('T2 expected 9300 returned only after save; diff 0; match', (:'r2'::jsonb ->> 'expected')::numeric=9300 and (:'r2'::jsonb ->> 'diff')::numeric=0 and (:'r2'::jsonb ->> 'match')='true' and (:'r2'::jsonb ->> 'counted')::numeric=9300);
-select tt.chk('T2 ZERO diff is stored (row + check_data.blind)', (select diff=0 and counted=9300 and expected=9300 from entry_counts where entry_id=:'e1'::uuid and section='drawer')
-  and (select (check_data #>> '{blind,drawer,diff}')::numeric=0 and (check_data #>> '{blind,drawer,match}')='true' from entries where id=:'e1'::uuid));
+select tt.chk('T2 BLIND: the maker gets saved + counted only, no expected / diff / match', (:'r2'::jsonb ->> 'saved')='true' and not (:'r2'::jsonb ? 'expected') and not (:'r2'::jsonb ? 'diff') and not (:'r2'::jsonb ? 'match'));
+select tt.chk('T2 the maker cannot read the count row (RLS) nor check_data.blind while the sheet is a draft', (select count(*) from entry_counts where entry_id=:'e1'::uuid)=0 and (select not (check_data ? 'blind') from entries where id=:'e1'::uuid));
+select tt.as(:'o');
+select tt.chk('T2 ZERO diff is stored (row)', (select diff=0 and counted=9300 and expected=9300 from entry_counts where entry_id=:'e1'::uuid and section='drawer'));
+select tt.chk('T2 an approver / see_expected holder gets expected 9300, diff 0, match', (count_get(:'e1'::uuid,'drawer') ->> 'expected')::numeric=9300 and (count_get(:'e1'::uuid,'drawer') ->> 'diff')::numeric=0 and (count_get(:'e1'::uuid,'drawer') ->> 'match')='true');
+select tt.as(:'s');
+
 select tt.chk('T2 expected still not in entries.data / flags', (select data::text !~ 'expected' and flags::text !~ 'expected' from entries where id=:'e1'::uuid));
 select tt.chk('T2 the same count again = same answer, flagged already', (count_save(:'e1'::uuid,'drawer','{"n1000":9,"n100":3}') ->> 'already')='true');
 select tt.err('T2 a different figure is refused (immutable)', format($$select count_save('%s','drawer','{"n1000":10}')$$, :'e1'), 'count_already_saved');
 select tt.err('T2 the typed count cannot be changed through the entry', format($$select save_entry('%s'::uuid,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"d_bkash":3000,"dues":500,"credit_sales":200,"cash_count":{"n1000":10,"n100":3}}','[]','changed')$$, :'e1'), 'count_locked');
 select tt.chk('T2 other figures of the entry may still change', (select (save_entry(:'e1'::uuid,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"d_bkash":3000,"dues":500,"credit_sales":200,"cash_count":{"n1000":9,"n100":3},"slip_no":"A1"}','[]','x') ->> 'id')=:'e1'));
-select tt.chk('T2 count_get after save shows the figures', (count_get(:'e1'::uuid,'drawer') ->> 'expected')::numeric=9300 and (count_get(:'e1'::uuid,'drawer') ->> 'saved')='true' and (count_get(:'e1'::uuid,'drawer') ->> 'inputs_changed')='false');
+select tt.chk('T2 count_get for the maker: saved, hidden, no figures', (count_get(:'e1'::uuid,'drawer') ->> 'saved')='true' and (count_get(:'e1'::uuid,'drawer') ->> 'hidden')='true' and not (count_get(:'e1'::uuid,'drawer') ? 'expected') and not (count_get(:'e1'::uuid,'drawer') ? 'diff'));
+select tt.chk('T2 the maker peeking at a saved count gets no figures either', not (count_peek(:'e1'::uuid,'drawer') ? 'expected'));
 select save_entry(:'e1'::uuid,'14-1',1,current_date,'{"open_counted":2000,"total_entered":11000,"d_bkash":3000,"dues":500,"credit_sales":200,"cash_count":{"n1000":9,"n100":3}}','[]','fix total') is not null as ch \gset
-select tt.chk('T2 later change of the figures is visible (inputs_changed), the stored diff stays', (count_get(:'e1'::uuid,'drawer') ->> 'inputs_changed')='true' and (count_get(:'e1'::uuid,'drawer') ->> 'expected')::numeric=9300);
+select tt.as(:'o'); select tt.chk('T2 later change of the figures is visible (inputs_changed), the stored diff stays', (count_get(:'e1'::uuid,'drawer') ->> 'inputs_changed')='true' and (count_get(:'e1'::uuid,'drawer') ->> 'expected')::numeric=9300); select tt.as(:'s');
 select tt.err('T2 direct update of entry_counts refused', $$update entry_counts set counted=1$$, 'permission denied');
 reset role;
 select tt.err('T2 even the DB owner cannot change a count', $$update entry_counts set counted=1$$, 'append-only');
 select tt.err('T2 nor delete', $$delete from entry_counts$$, 'append-only');
 select tt.err('T2 nor truncate', $$truncate entry_counts$$, 'append-only');
 set role authenticated; select tt.as(:'s');
+-- count_missing: the typed entry must hold the count
+select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000}','[]') ->> 'id' as e1m \gset
+select tt.err('T2 count_save needs the count in the saved entry (count_missing)', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e1m'), 'count_missing');
+select tt.err('T2 a second counted draft the same day by the same person is refused (no throw-away drafts)', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e1m'), 'count_missing') ;
+select save_entry(:'e1m'::uuid,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"cash_count":{"n1000":1}}','[]','x') is not null as e1ms \gset
+select tt.err('T2 draft limit: e1 is still an open counted draft', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e1m'), 'count_draft_limit');
+-- submit e1: the server adds nothing (diff 0)
+select tt.chk('T2 e1 submits', (submit_entry(:'e1'::uuid) ->> 'status')='submitted');
+select tt.chk('T2 after submit the maker reads the figures (check_data.blind mirrored)', (select (check_data #>> '{blind,drawer,diff}')::numeric=0 from entries where id=:'e1'::uuid) and (count_get(:'e1'::uuid,'drawer') ->> 'expected')::numeric=9300);
 -- a short drawer
 select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"cash_count":{"n1000":11,"n100":3}}','[]') ->> 'id' as e2 \gset
 select count_save(:'e2'::uuid,'drawer','{"n1000":11,"n100":3}') as r3 \gset
-select tt.chk('T2 over by 1300 stored (counted 11300, expected 12000? no: 2000+10000=12000, diff -700)', (:'r3'::jsonb ->> 'expected')::numeric=12000 and (:'r3'::jsonb ->> 'diff')::numeric=-700 and (select diff=-700 from entry_counts where entry_id=:'e2'::uuid));
-select tt.err('T2 count on a submitted drawer is closed', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e0'), 'count_not_open');
+select tt.chk('T2 maker blind again on the short drawer; the row holds diff -700', not (:'r3'::jsonb ? 'diff') and (select diff=-700 from entry_counts where entry_id=:'e2'::uuid) is null);
+select tt.as(:'o'); select tt.chk('T2 the owner sees -700 stored', (select diff=-700 and expected=12000 from entry_counts where entry_id=:'e2'::uuid)); select tt.as(:'s');
+select tt.chk('T2 e2 submits and the SERVER adds the cash_short_over flag (red: no tolerance set) + an exception', (submit_entry(:'e2'::uuid) ->> 'status')='submitted' and (select count(*) from entries where id=:'e2'::uuid and flags @> '[{"code":"cash_short_over","level":"red"}]')=1);
+select tt.chk('T2 ...the exception exists', (select count(*) from exceptions where entry_id=:'e2'::uuid and flag_code='cash_short_over' and amount=-700)=1);
+
 
 \echo == T3 who may look before the count (see_expected, owner switch)
 select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"cash_count":{"n1000":12}}','[]') ->> 'id' as e3 \gset
@@ -101,7 +119,7 @@ select tt.as(:'g'); select tt.chk('T3 ...the delegate still may', (count_peek(:'
 select tt.as(:'o'); select set_rule('owner_sees_expected_first','true') is null as r5 \gset
 select tt.as(:'s');
 select count_save(:'e3'::uuid,'drawer','{"n1000":12}') is not null as cs3 \gset
-select tt.chk('T3 others peeked before the maker counted: recorded (seen_before_count), the maker did not (expected_seen_by is the maker at save time)', (select seen_before_count and expected_seen_by=:'s'::uuid from entry_counts where entry_id=:'e3'::uuid));
+select tt.as(:'o'); select tt.chk('T3 others peeked before the maker counted: recorded (seen_before_count), the maker did not (expected_seen_by is the maker at save time)', (select seen_before_count and expected_seen_by=:'s'::uuid from entry_counts where entry_id=:'e3'::uuid)); select tt.as(:'s');
 select tt.as(:'o'); select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"cash_count":{"n1000":12}}','[]') ->> 'id' as e3b \gset
 select count_peek(:'e3b'::uuid,'drawer') is not null as pk2 \gset
 select count_save(:'e3b'::uuid,'drawer','{"n1000":12}') is not null as cs3b \gset
