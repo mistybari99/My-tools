@@ -136,6 +136,11 @@ begin
     new.tracked := false;
   end if;
   if new.sub_category is not null and new.sub_category = '' then new.sub_category := null; end if;
+  -- prices: finite and 0 .. 1e9 (a numeric can hold NaN / Infinity); the unit must be an old item unit or a value of the units list
+  if new.sell_price is not null and not (new.sell_price between 0 and 1000000000) then raise exception 'bad_price'; end if;
+  if new.wholesale_price is not null and not (new.wholesale_price between 0 and 1000000000) then raise exception 'bad_price'; end if;
+  if new.unit is not null and (tg_op = 'INSERT' or new.unit is distinct from old.unit) and new.unit not in ('kg', 'pc', 'lb')
+     and not exists (select 1 from public.option_lists where list_code = 'units' and value_code = new.unit and active) then raise exception 'bad_unit'; end if;
   return new;
 end $$;
 drop trigger if exists items_p14_guard on public.items;
@@ -148,7 +153,7 @@ create trigger audit_items after insert or update on public.items for each row
 
 -- ---------- (7) server enforcement: sales and stock ----------
 create or replace function public._sale_item_guard() returns trigger language plpgsql security definer set search_path = public as $$
-declare ln jsonb; it public.items;
+declare ln jsonb; it public.items; late boolean := new.sold_at < now() - interval '2 minutes'; changed boolean := false;
 begin
   if new.lines is null or jsonb_typeof(new.lines) <> 'array' then return new; end if;
   for ln in select x from jsonb_array_elements(new.lines) x where nullif(x->>'item_id', '') is not null loop
@@ -156,18 +161,33 @@ begin
     if not found then continue; end if;
     -- sold only when the item is a sellable type, switched on for sale and has a selling price ("Data needed" otherwise)
     if not it.sellable or it.sell_price is null or it.item_type in ('asset', 'raw_material') then
+      -- an offline sale made BEFORE the item changed (it was fine at the sale time) is accepted and flagged red; an online attempt is refused
+      if late and it.updated_at > new.sold_at then changed := true; continue; end if;
       raise exception 'item_not_sellable' using detail = it.code || ' ' || it.name_bn;
     end if;
   end loop;
+  if changed then perform set_config('bos.offline_item_changed', new.id::text, true); end if;
   return new;
+end $$;
+create or replace function public._sale_item_changed_exc() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if coalesce(current_setting('bos.offline_item_changed', true), '') = new.id::text then
+    insert into public.exceptions (entry_id, sale_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+      values (null, new.id, 'POS', new.location_id, new.sale_date, 'offline_sale_item_changed', 'red', new.total,
+        jsonb_build_object('bn', 'রসিদ ' || new.receipt || ': অফলাইনে করা সেল — পরে আইটেমের ফ্ল্যাগ/দাম বদলেছে, সেল গ্রহণ করা হয়েছে', 'en', 'Receipt ' || new.receipt || ': an offline sale was accepted although the item changed (sellable / price / type) after the sale time'));
+  end if;
+  return null;
 end $$;
 drop trigger if exists sales_item_guard on public.sales;
 create trigger sales_item_guard before insert on public.sales for each row execute function public._sale_item_guard();
+drop trigger if exists sales_item_changed_exc on public.sales;
+create trigger sales_item_changed_exc after insert on public.sales for each row execute function public._sale_item_changed_exc();
 
 create or replace function public._ledger_item_guard() returns trigger language plpgsql security definer set search_path = public as $$
 declare ok boolean;
 begin
   if new.reverses_id is not null then return new; end if;                  -- undoing an earlier line is always allowed
+  if new.reason = 'sale_out' and new.made_at < now() - interval '2 minutes' then return new; end if;      -- a sale that syncs late has already happened
   select count_in_business into ok from public.items where id = new.item_id;
   if ok is distinct from true then raise exception 'item_not_counted' using detail = new.item_id::text; end if;
   return new;
@@ -200,8 +220,13 @@ end $$;
 
 -- ---------- (8) item codes ----------
 -- category value (c14) or category number (14) -> the two-digit number used in codes; a category without one gets the next free number (only inside item_new)
+create or replace function public._cat_free_no() returns text language sql stable security definer set search_path = public as $$
+  select lpad((greatest(
+    coalesce((select max((extra->>'cat_no')::int) from public.option_lists where list_code = 'item_categories' and (extra->>'cat_no') ~ '^[0-9]+$'), 0),
+    coalesce((select max(substring(code from '^([0-9]+)-[0-9]+$')::int) from public.items where code ~ '^[0-9]+-[0-9]+$'), 0)) + 1)::text, 2, '0');
+$$;
 create or replace function public._cat_no(p_cat text, p_make boolean default false) returns text language plpgsql security definer set search_path = public as $$
-declare n text; mx int;
+declare n text;
 begin
   if p_cat is null or btrim(p_cat) = '' then return null; end if;
   if p_cat ~ '^[0-9]{2,3}$' then return p_cat; end if;
@@ -209,11 +234,11 @@ begin
   if n is not null and n <> '' then return n; end if;
   if not p_make or not exists (select 1 from public.option_lists where list_code = 'item_categories' and value_code = p_cat) then return null; end if;
   perform pg_advisory_xact_lock(hashtext('item_cat_no'));
-  select coalesce(max((extra->>'cat_no')::int), 0) + 1 into mx from public.option_lists where list_code = 'item_categories' and (extra->>'cat_no') ~ '^[0-9]+$';
-  n := lpad(mx::text, 2, '0');
+  n := public._cat_free_no();               -- above every category number AND every code prefix in use, so it is unique
   update public.option_lists set extra = extra || jsonb_build_object('cat_no', n) where list_code = 'item_categories' and value_code = p_cat;
   return n;
 end $$;
+create unique index if not exists option_lists_cat_no_uq on public.option_lists ((extra->>'cat_no')) where list_code = 'item_categories' and (extra->>'cat_no') is not null;
 
 -- next code in a category: highest numeric suffix + 1, zero-padded to 3 digits. Retired items keep their row, so a retired code is never handed out again.
 create or replace function public._next_code(p_cat_no text, p_lock boolean) returns text language plpgsql security definer set search_path = public as $$
@@ -230,7 +255,10 @@ declare n text;
 begin
   if not public.is_active() then raise exception 'not allowed'; end if;
   n := public._cat_no(p_category, false);
-  if n is null then return null; end if;
+  if n is null then      -- an owner-made category without a number: the number item_new would give it
+    if p_category is not null and exists (select 1 from public.option_lists where list_code = 'item_categories' and value_code = p_category and active) then return public._cat_free_no() || '-001'; end if;
+    return null;
+  end if;
   return public._next_code(n, false);
 end $$;
 
@@ -241,6 +269,7 @@ begin
   nbn := coalesce(nullif(btrim(p_patch->>'name_bn'), ''), nullif(btrim(p_patch->>'name_en'), ''));
   if nbn is null then raise exception 'name_required'; end if;
   if not exists (select 1 from public.item_types where code = ty and active) then raise exception 'bad_item_type'; end if;
+  if cat is not null and exists (select 1 from public.option_lists where list_code = 'item_categories' and value_code = cat and not active) then raise exception 'category_inactive'; end if;
   cn := public._cat_no(cat, true);
   if cn is not null then cd := public._next_code(cn, true); end if;       -- locked until this transaction ends; the unique index is the backstop
   select * into f from public._item_type_flags(ty);
@@ -283,6 +312,32 @@ begin
   end if;      -- last: the lock never blocks the changes of the same request
 end $$;
 
+-- one place that decides which keys a patch may carry; the flag / type keys only come through item_apply / item_new (they set bos.item_apply)
+create or replace function public._item_patch_check(p_patch jsonb) returns void language plpgsql security definer set search_path = public as $$
+declare k text; v text; cat text;
+begin
+  if p_patch is null or jsonb_typeof(p_patch) <> 'object' then raise exception 'bad_request'; end if;
+  for k in select jsonb_object_keys(p_patch) loop
+    if k not in ('name_bn','name_en','name_mix','category','category_bn','unit','sell_price','is_active','sub_category','base_unit','sell_units','wholesale_price','tracked','min_stock',
+                 'barcode','source','vat_applicable','images','details','cost_price','item_type','control_class','count_in_business','sellable','locked','hidden','master_code','retired_reason') then
+      raise exception 'bad_field';
+    end if;
+    if k in ('item_type','control_class','count_in_business','sellable','locked','hidden','master_code','retired_reason') and coalesce(current_setting('bos.item_apply', true), '') <> '1' then
+      raise exception 'bad_field';
+    end if;
+  end loop;
+  foreach k in array array['sell_price', 'wholesale_price', 'cost_price', 'min_stock'] loop
+    v := nullif(btrim(coalesce(p_patch->>k, '')), '');
+    if v is not null and (v !~ '^[0-9]{1,10}(\.[0-9]{1,6})?$' or v::numeric > 1000000000) then raise exception 'bad_price'; end if;
+  end loop;
+  cat := nullif(btrim(coalesce(p_patch->>'category', '')), '');
+  if cat is not null and not exists (select 1 from public.option_lists where list_code = 'item_categories' and value_code = cat) and not exists (select 1 from public.items where category = cat) then raise exception 'bad_category'; end if;
+end $$;
+create or replace function public._item_changes_guard() returns trigger language plpgsql security definer set search_path = public as $$
+begin perform public._item_patch_check(new.patch); return new; end $$;
+drop trigger if exists item_changes_guard on public.item_changes;
+create trigger item_changes_guard before insert on public.item_changes for each row execute function public._item_changes_guard();
+
 do $$
 declare d text := pg_get_functiondef('public.apply_item_patch(uuid,jsonb)'::regprocedure); mk text; done boolean;
 begin
@@ -299,6 +354,7 @@ begin
       language plpgsql security definer set search_path = public as $b$
       declare iid uuid;   -- bos14-master @MK@ : creation (next code per category) and the item-master fields are done here, everything else by the previous version
       begin
+        perform public._item_patch_check(p_patch);
         if p_item is null then iid := public._item_create_p14(p_patch); else iid := p_item; end if;
         iid := public._apply_item_patch_p12(iid, p_patch);
         perform public._item_flags_apply(iid, p_patch);
@@ -321,7 +377,7 @@ begin
               where ur.user_id = auth.uid() and r.allow_self_approve);
   if c.requested_by = auth.uid() and not self_ok then raise exception 'you cannot approve your own request'; end if;
   select staff_id into sid from public.profiles where id = auth.uid();
-  if p_approve then perform public.apply_item_patch(c.item_id, c.patch); end if;
+  if p_approve then perform set_config('bos.item_apply', '1', true); perform public.apply_item_patch(c.item_id, c.patch); perform set_config('bos.item_apply', '', true); end if;
   update public.item_changes set status = case when p_approve then 'approved' else 'rejected' end,
     decided_by = auth.uid(), decided_staff = sid, decided_at = now(), decision_note = p_note where id = p_id;
   return jsonb_build_object('status', case when p_approve then 'approved' else 'rejected' end);
@@ -337,24 +393,21 @@ create policy item_changes_read on public.item_changes for select to authenticat
 -- item_apply: change an existing item (any field of apply_item_patch + type / flags). Owner or item_create holder = at once, otherwise a request.
 create or replace function public.item_apply(p_item uuid, p_patch jsonb, p_note text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare sid text; cid bigint; k text;
+declare sid text; cid bigint; k text; iid uuid;
 begin
   if p_item is null or p_patch is null or jsonb_typeof(p_patch) <> 'object' then raise exception 'bad_request'; end if;
   if not exists (select 1 from public.items where id = p_item) then raise exception 'item_not_found'; end if;
   if not (public.is_owner() or public.can_do('ITEMS', 'enter') or public.has_grant('item_create')) then raise exception 'not allowed'; end if;
   if p_patch ? 'cost_price' and not public.can_do('ITEM_COST', 'enter') then raise exception 'not allowed to change cost'; end if;
   if p_patch ? 'locked' and not public.is_owner() then raise exception 'not allowed'; end if;               -- only the owner locks / unlocks
-  for k in select jsonb_object_keys(p_patch) loop
-    if k not in ('name_bn','name_en','name_mix','category','category_bn','unit','sell_price','is_active','sub_category','base_unit','sell_units','wholesale_price','tracked','min_stock',
-                 'barcode','source','vat_applicable','images','details','cost_price','item_type','control_class','count_in_business','sellable','locked','hidden','master_code','retired_reason') then
-      raise exception 'bad_field';
-    end if;
-  end loop;
+  perform set_config('bos.item_apply', '1', true); perform public._item_patch_check(p_patch);
   if public.is_owner() or public.has_grant('item_create') then
-    return jsonb_build_object('status', 'applied', 'item_id', public.apply_item_patch(p_item, p_patch));
+    iid := public.apply_item_patch(p_item, p_patch); perform set_config('bos.item_apply', '', true);
+    return jsonb_build_object('status', 'applied', 'item_id', iid);
   end if;
   select staff_id into sid from public.profiles where id = auth.uid();
   insert into public.item_changes (item_id, patch, note, requested_by, requested_staff) values (p_item, p_patch, left(p_note, 300), auth.uid(), sid) returning id into cid;
+  perform set_config('bos.item_apply', '', true);
   return jsonb_build_object('status', 'pending', 'id', cid);
 end $$;
 
@@ -373,12 +426,14 @@ begin
   if cat is not null and not exists (select 1 from public.option_lists where list_code = 'item_categories' and value_code = cat and active)
      and not exists (select 1 from public.items where category = cat) then raise exception 'bad_category'; end if;
   direct := public.is_owner() or public.has_grant('item_create') or not public.rule_on('item_create_needs_approval');
+  perform set_config('bos.item_apply', '1', true); perform public._item_patch_check(p_patch);
   if direct then
-    iid := public.apply_item_patch(null, p_patch);
+    iid := public.apply_item_patch(null, p_patch); perform set_config('bos.item_apply', '', true);
     return jsonb_build_object('status', 'created', 'item_id', iid, 'code', (select code from public.items where id = iid));
   end if;
   select staff_id into sid from public.profiles where id = auth.uid();
   insert into public.item_changes (item_id, patch, note, requested_by, requested_staff) values (null, p_patch, left(p_note, 300), auth.uid(), sid) returning id into cid;
+  perform set_config('bos.item_apply', '', true);
   return jsonb_build_object('status', 'pending', 'id', cid);
 end $$;
 
@@ -610,12 +665,15 @@ begin
   return jsonb_build_object('loaded', jsonb_array_length(p_rows) - s, 'skipped', s);
 end $$;
 
-create or replace function public._item_link(p_item uuid, p_dict text, p_via text) returns void language plpgsql security definer set search_path = public as $$
+drop function if exists public._item_link(uuid, text, text);
+create or replace function public._item_link(p_item uuid, p_dict text, p_via text, p_force boolean default false) returns void language plpgsql security definer set search_path = public as $$
 declare tid uuid; cls text;
 begin
   select id, control_class into tid, cls from public.items where code = p_dict and import_batch is not null;
   if tid is null then raise exception 'master_code_not_found'; end if;
   if tid = p_item then raise exception 'bad_request'; end if;
+  -- an old (sold) item stands for a sellable product; linking it to a material / asset / tool code needs the owner's explicit yes
+  if not coalesce(p_force, false) and exists (select 1 from public.items where id = tid and item_type in ('asset', 'raw_material', 'packaging', 'consumable', 'controlled')) then raise exception 'master_type_mismatch'; end if;
   if exists (select 1 from public.item_master_links where dict_code = p_dict and active and item_id <> p_item) then raise exception 'master_code_taken'; end if;
   perform set_config('bos.item_sys', '1', true);
   update public.item_master_links set active = false, unlinked_at = now() where item_id = p_item and active and dict_code <> p_dict;
@@ -633,7 +691,7 @@ begin
   for r in select m.* from public.item_mapping_review m where m.status = 'pending' and m.auto_ok and m.suggested_code is not null
            and exists (select 1 from public.items t where t.code = m.suggested_code and t.import_batch is not null)
            and not exists (select 1 from public.item_master_links l where l.dict_code = m.suggested_code and l.active) order by m.id loop
-    perform public._item_link(r.item_id, r.suggested_code, 'auto');
+    perform public._item_link(r.item_id, r.suggested_code, 'auto', false);
     update public.item_mapping_review set status = 'linked', decided_at = now(), decided_by = auth.uid(), note = 'auto (high confidence)' where id = r.id;
     n := n + 1;
   end loop;
@@ -641,7 +699,8 @@ begin
 end $$;
 
 -- decide: 'linked' (needs p_dict), 'rejected' (stays a stand-alone old item), 'pending' (undo)
-create or replace function public.item_mapping_decide(p_item uuid, p_dict text, p_status text, p_note text default null) returns jsonb
+drop function if exists public.item_mapping_decide(uuid, text, text, text);
+create or replace function public.item_mapping_decide(p_item uuid, p_dict text, p_status text, p_note text default null, p_force boolean default false) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare old_code text; tid uuid;
 begin
@@ -651,7 +710,8 @@ begin
   insert into public.item_mapping_review (item_id) values (p_item) on conflict (item_id) do nothing;
   if p_status = 'linked' then
     if nullif(btrim(p_dict), '') is null then raise exception 'master_code_not_found'; end if;
-    perform public._item_link(p_item, btrim(p_dict), 'manual');
+    if coalesce(p_force, false) and not public.is_owner() then raise exception 'not allowed'; end if;
+    perform public._item_link(p_item, btrim(p_dict), 'manual', p_force);
     update public.item_mapping_review set status = 'linked', suggested_code = coalesce(suggested_code, btrim(p_dict)), decided_by = auth.uid(), decided_at = now(), note = left(p_note, 300) where item_id = p_item;
   else
     select master_code into old_code from public.items where id = p_item;
@@ -693,7 +753,7 @@ create table if not exists public.assets (
   id uuid primary key default gen_random_uuid(),
   item_id uuid not null references public.items(id),
   location_id int not null references public.locations(id),
-  tag text not null unique default ('A-' || lpad(nextval('public.asset_tag_seq')::text, 5, '0')),
+  tag text not null unique check (length(tag) between 1 and 60) default ('A-' || lpad(nextval('public.asset_tag_seq')::text, 5, '0')),
   bought_on date,
   condition text,                                           -- value of the list asset_conditions
   status text not null default 'in_use' check (status in ('in_use', 'in_store', 'under_repair', 'lost', 'sold', 'retired')),
@@ -748,7 +808,8 @@ begin
   select * into it from public.items where id = nullif(p->>'item_id', '')::uuid;
   if not found or it.item_type <> 'asset' then raise exception 'not_an_asset_item'; end if;
   q := coalesce(nullif(p->>'qty', '')::int, 1); if q < 1 or q > 200 then raise exception 'bad_qty'; end if;
-  tg := nullif(btrim(p->>'tag'), ''); if tg is not null and q > 1 then raise exception 'tag_needs_qty_1'; end if;
+  tg := nullif(btrim(p->>'tag'), ''); if tg is not null and length(tg) > 60 then raise exception 'tag_too_long'; end if;
+  if tg is not null and q > 1 then raise exception 'tag_needs_qty_1'; end if;
   cost_ := nullif(p->>'cost', '')::numeric;
   if cost_ is not null then
     if not (cost_ between 0 and 1000000000000) then raise exception 'bad_cost'; end if;
@@ -814,6 +875,7 @@ begin
   select * into a from public.assets where id = p_id for update;
   if not found then raise exception 'not found'; end if;
   if not public._asset_ok(a.location_id) then raise exception 'not allowed'; end if;
+  if a.purchase_bill_id is not null and exists (select 1 from public.purchase_bills where id = a.purchase_bill_id and status = 'void') then raise exception 'bill_voided'; end if;
   update public.assets set active = true, status = 'in_use', retired_at = null, retired_reason = null where id = p_id;
   return jsonb_build_object('id', p_id);
 end $$;
@@ -827,7 +889,8 @@ begin
   if not found or pb.kind <> 'bill' or pb.status <> 'posted' then return 0; end if;
   net := case when pb.subtotal > 0 then (pb.subtotal - pb.discount) / pb.subtotal else 1 end;
   for ln in select l.*, i.item_type from public.purchase_lines l join public.items i on i.id = l.item_id where l.bill_id = p_bill and i.item_type = 'asset' order by l.line_no loop
-    q := least(greatest(floor(ln.qty)::int, 1), 200);
+    if ln.qty > 200 then raise exception 'asset_qty_too_large'; end if;           -- never cap silently: split the line (or add the rows by hand)
+    q := greatest(floor(ln.qty)::int, 1);
     for k in 1..q loop
       insert into public.assets (item_id, location_id, bought_on, condition, status, purchase_bill_id, purchase_line_id, seq_no, note)
         values (ln.item_id, pb.location_id, pb.bill_date, 'new', 'in_use', pb.id, ln.id, k, case when ln.qty <> floor(ln.qty) then 'bought qty ' || ln.qty::text || ' (fraction)' end)
@@ -837,6 +900,23 @@ begin
         insert into public.asset_costs (asset_id, cost) values (aid, round(ln.unit_cost * net, 2)) on conflict do nothing;
         total := total + 1;
       end if;
+    end loop;
+  end loop;
+  return total;
+end $$;
+
+-- a posted purchase RETURN takes the same number of register rows out (latest first, rows of the returned bill first)
+create or replace function public._assets_from_return(p_bill uuid) returns int language plpgsql security definer set search_path = public as $$
+declare pb public.purchase_bills; ln record; q int; total int := 0; a record;
+begin
+  select * into pb from public.purchase_bills where id = p_bill;
+  if not found or pb.kind <> 'return' or pb.status <> 'posted' then return 0; end if;
+  for ln in select l.* from public.purchase_lines l join public.items i on i.id = l.item_id where l.bill_id = p_bill and i.item_type = 'asset' order by l.line_no loop
+    q := least(greatest(floor(ln.qty)::int, 1), 200);
+    for a in select id from public.assets where item_id = ln.item_id and location_id = pb.location_id and active
+             order by (purchase_bill_id is not distinct from pb.ref_bill_id) desc, created_at desc, tag desc limit q loop
+      update public.assets set active = false, status = 'retired', retired_at = now(), retired_reason = 'purchase return' where id = a.id;
+      total := total + 1;
     end loop;
   end loop;
   return total;
@@ -855,7 +935,7 @@ begin
         r := public._post_purchase_p13(p_id, p_payments);
         if coalesce((r->>'dup')::boolean, false) then return r; end if;
         n := public._assets_from_bill(p_id);
-        return r || jsonb_build_object('assets_added', n);
+        return r || jsonb_build_object('assets_added', n, 'assets_returned', public._assets_from_return(p_id));
       end $b$ $f$;
   end if;
   if position('bos14-assets' in pg_get_functiondef('public.void_purchase(uuid,text)'::regprocedure)) = 0 then
@@ -872,20 +952,20 @@ begin
       end $b$ $f$;
   end if;
 end $$;
-revoke all on function public._post_purchase_p13(uuid, jsonb), public._void_purchase_p13(uuid, text), public._assets_from_bill(uuid), public._asset_ok(int) from public, anon, authenticated;
+revoke all on function public._post_purchase_p13(uuid, jsonb), public._void_purchase_p13(uuid, text), public._assets_from_bill(uuid), public._assets_from_return(uuid), public._asset_ok(int), public._item_unit_code(text), public._assets_touch(), public._item_patch_check(jsonb), public._item_changes_guard(), public._cat_free_no(), public._sale_item_changed_exc() from public, anon, authenticated;
 revoke all on function public.post_purchase(uuid, jsonb), public.void_purchase(uuid, text) from public, anon;
 grant execute on function public.post_purchase(uuid, jsonb), public.void_purchase(uuid, text) to authenticated;
 
 -- ---------- (13) execute rights ----------
 revoke all on function public.item_next_code(text), public.item_new(jsonb, text), public.item_apply(uuid, jsonb, text), public.item_dup_check(text, text, uuid),
   public.item_type_set(text, jsonb), public.item_class_map_set(text, text, boolean), public.item_master_import_preview(jsonb), public.item_master_import_apply(jsonb, text, int),
-  public.item_mapping_load(jsonb), public.item_mapping_autolink(), public.item_mapping_decide(uuid, text, text, text),
+  public.item_mapping_load(jsonb), public.item_mapping_autolink(), public.item_mapping_decide(uuid, text, text, text, boolean),
   public.asset_add(jsonb), public.asset_update(uuid, jsonb), public.asset_retire(uuid, text, text), public.asset_reactivate(uuid),
-  public._item_link(uuid, text, text), public._item_master_classify(jsonb), public._items_p14_guard(), public._sale_item_guard(), public._ledger_item_guard(), public._tools_switch(),
+  public._item_link(uuid, text, text, boolean), public._item_master_classify(jsonb), public._items_p14_guard(), public._sale_item_guard(), public._ledger_item_guard(), public._tools_switch(),
   public._item_create_p14(jsonb) from public, anon;
 grant execute on function public.item_next_code(text), public.item_new(jsonb, text), public.item_apply(uuid, jsonb, text), public.item_dup_check(text, text, uuid),
   public.item_type_set(text, jsonb), public.item_class_map_set(text, text, boolean), public.item_master_import_preview(jsonb), public.item_master_import_apply(jsonb, text, int),
-  public.item_mapping_load(jsonb), public.item_mapping_autolink(), public.item_mapping_decide(uuid, text, text, text),
+  public.item_mapping_load(jsonb), public.item_mapping_autolink(), public.item_mapping_decide(uuid, text, text, text, boolean),
   public.asset_add(jsonb), public.asset_update(uuid, jsonb), public.asset_retire(uuid, text, text), public.asset_reactivate(uuid) to authenticated;
-revoke all on function public._item_link(uuid, text, text), public._item_master_classify(jsonb), public._items_p14_guard(), public._sale_item_guard(), public._ledger_item_guard(),
+revoke all on function public._item_link(uuid, text, text, boolean), public._item_master_classify(jsonb), public._items_p14_guard(), public._sale_item_guard(), public._ledger_item_guard(),
   public._tools_switch(), public._item_create_p14(jsonb) from authenticated;

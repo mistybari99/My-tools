@@ -350,7 +350,7 @@ async function save() {
   const { data, error } = D.master ? (F.id ? await sb.rpc('item_apply', { p_item: F.id, p_patch: patch, p_note: note }) : await sb.rpc('item_new', { p_patch: patch, p_note: note }))
     : await sb.rpc('submit_item_change', { p_item: F.id || null, p_patch: patch, p_note: note });
   if (btn) btn.disabled = false;
-  if (error) { if (/duplicate|unique/i.test(error.message || '')) return toast(T('dupbc')); if (/item_locked/.test(error.message || '')) return toast(lab(L('এই আইটেম লক করা — শুধু মালিক বদলাতে পারেন', 'This item is locked — only the owner can change it', 'এই Item locked — শুধু Owner বদলাতে পারেন'))); if (/item_has_stock/.test(error.message || '')) return toast(lab(L('স্টক আছে — আগে শূন্য করুন', 'There is stock — bring it to zero first', 'Stock আছে — আগে শূন্য করুন'))); return fail(error); }
+  if (error) { if (/duplicate|unique/i.test(error.message || '')) return toast(T('dupbc')); if (/item_locked/.test(error.message || '')) return toast(lab(L('এই আইটেম লক করা — শুধু মালিক বদলাতে পারেন', 'This item is locked — only the owner can change it', 'এই Item locked — শুধু Owner বদলাতে পারেন'))); if (/item_has_stock/.test(error.message || '')) return toast(lab(L('স্টক আছে — আগে শূন্য করুন', 'There is stock — bring it to zero first', 'Stock আছে — আগে শূন্য করুন'))); return (B.itemMaster && B.itemMaster.errMsg(error) ? toast(B.itemMaster.errMsg(error)) : fail(error)); }
   toast(data && (data.status === 'applied' || data.status === 'created') ? T('saved') + (data.code ? ' · ' + data.code : '') : T('appr'));
   F = null; go('items');
 }

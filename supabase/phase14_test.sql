@@ -365,4 +365,54 @@ reset role;
 select tt.err('T10 no delete on types', 'set role authenticated; delete from item_types where code=''resale''', 'permission denied');
 reset role;
 
+\echo == T11 audit fixes: prices, units, whitelist, offline sale, asset return, categories, force link
+set role authenticated; select tt.as(:'o');
+select tt.err('T11 NaN price refused', format($$select item_apply(%L,'{"sell_price":"NaN"}'::jsonb)$$, :'i_fg'), 'bad_price');
+select tt.err('T11 negative price refused', format($$select item_apply(%L,'{"sell_price":-5}'::jsonb)$$, :'i_fg'), 'bad_price');
+select tt.err('T11 huge price refused', format($$select item_apply(%L,'{"wholesale_price":2000000000}'::jsonb)$$, :'i_fg'), 'bad_price');
+select tt.err('T11 unknown unit refused', format($$select item_apply(%L,'{"unit":"zz"}'::jsonb)$$, :'i_fg'), 'bad_unit');
+select tt.err('T11 unknown category refused', format($$select item_apply(%L,'{"category":"nope"}'::jsonb)$$, :'i_fg'), 'bad_category');
+select tt.err('T11 old path: flags are not a plain field', format($$select submit_item_change(%L,'{"locked":true}'::jsonb)$$, :'i_fg'), 'bad_field');
+select tt.err('T11 old path: unknown key refused', format($$select submit_item_change(%L,'{"zzz":1}'::jsonb)$$, :'i_fg'), 'bad_field');
+select tt.err('T11 new item with a bad price refused', 'select item_new(''{"name_bn":"x","category":"c14","sell_price":"1e99"}''::jsonb)', 'bad_price');
+reset role;
+select tt.err('T11 the table guard refuses NaN too', 'update items set sell_price=''NaN'' where code=''14-002''', 'bad_price');
+select tt.as(:'s');
+select tt.err('T11 staff cannot queue a flag change through the old path', format($$set role authenticated; select submit_item_change(%L,'{"item_type":"asset"}'::jsonb)$$, :'i_fg'), 'bad_field');
+reset role;
+select tt.as(:'o');
+update items set sellable=false where code='14-002';
+insert into sales (client_id, location_id, receipt, sold_at, sale_date, lines, subtotal, discount, total, pay_mode, created_by, created_staff, status)
+  values (gen_random_uuid(), 1, 9001, now() - interval '1 hour', current_date, format('[{"item_id":"%s","qty":1,"price":500,"amount":500,"unit":"kg"}]', :'i_fg')::jsonb, 500, 0, 500, 'cash', :'o', 'owner1', 'done') returning id as osid \gset
+select tt.chk('T11 offline sale of an item that changed after it: accepted, red exception offline_sale_item_changed', (select count(*) from exceptions where sale_id=:'osid'::uuid and flag_code='offline_sale_item_changed' and level='red')=1);
+set session_replication_role = replica; update items set updated_at = now() - interval '3 hours' where code='14-002'; set session_replication_role = origin;
+select tt.err('T11 offline sale of an item that was already unsellable at sale time: refused', format($$insert into sales (client_id, location_id, receipt, sold_at, sale_date, lines, subtotal, discount, total, pay_mode, created_by, created_staff, status) values (gen_random_uuid(), 1, 9002, now() - interval '1 hour', current_date, '[{"item_id":"%s","qty":1,"price":500,"amount":500}]'::jsonb, 500, 0, 500, 'cash', %L, 'owner1', 'done')$$, :'i_fg', :'o'), 'item_not_sellable');
+update items set sellable=true where code='14-002';
+select id as i_chair2 from items where code='01-091' \gset
+set role authenticated; select tt.as(:'p');
+select save_purchase(null,null,:'sa'::uuid,1,'A-3','2026-02-01'::date,format('[{"item_id":"%s","qty":2,"unit":"pc","unit_cost":800}]',:'i_chair2')::jsonb) ->> 'id' as ab3 \gset
+select post_purchase(:'ab3'::uuid) as pr3 \gset
+select tt.as(:'o');
+select save_purchase(null,null,:'sa'::uuid,1,'RT-1','2026-02-02'::date,format('[{"item_id":"%s","qty":1,"unit":"pc","unit_cost":800}]',:'i_chair2')::jsonb, 0, null, null, 'return', :'ab3'::uuid, 'damaged') ->> 'id' as rb3 \gset
+select post_purchase(:'rb3'::uuid) as pr4 \gset
+select tt.chk('T11 purchase return retires one register row of the returned bill (latest first)', (:'pr4'::jsonb->>'assets_returned')::int=1 and (select count(*) from assets where purchase_bill_id=:'ab3'::uuid and active)=1 and (select count(*) from assets where purchase_bill_id=:'ab3'::uuid and retired_reason='purchase return')=1);
+select save_purchase(null,null,:'sa'::uuid,1,'A-4','2026-02-03'::date,format('[{"item_id":"%s","qty":201,"unit":"pc","unit_cost":1}]',:'i_chair2')::jsonb) ->> 'id' as ab4 \gset
+select tt.err('T11 more than 200 assets on one line: refused, never capped', format($$select post_purchase(%L::uuid)$$, :'ab4'), 'asset_qty_too_large');
+select tt.err('T11 reactivating a row of a voided bill refused', format($$select asset_reactivate(%L)$$, (select id from assets where purchase_bill_id=:'ab'::uuid limit 1)), 'bill_voided');
+select tt.err('T11 tag length limit', format($$select asset_add(jsonb_build_object('item_id',%L,'location_id',1,'tag',repeat('x',61)))$$, :'i_chair2'), 'tag_too_long');
+reset role; update option_lists set active=false where value_code='myc'; set role authenticated; select tt.as(:'o');
+select tt.err('T11 inactive category refuses new items', 'select item_new(''{"name_bn":"zz","category":"myc"}''::jsonb)', 'category_inactive');
+reset role; update option_lists set active=true where value_code='myc'; insert into option_lists (list_code,value_code,label_bn,label_en,sort,extra) values ('item_categories','myc2','দুই','Two',98,'{}');
+set role authenticated; select tt.as(:'o');
+select item_next_code('myc2') as pv2 \gset
+select item_new('{"name_bn":"দুই আইটেম","category":"myc2","item_type":"resale"}'::jsonb) ->> 'code' as cd2 \gset
+select tt.chk('T11 preview of an unnumbered category equals what item_new gives (' || :'pv2' || ')', :'pv2' = :'cd2' and :'cd2' like '%-001');
+reset role;
+select tt.err('T11 category numbers are unique', 'update option_lists set extra = extra || ''{"cat_no":"01"}'' where value_code=''myc2''', 'duplicate key');
+set role authenticated; select tt.as(:'o');
+select tt.err('T11 an old item cannot be linked to an asset code without force', format($$select item_mapping_decide(%L,'01-001','linked')$$, (select id from items where code='I-004')), 'master_type_mismatch');
+select tt.chk('T11 the owner can force it', (select item_mapping_decide((select id from items where code='I-004'),'01-001','linked',null,true)->>'status')='linked');
+reset role;
+select tt.chk('T11 helper functions are not executable by anon', not has_function_privilege('anon','public._item_unit_code(text)','execute') and not has_function_privilege('anon','public._assets_touch()','execute'));
+
 select '--- FAILED: ' || count(*) filter (where not ok) || ' of ' || count(*) from tt.res;

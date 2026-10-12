@@ -64,6 +64,8 @@ const RS = { opening: L('প্রারম্ভিক', 'Opening', 'Opening'),
   transfer_out: L('পাঠানো', 'Transfer out', 'Transfer out'), transfer_in: L('গ্রহণ', 'Transfer in', 'Transfer in'), wastage: L('নষ্ট', 'Wastage', 'Wastage'), count_adjust: L('গণনা ঠিক', 'Count', 'Count adjust'), reversal: L('উল্টানো', 'Reversal', 'Reversal') };
 // server error text -> friendly (shared with purchase.js). Order matters little: keys are whole words.
 const ERR = {
+  item_not_counted: L('এই আইটেম ব্যবসার হিসাবে ধরা নয় (সম্পদ / ভোগ্য / যন্ত্রপাতি) — স্টকে আসে না', 'This item is not counted in the business (asset / consumable / tool) — it has no stock', 'এই Item business-এর হিসাবে ধরা নয় — stock-এ আসে না'),
+  asset_qty_too_large: L('এক লাইনে ২০০-র বেশি সম্পদ হয় না — লাইন ভাগ করুন', 'More than 200 assets on one line is not allowed — split the line', 'এক line-এ ২০০-র বেশি asset হয় না — line ভাগ করুন'),
   unit_unknown: L('এই এককের রূপান্তর জানা নেই — পণ্যের বেস এককে লিখুন বা রূপান্তর বসান', 'This unit has no conversion for the item — use the base unit or add a conversion', 'এই unit-এর conversion জানা নেই — base unit-এ লিখুন বা conversion বসান'),
   insufficient_stock: L('মজুতে এত নেই', 'Not enough stock on hand', 'Stock-এ এত নেই'), item_not_tracked: L('এই পণ্যের স্টক ট্র্যাক বন্ধ', 'Stock tracking is off for this item', 'এই item-এ stock track বন্ধ'),
   item_not_found: L('পণ্য পাওয়া যায়নি', 'Item not found', 'Item পাওয়া যায়নি'), bad_qty: L('পরিমাণ ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), bad_cost: L('দাম ঠিক নয়', 'Cost is not valid', 'Cost ঠিক নয়'),

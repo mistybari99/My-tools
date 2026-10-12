@@ -133,10 +133,17 @@ css.textContent = `.im-act{display:flex;align-items:center;gap:10px;width:100%;j
 .im-bar{height:10px;border-radius:5px;background:var(--line,#e3e0d8);overflow:hidden}.im-bar>i{display:block;height:100%;background:var(--sig-ok,#3a7d5c);width:0}.im-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.im-grid .stat{padding:8px}`;
 document.head.appendChild(css);
 
+const ERRT = { bad_price: L('দাম ঠিক নয় (০ থেকে ১০০ কোটির মধ্যে সংখ্যা)', 'The price is not valid (a number from 0 to 1,000,000,000)', 'Price ঠিক নয় (০ থেকে ১০০ কোটি)'), bad_unit: L('এই একক তালিকায় নেই', 'This unit is not in the units list', 'এই unit list-এ নেই'),
+  bad_category: L('এই ক্যাটাগরি তালিকায় নেই', 'This category is not in the list', 'এই category list-এ নেই'), category_inactive: L('এই ক্যাটাগরি বন্ধ — নতুন আইটেম যোগ হবে না', 'This category is switched off — no new items', 'এই category বন্ধ — নতুন item হবে না'),
+  bad_field: L('এই ঘর এই পথে বদলানো যায় না', 'This field cannot be changed this way', 'এই field এই পথে বদলানো যায় না'), item_not_counted: X.m_cnt_off, bill_voided: L('বাতিল বিলের সম্পদ আবার চালু করা যায় না', 'An asset of a voided bill cannot be reactivated', 'Voided bill-এর asset আবার চালু হয় না'),
+  tag_too_long: L('ট্যাগ ৬০ অক্ষরের বেশি হয় না', 'The tag is at most 60 characters', 'Tag ৬০ অক্ষরের বেশি হয় না'), name_required: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
+const errMsg = (e) => { const m = (e && e.message) || ''; for (const k of Object.keys(ERRT)) if (m.includes(k)) return lab(ERRT[k]); return null; };
+const failx = (e) => { const m = errMsg(e); if (m) return toast(m); return fail(e); };
+
 // ---------- item changes through the server ----------
 async function applyPatch(id, patch, note) {
   const { data, error } = await sb.rpc('item_apply', { p_item: id, p_patch: patch, p_note: note || null });
-  if (error) { if (/item_locked/.test(error.message || '')) { toast(lab(X.f_locked)); return null; } if (/item_has_stock/.test(error.message || '')) { toast(lab(L('স্টক আছে — আগে শূন্য করুন', 'There is stock — bring it to zero first', 'Stock আছে — আগে শূন্য করুন'))); return null; } fail(error); return null; }
+  if (error) { if (/item_locked/.test(error.message || '')) { toast(lab(X.f_locked)); return null; } if (/item_has_stock/.test(error.message || '')) { toast(lab(L('স্টক আছে — আগে শূন্য করুন', 'There is stock — bring it to zero first', 'Stock আছে — আগে শূন্য করুন'))); return null; } failx(error); return null; }
   toast(data && data.status === 'applied' ? T('saved') : T('sent'));
   if (B.items2 && B.items2.reload) { try { await B.items2.reload(); } catch (e) { /* list reloads on its own */ } if (B.items2.redraw) B.items2.redraw(); }
   return data;
@@ -197,8 +204,10 @@ function drawPick(q) {
   const rows = itemsNow().filter((i) => i.import_batch && i.is_active && (!s || [i.code, i.name_bn, i.name_en].some((x) => (x || '').toLowerCase().includes(s)))).sort((a, b) => (a.control_class === 'Finished Good' ? 0 : 1) - (b.control_class === 'Finished Good' ? 0 : 1) || a.code.localeCompare(b.code)).slice(0, 30);
   el.innerHTML = rows.map((i) => `<button class="im-act" data-act="im_pick_do" data-c="${esc(i.code)}"><span><b>${esc(i.code)}</b> · ${esc(nm(i))}<br><small class="muted">${esc(i.control_class || '')}${i.unit ? ' · ' + esc(i.unit) : ''}${i.hidden ? ' · ' + esc(T('c_hidden')) : ''}</small></span></button>`).join('') || `<p class="muted">${esc(T('none'))}</p>`;
 }
-async function linkTo(oldId, code, note) {
-  const { error } = await sb.rpc('item_mapping_decide', { p_item: oldId, p_dict: code, p_status: 'linked', p_note: note || null });
+async function linkTo(oldId, code, note, force) {
+  const { error } = await sb.rpc('item_mapping_decide', { p_item: oldId, p_dict: code, p_status: 'linked', p_note: note || null, p_force: !!force });
+  if (error && /master_type_mismatch/.test(error.message || '') && isOwner() && !force && window.confirm(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয় (কাঁচামাল / সম্পদ / যন্ত্রপাতি …)। তবুও মেলাবেন?', 'That master code is not a product for sale (material / asset / tool …). Link anyway?', 'এই master code বিক্রির product নয়। তবুও link করবেন?')))) return linkTo(oldId, code, note, true);
+  if (error && /master_type_mismatch/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয় — শুধু মালিক জোর করে মেলাতে পারেন', 'That master code is not a product for sale — only the owner can force the link', 'এই master code বিক্রির product নয় — শুধু Owner force করতে পারেন')));
   if (error) { if (/master_code_taken/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোড আরেক আইটেমের সাথে মেলানো', 'That master code is already linked to another item', 'এই master code অন্য item-এর সাথে linked'))); return fail(error); }
   toast(T('l_ok'));
 }
@@ -232,7 +241,7 @@ async function niGo() {
   const btn = $('#ni_go'); if (btn) btn.disabled = true;
   const { data, error } = await sb.rpc('item_new', { p_patch: patch, p_note: null });
   if (btn) btn.disabled = false;
-  if (error) return fail(error);
+  if (error) return failx(error);
   closeSheet();
   if (data && data.status === 'created') { toast(T('ni_done') + ' ' + data.code); }
   else toast(T('ni_pend'));
@@ -403,8 +412,10 @@ function mpMenu(itemId) {
     x.status !== 'pending' ? ['im_mp_undo', T('mp_undo'), `data-v="${esc(itemId)}"`] : null,
   ]));
 }
-async function mpDecide(itemId, code, status) {
-  const { error } = await sb.rpc('item_mapping_decide', { p_item: itemId, p_dict: code, p_status: status, p_note: null });
+async function mpDecide(itemId, code, status, force) {
+  const { error } = await sb.rpc('item_mapping_decide', { p_item: itemId, p_dict: code, p_status: status, p_note: null, p_force: !!force });
+  if (error && /master_type_mismatch/.test(error.message || '') && isOwner() && !force && window.confirm(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয়। তবুও মেলাবেন?', 'That master code is not a product for sale. Link anyway?', 'এই master code বিক্রির product নয়। তবুও link করবেন?')))) return mpDecide(itemId, code, status, true);
+  if (error && /master_type_mismatch/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোডটি বিক্রির পণ্য নয়', 'That master code is not a product for sale', 'এই master code বিক্রির product নয়')));
   if (error) { if (/master_code_taken/.test(error.message || '')) return toast(lab(L('এই মাস্টার কোড আরেক আইটেমের সাথে মেলানো', 'That master code is already linked to another item', 'এই master code অন্য item-এর সাথে linked'))); return fail(error); }
   closeSheet(); toast(T('saved')); await viewMap();
 }
@@ -572,7 +583,7 @@ document.addEventListener('change', async (e) => {
 });
 
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { itemimport: viewImport, itemmap: viewMap, itemtypes: viewTypes, assets: viewAssets });
-B.itemMaster = { init, on: () => M.master, canNew, canFlag, types: () => M.types, typeLabel, formHTML, formPatch, rowMenu, newItemSheet, byCategory, nextCodeLocal, showNext, catNo, fixedType };
+B.itemMaster = { errMsg, init, on: () => M.master, canNew, canFlag, types: () => M.types, typeLabel, formHTML, formPatch, rowMenu, newItemSheet, byCategory, nextCodeLocal, showNext, catNo, fixedType };
 // start loading the settings tables once the user is signed in (the pages above call init() themselves)
 window.addEventListener('hashchange', () => { if (S.ctx && !M.p) init(); });
 })();

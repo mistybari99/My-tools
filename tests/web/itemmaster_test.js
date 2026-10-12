@@ -25,6 +25,7 @@ function mkData(o = {}) {
   it.push({ id: 'd1', code: '14-001', name_bn: 'রসগোল্লা', name_en: 'Roshogolla', category: 'c14', sub_category: 'c14_aa', unit: 'kg', sell_price: null, is_active: true, item_type: 'finished_good', count_in_business: true, sellable: true, locked: false, hidden: false, control_class: 'Finished Good', import_batch: 'b1', tracked: false, source: 'made', images: [], sell_units: [] },
     { id: 'd2', code: '14-028', name_bn: 'রসমালাই', name_en: 'Roshomalai', category: 'c14', sub_category: 'c14_aa', unit: 'kg', sell_price: null, is_active: true, item_type: 'finished_good', count_in_business: true, sellable: true, locked: false, hidden: false, control_class: 'Finished Good', import_batch: 'b1', tracked: false, images: [], sell_units: [] },
     { id: 'a1', code: '01-001', name_bn: 'কেক মিক্সার', name_en: 'Cake Mixer', category: 'c01', unit: 'pc', sell_price: null, is_active: true, item_type: 'asset', count_in_business: false, sellable: false, locked: false, hidden: false, control_class: 'Asset', import_batch: 'b1', tracked: false, images: [], sell_units: [] });
+  if (o.big) for (let i = 0; i < 1500; i++) it.push({ id: 'big' + i, code: '20-' + String(i + 1).padStart(4, '0'), name_bn: 'ডিকশনারি ' + i, name_en: 'Dict ' + i, category: 'c14', unit: 'pc', sell_price: null, is_active: true, item_type: 'consumable', count_in_business: false, sellable: false, locked: false, hidden: false, import_batch: 'b1', tracked: false, images: [], sell_units: [] });
   T.item_mapping_review = [{ id: 1, item_id: it[0].id, suggested_code: '14-028', confidence: 0.9, auto_ok: false, status: 'pending' }, { id: 2, item_id: it[5].id, suggested_code: '14-001', confidence: 0.55, auto_ok: false, status: 'pending' }, { id: 3, item_id: it[6].id, suggested_code: '14-028', confidence: 1, auto_ok: true, status: 'linked' }];
   it[6].master_code = '14-028';
   T.assets = [{ id: 'as1', item_id: 'a1', location_id: 1, tag: 'A-00001', bought_on: '2026-09-01', condition: 'new', status: 'in_use', maintenance_ref: null, note: 'main hall', active: true, purchase_bill_id: 'pb1' },
@@ -38,6 +39,8 @@ function mkData(o = {}) {
 const dictRows = (n) => Array.from({ length: n }, (_, i) => ({ code: '14-' + String(100 + i).padStart(3, '0'), cat_no: '14', category: 'Finished Goods Sweet', name_en: 'Sweet ' + i, name_bn: 'মিষ্টি ' + i, subcategory: 'Chhana', unit: 'kg', control_class: 'Finished Good', note: '' }));
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables; const Q = window.__Q = window.__Q || { calls: [], fail: {}, applyFail: 0 };
  window.__CALLS = Q.calls;
+ const rf = c.from; c.from = (name) => { const b = rf(name); const r0 = b.range, t0 = b.then; b.range = (x, y) => { b.__ranged = true; return r0.call(b, x, y); };
+   b.then = (res, rej) => t0.call(b, (o) => { if (o && Array.isArray(o.data) && o.data.length > 1000) o = Object.assign({}, o, { data: o.data.slice(0, 1000) }); return res ? res(o) : o; }, rej); return b; };
  c.rpc = async (fn, args) => { Q.calls.push([fn, JSON.parse(JSON.stringify(args || {}))]);
   if (Q.fail[fn]) { const m = Q.fail[fn]; delete Q.fail[fn]; return { data: null, error: { message: m } }; }
   if (fn === 'has_grant') return { data: window.__GRANT === true, error: null };
@@ -208,6 +211,13 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await wait(p, 600);
   const posNames = await p.evaluate(() => document.body.innerText);
   ok(!/Cake Mixer/.test(posNames) && !/Roshogolla/.test(posNames), 'POS does not offer an asset or an unpriced dictionary item'); await p.close();
+
+  // ---------- more than 1000 items: the 57 priced items must still show ----------
+  p = await open({ big: true }, '#/items'); await wait(p, 800);
+  await p.fill('#p2_q', 'I-001'); await wait(p, 400); ok(await p.locator('.p2-row:has-text("I-001")').count() === 1, 'items list: the old items are still there with 1560+ items (paged read)');
+  await p.fill('#p2_q', 'I-057'); await wait(p, 400); ok(await p.locator('.p2-row:has-text("I-057")').count() === 1, 'items list: last old item too'); await p.close();
+  p = await open({ big: true }, '#/pos'); await wait(p, 900);
+  ok(/সাদা মিষ্টি/.test(await p.evaluate(() => document.body.innerText)), 'POS: the priced old items show with 1500 more items in the table'); await p.close();
 
   // ---------- purchase bill: add a new asset item ----------
   const PD = { sales: [] };
