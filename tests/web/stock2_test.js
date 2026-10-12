@@ -83,7 +83,8 @@ const base = C.baseData(SP), srv = C.serve(8094);
 
   // ---------- wastage ----------
   p = await open({ photoAbove: 5 }, '#/stock'); await p.click('[data-act=s2_actions]'); await wait(p, 300); await p.click('[data-act=s2_do][data-v=waste]'); await wait(p, 300); await p.screenshot({ path: SP + '/st_waste.png' }); await noOverflow(p, 'wastage sheet');
-  ok(await p.locator('#a_reason option').count() === 4, 'reasons from the list (3 + blank)');
+  ok(await p.locator('#a_reason option:not([value^="__"])').count() === 4, 'reasons from the list (3 + blank)');
+  ok(await p.locator('#a_reason option[value^="__"]').count() === 2, 'W3: wastage reasons also offer + Add new and Other (shared list control)');
   await p.fill('#a_item', 'I-001'); await p.fill('#a_qty', '2'); await p.click('#a_go'); await wait(p, 150); ok(/Choose a reason/.test(await toastTxt(p)), 'reason required');
   await p.selectOption('#a_reason', 'spoiled'); await p.fill('#a_qty', '9'); await p.click('#a_go'); await wait(p, 150); ok(/photo is needed/.test(await toastTxt(p)) && (await calls(p, 'stock_wastage')).length === 0, 'photo precheck above the rule limit');
   fs.writeFileSync(SP + '/pic.png', C.PNGBUF);
