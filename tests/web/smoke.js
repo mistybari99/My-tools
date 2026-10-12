@@ -35,7 +35,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.fill('#a_sid', 'owner1'); await p.fill('#a_pin', '1234'); await p.click('[data-act=dologin]'); await p.waitForTimeout(400); console.log('after login h1:', await p.textContent('h1'), '| tiles:', await p.locator('.tile').count());
   for (const [lang, hash, name] of [['bn', '#/home', 'home_bn'], ['mix', '#/home', 'home_mix'], ['en', '#/home', 'home_en'], ['bn', '#/items', 'items'], ['mix', '#/staff', 'staff'], ['bn', '#/matrix', 'matrix'], ['en', '#/rules', 'rules'], ['bn', '#/settings', 'settings'], ['bn', '#/logs', 'logs'], ['bn', '#/backup', 'backup'], ['bn', '#/itemreq', 'itemreq']]) {
     const q = await page('', hash, name, lang); await q.screenshot({ path: `${SP}/s_${name}.png`, fullPage: false });
-    if (name === 'items') { await q.fill('#p2_q', 'কালো'); console.log('search কালো ->', await q.locator('.p2-row').count()); await q.click('.p2-row >> nth=0'); await q.waitForTimeout(200); await q.screenshot({ path: SP + '/s_item_sheet.png' }); await q.click('[data-act=itemsave]'); await q.waitForTimeout(300); }
+    if (name === 'items') { await q.fill('#p2_q', 'কালো'); console.log('search কালো ->', await q.locator('.p2-row').count()); await q.click('.p2-row >> nth=0'); await q.waitForTimeout(200); await q.screenshot({ path: SP + '/s_item_sheet.png' }); await q.click('[data-act=p2_save]'); await q.waitForTimeout(300); }
     if (name === 'staff') { await q.click('[data-act=staffopen]'); await q.waitForTimeout(200); await q.screenshot({ path: SP + '/s_staff_sheet.png' }); }
     if (name === 'matrix') { await q.click('[data-act=mrole][data-v=cash_controller]'); await q.click('[data-act=perm][data-f="10-1"][data-k=view]'); await q.waitForTimeout(200); console.log('after view off, 10-1 on-toggles:', await q.locator('.perm:has-text("10-1") .tog.on').count()); }
     await q.context().close();
@@ -43,9 +43,9 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   const NOCOST = 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}}';
   const nc = await page(NOCOST, '#/items', 'nocost', 'bn'); await nc.waitForTimeout(300);
   console.log('no-cost user sees cost numbers? (expect 0 muted prices):', await nc.locator('#i_list .pr .muted').count());
-  await nc.click('.p2-row >> nth=0'); await nc.waitForTimeout(200); console.log('no-cost sheet has cost field:', await nc.locator('#f_cost').count(), '| approval notice:', await nc.locator('.notice.warn').count());
+  await nc.click('.p2-row >> nth=0'); await nc.waitForTimeout(200); console.log('no-cost sheet has cost field:', await nc.locator('#p_cost').count(), '| approval notice:', await nc.locator('.notice.warn').count());
   await nc.screenshot({ path: SP + '/s_nocost_sheet.png' });
-  await nc.fill('#f_sell', '999'); await nc.click('[data-act=itemsave]'); await nc.waitForTimeout(300); console.log('toast after non-owner save:', await nc.textContent('#toast'));
+  await nc.fill('#p_sell', '999'); await nc.click('[data-act=p2_save]'); await nc.waitForTimeout(300); console.log('toast after non-owner save:', await nc.textContent('#toast'));
   const ncr = await page(NOCOST, '#/itemreq', 'nocost_req', 'bn'); console.log('non-approver sees approve buttons:', await ncr.locator('[data-act=itemdecide]').count());
   const pend = await page('window.__PROFILE={id:"u3",staff_id:"new1",full_name:"New",status:"pending",lang:"bn"};window.__OWNER=false', '', 'pending', 'bn'); await pend.screenshot({ path: SP + '/s_pending.png' });
   const staff = await page('window.__OWNER=false', '#/staff', 'nonowner', 'bn'); console.log('non-owner reaching #/staff sees tiles:', await staff.locator('.tile').count(), 'h1:', await staff.textContent('h1'));
