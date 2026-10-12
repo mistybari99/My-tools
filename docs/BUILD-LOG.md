@@ -378,3 +378,17 @@ Changed
 - Form codes 05-3, 05-4, 06-2, 06-3 verified in the forms seed (schema.sql); no verb bound (reachable on the category page).
 - Tests edited for intentional IA change: control_test (Rollout no longer Soon; Locations now in the Locations group), stock2_test (group ids stock/purch, "Purchasing").
 Not confirmed / limits: no real Supabase or phone; Now strip rows are ordered by fixed priority (counts carry no age except the oldest waiting entry date); rule `ia_home_v2` has no settings row/UI (no SQL added), so the owner-side switch needs one `rules` insert later; flows (close day / open shop, A3), Switchboard, per-person slot overrides and the owner role defaults are not built (increments B, C); "Find" does not search entry numbers or suppliers; most screens still use their own loading/empty text (ui.state not rolled out); back-from-dirty-form confirm (A4 second half) not built.
+
+## Design system: 3 themes, 3D icons, Sell first (theme.css / icons3d.js)
+- New `web/theme.css` (last stylesheet), `web/icons3d.js` (`BOS.icon`), head script in index.html (`BOS_THEME`, key `bos_theme`). Premium Dark (default), Premium Light, Classic (no override). Theme dropdown in drawer footer and Me sheet.
+- nav.js: icons via `BOS.icon` in Premium (old icons kept for Classic / missing keys); Sell big button first on Home for POS roles; bottom bar = 2 + Sell orb + 2 (5 buttons) for POS roles. ia.js: `i3` icon key per record, `barSlots`, owner quick actions start with POS.
+- tests/web/ia_test.js: two bar assertions changed from 4 to 5 buttons (centre Sell orb). New tests/web/theme_test.js. Screenshots: tests/web/theme_*_{dark,light,classic}.png.
+- Not confirmed: real devices / real Bangla web fonts (fonts are stubbed in tests), iOS input zoom at 12.5px inputs, contrast measured by eye plus token choice (not a tool).
+- Docs: docs/DESIGN_SYSTEM.md.
+
+## UI-CONTROLS: collapsed control kit (controls.js / controls.css)
+- New: `web/controls.js` (BOS.ctl: select, multi, tick, menu, seg, enhance, setMode), `web/controls.css` (small scale 12-13px/11px, 40-44px rows, CSS variables with fallbacks, linked after styles.css and before theme.css), `supabase/phase30_controls.sql` (rule `ui_collapsed_controls`, absent = ON), `tests/web/controls_test.js`, `docs/CONTROLS_AUDIT.md`. index.html: link + script (after listctl.js).
+- entry.js: the CH builder now writes `data-ch`, `data-cur` (current/retired value) and `data-req` on its wrapper so the dropdown can show retired values and the clear option only when not required (one line).
+- Enhancer runs on a MutationObserver of document.body (≥30ms throttle, idempotent, `data-ctl="off"` skips); native selects stay in the DOM hidden (value/selectedIndex setters hooked, change+input dispatched); button groups keep their original buttons and receive the click, so the engine binding/validation/redraw is unchanged. Instant switch-back via `html[data-ctl=off]` CSS + `BOS.ctl.setMode('off')`.
+- Confirmed (headless Chromium, stub data): controls_test 0 failures; allforms, pos2, rules, lists, biz, nav, reports, settings2, invoice, favsync, items2, barcode, stock2, purchase, listctl all pass after one fix (hidden originals first overlapped each other; now spread so Playwright/real clicks hit them).
+- NOT confirmed: real phone/TalkBack, theme.css interplay (written by another agent), Supabase rule row (SQL not applied here), the rules-hub UI for the new switch (appears automatically as a settings rule if the rules hub lists module `settings`).
