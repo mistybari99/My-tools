@@ -9,19 +9,19 @@ One entry per task: what changed, what could NOT be confirmed, manual checks and
 - [x] 3. Real low-stock status on items list/filter (stock_levels RPC, min_stock flag)
 - [x] 4. Stock: category label list in stock_levels; purchase/sale unit list per item; item-name search in stock list
 - [x] 5. Barcode scan on purchase-bill item field and stock actions
-- [ ] 6. Home Accounting "Day book" tile
+- [x] 6. Home Accounting "Day book" tile
 - [x] 7. Per-line stock-effect preview in purchase bill editor
 - [x] 8. Photos for stock/purchase: dedicated STOCK / PURCHASE prefixes or grant-based photo_ok
 - [x] 9. Emergency-rule keys for stock_count_adjust, stock_transfer, stock_issue, stock_production
 - [x] 10. Wastage: manager approval above an owner-set limit (maker-checker)
 - [x] 11. Supplier refund (cash back) alongside return credits; sale_return flow
 - [x] 12. Expired batches: optional setting to block selling expired stock
-- [ ] 13. Salary view / export_data grants: salary report page, server-side export grant
+- [x] 13. Salary view / export_data grants: salary report page, server-side export grant
 - [x] 14. stock_ledger.ref_id column grant leak: revoke column or null via view
-- [ ] 15. Forms <-> stock/purchase links (04-1, 04-2, 04-3, 03-1, 05-1 post to ledger when approved, switchable, default off; 04-4 / 06-5 as views; 06-5 supplier_pick)
-- [ ] 16. Discount approver stored on sales; brand-level P&L; remaining reports of the 65-report catalogue
-- [ ] 17. Nav leftovers: Year tab follows fiscal_year_start; drawer search; location switcher in drawer footer; staff home "today's sheets"; owner default favourites per role UI
-- [ ] 18. Run tests/web/smoke.js; real-device checks list for the owner (thermal printer 58/80, camera barcode, offline sale sync, Chrome auto-translate off)
+- [x] 15. Forms <-> stock/purchase links (04-1, 04-2, 04-3, 03-1, 05-1 post to ledger when approved, switchable, default off; 04-4 / 06-5 as views; 06-5 supplier_pick)
+- [x] 16. Discount approver stored on sales; brand-level P&L; remaining reports of the 65-report catalogue
+- [x] 17. Nav leftovers: Year tab follows fiscal_year_start; drawer search; location switcher in drawer footer; staff home "today's sheets"; owner default favourites per role UI
+- [x] 18. Run tests/web/smoke.js; real-device checks list for the owner (thermal printer 58/80, camera barcode, offline sale sync, Chrome auto-translate off)
 - [x] 19. Security backlog: BACKUP_TABLES completeness, server-side PIN lockout + failed-login log, audit_log append-only, immutable codes, option deletes revoked (W1)
 - [ ] 20. VAT/Mushak 6.3 receipt line stays OFF until the owner's adviser gives the rate; no number invented
 
