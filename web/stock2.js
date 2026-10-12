@@ -164,8 +164,10 @@ const LOCK = '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="cu
 let ITEMS = null;
 async function trackedItems() {
   if (ITEMS) return ITEMS;
-  const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active').eq('tracked', true).order('code');
-  ITEMS = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && i.tracked !== false);
+  // item master: only items counted in the business can be tracked (the server forces tracked off for assets, consumables, tools ...); hidden items stay out of the pickers
+  let r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active,count_in_business,hidden').eq('tracked', true).order('code');
+  if (r.error) r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,sell_units,barcode,tracked,is_active').eq('tracked', true).order('code');
+  ITEMS = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && i.tracked !== false && i.count_in_business !== false && !i.hidden);
   return ITEMS;
 }
 const itemText = (i) => i.code + ' · ' + nm(i);

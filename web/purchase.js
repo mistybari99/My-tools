@@ -73,8 +73,9 @@ const PL = { f: { loc: '', supplier: '', status: '', from: '', to: '' }, rows: [
 let ITEMS_ALL = null, F = null;
 async function allItems() {
   if (ITEMS_ALL) return ITEMS_ALL;
-  const r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active').order('code');
-  ITEMS_ALL = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false); return ITEMS_ALL;
+  let r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active,item_type,hidden').order('code');
+  if (r.error) r = await sb.from('items').select('id,code,name_bn,name_en,name_mix,unit,base_unit,barcode,tracked,is_active').order('code');      // database without the item master
+  ITEMS_ALL = r.error ? [] : (r.data || []).filter((i) => i.is_active !== false && !i.hidden); return ITEMS_ALL;
 }
 const sups = () => (B.ENV && B.ENV.sup) || [];
 const supById = (id) => sups().find((s) => s.id === id);
@@ -155,6 +156,7 @@ function lineHTML(l, i) {
   const items = ITEMS_ALL, it = l.item_id ? items.find((x) => x.id === l.item_id) : null; l._ri = !!it;
   return `<div class="rowcard" data-li="${i}"><div class="rc-h"><b>#${i + 1}</b>${F.lines.length > 1 ? `<button type="button" class="mini" data-act="pu_delline" data-i="${i}" aria-label="✕">✕</button>` : ''}</div><div class="stack">
     <div><label>${esc(T('item'))}</label><div class="p2-inl"><input data-ln="${i}.item" list="pu_dl" autocomplete="off" value="${esc(l.item)}" placeholder="${esc(T('itemph'))}">${scanOn() ? `<button type="button" class="mini" data-act="pu_scan" data-i="${i}" aria-label="${esc(T('scan'))}">▮▮ ${esc(T('scan'))}</button>` : ''}</div></div>
+    ${it && it.item_type === 'asset' ? `<div class="hint">${esc(lab(L('সম্পদ: স্টকে নয়, সম্পদ-খাতায় যোগ হবে', 'Asset: goes to the asset register, not to stock', 'Asset: stock এ নয়, asset register এ যোগ হবে')))}</div>` : ''}
     ${it ? '' : `<div><label>${esc(T('desc'))}</label><input data-ln="${i}.desc" autocomplete="off" value="${esc(l.desc)}"></div>`}
     <div class="row"><div style="flex:1"><label>${esc(T('qty'))}</label><input data-ln="${i}.qty" inputmode="decimal" value="${esc(l.qty)}"></div>
       <div style="flex:1"><label>${esc(T('unit'))}</label><select data-ln="${i}.unit"><option value="">${esc(it ? unitLabel(it.unit) || T('itemUnit') : T('itemUnit'))}</option>${optHTML(lists('units').map((r) => [r.value_code, lab(rowL(r))]), l.unit)}</select></div>
@@ -171,7 +173,7 @@ function drawEditor() {
     <div class="row"><div style="flex:1"><label for="pe_no">${esc(T('billNo'))}</label><input id="pe_no" autocomplete="off" value="${esc(F.billNo)}"></div><div style="flex:1"><label for="pe_date">${esc(T('date'))}</label><input id="pe_date" type="date" value="${esc(F.date)}"></div></div>
     ${ret ? `<div><label for="pe_reason">${esc(T('reason'))} *</label><select id="pe_reason"><option value="">—</option>${optHTML(reasons, F.reason)}</select></div><div><label for="pe_ref">${esc(T('againstBill'))}</label><select id="pe_ref"><option value="">—</option></select></div>` : ''}
     <datalist id="pu_dl">${ITEMS_ALL.map((i) => `<option value="${esc(U.itemText(i))}"></option>`).join('')}</datalist>
-    <h3 style="margin:6px 0 0">${esc(T('lines'))}</h3><div id="pe_lines">${F.lines.map(lineHTML).join('')}</div><button type="button" class="full" data-act="pu_addline">＋ ${esc(T('addLine'))}</button>
+    <h3 style="margin:6px 0 0">${esc(T('lines'))}</h3><div id="pe_lines">${F.lines.map(lineHTML).join('')}</div><button type="button" class="full" data-act="pu_addline">＋ ${esc(T('addLine'))}</button>${!ret && B.itemMaster && B.itemMaster.canNew() ? `<button type="button" class="full" data-act="pu_newitem">＋ ${esc(lab(L('নতুন আইটেম (সম্পদ) তালিকায় যোগ', 'New item (asset) added to the item list', 'নতুন Item (Asset) list এ যোগ')))}</button>` : ''}
     <div><label for="pe_disc">${esc(T('discount'))}</label><input id="pe_disc" inputmode="decimal" value="${esc(F.discount)}"></div>
     <div class="card stack" id="pe_tot">${totHTML(tt)}</div>
     ${F.canPay && !ret ? `<h3 style="margin:6px 0 0">${esc(T('payNow'))}</h3><div id="pe_pay">${B.pay.html(F.pay)}</div><div class="hint">${esc(T('payHint'))}</div>` : ''}
@@ -461,6 +463,10 @@ Object.assign(H, {
   pu_open: (a) => { location.hash = '#/purchase/' + a.dataset.v; },
   pu_new: () => { location.hash = '#/purchase/new'; }, pu_new_ret: () => { location.hash = '#/purchase/return'; },
   pu_addline: () => { syncFixed(); F.lines.push({ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); drawPreviews(); },
+  pu_newitem: () => B.itemMaster.newItemSheet({ type: 'asset', onCreated: async (it) => { if (!F || !it) return; syncFixed(); ITEMS_ALL = null; await allItems();
+    const row = ITEMS_ALL.find((x) => x.id === it.item_id) || it; const l = F.lines.length === 1 && !F.lines[0].item_id && !F.lines[0].desc && !F.lines[0].qty ? F.lines[0] : null;
+    const nl = l || { item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }; nl.item_id = row.id; nl.item = U.itemText(row); if (!l) F.lines.push(nl);
+    drawEditor(); } }),
   pu_delline: (a) => { F.lines.splice(Number(a.dataset.i), 1); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); refreshTot(); drawPreviews(); },
   pu_scan: async (a) => { const i = Number(a.dataset.i), l = F && F.lines[i]; if (!l) return; const it = await B.barcode.scanItem(ITEMS_ALL); if (!it || !F) return;
     l.item_id = it.id; l.item = U.itemText(it); $('#pe_lines').innerHTML = F.lines.map(lineHTML).join(''); drawPreviews(); },
