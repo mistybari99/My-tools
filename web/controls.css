@@ -1,8 +1,7 @@
 /* Islamia BOS · collapsed control kit styles (controls.js). Loaded after styles.css, before theme.css: every colour is a variable with a fallback so the theme applies. Small scale: 12-13px text, 11px meta, 40-44px touch rows. */
 :root { --ctl-r: var(--radius-8, 10px); }
 /* originals stay in the DOM, visually hidden, still clickable by code/tests */
-html:not([data-ctl="off"]) .ctl-hid { position: absolute !important; width: 2px !important; height: 2px !important; min-width: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; opacity: 0 !important; overflow: hidden !important; z-index: 3; transform: translate(calc(var(--cx, 0) * 3px - 3px), calc(var(--cy, 0) * 3px - 3px)); }
-html:not([data-ctl="off"]) .ctl-grp > :not(.ctl-trg):not(.ctl-roval):not(.ctl-dots) { position: absolute !important; width: 2px !important; height: 2px !important; min-width: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; opacity: 0 !important; overflow: hidden !important; z-index: 3; transform: translate(calc(var(--cx, 0) * 3px - 3px), calc(var(--cy, 0) * 3px - 3px)); }
+html:not([data-ctl="off"]) .ctl-hid { position: absolute !important; width: 2px !important; height: 2px !important; min-width: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; opacity: 0 !important; overflow: hidden !important; z-index: 3; translate: calc(var(--cx, 0) * 3px) calc(-5px - var(--cy, 0) * 3px); transform: none !important; transition: none !important; }
 html:not([data-ctl="off"]) .ctl-grp { display: flex; }
 html[data-ctl="off"] .ctl-trg:not(.ctl-dots), html[data-ctl="off"] .ctl-roval, html[data-ctl="off"] .ctl-dots { display: none !important; }
 /* trigger */

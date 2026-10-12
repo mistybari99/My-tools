@@ -22,27 +22,31 @@ Kit: `web/controls.js` + `web/controls.css`, API `BOS.ctl.{select,multi,tick,men
 | others (app, dues, salary, salereturn, nav, pinsign...) | ~12 | ~5 | 0 | |
 Total approx: 105 `<select`, 90 `tog` builders, 9 checkboxes, 0 radios, 0 `.chips` classes. No three-dot row menu needed to be invented: lists already use `⋮` (`mini` buttons); no row with 3+ inline secondary buttons was found on probed screens (enhancer kept for future rows, unit-tested on a fixture).
 
-## 2. Runtime conversion (initial render, 360px, stub data)
+## 2. Runtime conversion (final; initial render, 360px, stub data)
+Rule: only real option choices are converted. Detection = native `<select>`; CH groups (`data-ch`); multi groups (`fl_t`, `data-su`, `data-ctl="multi"`); >=4 checkbox label groups; filter-sheet chip groups (`.fl-chipset`); and chip rows explicitly marked `data-ctl="select"`. The `⋮` row converter works only inside `data-ctl="menu"`. Generic button rows, `.hrow` lists, tiles, tabs and action rows are never touched.
 | Area | Converted |
 |---|---|
-| 41 forms (shared builders) | 318 native selects (many are repeated table-row selects) -> sheet dropdowns; 15 CH groups (>3 options) -> dropdown; every ≤3-option CH -> compact seg; read-only entries show plain values |
-| Items list / filter sheet (`p2_fb`) | 5 selects in the filter sheet; sell-unit chips (`data-su`) -> multi |
+| 41 forms (shared builders) | 318 native selects (many are repeated table-row selects) -> sheet dropdowns; 15 CH groups with >3 options -> dropdown; ~82 CH with <=3 options stay compact seg; read-only entries show plain values |
+| Items filter sheet (`p2_fb`) | 5 selects; sell-unit chips (`data-su`) -> multi |
 | Stock levels + filter sheet | 3 + 2 selects |
-| Purchase list / sheets | 2+ selects |
-| Reports filter sheet (filters.js) | 1 single chip group (presets) + 3 multi groups (locations/brands/modes...) -> dropdown/multi; sale-type & status (2 options) stay seg |
-| Lists admin | list chooser chips (ls2_pick) -> dropdown |
-| Daybook / Biz / Locations / Invoice | mode / period / status chip rows -> dropdown |
-| POS | selects -> dropdown; payment add buttons, retail/wholesale, discount-type, tabs and category chips stay one-tap on purpose |
-| Header | nav drawer selects (location, theme) are collapsed too |
+| Purchase | 2+ selects |
+| Reports filter sheet (filters.js) | 1 single chip group (presets) + 3 multi groups (locations/brands/modes) -> dropdown/multi; sale type / status (2 options) stay seg |
+| Lists admin | list chooser (`ls2_pick`, marked) -> 1 dropdown |
+| Daybook | mode chips (all/cash/bank/mobile, marked) -> 1 dropdown |
+| Biz | period chips (marked) -> 1 dropdown |
+| Locations | status filter (`lo_chips`, marked) -> 1 dropdown |
+| Rollout | mode filter (`ro_chips`, marked) -> 1 dropdown |
+| POS | category chips (`pos_cats`, marked) -> 1 dropdown ("All"); 3 selects (customer picker etc.) -> dropdown; payment add buttons, retail/wholesale, discount type, tabs stay one-tap |
+| Header drawer | location + theme selects collapsed |
+| Invoice, settings2, itemmaster, bulkitems | selects collapsed; tabs / language (3) / on-off preferences stay |
+Row `⋮` converter: 0 rows converted (none opted in; lists already use `⋮`).
 
 ## 3. Left open, and why
-- On/off `.tog` switches (rules hub ~129 rows, `im_tg`, `p2_tg`, `ro_sw`...): a single boolean already collapsed to one button, not an option list.
-- POS: `pos_cat` category chips (speed), `pay_add` mode buttons, retail/wholesale, discount type: the 2-3 most used one-tap choices.
-- Tabs (`*_tab`, `pos_tab`): navigation, not a field.
-- Groups with 2-3 mutually exclusive options: compact seg (spec).
-- Date presets inside the filter sheet when ≤3 options.
-- `bulkitems` checkboxes: per-row selection, not an option list.
-- Native date/time/number inputs.
+- On/off `.tog` switches (rules hub ~129, `im_tg`, `p2_tg`, `ro_sw`, `iv_pref`): single booleans.
+- POS: payment add buttons, retail/wholesale, discount type, sell/today tabs: one-tap by design.
+- Tabs (`*_tab`, `bk_tab`, `mp_tab`, `im_mp_tab`, reports group tabs, `rc_f` with 3): navigation or <=3 options.
+- Groups with 2-3 mutually exclusive options (`iv_lang`, `rc_pkmode`, sale type, status): seg.
+- `bulkitems` row-selection checkboxes; native date/time/number inputs.
 
 ## 4. Limits
 - Enhancer is heuristic: single-choice groups are recognised as ≥4 `button.tog[data-act][data-v]` with ≤1 `.on` in the same parent and an act not matching tabs/pos/pay/add/preset/lang. A screen that wants exemption sets `data-ctl="off"`.

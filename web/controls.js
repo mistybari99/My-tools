@@ -182,7 +182,7 @@ function rebuild(container, sig, build) {
   const s = container._ctl; if (s && s.sig === sig && s.trg.isConnected) return false;
   if (s) { s.trg.remove(); }
   const trg = build(); container._ctl = { sig, trg, mo: container._ctlmo };
-  container.classList.add('ctl-grp'); spread([...container.children].filter((c) => !c.classList.contains('ctl-trg') && !c.classList.contains('ctl-roval'))); container.prepend(trg); return true;
+  container.classList.add('ctl-grp'); const gn = [...container.children].filter((c) => c.matches && c.matches('button.tog')); gn.forEach((c) => c.classList.add('ctl-hid')); spread(gn); container.prepend(trg); return true;
 }
 function groupCfg(container, btns, multiMode) {
   const k0 = btns[0], isPick = k0.dataset.act === 'pick', ro = btns.every((b) => b.disabled);
@@ -225,7 +225,7 @@ function readonlyValue(container, btns) {
   const cur = btns.find(isOn); const txt = cur ? btnLabel(cur) : (container.dataset.cur ? String(container.dataset.cur).replace(/^other:/, '') : '—');
   const sig = 'R' + txt + btns.length; const s = container._ctl;
   if (s && s.sig === sig && s.trg.isConnected) return;
-  if (s) s.trg.remove(); const v = el('span', 'ctl-roval', esc(txt)); container._ctl = { sig, trg: v }; container.classList.add('ctl-grp'); spread([...container.children]); container.prepend(v);
+  if (s) s.trg.remove(); const v = el('span', 'ctl-roval', esc(txt)); container._ctl = { sig, trg: v }; container.classList.add('ctl-grp'); const gn = [...container.children].filter((c) => c.matches && c.matches('button.tog')); gn.forEach((c) => c.classList.add('ctl-hid')); spread(gn); container.prepend(v);
 }
 
 function enhanceChecks(root) {
@@ -271,7 +271,7 @@ function enhance(root) {
     if (act === 'pick') { const all = [...p.children].filter((c) => c.dataset && c.dataset.act === 'pick'); if (all.every((b) => b.disabled)) return readonlyValue(p, all); if (all.length > 3) return enhanceGroup(p, all, false); return enhanceSeg(p); }
     const mk = p.dataset.ctl, fl = p.classList.contains('fl-chipset');
     if (btns.length >= 2 && (act === 'fl_t' || btns.every((b) => b.dataset.su !== undefined) || mk === 'multi')) return enhanceGroup(p, btns, true);
-    if (!(fl || mk === 'select') || SKIP_ACT.test(act)) return;          // generic button rows are actions/navigation: never converted
+    if (!(fl || mk === 'select') || (!mk && SKIP_ACT.test(act))) return;          // generic button rows are actions/navigation: never converted
     if (btns.length < 4) { if (btns.every((b) => b.dataset.v !== undefined)) enhanceSeg(p); return; }
     if (!btns.every((b) => b.dataset.v !== undefined) || btns.filter(isOn).length > 1) return;
     enhanceGroup(p, btns, false);
