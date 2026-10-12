@@ -402,6 +402,7 @@ const X18 = {
   blind_hint: L('গণনা সেভ করার পরেই প্রত্যাশিত অঙ্ক ও কম/বেশি দেখা যাবে। সেভ করলে গণনা আর বদলানো যায় না।', 'The expected figure and the short/over appear only after you save the count. A saved count cannot be changed.', 'Count save করার পরেই expected ও কম/বেশি দেখা যাবে। Save করলে count আর বদলানো যায় না।'),
   save_count: L('গণনা সেভ করুন', 'Save count', 'Count save করুন'), peek: L('আগে প্রত্যাশিত দেখুন (লগ হবে)', 'Show expected first (logged)', 'আগে expected দেখুন (log হবে)'),
   need_count: L('আগে নোট ধরে গণনা লিখুন', 'Enter the count by notes first', 'আগে note ধরে count লিখুন'), need_net: L('গণনা সেভ করতে নেট লাগবে', 'Saving the count needs a connection', 'Count save করতে net লাগবে'),
+  later: L('প্রত্যাশিত অঙ্ক ও কম/বেশি জমা দেওয়ার পর যাচাইকারীর কাছে দেখা যাবে', 'The expected figure and the short/over are shown to the approver after you submit', 'Expected ও কম/বেশি submit করার পর approver দেখবেন'),
   saved_t: L('গণনা সেভ হয়েছে', 'Count saved', 'Count save হয়েছে'), counted: L('গণনায় প্রাপ্ত', 'Counted', 'Count'), expected: L('প্রত্যাশিত', 'Expected', 'Expected'),
   so: L('কম / বেশি', 'Short / over', 'কম / বেশি'), matches: L('মিলেছে', 'matches', 'মিলেছে'), seen_early: L('প্রত্যাশিত অঙ্ক গণনার আগে দেখা হয়েছিল', 'The expected figure was seen before the count', 'Expected count-এর আগে দেখা হয়েছিল'),
   hub_hidden: L('লেখকের গণনা ও হ্যান্ডওভার অঙ্ক আপনার গণনা সেভ হওয়া পর্যন্ত লুকানো', "The sender's count and handover amount stay hidden until your count is saved", 'Sender-এর count ও handover আপনার count save হওয়া পর্যন্ত লুকানো'),
@@ -420,6 +421,10 @@ const X18 = {
   e_signer_locked: L('এই লগইন ভুল পিনে তালাবদ্ধ — কিছুক্ষণ পরে', 'This login is locked after wrong PINs - try later', 'এই login ভুল PIN-এ locked — কিছুক্ষণ পরে'),
   e_pin_signature_required: L('পিন স্বাক্ষর বাকি আছে', 'A PIN signature is still missing', 'PIN signature বাকি আছে'),
   e_signature_mismatch: L('ফর্মের নাম আর স্বাক্ষরকারী মিলছে না', 'The name on the form does not match the signer', 'Form-এর নাম আর signer মিলছে না'),
+  e_count_missing: L('আগে নোট ধরে গণনা এন্ট্রিতে লিখে সেভ করুন', 'Type the count in the sheet and save it first', 'আগে count sheet-এ লিখে save করুন'),
+  e_count_draft_limit: L('আজ এই লোকেশনে আপনার একটি গণনা-করা খসড়া আগেই আছে — সেটা জমা দিন', 'You already have a counted draft here today - submit it first', 'আজ এই location-এ আপনার একটি counted draft আছে — আগে সেটা submit করুন'),
+  e_login_not_fresh: L('স্বাক্ষরকারীকে এখনই আবার পিন দিয়ে ঢুকতে হবে', 'The signer must sign in again just now', 'Signer-কে এখনই আবার PIN দিয়ে ঢুকতে হবে'),
+  e_pin_signature_stale: L('স্বাক্ষরের পর শিট বদলেছে — আবার স্বাক্ষর করান', 'The sheet changed after the signature - sign again', 'Signature-এর পর sheet বদলেছে — আবার sign করান'),
   e_pin_signature_off: L('পিন স্বাক্ষর এখন বন্ধ আছে', 'PIN signature is switched off', 'PIN signature এখন off'),
 };
 Object.assign(X17, X18);
@@ -430,7 +435,8 @@ const BLIND_V = { '14-1': ['expected', 'short_over', 'so_nonzero'], '10-1': ['co
 const BLIND_FLAG = { '14-1': 'cash_short_over', '10-1': 'hub_diff' };
 const PIN_ROLES = { '14-1': ['witness', 'second_sig'], '10-1': ['hub_pair'] };
 const blindStage = () => !!E && ((E.code === '14-1' && E.mode === 'edit') || (E.code === '10-1' && E.mode === 'check'));
-const blindPending = () => !!(E && E.blind && E.blind.on && blindStage() && !E.blind.saved && !E.blind.peeked);
+const blindRevealed = () => !!(E.blind.peeked || (E.blind.saved && E.blind.res && E.blind.res.expected !== undefined));    // the maker's own count_save answer carries no figures (server side blind)
+const blindPending = () => !!(E && E.blind && E.blind.on && blindStage() && !blindRevealed());
 function blindMask() {
   if (!blindPending()) return;
   BLIND_V[E.code].forEach((k) => { delete E.calc.v[k]; });
@@ -456,6 +462,7 @@ async function loadW5b() {
 function blindBoxHTML(sec) {
   if (!E.blind || !E.blind.on || !blindStage() || !sec.fields.some((f) => f.id === BLIND_FIELD[E.code])) return '';
   const b = E.blind;
+  if (b.saved && b.res && b.res.expected === undefined) return `<div class="notice ok" id="blindbox"><b>${esc(lab(X18.saved_t))}</b> · ${esc(lab(X18.counted))}: ${esc(money(b.res.counted))}<div class="muted" style="font-size:.85rem" id="blind_later">${esc(lab(X18.later))}</div></div>`;
   if (b.saved && b.res) {
     const r = b.res, d = Number(r.diff);
     return `<div class="notice ${d === 0 ? 'ok' : 'warn'}" id="blindbox"><b>${esc(lab(X18.saved_t))}</b><div>${esc(lab(X18.counted))}: ${esc(money(r.counted))} · ${esc(lab(X18.expected))}: ${esc(money(r.expected))}</div>
@@ -642,7 +649,7 @@ async function submit() {
   if (E.queued) { const it = qfind(qkey()); if (it && !qput({ ...it, submit: true })) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
   const { error } = await callSubmit(E.id);
   if (error && isNet(error)) { if (!queueSubmit(E.id)) return queueFailSheet(); toast(t17('queued_submit')); return draw(); }
-  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); return fail17(error); }
+  if (error) { if (/red_blocked/.test(error.message)) return releaseSheet(); if (/pin_signature_stale/.test(error.message) && E.pin) { E.pin.sigs = {}; fail17(error); return draw(); } return fail17(error); }
   toast(t('submitted_ok')); await reloadEntry(E.id);
 }
 async function loadReleases() {

@@ -23,11 +23,12 @@ const EXTRA6 = `(function(){ const real = window.supabase.createClient; window.s
   if (fn === 'blind_active') return { data: W.blind === 'missing' ? null : !!W.blind, error: W.blind === 'missing' ? { message: 'function does not exist' } : null };
   if (fn === 'pin_sig_active') return { data: W.pin === 'missing' ? null : !!W.pin, error: W.pin === 'missing' ? { message: 'function does not exist' } : null };
   const exp = (e, sec) => { const d = e.data || {}; if (sec === 'drawer') return num(d.open_counted) + num(d.total_entered) - (num(d.d_bkash) + num(d.d_nagad) + num(d.d_card) + num(d.d_bank) + num(d.d_other)) + num(d.dues) + num(d.new_adv) - num(d.prior_adv) - num(d.refund) - num(d.credit_sales) - num(d.midday_hub) + num(d.rounding); return den(d.count) - num(d.leave_float); };
-  if (fn === 'count_get') { const r = W.counts[args.p_entry + ':' + args.p_section]; return { data: r ? Object.assign({ saved: true }, r) : { saved: false, blind: true }, error: null }; }
+  if (fn === 'count_get') { const r = W.counts[args.p_entry + ':' + args.p_section]; if (r && W.hide) return { data: { saved: true, counted: r.counted, hidden: true }, error: null }; return { data: r ? Object.assign({ saved: true }, r) : { saved: false, blind: true }, error: null }; }
   if (fn === 'count_peek') { const e = E.find((x) => x.id === args.p_entry); if (!e) return { data: null, error: { message: 'entry not found', code: 'P0001' } }; if (W.noPeek) return { data: null, error: { message: 'not allowed', code: 'P0001' } }; W.peeks.push(args.p_entry); return { data: { saved: false, expected: exp(e, args.p_section) }, error: null }; }
   if (fn === 'count_save') { const e = E.find((x) => x.id === args.p_entry); if (!e) return { data: null, error: { message: 'entry not found', code: 'P0001' } }; const k = args.p_entry + ':' + args.p_section;
     if (W.counts[k]) return { data: null, error: { message: 'count_already_saved', code: 'P0001' } };
     const counted = den(args.p_counted), ex = exp(e, args.p_section); W.counts[k] = { counted, expected: ex, diff: counted - ex, match: counted === ex, seen_before_count: W.peeks.includes(args.p_entry) };
+    if (W.hide) return { data: { section: args.p_section, saved: true, counted, hidden: true }, error: null };
     return { data: { section: args.p_section, counted, expected: ex, diff: counted - ex, match: counted === ex }, error: null }; }
   if (fn === 'sign_entry') { if (!second) return { data: null, error: { message: 'signer must be the second login', code: 'P0001' } };
     const e = E.find((x) => x.id === args.p_entry); const staff = (c.__email || '').split('@')[0];

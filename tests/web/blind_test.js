@@ -57,6 +57,12 @@ const base = C.baseData(SP), PORT = 8351, srv = C.serve(PORT);
   p = await open({ w6: {} }, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.evaluate(() => { window.__W6S.err.count_save = 'count_already_saved'; }); await p.click('#blind_save'); await wait(p, 400);
   ok(/already saved/i.test(await p.evaluate(() => document.body.innerText)), 'count_already_saved gets a clear message'); ok(await p.locator('#blind_save').count() === 1, 'and the page stays blind');
 
+  // ---------- A2: server hides expected / diff from the maker of a draft ----------
+  p = await open({ w6: { hide: true } }, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.click('#blind_save'); await wait(p, 500);
+  ok(/Count saved/.test(await p.textContent('#blindbox')) && await p.locator('#blind_later').count() === 1, 'maker: count saved, expected / diff come after submit');
+  ok(!/Expected: |Short \/ over/.test(await p.textContent('#blindbox')) && await hiddenCalc(p, 'expected') && await hiddenCalc(p, 'short_over'), 'maker never sees expected or short/over after the save');
+  ok(await p.locator('[data-p="cash_count.n1000"][disabled]').count() === 1, 'count read-only after the save');
+
   // ---------- B: peek (logged) ----------
   p = await open({}, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.click('#blind_peek'); await wait(p, 500);
   ok((await calls(p, 'count_peek')).length === 1 && /Expected: ৳ 9,300/.test(await p.textContent('#blindbox')), 'peek returns the expected figure');

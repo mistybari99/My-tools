@@ -8,6 +8,7 @@
 \set y '00000000-0000-0000-0000-000000000005'
 \set c '00000000-0000-0000-0000-000000000006'
 \set g '00000000-0000-0000-0000-000000000007'
+\set q '00000000-0000-0000-0000-000000000008'
 create schema if not exists tt;
 create table if not exists tt.res (name text, ok boolean);
 truncate tt.res;
@@ -24,10 +25,10 @@ grant usage on schema tt to authenticated, anon; grant execute on all functions 
 insert into auth.users (id,email,raw_user_meta_data) values
  (:'o','owner1@s.app','{"full_name":"Owner"}'), (:'s','maker2@s.app','{"full_name":"Maker"}'), (:'w','witn3@s.app','{"full_name":"Witness"}'),
  (:'x','secs4@s.app','{"full_name":"Second"}'), (:'y','other5@s.app','{"full_name":"Other place"}'), (:'c','hubc6@s.app','{"full_name":"Hub counter"}'),
- (:'g','mgmt7@s.app','{"full_name":"Mgmt see"}') on conflict do nothing;
+ (:'g','mgmt7@s.app','{"full_name":"Mgmt see"}'), (:'q','sales8@s.app','{"full_name":"View only"}') on conflict do nothing;
 update profiles set status='active';
-insert into user_roles values (:'s','showroom_manager'),(:'w','showroom_manager'),(:'x','showroom_manager'),(:'y','showroom_manager'),(:'c','cash_controller'),(:'g','management') on conflict do nothing;
-insert into user_locations values (:'s',1),(:'w',1),(:'x',1),(:'y',2),(:'c',1) on conflict do nothing;
+insert into user_roles values (:'s','showroom_manager'),(:'w','showroom_manager'),(:'x','showroom_manager'),(:'y','showroom_manager'),(:'c','cash_controller'),(:'g','management'),(:'q','salesperson') on conflict do nothing;
+insert into user_locations values (:'q',1),(:'s',1),(:'w',1),(:'x',1),(:'y',2),(:'c',1) on conflict do nothing;
 insert into location_settings (location_id, key, value) values (1,'drawer_float','2000') on conflict (location_id,key) do update set value=excluded.value;
 select profiles.staff_id as sw from profiles where id = :'w' \gset
 select profiles.staff_id as sx from profiles where id = :'x' \gset
@@ -90,7 +91,6 @@ set role authenticated; select tt.as(:'s');
 -- count_missing: the typed entry must hold the count
 select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000}','[]') ->> 'id' as e1m \gset
 select tt.err('T2 count_save needs the count in the saved entry (count_missing)', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e1m'), 'count_missing');
-select tt.err('T2 a second counted draft the same day by the same person is refused (no throw-away drafts)', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e1m'), 'count_missing') ;
 select save_entry(:'e1m'::uuid,'14-1',1,current_date,'{"open_counted":2000,"total_entered":10000,"cash_count":{"n1000":1}}','[]','x') is not null as e1ms \gset
 select tt.err('T2 draft limit: e1 is still an open counted draft', format($$select count_save('%s','drawer','{"n1000":1}')$$, :'e1m'), 'count_draft_limit');
 -- submit e1: the server adds nothing (diff 0)
@@ -101,8 +101,9 @@ select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entere
 select count_save(:'e2'::uuid,'drawer','{"n1000":11,"n100":3}') as r3 \gset
 select tt.chk('T2 maker blind again on the short drawer; the row holds diff -700', not (:'r3'::jsonb ? 'diff') and (select diff=-700 from entry_counts where entry_id=:'e2'::uuid) is null);
 select tt.as(:'o'); select tt.chk('T2 the owner sees -700 stored', (select diff=-700 and expected=12000 from entry_counts where entry_id=:'e2'::uuid)); select tt.as(:'s');
-select tt.chk('T2 e2 submits and the SERVER adds the cash_short_over flag (red: no tolerance set) + an exception', (submit_entry(:'e2'::uuid) ->> 'status')='submitted' and (select count(*) from entries where id=:'e2'::uuid and flags @> '[{"code":"cash_short_over","level":"red"}]')=1);
-select tt.chk('T2 ...the exception exists', (select count(*) from exceptions where entry_id=:'e2'::uuid and flag_code='cash_short_over' and amount=-700)=1);
+select (submit_entry(:'e2'::uuid) ->> 'status') as sub2 \gset
+select tt.chk('T2 e2 submits and the SERVER adds the cash_short_over flag (red: no tolerance set)', :'sub2'='submitted' and (select count(*) from entries where id=:'e2'::uuid and flags @> '[{"code":"cash_short_over","level":"red"}]')=1);
+select tt.as(:'o'); select tt.chk('T2 ...the exception exists', (select count(*) from exceptions where entry_id=:'e2'::uuid and flag_code='cash_short_over' and amount=-700)=1); select tt.as(:'s');
 
 
 \echo == T3 who may look before the count (see_expected, owner switch)
@@ -161,6 +162,16 @@ select tt.chk('T5 approve with the same count passes and check_data.blind is kep
   and (select (check_data #>> '{blind,hub,expected}')::numeric=4000 and check_data ? 'rcount' from entries where id=:'h1'::uuid));
 select tt.chk('T5 maker of an approved entry can read the saved result', (select count(*) from entry_counts where entry_id=:'h1'::uuid)=1);
 
+select tt.as(:'s'); select save_entry(null,'10-1',1,current_date,'{"count":{"n1000":2},"leave_float":0}','[]') ->> 'id' as h2 \gset
+select submit_entry(:'h2'::uuid) is not null as sb2 \gset
+select tt.as(:'c'); select count_save(:'h2'::uuid,'hub','{"n1000":1}') is not null as cs_h2 \gset
+select tt.chk('T5 a counted hub entry can still be rejected (send back) without any receipt data', (decide_entry(:'h2'::uuid, false, 'recount please', null, '[]'::jsonb) ->> 'status')='rejected');
+-- counted but never submitted: owner exception after the day
+reset role; update entries set entry_date = current_date - 1 where id = :'e3'::uuid; set role authenticated; select tt.as(:'o');
+select count_unsubmitted_scan() as scn \gset
+select tt.chk('T5 count_unsubmitted: a counted draft left over from an earlier day raises an owner exception', :'scn'::int >= 1 and (select count(*) from exceptions where entry_id=:'e3'::uuid and flag_code='count_unsubmitted' and level='red')=1);
+select tt.chk('T5 ...once only', count_unsubmitted_scan() = 0);
+
 \echo == T6 PIN signatures
 select tt.as(:'s');
 select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":0}','[]') ->> 'id' as g1 \gset
@@ -168,7 +179,7 @@ select tt.as(:'w'); select tt.err('T6 off: refused', format($$select sign_entry(
 select tt.as(:'o'); select set_rule('pin_signature_on','true') is null as r8 \gset
 select tt.chk('T6 on for 14-1 and 10-1 only', pin_sig_active('14-1') and pin_sig_active('10-1') and not pin_sig_active('03-1'));
 select tt.as(:'s'); select tt.err('T6 the maker cannot sign', format($$select sign_entry('%s','witness')$$, :'g1'), 'signer_is_maker');
-select tt.as(:'y'); select tt.err('T6 a person without access to the place cannot sign (not even see the entry)', format($$select sign_entry('%s','witness')$$, :'g1'), 'not allowed for this location');
+select tt.as(:'y'); select tt.err('T6 a person without access to the place cannot sign (not even see the entry)', format($$select sign_entry('%s','witness')$$, :'g1'), 'not allowed');
 select tt.as(:'w');
 select tt.err('T6 unknown role', format($$select sign_entry('%s','boss')$$, :'g1'), 'bad_role');
 select tt.err('T6 hub_pair belongs to 10-1 only', format($$select sign_entry('%s','hub_pair')$$, :'g1'), 'bad_role');
@@ -204,6 +215,32 @@ reset role; select login_failed(:'sw') from generate_series(1,5); set role authe
 select tt.as(:'w'); select tt.err('T6 a locked login cannot sign (5 wrong PINs, rule 14)', format($$select sign_entry('%s','witness')$$, :'g2'), 'signer_locked');
 reset role; delete from login_failures where staff_id=:'sw'; set role authenticated;
 select tt.as(:'w'); select tt.chk('T6 after the lock is released it can', sign_entry(:'g2'::uuid,'witness') is not null);
+\echo == T6b stale signatures, fresh login, view-only signer, entered later, owner override
+select tt.as(:'s'); select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":0}','[]') ->> 'id' as g3 \gset
+select tt.as(:'q'); select tt.err('T6b a signer without enter/approve right on the form is refused', format($$select sign_entry('%s','witness')$$, :'g3'), 'not allowed');
+select tt.as(:'w'); select set_config('request.jwt.claim.iat', (extract(epoch from now()) - 300)::bigint::text, false) is not null as oldtok \gset
+select tt.err('T6b an old token cannot sign (login_not_fresh)', format($$select sign_entry('%s','witness')$$, :'g3'), 'login_not_fresh');
+select tt.as(:'w'); select sign_entry(:'g3'::uuid,'witness') is not null as sw3 \gset
+select tt.as(:'s'); select save_entry(:'g3'::uuid,'14-1',1,current_date,format('{"open_counted":2000,"total_entered":5,"witness":"%s"}', :'sw')::jsonb,'[]','chg') is not null as ch3 \gset
+select tt.err('T6b data changed after the signature: stale', format($$select submit_entry('%s')$$, :'g3'), 'pin_signature_stale:witness');
+select tt.as(:'w'); select tt.chk('T6b the same login can sign the changed sheet again', sign_entry(:'g3'::uuid,'witness') is not null);
+select tt.as(:'x'); select tt.chk('T6b ...and the second signature for the new version', sign_entry(:'g3'::uuid,'second_sig') is not null);
+select tt.as(:'s'); select save_entry(:'g3'::uuid,'14-1',1,current_date,format('{"open_counted":2000,"total_entered":5,"witness":"%s","second_sig":"%s"}', :'sw', :'sx')::jsonb,'[]','names') is not null as nm3 \gset
+select tt.chk('T6b submit passes with current signatures (names do not make it stale)', (submit_entry(:'g3'::uuid) ->> 'status')='submitted');
+-- entered later is exempt (yellow exception)
+select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":0}','[]',null,'{"entered_later":true,"paper_serial":"PX1","paper_at":"2026-10-01T09:00:00+06:00"}') ->> 'id' as gl \gset
+select (submit_entry(:'gl'::uuid) ->> 'status') as sl \gset
+select tt.as(:'o'); select tt.chk('T6b entered later: submit without PIN signatures + yellow exception unsigned_entered_later', :'sl'='submitted' and (select count(*) from exceptions where entry_id=:'gl'::uuid and flag_code='unsigned_entered_later' and level='yellow')=1); select tt.as(:'s');
+-- owner override
+select tt.as(:'o'); select save_entry(null,'14-1',1,current_date,'{"open_counted":2000,"total_entered":0}','[]') ->> 'id' as go \gset
+select tt.err('T6b owner override is OFF by default', format($$select submit_entry('%s')$$, :'go'), 'pin_signature_required');
+select set_rule('pin_signature_owner_override','true') is null as ro \gset
+select (submit_entry(:'go'::uuid) ->> 'status') as so \gset
+select tt.chk('T6b owner override ON: submits with a yellow exception', :'so'='submitted' and (select count(*) from exceptions where entry_id=:'go'::uuid and flag_code='unsigned_owner_override')=1);
+select set_rule('pin_signature_owner_override','false') is null as ro2 \gset
+-- hub: reject / send-back is never blocked by a counted entry; the receipt may be absent on a reject
+select tt.chk('T6b count_unsubmitted scan exists and runs', count_unsubmitted_scan() >= 0);
+
 select tt.as(:'o'); select pin_sig_cfg_set('14-1', false) is not null as pc \gset
 select tt.chk('T6 per-form list: 14-1 off, 10-1 on', not pin_sig_active('14-1') and pin_sig_active('10-1'));
 select tt.as(:'s'); select tt.chk('T6 14-1 submits again without signatures when its switch is off', (submit_entry((select save_entry(null,'14-1',1,current_date,'{}','[]') ->> 'id')::uuid) ->> 'status')='submitted');
