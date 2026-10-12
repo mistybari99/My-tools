@@ -45,7 +45,7 @@ const base = C.baseData(SP), srv = C.serve(8301);
 
   // ---------- start date: opening/closing ----------
   p = await open({ db: { start: '2026-10-01' } }, '#/daybook');
-  ok(await p.locator('#db_needstart').count() === 0 && await p.locator('#db_sum .chip.warn').count() === 0, 'start set -> no Data needed');
+  ok(await p.locator('#db_needstart').count() === 0 && await p.locator('#db_sum .chip.warn:not(.neg)').count() === 0, 'start set -> no Data needed');
   ok(/Net since start/.test(await p.textContent('#db_days .db-day:first-child')), 'no opening balances set -> labelled Net since start, not Closing'); ok(/Net since start/.test(await p.textContent('#db_sum')) && !/Opening/.test(await p.textContent('#db_sum')), 'summary uses Net since start labels'); ok(await p.locator('#db_startnote').count() === 1, 'start note'); await p.screenshot({ path: SP + '/db_start.png' });
   // internal handover leaves all-locations sums (flag from server)
   await p.close();
@@ -90,7 +90,7 @@ const base = C.baseData(SP), srv = C.serve(8301);
   const so = await calls(p, 'set_daybook_opening'); ok(so.length === 1 && so[0].p_cash === 1000 && so[0].p_bank === 2000 && so[0].p_mobile === null, 'opening balances saved (Bangla digits + commas; empty = null)');
   await p.click('#db_menu'); await wait(p, 150); await p.click('[data-act=db_settings]'); await wait(p, 200); await p.click('[data-act=db_mask][data-v="1"]'); await wait(p, 300);
   ok((await calls(p, 'set_rule')).some((x) => x.p_key === 'daybook_mask_names' && x.p_value === true), 'mask switch sent');
-  await p.click('[data-act=db_en][data-v="0"]'); await wait(p, 300); const sr = await calls(p, 'set_rule'); ok(sr.length === 1 && sr[0].p_key === 'daybook_enabled' && sr[0].p_value === false, 'switch off sent to set_rule'); await p.close();
+  await p.click('[data-act=db_en][data-v="0"]'); await wait(p, 300); const sr = await calls(p, 'set_rule'); ok(sr.some((x) => x.p_key === 'daybook_enabled' && x.p_value === false), 'switch off sent to set_rule'); await p.close();
 
   // ---------- not allowed / off / sql missing ----------
   p = await open({ owner: false, m: { grants: [], ctx: { is_owner: false, roles: ['salesperson'], locations: [1] } }, db: { denied: true } }, '#/daybook');

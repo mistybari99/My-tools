@@ -112,3 +112,18 @@ Not confirmed (mock only / open)
 Checks
 - phase12_test.sql: fresh db (phase8 9 10 12) 84 pass / 0 fail; also with phase11 + phase13 in either order; phase12 run twice OK. phase10_test.sql (two T11 lines edited: they read stock_ledger.ref_id as a normal user, which is now correctly refused; they now read it as the table owner) 0 fail with and without phase12; phase11_test / phase13_test 0 fail on a db with phase12; phase8_test only the known T1.
 - web: items3_test, stock3_test, purchase3_test, salereturn_test (new) + items2 / barcode (extended) / stock2 / purchase (photo-path expectation changed to STOCK / PURCHASE) - see the final report for the full list result.
+
+#### phase13 audit fixes (D1-D12)
+- D1: running totals only cumulate rows dated >= daybook_start (test with the start inside the data range). Response now has net_open/net_close (running net since start) per day and in totals.
+- D2: day_book no longer builds a giant jsonb: opening = one aggregate over [start, p_from-1]; lines only for the requested range; the line source function is plain (inlinable) SQL with timestamp-range predicates (index friendly). Timing on a scratch DB with 300,000 payments (2025-01..2026-08, 3 locations): 2-day query 0.18 s all-locations, 0.09 s one location.
+- D3: owner-only set_daybook_opening(cash, bank, mobile) (rules daybook_open_*; empty = null). open/close (real balances) are returned only when all three are set AND the view is all-locations (the balances are business-wide); otherwise the page shows "Net since start" (never "Opening/Closing"). Warning chip on negative balances / net / days.
+- D4: sale_returns.refund_amount (OUT by refund_mode) and supplier_refunds (IN) are included through _daybook_lines12 (plpgsql, guarded by to_regclass, so phase13 works without phase12). Note added to "How this is counted".
+- D5 DECISION: cash handover slips (10-1) are INTERNAL transfers: always their own lines (chip, `internal`) and summed separately in `transfers` (day + totals) in both views; they are counted as cash OUT only in a single-location view (cash really left that showroom) and never in the all-locations in/out/net totals. The form records no hub location, so the hub-side IN cannot be booked ("hub receipt not recorded" note).
+- D6: _db_num accepts thousands commas, leading/trailing dot, currency signs/spaces (৳, Tk, BDT), Bangla digits; result has skipped_rows (10-2 lines, 02-3 advances, 02-2 receipts whose amount text is not readable) and the page says "N lines could not be read".
+- D7: CSV/print of a single day: totals, opening and closing are those of the selected day(s), with a "Scope" row ("whole period" or the dates); internal rows are marked in print.
+- D8: banners for start after the period and for a start inside the period; labels switch between Opening/Closing and Net since start.
+- D9: future-dated lines are not shown and `to` is capped at today (`capped` flag); salary_report reports duplicate_sheets (same location + month, >1 sheet) and marks same-name lines `ambiguous` (paid/signed not guessed; nothing is summed per name, every line stays separate).
+- D10: range = at most 366 days inclusive (off-by-one fixed), infinite / pre-2000 / post-2100 dates and null give bad_range.
+- D12: rule daybook_mask_names (default OFF; owner switch in the day book settings): non-owner holders get text/ref null and names_masked=true.
+- D11 left as is (documented earlier): bank deposits (10-3) are not dated per day and not included.
+- Tests: phase13_test.sql 76 pass / 0 fail (with phase12 installed; D4 block is skipped by \if when phase12 is absent); web tests extended.
