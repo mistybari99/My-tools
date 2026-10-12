@@ -457,6 +457,9 @@ function viewBackup() {
     <button class="full" data-act="bk_items">${esc(t('backup_items'))}</button></div>`, true);
 }
 async function fetchAll(table) {
+  // the two stock tables hold cost columns that are not granted: the owner reads them through definer RPCs (phase12)
+  if (table === 'stock_balance') { const r = await sb.rpc('backup_stock_balance'); if (r.error) throw r.error; return r.data || []; }
+  if (table === 'stock_ledger') { const out = []; let last = 0; for (;;) { const r = await sb.rpc('backup_stock_ledger', { p_from: last, p_limit: 1000 }); if (r.error) throw r.error; const d = r.data || []; out.push(...d); if (d.length < 1000) break; last = d[d.length - 1].id; } return out; }
   const out = []; for (let from = 0; ; from += 1000) {
     const { data, error } = await sb.from(table).select('*').range(from, from + 999); if (error) throw error;
     out.push(...data); if (data.length < 1000) break; }

@@ -1,3 +1,4 @@
+-- FRESH DB ONLY (counts and stock numbers assume an empty start; do not re-run on a used db).
 -- Phase 12 tests. Fresh db: ORDER="phase8 phase9 phase10 phase12" bash tests/sql/build_fresh_db.sh <db>; then psql -qAt -f supabase/phase12_test.sql (prints PASS / FAIL, totals at the end).
 \set ON_ERROR_STOP off
 \set o '00000000-0000-0000-0000-000000000001'
@@ -233,6 +234,47 @@ select tt.chk('T9 other columns still readable directly', (select count(*) from 
 select tt.as(:'s'); select tt.chk('T9 stock_ledger_rows hides the purchase ref from a salesperson', (select count(*) from stock_ledger_rows(1,:'ia'::uuid) where reason='purchase_in' and ref_id is null)=1);
 select tt.as(:'p');
 select tt.chk('T9 ... and gives it to the purchasing person', (select count(*) from stock_ledger_rows(1,:'ia'::uuid) where reason='purchase_in' and ref_id=:'pb')=1);
+reset role;
+
+\echo == T10 audit fixes
+-- daily sum against the wastage limit (stops splitting)
+set role authenticated; select tt.as(:'o'); select set_rule('wastage_approval_limit','5'); select tt.as(:'k');
+select coalesce(stock_wastage(:'ib'::uuid,1,3,'spoiled',null,null,null,gen_random_uuid()) ->> 'pending','-') as pn \gset
+select tt.chk('T10 first 3 under the limit posts', :'pn'='-');
+select coalesce(stock_wastage(:'ib'::uuid,1,3,'spoiled',null,null,null,gen_random_uuid()) ->> 'pending','-') as pn \gset
+select tt.chk('T10 second 3 the same day: the SUM 6 > 5 goes pending', :'pn'='true');
+select tt.as(:'o'); select set_rule('wastage_limit_daily_sum','false'); select tt.as(:'k');
+select coalesce(stock_wastage(:'ib'::uuid,1,3,'spoiled',null,null,null,gen_random_uuid()) ->> 'pending','-') as pn \gset
+select tt.chk('T10 sum switch off: 3 posts again', :'pn'='-');
+select tt.as(:'o'); select set_rule('wastage_limit_daily_sum',null); select set_rule('wastage_approval_limit',null); select tt.as(:'k');
+select tt.err('T10 wastage qty above 999,999,999 refused', format($$select stock_wastage(%L,1,1000000000,'spoiled')$$, :'ib'), 'bad_qty');
+-- malformed lines
+select tt.as(:'m');
+select tt.err('T10 malformed item id', format($$select sale_return(null,%L,'[{"item_id":"zzz","qty":1}]'::jsonb,'damaged',null,'cash')$$, :'sa'), 'bad_item');
+select tt.err('T10 malformed qty', format($$select sale_return(null,%L,'[{"item_id":"%s","qty":"abc"}]'::jsonb,'damaged',null,'cash')$$, :'sa', :'ic'), 'bad_qty');
+select tt.err('T10 line that is not an object', format($$select sale_return(null,%L,'[5]'::jsonb,'damaged',null,'cash')$$, :'sa'), 'bad_item');
+-- no stock trace: sold while untracked, tracked later
+reset role; select id as iu from items where code='I-004' \gset
+update items set unit='kg', base_unit='kg', sell_price=33.33, tracked=false where id=:'iu'::uuid;
+set role authenticated; select tt.as(:'s');
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":3,"price":33.33,"unit":"kg"}]',:'iu')::jsonb,0,'[{"mode":"cash","amount":99.99}]',null,null,'retail',null,false) ->> 'id' as su \gset
+reset role; update items set tracked=true where id=:'iu'::uuid;
+set role authenticated; select tt.as(:'m');
+select sale_return(null,:'su'::uuid,format('[{"item_id":"%s","qty":1}]',:'iu')::jsonb,'damaged',null,'cash') ->> 'amount' as a1 \gset
+select sale_return(null,:'su'::uuid,format('[{"item_id":"%s","qty":1}]',:'iu')::jsonb,'damaged',null,'cash');
+select sale_return(null,:'su'::uuid,format('[{"item_id":"%s","qty":1}]',:'iu')::jsonb,'damaged',null,'cash');
+reset role;
+select tt.chk('T10 partial returns add up to the line exactly (99.99), nothing left', (select sum(amount) from sale_returns where sale_id=:'su'::uuid)=99.99 and :'a1'::numeric=33.33);
+select tt.chk('T10 no ledger trace: no phantom stock, yellow exception return_no_stock_trace', not exists(select 1 from stock_ledger where item_id=:'iu'::uuid) and (select count(*) from exceptions where flag_code='return_no_stock_trace' and sale_id=:'su'::uuid)>=1);
+-- location-scoped view_cost
+set role authenticated; select tt.as(:'o'); select set_user_grant(:'v'::uuid,'view_cost',null,null,false); select tt.as(:'v');
+select tt.chk('T10 no grant: nothing', (select count(*) from items_with_cost())=0);
+select tt.as(:'o'); select set_user_grant(:'v'::uuid,'view_cost',1); select tt.as(:'v');
+select tt.chk('T10 location-scoped view_cost still gives the list', (select count(*) from items_with_cost())>=1);
+-- backup RPCs
+select tt.as(:'o');
+select tt.chk('T10 owner backup of ledger and balance (with costs)', (select count(*) from backup_stock_ledger(0,10))>0 and (select count(*) from backup_stock_balance())>0 and (select count(*) from backup_stock_ledger((select max(id) from backup_stock_ledger(0,5000)),10))=0);
+select tt.as(:'k'); select tt.err('T10 others cannot use the backup RPC', 'select * from backup_stock_ledger(0,10)', 'not allowed');
 reset role;
 
 select '--- FAILED: ' || count(*) filter (where not ok) || ' of ' || count(*) from tt.res;

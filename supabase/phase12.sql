@@ -44,7 +44,9 @@ revoke all on function public.apply_item_patch(uuid, jsonb), public._apply_item_
 create or replace function public.items_with_cost() returns table (item_id uuid, cost_price numeric)
 language sql stable security definer set search_path = public as $$
   select c.item_id, c.cost_price from public.item_costs c
-  where public.is_active() and (public.is_owner() or public.can_do('ITEM_COST', 'view') or public.has_grant('view_cost'));
+  -- a location-scoped personal view_cost grant counts too (the list is company wide, so any location grant is enough; role grants and the owner as before)
+  where public.is_active() and (public.is_owner() or public.can_do('ITEM_COST', 'view') or public.has_grant('view_cost')
+    or exists (select 1 from public.user_grants g where g.user_id = auth.uid() and g.grant_code = 'view_cost' and (g.valid_until is null or g.valid_until > now())));
 $$;
 revoke all on function public.items_with_cost() from public, anon;
 grant execute on function public.items_with_cost() to authenticated;
@@ -52,6 +54,7 @@ grant execute on function public.items_with_cost() to authenticated;
 -- ---------- rules, grants ----------
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_en, sort) values
  ('wastage_approval_limit', 'stock', 'number', null, null, null, 0, 1000000000, 'এর বেশি পরিমাণ নষ্ট দেখাতে হলে আরেকজনের অনুমোদন লাগবে (বেস এককে)', 'এর বেশি quantity নষ্ট দেখাতে হলে আরেকজনের approval লাগবে (base unit এ)', 'A wastage above this quantity waits for a second person to approve (in the item base unit)', 'Empty = Data needed = off (every write-off posts at once). The owner is never held back', 103),
+ ('wastage_limit_daily_sum', 'stock', 'switch', 'true', null, null, null, null, 'একই ব্যক্তির একই দিনে একই পণ্যের নষ্ট মালের যোগফলও সীমার সাথে মেলানো হবে', 'একই person এর একই দিনে একই item এর wastage এর যোগফলও limit এর সাথে মেলানো হবে', 'The same person''s wastage of the same item on the same day is added up against the limit (stops splitting a big write-off)', 'Only matters when wastage_approval_limit is set', 105),
  ('block_expired_sale', 'stock', 'switch', 'false', null, null, null, null, 'মেয়াদোত্তীর্ণ মাল বিক্রি আটকানো', 'মেয়াদোত্তীর্ণ মাল sale আটকানো', 'Block selling expired stock', 'Off = the sale goes through and the owner gets a red line (as before). On = the sale is refused. A sale that syncs late from an offline phone is never refused', 104),
  ('sale_return_due_first', 'pos', 'switch', 'true', null, null, null, null, 'বিক্রি ফেরতে আগে গ্রাহকের বাকি কমবে, বাকি টাকা ফেরত', 'Sale return এ আগে customer এর due কমবে, বাকি টাকা ফেরত', 'A sale return first reduces what the customer owes; only the rest is refunded', 'Off = the whole value is refunded in cash / mobile / card', 90),
  ('em_stock_count_adjust', 'emergency', 'switch', 'false', null, null, null, null, 'জরুরি অনুরোধ চলবে: গণনা অনুযায়ী স্টক ঠিক', 'জরুরি request চলবে: count অনুযায়ী stock ঠিক', 'Emergency allowed for: adjusting stock to a count', 'Off by default', 127),
@@ -237,7 +240,7 @@ end $$;
 create or replace function public.stock_wastage(p_item uuid, p_loc int, p_qty numeric, p_reason text, p_note text default null, p_photo text default null,
   p_unit text default null, p_client uuid default null, p_batch bigint default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare it public.items; bq numeric; lid bigint; lim numeric; sid text; alim numeric; rid uuid; rq public.wastage_requests;
+declare it public.items; bq numeric; lid bigint; lim numeric; sid text; alim numeric; rid uuid; rq public.wastage_requests; dsum numeric := 0; dd date := (now() at time zone 'Asia/Dhaka')::date;
 begin
   it := public._stock_guard(p_item, p_loc, 'wastage_write_off', (now() at time zone 'Asia/Dhaka')::date);
   perform public._client_lock(p_client);
@@ -253,6 +256,7 @@ begin
   if p_reason is null or not exists (select 1 from public.option_lists where list_code = 'wastage_reasons' and value_code = p_reason and active) then raise exception 'bad_reason'; end if;
   bq := public._base_qty(p_item, p_qty, p_unit);
   if bq is null then raise exception 'unit_unknown'; end if;
+  if not (bq between 0.0001 and 999999999) then raise exception 'bad_qty'; end if;
   lim := public.rule_num('wastage_photo_above');
   if lim is not null and bq > lim and nullif(btrim(p_photo), '') is null then raise exception 'photo_required'; end if;
   if length(coalesce(p_photo, '')) > 300 then raise exception 'bad_photo'; end if;
@@ -260,7 +264,11 @@ begin
   if p_batch is not null and not exists (select 1 from public.stock_batches where id = p_batch and item_id = p_item and location_id = p_loc) then raise exception 'batch_not_found'; end if;
   select staff_id into sid from public.profiles where id = auth.uid();
   alim := public.rule_num('wastage_approval_limit');
-  if alim is not null and bq > alim and not public.is_owner() then
+  if alim is not null and public.rule_on('wastage_limit_daily_sum') then        -- today's wastage of this person for this item here, posted + still pending
+    select coalesce((select sum(w.qty) from public.stock_wastage w where w.created_by = auth.uid() and w.item_id = p_item and w.location_id = p_loc and (w.made_at at time zone 'Asia/Dhaka')::date = dd), 0)
+         + coalesce((select sum(r.qty) from public.wastage_requests r where r.requested_by = auth.uid() and r.item_id = p_item and r.location_id = p_loc and r.status = 'pending' and (r.requested_at at time zone 'Asia/Dhaka')::date = dd), 0) into dsum;
+  end if;
+  if alim is not null and (bq > alim or dsum + bq > alim) and not public.is_owner() then
     begin
       insert into public.wastage_requests (client_id, item_id, location_id, qty, reason_code, note, photo, batch_id, requested_by, requested_staff)
         values (p_client, p_item, p_loc, bq, p_reason, left(p_note, 200), nullif(btrim(p_photo), ''), p_batch, auth.uid(), sid) returning id into rid;
@@ -566,7 +574,7 @@ $$;
 create or replace function public.sale_return(p_client uuid, p_sale uuid, p_lines jsonb, p_reason text, p_note text default null,
   p_refund_mode text default null, p_wallet text default null, p_ref text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare s public.sales; r public.sale_returns; it public.items; ln record; rid uuid := gen_random_uuid(); sq numeric; samt numeric; su text; pq numeric; price numeric; lamt numeric;
+declare s public.sales; r public.sale_returns; it public.items; ln record; rid uuid := gen_random_uuid(); pamt numeric; sq numeric; samt numeric; su text; pq numeric; price numeric; lamt numeric;
         gross numeric := 0; amt numeric; credit numeric := 0; refund numeric; bal numeric; fac numeric; out_lines jsonb := '[]'::jsonb; sid text;
         bq numeric; prior numeric; skip numeric; rem numeric; take numeric; o record; avail numeric; lid bigint;
 begin
@@ -584,6 +592,11 @@ begin
   if p_reason is null or not exists (select 1 from public.option_lists where list_code = 'return_reasons' and value_code = p_reason and active) then raise exception 'reason_required'; end if;
   if p_lines is null or jsonb_typeof(p_lines) <> 'array' or jsonb_array_length(p_lines) = 0 then raise exception 'no_lines'; end if;
   if not (public.has_grant('sale_return', s.location_id) or public._use_em('sale_return', s.location_id, 'sale_return:' || p_sale::text, null)) then raise exception 'not allowed'; end if;
+  -- every line is checked before anything is cast: a malformed uuid / quantity is bad_item / bad_qty, never a raw cast error
+  for ln in select e from jsonb_array_elements(p_lines) e loop
+    if jsonb_typeof(ln.e) <> 'object' or coalesce(ln.e->>'item_id', '') !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' then raise exception 'bad_item'; end if;
+    if coalesce(ln.e->>'qty', '') !~ '^[0-9]{1,9}(\.[0-9]{1,6})?$' then raise exception 'bad_qty'; end if;
+  end loop;
   perform 1 from public.sales where id = p_sale for update;                  -- one return at a time per sale
   select * into s from public.sales where id = p_sale;
   if s.status <> 'done' then raise exception 'sale_not_done'; end if;
@@ -596,7 +609,10 @@ begin
     if sq <= 0 then raise exception 'line_not_in_sale'; end if;
     select coalesce(sum((e->>'qty')::numeric), 0) into pq from public.sale_returns x, jsonb_array_elements(x.lines) e where x.sale_id = s.id and x.status = 'done' and e->>'item_id' = ln.iid;
     if ln.q > sq - pq + 0.00005 then raise exception 'return_exceeds_sale'; end if;
-    price := samt / sq; lamt := round(ln.q * price, 2); gross := gross + lamt;
+    select coalesce(sum((e->>'amount')::numeric), 0) into pamt from public.sale_returns x, jsonb_array_elements(x.lines) e where x.sale_id = s.id and x.status = 'done' and e->>'item_id' = ln.iid;
+    price := samt / sq;
+    -- the last unit takes what is left of the line's money, so partial returns add up to the line exactly
+    lamt := case when ln.q >= sq - pq - 0.00005 then greatest(samt - pamt, 0) else round(ln.q * price, 2) end; gross := gross + lamt;
     select * into it from public.items where id = ln.iid::uuid;
     out_lines := out_lines || jsonb_build_object('item_id', ln.iid, 'name', coalesce(it.name_bn, ''), 'unit', su, 'qty', ln.q, 'price', round(price, 4), 'amount', lamt);
   end loop;
@@ -604,6 +620,7 @@ begin
   fac := case when s.subtotal > 0 then s.total / s.subtotal else 1 end;               -- the sale's discount is shared in proportion
   amt := round(gross * fac, 2);
   if not (amt between 0.01 and 999999999999) then raise exception 'bad_amount'; end if;
+  if s.customer_id is not null then perform pg_advisory_xact_lock(hashtextextended('bos12c:' || s.customer_id::text, 0)); end if;
   if s.customer_id is not null and public.rule_on('sale_return_due_first') then
     bal := coalesce(public._cust_bal(s.customer_id), 0);
     credit := least(amt, greatest(bal, 0));
@@ -644,8 +661,9 @@ begin
       perform public.stock_post(it.id, s.location_id, take, 'sale_return', 'sale_return', rid::text, o.unit_cost, o.batch_id, now(), left('return of receipt ' || s.receipt, 200), null, 'none');
       rem := rem - take;
     end loop;
-    if rem >= 0.0005 then            -- the sale took this out without a ledger row (stock tracking was switched on later): put it back as plain stock
-      perform public.stock_post(it.id, s.location_id, rem, 'sale_return', 'sale_return', rid::text, null, null, now(), left('return of receipt ' || s.receipt, 200), null, 'none');
+    if rem >= 0.0005 then            -- no sale_out ledger row covers this (stock tracking was switched on after the sale): nothing is invented, the owner is told
+      perform public._stock_exc(s.location_id, 'return_no_stock_trace', 'yellow', 'রসিদ ' || s.receipt || ': ' || it.name_bn || ' — বিক্রির স্টক-হিসাব নেই, ফেরত মাল স্টকে ওঠেনি (টাকা ফেরত/বাকি কমা হয়েছে)',
+        'Receipt ' || s.receipt || ': ' || coalesce(it.name_en, it.name_bn) || ' — the sale has no stock ledger trace, the returned goods were NOT put back (money / due credit was still given)', s.id, s.sale_date, 'POS');
     end if;
   end loop;
   perform public._stock_exc(s.location_id, 'sale_return', 'yellow', 'রসিদ ' || s.receipt || ': বিক্রি ফেরত ' || amt::text, 'Receipt ' || s.receipt || ': a sale return of ' || amt::text, s.id, s.sale_date, 'POS', amt);
@@ -702,6 +720,22 @@ begin
   if not public._pur_ok(null) then raise exception 'not allowed'; end if;
   return query select z.id, z.name, z.mobile, -z.b from (select s.id, s.name, s.mobile, public._sup_balance(s.id) b from public.suppliers s) z where z.b < 0 order by 4 desc;
 end $$;
+
+-- owner-only copies of the two tables whose cost columns are not granted (for the app's backup)
+create or replace function public.backup_stock_ledger(p_from bigint default 0, p_limit int default 1000) returns setof public.stock_ledger
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  return query select * from public.stock_ledger where id > coalesce(p_from, 0) order by id limit least(greatest(coalesce(p_limit, 1000), 1), 5000);
+end $$;
+create or replace function public.backup_stock_balance() returns setof public.stock_balance
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  return query select * from public.stock_balance order by item_id, location_id;
+end $$;
+revoke all on function public.backup_stock_ledger(bigint, int), public.backup_stock_balance() from public, anon, authenticated;
+grant execute on function public.backup_stock_ledger(bigint, int), public.backup_stock_balance() to authenticated;
 
 -- ---------- privileges for everything new ----------
 revoke all on function public._wastage_post(uuid, int, numeric, text, text, text, bigint, uuid, uuid, text), public._cust_bal(uuid), public._sale_void_guard(),

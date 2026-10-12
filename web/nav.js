@@ -83,6 +83,7 @@ const ROUTES = [
   { k: 'purchase/return', g: 'purch', lb: () => lab(L('ক্রয় ফেরত', 'Purchase return', 'Purchase return')), ic: 'doc', ok: () => locOk() },
   { k: 'daybook', g: 'acc', lb: () => T('daybook'), ic: 'doc', ok: () => isOwner() || GF.view_daybook === true },
   { k: 'salary', g: 'people', lb: () => T('salary'), ic: 'doc', ok: () => isOwner() || GF.salary_view === true },
+  { k: 'salereturn', g: 'sale', lb: () => lab(L('বিক্রি ফেরত', 'Sale returns', 'Sale return')), ic: 'doc', ok: () => canPos() },
   { k: 'payables', g: 'supp', lb: () => T('payables'), ic: 'dues', ok: () => locOk() },
   { k: 'pos', g: 'sale', lb: () => t('pos'), ok: () => canPos() },
   { k: 'reports', g: 'reports', lb: () => T('g_reports'), ic: 'doc', ok: () => true },
