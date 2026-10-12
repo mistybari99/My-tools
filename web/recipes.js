@@ -117,7 +117,7 @@ async function load() {
   D.canCost = S2h.costOk ? await S2h.costOk(null) : owner();
   D.ready = true;
 }
-const linesOf = (id) => D.lines.filter((x) => x.recipe_id === id);
+const linesOf = (id) => D.lines.filter((x) => x.recipe_id === id && x.active !== false);
 const latestActive = (itemId) => D.recipes.filter((r) => r.item_id === itemId && r.active).sort((a, b) => b.version - a.version)[0];
 const wasteMissing = (r) => linesOf(r.id).some((x) => x.waste_pct === null || x.waste_pct === undefined);
 

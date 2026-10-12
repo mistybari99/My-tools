@@ -329,3 +329,10 @@ Not confirmed / not done (honest list)
 Checks
 - phase18_test.sql: 86 pass / 0 fail on a fresh build (ORDER phase8..phase18) and on phase8..phase14 + 17 + 18. phase8..phase17 tests give the same results with phase18 installed (phase8 and phase10 known single fails as before; each test run on its own fresh DB).
 - Web: tests/web/blind_test.js and tests/web/sign_test.js (helper w5b_common.js): errors none, 0 assert failures. Full web list: see the final report.
+
+#### W6 audit fixes (phase19.sql re-edited in place, idempotent)
+- `_recipe_need` sums per item: an item that is both an ingredient and production packaging moves by the full total in ONE ledger line (test: 3 + 2 = 5 boxes).
+- Lines are never deleted: `recipe_lines.active`; editing an unused draft retires the old lines and inserts new ones (partial unique index on active lines); any DELETE on lines / recipes is refused (`recipe_used` for a used version, else `no_delete`). All readers use active lines only.
+- `recipe_cost(recipe, loc)` with a place needs `_cost_ok(loc)` + can_loc (location-scoped or global view_cost, like the stock cost columns); without a place only locations where the caller may see costs are averaged.
+- `production_post` returns `cost_complete` only to cost holders; the column `production_runs.cost_complete` is not granted to the app roles.
+- Tests: phase19_test.sql 94 checks, phase12 0 of 97, phase14 0 of 153 (fresh builds). Web: recipes_test.js rerun.

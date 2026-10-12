@@ -142,6 +142,7 @@ set role authenticated; select tt.as(:'o'); select set_rule('stock_negative_mode
 reset role;
 
 \echo == T4 count sheet
+select coalesce((select qty from stock_balance where item_id=(select id from items where code='T2') and location_id=1),0) as t2before \gset
 set role authenticated; select tt.as(:'k');
 select (select qty from stock_balance where item_id=(select id from items where code='T1') and location_id=1) as t1bal \gset
 select save_entry(null,'04-3',1,current_date,format('{"rows":[{"item":"T1","count":"%s","book":"%s","reason":"x"},{"item":"T2","count":"9","book":"5","reason":"found more"}]}', :'t1bal', :'t1bal')::jsonb,'[]') ->> 'id' as c1 \gset
@@ -150,7 +151,13 @@ select tt.as(:'m'); select decide_entry(:'c1'::uuid, true, null, null, '[]') ->>
 reset role;
 select tt.chk('T4 count: equal = no ledger row (no_change), different = count_adjust delta to the counted figure',
   (select reason from entry_ledger_posts where entry_id=:'c1'::uuid and line_no=1)='no_change' and not exists (select 1 from stock_ledger where ref_id=:'c1'||':g1:1')
-  and (select reason from stock_ledger where ref_id=:'c1'||':g1:2')='count_adjust' and (select qty from stock_balance where item_id=(select id from items where code='T2') and location_id=1)=9);
+  and (select reason from stock_ledger where ref_id=:'c1'||':g1:2')='count_adjust' and (select qty from stock_balance where item_id=(select id from items where code='T2') and location_id=1)=:t2before+4);
+set role authenticated; select tt.as(:'k');
+select save_entry(null,'04-3',1,current_date,'{"rows":[{"item":"T1","count":"3"}]}','[]') ->> 'id' as c3 \gset
+select submit_entry(:'c3'::uuid) is not null as sc3 \gset
+select tt.as(:'m'); select decide_entry(:'c3'::uuid, true, null, null, '[]') ->> 'status' as dc3 \gset
+reset role;
+select tt.chk('T4 a count row without the sheet system balance is skipped (no_count_basis), not guessed', :'dc3'='approved' and (select reason from entry_ledger_posts where entry_id=:'c3'::uuid)='no_count_basis' and not exists (select 1 from stock_ledger where ref_id like :'c3'||'%'));
 
 \echo == T5 transfer challan
 set role authenticated; select tt.as(:'k');
@@ -183,6 +190,14 @@ select tt.as(:'m'); select decide_entry(:'t1'::uuid, true, null, '{"items":[{"re
 reset role;
 select tt.chk('T5 revised transfer: gen 2, old transfer rows cancelled and reversed, balance at 2 for T2 = 2', (select max(gen) from entry_ledger_posts where entry_id=:'t1'::uuid)=2
   and (select qty from stock_balance where item_id=(select id from items where code='T2') and location_id=2)=2 and (select count(*) from stock_transfers where status='cancelled')=2);
+
+set role authenticated; select tt.as(:'k');
+select save_entry(null,'03-1',1,current_date,'{"from_loc":"2","to_loc":"1","items":[{"item":"T1","sent":"1"}]}','[]') ->> 'id' as t4 \gset
+select submit_entry(:'t4'::uuid) is not null as st4 \gset
+select tt.as(:'m'); select decide_entry(:'t4'::uuid, true, null, '{"items":[{"received":"1"}]}'::jsonb, '[]') ->> 'status' as dt4 \gset
+reset role;
+select tt.chk('T5 sender place differs from the entry place: skipped location_mismatch, nothing posted', :'dt4'='approved' and (select reason from entry_ledger_posts where entry_id=:'t4'::uuid)='location_mismatch' and not exists (select 1 from stock_ledger where ref_id like :'t4'||'%')
+  and exists (select 1 from exceptions where entry_id=:'t4'::uuid and flag_code='ledger_skip'));
 
 \echo == T6 factory sheet
 update rules set value='false' where key='location_block_when_paused';

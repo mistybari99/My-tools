@@ -87,7 +87,7 @@ select tt.err('T1 no lines', format($$select recipe_save(null,%L,1,'kg','x','[]'
 select (recipe_save(:'rdraft'::uuid,null,3,'kg','edited',format('[{"ingredient_item_id":"%s","qty":2,"unit":"kg","waste_pct":5}]',:'ifl')::jsonb) ->> 'version')::int as edv \gset
 select tt.chk('T1 an unused draft can be edited', :edv=2 and (select yield_qty from recipes where id=:'rdraft')=3);
 select recipe_set_active(:'rdraft'::uuid,false);
-select tt.chk('T1 inactivate (not deleted)', (select not active from recipes where id=:'rdraft') and (select count(*) from recipe_lines where recipe_id=:'rdraft')=1);
+select tt.chk('T1 inactivate (not deleted)', (select not active from recipes where id=:'rdraft') and (select count(*) from recipe_lines where recipe_id=:'rdraft' and active)=1 and (select count(*) from recipe_lines where recipe_id=:'rdraft' and not active)=1);
 reset role;
 select id as r1 from recipes where item_id=:'ifin' and version=1 \gset
 
@@ -123,7 +123,7 @@ select tt.chk('T4 finished good +6 kg with a batch', (select qty from stock_bala
 select tt.chk('T4 cost = (1.65*40 + 0.6*60 + 36*10) / 6 = 77', (select avg_cost from stock_balance where item_id=:'ifin' and location_id=1)=77);
 select tt.chk('T4 ledger: 3 issue_out lines + 1 production_in, same ref', (select count(*) from stock_ledger where ref_type='production' and ref_id=(:'pr'::jsonb->>'run_id') and reason='issue_out')=3
   and (select count(*) from stock_ledger where ref_type='production' and ref_id=(:'pr'::jsonb->>'run_id') and reason='production_in')=1);
-select tt.chk('T4 outcome has no cost, says cost_complete and waste_missing 1', :'pr'::jsonb::text not ilike '%unit_cost%' and (:'pr'::jsonb->>'cost_complete')::boolean and (:'pr'::jsonb->>'waste_missing')::int=1);
+select tt.chk('T4 outcome has no cost figures and no cost_complete for a non-cost holder, waste_missing 1', :'pr'::jsonb::text not ilike '%unit_cost%' and not (:'pr'::jsonb ? 'cost_complete') and (:'pr'::jsonb->>'waste_missing')::int=1);
 select tt.chk('T4 yellow line for the empty waste %', exists(select 1 from exceptions where flag_code='recipe_waste_missing' and level='yellow'));
 select tt.chk('T4 the recipe is frozen now (used_at set)', (select used_at is not null from recipes where id=:'r1'));
 select tt.chk('T4 production run stored without cost', exists(select 1 from production_runs where id=(:'pr'::jsonb->>'run_id')::uuid and yield_base=6 and cost_complete));
@@ -176,6 +176,7 @@ set role authenticated; select tt.as(:'f');
 select tt.err('T6 edit of a used version refused', format($$select recipe_save(%L,null,5,'kg','x','[{"ingredient_item_id":"%s","qty":1}]'::jsonb)$$, :'r1', :'ifl'), 'recipe_used');
 reset role;
 select tt.err('T6 direct line update refused even for postgres', format($$update recipe_lines set qty=9 where recipe_id=%L$$, :'r1'), 'recipe_used');
+select tt.err('T6 draft lines are never deleted either', format($$delete from recipe_lines where recipe_id=%L$$, :'rdraft'), 'no_delete');
 select tt.err('T6 direct line delete refused', format($$delete from recipe_lines where recipe_id=%L$$, :'r1'), 'recipe_used');
 select tt.err('T6 direct line insert refused', format($$insert into recipe_lines (recipe_id, ingredient_item_id, qty) values (%L, %L, 1)$$, :'r1', :'ibx'), 'recipe_used');
 select tt.err('T6 yield change refused', format($$update recipes set yield_qty=9 where id=%L$$, :'r1'), 'recipe_used');
@@ -205,6 +206,12 @@ select recipe_save(null,:'ifin2'::uuid,1,'kg','no stock cost',format('[{"ingredi
 select tt.chk('T7 unknown cost = null (Data needed), never invented', (recipe_cost(:'r5'::uuid) ->> 'complete')::boolean is false and (recipe_cost(:'r5'::uuid) ->> 'batch_cost') is null);
 reset role;
 
+reset role; select tt.as(:'o'); set role authenticated;
+select set_user_grant(:'x'::uuid,'view_cost',3) is null as gx \gset
+select tt.as(:'x');
+select tt.err('T7 location-scoped view_cost: not allowed at another place', format($$select recipe_cost(%L, 1)$$, :'r1'), 'not allowed');
+reset role;
+
 \echo == T8 packaging: production mode
 set role authenticated; select tt.as(:'f');
 select tt.chk('T8 packaging_set by delegate', packaging_set(:'ifin'::uuid,:'ibx'::uuid,2,'production') > 0);
@@ -218,6 +225,21 @@ set role authenticated; select tt.as(:'o'); select set_rule('packaging_consume_o
 select tt.as(:'f'); select production_post(1,:'r1'::uuid,1,'66666666-6666-6666-6666-666666666666') is not null as pp2 \gset
 reset role;
 select tt.chk('T8 setting off: no packaging taken', (select qty from stock_balance where item_id=:'ibx' and location_id=1)=46);
+
+-- an item that is BOTH an ingredient and production packaging: the stock moves by the SUM
+set role authenticated; select tt.as(:'o');
+select recipe_save(null,:'ifin2'::uuid,1,'kg','box twice',format('[{"ingredient_item_id":"%s","qty":3,"waste_pct":0}]',:'ibx')::jsonb) ->> 'id' as r6 \gset
+select packaging_set(:'ifin2'::uuid,:'ibx'::uuid,2,'production') > 0 as pk2 \gset
+select set_rule('packaging_consume_on','"production"');
+select tt.as(:'f'); select production_post(1,:'r6'::uuid,1,'88888888-8888-8888-8888-888888888888') as pr6 \gset
+select tt.as(:'o'); select set_rule('packaging_consume_on','"off"');
+reset role;
+select tt.chk('T8 item both ingredient (3) and packaging (1kg x 2) = 5 boxes out in one line', (select qty from stock_balance where item_id=:'ibx' and location_id=1)=41 and (select count(*) from stock_ledger where ref_id=(:'pr6'::jsonb->>'run_id') and item_id=:'ibx')=1 and (select -qty_delta from stock_ledger where ref_id=(:'pr6'::jsonb->>'run_id') and item_id=:'ibx')=5);
+select tt.chk('T8 non-cost holder gets no cost_complete (factory)', not (:'pr6'::jsonb ? 'cost_complete'));
+select tt.chk('T8 cost_complete column not readable by app roles', not has_column_privilege('authenticated','production_runs','cost_complete','select'));
+
+set role authenticated; select tt.as(:'o'); select stock_count_adjust(:'ibx'::uuid,1,46,'w6 back to 46') is not null as back46 \gset
+reset role;
 
 \echo == T9 packaging with a sale (trigger), void, never blocks
 set role authenticated; select tt.as(:'o');

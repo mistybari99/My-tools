@@ -111,7 +111,8 @@ begin
   elsif e.form_code = '04-3' then
     for r, n in select x.v, x.o::int from jsonb_array_elements(case when jsonb_typeof(e.data->'rows') = 'array' then e.data->'rows' else '[]'::jsonb end) with ordinality x(v, o) loop
       continue when coalesce(nullif(btrim(r->>'item'), ''), nullif(btrim(r->>'count'), '')) is null;
-      out := out || jsonb_build_object('n', n, 'kind', 'count', 'item', nullif(btrim(r->>'item'), ''), 'qty', public._elp_num(r->>'count'),
+      out := out || jsonb_build_object('n', n, 'kind', 'count', 'item', nullif(btrim(r->>'item'), ''), 'qty', public._elp_num(r->>'count'), 'book', public._elp_num(r->>'book'),
+        'skip', case when public._elp_num(r->>'book') is null then 'no_count_basis' end,
         'note', left(note || ' ' || coalesce(nullif(btrim(r->>'reason'), ''), 'stock count'), 190));
     end loop;
   elsif e.form_code = '03-1' then
@@ -142,7 +143,13 @@ declare it public.items; n int := (l->>'n')::int; kind text := l->>'kind'; qty n
         tl int := nullif(l->>'to', '')::int; rq numeric; rbq numeric; note text := nullif(l->>'note', ''); at_ timestamptz := now(); sl jsonb; exp timestamptz; bid bigint; sid text;
         stt text := 'posted'; why text; ucost numeric;
 begin
+  if l->>'skip' is null and kind = 'transfer' then
+    if (fl is not null and fl <> e.location_id) or (fl is null and tl is not null and tl <> e.location_id) then why := 'location_mismatch'; stt := 'skipped';
+    elsif not (public.is_owner() or ((fl is null or public.can_loc(fl)) and (tl is null or public.can_loc(tl)))) then why := 'location_mismatch'; stt := 'skipped';
+    end if;
+  end if;
   if l->>'skip' is not null then why := l->>'skip'; stt := 'skipped';
+  elsif stt = 'skipped' then null;
   else
     if l->>'item' is null then raise exception 'item_missing'; end if;
     select * into it from public.items where code = l->>'item';
@@ -174,9 +181,12 @@ begin
   elsif kind = 'out' then
     lid := public.stock_post(it.id, e.location_id, -bq, 'issue_out', 'entry', ref, null, null, at_, note, null, 'full');
   elsif kind = 'count' then
+    -- the count is against the system balance written on the sheet at COUNT time (a snapshot of the live balance is not possible later): delta = counted - that figure, applied to the CURRENT balance
     insert into public.stock_balance (item_id, location_id) values (it.id, e.location_id) on conflict do nothing;
     select * into bal from public.stock_balance where item_id = it.id and location_id = e.location_id for update;
-    d := round(bq - bal.qty, 4);
+    rbq := public._base_qty(it.id, nullif(l->>'book', '')::numeric, it.unit);
+    if rbq is null then raise exception 'unit_unknown: % %', it.code, coalesce(it.unit, ''); end if;
+    d := round(bq - rbq, 4);
     if d <> 0 then lid := public.stock_post(it.id, e.location_id, d, 'count_adjust', 'entry', ref, null, null, at_, left(coalesce(note, 'stock count'), 200), null, 'none'); end if;
     why := case when d = 0 then 'no_change' else 'delta ' || d::text end;
   elsif kind = 'prod' then

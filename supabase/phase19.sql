@@ -62,6 +62,9 @@ create table if not exists public.recipe_lines (
   sort int not null default 0,
   unique (recipe_id, ingredient_item_id)
 );
+alter table public.recipe_lines add column if not exists active boolean not null default true;
+alter table public.recipe_lines drop constraint if exists recipe_lines_recipe_id_ingredient_item_id_key;
+create unique index if not exists recipe_lines_one_active on public.recipe_lines (recipe_id, ingredient_item_id) where active;
 create table if not exists public.product_packaging (
   id bigserial primary key,
   product_item_id uuid not null references public.items(id),
@@ -110,7 +113,7 @@ begin
   if tg_table_name = 'recipes' then
     if tg_op = 'DELETE' then
       if old.used_at is not null then raise exception 'recipe_used'; end if;
-      return old;
+      raise exception 'no_delete';
     end if;
     if tg_op = 'UPDATE' and old.used_at is not null and (new.item_id is distinct from old.item_id or new.version is distinct from old.version
         or new.yield_qty is distinct from old.yield_qty or new.yield_unit is distinct from old.yield_unit) then raise exception 'recipe_used'; end if;
@@ -119,6 +122,7 @@ begin
   rid := case when tg_op = 'DELETE' then old.recipe_id else new.recipe_id end;
   select used_at into used from public.recipes where id = rid;
   if used is not null then raise exception 'recipe_used'; end if;
+  if tg_op = 'DELETE' then raise exception 'no_delete'; end if;
   if tg_op = 'UPDATE' and new.recipe_id is distinct from old.recipe_id then raise exception 'recipe_used'; end if;
   return case when tg_op = 'DELETE' then old else new end;
 end $$;
@@ -220,7 +224,7 @@ begin
   else
     rid := p_id; v := r.version;
     update public.recipes set yield_qty = p_yield_qty, yield_unit = yu, note = left(p_note, 300) where id = rid;
-    delete from public.recipe_lines where recipe_id = rid;               -- a draft only (never used): the trigger refuses this for a used version
+    update public.recipe_lines set active = false where recipe_id = rid and active;      -- a draft only (never used): old lines are retired, never deleted; the trigger refuses this for a used version
   end if;
   perform public._recipe_put_lines(rid, p_lines);
   return jsonb_build_object('id', rid, 'version', v);
@@ -245,12 +249,12 @@ begin
   select * into tgt from public.items where id = coalesce(p_item, s.item_id);
   if not found then raise exception 'item_not_found'; end if;
   if tgt.item_type is distinct from 'finished_good' then raise exception 'bad_product_type'; end if;
-  if exists (select 1 from public.recipe_lines where recipe_id = p_from and ingredient_item_id = tgt.id) then raise exception 'ingredient_is_product'; end if;
+  if exists (select 1 from public.recipe_lines where recipe_id = p_from and active and ingredient_item_id = tgt.id) then raise exception 'ingredient_is_product'; end if;
   select coalesce(max(version), 0) + 1 into v from public.recipes where item_id = tgt.id;
   insert into public.recipes (item_id, version, yield_qty, yield_unit, active, note, client_id, created_by)
     values (tgt.id, v, s.yield_qty, case when tgt.id = s.item_id then s.yield_unit else null end, true, s.note, p_client, auth.uid()) returning id into rid;
   insert into public.recipe_lines (recipe_id, ingredient_item_id, qty, unit, waste_pct, note, sort)
-    select rid, ingredient_item_id, qty, unit, waste_pct, note, sort from public.recipe_lines where recipe_id = p_from;
+    select rid, ingredient_item_id, qty, unit, waste_pct, note, sort from public.recipe_lines where recipe_id = p_from and active;
   if tgt.id <> s.item_id and public._base_qty(tgt.id, s.yield_qty, null) is null then raise exception 'unit_unknown'; end if;
   if p_retire_old and tgt.id = s.item_id then update public.recipes set active = false where id = p_from; end if;
   return jsonb_build_object('id', rid, 'version', v);
@@ -294,22 +298,23 @@ declare r public.recipes; yb numeric;
 begin
   select * into r from public.recipes where id = p_recipe;
   if not found then return; end if;
+  yb := coalesce(public._base_qty(r.item_id, r.yield_qty, r.yield_unit), 0) * p_batches;
   return query
-    select i.id, 'ingredient'::text,
-           round(public._base_qty(i.id, l.qty, l.unit) * p_batches * (1 + coalesce(l.waste_pct, 0) / 100), 4),
-           coalesce(b.qty, 0), i.tracked, public._base_qty(i.id, l.qty, l.unit) is not null, l.waste_pct is null,
-           i.code, i.name_bn, i.name_en, public._item_base(i.id)
-      from public.recipe_lines l join public.items i on i.id = l.ingredient_item_id
-      left join public.stock_balance b on b.item_id = i.id and b.location_id = p_loc
-     where l.recipe_id = p_recipe;
-  if coalesce(public.rule_txt('packaging_consume_on'), 'off') = 'production' then
-    yb := public._base_qty(r.item_id, r.yield_qty, r.yield_unit) * p_batches;
-    return query
+    select z.item_id, min(z.kind), sum(z.need), max(z.on_hand), bool_and(z.tracked), bool_and(z.unit_ok), bool_or(z.waste_missing), z.code, z.name_bn, z.name_en, z.base_unit
+    from (
+      select i.id as item_id, 'ingredient'::text as kind,
+             round(public._base_qty(i.id, l.qty, l.unit) * p_batches * (1 + coalesce(l.waste_pct, 0) / 100), 4) as need,
+             coalesce(b.qty, 0) as on_hand, i.tracked, public._base_qty(i.id, l.qty, l.unit) is not null as unit_ok, l.waste_pct is null as waste_missing,
+             i.code, i.name_bn, i.name_en, public._item_base(i.id) as base_unit
+        from public.recipe_lines l join public.items i on i.id = l.ingredient_item_id
+        left join public.stock_balance b on b.item_id = i.id and b.location_id = p_loc
+       where l.recipe_id = p_recipe and l.active
+      union all
       select i.id, 'packaging'::text, round(pp.qty_per_unit * yb, 4), coalesce(b.qty, 0), i.tracked, true, false, i.code, i.name_bn, i.name_en, public._item_base(i.id)
         from public.product_packaging pp join public.items i on i.id = pp.packaging_item_id
         left join public.stock_balance b on b.item_id = i.id and b.location_id = p_loc
-       where pp.product_item_id = r.item_id and pp.active and pp.applies_to = 'production';
-  end if;
+       where coalesce(public.rule_txt('packaging_consume_on'), 'off') = 'production' and pp.product_item_id = r.item_id and pp.active and pp.applies_to = 'production') z
+    group by z.item_id, z.code, z.name_bn, z.name_en, z.base_unit;
 end $$;
 
 -- preview for the production sheet: what will be used, what is on hand, what is short. No costs.
@@ -360,17 +365,18 @@ create or replace function public.recipe_cost(p_recipe uuid, p_loc int default n
 language plpgsql security definer set search_path = public as $$
 declare r public.recipes; ls jsonb := '[]'::jsonb; total numeric := 0; complete boolean := true; l record; need numeric; av numeric; yb numeric;
 begin
-  if not public._recipe_cost_ok() then raise exception 'not allowed'; end if;
-  if p_loc is not null and not public.can_loc(p_loc) then raise exception 'not allowed'; end if;
+  if p_loc is not null then
+    if not (public._cost_ok(p_loc) and public.can_loc(p_loc)) then raise exception 'not allowed'; end if;      -- same rule as the stock cost columns
+  elsif not public._recipe_cost_ok() then raise exception 'not allowed'; end if;
   select * into r from public.recipes where id = p_recipe;
   if not found then raise exception 'recipe_not_found'; end if;
-  for l in select x.*, i.code, i.name_bn, i.name_en from public.recipe_lines x join public.items i on i.id = x.ingredient_item_id where x.recipe_id = p_recipe order by x.sort, x.id loop
+  for l in select x.*, i.code, i.name_bn, i.name_en from public.recipe_lines x join public.items i on i.id = x.ingredient_item_id where x.recipe_id = p_recipe and x.active order by x.sort, x.id loop
     need := round(public._base_qty(l.ingredient_item_id, l.qty, l.unit) * (1 + coalesce(l.waste_pct, 0) / 100), 4);
     if p_loc is not null then
       select avg_cost into av from public.stock_balance where item_id = l.ingredient_item_id and location_id = p_loc;
     else
       select sum(qty * avg_cost) / nullif(sum(qty), 0) into av from public.stock_balance
-        where item_id = l.ingredient_item_id and qty > 0 and avg_cost is not null and (public._all_locs() or public.can_loc(location_id));
+        where item_id = l.ingredient_item_id and qty > 0 and avg_cost is not null and (public._all_locs() or public.can_loc(location_id)) and public._cost_ok(location_id);
     end if;
     if av is null then complete := false; else total := total + need * av; end if;
     ls := ls || jsonb_build_object('ingredient_item_id', l.ingredient_item_id, 'code', l.code, 'need_base', need, 'unit_cost', av, 'line_cost', case when av is null then null else round(need * av, 4) end,
@@ -403,7 +409,7 @@ begin
   if not r.active then raise exception 'recipe_inactive'; end if;
   if p_batches is null or not (p_batches between 0.0001 and 100000) then raise exception 'bad_qty'; end if;
   if at_ > now() + interval '10 minutes' then raise exception 'bad_date'; end if;
-  if not exists (select 1 from public.recipe_lines where recipe_id = r.id) then raise exception 'no_lines'; end if;
+  if not exists (select 1 from public.recipe_lines where recipe_id = r.id and active) then raise exception 'no_lines'; end if;
   f := public._base_qty(r.item_id, r.yield_qty, r.yield_unit);
   if f is null or not (f > 0) then raise exception 'unit_unknown'; end if;
   yb := round(f * p_batches, 4);
@@ -448,7 +454,7 @@ begin
     perform public._stock_exc(p_loc, 'recipe_waste_missing', 'yellow', it.name_bn || ': রেসিপিতে অপচয় % বসানো নেই — ০ ধরা হয়েছে (' || wm::text || ' লাইন)',
       coalesce(it.name_en, it.name_bn) || ': the recipe has no waste % on ' || wm::text || ' line(s) — counted as 0', null, (at_ at time zone 'Asia/Dhaka')::date, 'STOCK');
   end if;
-  return jsonb_build_object('run_id', rid, 'ledger_id', lid, 'batch_id', bid, 'qty', yb, 'expires_at', exp, 'consumed', used, 'waste_missing', wm, 'cost_complete', cost_ok);
+  return jsonb_build_object('run_id', rid, 'ledger_id', lid, 'batch_id', bid, 'qty', yb, 'expires_at', exp, 'consumed', used, 'waste_missing', wm) || case when public._cost_ok(p_loc) then jsonb_build_object('cost_complete', cost_ok) else '{}'::jsonb end;
 end $$;
 
 -- the old direct "production in": identical to phase10 except the new switch (production_requires_recipe)
@@ -551,3 +557,6 @@ revoke all on function public.stock_production_in(uuid, int, numeric, timestampt
 grant execute on function public.stock_production_in(uuid, int, numeric, timestamptz, text, text, uuid, numeric) to authenticated;
 -- the read policies call this helper as the signed-in person
 grant execute on function public._recipe_read() to authenticated;
+-- cost_complete is a cost fact: not readable by people who may not see costs
+revoke select on public.production_runs from authenticated;
+grant select (id, client_id, location_id, recipe_id, item_id, batches, made_at, yield_base, ledger_in_id, batch_id, waste_missing, note, created_by, created_at) on public.production_runs to authenticated;
