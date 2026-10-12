@@ -284,20 +284,26 @@ begin
 end $$;
 
 do $$
+declare d text := pg_get_functiondef('public.apply_item_patch(uuid,jsonb)'::regprocedure); mk text; done boolean;
 begin
-  if position('bos14-master' in pg_get_functiondef('public.apply_item_patch(uuid,jsonb)'::regprocedure)) = 0 then
+  -- already installed? (the marker can sit one level down when phase12 was run after phase14)
+  done := position('bos14-master' in d) > 0
+       or coalesce(position('bos14-master' in pg_get_functiondef(to_regprocedure('public._apply_item_patch_base(uuid,jsonb)'))) > 0, false);
+  if not done then
+    -- when phase12 is already in place the new wrapper carries its marker too, so a later re-run of phase12 stays a no-op; without phase12 the marker is left out and phase12 can still add its details step on top
+    mk := case when position('bos12-details' in d) > 0 then 'bos12-details' else '' end;
     drop function if exists public._apply_item_patch_p12(uuid, jsonb);
     alter function public.apply_item_patch(uuid, jsonb) rename to _apply_item_patch_p12;
-    execute $f$
+    execute replace($f$
       create function public.apply_item_patch(p_item uuid, p_patch jsonb) returns uuid
       language plpgsql security definer set search_path = public as $b$
-      declare iid uuid;   -- bos14-master (also keeps the bos12-details marker so a re-run of phase12 stays a no-op). Everything else: the previous version.
+      declare iid uuid;   -- bos14-master @MK@ : creation (next code per category) and the item-master fields are done here, everything else by the previous version
       begin
         if p_item is null then iid := public._item_create_p14(p_patch); else iid := p_item; end if;
         iid := public._apply_item_patch_p12(iid, p_patch);
         perform public._item_flags_apply(iid, p_patch);
         return iid;
-      end $b$ $f$;
+      end $b$ $f$, '@MK@', mk);
   end if;
 end $$;
 revoke all on function public.apply_item_patch(uuid, jsonb), public._apply_item_patch_p12(uuid, jsonb), public._item_create_p14(jsonb), public._item_flags_apply(uuid, jsonb),
@@ -660,6 +666,25 @@ begin
     update public.item_mapping_review set status = p_status, decided_by = auth.uid(), decided_at = now(), note = left(p_note, 300) where item_id = p_item;
   end if;
   return jsonb_build_object('status', p_status);
+end $$;
+
+-- helper trigger functions of phase11 (W1): created here only when phase11 has not been run yet (same text, so a later phase11 changes nothing)
+do $$
+begin
+  if to_regprocedure('public.no_hard_delete()') is null then
+    execute $f$create function public.no_hard_delete() returns trigger language plpgsql set search_path = public as $b$ begin raise exception 'nothing is deleted – retire instead'; end $b$ $f$;
+  end if;
+  if to_regprocedure('public.code_immutable()') is null then
+    execute $f$create function public.code_immutable() returns trigger language plpgsql set search_path = public as $b$
+      declare c text; o text; n text;
+      begin
+        foreach c in array tg_argv loop
+          o := to_jsonb(old) ->> c; n := to_jsonb(new) ->> c;
+          if o is not null and o is distinct from n then raise exception 'code is immutable'; end if;
+        end loop;
+        return new;
+      end $b$ $f$;
+  end if;
 end $$;
 
 -- ---------- (12) asset register ----------

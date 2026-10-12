@@ -138,6 +138,7 @@ async function editor(o) {
   shell(T(o.kind === 'return' ? 'newRet' : 'newBill'), `<p class="muted">${esc(T('loading'))}</p>`, 'purchase');
   try { await B.loadStatic(); } catch (e) { /* defaults */ }
   await allItems();
+  try { if (B.itemMaster) await B.itemMaster.init(); } catch (e) { /* item master not installed */ }
   let b = null;
   if (o.id) { const r = await sb.rpc('purchase_get', { p_id: o.id }); if (r.error) { if (/not allowed/.test(r.error.message || '')) return lockPage(T('title'), 'purchase'); return errToast(r.error); } b = r.data; if (b.status !== 'draft') { location.hash = '#/purchase/' + o.id; return; } }
   const kind = b ? b.kind : o.kind;
