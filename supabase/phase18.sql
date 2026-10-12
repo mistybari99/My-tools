@@ -20,6 +20,8 @@ insert into public.rules (key, module, kind, default_value, unit, choices, min_v
    'চালু করলে ১৪-১ (ড্রয়ার) ও ১০-১ (হাব)-এ প্রত্যাশিত অঙ্ক গণনা সেভের আগে দেখা যাবে না। ফর্ম × লোকেশন আলাদা করে বন্ধ করা যায়', 'চালু করলে 14-1 (drawer) ও 10-1 (hub)-এ expected figure count save-এর আগে দেখা যাবে না। form × location আলাদা বন্ধ করা যায়', 'When on, forms 14-1 (drawer) and 10-1 (hub) do not show the expected figure before the count is saved. Can be switched off per form x place', 94),
  ('owner_sees_expected_first', 'entries', 'switch', 'true', null, null, null, null, 'মালিক গণনার আগেও প্রত্যাশিত অঙ্ক দেখতে পারবেন', 'Owner count-এর আগেও expected দেখতে পারবেন', 'Owner may see the expected figure before the count is saved',
    'বন্ধ করলে মালিকও আগে দেখতে পারবেন না (see_expected অনুমতিপ্রাপ্ত অন্য কেউ পারবেন)। প্রতিবার দেখা লগে থাকে', 'বন্ধ করলে owner-ও আগে দেখতে পারবেন না (see_expected grant-ওয়ালা অন্য কেউ পারবেন)। প্রতিবার log-এ থাকে', 'When off the owner is blind too (a person holding see_expected still may). Every early look is logged', 95),
+ ('pin_signature_owner_override', 'entries', 'switch', 'false', null, null, null, null, 'পিন স্বাক্ষর ছাড়া জমা: মালিকের ছাড় (হলুদ এক্সেপশনসহ)', 'PIN signature ছাড়া submit: owner override (yellow exception সহ)', 'Owner may submit without the PIN signatures (yellow exception)',
+   'চালু থাকলে শুধু মালিক স্বাক্ষর ছাড়া জমা দিতে পারবেন; হলুদ এক্সেপশন তৈরি হয়', 'চালু থাকলে শুধু owner signature ছাড়া submit করতে পারবেন; yellow exception হয়', 'When on only the owner may submit without signatures; a yellow exception is raised', 97),
  ('pin_signature_on', 'entries', 'switch', 'false', null, null, null, null, 'পিন স্বাক্ষর: দ্বিতীয় স্বাক্ষর অন্য লগইন + নিজের পিন', 'PIN signature: দ্বিতীয় signature অন্য login + নিজের PIN', 'PIN signature: the second signature is another login with its own PIN',
    'বন্ধ থাকলে আগের মতো নাম বেছে সাক্ষী। চালু করলে ফর্ম অনুযায়ী (তালিকা) সাক্ষী নিজের পিন দিয়ে স্বাক্ষর করবেন; লেখক নিজে স্বাক্ষর করতে পারবেন না', 'বন্ধ থাকলে আগের মতো name বেছে witness। চালু করলে form অনুযায়ী witness নিজের PIN দিয়ে sign করবেন', 'When off the old name-picker witness stays. When on (per form list) the witness signs with their own PIN; the maker can never be the signer', 96)
 on conflict (key) do nothing;
@@ -91,6 +93,11 @@ begin
 end $$;
 
 -- ---------- (3) counts ----------
+-- the maker of a draft must not learn expected / diff from the server while blind is on (only an approver, or a see_expected holder, does)
+create or replace function public._count_hide18(e public.entries) returns boolean
+language sql stable security definer set search_path = public as $$
+  select public.blind_active(e.form_code, e.location_id) and e.status = 'draft' and e.created_by = auth.uid() and not public.has_grant('see_expected', e.location_id);
+$$;
 create table if not exists public.entry_counts (
   entry_id uuid not null references public.entries(id),
   section text not null check (section in ('drawer', 'hub')),
@@ -127,7 +134,7 @@ alter table public.entry_counts enable row level security;
 alter table public.entry_count_peeks enable row level security;
 drop policy if exists entry_counts_read on public.entry_counts;
 create policy entry_counts_read on public.entry_counts for select to authenticated
-  using (exists (select 1 from public.entries e where e.id = entry_id));      -- rows exist only AFTER the count; same visibility as the entry
+  using (exists (select 1 from public.entries e where e.id = entry_id and not public._count_hide18(e)));      -- rows exist only AFTER the count; the maker of a blind draft does not read expected / diff
 drop policy if exists entry_count_peeks_read on public.entry_count_peeks;
 create policy entry_count_peeks_read on public.entry_count_peeks for select to authenticated using (public.is_owner());
 revoke all on public.entry_counts, public.entry_count_peeks from public, anon, authenticated;
@@ -224,11 +231,29 @@ begin
   return e.created_by <> auth.uid() or self_ok;
 end $$;
 
+
+-- counted but never submitted (throw-away drafts): an owner exception once the business day is over (no invented time limit)
+create or replace function public.count_unsubmitted_scan() returns int
+language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  if not public.is_active() then raise exception 'not allowed'; end if;
+  insert into public.exceptions (entry_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+    select e.id, e.form_code, e.location_id, e.entry_date, 'count_unsubmitted', 'red', null,
+           jsonb_build_object('bn', 'গণনা সেভ হয়েছে কিন্তু শিট জমা হয়নি', 'en', 'Count saved but the sheet was never submitted')
+    from public.entry_counts c join public.entries e on e.id = c.entry_id
+    where c.section = 'drawer' and e.status = 'draft' and e.entry_date < (now() at time zone 'Asia/Dhaka')::date
+      and not exists (select 1 from public.exceptions x where x.entry_id = e.id and x.flag_code = 'count_unsubmitted');
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
 create or replace function public.count_save(p_entry uuid, p_section text, p_counted jsonb) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare e public.entries; tot numeric; inp jsonb; ex numeric; df numeric; sid text; c public.entry_counts; peek public.entry_count_peeks;
+declare e public.entries; tot numeric; inp jsonb; ex numeric; df numeric; sid text; c public.entry_counts; peek public.entry_count_peeks; hide boolean;
 begin
   if p_section not in ('drawer', 'hub') then raise exception 'bad_section'; end if;
+  perform public.count_unsubmitted_scan();
   select * into e from public.entries where id = p_entry for update;
   if not found then raise exception 'entry not found'; end if;
   if e.form_code <> public._count_sec18(p_section) then raise exception 'bad_section'; end if;
@@ -239,11 +264,20 @@ begin
   if found then
     -- a retry of the same count (lost answer) gets the saved result; a different figure is refused: the count never changes
     if c.counted = tot and c.counted_by = auth.uid() then
+      if public._count_hide18(e) then return jsonb_build_object('section', p_section, 'saved', true, 'counted', c.counted, 'hidden', true, 'already', true); end if;
       return jsonb_build_object('section', p_section, 'counted', c.counted, 'expected', c.expected, 'diff', c.diff, 'match', c.diff = 0, 'already', true);
     end if;
     raise exception 'count_already_saved';
   end if;
-  if p_section = 'drawer' and (e.data ? 'cash_count') and public._den_total18(e.data -> 'cash_count', false) <> tot then raise exception 'count_mismatch'; end if;
+  if p_section = 'drawer' then
+    if not (e.data ? 'cash_count') then raise exception 'count_missing'; end if;
+    if public._den_total18(e.data -> 'cash_count', false) <> tot then raise exception 'count_mismatch'; end if;
+    -- one counted open draft per person, place and day: no throw-away drafts to read the expected figure
+    if exists (select 1 from public.entries x join public.entry_counts k on k.entry_id = x.id and k.section = 'drawer'
+               where x.form_code = e.form_code and x.location_id = e.location_id and x.entry_date = e.entry_date and x.created_by = e.created_by and x.status = 'draft' and x.id <> e.id) then
+      raise exception 'count_draft_limit';
+    end if;
+  end if;
   if p_section = 'hub' and (e.check_data ? 'rcount') and public._den_total18(e.check_data -> 'rcount', false) <> tot then raise exception 'count_mismatch'; end if;
   inp := public._count_inputs18(e, p_section);
   ex := public._count_expected18(inp, p_section);
@@ -254,7 +288,8 @@ begin
     values (p_entry, p_section, coalesce(p_counted, 'null'::jsonb), tot, ex, df, md5(inp::text), auth.uid(), sid, now(),
             coalesce(peek.seen_by, auth.uid()), coalesce(peek.seen_at, now()),
             exists (select 1 from public.entry_count_peeks where entry_id = p_entry and section = p_section));
-  update public.entries set check_data = check_data where id = p_entry;          -- the guard trigger mirrors the result into check_data.blind
+  update public.entries set check_data = check_data where id = p_entry;          -- the guard trigger mirrors the result into check_data.blind (not while a draft)
+  if public._count_hide18(e) then return jsonb_build_object('section', p_section, 'saved', true, 'counted', tot, 'hidden', true); end if;
   return jsonb_build_object('section', p_section, 'counted', tot, 'expected', ex, 'diff', df, 'match', df = 0);
 end $$;
 
@@ -269,7 +304,10 @@ begin
   if e.form_code <> public._count_sec18(p_section) then raise exception 'bad_section'; end if;
   if not public._count_can18(e, p_section, false) then raise exception 'not allowed'; end if;
   select * into c from public.entry_counts where entry_id = p_entry and section = p_section;
-  if found then return jsonb_build_object('saved', true, 'counted', c.counted, 'expected', c.expected, 'diff', c.diff); end if;
+  if found then
+    if public._count_hide18(e) then return jsonb_build_object('saved', true, 'counted', c.counted, 'hidden', true); end if;
+    return jsonb_build_object('saved', true, 'counted', c.counted, 'expected', c.expected, 'diff', c.diff);
+  end if;
   if public.blind_active(e.form_code, e.location_id) then
     if public.is_owner() and not public.rule_on('owner_sees_expected_first') and not exists (
          select 1 from public.user_grants g where g.user_id = auth.uid() and g.grant_code = 'see_expected' and (g.valid_until is null or g.valid_until > now()) and (g.location_id is null or g.location_id = e.location_id)) then
@@ -292,21 +330,36 @@ begin
   if not found or not public.is_active() or not public.can_loc(e.location_id) then raise exception 'not allowed'; end if;
   select * into c from public.entry_counts where entry_id = p_entry and section = p_section;
   if not found then return jsonb_build_object('saved', false, 'blind', public.blind_active(e.form_code, e.location_id)); end if;
+  if public._count_hide18(e) then return jsonb_build_object('saved', true, 'counted', c.counted, 'hidden', true, 'counted_at', c.counted_at); end if;
   return jsonb_build_object('saved', true, 'counted', c.counted, 'expected', c.expected, 'diff', c.diff, 'match', c.diff = 0, 'counted_at', c.counted_at, 'counted_staff', c.counted_staff,
     'seen_before_count', c.seen_before_count, 'inputs_changed', md5(public._count_inputs18(e, p_section)::text) is distinct from c.inputs_hash);
 end $$;
 
--- guard on entries: a saved count cannot be changed through the entry, the result is mirrored into check_data.blind
+-- guard on entries: a saved count cannot be changed through the entry, the result is mirrored into check_data.blind once the sheet is submitted,
+-- and the server adds the cash short/over flag at submit (the maker never sees expected / diff before that)
 create or replace function public._entries_blind_guard() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare r public.entry_counts;
+declare r public.entry_counts; tol numeric; tj jsonb; lvl text;
 begin
   for r in select * from public.entry_counts where entry_id = new.id loop
-    if r.section = 'drawer' and (new.data is distinct from old.data) and public._den_total18(new.data -> 'cash_count', false) <> r.counted then raise exception 'count_locked'; end if;
-    if r.section = 'hub' and (new.check_data ? 'rcount' or (new.status in ('approved', 'rejected') and old.status = 'submitted'))
-       and public._den_total18(new.check_data -> 'rcount', false) <> r.counted then raise exception 'count_locked'; end if;
+    if r.section = 'drawer' then
+      if new.data is distinct from old.data and (new.data ? 'cash_count') and public._den_total18(new.data -> 'cash_count', false) <> r.counted then raise exception 'count_locked'; end if;
+      if old.status = 'draft' and new.status = 'submitted' then
+        if not (new.data ? 'cash_count') or public._den_total18(new.data -> 'cash_count', false) <> r.counted then raise exception 'count_locked'; end if;
+        if r.diff <> 0 and not exists (select 1 from jsonb_array_elements(new.flags) f where f ->> 'code' = 'cash_short_over') then
+          begin tj := public.get_limit(new.location_id, 'cash_tol', new.entry_date); exception when others then tj := null; end;
+          tol := case when tj is not null and jsonb_typeof(tj) = 'number' then (tj #>> '{}')::numeric end;
+          lvl := case when tol is not null and abs(r.diff) <= tol then 'yellow' else 'red' end;
+          new.flags := new.flags || jsonb_build_array(jsonb_build_object('code', 'cash_short_over', 'level', lvl, 'amount', r.diff, 'src', 'system',
+            'text', case when r.diff < 0 then jsonb_build_object('bn', 'ক্যাশ কম', 'en', 'Cash short') else jsonb_build_object('bn', 'ক্যাশ বেশি', 'en', 'Cash over') end));
+        end if;
+      end if;
+    elsif new.check_data ? 'rcount' and public._den_total18(new.check_data -> 'rcount', false) <> r.counted then raise exception 'count_locked';
+    end if;
   end loop;
-  if exists (select 1 from public.entry_counts where entry_id = new.id) then
+  if new.status = 'draft' then
+    new.check_data := coalesce(new.check_data, '{}'::jsonb) - 'blind';
+  elsif exists (select 1 from public.entry_counts where entry_id = new.id) then
     new.check_data := coalesce(new.check_data, '{}'::jsonb) || jsonb_build_object('blind', (
       select jsonb_object_agg(section, jsonb_build_object('counted', counted, 'expected', expected, 'diff', diff, 'match', diff = 0, 'counted_at', counted_at))
       from public.entry_counts where entry_id = new.id));
@@ -318,12 +371,14 @@ create trigger entries_blind_guard before update on public.entries for each row 
 
 -- ---------- (4) PIN signatures ----------
 create table if not exists public.entry_signatures (
+  id bigserial primary key,
   entry_id uuid not null references public.entries(id),
   role text not null check (role in ('witness', 'second_sig', 'hub_pair')),
   signer_id uuid not null, signer_staff text,
   signed_at timestamptz not null default now(),
-  primary key (entry_id, role),
-  unique (entry_id, signer_id)
+  data_hash text not null,                         -- md5 of the sheet (without the signer names) when it was signed: a later change makes the signature stale
+  unique (entry_id, role, data_hash),
+  unique (entry_id, signer_id, data_hash)
 );
 drop trigger if exists entry_signatures_no_change on public.entry_signatures;
 create trigger entry_signatures_no_change before update or delete on public.entry_signatures for each row execute function public._append_only18();
@@ -338,54 +393,118 @@ grant select on public.entry_signatures to authenticated;
 drop trigger if exists audit_entry_signatures on public.entry_signatures;
 create trigger audit_entry_signatures after insert on public.entry_signatures for each row execute function public.log_change('entry_id,role');
 
+create or replace function public._sig_hash18(d jsonb) returns text
+language sql immutable as $$ select md5(((coalesce(d, '{}'::jsonb)) - 'witness' - 'second_sig' - 'pair_by')::text); $$;
+create or replace function public._addflag18(fl jsonb, p_code text, p_level text, p_bn text, p_en text) returns jsonb
+language sql immutable as $$ select coalesce(fl, '[]'::jsonb) || jsonb_build_array(jsonb_build_object('code', p_code, 'level', p_level, 'src', 'system', 'text', jsonb_build_object('bn', p_bn, 'en', p_en))); $$;
+
 -- called by the SECOND person's own session (their PIN was checked by Supabase Auth in the browser): auth.uid() is the signer
 create or replace function public.sign_entry(p_entry uuid, p_role text) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare e public.entries; sid text;
+declare e public.entries; sid text; iat numeric; h text;
 begin
   if not public.is_active() then raise exception 'not allowed'; end if;
-  if p_role not in ('witness', 'second_sig', 'hub_pair') then raise exception 'bad_role'; end if;
   select * into e from public.entries where id = p_entry for update;
-  if not found then raise exception 'entry not found'; end if;
+  -- place first, one text for every refusal of access (no hint whether the entry exists)
+  if not found or not public.can_loc(e.location_id) or not (public.can_do(e.form_code, 'enter') or public.can_do(e.form_code, 'approve')) then raise exception 'not allowed'; end if;
+  if p_role not in ('witness', 'second_sig', 'hub_pair') then raise exception 'bad_role'; end if;
   if (p_role in ('witness', 'second_sig') and e.form_code <> '14-1') or (p_role = 'hub_pair' and e.form_code <> '10-1') then raise exception 'bad_role'; end if;
   if not public.pin_sig_active(e.form_code) then raise exception 'pin_signature_off'; end if;
   if e.status not in ('draft', 'submitted') then raise exception 'entry is locked'; end if;
   if e.created_by = auth.uid() then raise exception 'signer_is_maker'; end if;
-  if not public.can_loc(e.location_id) then raise exception 'not allowed for this location'; end if;
+  -- a fresh sign-in just now (the browser signs the signer in on a second client): an old token cannot sign
+  begin iat := coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'iat', nullif(current_setting('request.jwt.claim.iat', true), ''))::numeric; exception when others then iat := null; end;
+  if iat is null or iat < extract(epoch from now()) - 120 then raise exception 'login_not_fresh'; end if;
   select staff_id into sid from public.profiles where id = auth.uid();
   if exists (select 1 from public.login_failures f where f.staff_id = sid and f.locked and (f.locked_until is null or f.locked_until > now())) then raise exception 'signer_locked'; end if;
-  if exists (select 1 from public.entry_signatures where entry_id = p_entry and signer_id = auth.uid()) then raise exception 'signer_already_signed'; end if;
-  if exists (select 1 from public.entry_signatures where entry_id = p_entry and role = p_role) then raise exception 'role_already_signed'; end if;
-  insert into public.entry_signatures (entry_id, role, signer_id, signer_staff) values (p_entry, p_role, auth.uid(), sid);
+  h := public._sig_hash18(e.data);
+  if exists (select 1 from public.entry_signatures where entry_id = p_entry and signer_id = auth.uid() and data_hash = h) then raise exception 'signer_already_signed'; end if;
+  if exists (select 1 from public.entry_signatures where entry_id = p_entry and role = p_role and data_hash = h) then raise exception 'role_already_signed'; end if;
+  insert into public.entry_signatures (entry_id, role, signer_id, signer_staff, data_hash) values (p_entry, p_role, auth.uid(), sid, h);
   return jsonb_build_object('entry', p_entry, 'role', p_role, 'signer_staff', sid);
 end $$;
 
--- a draft cannot be submitted without the PIN signatures once they are switched on for the form
+-- a draft cannot be submitted without valid (not stale) PIN signatures once they are switched on for the form
 create or replace function public._entries_sig_guard() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare roles text[]; r text; s text;
+declare roles text[]; r text; s text; h text; missing text[] := '{}';
 begin
   if not (old.status = 'draft' and new.status = 'submitted') then return new; end if;
   if not public.pin_sig_active(new.form_code) then return new; end if;
   roles := case new.form_code when '14-1' then array['witness', 'second_sig'] else array['hub_pair'] end;
+  h := public._sig_hash18(new.data);
   foreach r in array roles loop
-    select signer_staff into s from public.entry_signatures where entry_id = new.id and role = r;
-    if s is null then raise exception 'pin_signature_required:%', r; end if;
+    select signer_staff into s from public.entry_signatures where entry_id = new.id and role = r and data_hash = h order by id desc limit 1;
+    if s is null then
+      missing := missing || r;
+      continue;
+    end if;
     if r = 'witness' and coalesce(new.data ->> 'witness', '') <> s then raise exception 'signature_mismatch:witness'; end if;
     if r = 'second_sig' and coalesce(new.data ->> 'second_sig', '') <> s then raise exception 'signature_mismatch:second_sig'; end if;
   end loop;
+  if array_length(missing, 1) > 0 then
+    if new.entered_later then
+      new.flags := public._addflag18(new.flags, 'unsigned_entered_later', 'yellow', 'কাগজ থেকে পরে তোলা — পিন স্বাক্ষর নেই', 'Entered later from paper - no PIN signature');
+    elsif public.is_owner() and public.rule_on('pin_signature_owner_override') then
+      new.flags := public._addflag18(new.flags, 'unsigned_owner_override', 'yellow', 'মালিকের ছাড়ে পিন স্বাক্ষর ছাড়া জমা', 'Submitted without PIN signatures by the owner override');
+    else
+      r := missing[1];
+      if exists (select 1 from public.entry_signatures where entry_id = new.id and role = r) then raise exception 'pin_signature_stale:%', r; end if;
+      raise exception 'pin_signature_required:%', r;
+    end if;
+  end if;
   return new;
 end $$;
 drop trigger if exists entries_sig_guard on public.entries;
 create trigger entries_sig_guard before update on public.entries for each row execute function public._entries_sig_guard();
 
+
+-- submit_entry (phase17 body) with ONE change: the exceptions are made from the flags AFTER the update, so flags the server adds at submit
+-- (cash_short_over from the saved blind count, unsigned_entered_later, unsigned_owner_override) become exceptions too
+create or replace function public.submit_entry(p_id uuid) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare e public.entries; f public.forms; fl jsonb; blocked text[] := '{}'; auto boolean;
+begin
+  select * into e from public.entries where id = p_id for update;
+  if not found then raise exception 'entry not found'; end if;
+  if e.status <> 'draft' then raise exception 'entry is locked'; end if;
+  if e.created_by <> auth.uid() and not public.is_owner() then raise exception 'only the maker can submit'; end if;
+  if not public.can_do(e.form_code, 'enter') or not public.can_loc(e.location_id) then raise exception 'not allowed'; end if;
+  if public.rollout_mode(e.form_code, e.location_id) = 'paper' and public.rule_on('rollout_enforce') and not e.entered_later then
+    raise exception 'rollout_paper:%', e.form_code;
+  end if;
+  select * into f from public.forms where code = e.form_code;
+  if f.red_block then
+    for fl in select * from jsonb_array_elements(e.flags) loop
+      if fl->>'level' = 'red' and fl->>'code' <> 'entered_later_old' and not exists (select 1 from public.release_requests r
+           where r.entry_id = e.id and r.flag_code = fl->>'code' and r.status = 'approved'
+             and r.flag_amount is not distinct from nullif(fl->>'amount','')::numeric) then
+        blocked := blocked || (fl->>'code');
+      end if;
+    end loop;
+    if array_length(blocked, 1) > 0 then raise exception 'red_blocked:%', array_to_string(blocked, ','); end if;
+  end if;
+  update public.entries set status = 'submitted', submitted_at = now(), updated_at = now() where id = p_id;
+  select * into e from public.entries where id = p_id;
+  select coalesce((select (value #>> '{}')::boolean from public.settings where key = 'auto_exceptions'), true) into auto;
+  delete from public.exceptions where entry_id = e.id and status = 'open' and flag_code <> 'count_unsubmitted';
+  if auto then
+    insert into public.exceptions (entry_id, form_code, location_id, entry_date, flag_code, level, amount, text)
+      select e.id, e.form_code, e.location_id, e.entry_date, x->>'code', x->>'level', nullif(x->>'amount','')::numeric, x->'text'
+      from jsonb_array_elements(e.flags) x;
+  end if;
+  return jsonb_build_object('status', 'submitted');
+end $$;
+revoke all on function public.submit_entry(uuid) from public, anon;
+grant execute on function public.submit_entry(uuid) to authenticated;
+
 -- ---------- (5) rights ----------
 revoke execute on function public.blind_active(text, int), public.pin_sig_active(text), public.blind_cfg_set(text, int, boolean), public.pin_sig_cfg_set(text, boolean),
-  public.count_save(uuid, text, jsonb), public.count_peek(uuid, text), public.count_get(uuid, text), public.sign_entry(uuid, text),
+  public.count_save(uuid, text, jsonb), public.count_peek(uuid, text), public.count_get(uuid, text), public.sign_entry(uuid, text), public.count_unsubmitted_scan(), public._count_hide18(public.entries), public._sig_hash18(jsonb), public._addflag18(jsonb, text, text, text, text),
   public._n18(jsonb, text), public._den_total18(jsonb, boolean), public._count_inputs18(public.entries, text), public._count_expected18(jsonb, text),
   public._count_sec18(text), public._count_can18(public.entries, text, boolean), public._entries_blind_guard(), public._entries_sig_guard(), public._append_only18() from public, anon;
 grant execute on function public.blind_active(text, int), public.pin_sig_active(text), public.blind_cfg_set(text, int, boolean), public.pin_sig_cfg_set(text, boolean),
-  public.count_save(uuid, text, jsonb), public.count_peek(uuid, text), public.count_get(uuid, text), public.sign_entry(uuid, text) to authenticated;
+  public.count_save(uuid, text, jsonb), public.count_peek(uuid, text), public.count_get(uuid, text), public.sign_entry(uuid, text), public.count_unsubmitted_scan(), public._count_hide18(public.entries) to authenticated;   -- _count_hide18 is used by the entry_counts read policy
 -- the helpers stay internal (they are called inside security definer functions); authenticated needs no direct access
 revoke execute on function public._n18(jsonb, text), public._den_total18(jsonb, boolean), public._count_inputs18(public.entries, text), public._count_expected18(jsonb, text),
   public._count_sec18(text), public._count_can18(public.entries, text, boolean), public._entries_blind_guard(), public._entries_sig_guard(), public._append_only18() from authenticated;
