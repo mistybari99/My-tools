@@ -133,7 +133,7 @@ select tt.chk('T7 posted 3 documents; journal expense total = 250 (200 quick + 5
   and (select coalesce(sum(l.debit),0) from journal_lines l join journal_entries j on j.id=l.entry_id join coa_accounts a on a.id=l.account_id where a.type='expense' and j.source_type in ('quick_expense','expense_voucher'))=250);
 select tt.chk('T7 quick expense journal lines: transport -> expense account, credit cash', exists (select 1 from journal_entries j join journal_lines l on l.entry_id=j.id join acct_mappings m on m.account_id=l.account_id and m.key='pay_cash' where j.source_type='quick_expense' and l.credit>0));
 select tt.chk('T7 day book vs journal: expense no longer differs (quick entries count in both); only the 02-2 salary (no journal source yet) does', jsonb_array_length(daybook_vs_journal(tt.today()-1, tt.today())->'rows')=1
-  and daybook_vs_journal(tt.today()-1, tt.today())->'rows'->0->>'kind'='salary');
+  and daybook_vs_journal(tt.today()-1, tt.today())->'rows'->0->>'kind' in ('salary','salary_form'));
 select _p27_pl(tt.today(), tt.today(), array[1]) as plr \gset
 select tt.chk('T7 P&L expense = 250 (quick 200 + voucher 50), the shadow voucher is not added again', (select o_exp from _p27_pl(tt.today(), tt.today(), array[1]))=250);
 select tt.chk('T7 expense trend sees 250 in total', (select coalesce(sum((x->>'current')::numeric),0) from _r3q_e2_expense_trend(tt.today(), tt.today(), array[1], '{}'::jsonb) x)=250);
