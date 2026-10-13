@@ -59,7 +59,7 @@ do $$ declare t text; begin
   foreach t in array array['comparison_pairs', 'comparison_days', 'parallel_months'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists %I on public.%I', t || '_read', t);
-    execute format('create policy %I on public.%I for select to authenticated using (public.is_active())', t || '_read', t);
+    execute format('create policy %I on public.%I for select to authenticated using (public.is_active()%s)', t || '_read', t, case when t = 'comparison_days' or t = 'parallel_months' then ' and public.can_loc(location_id)' else '' end);
     execute format('revoke all on public.%I from public, anon, authenticated', t);
     execute format('grant select on public.%I to authenticated', t);
     execute format('drop trigger if exists %I on public.%I', 'audit_' || t, t);
@@ -104,6 +104,7 @@ begin
   select * into pr from public.comparison_pairs where id = p_pair and is_active;
   if not found then raise exception 'pair_not_found'; end if;
   if public.rollout_mode(pr.form_code, p_loc) is distinct from 'parallel' then raise exception 'not_parallel'; end if;
+  if exists (select 1 from public.parallel_months m where m.form_code = pr.form_code and m.location_id = p_loc and m.month = date_trunc('month', p_day)::date) then raise exception 'month_decided'; end if;
   if not (public.is_owner() or public.can_do(pr.form_code, 'enter') or public.can_do(pr.form_code, 'approve') or public.has_grant('rollout_manage', p_loc)) then raise exception 'not allowed'; end if;
   insert into public.comparison_days (pair_id, form_code, location_id, day) values (p_pair, pr.form_code, p_loc, p_day) on conflict (pair_id, location_id, day) do nothing;
   select * into r from public.comparison_days where pair_id = p_pair and location_id = p_loc and day = p_day for update;
@@ -129,6 +130,7 @@ begin
   if not found or not public.can_loc(r.location_id) then raise exception 'not allowed'; end if;
   if not (public.is_owner() or public.has_grant('rollout_manage', r.location_id) or r.keeper_user = auth.uid() or r.enterer_user = auth.uid()) then raise exception 'not allowed'; end if;
   if r.result <> 'differ' then raise exception 'not_differ'; end if;
+  if exists (select 1 from public.parallel_months m where m.form_code = r.form_code and m.location_id = r.location_id and m.month = date_trunc('month', r.day)::date) then raise exception 'month_decided'; end if;
   if p_reason is null or length(btrim(p_reason)) < 3 or p_fix is null or length(btrim(p_fix)) < 3 then raise exception 'reason_and_fix_required'; end if;
   update public.comparison_days set reason = left(btrim(p_reason), 300), fix = left(btrim(p_fix), 300) where id = r.id;
   return jsonb_build_object('id', r.id);
@@ -249,6 +251,7 @@ begin
   if not found or not public._books_mgr(b.location_id) or not public.can_loc(b.location_id) then raise exception 'not allowed'; end if;
   if p_status not in ('active', 'used', 'void') then raise exception 'bad_value'; end if;
   if p_status = 'void' and (p_note is null or length(btrim(p_note)) < 3) then raise exception 'note_required'; end if;
+  if p_status <> 'void' and b.status = 'void' and exists (select 1 from public.paper_books o where o.id <> b.id and o.form_code = b.form_code and o.location_id = b.location_id and o.status <> 'void' and coalesce(o.prefix, '') = coalesce(b.prefix, '') and b.first_no <= o.last_no and b.last_no >= o.first_no) then raise exception 'books_overlap'; end if;
   update public.paper_books set status = p_status, note = coalesce(left(nullif(btrim(p_note), ''), 300), note) where id = p_id;
   return jsonb_build_object('id', p_id, 'status', p_status);
 end $$;
@@ -317,7 +320,7 @@ begin
   if not public.is_active() then raise exception 'not allowed'; end if;
   select coalesce(jsonb_agg(to_jsonb(x) order by x.since), '[]'::jsonb) into out_ from (
     select * from (
-      select 'entry'::text kind, e.id::text id, e.form_code || ' #' || coalesce(e.serial::text, '') as label, e.location_id, e.submitted_at as since, ('entry/' || e.id)::text as route
+      select 'entry'::text kind, e.id::text id, e.form_code || ' #' || coalesce(e.serial::text, '') as label, e.location_id, coalesce(e.submitted_at, e.created_at) as since, ('entry/' || e.id)::text as route
         from public.entries e where e.status = 'submitted' and public.can_loc(e.location_id) and (public.is_owner() or public.can_do(e.form_code, 'approve')) and e.created_by is distinct from auth.uid()
       union all
       select 'release', r.id::text, r.flag_code, (select en.location_id from public.entries en where en.id = r.entry_id), r.requested_at, 'releases'

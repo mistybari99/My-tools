@@ -893,9 +893,9 @@ Object.assign(A.H, {
   e_copy_last: async () => {
     const r = await sb.from('entries').select('data').eq('form_code', E.code).eq('location_id', E.loc).eq('created_by', S.ctx.profile.id).neq('status', 'rejected').order('created_at', { ascending: false }).limit(1);
     const last = r.data && r.data[0] && r.data[0].data; if (!last) return toast(lab(X17.copy_none));
-    const KEEP = new Set(['item', 'select', 'choice', 'supplier']), put = (fd, src, dst) => { if (!KEEP.has(fd.type) || src[fd.id] === undefined || src[fd.id] === null || src[fd.id] === '') return; if (dst[fd.id] === undefined || dst[fd.id] === '') dst[fd.id] = src[fd.id]; };
+    const KEEP = new Set(['item', 'supplier']), put = (fd, src, dst) => { if (!KEEP.has(fd.type) || src[fd.id] === undefined || src[fd.id] === null || src[fd.id] === '') return; if (dst[fd.id] === undefined || dst[fd.id] === '') dst[fd.id] = src[fd.id]; };
     const walk = (fd) => { if (fd.type === 'table') { const rows = Array.isArray(last[fd.id]) ? last[fd.id] : []; if (!rows.length || rowsOf(fd)) return; E.data[fd.id] = E.data[fd.id] && E.data[fd.id].length ? E.data[fd.id] : rows.map(() => ({}));
-          rows.forEach((row, i) => { E.data[fd.id][i] = E.data[fd.id][i] || {}; fd.cols.forEach((c) => put(c, row || {}, E.data[fd.id][i])); }); } else put(fd, last, E.data); };
+          rows.forEach((row, i) => { E.data[fd.id][i] = E.data[fd.id][i] || {}; fd.cols.forEach((c) => { if (c.who !== 'checker') put(c, row || {}, E.data[fd.id][i]); }); }); } else if (fd.who !== 'checker') put(fd, last, E.data); };
     (E.spec.head || []).forEach(walk); (E.spec.sections || []).forEach((s) => (s.fields || []).forEach(walk));
     E.dirty = true; recompute(); toast(lab(X17.copy_done)); const sc = window.scrollY; draw(); window.scrollTo(0, sc);
   },

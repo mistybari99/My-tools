@@ -53,7 +53,7 @@ async function render() {
     canPos ? q(sb.rpc('customer_dues')) : { data: null },
     owner ? q(sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     q(sb.rpc('my_emergency')),
-    (anyApprove || owner) ? q(sb.rpc('needs_you_oldest', { p_limit: 6 })) : { data: [] },
+    q(sb.rpc('needs_you_oldest', { p_limit: 6 })),
   ]);
   const reds = (ex.data || []).filter((x) => x.level === 'red').length, yel = (ex.data || []).filter((x) => x.level === 'yellow').length;
   const mineToApprove = (sub.data || []).filter((e) => owner || (perms[e.form_code] && perms[e.form_code].approve)).length;

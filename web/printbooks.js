@@ -58,6 +58,7 @@ document.addEventListener('change', async (e) => {
   if (e.target.id === 'pb_form') { D.form = e.target.value; await load(); draw(); }
 });
 async function view() {
+  if (B.loadStatic) await B.loadStatic();
   const locs = LOCS(); if (!D.loc || !locs.find((l) => l.id === D.loc)) D.loc = (locs[0] || {}).id;
   shell(T('title'), '<div id="pb_body"><p class="muted">…</p></div>', true);
   try { await load(); draw(); } catch (e) { fail(e); }

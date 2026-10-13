@@ -79,8 +79,8 @@ const EXTRA9 = `(function(){ const real = window.supabase.createClient; window.s
 
   // home needs-you list
   p = await open('#/home');
-  ok(await p.locator('.dash-row .dl', { hasText: '#9002' }).count() === 1, 'Needs-you row shows the oldest entry'); 
-  const rowsTxt = await p.locator('.dash-row .dl').allTextContents(); const i1 = rowsTxt.findIndex((t) => /9002/.test(t)), i2 = rowsTxt.findIndex((t) => /cash_over/.test(t)); ok(i1 >= 0 && i2 > i1, 'oldest first');
+  ok(await p.locator('#hv_oldest .hrow', { hasText: '#9002' }).count() === 1, 'Needs-you row shows the oldest entry');
+  const rowsTxt = await p.locator('#hv_oldest .hrow').allTextContents(); const i1 = rowsTxt.findIndex((t) => /9002/.test(t)), i2 = rowsTxt.findIndex((t) => /cash_over/.test(t)); ok(i1 >= 0 && i2 > i1, 'oldest first');
 
   // files
   ok(fs.existsSync('/home/user/My-tools/web/sw.js') && /bos-sw-/.test(fs.readFileSync('/home/user/My-tools/web/sw.js', 'utf8')), 'service worker file present');

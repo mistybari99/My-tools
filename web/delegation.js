@@ -45,6 +45,6 @@ Object.assign(H, {
     const r = await sb.rpc('set_user_grant', { p_user: u, p_code: c, p_loc: l ? Number(l) : null, p_until: d ? d + 'T23:59:59+06:00' : null, p_allowed: true, p_note: null }); if (r.error) return fail(r.error); toast(T('saved')); await load(); draw(); },
 });
 document.addEventListener('input', (e) => { if (e.target.id === 'dg_q') { D.q = e.target.value; const pos = e.target.selectionStart; draw(); const q = $('#dg_q'); if (q) { q.focus(); try { q.setSelectionRange(pos, pos); } catch (x) { /* ignore */ } } } });
-async function view() { shell(T('title'), '<div id="dg_body"><p class="muted">…</p></div>', true); try { await load(); draw(); } catch (e) { fail(e); } }
+async function view() { shell(T('title'), '<div id="dg_body"><p class="muted">…</p></div>', true); try { if (B.loadStatic) await B.loadStatic(); await load(); draw(); } catch (e) { fail(e); } }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { delegation: view });
 })();

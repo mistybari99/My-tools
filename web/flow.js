@@ -64,6 +64,7 @@ async function check(kind) {
 async function loadSkips() { const r = await sb.from('flow_skips').select('flow,step,location_id,day').eq('day', today()); D.skips = r.error ? [] : (r.data || []); }
 async function listView() {
   shell(T('title'), '<div id="fl_body"><p class="muted">…</p></div>', true);
+  if (B.loadStatic) await B.loadStatic();
   const locs = LOCS(); if (!D.loc || !locs.find((l) => l.id === D.loc)) D.loc = (locs[0] || {}).id;
   await loadSkips();
   const cards = await Promise.all(Object.keys(FLOWS).map(async (id) => { const res = await Promise.all(FLOWS[id].map(async ([k, kind]) => (D.skips.some((s) => s.flow === id && s.step === k && s.location_id === D.loc) ? 'skipped' : check(kind))));
@@ -72,6 +73,7 @@ async function listView() {
 }
 async function flowView(id) {
   shell(T(id), '<div id="fl_body"><p class="muted">…</p></div>', true);
+  if (B.loadStatic) await B.loadStatic();
   const locs = LOCS(); if (!D.loc || !locs.find((l) => l.id === D.loc)) D.loc = (locs[0] || {}).id;
   await loadSkips();
   const steps = FLOWS[id]; const res = await Promise.all(steps.map(async ([k, kind]) => (D.skips.some((s) => s.flow === id && s.step === k && s.location_id === D.loc) ? 'skipped' : check(kind))));

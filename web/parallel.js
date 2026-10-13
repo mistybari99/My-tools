@@ -24,7 +24,7 @@ const X = {
   e_no_pair_named: L('আগে একটি জোড়া ঠিক করুন', 'Name a pair first', 'আগে একটি জোড়া ঠিক করুন'), e_no_comparison_days: L('এই মাসে কোনো তুলনার দিন নেই', 'No comparison days this month', 'এই মাসে কোনো তুলনার দিন নেই'),
   e_month_not_ended: L('মাস শেষ হয়নি', 'The month is not over yet', 'মাস শেষ হয়নি'), e_already_decided: L('এই মাসের সিদ্ধান্ত আগেই হয়েছে', 'This month is already decided', 'এই মাসের সিদ্ধান্ত হয়ে গেছে'),
   e_already_recorded: L('এই অঙ্ক আগেই অন্য কেউ লিখেছেন', 'Someone else already recorded this figure', 'অন্য কেউ আগেই লিখেছেন'), e_not_parallel: L('ফর্মটি এখন পাশাপাশি অবস্থায় নেই', 'The form is not in Parallel', 'Form এখন Parallel-এ নেই'),
-  e_not_allowed: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), e_note_required: L('নোট লিখুন', 'Write a note', 'Note লিখুন'), e_bad_amount: L('অঙ্ক ঠিক নয়', 'Figure is not valid', 'অঙ্ক ঠিক নয়'),
+  e_month_decided: L('এই মাসের সিদ্ধান্ত হয়ে গেছে — আর বদলানো যাবে না', 'This month is already decided - no more changes', 'এই মাসের সিদ্ধান্ত হয়ে গেছে'), e_not_allowed: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), e_note_required: L('নোট লিখুন', 'Write a note', 'Note লিখুন'), e_bad_amount: L('অঙ্ক ঠিক নয়', 'Figure is not valid', 'অঙ্ক ঠিক নয়'),
   e_reason_and_fix_required: L('কারণ ও ব্যবস্থা দুটোই লিখুন', 'Write both reason and fix', 'কারণ ও fix দুটোই লিখুন'),
 };
 const T = (k) => lab(X[k]);
@@ -32,7 +32,7 @@ const eText = (e) => { const m = String((e && e.message) || ''); const k = Objec
 const D = { cells: [], pairs: [], cur: null, status: null, days: [] };
 const isOwner = () => !!(S.ctx && S.ctx.is_owner);
 const monthStart = (d) => d.slice(0, 7) + '-01';
-const prevMonth = () => { const t = new Date(today() + 'T00:00:00Z'); t.setUTCMonth(t.getUTCMonth() - 1); return t.toISOString().slice(0, 7) + '-01'; };
+const prevMonth = () => { const t = new Date(monthStart(today()) + 'T00:00:00Z'); t.setUTCMonth(t.getUTCMonth() - 1); return t.toISOString().slice(0, 7) + '-01'; };
 
 async function load() {
   const [c, p] = await Promise.all([sb.from('form_rollout').select('form_code,location_id,mode').eq('mode', 'parallel'), sb.from('comparison_pairs').select('*').order('id')]);
@@ -82,6 +82,7 @@ document.addEventListener('change', async (e) => {
 });
 async function view() {
   shell(T('title'), '<div id="pl_body"><p class="muted">…</p></div>', true);
+  if (B.loadStatic) await B.loadStatic();
   try { await load(); draw(); } catch (e) { fail(e); }
 }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { parallel: view });

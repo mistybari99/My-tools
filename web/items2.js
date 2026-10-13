@@ -392,7 +392,7 @@ Object.assign(H, {
   p2_fg: () => { Fl.flag = Fl.flag === 'unpriced_fg' ? '' : 'unpriced_fg'; shown = PAGE; viewList(); },
   p2_fg_bulk: () => { B.bulkPreset = 'fg'; go('bulkitems'); },
   p2_apply: () => { Fl.cat = $('#ff_cat').value; Fl.sub = $('#ff_sub').value; Fl.source = $('#ff_src').value; Fl.tracked = $('#ff_trk').value; Fl.active = $('#ff_act').value; Fl.type = $('#ff_type') ? $('#ff_type').value : ''; Fl.flag = $('#ff_flag') ? $('#ff_flag').value : ''; Fl.low = isOn('ff_low'); Fl.lowNow = isOn('ff_lownow'); shown = PAGE; closeSheet(); drawList(); },
-  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', flag: '' }); shown = PAGE; closeSheet(); drawList(); },
+  p2_reset: () => { Object.assign(Fl, { cat: '', sub: '', source: '', tracked: '', low: false, lowNow: false, active: '', type: '', cls: '', flag: '' }); shown = PAGE; closeSheet(); const bd = $('#p2_badges'); if (bd) bd.innerHTML = badgesHTML(); drawList(); },
   p2_chip_x: (a) => { const k = a.dataset.k; Fl[k] = k === 'low' || k === 'lowNow' ? false : ''; shown = PAGE; const bd = $('#p2_badges'); if (bd) bd.innerHTML = badgesHTML(); drawList(); },
   p2_more: () => { shown += PAGE; drawList(); },
   p2_tg: (a) => {

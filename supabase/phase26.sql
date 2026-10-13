@@ -51,7 +51,11 @@ language sql stable security definer set search_path = public as $$
     left join public.suppliers s on s.id::text = e.data ->> 'supplier_id'
    where e.form_code = '04-1' and e.status in ('submitted', 'approved') and e.entry_date between d1 and d2 and e.location_id = any (locs)
      and nullif(btrim(coalesce(s.name, e.data ->> 'supplier')), '') is not null
-     and public._r2_num(n.r -> 'rate') > 0 and public._r2_num(n.r -> 'counted') > 0;
+     and public._r2_num(n.r -> 'rate') > 0 and public._r2_num(n.r -> 'counted') > 0
+     -- a delivery entered as a purchase bill AND a GRN is counted once (the bill wins): no posted bill line for the same item and place within 3 days
+     and not exists (select 1 from public.purchase_bills b2 join public.purchase_lines pl2 on pl2.bill_id = b2.id join public.suppliers s2 on s2.id = b2.supplier_id
+                      where b2.status = 'posted' and b2.kind = 'bill' and pl2.item_id = i.id and b2.location_id = e.location_id and abs(b2.bill_date - e.entry_date) <= 3
+                        and lower(btrim(s2.name)) = lower(btrim(coalesce(s.name, e.data ->> 'supplier'))));
 $$;
 
 -- one row per purchase order (06-3, not cancelled) with what was received (04-1 on that PO number) and what was billed (06-4)
