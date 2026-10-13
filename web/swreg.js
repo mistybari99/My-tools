@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 if (!('serviceWorker' in navigator)) return;
-const secure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const secure = location.protocol === 'https:';      // real sites only: a local test or dev server is never cached
 let off = false; try { off = localStorage.getItem('bos_sw') === 'off'; } catch (e) { /* storage blocked */ }
 // a phone that was switched off by the rule is re-checked after the rules load: if the rule is ON again the flag is removed and the cache comes back on the next start
 const kill = async () => { try { const rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map((r) => r.unregister())); const ks = await caches.keys(); await Promise.all(ks.filter((k) => k.startsWith('bos-sw-')).map((k) => caches.delete(k))); } catch (e) { /* ignore */ } };
