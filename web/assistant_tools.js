@@ -35,7 +35,7 @@ const C = {
   pay: ['payable', 'payables', 'we owe', 'do we owe', 'owe supplier', 'owe to', 'supplier due', 'supplier dues', 'dena', 'দেনা', 'দায়', 'দায়'],
   customer: ['customer', 'customers', 'client', 'clients', 'buyer', 'khoddar', 'kastomar', 'গ্রাহক', 'খদ্দের', 'ক্রেতা', 'কাস্টমার'],
   supplier: ['supplier', 'suppliers', 'vendor', 'vendors', 'mohajon', 'mahajan', 'সরবরাহকারী', 'মহাজন', 'সাপ্লায়ার', 'সাপ্লায়ার'],
-  stock: ['stock', 'stocks', 'inventory', 'mojud', 'mal', 'স্টক', 'মজুত', 'মজুদ', 'মাল'],
+  stock: ['stock', 'stocks', 'inventory', 'mojud', 'mal', 'স্টক', 'মজুত', 'মজুদ', 'মাল '],
   low: ['low', 'short', 'below minimum', 'running out', 'run out', 'finishing', 'reorder', 'shesh', 'kom', 'কম', 'ফুরিয়ে', 'ফুরিয়ে', 'শেষ হয়ে', 'শেষ হয়ে', 'অর্ডার দিতে'],
   expiry: ['expiry', 'expire', 'expires', 'expired', 'expiring', 'meyad', 'mead', 'মেয়াদ', 'মেয়াদ', 'মেয়াদোত্তীর্ণ'],
   wastage: ['wastage', 'waste', 'wasted', 'spoil', 'spoiled', 'spoilage', 'nosto', 'noshto', 'নষ্ট', 'অপচয়', 'অপচয়'],
@@ -95,11 +95,12 @@ const INTENTS = [
   I('pnl', 'pnl', ['profit'], ['loss', 'branch'], ['item', 'category']),
   I('pnl', 'pnl', ['loss'], [], ['item']),
   I('shop_pnl', 'shop_pnl', ['profit', 'branch'], ['loss', 'worst', 'top'], ['item'], 3),
+  I('shop_pnl', 'shop_pnl', ['loss', 'branch'], ['worst'], ['item'], 3),
   I('expenses', 'expenses_by_head', ['expense'], ['top', 'today'], ['change', 'trend']),
   I('expenses', 'expenses_by_head', ['cost', 'top'], [], ['item', 'profit']),
   I('expense_change', 'expense_trend', ['expense', 'change']),
   I('expense_change', 'expense_trend', ['expense', 'trend']),
-  I('discounts', 'discounts', ['discount'], ['staff']),
+  I('discounts', 'discounts', ['discount'], ['staff'], [], 1),
   I('voids', 'voids', ['void'], ['staff']),
   I('cash_short', 'cash_short_over', ['cash', 'shortover']),
   I('cash_flow', 'cash_flow', ['cash'], ['trend', 'today'], ['shortover', 'position', 'bank']),
@@ -108,13 +109,13 @@ const INTENTS = [
   I('paymode', 'payment_modes', ['paymode']),
   I('collections', 'collections', ['collection'], ['recv']),
   I('receivables', 'receivables', ['recv'], ['customer', 'top'], ['pay', 'supplier', 'collection']),
-  I('receivables', 'receivables', ['customer', 'top'], [], ['item', 'sales', 'lapsed', 'tier'], -2),
-  I('best_customers', 'best_customers', ['customer', 'sales'], ['top'], ['lapsed'], 1),
-  I('lapsed', 'lapsed_customers', ['lapsed']),
+  I('best_customers', 'best_customers', ['customer', 'top'], ['sales'], ['recv', 'pay', 'lapsed', 'tier'], 1),
+  I('best_customers', 'best_customers', ['customer', 'sales'], ['top'], ['lapsed', 'recv'], 1),
+  I('lapsed', 'lapsed_customers', ['lapsed'], ['customer'], [], 2),
   I('payables', 'payables', ['pay'], ['supplier', 'top']),
   I('payables', 'payables', ['supplier', 'recv'], [], [], 1),
   I('payables', 'payables', ['supplier'], [], ['purchase'], -4),
-  I('purchases', 'purchases_by_supplier', ['purchase'], ['supplier', 'top']),
+  I('purchases', 'purchases_by_supplier', ['purchase'], ['supplier', 'top'], ['lapsed']),
   I('stock_low', 'stock_low', ['stock', 'low'], [], ['value']),
   I('stock_low', 'stock_low', ['low'], ['item'], ['sales', 'cash', 'expense', 'value', 'profit', 'branch', 'worst'], -4),
   I('stock_value', 'stock_value', ['stock', 'value']),
@@ -125,9 +126,9 @@ const INTENTS = [
   I('transfers', 'transfers_gap', ['transfer']),
   I('exceptions', 'exceptions_summary', ['exceptions'], ['unusual'], ['gaps']),
   I('gaps', 'number_gaps', ['gaps']),
-  I('compliance', 'compliance', ['compliance']),
+  I('compliance', 'compliance', ['compliance'], [], [], 1),
   I('attendance', 'attendance_summary', ['attendance'], ['staff']),
-  I('staff_outliers', 'staff_outliers', ['staff'], ['unusual', 'worst', 'top', 'discount', 'void'], ['attendance', 'salary', 'branch']),
+  I('staff_outliers', 'staff_outliers', ['staff'], ['unusual', 'worst', 'top', 'void'], ['attendance', 'salary', 'branch']),
   I('payroll', 'payroll', ['salary'], ['staff']),
   I('hours', 'hour_weekday', ['hour'], ['sales']),
   I('outlook', 'outlook', ['outlook'], ['sales']),
@@ -343,7 +344,7 @@ const SUGGEST = [
   ['stock', 'expiry_soon', L('কী কী মেয়াদ শেষ হচ্ছে?', 'What is expiring soon?', 'কী expire হচ্ছে?')],
   ['stock', 'unusual', L('অস্বাভাবিক কিছু আছে?', 'Anything unusual?', 'অস্বাভাবিক কিছু?')],
   ['people', 'attendance_summary', L('এই মাসে কে বেশি অনুপস্থিত?', 'Who was absent most this month?', 'কে বেশি absent?')],
-  ['people', 'staff_outliers', L('কোন স্টাফের ছাড় বেশি?', 'Which staff give the most discount?', 'কোন staff-এর ছাড় বেশি?')],
+  ['people', 'discounts', L('কোন স্টাফের ছাড় বেশি?', 'Which staff give the most discount?', 'কোন staff-এর ছাড় বেশি?')],
   ['people', 'best_customers', L('সেরা গ্রাহক কারা?', 'Who are the best customers?', 'সেরা customer কারা?')],
   ['setup', 'health', L('সেটআপে কী বাকি বা ভুল?', 'What is incomplete or wrong in the setup?', 'Setup-এ কী বাকি?')],
   ['setup', 'kb', L('নতুন শোরুম কীভাবে চালু করব?', 'How do I set up a new location?', 'নতুন showroom কীভাবে চালু?')],
@@ -351,8 +352,7 @@ const SUGGEST = [
   ['setup', 'help', L('তুমি কী পারো?', 'What can you do?', 'তুমি কী পারো?')],
 ];
 
-let LOCS_CACHE = null;
 function locName(id) { const l = ((B.ENV && B.ENV.locs) || []).find((x) => Number(x.id) === Number(id)); return l ? (lang() === 'en' ? (l.name_en || l.name_bn) : l.name_bn) : (id == null ? '' : '#' + id); }
 
-B.assistantTools = { TOOLS, COMPOSITE, INTENTS, CONCEPTS: C, SUGGEST, PRICES, presetDates, periodDates, flt, locName, today, addDays, _cache: () => LOCS_CACHE };
+B.assistantTools = { TOOLS, COMPOSITE, INTENTS, CONCEPTS: C, SUGGEST, PRICES, presetDates, periodDates, flt, locName, today, addDays };
 })();
