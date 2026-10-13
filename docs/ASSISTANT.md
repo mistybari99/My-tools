@@ -9,7 +9,7 @@ Audit that led to this design: docs/ASSISTANT_AUDIT.md.
 | `web/assistant_tools.js` | The approved tool registry (`BOS.assistantTools`): ~45 read-only tools, each = key, bn/en title, params whitelist, `needs(me)` access check, `run()` that calls ONE existing server function; the concept lexicon (Bangla / English / Banglish) and intent table; composite definitions; suggested questions; documented token prices. |
 | `web/assistant.js` | `#/assistant` page + `BOS.assistant.open(q)`. Normaliser, safety filter, entity extraction, router, tool runner (cache, timeout, honest errors), composer (templates + returned numbers only), KB search (BM25), chat UI (cards, sortable tables, inline-SVG charts, link chips, CSV export, print, "Ask why"), session memory, owner settings (usage, notes), provider adapters. |
 | `web/data/kb.json` | Generated knowledge base (screens, 150+ settings, grants, 45 forms, playbooks, doc chunks). Never hand-edited. |
-| `tools/build_kb.py` + `tools/kb_playbooks/*.md` | Generator + 17 hand-written setup playbooks (15 active, 2 waiting for their modules). |
+| `tools/build_kb.py` + `tools/kb_playbooks/*.md` | Generator + 17 hand-written setup playbooks (all 17 validated against the current code; optional-module ones are skipped while their module is absent). |
 | `supabase/phase47.sql` | rules, grants, `assistant_notes`, `assistant_usage`, `assistant_me()`, `assistant_health()`, `assistant_log()`, `assistant_usage_summary()`, `assistant_proxy_check()`, `assistant_note_save/retire()`. |
 | `tools/edge/assistant-proxy.ts` | OPTIONAL, NOT DEPLOYED Edge Function for an LLM router. |
 
@@ -32,7 +32,7 @@ Audit that led to this design: docs/ASSISTANT_AUDIT.md.
 7. **Log**: `assistant_log('local', intent, tool keys, ms, 0, 0, ok)` - no question text, no results.
 
 Composite answers (never compute a figure of their own): **financial position** (day book closing balances - only when the opening balances are set and the
-person sees every place; customer dues; supplier dues; stock value at cost - cost right; month P&L - owner; balance sheet - only if phase40 is installed), each
+person sees every place; customer dues; supplier dues; stock value at cost - cost right; month P&L - owner; balance sheet - `acct_balance_sheet`, only if phase40 is installed), each
 line verified / data needed / not available; **what changed and why** (engine-1 compare per place and item + E2 expense trend; movers table; interpretation
 limited to the numbers); **unusual** (existing detectors only: cash short, voids, wastage, over-limit discounts, price overrides, red/open exceptions, count
 variance, paper-number gaps, transfers not received; ranked by money then count); **priorities** (bad setup findings, approvals waiting > 24 h, red exceptions,

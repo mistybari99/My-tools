@@ -5,7 +5,7 @@
        cash_short_over, w1_cash_flow, stock_low, stock_balance, expiry_soon, wastage, transfers_gap, supplier_ageing, purchases_by_supplier,
        attendance_summary, exceptions_summary, k2_count_variance, g2_paper_numbers, x4_compliance, l1_pnl, l2_margin, l3_shop_pnl, t3_payroll, d5_lapsed, item_slow)
      day_book (phase23) · supplier_dues (phase10) · needs_you_oldest (phase28) · number_audit_summary (phase5) · biz_staff / biz_outlook (phase4/6)
-     assistant_health / assistant_me (phase47) · optional, only when installed: balance_sheet, income_statement, trial_balance, partner_overview, tier_usage_report, backup_status
+     assistant_health / assistant_me (phase47) · optional, only when installed: acct_balance_sheet / acct_income_statement / acct_trial_balance (phase40), partner_overview (44), tier_usage_report (43), backup_status (46)
    No tool takes SQL, a table name, a function name or a sort expression from the user or from an AI; report keys are fixed here AND whitelisted on the server.
    A tool the person may not use is hidden (needs(me)); a server refusal is reported honestly as "not available with your access". */
 (() => {
@@ -193,7 +193,8 @@ const col = (key, bn, en, type) => ({ key, label_bn: bn, label_en: en, type });
 const TOOLS = {};
 const T = (key, o) => { TOOLS[key] = Object.assign({ key, params: ['period', 'locs'], group: 'money', needs: () => true, defPeriod: 'this_month' }, o); };
 const R = (g) => (me) => (me.reports && me.reports[g]) ? true : 'access';
-const opt = (name) => (me) => ((me.optional || []).some((x) => x.name === name) ? true : 'install');
+const pickOpt = (me, names) => (me.optional || []).find((x) => [].concat(names).includes(x.name));
+const opt = (names) => (me) => (pickOpt(me, names) ? true : 'install');
 
 T('sales_summary', { title: L('বিক্রির সারসংক্ষেপ', 'Sales summary', 'Sales summary'), group: 'today', needs: R('sales'), defPeriod: 'today', report: 'sales_summary',
   head: ['net', 'bills', 'avg_bill', 'discount', 'due', 'void_amt'], run: rep1('sales_summary'), link: 'report/sales_summary' });
@@ -303,15 +304,15 @@ T('locations', { title: L('জায়গার তালিকা', 'Locations
       rows: ls.map((l) => ({ code: l.code, name: lang() === 'en' ? (l.name_en || l.name_bn) : l.name_bn, kind: l.kind || '', status: l.status || 'live' })), totals: { places: ls.length }, derived: ['places'],
       source: { kind: 'table', name: 'locations', params: {} }, asOf: new Date().toISOString(), dataNeeded: ls.length === 0 }; }, link: 'locations', head: ['places'] });
 // optional modules: listed only when installed (assistant_me().optional) and executable by this person
-const optRun = (name, key) => async (p, X) => { const m = ((X.me.optional || []).find((x) => x.name === name)) || { args: [] }; const [f, t] = periodDates(p.period); const args = {};
+const optRun = (names, key) => async (p, X) => { const m = pickOpt(X.me, names) || { name: [].concat(names)[0], args: [] }; const name = m.name; const [f, t] = periodDates(p.period); const args = {};
   (m.args || []).forEach((a) => { if (/as_?of|date$/.test(a)) args[a] = t; else if (/from/.test(a)) args[a] = f; else if (/to$/.test(a)) args[a] = t; else if (/loc/.test(a)) args[a] = p.locs && p.locs.length === 1 ? Number(p.locs[0]) : null; });
   const d = await X.call(name, args); const flat = []; const walk = (o, pre) => { if (!o || typeof o !== 'object' || flat.length > 60) return; Object.keys(o).forEach((k) => { const v = o[k]; if (typeof v === 'number' || (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v))) flat.push({ k: pre + k, v }); else if (typeof v === 'boolean') flat.push({ k: pre + k, v: String(v) }); else if (v && typeof v === 'object' && !Array.isArray(v)) walk(v, pre + k + '.'); }); };
   if (Array.isArray(d)) return { ok: true, key, columns: Object.keys(d[0] || {}).slice(0, 8).map((k) => col(k, k, k, typeof d[0][k] === 'number' ? 'num' : 'text')), rows: d.slice(0, 200), totals: null, source: { kind: 'rpc', name, params: args }, asOf: new Date().toISOString(), dataNeeded: d.length === 0 };
   walk(d, '');
   return { ok: true, key, columns: [col('k', 'কী', 'Item', 'text'), col('v', 'মান', 'Value', 'num')], rows: flat, totals: null, source: { kind: 'rpc', name, params: args }, asOf: new Date().toISOString(), dataNeeded: flat.length === 0 }; };
-T('acc_balance_sheet', { title: L('ব্যালান্স শিট', 'Balance sheet', 'Balance sheet'), needs: opt('balance_sheet'), run: optRun('balance_sheet', 'acc_balance_sheet'), link: 'accounts', nodate: true, params: ['locs'] });
-T('acc_income_statement', { title: L('আয়-ব্যয় বিবরণী', 'Income statement', 'Income statement'), needs: opt('income_statement'), run: optRun('income_statement', 'acc_income_statement'), link: 'accounts' });
-T('acc_trial_balance', { title: L('রেওয়ামিল', 'Trial balance', 'Trial balance'), needs: opt('trial_balance'), run: optRun('trial_balance', 'acc_trial_balance'), link: 'accounts' });
+T('acc_balance_sheet', { title: L('ব্যালান্স শিট', 'Balance sheet', 'Balance sheet'), needs: opt(['acct_balance_sheet', 'balance_sheet']), run: optRun(['acct_balance_sheet', 'balance_sheet'], 'acc_balance_sheet'), link: 'accounts', nodate: true, params: ['locs'] });
+T('acc_income_statement', { title: L('আয়-ব্যয় বিবরণী', 'Income statement', 'Income statement'), needs: opt(['acct_income_statement', 'income_statement']), run: optRun(['acct_income_statement', 'income_statement'], 'acc_income_statement'), link: 'accounts' });
+T('acc_trial_balance', { title: L('রেওয়ামিল', 'Trial balance', 'Trial balance'), needs: opt(['acct_trial_balance', 'trial_balance']), run: optRun(['acct_trial_balance', 'trial_balance'], 'acc_trial_balance'), link: 'accounts' });
 T('partners', { title: L('অংশীদারদের সারসংক্ষেপ', 'Partners overview', 'Partner overview'), needs: (me) => (me.is_owner ? opt('partner_overview')(me) : 'access'), run: optRun('partner_overview', 'partners'), link: 'partners', nodate: true, params: [] });
 T('tiers', { title: L('গ্রাহক টিয়ার ব্যবহার', 'Customer tier use', 'Customer tier'), needs: opt('tier_usage_report'), run: optRun('tier_usage_report', 'tiers'), link: 'customers' });
 T('backup', { title: L('ব্যাকআপের অবস্থা', 'Backup status', 'Backup status'), group: 'setup', needs: opt('backup_status'), run: optRun('backup_status', 'backup'), link: 'backup', nodate: true, params: [] });

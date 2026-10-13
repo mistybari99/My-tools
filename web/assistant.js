@@ -91,7 +91,7 @@ const lbl = (o) => (o ? (lab(o) || o.en || o.bn) : '');
 const num = (v) => (v === null || v === undefined || v === '' ? null : Number(v));
 const fmtN = (v, dec = 2) => { const n = num(v); return n === null || !Number.isFinite(n) ? '—' : n.toLocaleString('en-IN', { maximumFractionDigits: dec }); };
 const fmtV = (v, type) => { if (v === null || v === undefined || v === '') return '—';
-  if (type === 'money') return '৳' + fmtN(v); if (type === 'pct') return fmtN(v) + '%'; if (type === 'int') return fmtN(v, 0); if (type === 'num') return fmtN(v, 3);
+  if (type === 'money') { const n = num(v); return Number.isFinite(n) ? (n < 0 ? '-৳' + fmtN(-n) : '৳' + fmtN(n)) : '—'; } if (type === 'pct') return fmtN(v) + '%'; if (type === 'int') return fmtN(v, 0); if (type === 'num') return fmtN(v, 3);
   if (type === 'datetime') { try { return new Date(v).toLocaleString('en-GB', { timeZone: 'Asia/Dhaka', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) { return String(v); } }
   return String(v); };
 const MONEYK = /^(net|gross|amount|value|balance|overdue|discount|disc|due|paid|void_amt|total|cash_in|cash_out|net_cash|current|previous|change|profit|net_sales|cogs|expenses|salary|fixed|revenue|margin|short_amount|over_amount|reorder_value|no_receipt_amount|gross_pay|net_pay|adv_outstanding|amount_period|over_total|avg_bill|spend)$/;
@@ -208,7 +208,7 @@ function understand(raw) {
 }
 
 // ---------- the router ----------
-const nonTopic = new Set(['today', 'report', 'top', 'worst', 'change', 'help']);
+const nonTopic = new Set(['today', 'report', 'top', 'worst', 'help']);
 function score(has) {
   const out = [];
   for (const it of AT.INTENTS) {
@@ -607,33 +607,33 @@ function svgChart(ch) {
   if (ch.type === 'line') {
     const W = 320, Hh = 110, pad = 6, mx = Math.max(...pts.map((p) => p.v)), mn = Math.min(0, ...pts.map((p) => p.v)), sp = (mx - mn) || 1;
     const xy = pts.map((p, i) => [pad + i * (W - 2 * pad) / (pts.length - 1), Hh - pad - (p.v - mn) * (Hh - 2 * pad) / sp]);
-    return `<svg class="as-svg" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${esc(pts.map((p) => p.l + ' ' + fmtV(p.v, ch.vtype)).join(', '))}"><polyline fill="none" stroke="currentColor" stroke-width="2" points="${xy.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}"/>${xy.map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2"><title>${esc(pts[i].l + ': ' + fmtV(pts[i].v, ch.vtype))}</title></circle>`).join('')}</svg>
-      <div class="row between muted as-axis"><span>${esc(pts[0].l)}</span><span>${esc(pts[pts.length - 1].l)}</span></div>`;
+    return `<svg class="asst-svg" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="${esc(pts.map((p) => p.l + ' ' + fmtV(p.v, ch.vtype)).join(', '))}"><polyline fill="none" stroke="currentColor" stroke-width="2" points="${xy.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}"/>${xy.map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.2"><title>${esc(pts[i].l + ': ' + fmtV(pts[i].v, ch.vtype))}</title></circle>`).join('')}</svg>
+      <div class="row between muted asst-axis"><span>${esc(pts[0].l)}</span><span>${esc(pts[pts.length - 1].l)}</span></div>`;
   }
   const mx = Math.max(...pts.map((p) => Math.abs(p.v))) || 1;
-  return `<div class="as-bars" role="img" aria-label="${esc(pts.map((p) => p.l + ' ' + fmtV(p.v, ch.vtype)).join(', '))}">${pts.map((p) => `<div class="as-bar"><span class="as-bl">${esc(p.l)}</span><span class="as-bt"><i style="width:${Math.max(2, Math.round(100 * Math.abs(p.v) / mx))}%" class="${p.v < 0 ? 'neg' : ''}"></i></span><span class="as-bv">${esc(fmtV(p.v, ch.vtype))}</span></div>`).join('')}</div>`;
+  return `<div class="asst-bars" role="img" aria-label="${esc(pts.map((p) => p.l + ' ' + fmtV(p.v, ch.vtype)).join(', '))}">${pts.map((p) => `<div class="asst-bar"><span class="asst-bl">${esc(p.l)}</span><span class="asst-bt"><i style="width:${Math.max(2, Math.round(100 * Math.abs(p.v) / mx))}%" class="${p.v < 0 ? 'neg' : ''}"></i></span><span class="asst-bv">${esc(fmtV(p.v, ch.vtype))}</span></div>`).join('')}</div>`;
 }
 function tableHtml(tb, id) {
   const cols = tb.columns; const hl = (c) => (isEn() ? (c.label_en || c.label_bn) : (c.label_bn || c.label_en));
-  return `<div class="as-tw"><table class="as-t" data-tid="${id}"><thead><tr>${cols.map((c, i) => `<th><button type="button" data-act="as_sort" data-t="${id}" data-c="${i}" aria-label="${esc(hl(c))}">${esc(hl(c))}</button></th>`).join('')}</tr></thead><tbody>${tb.rows.map((r) => `<tr>${cols.map((c) => `<td class="${['money', 'int', 'num', 'pct'].includes(c.type) ? 'n' : ''}">${esc(fmtV(r[c.key], r._type && c.key === 'amount' ? r._type : c.type))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return `<div class="asst-tw"><table class="asst-t" data-tid="${id}"><thead><tr>${cols.map((c, i) => `<th><button type="button" data-act="asst_sort" data-t="${id}" data-c="${i}" aria-label="${esc(hl(c))}">${esc(hl(c))}</button></th>`).join('')}</tr></thead><tbody>${tb.rows.map((r) => `<tr>${cols.map((c) => `<td class="${['money', 'int', 'num', 'pct'].includes(c.type) ? 'n' : ''}">${esc(fmtV(r[c.key], r._type && c.key === 'amount' ? r._type : c.type))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 let CID = 0; const CARDS = {};
 function cardHtml(c) {
   const id = 'c' + (++CID); CARDS[id] = c;
   const st = c.status === 'verified' ? T('verified') : c.status === 'partial' ? T('partial') : c.status === 'data_needed' ? T('dataNeeded') : c.status === 'clarify' ? '' : c.status === 'refused' ? '' : T('na');
-  const opts = c.options ? `<div class="row wrap as-chips">${c.options.map((o) => `<button type="button" class="as-chip" data-act="as_pick" data-v="${esc(o.tool)}">${esc(o.label)}</button>`).join('')}</div>` : '';
-  const blocks = (c.blocks || []).map(([h, list]) => list.length ? `<div class="as-sub"><b>${esc(h)}</b><div class="muted">${list.map(esc).join(' · ')}</div></div>` : '').join('');
-  const steps = c.steps ? `<ol class="as-steps">${c.steps.map((s) => `<li><a href="#/${esc(s.route)}">${esc(s.text)}</a> <span class="chip ${s.s === 'done' ? 'ok' : s.s === 'todo' ? 'warn' : ''}">${esc(s.s === 'done' ? T('stepDone') : s.s === 'todo' ? T('stepTodo') : s.s === 'unknown' ? T('stepUnknown') : s.s === 'info' ? 'ⓘ' : T('stepCheck'))}</span>${s.now ? `<div class="muted as-small">${esc(s.now)}</div>` : ''}</li>`).join('')}</ol>` : '';
-  const hits = c.kbHits ? c.kbHits.map((h) => `<div class="as-sub"><b>${esc(h.title)}</b> <span class="muted as-small">${esc(h.kind)}</span><div class="muted as-small">${esc(h.text)}</div></div>`).join('') : '';
-  const interp = c.interp && c.interp.length ? `<div class="as-sub"><b>${esc(T('interp'))}</b><ul>${c.interp.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
-  const links = (c.links || []).length ? `<div class="row wrap as-chips">${c.links.map((l) => `<a class="as-chip" href="#/${esc(l.route)}">${esc(T('open'))}: ${esc(l.label)}</a>`).join('')}</div>` : '';
-  const btns = c.table || c.steps ? `<div class="row wrap as-acts">${c.table ? `<button type="button" data-act="as_csv" data-v="${id}">${esc(T('exportB'))}</button>` : ''}<button type="button" data-act="as_print" data-v="${id}">${esc(T('printB'))}</button>${c.tools && c.tools.length && !c.steps ? `<button type="button" data-act="as_why" data-v="${id}">${esc(T('whyB'))}</button>` : ''}</div>` : '';
-  const foot = c.status === 'refused' || c.status === 'clarify' ? '' : `<div class="muted as-foot">${st ? `<span class="chip ${chipCls(c.status)}">${esc(st)}</span> ` : ''}${c.source && c.source.name ? esc(T('src')) + ': ' + esc(c.source.name) + ' · ' : ''}${c.period ? esc(T('period')) + ': ' + esc(c.period) + ' · ' : ''}${c.cmp ? esc(T('cmpPeriod')) + ': ' + esc(c.cmp) + ' · ' : ''}${c.loc ? esc(c.loc) + ' · ' : ''}${c.kbVer ? esc(T('kbVer')) + ': ' + esc(c.kbVer) + ' · ' : ''}${esc(T('asof'))}: ${esc(new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Dhaka', hour: '2-digit', minute: '2-digit' }))}${c.ms !== undefined ? ' · ' + c.ms + ' ms' : ''}</div>`;
-  return `<div class="card as-card as-print-target" id="${id}" data-status="${esc(c.status || '')}" data-refused="${esc(c.refused || '')}"><b class="as-h">${esc(c.title || '')}</b>${c.summary ? `<p class="as-sum">${esc(c.summary)}</p>` : ''}${opts}${blocks}${steps}${hits}
-    ${c.chart ? svgChart(c.chart) : ''}${c.table ? tableHtml(c.table, id) : ''}${interp}${(c.notes || []).length ? `<ul class="muted as-notes">${c.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}${links}${btns}${foot}</div>`;
+  const opts = c.options ? `<div class="row wrap asst-chips">${c.options.map((o) => `<button type="button" class="asst-chip" data-act="asst_pick" data-v="${esc(o.tool)}">${esc(o.label)}</button>`).join('')}</div>` : '';
+  const blocks = (c.blocks || []).map(([h, list]) => list.length ? `<div class="asst-sub"><b>${esc(h)}</b><div class="muted">${list.map(esc).join(' · ')}</div></div>` : '').join('');
+  const steps = c.steps ? `<ol class="asst-steps">${c.steps.map((s) => `<li><a href="#/${esc(s.route)}">${esc(s.text)}</a> <span class="chip ${s.s === 'done' ? 'ok' : s.s === 'todo' ? 'warn' : ''}">${esc(s.s === 'done' ? T('stepDone') : s.s === 'todo' ? T('stepTodo') : s.s === 'unknown' ? T('stepUnknown') : s.s === 'info' ? 'ⓘ' : T('stepCheck'))}</span>${s.now ? `<div class="muted asst-small">${esc(s.now)}</div>` : ''}</li>`).join('')}</ol>` : '';
+  const hits = c.kbHits ? c.kbHits.map((h) => `<div class="asst-sub"><b>${esc(h.title)}</b> <span class="muted asst-small">${esc(h.kind)}</span><div class="muted asst-small">${esc(h.text)}</div></div>`).join('') : '';
+  const interp = c.interp && c.interp.length ? `<div class="asst-sub"><b>${esc(T('interp'))}</b><ul>${c.interp.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '';
+  const links = (c.links || []).length ? `<div class="row wrap asst-chips">${c.links.map((l) => `<a class="asst-chip" href="#/${esc(l.route)}">${esc(T('open'))}: ${esc(l.label)}</a>`).join('')}</div>` : '';
+  const btns = c.table || c.steps ? `<div class="row wrap asst-acts">${c.table ? `<button type="button" data-act="asst_csv" data-v="${id}">${esc(T('exportB'))}</button>` : ''}<button type="button" data-act="asst_print" data-v="${id}">${esc(T('printB'))}</button>${c.tools && c.tools.length && !c.steps ? `<button type="button" data-act="asst_why" data-v="${id}">${esc(T('whyB'))}</button>` : ''}</div>` : '';
+  const foot = c.status === 'refused' || c.status === 'clarify' ? '' : `<div class="muted asst-foot">${st ? `<span class="chip ${chipCls(c.status)}">${esc(st)}</span> ` : ''}${c.source && c.source.name ? esc(T('src')) + ': ' + esc(c.source.name) + ' · ' : ''}${c.period ? esc(T('period')) + ': ' + esc(c.period) + ' · ' : ''}${c.cmp ? esc(T('cmpPeriod')) + ': ' + esc(c.cmp) + ' · ' : ''}${c.loc ? esc(c.loc) + ' · ' : ''}${c.kbVer ? esc(T('kbVer')) + ': ' + esc(c.kbVer) + ' · ' : ''}${esc(T('asof'))}: ${esc(new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Dhaka', hour: '2-digit', minute: '2-digit' }))}${c.ms !== undefined ? ' · ' + c.ms + ' ms' : ''}</div>`;
+  return `<div class="card asst-card asst-print-target" id="${id}" data-status="${esc(c.status || '')}" data-refused="${esc(c.refused || '')}"><b class="asst-h">${esc(c.title || '')}</b>${c.summary ? `<p class="asst-sum">${esc(c.summary)}</p>` : ''}${opts}${blocks}${steps}${hits}
+    ${c.chart ? svgChart(c.chart) : ''}${c.table ? tableHtml(c.table, id) : ''}${interp}${(c.notes || []).length ? `<ul class="muted asst-notes">${c.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}${links}${btns}${foot}</div>`;
 }
-function addUser(text) { const log = $('#as_log'); if (!log) return; log.insertAdjacentHTML('beforeend', `<div class="as-me"><span>${esc(text)}</span></div>`); log.scrollTop = log.scrollHeight; }
-function addCard(c) { const log = $('#as_log'); if (log) { log.insertAdjacentHTML('beforeend', cardHtml(c)); const el = log.lastElementChild; if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); } return c; }
+function addUser(text) { const log = $('#asst_log'); if (!log) return; log.insertAdjacentHTML('beforeend', `<div class="asst-me"><span>${esc(text)}</span></div>`); log.scrollTop = log.scrollHeight; }
+function addCard(c) { const log = $('#asst_log'); if (log) { log.insertAdjacentHTML('beforeend', cardHtml(c)); const el = log.lastElementChild; if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); } return c; }
 
 // ---------- export / print ----------
 function csvOf(c) { const cols = c.table.columns; const q = (v) => { const s = v === null || v === undefined ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
@@ -646,79 +646,79 @@ async function exportCard(c) {
   if (c.source && c.source.kind === 'report') { try { await sb.rpc('log_report_export2', { p_key: c.source.name, p_kind: 'csv_assistant', p_filters: (c.source.params && c.source.params.p_filters) || {}, p_rows: (c.table.all || []).length }); } catch (e) { /* audit is best effort */ } }
 }
 const exportLast = () => exportCard(ST8.last);
-function printCard(id) { document.body.classList.add('as-printing'); const el = id && document.getElementById(id); if (el) el.classList.add('as-print-on'); try { window.print(); } finally { setTimeout(() => { document.body.classList.remove('as-printing'); if (el) el.classList.remove('as-print-on'); }, 300); } }
-const printLast = () => { const cs = document.querySelectorAll('.as-card'); printCard(cs.length ? cs[cs.length - 1].id : null); };
+function printCard(id) { document.body.classList.add('asst-printing'); const el = id && document.getElementById(id); if (el) el.classList.add('asst-print-on'); try { window.print(); } finally { setTimeout(() => { document.body.classList.remove('asst-printing'); if (el) el.classList.remove('asst-print-on'); }, 300); } }
+const printLast = () => { const cs = document.querySelectorAll('.asst-card'); printCard(cs.length ? cs[cs.length - 1].id : null); };
 
 // ---------- page ----------
-const CSS = `.as-log{display:flex;flex-direction:column;gap:6px;min-height:120px}.as-me{align-self:flex-end;max-width:85%;background:var(--ruby-grad,#7a1f2b);color:#fff4df;border-radius:14px 14px 2px 14px;padding:8px 12px;font-size:.95rem;overflow-wrap:anywhere}
-.as-card{overflow:hidden;font-size:.9rem}.as-h{display:block;margin-bottom:4px}.as-sum{margin:4px 0 8px;overflow-wrap:anywhere}.as-chips{gap:6px;margin:6px 0}.as-chip{display:inline-flex;align-items:center;min-height:40px;padding:4px 12px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:inherit;text-decoration:none;font-size:.85rem;max-width:100%;overflow-wrap:anywhere}
-.as-tw{max-width:100%;overflow-x:auto;margin:6px 0}.as-t{border-collapse:collapse;width:100%;font-size:.8rem}.as-t th,.as-t td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}.as-t td.n{text-align:right;white-space:nowrap}.as-t th button{all:unset;cursor:pointer;font-weight:700;min-height:32px}
-.as-bars{display:flex;flex-direction:column;gap:3px;margin:6px 0}.as-bar{display:grid;grid-template-columns:minmax(0,38%) 1fr auto;gap:6px;align-items:center;font-size:.78rem}.as-bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.as-bt{background:var(--line);border-radius:4px;height:10px;overflow:hidden}.as-bt i{display:block;height:100%;background:var(--gold,#c9a227)}.as-bt i.neg{background:var(--bad,#b00)}.as-bv{white-space:nowrap}
-.as-svg{width:100%;height:auto;color:var(--gold,#c9a227);margin-top:6px}.as-axis{font-size:.72rem}.as-foot{font-size:.75rem;margin-top:8px;overflow-wrap:anywhere}.as-notes{font-size:.78rem;margin:6px 0;padding-left:18px}.as-sub{margin:6px 0}.as-small{font-size:.78rem}.as-steps{padding-left:20px;margin:6px 0}.as-steps li{margin:6px 0}
-.as-acts{gap:6px;margin-top:6px}.as-acts button{min-height:40px}.as-in{position:sticky;bottom:0;z-index:8;background:var(--bg,#fff);padding:8px 0;display:flex;gap:6px}body.has-bnav .as-in{bottom:calc(60px + env(safe-area-inset-bottom))}.as-in input{flex:1;min-width:0;min-height:44px}.as-in button{min-height:44px;min-width:44px}
-.as-grp{margin:4px 0}.as-grp b{font-size:.8rem}.as-alert{display:flex;gap:6px;flex-wrap:wrap}
-@media print{body.as-printing *{visibility:hidden}body.as-printing .as-print-on,body.as-printing .as-print-on *{visibility:visible}body.as-printing .as-print-on{position:absolute;left:0;top:0;width:100%}}`;
-function css() { if (!document.getElementById('as_css')) { const s = document.createElement('style'); s.id = 'as_css'; s.textContent = CSS; document.head.appendChild(s); } }
+const CSS = `.asst-log{display:flex;flex-direction:column;gap:6px;min-height:120px}.asst-me{align-self:flex-end;max-width:85%;background:var(--ruby-grad,#7a1f2b);color:#fff4df;border-radius:14px 14px 2px 14px;padding:8px 12px;font-size:.95rem;overflow-wrap:anywhere}
+.asst-card{overflow:hidden;font-size:.9rem}.asst-h{display:block;margin-bottom:4px}.asst-sum{margin:4px 0 8px;overflow-wrap:anywhere}.asst-chips{gap:6px;margin:6px 0}.asst-chip{display:inline-flex;align-items:center;min-height:40px;padding:4px 12px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:inherit;text-decoration:none;font-size:.85rem;max-width:100%;overflow-wrap:anywhere}
+.asst-tw{max-width:100%;overflow-x:auto;margin:6px 0}.asst-t{border-collapse:collapse;width:100%;font-size:.8rem}.asst-t th,.asst-t td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}.asst-t td.n{text-align:right;white-space:nowrap}.asst-card .asst-t th>button{all:unset!important;cursor:pointer!important;font-weight:700!important;font-size:.8rem!important;min-height:32px!important;display:inline-flex!important;align-items:center!important;color:inherit!important}
+.asst-bars{display:flex;flex-direction:column;gap:3px;margin:6px 0}.asst-bar{display:grid;grid-template-columns:minmax(0,38%) 1fr auto;gap:6px;align-items:center;font-size:.78rem}.asst-bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.asst-bt{background:var(--line);border-radius:4px;height:10px;overflow:hidden}.asst-bt i{display:block;height:100%;background:var(--gold,#c9a227)}.asst-bt i.neg{background:var(--bad,#b00)}.asst-bv{white-space:nowrap}
+.asst-svg{width:100%;height:auto;color:var(--gold,#c9a227);margin-top:6px}.asst-axis{font-size:.72rem}.asst-foot{font-size:.75rem;margin-top:8px;overflow-wrap:anywhere}.asst-notes{font-size:.78rem;margin:6px 0;padding-left:18px}.asst-sub{margin:6px 0}.asst-small{font-size:.78rem}.asst-steps{padding-left:20px;margin:6px 0}.asst-steps li{margin:6px 0}
+.asst-acts{gap:6px;margin-top:6px}.asst-acts button{min-height:40px}.asst-in{position:sticky;bottom:0;z-index:8;background:var(--bg,#fff);padding:8px 0;display:flex;gap:6px}body.has-bnav .asst-in{bottom:calc(60px + env(safe-area-inset-bottom))}.asst-in input{flex:1;min-width:0;min-height:44px}.asst-in button{min-height:44px;min-width:44px}
+.asst-grp{margin:4px 0}.asst-grp b{font-size:.8rem}.asst-alert{display:flex;gap:6px;flex-wrap:wrap}
+@media print{body.asst-printing *{visibility:hidden}body.asst-printing .asst-print-on,body.asst-printing .asst-print-on *{visibility:visible}body.asst-printing .asst-print-on{position:absolute;left:0;top:0;width:100%}}`;
+function css() { if (!document.getElementById('asst_css')) { const s = document.createElement('style'); s.id = 'asst_css'; s.textContent = CSS; document.head.appendChild(s); } }
 function chipsHtml(me) {
   const ok = (k) => { if (k === 'kb') return true; if (AT.COMPOSITE[k]) return k === 'help' || k === 'notes' || AT.COMPOSITE[k].parts.some((x) => AT.TOOLS[x] && AT.TOOLS[x].needs(me) === true); return AT.TOOLS[k] && AT.TOOLS[k].needs(me) === true; };
   const groups = ['today', 'money', 'stock', 'people', 'setup'];
-  return groups.map((g) => { const qs = AT.SUGGEST.filter((s) => s[0] === g && ok(s[1])); return qs.length ? `<div class="as-grp"><b>${esc(T('g_' + g))}</b><div class="row wrap as-chips">${qs.map((s) => `<button type="button" class="as-chip" data-act="as_ask" data-q="${esc(lbl(s[2]))}">${esc(lbl(s[2]))}</button>`).join('')}</div></div>` : ''; }).join('');
+  return groups.map((g) => { const qs = AT.SUGGEST.filter((s) => s[0] === g && ok(s[1])); return qs.length ? `<div class="asst-grp"><b>${esc(T('g_' + g))}</b><div class="row wrap asst-chips">${qs.map((s) => `<button type="button" class="asst-chip" data-act="asst_ask" data-q="${esc(lbl(s[2]))}">${esc(lbl(s[2]))}</button>`).join('')}</div></div>` : ''; }).join('');
 }
 async function alerts(me) {
-  const box = $('#as_alerts'); if (!box) return; const parts = [];
-  try { const n = await runTool('needs_you', {}, me); if (n.ok) parts.push(`<button type="button" class="as-chip" data-act="as_ask" data-q="${esc(lbl(AT.SUGGEST[1][2]))}">${esc(T('waiting'))}: ${fmtN(n.rows.length, 0)}</button>`); } catch (e) { /* optional */ }
-  if (me.health) { try { const h = await runTool('health', {}, me); if (h.ok) { HEALTH = h.findings; const bad = h.findings.filter((x) => x.severity !== 'info').length; parts.push(`<button type="button" class="as-chip" data-act="as_tool" data-v="health">${esc(T('setupIssues'))}: ${fmtN(bad, 0)}</button>`); } } catch (e) { /* optional */ } }
+  const box = $('#asst_alerts'); if (!box) return; const parts = [];
+  try { const n = await runTool('needs_you', {}, me); if (n.ok) parts.push(`<button type="button" class="asst-chip" data-act="asst_ask" data-q="${esc(lbl(AT.SUGGEST[1][2]))}">${esc(T('waiting'))}: ${fmtN(n.rows.length, 0)}</button>`); } catch (e) { /* optional */ }
+  if (me.health) { try { const h = await runTool('health', {}, me); if (h.ok) { HEALTH = h.findings; const bad = h.findings.filter((x) => x.severity !== 'info').length; parts.push(`<button type="button" class="asst-chip" data-act="asst_tool" data-v="health">${esc(T('setupIssues'))}: ${fmtN(bad, 0)}</button>`); } } catch (e) { /* optional */ } }
   box.innerHTML = parts.length ? `<b>${esc(T('alerts'))}</b> ${parts.join('')}` : '';
 }
 async function ownerPanel(me) {
-  const box = $('#as_owner'); if (!box || !me.is_owner) return;
+  const box = $('#asst_owner'); if (!box || !me.is_owner) return;
   let u = null; try { const r = await sb.rpc('assistant_usage_summary', {}); u = r.error ? null : r.data; } catch (e) { u = null; }
   const est = u ? Object.entries(AT.PRICES).map(([m, p]) => m + ': $' + ((Number(u.tokens_in || 0) * p.in + Number(u.tokens_out || 0) * p.out) / 1e6).toFixed(4)).join(' · ') : '—';
   let notes = []; try { const r = await sb.from('assistant_notes').select('*').order('id'); notes = r.data || []; } catch (e) { notes = []; }
   box.innerHTML = `<details data-ctl="off" class="card"><summary><b>${esc(T('settings'))}</b></summary>
     <p class="muted">${esc(me.provider === 'llm_proxy' ? T('engineProxy') : T('engine'))}. ${esc(T('proxyOff'))}</p>
     <p>${esc(T('usage'))}: ${u ? `${fmtN(u.questions, 0)} ${esc(T('questions'))} · ${fmtN(u.avg_ms, 0)} ms · ${esc(T('tokens'))} ${fmtN(u.tokens_in, 0)} / ${fmtN(u.tokens_out, 0)} · ${esc(T('budget'))}: ${u.budget === null || u.budget === undefined ? esc(T('dataNeeded')) : fmtN(u.budget, 0)}` : '—'}</p>
-    <p class="muted as-small">${esc(T('estCost'))}: ${esc(est)}</p>
-    <b>${esc(T('notesT'))}</b>${notes.length ? notes.map((n) => `<div class="row between as-sub"><span>${esc(n.status === 'retired' ? '✕ ' : '')}<b>${esc(n.title)}</b> <span class="muted as-small">${esc(lab(X['k_' + n.kind] || L(n.kind, n.kind)))}</span><div class="muted as-small">${esc(redact(n.body_bn || n.body_en || ''))}</div></span>${n.status === 'approved' ? `<button type="button" data-act="as_nretire" data-v="${esc(n.id)}">${esc(T('retire'))}</button>` : ''}</div>`).join('') : `<p class="muted">${esc(T('noNotes'))}</p>`}
-    <div class="stack"><label for="as_nkind" class="muted as-small">${esc(T('addNote'))}</label><select id="as_nkind">${['rule', 'procedure', 'fact'].map((k) => `<option value="${k}">${esc(T('k_' + k))}</option>`).join('')}</select>
-    <input id="as_ntitle" placeholder="${esc(T('nTitle'))}" aria-label="${esc(T('nTitle'))}" autocomplete="off" maxlength="120"><textarea id="as_nbn" rows="2" placeholder="${esc(T('nBn'))}" aria-label="${esc(T('nBn'))}" maxlength="2000"></textarea><textarea id="as_nen" rows="2" placeholder="${esc(T('nEn'))}" aria-label="${esc(T('nEn'))}" maxlength="2000"></textarea>
-    <button type="button" class="primary" data-act="as_nsave">${esc(T('save'))}</button></div></details>`;
+    <p class="muted asst-small">${esc(T('estCost'))}: ${esc(est)}</p>
+    <b>${esc(T('notesT'))}</b>${notes.length ? notes.map((n) => `<div class="row between asst-sub"><span>${esc(n.status === 'retired' ? '✕ ' : '')}<b>${esc(n.title)}</b> <span class="muted asst-small">${esc(lab(X['k_' + n.kind] || L(n.kind, n.kind)))}</span><div class="muted asst-small">${esc(redact(n.body_bn || n.body_en || ''))}</div></span>${n.status === 'approved' ? `<button type="button" data-act="asst_nretire" data-v="${esc(n.id)}">${esc(T('retire'))}</button>` : ''}</div>`).join('') : `<p class="muted">${esc(T('noNotes'))}</p>`}
+    <div class="stack"><label for="asst_nkind" class="muted asst-small">${esc(T('addNote'))}</label><select id="asst_nkind">${['rule', 'procedure', 'fact'].map((k) => `<option value="${k}">${esc(T('k_' + k))}</option>`).join('')}</select>
+    <input id="asst_ntitle" placeholder="${esc(T('nTitle'))}" aria-label="${esc(T('nTitle'))}" autocomplete="off" maxlength="120"><textarea id="asst_nbn" rows="2" placeholder="${esc(T('nBn'))}" aria-label="${esc(T('nBn'))}" maxlength="2000"></textarea><textarea id="asst_nen" rows="2" placeholder="${esc(T('nEn'))}" aria-label="${esc(T('nEn'))}" maxlength="2000"></textarea>
+    <button type="button" class="primary" data-act="asst_nsave">${esc(T('save'))}</button></div></details>`;
 }
 const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(X).filter((x) => x.startsWith('e_')).find((x) => m.includes(x.slice(2))); return k ? T(k) : (/not allowed/.test(m) ? T('na') : m); };
 let PENDING = null;
 async function view() {
-  css(); shell(T('title'), `<div id="as_body"><p class="muted">…</p></div>`, true);
+  css(); shell(T('title'), `<div id="asst_body"><p class="muted">…</p></div>`, true);
   if (B.loadStatic) { try { await B.loadStatic(); } catch (e) { /* offline: KB questions still work */ } }
   ME = null; HEALTH = null; const me = await loadMe(); loadState();
-  const body = $('#as_body'); if (!body) return;
+  const body = $('#asst_body'); if (!body) return;
   if (!me.allowed) { body.innerHTML = `<div class="card"><p>${esc(me.reason === 'assistant_off' ? T('off') : me.reason === 'offline' ? T('offline') : T('noRight'))}</p></div>`; return; }
   const voice = me.voice_on && (window.SpeechRecognition || window.webkitSpeechRecognition);
-  body.innerHTML = `<div id="as_alerts" class="as-alert"></div><div class="card muted as-small">${esc(T('hello'))}</div>
-    ${ST8.hist.length ? `<details data-ctl="off"><summary class="muted">${esc(T('earlier'))} (${ST8.hist.length})</summary>${ST8.hist.map((h) => `<div class="as-me"><span>${esc(h.q)}</span></div><div class="card as-small"><b>${esc(h.title)}</b><div>${esc(h.summary)}</div></div>`).join('')}</details>` : ''}
-    <div id="as_chips">${chipsHtml(me)}</div><div id="as_log" class="as-log" aria-live="polite"></div>
-    <div class="as-in"><input id="as_q" type="text" enterkeyhint="send" autocomplete="off" maxlength="500" placeholder="${esc(T('ph'))}" aria-label="${esc(T('ph'))}">${voice ? `<button type="button" data-act="as_mic" aria-label="${esc(T('mic'))}">🎤</button>` : ''}<button type="button" class="primary" data-act="as_send">${esc(T('send'))}</button></div>
-    <div id="as_owner"></div><p class="muted as-small" id="as_ver">${esc(me.provider === 'llm_proxy' ? T('engineProxy') : T('engine'))}</p>`;
+  body.innerHTML = `<div id="asst_alerts" class="asst-alert"></div><div class="card muted asst-small">${esc(T('hello'))}</div>
+    ${ST8.hist.length ? `<details data-ctl="off"><summary class="muted">${esc(T('earlier'))} (${ST8.hist.length})</summary>${ST8.hist.map((h) => `<div class="asst-me"><span>${esc(h.q)}</span></div><div class="card asst-small"><b>${esc(h.title)}</b><div>${esc(h.summary)}</div></div>`).join('')}</details>` : ''}
+    <div id="asst_chips">${chipsHtml(me)}</div><div id="asst_log" class="asst-log" aria-live="polite"></div>
+    <div class="asst-in"><input id="asst_q" type="text" enterkeyhint="send" autocomplete="off" maxlength="500" placeholder="${esc(T('ph'))}" aria-label="${esc(T('ph'))}">${voice ? `<button type="button" data-act="asst_mic" aria-label="${esc(T('mic'))}">🎤</button>` : ''}<button type="button" class="primary" data-act="asst_send">${esc(T('send'))}</button></div>
+    <div id="asst_owner"></div><p class="muted asst-small" id="asst_ver">${esc(me.provider === 'llm_proxy' ? T('engineProxy') : T('engine'))}</p>`;
   alerts(me); ownerPanel(me);
-  loadKB().then((k) => { const v = $('#as_ver'); if (v && k && k.version) v.textContent += ' · ' + T('kbVer') + ': ' + k.version; });
+  loadKB().then((k) => { const v = $('#asst_ver'); if (v && k && k.version) v.textContent += ' · ' + T('kbVer') + ': ' + k.version; });
   if (PENDING) { const q = PENDING; PENDING = null; await ask(q); }
 }
 Object.assign(H, {
-  as_send: async () => { const i = $('#as_q'); if (!i) return; const q = i.value.trim(); if (!q) return; i.value = ''; await ask(q); },
-  as_ask: async (a) => { await ask(a.dataset.q || ''); },
-  as_tool: async (a) => { const k = a.dataset.v; const t = AT.TOOLS[k] || AT.COMPOSITE[k]; await ask(t ? lbl(t.title) : k, { tool: k }); },
-  as_pick: async (a) => { const k = a.dataset.v; const t = AT.TOOLS[k] || AT.COMPOSITE[k]; await ask(t ? lbl(t.title) : k, { tool: k }); },
-  as_why: async () => { await ask(isEn() ? 'why?' : 'কেন?'); },
-  as_csv: async (a) => { await exportCard(CARDS[a.dataset.v]); },
-  as_print: (a) => printCard(a.dataset.v),
-  as_sort: (a) => { const c = CARDS[a.dataset.t]; if (!c || !c.table) return; const col = c.table.columns[Number(a.dataset.c)]; const dir = c._sortK === col.key && c._sortD === 1 ? -1 : 1; c._sortK = col.key; c._sortD = dir;
+  asst_send: async () => { const i = $('#asst_q'); if (!i) return; const q = i.value.trim(); if (!q) return; i.value = ''; await ask(q); },
+  asst_ask: async (a) => { await ask(a.dataset.q || ''); },
+  asst_tool: async (a) => { const k = a.dataset.v; const t = AT.TOOLS[k] || AT.COMPOSITE[k]; await ask(t ? lbl(t.title) : k, { tool: k }); },
+  asst_pick: async (a) => { const k = a.dataset.v; const t = AT.TOOLS[k] || AT.COMPOSITE[k]; await ask(t ? lbl(t.title) : k, { tool: k }); },
+  asst_why: async () => { await ask(isEn() ? 'why?' : 'কেন?'); },
+  asst_csv: async (a) => { await exportCard(CARDS[a.dataset.v]); },
+  asst_print: (a) => printCard(a.dataset.v),
+  asst_sort: (a) => { const c = CARDS[a.dataset.t]; if (!c || !c.table) return; const col = c.table.columns[Number(a.dataset.c)]; const dir = c._sortK === col.key && c._sortD === 1 ? -1 : 1; c._sortK = col.key; c._sortD = dir;
     const isN = ['money', 'int', 'num', 'pct'].includes(col.type); c.table.rows = c.table.rows.slice().sort((x, y) => { const p = x[col.key], q = y[col.key]; return dir * (isN ? (num(p) || 0) - (num(q) || 0) : String(p || '').localeCompare(String(q || ''))); });
-    const el = document.getElementById(a.dataset.t); const tw = el && el.querySelector('.as-tw'); if (tw) tw.outerHTML = tableHtml(c.table, a.dataset.t); },
-  as_mic: () => { const R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) return; const r = new R(); r.lang = LG() === 'en' ? 'en-US' : 'bn-BD'; r.onresult = (e) => { const i = $('#as_q'); if (i) i.value = e.results[0][0].transcript; }; r.start(); },
-  as_nsave: async () => { const r = await sb.rpc('assistant_note_save', { p_id: null, p_client: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())), p_kind: $('#as_nkind').value, p_title: $('#as_ntitle').value, p_body_bn: $('#as_nbn').value, p_body_en: $('#as_nen').value });
+    const el = document.getElementById(a.dataset.t); const tw = el && el.querySelector('.asst-tw'); if (tw) tw.outerHTML = tableHtml(c.table, a.dataset.t); },
+  asst_mic: () => { const R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) return; const r = new R(); r.lang = LG() === 'en' ? 'en-US' : 'bn-BD'; r.onresult = (e) => { const i = $('#asst_q'); if (i) i.value = e.results[0][0].transcript; }; r.start(); },
+  asst_nsave: async () => { const r = await sb.rpc('assistant_note_save', { p_id: null, p_client: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())), p_kind: $('#asst_nkind').value, p_title: $('#asst_ntitle').value, p_body_bn: $('#asst_nbn').value, p_body_en: $('#asst_nen').value });
     if (r.error) return A.toast(eText(r.error)); A.toast(T('saved')); KB.data = null; KB.loading = null; await ownerPanel(ME); },
-  as_nretire: async (a) => { const why = window.prompt(T('e_reason_required')); if (!why) return; const r = await sb.rpc('assistant_note_retire', { p_id: Number(a.dataset.v), p_reason: why }); if (r.error) return A.toast(eText(r.error)); KB.data = null; KB.loading = null; await ownerPanel(ME); },
+  asst_nretire: async (a) => { const why = window.prompt(T('e_reason_required')); if (!why) return; const r = await sb.rpc('assistant_note_retire', { p_id: Number(a.dataset.v), p_reason: why }); if (r.error) return A.toast(eText(r.error)); KB.data = null; KB.loading = null; await ownerPanel(ME); },
 });
-document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target && e.target.id === 'as_q') { e.preventDefault(); H.as_send(); } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target && e.target.id === 'asst_q') { e.preventDefault(); H.asst_send(); } });
 window.addEventListener('online', () => { CACHE.clear(); });
 function open(q) { if (q) PENDING = String(q); if ((location.hash.replace(/^#\/?/, '') || '').split('/')[0] === 'assistant') { if (PENDING) { const x = PENDING; PENDING = null; ask(x); } } else location.hash = '#/assistant'; }
 

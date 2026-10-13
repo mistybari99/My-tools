@@ -100,8 +100,8 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
     await p.goto(`http://localhost:${PORT}/#/assistant`); await p.waitForTimeout(1400); return p;
   }
   const wait = (p, n = 350) => p.waitForTimeout(n);
-  const ask = async (p, q) => { await p.fill('#as_q', q); await p.click('[data-act=as_send]'); await wait(p, 450); return p.evaluate(() => { const c = document.querySelectorAll('.as-card'); return c.length ? c[c.length - 1].innerText : ''; }); };
-  const lastCard = (p) => p.evaluate(() => { const c = document.querySelectorAll('.as-card'); const el = c[c.length - 1]; return el ? { text: el.innerText, status: el.dataset.status, refused: el.dataset.refused } : {}; });
+  const ask = async (p, q) => { await p.fill('#asst_q', q); await p.click('[data-act=asst_send]'); await wait(p, 450); return p.evaluate(() => { const c = document.querySelectorAll('.asst-card'); return c.length ? c[c.length - 1].innerText : ''; }); };
+  const lastCard = (p) => p.evaluate(() => { const c = document.querySelectorAll('.asst-card'); const el = c[c.length - 1]; return el ? { text: el.innerText, status: el.dataset.status, refused: el.dataset.refused } : {}; });
   const calls = (p, fn) => p.evaluate((f) => (window.__ASC || []).filter((c) => c[0] === f).map((c) => c[1]), fn);
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow ' + m);
   const nums = (s) => (String(s).match(/-?\d[\d,]*(\.\d+)?/g) || []).map((x) => Number(x.replace(/,/g, '')));
@@ -138,7 +138,7 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
   let txt = await ask(p, 'How are sales today?');
   ok(/৳12,345\.5/.test(txt) && /Bills: 37/.test(txt) && /৳333\.66/.test(txt) && /৳150/.test(txt) && /৳220/.test(txt), 'sales summary shows the exact server totals: ' + txt.slice(0, 300));
   const allowed = new Set([12345.5, 37, 333.66, 150, 0, 220, 2026, 10, 13, 1, 2, 9000, 3345.5]);
-  const sum = await p.evaluate(() => { const c = document.querySelectorAll('.as-card'); return c[c.length - 1].querySelector('.as-sum').innerText; });
+  const sum = await p.evaluate(() => { const c = document.querySelectorAll('.asst-card'); return c[c.length - 1].querySelector('.asst-sum').innerText; });
   ok(nums(sum).every((n) => allowed.has(Math.abs(n))), 'no invented figure in the summary: ' + sum);
   ok(/sales_summary/.test(txt) && /Verified/.test(txt) && /2026-10-01/.test(txt), 'footer: source, verified, period');
   ok(/Only your places/.test(txt), 'server note (location scope) is shown');
@@ -157,7 +157,7 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
   ok(/৳3,500/.test(txt) && /৳7,800/.test(txt) && /৳4,500\.25/.test(txt) && /৳45,678\.9/.test(txt) && /৳4,321/.test(txt), 'financial position lines = server figures');
   ok(/৳52,478\.65/.test(txt) && /not a balance sheet/.test(txt), 'verified lines added up (3,500 + 7,800 + 45,678.9 - 4,500.25) and labelled');
   ok(/Balance sheet[^\n]*\n?[^\n]*Not installed/.test(txt) || /Not installed yet/.test(txt), 'balance sheet flagged as not installed');
-  await noOverflow(p, 'after cards'); await p.screenshot({ path: SP + '/as_owner.png', fullPage: true });
+  await noOverflow(p, 'after cards'); await p.screenshot({ path: SP + '/asst_owner.png', fullPage: true });
   // receivables: injected text in DATA is shown as a name, never obeyed
   const before = (await calls(p, 'report_run2')).filter((x) => x.p_key === 't3_payroll').length;
   txt = await ask(p, 'How much do customers owe us?');
@@ -165,28 +165,28 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
   ok((await calls(p, 'report_run2')).filter((x) => x.p_key === 't3_payroll').length === before, 'no salary tool was called because of data');
   // export + print
   await p.evaluate(() => { window.print = () => { window.__printed = true; }; });
-  await p.click('.as-card:last-of-type [data-act=as_csv]').catch(() => p.locator('[data-act=as_csv]').last().click()); await wait(p, 400);
+  await p.click('.asst-card:last-of-type [data-act=asst_csv]').catch(() => p.locator('[data-act=asst_csv]').last().click()); await wait(p, 400);
   const csv = await p.evaluate(() => window.__asLastCsv || '');
   ok(/Balance/.test(csv) && /7800|5000/.test(csv), 'CSV export of the card table');
   ok((await calls(p, 'log_report_export2')).some((x) => x.p_key === 'customer_dues'), 'report export is audited (log_report_export2)');
-  await p.locator('[data-act=as_print]').last().click(); await wait(p, 200); ok(await p.evaluate(() => !!window.__printed), 'print works');
+  await p.locator('[data-act=asst_print]').last().click(); await wait(p, 200); ok(await p.evaluate(() => !!window.__printed), 'print works');
   // usage log carries no business content
   const logs = await p.evaluate(() => window.__ASLOG || []);
   ok(logs.length >= 5 && logs.every((l) => Object.keys(l).sort().join(',') === 'p_intent,p_ms,p_ok,p_provider,p_tokens_in,p_tokens_out,p_tools' && !/customers|owe|sales today/i.test(JSON.stringify(l))), 'usage log has keys only, no question text');
   // alerts + owner panel
-  const top = await p.evaluate(() => document.querySelector('#as_alerts').innerText);
+  const top = await p.evaluate(() => document.querySelector('#asst_alerts').innerText);
   ok(/waiting: 1/.test(top) && /setup issues: 2/.test(top), 'alerts: 1 waiting, 2 setup issues');
-  ok(/42 questions/.test(await p.evaluate(() => document.querySelector('#as_owner').innerText)), 'owner usage panel');
+  ok(/42 questions/.test(await p.evaluate(() => document.querySelector('#asst_owner').textContent)), 'owner usage panel');
   // KB playbook with live status
   txt = await ask(p, 'How do I switch on blind count?');
   ok(/Blind count/i.test(txt) && /Knowledge version/.test(txt) && /now: OFF/.test(txt), 'playbook answer with live rule value and knowledge version');
-  ok(await p.evaluate(() => document.querySelectorAll('.as-card:last-of-type .as-steps li, .as-steps li').length) >= 5, 'playbook steps listed');
+  ok(await p.evaluate(() => document.querySelectorAll('.asst-card:last-of-type .asst-steps li, .asst-steps li').length) >= 5, 'playbook steps listed');
   txt = await ask(p, 'What is incomplete or wrong in the setup?');
   ok(/VAT is on but the rate is blank/.test(txt) && /Findings: 2/.test(txt), 'health findings shown');
   txt = await ask(p, 'show the approved business rules'); ok(/Deposit rule/.test(txt) && /Approved by the owner/.test(txt), 'owner notes quoted as approved by the owner');
   // clarifying question
-  txt = await ask(p, 'how much?'); let lc = await lastCard(p); ok(lc.status === 'clarify' && (await p.locator('.as-card:last-of-type [data-act=as_pick], [data-act=as_pick]').count()) >= 2, 'ambiguous question asks back with chips');
-  await p.locator('[data-act=as_pick]').last().click(); await wait(p, 400); lc = await lastCard(p); ok(lc.status === 'verified' || lc.status === 'data_needed', 'picking a chip answers');
+  txt = await ask(p, 'how much?'); let lc = await lastCard(p); ok(lc.status === 'clarify' && (await p.locator('.asst-card:last-of-type [data-act=asst_pick], [data-act=asst_pick]').count()) >= 2, 'ambiguous question asks back with chips');
+  await p.locator('[data-act=asst_pick]').last().click(); await wait(p, 400); lc = await lastCard(p); ok(lc.status === 'verified' || lc.status === 'data_needed', 'picking a chip answers');
 
   // ===== 3. prompt injection + secrets: refused, nothing called =====
   const n0 = (await p.evaluate(() => (window.__ASC || []).filter((c) => !/^(assistant_log|has_grant)$/.test(c[0])).length));
@@ -194,8 +194,8 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
     await ask(p, q); lc = await lastCard(p); ok(lc.refused === r, `refused (${r}): ${q}`);
   }
   ok((await p.evaluate(() => (window.__ASC || []).filter((c) => !/^(assistant_log|has_grant)$/.test(c[0])).length)) === n0, 'no data function was called for refused questions');
-  ok(/cannot change, delete or approve/.test((await lastCard(p)).text) && (await p.locator('.as-card:last-of-type a.as-chip').count()) >= 1, 'write refusal offers a link to the screen');
-  await ask(p, 'my pin is 4567, what are sales'); const hist = await p.evaluate(() => document.querySelector('#as_log').innerText + JSON.stringify(sessionStorage));
+  ok(/cannot change, delete or approve/.test((await lastCard(p)).text) && (await p.locator('.asst-card:last-of-type a.asst-chip').count()) >= 1, 'write refusal offers a link to the screen');
+  await ask(p, 'my pin is 4567, what are sales'); const hist = await p.evaluate(() => document.querySelector('#asst_log').innerText + JSON.stringify(sessionStorage));
   ok(!/4567/.test(hist) && /\[•••\]/.test(hist), 'a PIN typed by mistake is redacted on screen and in session memory');
   ok((await lastCard(p)).refused === 'secret', 'and the question is refused');
   await ask(p, 'what is the weather today?'); ok((await lastCard(p)).refused === 'oos', 'out of scope');
@@ -203,9 +203,9 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
 
   // ===== 4. access: hidden tools, server refusal, no leak =====
   p = await open({ owner: false, as: { me: ME_MGR, fail: { 'report_run:customer_dues': 'not allowed' } } });
-  const chips = await p.evaluate(() => document.querySelector('#as_chips').innerText);
+  const chips = await p.evaluate(() => document.querySelector('#asst_chips').innerText);
   ok(!/most profitable/.test(chips) && /How are sales today/.test(chips) && !/incomplete or wrong/.test(chips), 'chips filtered to what this person may ask');
-  ok(!(await p.evaluate(() => document.querySelector('#as_owner').innerText)), 'no owner panel for a manager');
+  ok(!(await p.evaluate(() => document.querySelector('#asst_owner').innerText)), 'no owner panel for a manager');
   txt = await ask(p, 'profit and loss this month'); ok(/Not available with your access/.test(txt), 'P&L: not available with your access');
   ok(!(await calls(p, 'report_run2')).some((x) => x.p_key === 'l1_pnl'), 'hidden tool never called');
   txt = await ask(p, 'show all salaries'); ok(/Not available with your access/.test(txt) && !(await calls(p, 'report_run2')).some((x) => x.p_key === 't3_payroll'), 'salaries hidden for a manager');
@@ -226,13 +226,13 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
   txt = await ask(p, 'How do I set up a new location?'); ok(/location/i.test(txt) && (await lastCard(p)).status === 'verified', 'knowledge questions still work offline');
   await p.__ctx.setOffline(false);
   p = await open({ as: { me: { allowed: false, reason: 'assistant_off' } } });
-  ok(/switched off/.test(await p.evaluate(() => document.querySelector('#as_body').innerText)), 'assistant off message');
+  ok(/switched off/.test(await p.evaluate(() => document.querySelector('#asst_body').innerText)), 'assistant off message');
 
   // ===== 6. Bangla UI =====
   p = await open({ lang: 'bn' });
   txt = await ask(p, 'আজ বিক্রি কত?'); ok(/৳12,345\.5/.test(txt) && /যাচাইকৃত/.test(txt), 'Bangla answer with the same numbers');
   txt = await ask(p, 'এই মাসে কোন শাখা দুর্বল?'); ok(/২য় শাখা/.test(txt), 'Bangla place names'); c1 = (await calls(p, 'report_run')).pop(); ok(c1.p_sort === 'net:asc', 'weakest = ascending sort on the server');
-  await noOverflow(p, 'bn'); await p.screenshot({ path: SP + '/as_bn.png', fullPage: true });
+  await noOverflow(p, 'bn'); await p.screenshot({ path: SP + '/asst_bn.png', fullPage: true });
 
   console.log(`CHECKS: ${checks - bad}/${checks} passed`);
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);

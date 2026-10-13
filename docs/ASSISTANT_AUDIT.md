@@ -28,7 +28,7 @@ All below are `stable` or read-only `security definer` functions with their own 
 | `needs_you_oldest(limit)` (phase28) | oldest waiting approvals / releases / emergencies / item changes / pending staff / wastage / parallel months, with route | each row filtered by the caller's own rights | needs_you |
 | `number_audit_summary()` (phase5) | paper-number gaps per form x place | its own rules | number_gaps |
 | `rules`, `grant_defs`, `locations` tables (select) | settings, grant labels, places | RLS select for authenticated | rule_info, locations |
-| Optional (other agents, guarded by a catalogue check, never an error): `balance_sheet`, `income_statement`, `trial_balance` (phase40 accounting), `partner_overview` (phase44, owner), `tier_usage_report` (phase43), `backup_status` (phase46) | - | their own checks | acc_balance_sheet, acc_income_statement, acc_trial_balance, partners, tiers, backup |
+| Optional (other agents, guarded by a catalogue check, never an error): `acct_balance_sheet`, `acct_income_statement`, `acct_trial_balance`, `acct_overview` (phase40 accounting), `partner_overview` (phase44, owner), `tier_usage_report` (phase43), `backup_status` (phase46) | - | their own checks | acc_balance_sheet, acc_income_statement, acc_trial_balance, partners, tiers, backup |
 
 Write functions (sale, purchase, approve, rules set ...) exist but are **not** tools: the MVP has no write action at all.
 

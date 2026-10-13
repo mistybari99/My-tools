@@ -55,12 +55,12 @@ select tt.as(:'s'); select tt.chk('T1 assistant_use grant allowed, no health', (
 select tt.err('T1 manager without assistant_health cannot run the check', $$select assistant_health()$$, 'not allowed');
 select tt.as(:'k'); select tt.err('T1 storekeeper cannot run the check', $$select assistant_health()$$, 'not allowed');
 reset role;
-create or replace function public.balance_sheet(p_as_of date, p_loc int default null) returns jsonb language sql as $$ select '{}'::jsonb $$;
+create or replace function public.acct_balance_sheet(p_as_of date, p_loc int default null) returns jsonb language sql as $$ select '{}'::jsonb $$;
 set role authenticated; select tt.as(:'o');
-select tt.chk('T1 an installed optional function is listed with its argument names', (select x->'args' from jsonb_array_elements(assistant_me()->'optional') x where x->>'name'='balance_sheet') = '["p_as_of","p_loc"]'::jsonb);
-reset role; revoke all on function public.balance_sheet(date, int) from public, authenticated; set role authenticated; select tt.as(:'s');
+select tt.chk('T1 an installed optional function is listed with its argument names', (select x->'args' from jsonb_array_elements(assistant_me()->'optional') x where x->>'name'='acct_balance_sheet') = '["p_as_of","p_loc"]'::jsonb);
+reset role; revoke all on function public.acct_balance_sheet(date, int) from public, authenticated; set role authenticated; select tt.as(:'s');
 select tt.chk('T1 an optional function the caller may not execute is not listed', jsonb_array_length(assistant_me()->'optional')=0);
-reset role; drop function public.balance_sheet(date, int);
+reset role; drop function public.acct_balance_sheet(date, int);
 
 \echo == configuration check: fresh DB is mis-configured
 set role authenticated; select tt.as(:'o');

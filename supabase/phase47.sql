@@ -226,10 +226,11 @@ begin
     grp := grp || jsonb_build_object(g, public.rpt_access(g));
   end loop;
   select coalesce(jsonb_agg(jsonb_build_object('name', p.proname,
-           'args', coalesce((select jsonb_agg(a.n order by a.o) from unnest(p.proargnames, coalesce(p.proargmodes, array_fill('i'::"char", array[cardinality(p.proargnames)]))) with ordinality a(n, m, o) where a.m in ('i', 'b')), '[]'::jsonb))
+           'args', coalesce((select jsonb_agg(a.n order by a.o) from unnest(coalesce(p.proargnames, '{}'::text[])) with ordinality a(n, o)
+                              where p.proargmodes is null or p.proargmodes[a.o] in ('i', 'b')), '[]'::jsonb))
            order by p.proname), '[]'::jsonb) into opt
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-   where n.nspname = 'public' and p.proname = any (array['balance_sheet','income_statement','trial_balance','cash_flow_simple','partner_overview','tier_usage_report','backup_status'])
+   where n.nspname = 'public' and p.proname = any (array['acct_balance_sheet','acct_income_statement','acct_trial_balance','acct_overview','balance_sheet','income_statement','trial_balance','partner_overview','tier_usage_report','backup_status'])
      and has_function_privilege('authenticated', p.oid, 'execute');
   return jsonb_build_object('allowed', true, 'is_owner', own,
     'health', public._assistant_health_ok(), 'cost', public.rpt_cost_ok(), 'biz', public.biz_ok(),
@@ -251,7 +252,7 @@ create or replace function public.assistant_health() returns jsonb
 language plpgsql stable security definer set search_path = public as $$
 declare
   f jsonb := '[]'::jsonb; locs int[]; n bigint; n2 bigint; ev jsonb; r record; d date; today date := (now() at time zone 'Asia/Dhaka')::date;
-  age int := coalesce(public.rule_num('assistant_closed_age_days'), 45)::int; sid bigint; miss text[]; k text; v jsonb; maxh numeric; last timestamptz;
+  age int := coalesce(public.rule_num('assistant_closed_age_days'), 45)::int; sid bigint; miss text[]; k text; v jsonb; maxh numeric; last timestamptz; fin boolean;
   keys constant text[] := array['drawer_float', 'cash_tol', 'discount_limit', 'expense_max'];
 begin
   if not public._assistant_health_ok() then raise exception 'not allowed'; end if;
@@ -383,6 +384,9 @@ begin
   end if;
   if exists (select 1 from public.rules where key = 'accounting_on') and public.rule_on('accounting_on') and public.rule_txt('accounting_start_date') is null then
     f := f || public._ah('accounting_no_start', 'bad', 'হিসাব (অ্যাকাউন্টিং) চালু কিন্তু শুরুর তারিখ / প্রারম্ভিক ব্যালান্স নেই', 'Accounting on without a start date / opening balances', 'accounting_on ON, accounting_start_date blank', 'accounts', '{}'::jsonb);
+  elsif exists (select 1 from public.rules where key = 'accounting_on') and public.rule_on('accounting_on') and to_regclass('public.journal_entries') is not null then
+    execute 'select exists (select 1 from public.journal_entries o where o.source_type = ''opening'' and o.reverses_id is null and not exists (select 1 from public.journal_entries r where r.reverses_id = o.id))' into fin;
+    if not fin then f := f || public._ah('accounting_no_opening', 'warn', 'হিসাব চালু কিন্তু প্রারম্ভিক ব্যালান্স (opening journal) নেই', 'Accounting on without an opening journal', 'no active opening journal (phase40 acct_opening)', 'accounts', '{}'::jsonb); end if;
   end if;
   return f;
 end $$;
