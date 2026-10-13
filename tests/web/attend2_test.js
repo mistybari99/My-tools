@@ -72,6 +72,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---------- me: punch with and without evidence ----------
   let p = await open('#/attend2');
+  if (process.env.A2DBG) { console.log((await text(p)).slice(0, 600)); console.log(errors.join('\n')); }
   let t = await text(p); ok(/You can punch now/.test(t) && /Honest limits/.test(t), 'status chip + honest limits box');
   ok(await p.locator('[data-act=a2_punch]').count() === 2, 'check in / out buttons');
   await p.click('[data-act=a2_punch][data-v=in]'); await wait(p, 500);

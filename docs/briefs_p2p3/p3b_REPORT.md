@@ -45,3 +45,5 @@ Handlers use unique data-act names (sx_, sf_, bx_, ex_ prefixes). Existing icon 
 - #14: no scheduled/automatic export, no BI push, no per-column choice; journal export shows posted lines incl. reversals as stored. The export size is bounded by the row cap (max 20000) and the JSON is returned in one RPC response.
 - Denied export attempts are not logged (an exception rolls back). If the owner wants denied attempts logged, it needs a second autonomous log path (not built).
 - One more domain row changes phase48_test counts (see above).
+
+Web result: tests/web/salesx_test.js -> errors: none, assert failures: 0 (orders flow incl. deliver/cancel/link, forms link/unlink, benefits report + grant, export + download, friendly errors, Bangla mode, no overflow at 360px). `node --check web/salesx.js` OK.
