@@ -92,3 +92,45 @@ end $$;
 revoke all on function public._ob_kinds() from public, anon, authenticated;
 revoke all on function public.owner_board_get(), public.owner_board_save(jsonb) from public, anon;
 grant execute on function public.owner_board_get(), public.owner_board_save(jsonb) to authenticated;
+
+-- ============================================================
+-- Home favourites in the ⋮ menu: order, own label and "hide from Home" per person (synced with the existing user_favourites rows)
+-- ============================================================
+alter table public.user_favourites add column if not exists sort int;
+alter table public.user_favourites add column if not exists label text;
+alter table public.user_favourites add column if not exists hidden boolean not null default false;
+
+-- p_items: [{kind, key}] in the wanted order; the caller's own rows get sort = position (missing rows are created as pinned)
+create or replace function public.fav_order_set(p_items jsonb) returns int
+language plpgsql security definer set search_path = public as $$
+declare it jsonb; n int := 0; k text; ky text;
+begin
+  if not public.is_active() then raise exception 'not allowed'; end if;
+  if p_items is null or jsonb_typeof(p_items) <> 'array' then raise exception 'bad_items'; end if;
+  if jsonb_array_length(p_items) > 200 then raise exception 'too_many_items'; end if;
+  for it in select * from jsonb_array_elements(p_items) loop
+    if jsonb_typeof(it) <> 'object' then raise exception 'bad_item'; end if;
+    k := it ->> 'kind'; ky := it ->> 'key';
+    if k is null or k not in ('route', 'form') or ky is null or length(ky) = 0 or length(ky) > 120 then raise exception 'bad_item'; end if;
+  end loop;
+  for it in select * from jsonb_array_elements(p_items) loop
+    insert into public.user_favourites (user_id, kind, key, pinned, sort) values (auth.uid(), it ->> 'kind', it ->> 'key', true, n)
+      on conflict (user_id, kind, key) do update set sort = excluded.sort;
+    n := n + 1;
+  end loop;
+  return n;
+end $$;
+
+create or replace function public.fav_meta_set(p_kind text, p_key text, p_label text, p_hidden boolean) returns void
+language plpgsql security definer set search_path = public as $$
+declare lb text := nullif(btrim(coalesce(p_label, '')), '');
+begin
+  if not public.is_active() then raise exception 'not allowed'; end if;
+  if p_kind is null or p_kind not in ('route', 'form') or p_key is null or length(p_key) = 0 or length(p_key) > 120 then raise exception 'bad_item'; end if;
+  if lb is not null and length(lb) > 40 then raise exception 'label_too_long'; end if;
+  insert into public.user_favourites (user_id, kind, key, pinned, label, hidden) values (auth.uid(), p_kind, p_key, false, lb, coalesce(p_hidden, false))
+    on conflict (user_id, kind, key) do update set label = excluded.label, hidden = excluded.hidden;
+end $$;
+
+revoke all on function public.fav_order_set(jsonb), public.fav_meta_set(text, text, text, boolean) from public, anon;
+grant execute on function public.fav_order_set(jsonb), public.fav_meta_set(text, text, text, boolean) to authenticated;

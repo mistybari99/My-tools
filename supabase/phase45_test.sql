@@ -74,6 +74,27 @@ select tt.chk('E4 first owner still has exactly his one, untouched', (select cou
 select tt.err('E4 browser cannot write the table directly', $$insert into owner_board_items(user_id,widget) values (auth.uid(),'note')$$, 'permission denied');
 select tt.err('E4 browser cannot delete directly', $$delete from owner_board_items$$, 'permission denied');
 
+
+\echo == favourites: order, label, hide
+select tt.as(:'s');
+select tt.err('F1 order needs an array', $$select fav_order_set('{}'::jsonb)$$, 'bad_items');
+select tt.err('F1 kind checked', $$select fav_order_set('[{"kind":"x","key":"a"}]'::jsonb)$$, 'bad_item');
+select tt.err('F1 key length', format($$select fav_order_set(%L::jsonb)$$, jsonb_build_array(jsonb_build_object('kind','route','key',repeat('k',121)))), 'bad_item');
+select set_pin('route','dues',true) is null as p1 \gset
+select set_pin('route','items',true) is null as p2 \gset
+select set_pin('form','14-1',true) is null as p3 \gset
+select fav_order_set('[{"kind":"form","key":"14-1"},{"kind":"route","key":"items"},{"kind":"route","key":"dues"}]'::jsonb) as fo \gset
+select tt.chk('F2 order saved by position', :'fo'=3 and (select string_agg(key,',' order by sort) from user_favourites where pinned)='14-1,items,dues');
+select tt.chk('F2 setting the order does not unpin', (select count(*) from user_favourites where pinned)=3);
+select fav_meta_set('route','items','  My items  ',false) is null as m1 \gset
+select fav_meta_set('route','pos',null,true) is null as m2 \gset
+select tt.chk('F3 label trimmed and kept', (select label from user_favourites where key='items')='My items');
+select tt.chk('F3 hide creates an unpinned row', (select hidden and not pinned from user_favourites where key='pos'));
+select tt.err('F3 label too long', format($$select fav_meta_set('route','items',%L,false)$$, repeat('x',41)), 'label_too_long');
+select tt.as(:'k'); select tt.chk('F4 other people see none of it', (select count(*) from user_favourites where label is not null or hidden or sort is not null)=0);
+select tt.as(:'o'); select tt.chk('F4 owner has none of the staff rows', (select count(*) from user_favourites where key in ('pos','items'))=0);
+select tt.chk('F4 no execute for anon', not has_function_privilege('anon','fav_order_set(jsonb)','execute') and not has_function_privilege('anon','fav_meta_set(text,text,text,boolean)','execute'));
+
 \echo == switch
 reset role;
 update rules set default_value='false' where key='owner_board_on';
