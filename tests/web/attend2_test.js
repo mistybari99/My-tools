@@ -79,7 +79,6 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   let c = await calls(p, 'attendance_self_punch'); ok(c.length === 1 && c[0].p_dir === 'in' && c[0].p_ev_kind === null && c[0].p_lat !== null, 'punch without evidence, with the soft GPS (box ticked)');
   await p.click('[data-act=a2_regpass]'); await wait(p, 500);
   c = await calls(p, 'att_evidence_register'); ok(c.length === 1 && c[0].p_kind === 'webauthn' && c[0].p_ref === 'AQIDBAUGBwg' && c[0].p_emp === 'e5', 'passkey registered as a reference only');
-  await p.evaluate(() => { window.__A2.me = null; });
   ok(/passkey/.test(await text(p)), 'registration listed after the call');
   await p.selectOption('#a2_ev', 'webauthn'); await p.evaluate(() => { window.__A2.calls.length = 0; });
   await p.click('[data-act=a2_punch][data-v=out]'); await wait(p, 500);
