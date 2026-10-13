@@ -139,3 +139,15 @@ STOP: no implementation until owner approves this roadmap.
 6. **PIN hardening:** postponed (risk stays; see §7.1).
 Not yet asked (defaults proposed): attendance = fingerprint device primary, app punch fallback with geofence as flag only; accounting opening balances + bank reconcile later.
 Design rule derived: one transaction record + linked shadow copies (type, source_id, locked flag, created_at); posting uniqueness on (source_type, source_id).
+
+## 12. Numbered gap list (owner picks by number) + new requests (planning only)
+A Finance: 1 bank-statement reconcile · 2 year-end close · 3 VAT ledger · 4 asset depreciation · 5 budgets · 6 payroll/advance/partner/20-x/10-x auto-post
+B Stock: 7 reorder suggestion · 8 wastage-reason list · 9 batch/expiry on GRN
+C Production: 10 QC module
+D Sales: 11 online order channel · 12 20-x linked to sales
+E HR: 13 benefits depth
+F Reports: 14 BI export · 15 day book vs journal reconcile
+G Control: 16 PIN lockout (postponed) · 17 restore drill · 18 2FA · 19 forms retry queue · 20 server-side form equations
+H Integration: 21 SMS/WhatsApp · 22 payment gateway · 23 accounting export
+I Duplicate guards: 24 payroll · 25 stock · 26 production · 27 owner top-up · 28 expense (all via shadow copy)
+New: 29 attendance = two systems kept (staff attendance + daily attendance), both live, one count · 30 AI Assistant tab as side/front tab on Owner account, owner can grant access to others (verify what exists: route `assistant`, phase47)
