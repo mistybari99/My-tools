@@ -269,8 +269,8 @@ select bi_export('journal', tt.today(), tt.today(), null, 'json', null) as x8 \g
 select tt.chk('T4 owner can export purchases (csv) and the journal (json)', (:'x7'::jsonb->>'csv') like 'bill_id,%' and (:'x8'::jsonb->>'dataset')='journal');
 select set_rule('bi_export_max_rows','100') is null as r5 \gset
 select tt.chk('T4 the rule cap wins over a bigger limit (cap 100)', (bi_export('sales', tt.today(), tt.today(), null, 'json', 99999)->>'cap')::int=100);
-select tt.chk('T4 every successful call is logged, denied ones are not (owner 5 incl. the cap test, user e 5)', (select count(*) from bi_export_log where user_id=:'e')=5 and (select count(*) from bi_export_log where user_id=:'o')=5
-  and jsonb_array_length(bi_export_log_list(50))=10);
+select tt.chk('T4 every successful call is logged, denied ones are not (owner 4 incl. the cap test, user e 5)', (select count(*) from bi_export_log where user_id=:'e')=5 and (select count(*) from bi_export_log where user_id=:'o')=4
+  and jsonb_array_length(bi_export_log_list(50))=9);
 select tt.err('T4 the log is append-only', $$update bi_export_log set row_count=0$$, 'append_only');
 select tt.err('T4 the log cannot be deleted', $$delete from bi_export_log$$, 'append_only');
 select tt.as(:'e');

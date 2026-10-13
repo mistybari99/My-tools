@@ -91,7 +91,8 @@ select tt.chk('T2 the person cannot read another person''s registrations', (sele
 select tt.as(:'a'); select tt.chk('T2 ... and the other person sees none of them', (select count(*) from att_evidence_reg where employee_id=:'e1')=0 and (select count(*) from att_evidence_reg where employee_id=:'e7')=1);
 select att_evidence_register(:'e7'::uuid, 'webauthn', 'cred-OLD', 'old') ->> 'id' as evold \gset
 select tt.err('T2 void needs a reason', format($$select att_evidence_void(%s,'')$$, :'evold'), 'reason_required');
-select tt.chk('T2 void turns the flag off (row kept)', (att_evidence_void(:'evold'::bigint, 'lost phone') ->> 'active')='false' and (select count(*) from att_evidence_reg where id=:'evold' and not active)=1);
+select att_evidence_void(:'evold'::bigint, 'lost phone') ->> 'active' as vd \gset
+select tt.chk('T2 void turns the flag off (row kept)', :'vd'='false' and (select count(*) from att_evidence_reg where id=:'evold' and not active)=1);
 
 \echo == T3 punch with evidence and soft GPS
 select tt.as(:'o'); select set_rule('att_geo_check_on', 'true'::jsonb) is null as g1 \gset
@@ -166,15 +167,17 @@ select tt.err('T6 a month in an approved payroll cannot be re-marked', format($$
 select tt.as(:'o');
 select count(*) as cnt_before from entries where form_code='02-1' \gset
 select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"Karim","present":2,"late":1,"absent":1}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f1 \gset
-update entries set status='submitted' where id=:'f1'::uuid;
+select submit_entry(:'f1'::uuid) is not null as sub_f1 \gset
 select tt.chk('T7 submitted 02-1 for a month that path A holds is a locked shadow (primary a)', tt.is_shadow('entries', :'f1') and (select count(*) from shadow_links where domain='attendance' and state='confirmed')=1);
+reset role;
 select tt.err('T7 the shadow cannot be changed or re-opened', format($$update entries set status='draft' where id='%s'$$, :'f1'), 'shadow_locked');
+set role authenticated; select tt.as(:'o');
 select attendance_count_once(1, :'m0'::date) as co \gset
 select tt.chk('T7 report: counted = attendance record, form listed as shadow, Karim matches (2 present incl. 1 late, 1 late, 1 absent)',
   (:'co'::jsonb ->> 'counted')='attendance_record' and (:'co'::jsonb -> 'forms' -> 0 ->> 'is_shadow')='true' and (:'co'::jsonb ->> 'mismatches')='0'
   and ((:'co'::jsonb -> 'rows' -> 0 -> 'device' ->> 'present')::numeric)=2 and ((:'co'::jsonb -> 'rows' -> 0 -> 'form' ->> 'present')::numeric)=2);
 select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"করিম","present":5,"late":0,"absent":0}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f2 \gset
-update entries set status='submitted' where id=:'f2'::uuid;
+select submit_entry(:'f2'::uuid) is not null as sub_f2 \gset
 select tt.chk('T7 a second register for the same month is not shadowed twice (one link per place+month); it is listed', not tt.is_shadow('entries', :'f2') and (select count(*) from shadow_links where domain='attendance' and state<>'void')=1);
 select attendance_count_once(1, :'m0'::date) as co2 \gset
 select tt.chk('T7 report flags a difference between path A and the second register (5 vs 2)', (:'co2'::jsonb ->> 'mismatches')::int>=1);
@@ -182,16 +185,17 @@ select tt.as(:'k'); select tt.err('T7 report needs attendance rights at the plac
 select tt.as(:'o');
 -- month with nothing on path A: stays the record; later link-run picks it up
 select save_entry(null,'02-1',1,tt.today(),format('{"month":"%s","year":"%s","staff":[{"name":"Karim","present":1,"absent":0}]}', extract(month from tt.today())::int, extract(year from tt.today())::int)::jsonb,'[]') ->> 'id' as f3 \gset
-update entries set status='submitted' where id=:'f3'::uuid;
+select submit_entry(:'f3'::uuid) is not null as sub_f3 \gset
 select tt.chk('T7 path A has no record for the current month yet: the form is NOT a shadow (it is the only record)', not tt.is_shadow('entries', :'f3'));
 select tt.as(:'s'); select attendance_mark_others(:'e1'::uuid, tt.today(), 'present', '09:00', '19:00', 30, 'manual', 'today entry') is not null as mkt \gset
 select tt.as(:'k'); select tt.err('T7 link-run needs attendance_manage', format($$select attendance_form_link_run(1,'%s')$$, :'mc'), 'not allowed');
 select tt.as(:'o'); select attendance_form_link_run(1, :'mc'::date) -> 'result' ->> 'linked' as lr \gset
-select tt.chk('T7 link-run links it now; running again changes nothing', :'lr'='1' and tt.is_shadow('entries', :'f3') and (attendance_form_link_run(1, :'mc'::date) -> 'result' ->> 'already')='1');
+select attendance_form_link_run(1, :'mc'::date) -> 'result' ->> 'already' as lr2 \gset
+select tt.chk('T7 link-run links it now; running again changes nothing', :'lr'='1' and tt.is_shadow('entries', :'f3') and :'lr2'='1');
 -- primary b
 select path_switch_set('attendance',0,true,true,'b') is not null as sw5 \gset
 select save_entry(null,'02-1',3,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"Salma","present":3}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f4 \gset
-update entries set status='submitted' where id=:'f4'::uuid;
+select submit_entry(:'f4'::uuid) is not null as sub_f4 \gset
 select tt.chk('T7 primary=b: the form stays the record (no shadow) and the report says so', not tt.is_shadow('entries', :'f4') and (attendance_count_once(3, :'m0'::date) ->> 'counted')='form_02_1');
 -- path B locked
 select path_switch_set('attendance',0,true,false,'a') is not null as sw6 \gset
@@ -221,7 +225,8 @@ select entry_equation_check(:'w1'::uuid) as cw \gset
 select tt.chk('T8 02-2: net negative (1), other without reason (1), unsigned payment; t_net = 1600; phone saved none -> 3 missing', (:'cw'::jsonb -> 'recomputed' ->> 't_net')::numeric=1600 and (:'cw'::jsonb -> 'expected_flags' ->> 'net_negative')='1'
   and (:'cw'::jsonb -> 'expected_flags' ->> 'other_no_reason')='1' and (select count(*) from jsonb_array_elements(:'cw'::jsonb -> 'mismatches'))=3);
 select tt.chk('T8 02-2: receipts (2100) vs sheet net (1600) is reported as information only', (select count(*) from jsonb_array_elements(:'cw'::jsonb -> 'observations') x where x ->> 'code'='receipts_vs_net')=1);
-select tt.chk('T8 14-1 is not re-worked (honest: supported=false)', (entry_equation_check((save_entry(null,'14-1',1,tt.today(),'{}','[]') ->> 'id')::uuid) ->> 'supported')='false');
+select save_entry(null,'14-1',1,tt.today(),'{}','[]') ->> 'id' as x14 \gset
+select tt.chk('T8 14-1 is not re-worked (honest: supported=false)', (entry_equation_check(:'x14'::uuid) ->> 'supported')='false');
 select tt.as(:'t'); select tt.err('T8 another place cannot check my entry', format($$select entry_equation_check('%s')$$, :'q1'), 'not allowed');
 select tt.as(:'o');
 select tt.chk('T8 the check wrote nothing (read only)', (select count(*) from exceptions where flag_code='equation_mismatch')=0);
