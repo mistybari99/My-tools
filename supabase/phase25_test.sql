@@ -93,7 +93,7 @@ select tt.ent('10-1',1,3008,current_date-4,'approved','{}');
 -- G2 (April 2026, form 10-2)
 select tt.ent('10-2',1,4001,date '2026-04-01','approved','{"paper_no":"101"}');
 select tt.ent('10-2',1,4002,date '2026-04-02','approved','{"paper_no":"102"}');
-select tt.ent('10-2',1,4003,date '2026-04-03','approved','{"paper_no":" 102 "}');
+select tt.ent('10-2',1,4003,date '2026-04-03','approved','{"paper_no":"0102"}');
 select tt.ent('10-2',1,4004,date '2026-04-05','approved','{"paper_no":"105"}');
 select tt.ent('10-2',1,4005,date '2026-04-09','approved','{"paper_no":"104"}');
 select tt.ent('10-2',1,4006,date '2026-04-06','approved','{}');
@@ -200,7 +200,7 @@ select tt.as(:'r'); select tt.err('X3 owner-only: a report_control grant is not 
 
 \echo == X4
 select tt.as(:'o'); select tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', current_date-9, current_date)::jsonb) as j \gset
-select tt.chk('X4 loc1 14-1: 10 days, 3 submitted days (two sheets one day), 7 missing, 30%, 1 stale draft, 1 late (entered-later not counted)', tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'days')=10 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'submitted_days')=3 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'missing_days')=7 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'compliance_pct')=30 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'stale_drafts')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'late_submits')=1);
+select tt.chk('X4 loc1 14-1: 10 days, 4 submitted days (two sheets one day; the entered-later sheet counts as submitted), 6 missing, 40%, 1 stale draft, 1 late (entered-later not counted)', tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'days')=10 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'submitted_days')=4 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'missing_days')=6 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'compliance_pct')=40 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'stale_drafts')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'late_submits')=1);
 select tt.chk('X4 loc1 10-1: 1 submitted day, 9 missing, 10%', tt.num(tt.pick(:'j','{"location_id":1,"form":"10-1"}'),'submitted_days')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-1"}'),'missing_days')=9 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-1"}'),'compliance_pct')=10);
 select tt.chk('X4 loc2 never submitted: 0%; only live showrooms (4 shops x 2 forms = 8 rows; factories/godown absent)', tt.num(tt.pick(:'j','{"location_id":2,"form":"14-1"}'),'compliance_pct')=0 and jsonb_array_length(:'j'::jsonb->'rows')=8);
 select tt.chk('X4 a future end date does not add missing days (to = today + 5)', tt.num(tt.pick(tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', current_date-9, current_date+5)::jsonb),'{"location_id":1,"form":"14-1"}'),'days')=10);
@@ -218,7 +218,7 @@ select tt.chk('X5 loc-1 user: no staffB, 3 sales 1900', tt.pick(:'j','{"staff_id
 
 \echo == G2
 select tt.as(:'o'); select tt.run('g2_paper_numbers','{"from":"2026-04-01","to":"2026-04-30"}') as j \gset
-select tt.chk('G2 loc1 10-2: 7 entries, 1 without number, 5 distinct, 1 duplicate (trimmed), 1 out of order', tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'entries')=7 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'no_paper_no')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'distinct_numbers')=5 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'duplicate_numbers')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'out_of_order')=1);
+select tt.chk('G2 loc1 10-2: 7 entries, 1 without number, 5 distinct, 1 duplicate (0102 = 102), 1 out of order', tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'entries')=7 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'no_paper_no')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'distinct_numbers')=5 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'duplicate_numbers')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'out_of_order')=1);
 select tt.chk('G2 book usage: first 101, last 105, 1 number missing (103); draft 106 ignored', tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'first_no')=101 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'last_no')=105 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-2"}'),'missing_numbers')=1);
 select tt.chk('G2 loc2 book is separate and clean', tt.num(tt.pick(:'j','{"location_id":2,"form":"10-2"}'),'duplicate_numbers')=0 and tt.num(tt.pick(:'j','{"location_id":2,"form":"10-2"}'),'missing_numbers')=0);
 select tt.as(:'s'); select tt.run('g2_paper_numbers','{"from":"2026-04-01","to":"2026-04-30"}') as j \gset
@@ -236,7 +236,7 @@ select tt.chk('K3 loc-1 user: item A purchase_in 10 only', tt.num(tt.pick(:'j','
 \echo == E2
 select tt.as(:'o'); select tt.run('e2_expense_trend','{"from":"2026-05-11","to":"2026-05-20"}') as j \gset
 select tt.chk('E2 transport (owner, both locations): current 1150, previous 100, label from the head list', tt.num(tt.pick(:'j','{"head":"যাতায়াত / পরিবহন"}'),'current')=1150 and tt.num(tt.pick(:'j','{"head":"যাতায়াত / পরিবহন"}'),'previous')=100 and tt.num(tt.pick(:'j','{"head":"যাতায়াত / পরিবহন"}'),'change')=1050 and tt.num(tt.pick(:'j','{"head":"যাতায়াত / পরিবহন"}'),'change_pct')=1050);
-select tt.chk('E2 new head repair: previous 0 -> change_pct null; vanished head labour: -40, -100%', tt.num(tt.pick(:'j','{"head":"মেরামত / ইউটিলিটি"}'),'current')=300 and (tt.pick(:'j','{"head":"মেরামত / ইউটিলিটি"}')->'change_pct')='null'::jsonb and tt.num(tt.pick(:'j','{"head":"labour"}'),'change')=-40 and tt.num(tt.pick(:'j','{"head":"labour"}'),'change_pct')=-100);
+select tt.chk('E2 new head repair: previous 0 -> change_pct null; vanished head labour (label from the list): -40, -100%', tt.num(tt.pick(:'j','{"head":"মেরামত / ইউটিলিটি"}'),'current')=300 and (tt.pick(:'j','{"head":"মেরামত / ইউটিলিটি"}')->'change_pct')='null'::jsonb and tt.num(tt.pick(:'j','{"head":"অস্থায়ী শ্রমিকের মজুরি"}'),'change')=-40 and tt.num(tt.pick(:'j','{"head":"অস্থায়ী শ্রমিকের মজুরি"}'),'change_pct')=-100);
 select tt.chk('E2 totals: current 1450, previous 140 (draft 9999 excluded)', tt.num(:'j'::jsonb->'totals','current')=1450 and tt.num(:'j'::jsonb->'totals','previous')=140);
 select tt.as(:'s'); select tt.run('e2_expense_trend','{"from":"2026-05-11","to":"2026-05-20"}') as j \gset
 select tt.chk('E2 loc-1 user: transport current 150 only', tt.num(tt.pick(:'j','{"head":"যাতায়াত / পরিবহন"}'),'current')=150 and tt.num(:'j'::jsonb->'totals','current')=450);

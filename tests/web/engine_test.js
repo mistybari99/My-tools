@@ -5,7 +5,7 @@ const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Functi
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : f.endsWith('.css') ? 'text/css' : f.endsWith('.json') ? 'application/json' : f.endsWith('.svg') ? 'image/svg+xml' : f.endsWith('.webp') ? 'image/webp' : 'text/html' }); r.end(b); }); }).listen(8078);
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
-  const errors = []; const log = (...a) => console.log(...a);
+  const errors = []; const OUT = []; const log = (...a) => { OUT.push(a.map((x) => (typeof x === 'string' ? x : JSON.stringify(x))).join(' ')); console.log(...a); };
   async function open(hash, lang = 'bn') {
     const ctx = await br.newContext({ viewport: { width: 390, height: 800 }, deviceScaleFactor: 2, locale: 'bn-BD' }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push(hash + ': ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errors.push(hash + ' console: ' + m.text()); });
@@ -59,4 +59,10 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   // ---- lists/pages
   for (const [h, n] of [['#/form/14-1', 'list'], ['#/locset', 'locset'], ['#/exceptions', 'exceptions'], ['#/releases', 'releases'], ['#/home', 'home']]) { p = await open(h, 'mix'); await p.screenshot({ path: `${SP}/e_${n}.png` }); await p.context().close(); }
   log('JS errors:', errors.length ? errors : 'none'); await br.close(); srv.close();
+  // assertions on the printed figures (the screens must keep computing these exact numbers)
+  const all = OUT.join('\n'); let bad = 0; const ok = (c, m) => { if (!c) { bad++; console.log('FAIL:', m); } };
+  ok(/10-2 total: ৳ 1,500/.test(all), '10-2 total 1,500'); ok(/10-2 flags: .*সীমার উপরে/.test(all) && /রসিদ ছাড়া খরচ/.test(all) && /ইমপ্রেস্টের সমান নয়/.test(all), '10-2 flags (over limit, no receipt, imprest mismatch)');
+  ok(/10-1 counted: ৳ 3,350 handover: ৳ 1,850/.test(all), '10-1 counted and handover'); ok(/03-1 unit: কেজি/.test(all) && /চাহিদার চেয়ে বেশি পাঠানো/.test(all), '03-1 unit and over-dispatch flag');
+  ok(/04-3 book visible before count: false/.test(all), '04-3 book hidden before the count'); ok(errors.length === 0, 'no JS errors');
+  console.log('assert failures:', bad); if (bad) process.exitCode = 1;
 })().catch((e) => { console.error('FAIL', e); process.exit(1); });
