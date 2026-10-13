@@ -129,3 +129,13 @@ Core: Auth+Roles+Grants+Rules → Master data (items, locations, parties) → **
 10. Confirm form 0-1 = location settings screen.
 
 STOP: no implementation until owner approves this roadmap.
+
+## 11. Owner decisions (13 Oct 2026, via Q&A) — still no implementation
+1. **Payroll:** paper 02-2 may be written and also entered in app. When app payroll is entered, the 02-2 form version is locked/hidden and a hidden time-stamped **shadow copy** keeps the form record. Counted once.
+2. **Stock/production forms vs screens:** all three modes kept as owner switches per location+action (screen-primary / form-primary / either-locked). Default: screen-primary, form = shadow reference. Never both posting.
+3. **Expense 10-2 / day book:** quick entries in day book during the day get a **shadow copy** in the 10-2 form at day end; one click confirms. Principle applies **system-wide wherever logical**: each path (quick tab / formal form) is a separate option, usable alone, lockable, or both open — **count exactly once via shadow copy**.
+4. **Owner top-up/draw:** same switch pattern. Default: Partner capital primary, Cash moves gets shadow.
+5. **Form Kit + Business Guide:** owner will provide now (needed so shadow copies map to exact paper fields). Pending.
+6. **PIN hardening:** postponed (risk stays; see §7.1).
+Not yet asked (defaults proposed): attendance = fingerprint device primary, app punch fallback with geofence as flag only; accounting opening balances + bank reconcile later.
+Design rule derived: one transaction record + linked shadow copies (type, source_id, locked flag, created_at); posting uniqueness on (source_type, source_id).
