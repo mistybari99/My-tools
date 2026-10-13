@@ -96,6 +96,7 @@ const IA = [
   // Administration & settings
   rec('control', 'settings', ['কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'], { icon: 'control', ok: (c) => c.ctlOk(), cnt: 'ctl', tone: 'info', kw: ['control', 'admin', 'কন্ট্রোল', 'নিয়ন্ত্রণ'] }),
   rec('rulehub', 'settings', 't:rulehub', { ok: owner, mod: 14, kw: ['rules', 'switch', 'grants', 'নিয়ম', 'অপশন', 'অনুমতি'] }),
+  rec('owner', 'settings', ['মালিকের বোর্ড', 'Owner mode board', 'Owner mode board'], { icon: 'control', ok: owner, kw: ['owner', 'board', 'must check', 'daily check', 'morning', 'মালিক', 'বোর্ড', 'প্রতিদিন', 'দেখুন'] }),
   rec('switchboard', 'settings', ['সুইচবোর্ড (সব চালু/বন্ধ)', 'Switchboard (all on/off)', 'Switchboard (সব on/off)'], { icon: 'settings', ok: owner, kw: ['switch', 'on off', 'toggle', 'blind', 'pin', 'flag', 'সুইচ', 'চালু', 'বন্ধ', 'অন', 'অফ', 'সেটিংস'] }),
   rec('parallel', 'settings', ['পাশাপাশি মাস: তুলনা ও পাস/ফেল', 'Parallel month: compare & pass/fail', 'Parallel মাস: compare ও pass/fail'], { icon: 'doc', ok: (c) => c.own || c.GF.rollout_manage === true, parent: 'rollout', kw: ['parallel', 'compare', 'pass', 'fail', 'paper', 'পাশাপাশি', 'তুলনা', 'পাস', 'ফেল'] }),
   rec('printbooks', 'settings', ['ছাপা ও বই', 'Print & books', 'Print ও books'], { icon: 'print', ok: (c) => c.own || c.GF.head_management === true || c.GF.print_books === true, kw: ['print', 'book', 'serial', 'paper', 'ছাপা', 'বই', 'সিরিয়াল'] }),
@@ -120,7 +121,7 @@ const IA = [
 const I3 = { items: 'bag', 'items/new': 'plus', lists: 'list', 'settings2/units': 'scale', itemimport: 'download', itemmap: 'link', bulkitems: 'bag', itemtypes: 'tag', stock: 'box', assets: 'tool', purchase: 'cart', 'purchase/new': 'plus',
   'purchase/return': 'swap', payables: 'money', recipes: 'chef', pos: 'pos', salereturn: 'swap', dues: 'dues', invoice: 'print', daybook: 'book', cashmoves: 'money', parallel: 'swap', flow: 'check', delegation: 'users', printbooks: 'print', switchboard: 'settings', ledgerlinks: 'link', exceptions: 'warn', pending: 'stamp', itemreq: 'swap', releases: 'unlock',
   emergency: 'alert', changes: 'edit', numaudit: 'hash', outbox: 'upload', reports: 'chart', biz: 'pie', brandpnl: 'pie', discounts: 'tag', staff: 'users', matrix: 'matrix', salary: 'money', locations: 'pin', locset: 'pinset', locsheet: 'pinset',
-  rollout: 'sliders', control: 'sliders', rulehub: 'shield', rules: 'rules', settings: 'gear', settings2: 'sliders', logs: 'history', backup: 'download', home: 'home' };
+  rollout: 'sliders', control: 'sliders', rulehub: 'shield', owner: 'sliders', rules: 'rules', settings: 'gear', settings2: 'sliders', logs: 'history', backup: 'download', home: 'home' };
 IA.forEach((r) => { r.i3 = I3[r.route] || (r.route.startsWith('settings2/') ? 'gear' : r.icon); });
 const byRoute = new Map(IA.map((r) => [r.route, r]));
 

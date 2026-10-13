@@ -82,7 +82,7 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
   p = await open({}, '#/items'); for (const h of ['dues', 'reports', 'biz', 'stock', 'daybook', 'assets']) { await p.evaluate((x) => { location.hash = '#/' + x; }, h); await wait(p, 450); }
   const rc = await p.evaluate(() => window.BOS.ia.recent(JSON.parse(JSON.stringify(window.BOS_APP.S.ctx.profile.id))));
   ok(rc.length === 5 && rc[0] === 'assets' && !rc.includes('items'), 'recent keeps the last 5, newest first: ' + rc);
-  await p.goto(`http://localhost:${PORT}/#/home`); await wait(p, 1200); ok(await p.locator('#hv_recent .tog').count() >= 1, 'Home shows Recent'); await p.context().close();
+  await p.goto(`http://localhost:${PORT}/#/home`); await wait(p, 1200); ok(await p.locator('#hv_recent').count() === 0 && !/Recent/i.test(await p.locator('#app').innerText()), 'Home has no Recent block (Module E)'); await p.context().close();
 
   // ---------- old URLs still open (owner) ----------
   p = await open({}, '#/home');

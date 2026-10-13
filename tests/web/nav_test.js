@@ -25,7 +25,8 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.click('[data-act=hv_mode][data-v=acc]'); await sleep(300); await p.click('[data-act=hv_period][data-v=month]'); await sleep(600);
   await p.screenshot({ path: SP + '/n_home_acc.png' });
   // pin a tile
-  await p.click('#hv_tiles .qt:nth-child(1) .st'); await sleep(200);
+  await p.click('#hv_tiles .qt:nth-child(1) .st'); await sleep(300);   // the ⋮ menu of the tile (no star buttons any more)
+  await p.click('.ctl-sheet.ctl-menu .ctl-opt:first-child'); await sleep(250);   // first item = Pin to favourites
   console.log('pinned:', await p.evaluate(() => JSON.stringify(Object.keys(localStorage).filter((k) => k.startsWith('bos_p')).map((k) => [k, localStorage[k]]))));
   console.log('fav tiles:', await p.locator('#hv_fav .qt').count());
   // drawer
@@ -55,7 +56,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.goto('http://localhost:8091/#/pos'); await sleep(1200);
   console.log('bnav in pos:', await p.locator('#bnav').isVisible()); await p.screenshot({ path: SP + '/n_pos.png' });
   await p.goto('http://localhost:8091/#/form/10-1'); await sleep(900);
-  console.log('bnav in formlist:', await p.locator('#bnav').isVisible(), '| pin btn', await p.locator('#hd_pin').count());
+  console.log('bnav in formlist:', await p.locator('#bnav').isVisible(), '| header dots', await p.locator('#hd_dots').count(), '| stars', await p.locator('.st[aria-pressed]').count());
   // non-owner, hide mode vs lock mode
   await p.addInitScript(`window.__OWNER=false;window.__PERMS={POS:{view:true,enter:true,approve:false}};`);
   await p.evaluate(() => localStorage.setItem('bos_lang', 'bn')); await p.goto('http://localhost:8091/#/home'); await p.reload(); await sleep(1500);

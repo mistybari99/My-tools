@@ -284,7 +284,7 @@ begin
     hrs := coalesce(public.rule_num('notify_approvals_hours'), 24);
     select count(*), round(max(extract(epoch from (now() - s)) / 3600)) into cnt, amt from (
       select coalesce(e.submitted_at, e.created_at) s from public.entries e where e.status = 'submitted'
-      union all select r.requested_at from public.release_requests r where r.status = 'pending'
+      union all select rq.requested_at from public.release_requests rq where rq.status = 'pending'
       union all select q.created_at from public.emergency_requests q where q.status = 'pending'
       union all select c.requested_at from public.item_changes c where c.status = 'pending'
       union all select p.created_at from public.profiles p where p.status = 'pending'
@@ -539,13 +539,21 @@ begin
     'day_close', closes, 'backup', st);
 end $$;
 
+-- ---------- photos: the backup bot may READ the private "photos" bucket (tools/backup_photos.py); nobody else gains anything ----------
+do $$ begin
+  if to_regclass('storage.objects') is not null then
+    execute 'drop policy if exists ops_photos_read on storage.objects';
+    execute 'create policy ops_photos_read on storage.objects for select to authenticated using (bucket_id = ''photos'' and public._is_ops(''backup''))';
+  end if;
+end $$;
+
 -- ---------- grants ----------
 do $$ declare f text; r regprocedure; begin
   foreach f in array array['_is_ops', '_today', '_notif_ok', '_notif_add', '_backup_tables', '_day_sales', 'ops_account_set', 'backup_manifest', 'backup_dump', 'backup_log', 'backup_status',
       'notify_scan', 'notifications_for_me', 'notifications_unread_count', 'notification_read', 'notification_read_all', 'notify_config', 'urgent_alerts', 'notifications_mark_emailed', 'daily_digest'] loop
     for r in select p.oid::regprocedure from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname = f loop
       execute format('revoke all on function %s from public, anon, authenticated', r);
-      if f in ('_notif_ok', 'ops_account_set', 'backup_manifest', 'backup_dump', 'backup_log', 'backup_status', 'notify_scan', 'notifications_for_me', 'notifications_unread_count', 'notification_read', 'notification_read_all',
+      if f in ('_is_ops', '_notif_ok', 'ops_account_set', 'backup_manifest', 'backup_dump', 'backup_log', 'backup_status', 'notify_scan', 'notifications_for_me', 'notifications_unread_count', 'notification_read', 'notification_read_all',
                'notify_config', 'urgent_alerts', 'notifications_mark_emailed', 'daily_digest') then
         execute format('grant execute on function %s to authenticated', r);
       end if;

@@ -47,7 +47,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   const am = await p.evaluate((a) => a.filter((k) => !/^<svg/.test(window.BOS.icon(k, 18))), acts); ok(!am.length, 'action icons present' + (am.length ? ': ' + am : ''));
   ok(await p.evaluate(() => window.BOS.icon('nope') === '' && !window.BOS.icon.has('nope')), 'unknown key returns empty (nav falls back to old icon)');
   // POS first: owner
-  ok(await p.locator('.sellbig').count() === 1 && await p.evaluate(() => document.querySelector('#hv_main').firstElementChild.classList.contains('sellbig')), 'owner: Sell is the first/largest element of Home');
+  ok(await p.locator('.sellbig').count() === 1 && await p.evaluate(() => { const f = document.querySelector('#hv_main').firstElementChild; return f.classList.contains('hbigrow') && f.firstElementChild.classList.contains('sellbig'); }), 'owner: Sell is the first/largest element of Home');
   const centre = (pp) => pp.evaluate(() => { const b = [...document.querySelectorAll('#bnav > button')]; return b.length + '|' + b.findIndex((x) => x.classList.contains('sell')); });
   ok(await centre(p) === '5|2', 'owner: Sell orb is the centre slot: ' + await centre(p));
   ok(await p.evaluate(() => document.querySelector('#hv_qgrid .qt button').dataset.quick) === 'pos', 'owner: POS is first quick action');
