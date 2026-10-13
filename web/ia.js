@@ -73,7 +73,7 @@ const IA = [
   rec('exceptions', 'appr', 't:exceptions', { ok: approver, cnt: 'ex', tone: 'bad', mob: 1, mod: 9, kw: ['exception', 'problem', 'red', 'alert', 'গরমিল', 'সমস্যা', 'লাল'] }),
   rec('pending', 'appr', ['অনুমোদনের অপেক্ষায়', 'Awaiting approval', 'Approval-এর অপেক্ষায়'], { icon: 'doc', ok: approver, kw: ['pending', 'approve', 'অনুমোদন', 'অপেক্ষা'] }),
   rec('itemreq', 'appr', 't:item_req', { ok: (c) => c.P('ITEMS', 'enter') || c.P('ITEMS', 'approve'), cnt: 'itm', tone: 'info', mod: 4, home: { biz: 3 }, also: ['item'], kw: ['item request', 'price change', 'আইটেম অনুরোধ', 'দাম বদল', 'অনুমোদন'] }),
-  rec('releases', 'appr', 't:releases', { ok: owner, cnt: 'rel', tone: 'warn', mod: 10, kw: ['release', 'unlock', 'red control', 'ছাড়', 'মুক্তি'] }),
+  rec('releases', 'appr', 't:releases', { ok: (c) => c.own || c.GF.release_decide === true, cnt: 'rel', tone: 'warn', mod: 10, kw: ['release', 'unlock', 'red control', 'ছাড়', 'মুক্তি'] }),
   rec('emergency', 'appr', 't:emergency', { ok: owner, cnt: 'em', tone: 'warn', mod: 11, kw: ['emergency', 'override', 'জরুরি'] }),
   rec('changes', 'appr', ['বদলের অনুরোধ', 'Change requests', 'Change request'], { icon: 'doc', ok: (c) => c.own || c.GF.change_approve === true, cnt: 'chg', tone: 'info', kw: ['change', 'revision', 'edit request', 'বদল', 'সংশোধন'] }),
   rec('numaudit', 'appr', 't:numaudit', { ok: approver, mod: 12, kw: ['audit', 'gap', 'serial', 'number', 'অডিট', 'ফাঁক', 'সিরিয়াল'] }),

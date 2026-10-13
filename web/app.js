@@ -199,7 +199,10 @@ function dispatch(page) {
   const local = { home: viewHome, items: viewItems, staff: viewStaff, matrix: viewMatrix, rules: viewRules,
      settings: viewSettings, logs: viewLogs, backup: viewBackup, itemreq: viewItemReq };
   const extra = window.BOS_PAGES || {};
-  if ((page === 'exceptions' || page === 'releases') && !S.ctx.is_owner && !(page === 'exceptions' && Object.values(S.ctx.perms).some((p) => p.approve))) return viewHome();
+  if (page === 'releases' && !S.ctx.is_owner) {      // a delegate holding the grant release_decide may open the release page (the server decides what they see)
+    return hasAnyGrant(['release_decide']).then((ok) => { if (ok && extra.releases) return extra.releases(); return viewHome(); }, () => viewHome());
+  }
+  if (page === 'exceptions' && !S.ctx.is_owner && !Object.values(S.ctx.perms).some((p) => p.approve)) return viewHome();
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
   (local[page] || extra[page] || viewHome)();
 }
