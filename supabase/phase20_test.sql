@@ -50,6 +50,7 @@ select tt.as(:'m'); select decide_entry(:'g0'::uuid, true, null, null, '[]') ->>
 select tt.chk('T1 approved, no ledger rows, no log rows', :'d0'='approved' and not exists (select 1 from stock_ledger where item_id=(select id from items where code='T1'))
   and not exists (select 1 from entry_ledger_posts));
 select tt.as(:'o'); select set_rule('forms_post_to_ledger','true') is null as on1 \gset
+select set_rule('grn_receipt_source','"grn"') is null as on1b \gset   -- phase 23: GRN lines post only when the GRN is chosen as the source
 select tt.chk('T1 turning the switch on does not back-post old approvals', not exists (select 1 from entry_ledger_posts));
 
 \echo == T2 GRN posts
