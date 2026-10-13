@@ -611,7 +611,7 @@ async function home() {
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
   const sellBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
-  const ownBtn = ownerBoardOk() ? `<button class="hbig sellbig ownbig" data-act="go" data-v="owner" data-owner="1">${ico('control', 'sliders', 34)}<span class="sb-t"><b>${esc(T('omode'))}</b><small>${esc(T('omode_d'))}</small></span></button>` : '';
+  const ownBtn = ownerBoardOk() ? `<button class="hbig ownbig" data-act="go" data-v="owner" data-owner="1">${ico('control', 'sliders', 34)}<span class="sb-t"><b>${esc(T('omode'))}</b><small>${esc(T('omode_d'))}</small></span></button>` : '';
   const posBtn = sellBtn || ownBtn ? `<div class="hbigrow">${sellBtn}${ownBtn}</div>` : '';
   if (V2) setTimeout(() => loadOldest(), 0);
   $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
@@ -842,8 +842,8 @@ H.lang = (a) => { sig = ''; return prevLang(a); };
 (() => {
   if (document.getElementById('nav_e_css')) return; const st = document.createElement('style'); st.id = 'nav_e_css';
   st.textContent = `.st.dots{font-size:1.35rem;font-weight:700;line-height:1;color:var(--muted)}.hbtn.dots{font-size:1.5rem;font-weight:700;min-width:44px;min-height:44px}
-  .hbigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 4px}.hbigrow .hbig{margin:0}.hbigrow:empty{display:none}
-  .hbig.ownbig{background:var(--card);color:var(--ink);border:1px solid var(--hair)}.hbig.ownbig svg{color:var(--ink-2)}
+  .hbigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 4px}body .hbigrow>.hbig.hbig{margin:0}.hbigrow:empty{display:none}
+  .hbig.ownbig{display:flex;align-items:center;justify-content:center;gap:12px;min-height:68px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--hair)}.hbig.ownbig svg{width:34px;height:34px;flex:none;color:var(--ink-2)}.hbig.ownbig .sb-t{display:flex;flex-direction:column;align-items:flex-start;line-height:1.3;text-align:start}.hbig.ownbig .sb-t b{font-size:1.05rem}.hbig.ownbig .sb-t small{opacity:.85}
   .qt.edit{flex-direction:column}.qt.edit>.qm{padding-inline-end:38px}.qt .fedit{display:flex;border:1px solid var(--hair);border-top:0;border-radius:0 0 14px 14px;background:var(--card)}
   .qt .fedit button{flex:1;min-height:44px;border:0;background:transparent;color:var(--ink);font-size:1.1rem}.pk-row{display:flex;align-items:center;gap:8px;min-height:48px}.pk-row .lb{flex:1;min-width:0;overflow-wrap:anywhere}`;
   document.head.appendChild(st);

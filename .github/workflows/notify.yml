@@ -1,0 +1,66 @@
+# In-app notifications + Gmail: scan every 30 minutes (urgent mail when something is red), and the daily digest at 08:00 and 21:00 Asia/Dhaka.
+# Setup (secrets, Gmail app password, bot user, default-branch rule): docs/OPS_SETUP.md.  IMPORTANT: scheduled workflows only run from the repository
+# DEFAULT branch, so this file must be on the default branch of mistybari99/My-tools.
+#
+# Minutes: a private repo on the free plan has 2,000 Actions minutes a month. A run takes about a minute, 48 runs a day is ~1,450 minutes. To use fewer,
+# change the first cron to hourly: '0 0-1,3-14,16-23 * * *' (and delete the '30 ...' lines).
+name: notify
+
+on:
+  schedule:
+    - cron: '0,30 0-1,3-14,16-23 * * *'   # every 30 min (UTC hours, except the digest hours below)
+    - cron: '30 2,15 * * *'               # the half hour after each digest hour
+    - cron: '0 2 * * *'                   # 02:00 UTC = 08:00 Asia/Dhaka  -> morning digest (yesterday's numbers)
+    - cron: '0 15 * * *'                  # 15:00 UTC = 21:00 Asia/Dhaka  -> evening digest (today's numbers)
+  workflow_dispatch:
+    inputs:
+      digest:
+        description: 'Also send the daily digest now (ignores the hour, obeys the Switchboard e-mail switch)'
+        type: boolean
+        default: false
+      dry_run:
+        description: 'Dry run: print the e-mails in the log, send nothing'
+        type: boolean
+        default: false
+
+concurrency:
+  group: notify
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      NOTIFY_BOT_EMAIL: ${{ secrets.NOTIFY_BOT_EMAIL }}
+      NOTIFY_BOT_PASSWORD: ${{ secrets.NOTIFY_BOT_PASSWORD }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      MAIL_TO: ${{ secrets.MAIL_TO }}
+      APP_URL: ${{ vars.APP_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Scan, urgent mail, digest
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          DIGEST_NOW: ${{ github.event.inputs.digest }}
+          DRY: ${{ github.event.inputs.dry_run }}
+        run: |
+          MODE=scan; SLOT=manual
+          case "$SCHEDULE" in
+            '0 2 * * *')  MODE=digest; SLOT=08 ;;
+            '0 15 * * *') MODE=digest; SLOT=21 ;;
+          esac
+          if [ "$DIGEST_NOW" = "true" ]; then MODE=digest; SLOT=manual; fi
+          EXTRA=""; if [ "$DRY" = "true" ]; then EXTRA="--dry-run"; fi
+          python3 tools/notify_digest.py --mode "$MODE" --slot "$SLOT" $EXTRA

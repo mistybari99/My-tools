@@ -53,7 +53,7 @@ const EXTRA44 = `(function(){ const real = window.supabase.createClient; window.
     T.partner_ventures = [{ id: 1, name_bn: 'শো-রুম ১ ফ্র্যাঞ্চাইজ', name_en: 'Showroom 1 franchise', scope: 'location', location_id: 1, model: 'franchise', status: 'active' }];
     T.partner_agreements = [{ id: 10, venture_id: 1, title: 'Franchise deed', version: 1, status: 'active', effective_from: '2026-01-01', effective_to: null, clauses: [{ no: 1, title_en: 'Purpose', text_en: 'Run the shop' }], is_example: false },
       { id: 11, venture_id: 1, title: 'Draft deed', version: 1, status: 'draft', effective_from: null, effective_to: null, clauses: [{ no: 1, title_en: 'First', text_en: 'a' }, { no: 2, title_en: 'Second', text_en: 'b' }], is_example: true }];
-    T.agreement_parties = [{ id: 1, agreement_id: 10, party_id: 1, role: 'owner', active: true }, { id: 2, agreement_id: 10, party_id: 4, role: 'franchisee', active: true }, { id: 3, agreement_id: 11, party_id: 1, role: 'owner', active: true }, { id: 4, agreement_id: 11, party_id: 4, role: 'franchisee', active: true }, { id: 5, agreement_id: 11, party_id: 2, role: 'investor', active: true }];
+    T.agreement_parties = [{ id: 1, agreement_id: 10, party_id: 1, role: 'owner', active: true }, { id: 2, agreement_id: 10, party_id: 4, role: 'franchisee', active: true }, { id: 6, agreement_id: 10, party_id: 2, role: 'investor', active: true }, { id: 3, agreement_id: 11, party_id: 1, role: 'owner', active: true }, { id: 4, agreement_id: 11, party_id: 4, role: 'franchisee', active: true }, { id: 5, agreement_id: 11, party_id: 2, role: 'investor', active: true }];
     T.partner_rules = [{ id: 1, agreement_id: 10, step_no: 1, step_key: 'a', name: 'Base', kind: 'base', config: { base: 'net_profit_before_fees' }, active: true }, { id: 2, agreement_id: 10, step_no: 2, step_key: 'b', name: 'Royalty', kind: 'royalty', config: { role: 'owner', percent: 5, base: 'net_sales' }, active: true },
       { id: 3, agreement_id: 10, step_no: 3, step_key: 'c', name: 'Rest', kind: 'split', config: { shares: [{ role: 'franchisee', percent: 100 }] }, active: true },
       { id: 4, agreement_id: 11, step_no: 1, step_key: 'd', name: 'Base', kind: 'base', config: { base: 'net_profit_before_fees' }, active: true }, { id: 5, agreement_id: 11, step_no: 2, step_key: 'e', name: 'Investor payback', kind: 'payback', config: { party_id: 2, percent: 50, then_percent: 20 }, active: true }];
@@ -74,7 +74,7 @@ const EXTRA44 = `(function(){ const real = window.supabase.createClient; window.
   // ---- overview + owner only
   let p = await open('#/partners');
   ok(await p.locator('#pt_tab').count() === 1, 'section select present');
-  let t = await text(p); ok(/Showroom 1 franchise/.test(t) && /100,000/.test(t) && /4,200/.test(t), 'overview shows venture, capital and what is owed'); ok(/2026-03-01/.test(t), 'next settlement date shown');
+  let t = await text(p); ok(/Showroom 1 franchise/.test(t) && /1,00,000/.test(t) && /4,200/.test(t), 'overview shows venture, capital and what is owed'); ok(/2026-03-01/.test(t), 'next settlement date shown');
   await noOverflow(p, 'overview'); await p.screenshot({ path: SP + '/pt_overview.png', fullPage: true });
   const np = await open('#/partners', { owner: false }); ok(/Only the owner/.test(await text(np)) && await np.locator('#pt_tab').count() === 0, 'a non-owner sees only the owner-only note');
 

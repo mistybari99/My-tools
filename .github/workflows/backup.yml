@@ -1,0 +1,128 @@
+# Automatic backup of the Islamia BOS database into the PRIVATE repo, one commit per run (= one saved version), optionally also to Google Drive.
+# Setup (secrets, bot user, default-branch rule): docs/OPS_SETUP.md.  IMPORTANT: scheduled workflows only run from the repository DEFAULT branch,
+# so this file must be on the default branch of mistybari99/My-tools.
+#
+# What it does: tools/backup_dump.py (dump through the least-privilege "ops bot", no service_role key) -> tools/backup_photos.py (private photo bucket)
+# -> commits to the orphan branch "backups": latest/ (always the newest) + YYYY/MM/DD/ (that day's dump). The code branches are never touched.
+name: backup
+
+on:
+  schedule:
+    - cron: '30 20 * * *'      # 20:30 UTC = 02:30 Asia/Dhaka (UTC+6, no daylight saving)
+  workflow_dispatch:
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+permissions:
+  contents: write              # only this workflow pushes (to the "backups" branch)
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      HAS_DRIVE: ${{ secrets.GDRIVE_FOLDER_ID != '' && (secrets.GDRIVE_SERVICE_ACCOUNT_JSON != '' || secrets.GDRIVE_OAUTH_TOKEN != '') }}
+    steps:
+      - name: Refuse to run in a public repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          private=$(gh api "repos/${GITHUB_REPOSITORY}" --jq .private)
+          if [ "$private" != "true" ]; then
+            echo "::error::This repository is not private. Backups contain sales, costs and salaries and must never go to a public repository."
+            exit 1
+          fi
+
+      - name: Get the tools (default branch)
+        uses: actions/checkout@v4
+        with:
+          path: code
+          persist-credentials: false
+
+      - name: Get the backups branch
+        id: co_data
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: backups
+          path: data
+
+      - name: Create the backups branch (first run only)
+        if: steps.co_data.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf data && mkdir data && cd data
+          git init -q -b backups
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          B64=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          echo "::add-mask::$B64"
+          git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $B64"
+          echo "# Backups (private)" > README.md
+          echo "Automatic data backups made by .github/workflows/backup.yml. latest/ is the newest; YYYY/MM/DD/ is that day's dump. See docs/OPS_SETUP.md on the code branch." >> README.md
+
+      - name: Dump the database
+        id: dump
+        run: python3 code/tools/backup_dump.py --out out
+
+      - name: Copy the photos (private bucket)
+        id: photos
+        continue-on-error: true
+        run: |
+          mkdir -p data/latest drive_extra
+          if [ "$HAS_DRIVE" = "true" ]; then DRIVE=--drive; else DRIVE=; fi
+          python3 code/tools/backup_photos.py --git-dir data/latest/photos --drive-dir drive_extra/photos $DRIVE
+
+      - name: Put the dump into latest/ and the dated folder
+        run: |
+          DAY=$(TZ=Asia/Dhaka date +%Y/%m/%d)
+          mkdir -p data/latest "data/$DAY"
+          # latest/ = exactly this run's dump (photos/ inside latest/ is kept: files are only added)
+          find data/latest -maxdepth 1 -type f \( -name '*.ndjson.gz' -o -name 'manifest.json' \) -delete
+          cp out/*.ndjson.gz out/manifest.json data/latest/
+          rm -rf "data/$DAY" && mkdir -p "data/$DAY"
+          cp out/*.ndjson.gz out/manifest.json "data/$DAY/"
+          cp data/latest/photos_manifest.json "data/$DAY/" 2>/dev/null || true
+          echo "DAY=$DAY" >> "$GITHUB_ENV"
+
+      - name: Commit and push to the backups branch
+        env:
+          ROWS: ${{ steps.dump.outputs.rows }}
+        run: |
+          cd data
+          git config user.name "islamia-backup-bot"
+          git config user.email "backup-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "backup $(TZ=Asia/Dhaka date '+%Y-%m-%d %H:%M') rows=${ROWS:-0}"
+          git push origin HEAD:refs/heads/backups
+
+      - name: Install rclone (only when Google Drive is set up)
+        if: env.HAS_DRIVE == 'true'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rclone
+
+      - name: Copy to Google Drive (only when Google Drive is set up)
+        if: env.HAS_DRIVE == 'true'
+        env:
+          RCLONE_CONFIG_GD_TYPE: drive
+          RCLONE_CONFIG_GD_SCOPE: drive
+          RCLONE_CONFIG_GD_ROOT_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+          RCLONE_CONFIG_GD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GDRIVE_SERVICE_ACCOUNT_JSON }}
+          RCLONE_CONFIG_GD_TOKEN: ${{ secrets.GDRIVE_OAUTH_TOKEN }}
+          RCLONE_CONFIG_GD_TEAM_DRIVE: ${{ secrets.GDRIVE_SHARED_DRIVE_ID }}
+        run: |
+          rclone copy data/latest "gd:latest" --include '*.ndjson.gz' --include 'manifest.json' --include 'photos_manifest.json'
+          rclone copy "data/${DAY}" "gd:${DAY}"
+          if [ -d data/latest/photos ] && [ "$(du -sm data/latest/photos | cut -f1)" -lt 1024 ]; then rclone copy data/latest/photos gd:photos; fi
+          if [ -d drive_extra/photos ]; then rclone copy drive_extra/photos gd:photos; fi
+
+      - name: Fail the run if the photo copy failed (the database part is already saved)
+        if: steps.photos.outcome == 'failure'
+        run: |
+          echo "::error::The photo copy failed. The database backup itself was saved. Look at the 'Copy the photos' step."
+          exit 1

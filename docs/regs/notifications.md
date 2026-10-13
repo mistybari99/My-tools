@@ -1,0 +1,25 @@
+# Registration: module F (automatic backup + notifications) - for the lead to apply
+
+## (a) web/ia.js line (group `appr` = Approvals & exceptions; every signed-in active user may open it, the server decides what each person sees)
+```js
+  rec('notifications', 'appr', ['নোটিফিকেশন', 'Notifications', 'Notification'], { icon: 'doc', kw: ['notification', 'alert', 'bell', 'urgent', 'backup', 'warning', 'নোটিফিকেশন', 'সতর্কতা', 'ঘণ্টা', 'ব্যাকআপ'] }),
+```
+Header bell: in `headExtra()` of web/nav.js put `${B.notifications ? B.notifications.badge() : ''}` in front of the dots button (it returns a 40x40 button, `data-act="go" data-v="notifications"`, with a red number that the 60 s poll keeps up to date; the number element has class `nt-badge`). `B.notifications.start()` begins the poll (badge() and the page call it themselves); `B.notifications.refresh()` re-reads the count at once; the window event `bos:notif-count` ({detail:{n}}) fires on every change if the lead prefers to draw the bell elsewhere. Add `notifications` to the `ok`-free list if nav.js hides unknown routes.
+Switchboard (web/switchboard.js, not mine): add `notify: L('নোটিফিকেশন', 'Notifications', 'Notification')` to its `MOD` map so the module name is not shown raw.
+
+## (b) web/index.html script tag (after nav.js and switchboard.js, with the other late pages)
+```html
+<script src="notifications.js"></script>
+```
+(also add `notifications.js` to the service-worker page list if one exists; web/sw.js caches same-origin GETs on its own)
+
+## (c) SQL, rules and grants (supabase/phase46.sql, run after phase28; paste twice is safe)
+* Tables (RLS, select only for the browser, all writes through SECURITY DEFINER functions): `ops_accounts` (owner reads), `backup_runs` (owner reads), `notifications` (each user sees only what `_notif_ok` allows: own, or audience owner / manager / all, and only places they may see), `notification_reads` (own rows).
+* Browser functions: `notifications_for_me(p_limit, p_unread_only, p_level)`, `notifications_unread_count()`, `notification_read(p_id)`, `notification_read_all()`, owner: `ops_account_set(p_user, p_purpose, p_active)`, `backup_status()`.
+* Ops-bot-only functions (error `not allowed` for anyone else, including the owner): `backup_manifest()`, `backup_dump(p_table, p_after_id, p_limit)`, `backup_log(...)` need purpose `backup`; `notify_scan()`, `daily_digest(p_date)`, `urgent_alerts(p_since)`, `notifications_mark_emailed(p_ids)`, `notify_config()` need purpose `notify` (the owner may also call these five).
+* Backup whitelist: every base table in schema public except names containing `_secret`, names starting `ops_`, login data (`login_failures`, `login_attempts`, `login_throttle`), the module's own tables (`backup_runs`, `notifications`, `notification_reads`) and any table with a column named like password / passwd / pin_hash / secret / token / salt / api_key / private_key. Computed at call time, so new tables join automatically.
+* Storage: policy `ops_photos_read` lets the backup bot READ the private `photos` bucket (nothing else, nobody else gains anything).
+* No new grant codes. The ops bot is not an owner, has no roles, and is refused if it is an owner (`owner_cannot_be_bot`).
+* Rules (module `notify`, all editable by the owner; switches show in #/switchboard): `notify_on`, `notify_email_on`, `notify_digest_times` (choice off / 08 / 21 / 08,21), `notify_exceptions_on` + `notify_exceptions_hours` (24), `notify_approvals_on` + `notify_approvals_hours` (24), `notify_lowstock_on` + `notify_lowstock_min` (1), `notify_expiry_on` + `notify_expiry_days` (3), `notify_supdue_on` + `notify_supdue_min` (1000), `notify_credit_on`, `notify_dayclose_on` + `day_close_deadline` (text "22:00", Dhaka), `notify_wastage_on` + `notify_wastage_factor` (3) + `notify_wastage_min` (1000), `notify_cash_on` + `notify_cash_limit` (500), `notify_parallel_on`, `notify_backup_on` + `backup_max_age_hours` (36). The number / text rules are not shown on the Switchboard (it lists switches and choices only); the owner changes them in Settings or by `select set_rule('key', '36')`.
+* Notification kinds made by `notify_scan()` (once per kind + key + day): `red_exceptions` (bad), `approvals_waiting`, `low_stock` (per place), `expiring_batches` (per place), `supplier_overdue`, `credit_breach`, `day_close_missing` (per showroom, after the deadline, skips places whose form 14-1 is still on paper), `wastage_spike`, `cash_gap` (bad, once per exception), `parallel_decision`, `backup_stale` (bad), `backup_failed` (bad). Attendance / payroll lines in the digest are not included yet (those tables do not exist in phase 28; add them with `to_regclass` when they do).
+* Ops files (not the app): `.github/workflows/backup.yml`, `.github/workflows/notify.yml` (must be on the DEFAULT branch to run on schedule), `tools/ops_common.py`, `tools/backup_dump.py`, `tools/backup_photos.py`, `tools/notify_digest.py`, `tools/restore_backup.py`, `tools/test_ops.py`; owner guide `docs/OPS_SETUP.md`.

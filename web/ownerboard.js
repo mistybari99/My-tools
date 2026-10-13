@@ -402,7 +402,7 @@ function css() {
   #ob_main .ob-w.wide{grid-column:1/-1}#ob_main .ob-w.off{opacity:.55}#ob_main .ob-main{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;min-height:88px;padding:10px 12px;border:0;background:transparent;color:var(--ink);text-align:start;font:inherit;border-radius:0}
   #ob_main .ob-main .k{font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}#ob_main .ob-main .v{font-weight:700;font-size:1.35rem;line-height:1.2;overflow-wrap:anywhere;font-variant-numeric:lining-nums tabular-nums}#ob_main .ob-main .s{font-size:.76rem;color:var(--muted);overflow-wrap:anywhere}
   #ob_main .ob-ed{display:flex;gap:2px;border-top:1px solid var(--hair);justify-content:flex-end}#ob_main .ob-ed button{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--ink);font-size:1.1rem}#ob_main .ob-ed button[disabled]{opacity:.3}
-  #ob_main .ob-edit{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}`;
+  #ob_main .ob-bar button{min-height:40px;min-width:40px}#ob_main .ob-edit button{min-height:44px}#ob_main .ob-edit{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}`;
   document.head.appendChild(s);
 }
 const isOn = () => { try { return B.rule('owner_board_on', true) !== false; } catch (e) { return true; } };

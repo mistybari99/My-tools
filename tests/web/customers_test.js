@@ -161,7 +161,7 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
   ok(/already exists/.test(await text(p)), 'friendly duplicate-code text');
 
   // ---------- POS: tier chip + tier-discount button ----------
-  p = await open('#/pos'); await p.click('.pos-item >> nth=0'); await wait(p, 200); await p.click('[data-act=pos_cart]'); await wait(p, 300);
+  p = await open('#/pos'); const pcItem = base.tables.items.find((i) => i.unit === 'pc' && i.sell_price); await p.click(`.pos-item[data-v="${pcItem.id}"]`); await wait(p, 200); await p.click('[data-act=pos_cart]'); await wait(p, 300);
   await p.click('[data-act=pos_cust_show]'); await wait(p, 200); await p.fill('#cu_mobile', '01711111111'); await wait(p, 900);
   t = await p.locator('#cart_cust').innerText(); ok(/Gold/.test(t) && /Free delivery/.test(t) && /1 gift\(s\) due/.test(t), 'POS shows the tier chip, perks and the gift reminder');
   ok(await p.locator('#cart_tier_btn').count() === 1 && /Apply tier discount: Gold 10%/.test(await p.locator('#cart_tier_btn').innerText()), 'one-tap tier discount button');

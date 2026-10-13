@@ -15,6 +15,7 @@ const srvOp = (op, a) => {
   if (op === 'set_pin') { let r = SRV.fav.find((x) => x.kind === a.p_kind && x.key === a.p_key); if (!r) SRV.fav.push(r = { kind: a.p_kind, key: a.p_key, pinned: false, uses: 0, sort: null, label: null, hidden: false }); r.pinned = !!a.p_pinned; return { ok: true }; }
   if (op === 'fav_order_set') { a.p_items.forEach((it, i) => { let r = SRV.fav.find((x) => x.kind === it.kind && x.key === it.key); if (!r) SRV.fav.push(r = { kind: it.kind, key: it.key, pinned: true, uses: 0, sort: i, label: null, hidden: false }); r.sort = i; }); return { ok: true }; }
   if (op === 'fav_meta_set') { let r = SRV.fav.find((x) => x.kind === a.p_kind && x.key === a.p_key); if (!r) SRV.fav.push(r = { kind: a.p_kind, key: a.p_key, pinned: false, uses: 0, sort: null, label: null, hidden: false }); r.label = a.p_label || null; r.hidden = !!a.p_hidden; return { ok: true }; }
+  if (op === 'fav_get') return JSON.parse(JSON.stringify(SRV.fav));
   if (op === 'board_get') return SRV.board.map((r, i) => ({ id: i + 1, widget: r.widget, config: r.config, sort: i, enabled: r.enabled, updated_at: new Date().toISOString() }));
   if (op === 'board_save') { SRV.boardCalls++; if (a.length > 60) return { error: 'too_many_items' }; SRV.board = JSON.parse(JSON.stringify(a)); SRV.saves.push(a.map((x) => x.widget)); return { count: a.length }; }
   return null;
@@ -24,7 +25,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
  const miss = (fn) => ({ data: null, error: { message: 'Could not find the function public.' + fn + ' in the schema cache', code: 'PGRST202' } });
  const errB = () => { const b = new Proxy(function () {}, { get: (t, k) => (k === 'then' ? (res) => Promise.resolve({ data: null, count: null, error: { message: 'relation does not exist', code: '42P01' } }).then(res) : () => b), apply: () => b }); return b; };
- c.from = (name) => ((OB.missingTables || []).includes(name) ? errB() : from(name));
+ const favB = () => { const b = { select: () => b, eq: () => b, delete: () => b, order: () => b, then: (res, rej) => window.__srv('fav_get').then((d) => ({ data: d, error: null })).then(res, rej) }; return b; };
+ c.from = (name) => ((OB.missingTables || []).includes(name) ? errB() : name === 'user_favourites' ? favB() : from(name));
  c.rpc = async (fn, args) => {
   (window.__AC = window.__AC || []).push([fn, clone(args || {})]);
   if ((OB.missing || []).includes(fn)) return miss(fn);
@@ -100,7 +102,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.evaluate(() => { location.hash = '#/home'; }); await wait(p, 900);
   // drawer: no recent, ⋮ on rows
   await p.click('header.top [data-act=nav_open]'); await wait(p, 600);
-  ok(await p.locator('#navDrawer .dr-rc').count() === 0 && !/Recent/.test(await txt(p, '#navDrawer .dr-body')), 'drawer has no Recent block');
+  ok(!/Recent/i.test(await txt(p, '#navDrawer .dr-body')), 'drawer has no Recent block: ' + (/.{20}Recent.{20}/.exec(await txt(p, '#navDrawer .dr-body')) || [''])[0]);
   ok(await p.locator('#navDrawer .dr-i .st').count() > 0 && await p.locator('#navDrawer .dr-i .st[aria-pressed]').count() === 0, 'drawer rows have ⋮, no stars');
   await p.keyboard.press('Escape'); await wait(p, 400);
 
@@ -133,9 +135,9 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const p3 = await open('#/home'); ok(/My dues/.test(await txt(p3, '#hv_fav')), 'label synced to a second phone'); await p3.context().close();
   await p.click('#hd_dots'); await wait(p, 300); ok(await pick(p, 'Show hidden again'), 'header menu can show hidden again'); ok(await p.locator('#hv_tiles .st[data-v="r:items"]').count() === 1, 'tile is back');
   // add / remove through the menu
-  await dots(p, '#hv_tiles .st[data-v="r:biz"]'); ok(await pick(p, 'Pin to favourites'), 'pin via menu'); ok((await pins(p)).includes('r:biz'), 'pinned: ' + JSON.stringify(await pins(p)));
-  ok((await calls(p, 'set_pin')).some((c) => c.p_key === 'biz' && c.p_pinned === true), 'set_pin sent');
-  await dots(p, '#hv_fav .st[data-v="r:biz"]'); ok(await pick(p, 'Unpin'), 'unpin via menu'); ok(!(await pins(p)).includes('r:biz'), 'unpinned');
+  await dots(p, '#hv_tiles .st[data-v="r:reports"]'); ok(await pick(p, 'Pin to favourites'), 'pin via menu'); ok((await pins(p)).includes('r:reports'), 'pinned: ' + JSON.stringify(await pins(p)));
+  ok((await calls(p, 'set_pin')).some((c) => c.p_key === 'reports' && c.p_pinned === true), 'set_pin sent');
+  await dots(p, '#hv_fav .st[data-v="r:reports"]'); ok(await pick(p, 'Unpin'), 'unpin via menu'); ok(!(await pins(p)).includes('r:reports'), 'unpinned');
   // reset order -> menu (registry) order
   await p.click('#hd_dots'); await wait(p, 300); ok(await pick(p, 'Reset order'), 'reset order'); const ro = await pins(p); ok(ro.length === 3, 'reset order keeps the same favourites: ' + JSON.stringify(ro));
   // header ⋮ on another page
@@ -165,23 +167,23 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok((await p.locator('.ob-w[data-w=note]').allInnerTexts()).join(' ').match(/cash counts[\s\S]*stock counts[\s\S]*exceptions/i), 'daily checklist notes present');
   ok(/as of|As of/i.test(await txt(p, '#ob_bar')), 'shows the "as of" time');
   await noOverflow(p, 'owner board'); await p.screenshot({ path: SP + '/oh_board.png', fullPage: true });
-  ok(await p.evaluate(() => [...document.querySelectorAll('.ob-main,#ob_bar button,#ob_bar .tog')].every((b) => b.getBoundingClientRect().height >= 38)), 'tap sizes >= 38px');
+  ok(await p.evaluate(() => [...document.querySelectorAll('.ob-main,#ob_bar button,#ob_bar .tog')].every((b) => b.getBoundingClientRect().height >= 38)), 'tap sizes >= 38px: ' + JSON.stringify(await p.evaluate(() => [...document.querySelectorAll('.ob-main,#ob_bar button,#ob_bar .tog')].map((b) => Math.round(b.getBoundingClientRect().height)).filter((h) => h < 38))));
   // tap opens the page
   await p.click('.ob-w[data-w=cust_dues] .ob-main'); await wait(p, 700); ok(/#\/dues/.test(await p.evaluate(() => location.hash)), 'widget tap opens its page');
   await p.evaluate(() => { location.hash = '#/owner'; }); await wait(p, 1500);
   // note tick persists (no board saved yet -> defaults are written on the first change)
   const firstNote = p.locator('.ob-w[data-w=note]').first(); await firstNote.locator('.ob-main').click(); await wait(p, 500);
   ok(/☑/.test(await firstNote.innerText()), 'note ticked: ' + (await firstNote.innerText()).replace(/\s+/g, ' '));
-  ok(SRV.board.length === 15 && SRV.board.filter((x) => x.widget === 'note' && x.config.done_on === TD).length === 1, 'tick saved with today on the server, whole default list stored (' + SRV.board.length + ')');
+  ok(SRV.board.length === 17 && SRV.board.filter((x) => x.widget === 'note' && x.config.done_on === TD).length === 1, 'tick saved with today on the server, whole default list stored (' + SRV.board.length + ')');
   // edit mode: add / reorder / rename / limits / size / disable / remove / reset
-  await p.click('[data-act=ob_edit_toggle]'); await wait(p, 300); ok(await p.locator('.ob-ed').count() === 15, 'edit mode: controls on every widget');
+  await p.click('[data-act=ob_edit_toggle]'); await wait(p, 300); ok(await p.locator('.ob-ed').count() === 17, 'edit mode: controls on every widget (incl. the two dimmed "not available here" ones)');
   await p.click('[data-act=ob_add]'); await wait(p, 900);
   const cat = await p.evaluate(() => [...document.querySelectorAll('#ob_cat [data-act=ob_addk]')].map((b) => b.dataset.k));
   ok(cat.includes('top_sellers') && cat.includes('report') && cat.includes('page') && cat.includes('counter') && cat.includes('note') && !cat.includes('backup') && !cat.includes('notifications') && !cat.includes('attendance'), 'catalog lists what exists and hides the missing modules: ' + cat.join(','));
   await p.fill('#ob_q', 'top'); await wait(p, 200); ok(await p.locator('#ob_cat [data-act=ob_addk]').count() === 1, 'catalog is searchable');
   await p.click('#ob_cat [data-k=top_sellers]'); await wait(p, 900);
   ok(await p.locator('.ob-w[data-w=top_sellers]').count() === 1 && /Rosogolla/.test(await wt('top_sellers')), 'top sellers widget added with data: ' + (await wt('top_sellers')).replace(/\s+/g, ' '));
-  ok(SRV.board.length === 16 && SRV.board[15].widget === 'top_sellers', 'add persisted through owner_board_save');
+  ok(SRV.board.length === 18 && SRV.board[17].widget === 'top_sellers', 'add persisted through owner_board_save');
   // move to top via the widget menu
   await p.click('.ob-w[data-w=top_sellers] [data-act=ob_menu]'); await wait(p, 300); ok(await pick(p, 'Move to top'), 'widget menu: move to top');
   ok((await p.evaluate(() => document.querySelector('.ob-w').dataset.w)) === 'top_sellers' && SRV.board[0].widget === 'top_sellers', 'moved to top and saved');
