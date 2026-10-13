@@ -151,3 +151,9 @@ G Control: 16 PIN lockout (postponed) · 17 restore drill · 18 2FA · 19 forms 
 H Integration: 21 SMS/WhatsApp · 22 payment gateway · 23 accounting export
 I Duplicate guards: 24 payroll · 25 stock · 26 production · 27 owner top-up · 28 expense (all via shadow copy)
 New: 29 attendance = two systems kept (staff attendance + daily attendance), both live, one count · 30 AI Assistant tab as side/front tab on Owner account, owner can grant access to others (verify what exists: route `assistant`, phase47)
+
+## 13. Owner scope selection (13 Oct 2026)
+Selected: ALL numbers 1–28 (A–I). Requests 29, 30.
+29 Attendance: (a) staff self-punch in software, owner can lock per person/role; (b) not everyone uses a device; fingerprint/face registration option exists; (c) owner can grant a manager permission to mark others' daily attendance, rest time, closing time — via device/finger/face or manual entry. Honest limits: browser face/WebAuthn = evidence, not identity proof; fingerprint only via external device; GPS soft.
+30 AI Assistant: side tab, default owner only; others only by explicit grant; without grant the option is invisible. (Check existing `assistant` route/grants first.)
+Status: scope chosen, implementation NOT yet approved. Pending: Form Kit/Business Guide, final go.
