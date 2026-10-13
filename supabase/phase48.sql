@@ -19,6 +19,8 @@ create table if not exists public.path_domains (
   a_bn text not null, a_en text not null,                    -- path A (app / quick / screen)
   b_bn text not null, b_en text not null,                    -- path B (formal paper form / second screen)
   default_primary text not null default 'a' check (default_primary in ('a', 'b', 'first')),   -- which record is counted when both paths hold the same event
+  legacy_rule text,                                          -- an older owner switch that already meant "the form is the record": while it is ON the default primary is b (keeps today's behaviour)
+  allow_first boolean not null default false,                -- 'first one wins' only where the two records have a natural key (payroll month, owner money amount/date); not for stock
   note_bn text, note_en text,
   sort int not null default 0
 );
@@ -38,6 +40,8 @@ insert into public.path_domains (domain, a_bn, a_en, b_bn, b_en, default_primary
  ('owner_money',   'পার্টনার ক্যাপিটাল',          'Partner capital',                  'ক্যাশ মুভ (মালিকের জমা/উত্তোলন)', 'Cash move (owner top-up / draw)',       'a',
   'ডিফল্ট: পার্টনার ক্যাপিটাল মূল, ক্যাশ মুভ শ্যাডো।', 'Default: partner capital is primary, the cash move gets the shadow.', 70)
 on conflict (domain) do nothing;
+update public.path_domains set allow_first = true where domain in ('payroll', 'expense', 'owner_money') and not allow_first;
+update public.path_domains set legacy_rule = 'forms_post_to_ledger' where domain in ('stock_issue', 'stock_transfer', 'stock_count', 'production') and legacy_rule is distinct from 'forms_post_to_ledger';
 
 -- ---------- 2. the owner's switch ----------
 create table if not exists public.path_switch (
@@ -102,7 +106,7 @@ create policy shadow_links_sel on public.shadow_links for select to authenticate
 -- the effective setting: a place row beats the all-places row beats the domain default
 create or replace function public.path_cfg(p_domain text, p_loc int default 0) returns jsonb
 language sql stable security definer set search_path = public as $$
-  select jsonb_build_object('a_open', coalesce(x.a_open, true), 'b_open', coalesce(x.b_open, true), 'primary', coalesce(x.primary_rule, d.default_primary))
+  select jsonb_build_object('a_open', coalesce(x.a_open, true), 'b_open', coalesce(x.b_open, true), 'primary', coalesce(x.primary_rule, case when d.legacy_rule is not null and public.rule_on(d.legacy_rule) then 'b' else d.default_primary end))
     from public.path_domains d
     left join lateral (select s.* from public.path_switch s where s.domain = d.domain and s.location_id in (0, case when coalesce(p_loc, 0) > 0 then p_loc else 0 end)
                         order by s.location_id desc limit 1) x on true
@@ -141,6 +145,7 @@ begin
   if not exists (select 1 from public.path_domains where domain = p_domain) then raise exception 'unknown_domain'; end if;
   if p_a_open is null or p_b_open is null then raise exception 'bad_mode'; end if;
   if p_primary is not null and p_primary not in ('a', 'b', 'first') then raise exception 'bad_primary'; end if;
+  if p_primary = 'first' and not (select allow_first from public.path_domains where domain = p_domain) then raise exception 'first_not_allowed: stock and production records have no natural key, choose a or b'; end if;
   if loc > 0 and not exists (select 1 from public.locations where id = loc) then raise exception 'unknown_location'; end if;
   old := public.path_cfg(p_domain, loc);
   insert into public.path_switch (domain, location_id, a_open, b_open, primary_rule, note, updated_by, updated_at) values (p_domain, loc, p_a_open, p_b_open, p_primary, nullif(btrim(p_note), ''), auth.uid(), now())

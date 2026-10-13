@@ -57,8 +57,17 @@ select tt.err('T2 guard bad path', $$select path_guard('stock_issue',1,'c')$$, '
 do $$ begin perform path_guard('stock_issue',1,'b'); perform tt.chk('T2 guard passes an open path', true); exception when others then perform tt.chk('T2 guard passes an open path', false); end $$;
 select tt.chk('T2 winner: primary=b -> the incoming form wins, an incoming screen record loses', path_winner('stock_issue',1,'b')='incoming' and path_winner('stock_issue',1,'a')='existing');
 select tt.chk('T2 winner: default a -> the incoming app record wins', path_winner('payroll',1,'a')='incoming' and path_winner('payroll',1,'b')='existing');
+select tt.err('T2 first-wins is refused for stock', $$select path_switch_set('stock_issue',0,true,true,'first')$$, 'first_not_allowed');
 select path_switch_set('payroll',0,true,true,'first') is not null as pf \gset
 select tt.chk('T2 winner: first -> the earlier record always wins', path_winner('payroll',1,'a')='existing' and path_winner('payroll',1,'b')='existing');
+
+\echo == T2b legacy rule keeps today's behaviour
+select set_rule('forms_post_to_ledger','true') is null as r_on \gset
+select tt.chk('T2b stock default flips to b while forms_post_to_ledger is ON; payroll/expense unaffected', path_primary('stock_count',1)='b' and path_primary('production',3)='b' and path_primary('expense',1)='a');
+select path_switch_set('stock_count',0,true,true,'a') is not null as r_sw \gset
+select tt.chk('T2b an explicit owner row beats the legacy flip', path_primary('stock_count',1)='a');
+select set_rule('forms_post_to_ledger','false') is null as r_off \gset
+select tt.chk('T2b switch OFF again -> default a', path_primary('production',3)='a');
 
 \echo == T3 shadow engine
 select shadow_link_add('payroll',1,'payroll_runs','R1','entries:02-2','E1','app payroll wins') as l1 \gset
