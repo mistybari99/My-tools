@@ -222,7 +222,6 @@ document.addEventListener('change', (e) => {
   HS.data = null;
   if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') loadStats(); else window.dispatchEvent(new HashChangeEvent('hashchange'));   // the open screen draws again with the new place
   if ($('#hv_sheets')) loadSheets();
-  if ($('#hv_oldest')) loadOldest();
 });
 
 // ---------- drawer search over items / customers (the menu itself is searched on the phone, instantly) ----------
@@ -515,6 +514,7 @@ async function home() {
     <div class="card" style="padding:4px 12px">${hot.length ? hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')
       : `<div class="dash-ok">${esc(V2 ? T('all_clear') : T('attn_ok'))}</div>`}${V2 && rows.filter((r) => r[1]).length > 5 ? `<button class="hrow" data-act="go" data-v="${own || ctlOk() ? 'control' : 'pending'}"><span>${esc(T('see_all'))}</span><span class="cv">›</span></button>` : ''}</div>` : (V2 && hot.length ? `<div class="hsec">${esc(T('attn'))}<small>${hot.reduce((s, r) => s + r[1], 0)}</small></div><div class="card" style="padding:4px 12px">${hot.map((r) => `<button class="hrow mk ${r[2]}" data-act="go" data-v="${r[4]}"><span>${esc(r[3])}</span><span class="n">${r[1]}</span><span class="cv">›</span></button>`).join('')}</div>` : '');
   const posBtn = P('POS', 'enter') ? `<button class="primary hbig sellbig" data-act="go" data-v="pos" data-sell="1">${ic3('sell', 34)}<span class="sb-t"><b>${esc(T('sell'))}</b><small>${esc(t('pos'))}</small></span></button>` : '';
+  if (V2) setTimeout(() => loadOldest(), 0);
   $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + '</div><div id="hv_fav"></div><div id="hv_recent"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
