@@ -109,5 +109,14 @@ set role authenticated; select tt.as(:'o');
 select needs_you_oldest(5) as ny \gset
 select tt.chk('T8 oldest first and typed', (:'ny'::jsonb->0->>'label') like '%9002%' and (:'ny'::jsonb->0->>'kind')='entry' and jsonb_array_length(:'ny'::jsonb)>=2);
 select tt.as(:'k'); select tt.chk('T8 a person without approve rights sees none of those', not exists (select 1 from jsonb_array_elements(needs_you_oldest(20)) x where x->>'kind'='entry'));
+
+\echo == flow skips
+select tt.as(:'s');
+select tt.err('T9 a skip needs a note', $$select flow_skip('close_day','deposit',1,current_date,'')$$, 'note_required');
+select flow_skip('close_day','deposit',1,current_date,'paper slip used') is not null as fs \gset
+select flow_skip('close_day','deposit',1,current_date,'again') is not null as fs2 \gset
+select tt.chk('T9 one skip per person, step and day', (select count(*) from flow_skips)=1);
+select tt.as(:'k'); select tt.chk('T9 others cannot read it, the owner can', (select count(*) from flow_skips)=0);
+select tt.as(:'o'); select tt.chk('T9 owner reads it', (select count(*) from flow_skips)=1);
 reset role;
 select 'RESULT ' || count(*) filter (where ok) || ' pass / ' || count(*) filter (where not ok) || ' fail' from tt.res;

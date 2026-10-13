@@ -14,6 +14,10 @@
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values
  ('parallel_compare_on', 'entries', 'switch', 'true', null, null, null, null, 'পাশাপাশি মাস: দৈনিক তুলনা ও মাস-শেষের পাস/ফেল', 'Parallel মাস: daily comparison ও month-end pass/fail', 'Parallel month: daily comparison and month-end pass / fail',
   'বন্ধ করলে মাস-শেষে পাস/ফেল ছাড়াই মালিক নিজে কাগজ→অ্যাপ বদলাতে পারবেন (আগের মতো)।', 'Off = the owner can move paper→app without the month-end pass / fail (as before).', 90),
+ ('smart_defaults_on', 'entries', 'switch', 'true', null, null, null, null, 'নতুন ফর্মে "আগেরটা থেকে নিন" বোতাম', 'নতুন form-এ "আগেরটা থেকে নিন" button', 'A "Start from my last one" button on a new form',
+  'আগের এন্ট্রি থেকে শুধু আইটেম, সরবরাহকারী ও পছন্দের ঘর নেয়; কোনো পরিমাণ, টাকা, তারিখ বা সই নেয় না।', 'Copies only items, suppliers and choices from your last entry - never quantities, money, dates, signatures or photos.', 92),
+ ('offline_cache_on', 'ui', 'switch', 'true', null, null, null, null, 'ইন্টারনেট ছাড়া অ্যাপ খোলা (ফোনে সংরক্ষণ)', 'Internet ছাড়া app খোলা (phone-এ cache)', 'Open the app without internet (cached on the phone)',
+  'বন্ধ করলে ফোন থেকে সংরক্ষিত কপি মুছে যায়; অ্যাপ আগের মতো ইন্টারনেট লাগবে।', 'Off = the saved copy is removed from the phone; the app needs internet to start, as before.', 93),
  ('print_notes_auto', 'settings', 'switch', 'true', null, null, null, null, 'জায়গার নাম বদল/বন্ধে ছাপার নোট নিজে হবে', 'জায়গার নাম বদল/বন্ধে print note নিজে হবে', 'Print note is made when a place is renamed or closed',
   'পরের ছাপায় কী বদলাতে হবে তার নোট। ছাপার তারিখ লেখা না হওয়া পর্যন্ত নোট থাকে।', 'A note of what to change at the next print; it stays until the new print is recorded.', 91)
  on conflict (key) do nothing;
@@ -332,6 +336,38 @@ begin
   ) x;
   return out_;
 end $$;
+
+
+-- ---------- guided flows: a skipped step is recorded with a note (never silently ticked) ----------
+create table if not exists public.flow_skips (
+  id bigserial primary key,
+  flow text not null check (flow ~ '^[a-z_]{2,30}$'), step text not null check (step ~ '^[a-z0-9_]{1,40}$'),
+  location_id int references public.locations(id), day date not null,
+  note text not null check (length(btrim(note)) >= 3),
+  created_by uuid not null, created_staff text, created_at timestamptz not null default now(),
+  unique (flow, step, location_id, day, created_by)
+);
+alter table public.flow_skips enable row level security;
+drop policy if exists flow_skips_read on public.flow_skips;
+create policy flow_skips_read on public.flow_skips for select to authenticated using (created_by = auth.uid() or public.is_owner());
+revoke all on public.flow_skips from public, anon, authenticated; grant select on public.flow_skips to authenticated;
+drop trigger if exists audit_flow_skips on public.flow_skips;
+create trigger audit_flow_skips after insert on public.flow_skips for each row execute function public.log_change('id');
+drop trigger if exists flow_skips_no_change on public.flow_skips;
+create trigger flow_skips_no_change before update or delete on public.flow_skips for each row execute function public.no_hard_delete();
+create or replace function public.flow_skip(p_flow text, p_step text, p_loc int, p_day date, p_note text) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare sid text;
+begin
+  if not public.is_active() or (p_loc is not null and not public.can_loc(p_loc)) then raise exception 'not allowed'; end if;
+  if p_note is null or length(btrim(p_note)) < 3 then raise exception 'note_required'; end if;
+  if p_day is null or p_day > (now() at time zone 'Asia/Dhaka')::date or p_day < (now() at time zone 'Asia/Dhaka')::date - 31 then raise exception 'bad_date'; end if;
+  select staff_id into sid from public.profiles where id = auth.uid();
+  insert into public.flow_skips (flow, step, location_id, day, note, created_by, created_staff) values (p_flow, p_step, p_loc, p_day, left(btrim(p_note), 300), auth.uid(), sid)
+    on conflict (flow, step, location_id, day, created_by) do nothing;
+  return jsonb_build_object('ok', true);
+end $$;
+revoke all on function public.flow_skip(text, text, int, date, text) from public, anon; grant execute on function public.flow_skip(text, text, int, date, text) to authenticated;
 
 revoke all on function public._par_mgr(), public._books_mgr(int), public._loc_print_note(), public.comparison_pair_save(text, text, text, text, text, bigint, boolean), public.comparison_record(bigint, int, date, text, numeric),
   public.comparison_explain(bigint, text, text), public.parallel_month_status(text, int, date), public.parallel_month_decide(text, int, date, boolean, text), public.parallel_waiting(),
