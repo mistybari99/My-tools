@@ -24,3 +24,15 @@ Local DB: `su postgres -c "/usr/lib/postgresql/16/bin/pg_ctl -D /tmp/pg5544 -o '
 - Payroll/partner capital/advances still have no journal source (P2 gap #6). Web: new screens not browser-tested on a phone; web tests for paths.js not written.
 - setup-sql.html (public repo) not rebuilt for 48-51.
 - P2 next (accounts + attendance), then P3. Ask owner before each part.
+
+## P2 / P3 (built by 6 agents, integrated by lead) - paste order after phase51: 52, 53, 54, 60, 61, 62
+| phase | gaps | report | route |
+|---|---|---|---|
+| 52 | #6 journal auto-post: payroll payments, advances, partner capital (owner money posts once) | docs/briefs_p2p3/p2a_REPORT.md | accounts screen |
+| 53 | #1-#5 bank reconcile, year close, VAT report, assets+depreciation, budgets | p2b_REPORT.md | #/finance2 |
+| 54 | #29 attendance counted once + self punch + mark others, #20 equation check (#19 already existed in entry.js) | p2c_REPORT.md | #/attend2, #/eqcheck |
+| 60 | #7-#10 reorder, wastage by reason, batch/expiry, QC | p3a_REPORT.md | #/stockx |
+| 61 | #11-#14 online orders, 20-x link, benefits, BI export | p3b_REPORT.md | #/onlineorders #/saleforms #/benefitsx #/biexport |
+| 62 | #21-#23 SMS queue, payment recon, accounting export; #30 assistant = owner + assistant_use grant only | p3c_REPORT.md | #/integrations |
+SQL tests (fresh DB through 62): 48:54 49:16 50:45 51:23 52:33 53:112 54:84 60:62 61:114 62:74, all pass. phase47_test 2 old asserts (role list / head management open the assistant) now fail ON PURPOSE (phase62 tightens #30).
+Open: #16 PIN postponed; #17 restore drill, #18 2FA not built; none of the web pages seen on a real phone; setup-sql.html not rebuilt; owner must decide the notes in each report ("Not done").

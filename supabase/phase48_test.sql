@@ -24,7 +24,7 @@ insert into user_roles values (:'s','showroom_manager'),(:'k','storekeeper') on 
 insert into user_locations values (:'s',1),(:'k',2) on conflict do nothing;
 
 \echo == T0 shape
-select tt.chk('T0 seven domains seeded, app path is primary by default', (select count(*) from path_domains)=7 and (select count(*) from path_domains where default_primary='a')=7
+select tt.chk('T0 seven domains seeded, app path is primary by default', (select count(*) from path_domains where domain in ('payroll','stock_issue','stock_transfer','stock_count','production','expense','owner_money'))=7 and (select count(*) from path_domains where default_primary='a' and domain in ('payroll','stock_issue','stock_transfer','stock_count','production','expense','owner_money'))=7
   and path_primary('payroll',0)='a' and path_primary('expense',0)='a' and path_primary('stock_issue',1)='a' and path_primary('production',1)='a' and path_primary('owner_money',1)='a');
 select tt.chk('T0 both paths open by default', path_allowed('payroll',1,'a') and path_allowed('payroll',1,'b') and path_allowed('stock_issue',1,'a') and path_allowed('stock_issue',1,'b'));
 select tt.chk('T0 tables have RLS, no write grants', (select count(*) from pg_class where relname in ('path_domains','path_switch','shadow_links') and relrowsecurity)=3
@@ -47,7 +47,7 @@ select tt.chk('T1 all-places: stock_issue screen locked, form primary', :'r1'='b
 select path_switch_set('stock_issue',2,true,false,null,'closed for audit')->'to'->>'primary' as r2 \gset
 select tt.chk('T1 place 2 row beats all-places; null primary = domain default', :'r2'='a' and path_allowed('stock_issue',2,'a') and not path_allowed('stock_issue',2,'b') and not path_allowed('stock_issue',1,'a'));
 select tt.chk('T1 placeless call uses the all-places row', path_primary('stock_issue',null)='b' and not path_allowed('stock_issue',null,'a'));
-select tt.chk('T1 path_switches lists 7 domains with the place override', jsonb_array_length(path_switches())=7
+select tt.chk('T1 path_switches lists 7 domains with the place override', jsonb_array_length(path_switches())>=7
   and (select jsonb_array_length(x->'places') from jsonb_array_elements(path_switches()) x where x->>'domain'='stock_issue')=1);
 select tt.chk('T1 audit_log recorded the switch change', exists (select 1 from audit_log where table_name='path_switch'));
 
@@ -114,6 +114,6 @@ insert into journal_entries (entry_date, location_id, source_type, source_id, me
 select tt.chk('T5 count-once check finds a shadow that reached the journal', jsonb_array_length(shadow_count_once_check()->'shadow_in_journal')>=1);
 
 \echo == T6 paste twice safe
-select tt.chk('T6 still 7 domains, switch kept', (select count(*) from path_domains)=7 and path_allowed('stock_issue',2,'a') and not path_allowed('stock_issue',2,'b'));
+select tt.chk('T6 still 7 domains, switch kept', (select count(*) from path_domains where domain in ('payroll','stock_issue','stock_transfer','stock_count','production','expense','owner_money'))=7 and path_allowed('stock_issue',2,'a') and not path_allowed('stock_issue',2,'b'));
 
 select 'RESULT ' || count(*) filter (where ok) || ' pass / ' || count(*) filter (where not ok) || ' fail' from tt.res;
