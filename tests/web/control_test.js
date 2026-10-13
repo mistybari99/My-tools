@@ -24,7 +24,7 @@ const base = C.baseData(SP), PORT = 8322, srv = C.serve(PORT);
   let p = await open({}, '#/control');
   ok(await p.locator('[data-tile]').count() === 12, 'owner sees 12 tiles');
   ok(await p.locator('.grid[data-group]').count() === 4, 'four groups');
-  ok(await p.locator('[data-tile].soon').count() === 1, 'Print & books is the only Soon tile (Rollout board now opens #/rollout)');
+  ok(await p.locator('[data-tile].soon').count() === 0, 'no Soon tile is left (Print & books now opens #/printbooks)');
   ok(await p.locator('[data-tile=locations] .badge').textContent() === '1', 'Locations tile shows places being set up');
   ok(await p.locator('[data-tile=locset] .badge').textContent() === '1' && await p.locator('[data-tile=lists] .badge').textContent() === '4' && await p.locator('[data-tile=items] .badge').textContent() === '2' && await p.locator('[data-tile=staff] .badge').textContent() === '1', 'tile counts from the server');
   ok(await p.locator('#cc_needs [data-need]').count() === 7, 'merged Needs you: 7 rows with a count (releases/emergency are 0)');
