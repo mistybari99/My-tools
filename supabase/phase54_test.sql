@@ -166,14 +166,14 @@ select tt.err('T6 a month in an approved payroll cannot be re-marked', format($$
 \echo == T7 two paths counted once
 select tt.as(:'o');
 select count(*) as cnt_before from entries where form_code='02-1' \gset
-select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"Karim","present":2,"late":1,"absent":1}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f1 \gset
+select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"Karim","present":2,"late":0,"absent":1,"ot_hours":2}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f1 \gset
 select submit_entry(:'f1'::uuid) is not null as sub_f1 \gset
 select tt.chk('T7 submitted 02-1 for a month that path A holds is a locked shadow (primary a)', tt.is_shadow('entries', :'f1') and (select count(*) from shadow_links where domain='attendance' and state='confirmed')=1);
 reset role;
 select tt.err('T7 the shadow cannot be changed or re-opened', format($$update entries set status='draft' where id='%s'$$, :'f1'), 'shadow_locked');
 set role authenticated; select tt.as(:'o');
 select attendance_count_once(1, :'m0'::date) as co \gset
-select tt.chk('T7 report: counted = attendance record, form listed as shadow, Karim matches (2 present incl. 1 late, 1 late, 1 absent)',
+select tt.chk('T7 report: counted = attendance record, form listed as shadow, Karim matches (2 present, 1 absent, 2 OT hours)',
   (:'co'::jsonb ->> 'counted')='attendance_record' and (:'co'::jsonb -> 'forms' -> 0 ->> 'is_shadow')='true' and (:'co'::jsonb ->> 'mismatches')='0'
   and ((:'co'::jsonb -> 'rows' -> 0 -> 'device' ->> 'present')::numeric)=2 and ((:'co'::jsonb -> 'rows' -> 0 -> 'form' ->> 'present')::numeric)=2);
 select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"করিম","present":5,"late":0,"absent":0}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f2 \gset
@@ -239,8 +239,9 @@ select save_entry(null,'10-2',1,tt.today(),'{"lines":[{"head":"x","amount":"300"
 select submit_entry(:'q6'::uuid) is not null as s1 \gset
 select tt.chk('T9 switch ON: one red exception equation_mismatch is raised for the differing sheet; the submit still went through',
   (select count(*) from exceptions where entry_id=:'q6'::uuid and flag_code='equation_mismatch' and level='red' and status='open')=1 and (select status from entries where id=:'q6'::uuid)='submitted');
-select submit_entry(:'q1'::uuid) is not null as s2 \gset
-select tt.chk('T9 switch ON: an honest sheet raises nothing', (select count(*) from exceptions where entry_id=:'q1'::uuid and flag_code='equation_mismatch')=0);
+select save_entry(null,'10-2',1,tt.today(),'{"lines":[{"head":"x","amount":"300","receipt":"yes"}],"cash_now":"4600","receipts_total":"400"}','[]') ->> 'id' as q7 \gset
+select submit_entry(:'q7'::uuid) is not null as s2 \gset
+select tt.chk('T9 switch ON: an honest sheet raises nothing', (select status from entries where id=:'q7'::uuid)='submitted' and (select count(*) from exceptions where entry_id=:'q7'::uuid and flag_code='equation_mismatch')=0);
 select set_rule('entry_equation_flag_on', null) is null as r10 \gset
 
 select 'RESULT ' || count(*) filter (where ok) || ' pass / ' || count(*) filter (where not ok) || ' fail' from tt.res;

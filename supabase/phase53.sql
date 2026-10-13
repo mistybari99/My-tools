@@ -62,8 +62,7 @@ create table if not exists public.bank_recon_matches (
   how text not null default 'manual' check (how in ('manual', 'suggested')),
   note text,
   matched_by uuid, matched_at timestamptz not null default now(),
-  unmatched_by uuid, unmatched_at timestamptz, unmatch_note text,
-  foreign key (entry_id, line_no) references public.journal_lines(entry_id, line_no)
+  unmatched_by uuid, unmatched_at timestamptz, unmatch_note text      -- (entry_id, line_no) is checked in _a53_match1; no FK so phase40's truncate guard on journal_lines stays the one that answers
 );
 create unique index if not exists brm_line_uq on public.bank_recon_matches (line_id) where active;
 create unique index if not exists brm_jl_uq on public.bank_recon_matches (entry_id, line_no) where active;
