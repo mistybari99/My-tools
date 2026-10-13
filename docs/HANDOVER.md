@@ -1,3 +1,5 @@
+> **NOTE: later state, remaining work and working method are in docs/HANDOVER_2.md — read it first.**
+
 # HANDOVER — start here in a new chat (read fully before doing anything)
 
 ## 0. Who and what
