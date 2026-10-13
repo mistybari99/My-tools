@@ -256,7 +256,7 @@ async function assignSheet() {
     <div><label for="as_s">${esc(T('shifts'))}</label><select id="as_s">${D.shifts.map((s) => `<option value="${s.id}">${esc(s.name_bn)} ${esc(String(s.start_time).slice(0, 5))}–${esc(String(s.end_time).slice(0, 5))}</option>`).join('')}</select></div>
     <div class="row"><div><label for="as_f">${esc(T('from'))}</label><input id="as_f" type="date" value="${today()}"></div><div><label for="as_t">${esc(T('to'))}</label><input id="as_t" type="date"></div></div>
     <div>${esc(T('days'))}${wdBoxes('as_wd', () => true)}</div><div>${esc(T('offDays'))}${wdBoxes('as_off', () => false)}</div>
-    <button class="primary full" data-act="as_save">${esc(T('save'))}</button></div>`);
+    <button class="primary full" data-act="shf_save">${esc(T('save'))}</button></div>`);
 }
 
 // ---------------- page ----------------
@@ -366,7 +366,7 @@ Object.assign(H, {
     if (!a.dataset.v) data.location_id = D.loc;
     const d = await rpc('shift_save', { p_id: a.dataset.v ? Number(a.dataset.v) : null, p_data: data }, 'saved'); if (d) { closeSheet(); draw(); } },
   sh_assign: () => assignSheet(),
-  as_save: async () => { const m = (cls) => $$('.' + cls).reduce((s, b) => s | (b.checked ? 1 << Number(b.value) : 0), 0); const off = m('as_off');
+  shf_save: async () => { const m = (cls) => $$('.' + cls).reduce((s, b) => s | (b.checked ? 1 << Number(b.value) : 0), 0); const off = m('as_off');
     const d = await rpc('shift_assign', { p_emp: val('as_e'), p_shift: Number(val('as_s')), p_from: val('as_f'), p_to: val('as_t') || null, p_weekdays: m('as_wd'), p_off_mask: off || null, p_client: rid() }, 'saved'); if (d) closeSheet(); },
   hol_add: () => openSheet(`<h3>${esc(T('addHol'))}</h3><div class="stack"><div><label for="ho_d">${esc(T('date'))}</label><input id="ho_d" type="date"></div><div><label for="ho_bn">${esc(T('hName'))}</label><input id="ho_bn" autocomplete="off"></div>
       <div><label for="ho_en">${esc(T('hNameEn'))}</label><input id="ho_en" autocomplete="off"></div>${S.ctx.is_owner ? `<label class="row"><input type="checkbox" id="ho_all"> ${esc(T('allPlaces'))}</label>` : ''}

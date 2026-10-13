@@ -33,7 +33,7 @@ const EXTRA10 = `(function(){ const real = window.supabase.createClient; window.
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|code: P0001/.test(m.text())) errors.push('console: ' + m.text()); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA10 }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    await p.route((u) => u.pathname === '/', async (r) => { const res = await r.fetch(); const body = (await res.text()).replace('</body>', '<script src="notifications.js"></script></body>'); await r.fulfill({ response: res, body }); });
+    await p.route((u) => u.pathname === '/', async (r) => { const res = await r.fetch(); const body = ((h) => (/notifications\.js/.test(h) ? h : h.replace('</body>', '<script src="notifications.js"></script></body>')))(await res.text()); await r.fulfill({ response: res, body }); });
     const data = C.mk(base, {}); data.tables.backup_runs = [{ finished_at: '2026-10-12T02:40:00Z', status: 'failed', tables: 60, rows: 0 }, { finished_at: '2026-10-11T02:40:00Z', status: 'ok', tables: 60, rows: 12345 }];
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__NOTES=${JSON.stringify(o.empty ? [] : NOTES())};window.__OWNER=${o.owner === false ? 'false' : 'true'};try{localStorage.setItem('bos_lang','${o.lang || 'en'}')}catch(e){}`);
     await p.goto(`http://localhost:${PORT}/` + hash); await p.waitForTimeout(1400); return p;

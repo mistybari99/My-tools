@@ -154,7 +154,7 @@ const EXTRA42 = `(function(){ const real = window.supabase.createClient; window.
   t = await text(p); ok(/General shift/.test(t) && /09:00–18:00/.test(t) && /Victory Day/.test(t), 'shift and holiday listed');
   await p.click('[data-act=sh_edit][data-v=""]'); await wait(p, 300); await p.fill('#sh_bn', 'রাত'); await p.fill('#sh_st', '22:00'); await p.fill('#sh_et', '06:00'); await p.click('[data-act=sh_save]'); await wait(p, 500);
   c = await calls(p, 'shift_save'); ok(c.length === 1 && c[0].p_id === null && c[0].p_data.start_time === '22:00' && c[0].p_data.end_time === '06:00' && c[0].p_data.location_id === 1 && c[0].p_data.break_min === 60, 'new shift sent');
-  await p.click('[data-act=sh_assign]'); await wait(p, 300); await p.selectOption('#as_e', 'e2'); await p.uncheck('.as_wd[value="5"]'); await p.check('.as_off[value="5"]'); await p.click('[data-act=as_save]'); await wait(p, 400);
+  await p.click('[data-act=sh_assign]'); await wait(p, 300); await p.selectOption('#as_e', 'e2'); await p.uncheck('.as_wd[value="5"]'); await p.check('.as_off[value="5"]'); await p.click('[data-act=shf_save]'); await wait(p, 400);
   c = await calls(p, 'shift_assign'); ok(c.length === 1 && c[0].p_emp === 'e2' && c[0].p_weekdays === 127 - 32 && c[0].p_off_mask === 32 && c[0].p_client, 'shift assignment with weekdays and weekly off');
   await p.click('[data-act=hol_add]'); await wait(p, 300); await p.fill('#ho_d', '2026-12-25'); await p.fill('#ho_bn', 'বড়দিন'); await p.click('[data-act=ho_save]'); await wait(p, 500);
   c = await calls(p, 'holiday_save'); ok(c.length === 1 && c[0].p_day === '2026-12-25' && c[0].p_loc === 1 && c[0].p_paid === true, 'holiday saved for the place');

@@ -76,7 +76,7 @@ function acc(o = {}) {
     p.on('dialog', async (d) => { if (d.type() === 'prompt') await d.accept(o.reason || 'booked to the wrong month'); else await d.accept(); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + MOCK }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    await p.route(`http://localhost:${PORT}/`, (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(WEB + '/index.html', 'utf8').replace('<script src="cashmoves.js"></script>', '<script src="cashmoves.js"></script><script src="accounts.js"></script>') }));
+    await p.route(`http://localhost:${PORT}/`, (r) => r.fulfill({ contentType: 'text/html', body: ((h) => (/accounts\.js/.test(h) ? h : h.replace('<script src="cashmoves.js"></script>', '<script src="cashmoves.js"></script><script src="accounts.js"></script>')))(fs.readFileSync(WEB + '/index.html', 'utf8')) }));
     const data = C.mk(base, {}); const T = data.tables;
     T.coa_accounts = JSON.parse(JSON.stringify(COA)); T.acct_mappings = JSON.parse(JSON.stringify(MAPS)); T.suppliers = [{ id: 'sp1', name: 'Dudh Ghor' }, { id: 'sp2', name: 'Sugar Co' }]; T.customers = [{ id: 'c1', mobile: '01711111111', name: 'Rahim' }];
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__ACC=${JSON.stringify(acc(o))};try{localStorage.setItem('bos_lang','en')}catch(e){}window.print=()=>{window.__PRINTED=(document.getElementById('ac_print')||{}).innerText||'none'};`);
@@ -201,7 +201,7 @@ function acc(o = {}) {
   { const ctx = await br.newContext({ viewport: { width: 360, height: 780 } }); const q = await ctx.newPage(); q.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
     await q.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + MOCK }));
     await q.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    await q.route(`http://localhost:${PORT}/`, (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(WEB + '/index.html', 'utf8').replace('<script src="cashmoves.js"></script>', '<script src="cashmoves.js"></script><script src="accounts.js"></script>') }));
+    await q.route(`http://localhost:${PORT}/`, (r) => r.fulfill({ contentType: 'text/html', body: ((h) => (/accounts\.js/.test(h) ? h : h.replace('<script src="cashmoves.js"></script>', '<script src="cashmoves.js"></script><script src="accounts.js"></script>')))(fs.readFileSync(WEB + '/index.html', 'utf8')) }));
     const data = C.mk(base, {}); data.tables.coa_accounts = COA; data.tables.acct_mappings = MAPS;
     await q.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__ACC=${JSON.stringify(acc())};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
     await q.goto(`http://localhost:${PORT}/#/accounts`); await q.waitForTimeout(1500);

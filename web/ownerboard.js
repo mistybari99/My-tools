@@ -268,8 +268,8 @@ function widgetHtml(it, i, n) {
   else {
     if (v && v.hidden && !edit) return '';
     if (v && v.hidden) { val = '—'; sub = T('na'); tn = 'info'; act = 'ob_edit'; }
-    else if (!v) { val = '…'; sub = T('loading'); tn = 'info'; act = 'ob_open'; }
-    else { val = v.value; sub = v.sub; tn = tone(v, c); act = 'ob_open'; stale = !!v.stale; }
+    else if (!v) { val = '…'; sub = T('loading'); tn = 'info'; act = 'obd_open'; }
+    else { val = v.value; sub = v.sub; tn = tone(v, c); act = 'obd_open'; stale = !!v.stale; }
   }
   if (edit) act = 'ob_edit';
   const label = it.widget === 'note' ? (c.label || c.text || kindLabel('note')) : itemLabel(it, v);
@@ -379,7 +379,7 @@ const setEdit = (on) => { ST.edit = on; draw(); };
 Object.assign(H, {
   ob_refresh: () => refresh(true),
   ob_edit_toggle: () => setEdit(!ST.edit),
-  ob_open: (a) => { const it = byCid(a.dataset.cid), v = it && ST.vals[it.cid]; const r = (v && v.route) || (it && KINDS[it.widget].route) || 'home'; location.hash = '#/' + r; },
+  obd_open: (a) => { const it = byCid(a.dataset.cid), v = it && ST.vals[it.cid]; const r = (v && v.route) || (it && KINDS[it.widget].route) || 'home'; location.hash = '#/' + r; },
   ob_edit: (a) => editSheet(a.dataset.cid),
   ob_tick: (a) => { const it = byCid(a.dataset.cid); if (!it) return; const c = Object.assign({}, it.config), td = dhaka(); if (noteDone(c, td)) delete c.done_on; else c.done_on = c.repeat === 'weekly' ? weekStart(td) : td; it.config = c; draw(); persist(true); },
   ob_mv: (a) => move(a.dataset.cid, a.dataset.d),

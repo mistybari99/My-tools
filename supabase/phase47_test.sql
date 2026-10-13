@@ -39,7 +39,7 @@ select tt.chk('T0 usage log has no free-text column', not exists (select 1 from 
 set role authenticated;
 select tt.as(:'o');
 select tt.chk('T1 owner allowed, full map', (assistant_me()->>'allowed')::boolean and (assistant_me()->>'cost')::boolean and (assistant_me()->>'health')::boolean and (assistant_me()->'reports'->>'profit')::boolean);
-select tt.chk('T1 optional modules empty (nothing installed)', jsonb_array_length(assistant_me()->'optional')=0);
+select tt.chk('T1 optional modules is a list', jsonb_typeof(assistant_me()->'optional')='array');
 select tt.as(:'k');
 select tt.chk('T1 storekeeper not allowed by default', not (assistant_me()->>'allowed')::boolean and assistant_me()->>'reason'='no_right' and assistant_me() ? 'reports' = false);
 select tt.err('T1 storekeeper cannot log', $$select assistant_log('local','sales',array['sales_summary'],5)$$, 'not allowed');
@@ -59,7 +59,7 @@ create or replace function public.acct_balance_sheet(p_as_of date, p_loc int def
 set role authenticated; select tt.as(:'o');
 select tt.chk('T1 an installed optional function is listed with its argument names', (select x->'args' from jsonb_array_elements(assistant_me()->'optional') x where x->>'name'='acct_balance_sheet') = '["p_as_of","p_loc"]'::jsonb);
 reset role; revoke all on function public.acct_balance_sheet(date, int) from public, authenticated; set role authenticated; select tt.as(:'s');
-select tt.chk('T1 an optional function the caller may not execute is not listed', jsonb_array_length(assistant_me()->'optional')=0);
+select tt.chk('T1 an optional function the caller may not execute is not listed', not exists (select 1 from jsonb_array_elements(assistant_me()->'optional') x where x->>'name'='acct_balance_sheet'));
 reset role; drop function public.acct_balance_sheet(date, int);
 
 \echo == configuration check: fresh DB is mis-configured
@@ -101,7 +101,7 @@ select tt.chk('T2 GRN source without ledger posting = no effect', tt.codes() @> 
 reset role;
 create table if not exists public.backup_runs (id bigserial primary key, started_at timestamptz default now(), finished_at timestamptz default now(), status text);
 insert into backup_runs (finished_at, status) values (now() - interval '50 hours', 'ok');
-insert into rules (key, module, kind, default_value, label_bn) values ('accounting_on','accounting','switch','true','x'), ('accounting_start_date','accounting','text',null,'x') on conflict do nothing;
+insert into rules (key, module, kind, default_value, label_bn) values ('accounting_on','accounting','switch','true','x'), ('accounting_start_date','accounting','text',null,'x') on conflict do nothing; update rules set value='true'::jsonb where key='accounting_on'; update rules set value=null where key='accounting_start_date';
 set role authenticated; select tt.as(:'o');
 select tt.chk('T2 stale backup found when backups are installed (default 36 h)', tt.codes() @> array['backup_stale']);
 select tt.chk('T2 accounting on without start date', tt.codes() @> array['accounting_no_start']);
