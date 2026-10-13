@@ -80,16 +80,16 @@ insert into emergency_requests (grant_code, requested_by, requested_staff, locat
 insert into audit_log (staff_id, action, table_name, at) select 'alice','update','zz_t1','2026-03-15 10:00+06' from generate_series(1,3);
 insert into audit_log (staff_id, action, table_name, at) values ('alice','insert','zz_t1','2026-03-15 10:00+06'),('bob','update','zz_t2','2026-03-16 10:00+06'),('bob','update','zz_t2','2026-03-17 10:00+06');
 -- X4 (relative to today: period = last 10 days; ids 3001+)
-select tt.ent('14-1',1,3001,current_date-1,'approved','{}');
-select tt.ent('14-1',1,3002,current_date-1,'submitted','{}');
-select tt.ent('14-1',1,3003,current_date-2,'approved','{}');
-select tt.ent('14-1',1,3004,current_date-3,'approved','{}') as xl \gset
+select tt.ent('14-1',1,3001,(now() at time zone 'Asia/Dhaka')::date-1,'approved','{}');
+select tt.ent('14-1',1,3002,(now() at time zone 'Asia/Dhaka')::date-1,'submitted','{}');
+select tt.ent('14-1',1,3003,(now() at time zone 'Asia/Dhaka')::date-2,'approved','{}');
+select tt.ent('14-1',1,3004,(now() at time zone 'Asia/Dhaka')::date-3,'approved','{}') as xl \gset
 update entries set submitted_at = now() - interval '1 day' where id = :'xl';        -- Dhaka date = yesterday > entry_date (3 days ago): late
-select tt.ent('14-1',1,3005,current_date-5,'draft','{}');                           -- stale draft
-select tt.ent('14-1',1,3006,current_date,'draft','{}');                             -- today's draft is not stale
+select tt.ent('14-1',1,3005,(now() at time zone 'Asia/Dhaka')::date-5,'draft','{}');                           -- stale draft
+select tt.ent('14-1',1,3006,(now() at time zone 'Asia/Dhaka')::date,'draft','{}');                             -- today's draft is not stale
 insert into entries (form_code, location_id, serial, entry_date, status, data, created_by, created_staff, submitted_at, entered_later, paper_serial, paper_at)
- values ('14-1',1,3007,current_date-6,'approved','{}',:'s','st',now(),true,'P-1',now() - interval '6 days');   -- entered later: never counted as late
-select tt.ent('10-1',1,3008,current_date-4,'approved','{}');
+ values ('14-1',1,3007,(now() at time zone 'Asia/Dhaka')::date-6,'approved','{}',:'s','st',now(),true,'P-1',now() - interval '6 days');   -- entered later: never counted as late
+select tt.ent('10-1',1,3008,(now() at time zone 'Asia/Dhaka')::date-4,'approved','{}');
 -- G2 (April 2026, form 10-2)
 select tt.ent('10-2',1,4001,date '2026-04-01','approved','{"paper_no":"101"}');
 select tt.ent('10-2',1,4002,date '2026-04-02','approved','{"paper_no":"102"}');
@@ -199,12 +199,12 @@ select tt.chk('X3 alice update zz_t1: 3 events; insert 1; bob zz_t2 2 events ove
 select tt.as(:'r'); select tt.err('X3 owner-only: a report_control grant is not enough', $$select tt.run('x3_audit_log','{}')$$, 'not allowed');
 
 \echo == X4
-select tt.as(:'o'); select tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', current_date-9, current_date)::jsonb) as j \gset
+select tt.as(:'o'); select tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', (now() at time zone 'Asia/Dhaka')::date-9, (now() at time zone 'Asia/Dhaka')::date)::jsonb) as j \gset
 select tt.chk('X4 loc1 14-1: 10 days, 4 submitted days (two sheets one day; the entered-later sheet counts as submitted), 6 missing, 40%, 1 stale draft, 1 late (entered-later not counted)', tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'days')=10 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'submitted_days')=4 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'missing_days')=6 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'compliance_pct')=40 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'stale_drafts')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"14-1"}'),'late_submits')=1);
 select tt.chk('X4 loc1 10-1: 1 submitted day, 9 missing, 10%', tt.num(tt.pick(:'j','{"location_id":1,"form":"10-1"}'),'submitted_days')=1 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-1"}'),'missing_days')=9 and tt.num(tt.pick(:'j','{"location_id":1,"form":"10-1"}'),'compliance_pct')=10);
 select tt.chk('X4 loc2 never submitted: 0%; only live showrooms (4 shops x 2 forms = 8 rows; factories/godown absent)', tt.num(tt.pick(:'j','{"location_id":2,"form":"14-1"}'),'compliance_pct')=0 and jsonb_array_length(:'j'::jsonb->'rows')=8);
-select tt.chk('X4 a future end date does not add missing days (to = today + 5)', tt.num(tt.pick(tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', current_date-9, current_date+5)::jsonb),'{"location_id":1,"form":"14-1"}'),'days')=10);
-select tt.as(:'s'); select tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', current_date-9, current_date)::jsonb) as j \gset
+select tt.chk('X4 a future end date does not add missing days (to = today + 5)', tt.num(tt.pick(tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', (now() at time zone 'Asia/Dhaka')::date-9, (now() at time zone 'Asia/Dhaka')::date+5)::jsonb),'{"location_id":1,"form":"14-1"}'),'days')=10);
+select tt.as(:'s'); select tt.run('x4_compliance',format('{"from":"%s","to":"%s"}', (now() at time zone 'Asia/Dhaka')::date-9, (now() at time zone 'Asia/Dhaka')::date)::jsonb) as j \gset
 select tt.chk('X4 loc-1 user: only location 1 (2 rows)', jsonb_array_length(:'j'::jsonb->'rows')=2 and tt.pick(:'j','{"location_id":2}') is null);
 
 \echo == X5

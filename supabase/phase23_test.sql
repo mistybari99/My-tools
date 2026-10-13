@@ -142,13 +142,13 @@ select tt.err('A5 a partly sold batch cannot be voided', format($$select product
 
 \echo == A2 sales net of returns
 select sale_return(null,:'sa'::uuid,format('[{"item_id":"%s","qty":1}]',:'ifin')::jsonb,'damaged',null,'cash') ->> 'id' as srid \gset
-select biz_daily(current_date - 1, current_date + 1, 1) is not null as bd \gset
-select tt.chk('A2 revenue net: 260 sold - 260 returned = 0', (select coalesce(sum(revenue),0) from biz_daily(current_date - 1, current_date + 1, 1))=0);
+select biz_daily((now() at time zone 'Asia/Dhaka')::date - 1, (now() at time zone 'Asia/Dhaka')::date + 1, 1) is not null as bd \gset
+select tt.chk('A2 revenue net: 260 sold - 260 returned = 0', (select coalesce(sum(revenue),0) from biz_daily((now() at time zone 'Asia/Dhaka')::date - 1, (now() at time zone 'Asia/Dhaka')::date + 1, 1))=0);
 select set_rule('reports_net_of_returns','false') is null as off1 \gset
-select tt.chk('A2 switch OFF = gross revenue 260', (select coalesce(sum(revenue),0) from biz_daily(current_date - 1, current_date + 1, 1))=260);
+select tt.chk('A2 switch OFF = gross revenue 260', (select coalesce(sum(revenue),0) from biz_daily((now() at time zone 'Asia/Dhaka')::date - 1, (now() at time zone 'Asia/Dhaka')::date + 1, 1))=260);
 select set_rule('reports_net_of_returns','true') is null as on1 \gset
-select tt.chk('A2 sales_summary total is net (260 - 260 = 0) and the count is unchanged', (select coalesce(sum(total),0) from sales_summary(current_date - 1) where status='done')=0 and (select coalesce(sum(n),0) from sales_summary(current_date - 1) where status='done')>=1);
-select tt.chk('A2 sale_returns_summary shows the return', (select coalesce(sum(amount),0) from sale_returns_summary(current_date - 1))=260);
+select tt.chk('A2 sales_summary total is net (260 - 260 = 0) and the count is unchanged', (select coalesce(sum(total),0) from sales_summary((now() at time zone 'Asia/Dhaka')::date - 1) where status='done')=0 and (select coalesce(sum(n),0) from sales_summary((now() at time zone 'Asia/Dhaka')::date - 1) where status='done')>=1);
+select tt.chk('A2 sale_returns_summary shows the return', (select coalesce(sum(amount),0) from sale_returns_summary((now() at time zone 'Asia/Dhaka')::date - 1))=260);
 
 \echo == A4 cash moves and the day book
 reset role; insert into customers (mobile, name, type) values ('01788888888','Adv Cust','retail') on conflict do nothing;
@@ -160,10 +160,10 @@ select tt.err('A4 bad kind', $$select cash_move_add(1,'weird',500)$$, 'bad_kind'
 select tt.err('A4 bad amount', $$select cash_move_add(1,'bank_deposit',0)$$, 'bad_amount');
 select tt.err('A4 owner top-up needs a mode', $$select cash_move_add(1,'owner_topup',500)$$, 'bad_mode');
 select tt.err('A4 advance needs a customer', $$select cash_move_add(1,'cust_advance',500,null,'cash')$$, 'customer_required');
-select tt.err('A4 future date refused', $$select cash_move_add(1,'bank_deposit',500,current_date+30)$$, 'bad_date');
+select tt.err('A4 future date refused', $$select cash_move_add(1,'bank_deposit',500,(now() at time zone 'Asia/Dhaka')::date+30)$$, 'bad_date');
 select cash_move_add(1,'bank_deposit',500,null,null,null,null,null,null,true) as dry \gset
 select tt.chk('A4 dry run writes nothing', (:'dry'::jsonb->>'dry')::boolean and (select count(*) from cash_moves)=0);
-select set_daybook_start(current_date - 2);
+select set_daybook_start((now() at time zone 'Asia/Dhaka')::date - 2);
 select cash_move_add(1,'bank_deposit',500,null,null,null,'slip1','to bank','33333333-3333-3333-3333-333333333333') ->> 'id' as mv1 \gset
 select tt.chk('A4 idempotent client id', (cash_move_add(1,'bank_deposit',500,null,null,null,'slip1','to bank','33333333-3333-3333-3333-333333333333') ->> 'dup')::boolean and (select count(*) from cash_moves)=1);
 select cash_move_add(1,'owner_topup',2000,null,'cash') is not null as t1 \gset
@@ -173,19 +173,19 @@ select tt.err('A4 cannot use more than the advance balance (600)', format($$sele
 select cash_move_add(1,'cust_advance_used',200,null,null,:'cu'::uuid) is not null as u1 \gset
 select tt.chk('A4 customer advance balance = 1000-400-200 = 400', (select balance from customer_advances() where customer_id=:'cu'::uuid)=400);
 select tt.err('A4 an advance already refunded/used below zero cannot be voided', format($$select cash_move_void(%L,'wrong')$$, :'adv'), 'advance_already_used');
-select day_book(1,current_date - 1,current_date) as dbj \gset
+select day_book(1,(now() at time zone 'Asia/Dhaka')::date - 1,(now() at time zone 'Asia/Dhaka')::date) as dbj \gset
 select tt.chk('A4 day book shows deposit, top-up, advance and refund lines', (select count(distinct l->>'type') from jsonb_array_elements(:'dbj'::jsonb->'days') d, jsonb_array_elements(d->'lines') l where l->>'type' in ('bank_deposit','owner_topup','cust_advance','cust_advance_refund'))=4);
 select tt.chk('A4 advance-used moves no money (no daybook line)', not (:'dbj'::text like '%cust_advance_used%'));
 select tt.chk('A4 deposit has an out(cash) and an in(bank) line', (select count(*) from jsonb_array_elements(:'dbj'::jsonb->'days') d, jsonb_array_elements(d->'lines') l where l->>'type'='bank_deposit')=2);
 select cash_move_void(:'mv1'::uuid,'entered twice') ->> 'status' as vs \gset
-select tt.chk('A4 voided deposit disappears from the day book', :'vs'='void' and not exists (select 1 from jsonb_array_elements(day_book(1,current_date - 1,current_date)->'days') d, jsonb_array_elements(d->'lines') l where l->>'type'='bank_deposit'));
+select tt.chk('A4 voided deposit disappears from the day book', :'vs'='void' and not exists (select 1 from jsonb_array_elements(day_book(1,(now() at time zone 'Asia/Dhaka')::date - 1,(now() at time zone 'Asia/Dhaka')::date)->'days') d, jsonb_array_elements(d->'lines') l where l->>'type'='bank_deposit'));
 select tt.as(:'s'); select tt.chk('A4 salesperson cannot read cash moves', (select count(*) from cash_moves)=0);
 
 \echo == A1 GRN vs purchase page
 reset role;
 update items set tracked=true where code='W6-FL';
 set role authenticated; select tt.as(:'k');
-select save_entry(null,'04-1',1,current_date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"10","rate":"5","quality":"accept"}]}','[]') ->> 'id' as g1 \gset
+select save_entry(null,'04-1',1,(now() at time zone 'Asia/Dhaka')::date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"10","rate":"5","quality":"accept"}]}','[]') ->> 'id' as g1 \gset
 select submit_entry(:'g1'::uuid) is not null as sg1 \gset
 select tt.as(:'o'); select set_rule('forms_post_to_ledger','true') is null as fon \gset
 select decide_entry(:'g1'::uuid, true, null, null, '[]') ->> 'status' as dg1 \gset
@@ -194,7 +194,7 @@ select tt.chk('A1 default (purchase page is the source): GRN in-line is skipped,
   and not exists (select 1 from stock_ledger where ref_type='entry' and ref_id like :'g1' || '%'));
 set role authenticated; select tt.as(:'o'); select set_rule('grn_receipt_source','"grn"') is null as g2on \gset
 select tt.as(:'k');
-select save_entry(null,'04-1',1,current_date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"4","rate":"5","quality":"accept"}]}','[]') ->> 'id' as g2 \gset
+select save_entry(null,'04-1',1,(now() at time zone 'Asia/Dhaka')::date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"4","rate":"5","quality":"accept"}]}','[]') ->> 'id' as g2 \gset
 select submit_entry(:'g2'::uuid) is not null as sg2 \gset
 select tt.as(:'o'); select decide_entry(:'g2'::uuid, true, null, null, '[]') ->> 'status' as dg2 \gset
 reset role;
@@ -220,7 +220,7 @@ select set_rule('blind_count_on','true') is null as bon \gset
 select tt.chk('B2 stock_blind_active on for 04-3 and 04-1, off for others', stock_blind_active('04-3',1) and stock_blind_active('04-1',1) and not stock_blind_active('10-2',1) and not blind_active('04-3',1));
 select tt.as(:'k');
 select stock_balance_probe is not null from (select qty as stock_balance_probe from stock_balance where item_id=:'ifl'::uuid and location_id=1) z;
-select save_entry(null,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-FL","count":"7","book":"999"}]}','[]') ->> 'id' as c1 \gset
+select save_entry(null,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","rows":[{"item":"W6-FL","count":"7","book":"999"}]}','[]') ->> 'id' as c1 \gset
 reset role;
 select tt.chk('B2 the browser book figure is never stored in a draft', (select data->'rows'->0 ? 'book' from entries where id=:'c1'::uuid) is false);
 set role authenticated; select tt.as(:'k');
@@ -229,8 +229,8 @@ select count_lines_seal(:'c1'::uuid) ->> 'sealed' as sl \gset
 select tt.chk('B2 sealed one line', :'sl'='1');
 select tt.chk('B2 the counter cannot read the seals (book hidden)', (select count(*) from entry_count_seals)=0);
 select tt.chk('B2 state: blind, all sealed', (count_lines_state(:'c1'::uuid) ->> 'all_sealed')::boolean);
-select tt.err('B2 sealed count cannot be changed', format($$select save_entry(%L,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-FL","count":"9"}]}','[]','fix')$$, :'c1'), 'count_locked');
-select save_entry(:'c1'::uuid,'04-3',1,current_date,'{"movement":"no","witness":"w","rows":[{"item":"W6-FL","count":"7","reason":"short"}]}','[]') is not null as ok2 \gset
+select tt.err('B2 sealed count cannot be changed', format($$select save_entry(%L,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","rows":[{"item":"W6-FL","count":"9"}]}','[]','fix')$$, :'c1'), 'count_locked');
+select save_entry(:'c1'::uuid,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","witness":"w","rows":[{"item":"W6-FL","count":"7","reason":"short"}]}','[]') is not null as ok2 \gset
 select submit_entry(:'c1'::uuid) is not null as sub1 \gset
 reset role;
 select tt.chk('B2 at submit the SERVER book figure (flour balance) is written into the sheet', (select (data->'rows'->0->>'book')::numeric from entries where id=:'c1'::uuid) = (select qty from stock_balance where item_id=:'ifl'::uuid and location_id=1));
@@ -238,22 +238,22 @@ select tt.chk('B2 owner can read the seal', (select count(*) from (select set_co
 set role authenticated; select tt.as(:'o');
 select tt.chk('B2 owner reads the seal row', (select count(*) from entry_count_seals where entry_id=:'c1'::uuid)=1);
 select tt.as(:'k');
-select save_entry(null,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-FL","count":"3"},{"item":"W6-SU","count":"2"}]}','[]') ->> 'id' as c2 \gset
+select save_entry(null,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","rows":[{"item":"W6-FL","count":"3"},{"item":"W6-SU","count":"2"}]}','[]') ->> 'id' as c2 \gset
 select count_lines_seal(:'c2'::uuid) is not null as s2 \gset
-select save_entry(:'c2'::uuid,'04-3',1,current_date,'{"movement":"no","witness":"w","rows":[{"item":"W6-FL","count":"3","reason":"x"},{"item":"W6-SU","count":"2","reason":"x"},{"item":"W6-EG","count":"4","reason":"x"}]}','[]') is not null as ok3 \gset
+select save_entry(:'c2'::uuid,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","witness":"w","rows":[{"item":"W6-FL","count":"3","reason":"x"},{"item":"W6-SU","count":"2","reason":"x"},{"item":"W6-EG","count":"4","reason":"x"}]}','[]') is not null as ok3 \gset
 select tt.err('B2 a line added after sealing blocks the submit', format($$select submit_entry(%L)$$, :'c2'), 'count_not_sealed');
 -- 04-1: counted sealed first
-select save_entry(null,'04-1',1,current_date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"10"}]}','[]') ->> 'id' as g9 \gset
+select save_entry(null,'04-1',1,(now() at time zone 'Asia/Dhaka')::date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"10"}]}','[]') ->> 'id' as g9 \gset
 select count_lines_seal(:'g9'::uuid) ->> 'sealed' as sg \gset
 select tt.chk('B2 GRN counted sealed', :'sg'='1');
-select tt.err('B2 GRN counted figure cannot change after sealing', format($$select save_entry(%L,'04-1',1,current_date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"12"}]}','[]','fix')$$, :'g9'), 'count_locked');
-select save_entry(:'g9'::uuid,'04-1',1,current_date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"10","memo":"11","rate":"5"}]}','[]') is not null as g9b \gset
+select tt.err('B2 GRN counted figure cannot change after sealing', format($$select save_entry(%L,'04-1',1,(now() at time zone 'Asia/Dhaka')::date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"12"}]}','[]','fix')$$, :'g9'), 'count_locked');
+select save_entry(:'g9'::uuid,'04-1',1,(now() at time zone 'Asia/Dhaka')::date,'{"supplier":"Sup A","lines":[{"item":"W6-FL","counted":"10","memo":"11","rate":"5"}]}','[]') is not null as g9b \gset
 select tt.chk('B2 GRN memo may be entered after the seal', true);
 select tt.as(:'s'); select tt.err('B2 only the maker (or owner) seals', format($$select count_lines_seal(%L)$$, :'g9'), 'not allowed');
 select tt.as(:'o'); select set_rule('blind_count_on','false') is null as boff \gset
 select tt.chk('B2 switch OFF: nothing is blind', not stock_blind_active('04-3',1));
 select tt.as(:'k');
-select save_entry(null,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-FL","count":"7","book":"12"}]}','[]') ->> 'id' as c3 \gset
+select save_entry(null,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","rows":[{"item":"W6-FL","count":"7","book":"12"}]}','[]') ->> 'id' as c3 \gset
 reset role;
 select tt.chk('B2 switch OFF: the old behaviour (book as typed)', (select data->'rows'->0->>'book' from entries where id=:'c3'::uuid)='12');
 
@@ -270,7 +270,7 @@ select tt.chk('B3 pin_sig_active false while the rule is off', not pin_sig_activ
 select set_rule('pin_signature_on','true') is null as pon \gset
 select tt.chk('B3 pin_sig_active on for 04-3 and 14-1, not for 04-1', pin_sig_active('04-3') and pin_sig_active('14-1') and not pin_sig_active('04-1'));
 select tt.as(:'k');
-select save_entry(null,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-SU","count":"2","book":"2"}]}','[]') ->> 'id' as p1 \gset
+select save_entry(null,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","rows":[{"item":"W6-SU","count":"2","book":"2"}]}','[]') ->> 'id' as p1 \gset
 select tt.err('B3 submit without a witness signature is refused', format($$select submit_entry(%L)$$, :'p1'), 'pin_signature_required:witness');
 select tt.as(:'w3');
 select set_config('request.jwt.claim.iat', extract(epoch from now())::bigint::text, false) is not null as iat1 \gset
@@ -282,7 +282,7 @@ select tt.err('B3 the signed name must be in the sheet (mismatch)', format($$sel
 reset role;
 select staff_id as wstaff from profiles where id=:'w3' \gset
 set role authenticated; select tt.as(:'k');
-select save_entry(:'p1'::uuid,'04-3',1,current_date,format('{"movement":"no","witness":"%s","rows":[{"item":"W6-SU","count":"2","book":"2"}]}', :'wstaff')::jsonb,'[]','fix') is not null as sv \gset
+select save_entry(:'p1'::uuid,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,format('{"movement":"no","witness":"%s","rows":[{"item":"W6-SU","count":"2","book":"2"}]}', :'wstaff')::jsonb,'[]','fix') is not null as sv \gset
 select tt.chk('B3 submit passes with the matching signature', (submit_entry(:'p1'::uuid)) is not null);
 select tt.as(:'o'); select set_rule('pin_signature_on','false') is null as poff \gset
 
@@ -293,13 +293,13 @@ select set_rule('blind_count_on','true') is null as b1 \gset
 select set_rule('pin_signature_on','true') is null as p1 \gset
 reset role; update items set tracked=true where code='W6-SU';
 set role authenticated; select tt.as(:'k');
-select save_entry(null,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-SU","count":"2"}]}','[]') ->> 'id' as z1 \gset
+select save_entry(null,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,'{"movement":"no","rows":[{"item":"W6-SU","count":"2"}]}','[]') ->> 'id' as z1 \gset
 select count_lines_seal(:'z1'::uuid) is not null as zs \gset
 select tt.as(:'w3');
 select set_config('request.jwt.claim.iat', extract(epoch from now())::bigint::text, false) is not null as iat2 \gset
 select sign_entry(:'z1'::uuid,'witness') ->> 'signer_staff' as zw \gset
 select tt.as(:'k');
-select save_entry(:'z1'::uuid,'04-3',1,current_date,format('{"movement":"no","witness":"%s","rows":[{"item":"W6-SU","count":"2"}]}', :'zw')::jsonb,'[]','fix') is not null as zsv \gset
+select save_entry(:'z1'::uuid,'04-3',1,(now() at time zone 'Asia/Dhaka')::date,format('{"movement":"no","witness":"%s","rows":[{"item":"W6-SU","count":"2"}]}', :'zw')::jsonb,'[]','fix') is not null as zsv \gset
 select submit_entry(:'z1'::uuid) is not null as zsub \gset
 select tt.chk('AUD blind + PIN together: submit works and the server book is added', :'zsub' = 't' and (select data->'rows'->0 ? 'book' from entries where id=:'z1'::uuid));
 select tt.as(:'o');
