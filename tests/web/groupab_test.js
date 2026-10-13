@@ -9,7 +9,7 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
  c.rpc = async (fn, args) => {
   (window.__AC8 = window.__AC8 || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);
   if (fn === 'cash_move_add') { if (window.__ERR8) { const m = window.__ERR8; window.__ERR8 = null; return { data: null, error: { message: m, code: 'P0001' } }; } if (args.p_dry) return { data: { dry: true, daybook: 'cash out, bank in' }, error: null };
-    T.cash_moves.unshift({ id: 'cm' + T.cash_moves.length, kind: args.p_kind, mode: args.p_mode, amount: args.p_amount, move_date: args.p_date, ref: args.p_ref, note: args.p_note, status: 'done', customer_id: args.p_customer, created_at: '2026-10-13T10:00:00Z' }); return { data: { id: 'x' }, error: null }; }
+    T.cash_moves.unshift({ id: 'cm' + T.cash_moves.length, location_id: args.p_loc, kind: args.p_kind, mode: args.p_mode, amount: args.p_amount, move_date: args.p_date, ref: args.p_ref, note: args.p_note, status: 'done', customer_id: args.p_customer, created_at: '2026-10-13T10:00:00Z' }); return { data: { id: 'x' }, error: null }; }
   if (fn === 'cash_move_void') { const r = T.cash_moves.find((x) => x.id === args.p_id); if (r) r.status = 'void'; return { data: { status: 'void' }, error: null }; }
   if (fn === 'customer_advances') return { data: [{ customer_id: 'c1', name: 'Karim', mobile: '01711', balance: 600 }], error: null };
   if (fn === 'has_grant') return { data: true, error: null };
@@ -28,7 +28,7 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA8 }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const data = C.mk(base, {}); const T = data.tables;
-    T.cash_moves = [{ id: 'cm0', kind: 'bank_deposit', mode: null, amount: 500, move_date: '2026-10-12', ref: 'slip1', note: 'x', status: 'done', created_at: '2026-10-12T10:00:00Z' }];
+    T.cash_moves = [{ id: 'cm0', location_id: 1, kind: 'bank_deposit', mode: null, amount: 500, move_date: '2026-10-12', ref: 'slip1', note: 'x', status: 'done', created_at: '2026-10-12T10:00:00Z' }];
     T.rules = [
       { key: 'blind_count_on', module: 'entries', kind: 'switch', default_value: false, value: null, label_bn: 'অন্ধ গণনা', label_en: 'Blind count', sort: 1 },
       { key: 'pin_signature_on', module: 'entries', kind: 'switch', default_value: false, value: true, label_bn: 'পিন স্বাক্ষর', label_en: 'PIN signature', sort: 2 },
