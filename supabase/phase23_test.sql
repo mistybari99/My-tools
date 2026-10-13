@@ -178,7 +178,7 @@ select tt.chk('A4 day book shows deposit, top-up, advance and refund lines', (se
 select tt.chk('A4 advance-used moves no money (no daybook line)', not (:'dbj'::text like '%cust_advance_used%'));
 select tt.chk('A4 deposit has an out(cash) and an in(bank) line', (select count(*) from jsonb_array_elements(:'dbj'::jsonb->'days') d, jsonb_array_elements(d->'lines') l where l->>'type'='bank_deposit')=2);
 select cash_move_void(:'mv1'::uuid,'entered twice') ->> 'status' as vs \gset
-select tt.chk('A4 voided deposit disappears from the day book', :'vs'='void' and not (day_book(1,current_date - 1,current_date)::text like '%bank_deposit%'));
+select tt.chk('A4 voided deposit disappears from the day book', :'vs'='void' and not exists (select 1 from jsonb_array_elements(day_book(1,current_date - 1,current_date)->'days') d, jsonb_array_elements(d->'lines') l where l->>'type'='bank_deposit'));
 select tt.as(:'s'); select tt.chk('A4 salesperson cannot read cash moves', (select count(*) from cash_moves)=0);
 
 \echo == A1 GRN vs purchase page
@@ -285,6 +285,29 @@ set role authenticated; select tt.as(:'k');
 select save_entry(:'p1'::uuid,'04-3',1,current_date,format('{"movement":"no","witness":"%s","rows":[{"item":"W6-SU","count":"2","book":"2"}]}', :'wstaff')::jsonb,'[]','fix') is not null as sv \gset
 select tt.chk('B3 submit passes with the matching signature', (submit_entry(:'p1'::uuid)) is not null);
 select tt.as(:'o'); select set_rule('pin_signature_on','false') is null as poff \gset
+
+
+\echo == audit fixes
+set role authenticated; select tt.as(:'o');
+select set_rule('blind_count_on','true') is null as b1 \gset
+select set_rule('pin_signature_on','true') is null as p1 \gset
+reset role; update items set tracked=true where code='W6-SU';
+set role authenticated; select tt.as(:'k');
+select save_entry(null,'04-3',1,current_date,'{"movement":"no","rows":[{"item":"W6-SU","count":"2"}]}','[]') ->> 'id' as z1 \gset
+select count_lines_seal(:'z1'::uuid) is not null as zs \gset
+select tt.as(:'w3');
+select set_config('request.jwt.claim.iat', extract(epoch from now())::bigint::text, false) is not null as iat2 \gset
+select sign_entry(:'z1'::uuid,'witness') ->> 'signer_staff' as zw \gset
+select tt.as(:'k');
+select save_entry(:'z1'::uuid,'04-3',1,current_date,format('{"movement":"no","witness":"%s","rows":[{"item":"W6-SU","count":"2"}]}', :'zw')::jsonb,'[]','fix') is not null as zsv \gset
+select submit_entry(:'z1'::uuid) is not null as zsub \gset
+select tt.chk('AUD blind + PIN together: submit works and the server book is added', :'zsub' = 't' and (select data->'rows'->0 ? 'book' from entries where id=:'z1'::uuid));
+select tt.as(:'o');
+select set_rule('blind_count_on','false') is null as b2 \gset
+select set_rule('pin_signature_on','false') is null as p2 \gset
+select tt.chk('AUD hub_receipt saves without a mode', (cash_move_add(1,'hub_receipt',100) ->> 'id') is not null);
+reset role;
+select tt.chk('AUD biz_daily keeps the phase14 count_in_business patch', position('bos14' in pg_get_functiondef('public.biz_daily(date,date,int)'::regprocedure)) > 0);
 
 reset role;
 select 'RESULT ' || count(*) filter (where ok) || ' pass / ' || count(*) filter (where not ok) || ' fail' from tt.res;

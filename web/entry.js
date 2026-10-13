@@ -209,7 +209,7 @@ function wrap(fd, ed) { const id = FIELD_ID(); if (fd.show) E.shows[id] = fd.sho
 function tableHTML(fd, wrapAttrs) {
   const w = (fd.cols.some((c) => c.who === 'checker') && !fd.cols.some((c) => !c.who || c.who === 'maker')) ? 'c' : 'd';
   const FR = rowsOf(fd), n = FR ? FR.length : Math.max((E.data[fd.id] || []).length, fd.min || 1, (E.check[fd.id] || []).length);
-  const canEditStruct = isEd() && !FR;
+  const canEditStruct = isEd() && !FR && !(E.sb && E.sb.sealed);
   let h = `<div class="tbl" ${wrapAttrs}>${fd.label ? `<label>${esc(lab(fd.label))}</label>` : ''}`;
   for (let i = 0; i < n; i++) {
     h += `<div class="rowcard"><div class="rc-h"><b>${FR ? esc(lab(FR[i])) : (i + 1)}</b>${canEditStruct && n > (fd.min || 1) ? `<button type="button" class="mini" data-act="delrow" data-t="${fd.id}" data-i="${i}" aria-label="${esc(t('delete_row'))}">✕</button>` : ''}</div><div class="rc-g">`;
@@ -643,7 +643,7 @@ function missingRequired() {
           const row = (E.data[f.id] || [])[i] || {}, rowC = (E.check[f.id] || [])[i] || {};
           const any = Object.values(row).some(has) || Object.values(rowC).some(has);
           if (!any && !rowsOf(f)) continue;
-          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }, (f.rows ? lab(f.rows[i]) : String(i + 1)) + ' · '); });
+          f.cols.forEach((c) => { const isC = c.who === 'checker'; if ((E.mode === 'check') !== isC) return; check(c, isC ? E.check : E.data, `${f.id}.${i}.${c.id}`, { ...x, row, rowC }, (rowsOf(f) ? lab(rowsOf(f)[i]) : String(i + 1)) + ' · '); });
         }
       } else if ((E.mode === 'check') === ((f.who || sec.who) === 'checker')) check(f, f.who === 'checker' || sec.who === 'checker' ? E.check : E.data, f.id, x);
     });

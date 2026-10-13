@@ -154,7 +154,7 @@ begin
            case when e->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'qty')::numeric end qty,
            case when e->>'item_id' ~ '^[0-9a-f-]{36}$' then (e->>'item_id')::uuid end iid
     from ok o, jsonb_array_elements(case when jsonb_typeof(o.lines) = 'array' then o.lines else '[]'::jsonb end) e),
-  lc as (select l.*, c.cost_price from ln l left join public.item_costs c on c.item_id = l.iid),
+  lc as (select l.*, c.cost_price from ln l left join (select ic.item_id, ic.cost_price from public.item_costs ic join public.items cbi on cbi.id = ic.item_id where cbi.count_in_business /* bos14 */) c on c.item_id = l.iid),
   ag as (
     select lc.sale_date, lc.location_id,
            sum(lc.amt * lc.f) filter (where lc.cost_price is not null) cr,
@@ -162,13 +162,22 @@ begin
     from lc group by 1, 2),
   tot as (select ok.sale_date, ok.location_id, count(*) n, sum(ok.total) rev, sum(ok.discount) disc from ok group by 1, 2),
   vd as (select s.sale_date, s.location_id, count(*) vn, sum(s.total) va from s where s.status = 'void' group by 1, 2),
-  rt as (select (r.created_at at time zone 'Asia/Dhaka')::date sale_date, r.location_id, sum(r.amount) ra from public.sale_returns r
+  rr as (select r.id, (r.created_at at time zone 'Asia/Dhaka')::date sale_date, r.location_id, r.amount from public.sale_returns r
          where net_on and r.status = 'done' and (r.created_at at time zone 'Asia/Dhaka')::date between p_from and p_to
-           and (p_loc is null or r.location_id = p_loc) and r.location_id in (select l.id from public.locations l where public.can_loc(l.id)) group by 1, 2),
+           and (p_loc is null or r.location_id = p_loc) and r.location_id in (select l.id from public.locations l where public.can_loc(l.id))),
+  rl as (select rr.id, rr.sale_date, rr.location_id, c.cost_price,
+           case when e->>'amount' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'amount')::numeric end amt, case when e->>'qty' ~ '^[0-9]+(\.[0-9]+)?$' then (e->>'qty')::numeric end qty
+         from rr join public.sale_returns r on r.id = rr.id, jsonb_array_elements(case when jsonb_typeof(r.lines) = 'array' then r.lines else '[]'::jsonb end) e
+         left join (select ic.item_id, ic.cost_price from public.item_costs ic join public.items cbi on cbi.id = ic.item_id where cbi.count_in_business /* bos14 */) c
+           on c.item_id = (case when e->>'item_id' ~ '^[0-9a-f-]{36}$' then (e->>'item_id')::uuid end)),
+  rt as (select rr.sale_date, rr.location_id, sum(rr.amount) ra,
+           (select sum(x.amt) filter (where x.cost_price is not null) from rl x where x.sale_date = rr.sale_date and x.location_id = rr.location_id) rcr,
+           (select sum(x.qty * x.cost_price) filter (where x.cost_price is not null) from rl x where x.sale_date = rr.sale_date and x.location_id = rr.location_id) rcg
+         from rr group by 1, 2),
   k as (select t.sale_date, t.location_id from tot t union select v.sale_date, v.location_id from vd v union select x.sale_date, x.location_id from rt x)
   select k.sale_date, k.location_id,
          coalesce(t.n, 0), coalesce(t.rev, 0) - coalesce(x.ra, 0), coalesce(t.disc, 0), coalesce(v.vn, 0), coalesce(v.va, 0),
-         case when cost_ok then round(coalesce(a.cr, 0), 2) end, case when cost_ok then round(coalesce(a.cg, 0), 2) end
+         case when cost_ok then round(coalesce(a.cr, 0) - coalesce(x.rcr, 0), 2) end, case when cost_ok then round(coalesce(a.cg, 0) - coalesce(x.rcg, 0), 2) end
   from k
   left join tot t on t.sale_date = k.sale_date and t.location_id = k.location_id
   left join vd v on v.sale_date = k.sale_date and v.location_id = k.location_id
@@ -259,10 +268,12 @@ begin
   if p_kind is null or p_kind not in ('bank_deposit', 'bank_withdraw', 'owner_topup', 'owner_draw', 'cust_advance', 'cust_advance_refund', 'cust_advance_used', 'hub_receipt') then raise exception 'bad_kind'; end if;
   if p_amount is null or not (p_amount between 0.01 and 1000000000000) or round(p_amount, 2) <= 0 then raise exception 'bad_amount'; end if;
   if d < date '2000-01-01' or d > today + 1 then raise exception 'bad_date'; end if;
+  if p_kind = 'hub_receipt' then p_mode := 'cash'; end if;
   if p_kind in ('bank_deposit', 'bank_withdraw', 'cust_advance_used') then p_mode := null;
   elsif p_mode is null or p_mode not in ('cash', 'bank', 'mobile') then raise exception 'bad_mode';
   end if;
   if p_kind = 'hub_receipt' then p_mode := 'cash'; end if;
+  if p_kind like 'cust_advance%' and p_customer is not null then perform pg_advisory_xact_lock(hashtext('adv:' || p_customer::text)); end if;
   if p_kind like 'cust_advance%' then
     if p_customer is null or not exists (select 1 from public.customers where id = p_customer) then raise exception 'customer_required'; end if;
     if p_kind in ('cust_advance_refund', 'cust_advance_used') then
@@ -301,6 +312,7 @@ begin
   if not public.can_loc(r.location_id) or not (public.is_owner() or public.has_grant('cash_move', r.location_id)) then raise exception 'not allowed'; end if;
   if r.status = 'void' then return jsonb_build_object('id', r.id, 'status', 'void', 'dup', true); end if;
   perform public.lock_check(r.move_date);
+  if r.customer_id is not null then perform pg_advisory_xact_lock(hashtext('adv:' || r.customer_id::text)); end if;
   if r.kind = 'cust_advance' then   -- cannot void an advance that was already refunded or used
     select coalesce(sum(case when kind = 'cust_advance' then amount else -amount end), 0) - r.amount into bal from public.cash_moves where customer_id = r.customer_id and status = 'done' and kind like 'cust_advance%';
     if bal < 0 then raise exception 'advance_already_used'; end if;
@@ -462,8 +474,8 @@ begin
   return jsonb_build_object('from', p_from, 'to', v_to, 'capped', p_to > v_today, 'loc', p_loc, 'start', v_start, 'opening_known', v_known, 'balances', v_bal,
     'enabled', public.rule_on('daybook_enabled'), 'salary_hidden', v_hidden, 'names_masked', v_mask, 'skipped_rows', v_skipped, 'days', v_days,
     'totals', v_tot || jsonb_build_object('net_open', coalesce(v_tot -> 'net_open', 'null'::jsonb), 'net_close', coalesce(v_tot -> 'net_close', 'null'::jsonb), 'open', coalesce(v_tot -> 'open', 'null'::jsonb), 'close', coalesce(v_tot -> 'close', 'null'::jsonb)),
-    'notes', jsonb_build_array('card_as_bank', 'imprest_in_cash') || (case when exists (select 1 from public.cash_moves cm where cm.status = 'done' and cm.location_id = any (v_locs) and cm.move_date between p_from and v_to)
-      then '[]'::jsonb else jsonb_build_array('bank_deposit_not_dated', 'hub_receipt_not_recorded') end) || jsonb_build_array('drafts_excluded', 'refunds_included', 'future_dates_capped'));
+    'notes', jsonb_build_array('card_as_bank', 'imprest_in_cash') || (case when exists (select 1 from public.cash_moves cm where cm.status = 'done' and cm.kind = 'hub_receipt' and cm.location_id = any (v_locs) and cm.move_date between p_from and v_to)
+      then '[]'::jsonb else jsonb_build_array('hub_receipt_not_recorded') end) || jsonb_build_array('bank_deposit_not_dated') || jsonb_build_array('drafts_excluded', 'refunds_included', 'future_dates_capped'));
 end $$;
 revoke all on function public.day_book(int, date, date) from public, anon; grant execute on function public.day_book(int, date, date) to authenticated;
 
@@ -596,7 +608,8 @@ begin
   return new;
 end $$;
 drop trigger if exists entries_countseal_guard23 on public.entries;
-create trigger entries_countseal_guard23 before insert or update on public.entries for each row execute function public._entries_countseal_guard23();
+drop trigger if exists entries_zcountseal_guard23 on public.entries;   -- named to sort AFTER entries_sig_guard: the PIN hash is taken before the server book figure is added
+create trigger entries_zcountseal_guard23 before insert or update on public.entries for each row execute function public._entries_countseal_guard23();
 
 revoke all on function public.stock_blind_active(text, int), public.count_lines_state(uuid), public.count_lines_seal(uuid), public._entries_countseal_guard23(), public._append_only23() from public, anon;
 revoke all on function public._entries_countseal_guard23(), public._append_only23() from authenticated;
