@@ -67,6 +67,8 @@ const IA = [
   rec('invoice', 'cust', ['ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'], { icon: 'doc', ok: owner, kw: ['invoice', 'print', 'template', 'label', 'logo', 'ইনভয়েস', 'প্রিন্ট', 'ছাপা', 'লেবেল'] }),
   // Accounting & finance
   rec('daybook', 'acc', ['দিনের খাতা', 'Day book', 'Day book'], { icon: 'doc', ok: (c) => c.own || c.GF.view_daybook === true, home: { acc: 8 }, kw: ['day book', 'cash book', 'ledger', 'expense', 'দিনের খাতা', 'ক্যাশবুক', 'খরচ', 'হিসাব'] }),
+  rec('quickexp', 'acc', ['দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'], { icon: 'money', ok: (c) => c.own || c.P('10-2', 'enter'), kw: ['quick expense', 'day book expense', 'expense', 'imprest', 'voucher', 'দ্রুত খরচ', 'খরচ', 'ভাউচার', 'ইমপ্রেস্ট'], verbs: ['add expense', 'খরচ লিখুন'] }),
+  rec('paths', 'settings', ['পথ সুইচ ও শ্যাডো কপি', 'Path switches & shadow copies', 'Path switch ও shadow copy'], { icon: 'settings', ok: owner, kw: ['shadow', 'duplicate', 'double count', 'lock', 'payroll mode', 'primary', 'শ্যাডো', 'ডুপ্লিকেট', 'দুবার গোনা', 'লক', 'সুইচ'] }),
   rec('cashmoves', 'acc', ['ক্যাশ ও ব্যাংকের লেনদেন', 'Cash & bank moves', 'Cash ও Bank লেনদেন'], { icon: 'money', ok: (c) => c.own || c.GF.cash_move === true, kw: ['bank deposit', 'deposit', 'owner', 'advance', 'top up', 'hub', 'ব্যাংক জমা', 'অগ্রিম', 'অ্যাডভান্স', 'মালিক', 'ক্যাশ'] }),
   rec('ledgerlinks', 'acc', ['খাতায় পোস্ট (লিংক)', 'Ledger links', 'Ledger links'], { icon: 'doc', ok: owner, kw: ['ledger', 'post', 'journal', 'link', 'খাতা', 'পোস্ট', 'লেজার'] }),
   // Approvals & exceptions
