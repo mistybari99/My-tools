@@ -10,7 +10,7 @@
       select(_c, o) { if (o && o.head) head = true; if (o && o.count) count = true; return b; },
       order(c, o) { ord = [c, !(o && o.ascending === false)]; return b; },
       eq(c, v) { filters.push((r) => r[c] === v); return b; },
-      gte(c, v) { filters.push((r) => r[c] >= v); return b; }, neq(c, v) { filters.push((r) => r[c] !== v); return b; }, in(c, arr) { filters.push((r) => arr.includes(r[c])); return b; }, single() { single = true; return b; },
+      gte(c, v) { filters.push((r) => r[c] >= v); return b; }, lt(c, v) { filters.push((r) => r[c] < v); return b; }, lte(c, v) { filters.push((r) => r[c] <= v); return b; }, neq(c, v) { filters.push((r) => r[c] !== v); return b; }, in(c, arr) { filters.push((r) => arr.includes(r[c])); return b; }, single() { single = true; return b; },
       limit(n) { lim = n; return b; }, maybeSingle() { single = true; maybe = true; return b; }, range(a, z) { rng = [a, z]; return b; },
       insert(p) { op = 'insert'; payload = p; return b; }, update(p) { op = 'update'; payload = p; return b; },
       upsert(p, o) { op = 'upsert'; payload = p; conflict = o && o.onConflict ? o.onConflict.split(',') : null; return b; }, delete() { op = 'delete'; return b; },
