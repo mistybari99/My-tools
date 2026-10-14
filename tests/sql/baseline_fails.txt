@@ -68,7 +68,7 @@ phase90 0 119
 phase91 0 97
 phase92 0 46
 phase93 0 18
-phase94 0 80
+phase94 1 79
 phase95 0 48
 phase96 0 124
 phase97 0 155
@@ -81,7 +81,7 @@ phase101 3 54
 # NOTE phase101 3 fails: its T0/T3 count rows assuming the build 72..98 + 101 without phase99 (tests/sql/phase101_run.sh); with 99 in the chain they differ by design.
 # post-Step-E2E suites (build = docs/PASTE_ORDER.md 72..101 + phase103), measured in step E2E:
 phase89e 2 63
-phase98b 0 27
+phase98b 1 26
 phase100 0 80
 phase103 1 67
 # NOTE phase98 2 25 and phase89d 2 63: with phase103 on top, 'phase97 then phase98 = identical hash' (phase98 P1b, G1 last) and 'phase89 then 98 then 99 = identical' (phase89d P2, P2a) are false by design (phase103 re-creates those bodies); phase98b_test / phase89e_test are their replacements. Never edit the old files.
@@ -90,7 +90,7 @@ phase106 0 20
 phase105 0 52
 phase103b 1 67
 phase89f 2 63
-phase98c 0 27
+phase98c 1 26
 # NOTE phase89e 1, phase98b 2, phase103 1: these three re-paste phase103 as the LAST step and expect it to repair; once phase105 is on top that final state is phase103's text, not phase105's, so the 'identical hash' / 'recipe_cost restored' checks differ by design.
 #      Replacements (same assertions, every phase103 paste is followed by phase105): phase89f_test, phase98c_test, phase103b_test. Never edit the old files. phase103_test itself is 0 fail on a build WITHOUT phase105 (TEMPLATE=<db through 103>).
 # NOTE phase105_test.sql pastes phase105 itself; on this chain (105 already built in) it is a second paste, so the 'before' probes are marked (F) = real only on a build without phase105 (run it on <db through 103> to see the 26 failing-before assertions).
@@ -99,10 +99,19 @@ phase104 0 22
 phase107 0 56
 phase108 0 11
 phase111 0 9
-phase89g 0 65
-phase103c 0 68
+phase89g 2 63
+phase103c 1 67
 # INT4: phase89g_test / phase103c_test replace phase89f / phase103b for the chain 72..109 + phase111 (re-pasting 89 or 103 now needs 103,105,109,110,111 after it); phase98b is 0 fails on the final chain.
 # INT4 NOTE: phase89f 2 and phase103b 1 are false by design once phase109/111 exist (re-pasting 89 / 103 changes functions 109 re-creates); replacements phase89g_test / phase103c_test.
 # post-Step-Perf suites (build = docs/PASTE_ORDER.md up to phase108 + phase110 LAST), measured in step Perf:
-phase110 0 45
+phase110 2 43
 # NOTE phase89e 2 63 and phase103 1 67: with phase110 on top, 'phase89 then phase103 = identical bodies' (phase89e P2, P2a) and 'phase103 pasted twice = no body changes' (phase103 T9) are false by design (phase110 re-creates _cogs_lines72, inbox_list and _acct_stock_moves85; a re-paste of 89 / 103 puts the older text back, results identical, only slow). phase89f_test / phase103b_test are their replacements (they paste phase110 again after phase103). Never edit the old files.
+# phase114 / phase115 (batch 2): the six suites above re-paste an older phase (94 / 89 / 98 / 103 / 110) and assert "no body changed" or "exact list of re-created functions"; with 114 / 115 in the chain those assertions are false by design (re-paste rule, PASTE_ORDER section N). Their copies with 114 / 115 pasted again are the *h / *b / *d / *e suites below.
+phase89h 0 65
+phase94b 0 80
+phase98d 0 27
+phase98e 0 27
+phase103d 0 68
+phase110b 0 45
+phase114 0 52
+phase115 0 47
