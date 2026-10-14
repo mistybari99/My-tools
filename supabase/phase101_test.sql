@@ -29,7 +29,7 @@ insert into user_grants (user_id, grant_code) values (:'v','view_cost');
 -- the rule keys the step reports list, read from the phase files (not typed here)
 create table tt.keys101 (ph int, k text);
 \copy tt.keys101 from program 'python3 tests/sql/rec_keys.py' csv
-create table tt.new101 as select d.* from setup_rec_defs81 d where d.sort >= 300;
+create table tt.new101 as select d.* from setup_rec_defs81 d where d.sort >= 300 and d.phase <> '109';
 select count(*) as rules0 from rules where value is not null \gset
 select count(*) as audit0 from audit_log \gset
 

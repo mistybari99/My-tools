@@ -94,3 +94,4 @@ phase98c 0 27
 # NOTE phase89e 1, phase98b 2, phase103 1: these three re-paste phase103 as the LAST step and expect it to repair; once phase105 is on top that final state is phase103's text, not phase105's, so the 'identical hash' / 'recipe_cost restored' checks differ by design.
 #      Replacements (same assertions, every phase103 paste is followed by phase105): phase89f_test, phase98c_test, phase103b_test. Never edit the old files. phase103_test itself is 0 fail on a build WITHOUT phase105 (TEMPLATE=<db through 103>).
 # NOTE phase105_test.sql pastes phase105 itself; on this chain (105 already built in) it is a second paste, so the 'before' probes are marked (F) = real only on a build without phase105 (run it on <db through 103> to see the 26 failing-before assertions).
+phase109 0 23

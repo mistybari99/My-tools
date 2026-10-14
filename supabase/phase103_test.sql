@@ -268,6 +268,7 @@ select tt.chk('T9 tags kept: inventory_vs_gl bos85 bos96 bos103, recipe_cost bos
 select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fh0 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prosrc like '%bos103%' \gset
 select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fa0 from pg_proc p where p.pronamespace = 'public'::regnamespace \gset
 \i supabase/phase103.sql
+\i supabase/phase109.sql   -- Step Conc: 103 re-creates setup_recommend_apply without bos109; 109 puts it back
 select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fa1 from pg_proc p where p.pronamespace = 'public'::regnamespace \gset
 select tt.chk('T9 paste twice: no function body changes', :'fa0' = :'fa1');
 select tt.chk('T9 the switch is OFF by default and the new check row is installed once', (select default_value from rules where key = 'acct_manual_prod_in103') = 'false'::jsonb and (select count(*) from setup_check_defs81 where code = 'flw_grn_double103') = 1);

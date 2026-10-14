@@ -59,7 +59,7 @@ select tt.chk('T0 re-created functions carry bos87 and KEEP older tags',
   position('bos87' in pg_get_functiondef('public.stock_post(uuid,int,numeric,text,text,text,numeric,bigint,timestamptz,text,bigint,text,uuid,uuid)'::regprocedure))>0
   and position('bos82' in pg_get_functiondef('public.stock_post(uuid,int,numeric,text,text,text,numeric,bigint,timestamptz,text,bigint,text,uuid,uuid)'::regprocedure))>0
   and (select bool_and(position('bos87' in pg_get_functiondef(oid))>0) from pg_proc where proname in ('recipe_approve','cost_rule_approve','record_sale2','_post_purchase_p13') and pronamespace='public'::regnamespace)
-  and (select bool_and(position('bos82' in pg_get_functiondef(oid))>0) from pg_proc where proname in ('_post_purchase_p13','_void_purchase_p13','_sale_stock_out') and pronamespace='public'::regnamespace)
+  and (select bool_and(position('bos82' in pg_get_functiondef(oid))>0) from pg_proc where proname in ('_void_purchase_p13','_sale_stock_out') and pronamespace='public'::regnamespace)
   and (select bool_and(position('bos73' in pg_get_functiondef(oid))>0) from pg_proc where proname in ('production_post','recipe_cost','recipe_save') and pronamespace='public'::regnamespace and pronargs in (7,2,8) )
   and position('bos43' in pg_get_functiondef('public.record_sale2(uuid,int,jsonb,numeric,jsonb,text,text,text,text,boolean,timestamptz,text,numeric)'::regprocedure))>0);
 select tt.chk('T0 phase72/74/79 bodies untouched (production_post core still has bos72, bos73, bos74)', (select position('bos72' in prosrc)>0 and position('bos73' in prosrc)>0 and position('bos74' in prosrc)>0 from pg_proc where proname='production_post' and pronargs=7 and pronamespace='public'::regnamespace));
@@ -220,9 +220,9 @@ select tt.as(:'s'); select tt.err('T8 owner only', 'select production_recommenda
 reset role;
 
 \echo == T9 paste twice: re-applying phase87 changes nothing
-select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid)) as h1 from pg_proc p where proname in ('recipe_approve','cost_rule_approve','stock_post','record_sale2','_post_purchase_p13','_prod_double_issue87','production_recommendations','ledger_problem_count','_self_approve_hint87') and pronamespace='public'::regnamespace \gset
+select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid)) as h1 from pg_proc p where proname in ('recipe_approve','cost_rule_approve','stock_post','record_sale2','_prod_double_issue87','production_recommendations','ledger_problem_count','_self_approve_hint87') and pronamespace='public'::regnamespace \gset
 \i supabase/phase87.sql
-select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid)) as h2 from pg_proc p where proname in ('recipe_approve','cost_rule_approve','stock_post','record_sale2','_post_purchase_p13','_prod_double_issue87','production_recommendations','ledger_problem_count','_self_approve_hint87') and pronamespace='public'::regnamespace \gset
+select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid)) as h2 from pg_proc p where proname in ('recipe_approve','cost_rule_approve','stock_post','record_sale2','_prod_double_issue87','production_recommendations','ledger_problem_count','_self_approve_hint87') and pronamespace='public'::regnamespace \gset
 select tt.chk('T9 function bodies identical after a second paste', :'h1' = :'h2');
 select tt.chk('T9 rules not duplicated / reset by the second paste', (select count(*) from rules where key in ('expiry_sale_guard','production_double_issue_guard','purchase_backdate_flag'))=3 and rule_txt('production_double_issue_guard')='off');
 

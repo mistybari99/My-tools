@@ -21,8 +21,8 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DOC = os.path.join(REPO, "docs", "PASTE_ORDER.md")
 FINAL_BUILD = os.path.join(REPO, "tests", "sql", "final_build.sh")
 SUPA = os.path.join(REPO, "supabase")
-RANGE = range(72, 104)
-TAIL_AFTER_FINAL_BUILD = [99, 100, 101, 102, 103]
+RANGE = list(range(72, 104)) + [106, 107, 109]
+TAIL_AFTER_FINAL_BUILD = [99, 100, 101, 102, 103, 106, 107, 109]
 
 
 def canonical_order():
