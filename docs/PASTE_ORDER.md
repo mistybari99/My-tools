@@ -91,3 +91,8 @@ Installed on the owner's live database, in this order (72..103 - all 32 new file
 | 32 | phase103 (LAST) | installed |
 
 Next file: phase104 (see section G).
+
+## I. phase106 (backup / restore-drill coverage)
+
+`supabase/phase106.sql` goes after phase103 (and phase102 if used); guard inside (72..103). Re-creates only `_backup_tables()` (latest body = phase70, one change: `token_a`/`token_b` are not secrets) and adds `backup_coverage106()`. Independent of phase104 / 105. Audit: docs/backend/BACKUP_COVERAGE.md. Test: `supabase/phase106_test.sql`.
+phase106 makes `phase46_test` F13 false by design (perm_conflict rows carry `token_a` / `token_b` keys): `supabase/phase46b_test.sql` is the copy with F13 allowing them; tests/sql/baseline_fails.txt: phase46 1 known fail, phase46b 0.
