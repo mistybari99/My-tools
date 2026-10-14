@@ -1,6 +1,7 @@
 // Step Vis: web/optviews.js (owner screen + nav hook) with the real web/ia.js. Plain node, mocked rpc, no browser: node tests/web/optviews_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const ROOT = path.join(__dirname, '..', '..', 'web');
+const ROOT = _P.WEB_DIR;
 let pass = 0, failn = 0;
 const chk = (n, ok) => { if (ok) pass++; else { failn++; console.log('FAIL', n); } };
 const BN = /[ঀ-৿]/;

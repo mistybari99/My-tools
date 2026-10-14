@@ -1,6 +1,7 @@
 // Shared mock for stock2_test.js / purchase_test.js: in-page RPC stand-ins for the phase10 API (the Supabase stub returns null for unknown RPCs).
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), http = require('http');
-const ROOT = '/home/user/My-tools/web';
+const ROOT = _P.WEB_DIR;
 function baseData(SP) {
   const src = fs.readFileSync(SP + '/smoke.js', 'utf8');
   return new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);

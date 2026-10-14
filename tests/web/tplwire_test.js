@@ -1,7 +1,8 @@
 // Step TplInv (bos98): the template system wired into web/invoiceview.js. Mocked rpc, no browser. Run on its own: node tests/web/tplwire_test.js
 // (a) no B.tpl / nothing chosen => output identical to before; (b) chosen template => template HTML used, XSS-escaped; (c) no cost keys; plus choices cached once, 2 s cap, offline.
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const ROOT = path.join(__dirname, '..', '..', 'web');
+const ROOT = _P.WEB_DIR;
 let pass = 0, failn = 0;
 const chk = (n, ok) => { if (ok) pass++; else { failn++; console.log('FAIL', n); } };
 const BN = /[ঀ-৲৴-৿]/;

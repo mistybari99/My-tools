@@ -1,8 +1,9 @@
 // Step Inv (bos92): the real app (pos.js + invoice.js + invoiceview.js) in a phone-size browser with a mocked rpc.
 // Run on its own: node tests/web/invoiceview_pw_test.js <abs tests/web dir>      (serves ../../web of THIS checkout)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2] || __dirname, ROOT = path.join(__dirname, '..', '..', 'web'), PORT = 8493;
+const SP = process.argv[2] || __dirname, ROOT = _P.WEB_DIR, PORT = _P.freePort();
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
 data.tables.invoice_templates = data.tables.invoice_templates || []; data.tables.print_profiles = data.tables.print_profiles || [];
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);

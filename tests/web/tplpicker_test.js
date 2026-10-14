@@ -1,6 +1,7 @@
 // Phase 93 web: node tests/web/tplpicker_test.js  (plain node, mocked rpc): page renders for every doc type, set/clear call the right rpc, location scope, errors surface, XSS in location names, English page has no Bangla, unique data-act names, ia + index wiring.
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const W = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const W = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('FAIL:', m); } };
 const rd = (f) => fs.readFileSync(path.join(W, f), 'utf8');
 async function run(lang, opts) {

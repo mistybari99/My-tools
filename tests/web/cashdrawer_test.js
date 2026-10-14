@@ -1,8 +1,9 @@
 // Phase 95 web: node tests/web/cashdrawer_test.js  (plain node, mocked rpc, fake drivers)
 // Mode off = nothing; mode/when matrix; fail-soft; offline log queue + idempotent replay; no-sale reason; real drivers against fake browser APIs (bytes = ESC p 0 25 250);
 // owner screen in 3 languages (English has no Bangla letters); XSS; unique cdr_ data-act names; ia / index / pos.js wiring and guards.
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const W = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const W = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('FAIL:', m); } };
 const rd = (f) => fs.readFileSync(path.join(W, f), 'utf8');
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

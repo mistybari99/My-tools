@@ -2,8 +2,9 @@
 // Checks: language rule (English has no Bangla, 3 modes present), unique dg_ data-act names, route registry, owner gating, recommendation + WARNING texts,
 // card settle (idempotent client id, validation, over hint, void), autopost tick / scheduler, pending alert, error mapping, ia.js + index.html lines.
 // Run: node tests/web/dscr_test.js
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const WEB = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const WEB = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let n = 0, bad = 0;
 const ck = (name, ok) => { n++; if (!ok) { bad++; console.log('FAIL ' + name); } };
 const src = fs.readFileSync(path.join(WEB, 'books85.js'), 'utf8');

@@ -2,12 +2,13 @@
 // confirm, reverse), VAT report (off / rate missing / numbers), fixed assets (dry, save, register, schedule, depreciation preview + confirm), budgets (dry, save,
 // vs-actual), switches-off banners, no-permission text, Bangla, no horizontal overflow, no JS errors.
 // Run: node finance2_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8362, srv = C.serve(PORT);
-const WEB = '/home/user/My-tools/web';
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
+const WEB = _P.WEB_DIR;
 const ROW = (id, code, bn, en, type, parent, grp) => ({ id, code, name_bn: bn, name_en: en, type, parent_id: parent || null, is_group: !!grp, active: true });
 const COA = [ROW(1, '1100', 'নগদ ও ব্যাংক', 'Cash and bank', 'asset', null, true), ROW(2, '1110', 'হাতে নগদ', 'Cash in hand', 'asset', 1), ROW(3, '1120', 'ব্যাংক', 'Bank', 'asset', 1), ROW(4, '4100', 'বিক্রয়', 'Sales', 'income'), ROW(5, '5300', 'ভাড়া', 'Rent', 'expense')];
 const RULES = (o) => [['bank_recon_on', true], ['year_close_on', true], ['fixed_assets_on', true], ['budgets_on', true], ['vat_on', true], ['vat_rate', 15], ['period_closed_until', '2025-12-31']]

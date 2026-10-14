@@ -1,7 +1,8 @@
 // web/inbox.js - stub-DOM test (no browser): board strip, masked rows, make-order pre-fill + save call, friendly errors, escaping, 3 language modes.
 // Run: node tests/web/inbox_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'web', 'inbox.js'), 'utf8');
+const src = fs.readFileSync(path.join(_P.WEB_DIR, 'inbox.js'), 'utf8');
 let pass = 0, fail = 0; const ok = (n, c) => { if (c) pass++; else { fail++; console.log('FAIL ' + n); } };
 const body = { innerHTML: '' }, acts = {}, toasts = [], calls = [];
 let MODE = 'en', RPC = {};

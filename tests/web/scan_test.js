@@ -2,8 +2,9 @@
 // Covers: 3 languages (English mode has no Bangla letters), unique data-act names, ia.js + index.html lines, OCR text parser, payload + client checks,
 // upload path / client id idempotency, offline queue, confirm key stability, error texts, no public URL, no secret in the Scan files, edge-function validator.
 const fs = require('fs'), vm = require('vm'), path = require('path'), cp = require('child_process'), os = require('os');
-const ROOT = path.join(__dirname, '..', '..');
-const WEB = path.join(ROOT, 'web');
+const _P = require('./_paths');
+const ROOT = _P.REPO_DIR;
+const WEB = _P.WEB_DIR;
 let pass = 0, failn = 0;
 const chk = (n, ok) => { if (ok) pass++; else { failn++; console.log('FAIL', n); } };
 const BN = /[ঀ-৿]/;

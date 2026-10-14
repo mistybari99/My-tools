@@ -1,12 +1,13 @@
 // Phase 90 / Scan in a real browser at phone width (360px) with mocked scan_* RPCs: pick a photo -> draft -> check beside the photo -> map -> Confirm.
 // Run: node tests/web/scan_pw_test.js <abs tests/web dir>      (mock only: no Supabase, no OCR, no AI)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
 const SP = process.argv[2] || __dirname;
 const C = require(SP + '/w5_common.js');
-const base = C.baseData(SP), PORT = 8493;
+const base = C.baseData(SP), PORT = _P.freePort();
 // serve THIS worktree's web/ (the shared helper serves a fixed folder of another checkout)
-const ROOT = require('path').join(__dirname, '..', '..', 'web');
+const ROOT = _P.WEB_DIR;
 const srv = require('http').createServer((q, r) => { const f = require('path').join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
   r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[require('path').extname(f)] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const EXTRA_SC = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const M = window.__M;

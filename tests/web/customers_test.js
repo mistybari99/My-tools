@@ -1,10 +1,11 @@
 // Module C: customers (#/customers), tiers (#/tiers) and the POS tier chip / tier-discount button (web/pos.js).
 // Run: node customers_test.js <abs tests/web dir>      (the RPCs are mocked in the page; the SQL side is supabase/phase43_test.sql)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8355, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const MON = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' }).slice(5, 7);
 const EXTRA43 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x)); const W = window.__W43 = window.__W43 || { err: {}, dup: false, dry: { dry: true, count: 2, changes: [
@@ -56,7 +57,7 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
     p.on('dialog', (d) => d.accept(d.defaultValue()));
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + EXTRA43 }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    await p.route(`http://localhost:${PORT}/`, (r) => { let h = fs.readFileSync('/home/user/My-tools/web/index.html', 'utf8'); if (!/customers\.js/.test(h)) h = h.replace('</body>', '<script src="customers.js"></script></body>'); r.fulfill({ contentType: 'text/html', body: h }); });
+    await p.route(`http://localhost:${PORT}/`, (r) => { let h = fs.readFileSync(_P.WEB_DIR + '/index.html', 'utf8'); if (!/customers\.js/.test(h)) h = h.replace('</body>', '<script src="customers.js"></script></body>'); r.fulfill({ contentType: 'text/html', body: h }); });
     const data = C.mk(base, {}); const T = data.tables;
     T.customer_tiers = JSON.parse(JSON.stringify(TIERS)); T.gift_rules = [{ id: 5, tier_id: null, trigger: 'birthday', threshold: null, gift_text_bn: 'মিষ্টির বাক্স', gift_text_en: 'Sweet box', value_taka: 300, active: true }];
     T.rules = (T.rules || []).concat([rule('loyalty_points_on', 'switch', false, o.noLoyal ? false : true), rule('customer_gifts_on', 'switch', false, o.noGifts ? false : true), rule('tier_discount_on', 'switch', false, true), rule('customer_tier_auto_on', 'switch', false, o.autoOn ? true : null),

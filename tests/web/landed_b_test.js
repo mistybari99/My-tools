@@ -2,8 +2,9 @@
 // Step Land (bos97): web/landed.js with mocked rpc, no browser. Run on its own: node tests/web/landed_test.js
 // Language rule: every new string has bn / en / mix; the English text has no Bangla letters (the taka sign U+09F3 is the currency mark); unique data-act prefix lc_;
 // the module touches no existing file (purchase.js is not edited); ia.js has the rec and index.html the script tag at the END.
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const ROOT = path.join(__dirname, '..', '..', 'web');
+const ROOT = _P.WEB_DIR;
 let pass = 0, failn = 0;
 const chk = (n, ok) => { if (ok) pass++; else { failn++; console.log('FAIL', n); } };
 const BN = /[ঀ-৲৴-৿]/;
