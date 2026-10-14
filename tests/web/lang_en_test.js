@@ -5,7 +5,7 @@ const WEB = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
 let bad = 0, n = 0;
 const ia = fs.readFileSync(path.join(WEB, 'ia.js'), 'utf8');
 for (const m of ia.matchAll(/rec\('([^']+)',\s*'[^']+',\s*\[\s*'[^']*',\s*'([^']*)'/g)) { n++; if (BN.test(m[2])) { bad++; console.log('FAIL ia.js rec ' + m[1] + ': ' + m[2]); } }
-for (const f of ['accounts', 'recipebook', 'costing', 'costsources', 'costattrib', 'inbox', 'salesx', 'ia']) {
+for (const f of ['accounts', 'recipebook', 'costing', 'costsources', 'costattrib', 's1setup', 'inbox', 'salesx', 'ia']) {
   const s = fs.readFileSync(path.join(WEB, f + '.js'), 'utf8');
   for (const m of s.matchAll(/B\.L\(\s*'((?:[^'\\]|\\.)*)'\s*,\s*'((?:[^'\\]|\\.)*)'/g)) { n++; if (BN.test(m[2])) { bad++; console.log('FAIL ' + f + '.js B.L en: ' + m[2].slice(0, 70)); } }
 }
