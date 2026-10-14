@@ -75,9 +75,9 @@ Lead's chosen defaults / recommendations (UI shows them as 'প্রস্ত�
 - packaging on sale return: option B (packaging_return_mode none|restore|wastage), default none, recommend 'wastage' first
 - web form rate limit / captcha / silence hours: values live in settings; UI shows suggested ranges, owner taps to apply
 NEW STEPS:
-- S1 (phase79) decision follow-ups: per-item free-cost flag, cost_missing label, partner-base switch, packaging_return_mode, intake-bot role redesign
-- S2 (phase80) RECOMMENDATIONS + ACTIVATION GUIDE ('চালু করার গাইড'): function setup_recommendations() evaluates live DB state and returns recommended switches/settings with Bangla reason + status; one-tap apply with audit; readiness checks before switching a module on (e.g. accounting needs opening balances + mappings; stock tracking needs conversions + costs; production needs recipes approved); post-activation flow checks ('সব ঠিকঠাক বইছে?'); never blocks the owner
-- INT: integration branch merging B + C chain + C2b + H + E9, re-create production_post/recipe_cost once with ALL changes (phase72 + phase74 + phase73 approval gate), full regression
+- S1 (phase80) decision follow-ups: per-item free-cost flag, cost_missing label, partner-base switch, packaging_return_mode, intake-bot role redesign
+- S2 (phase81) RECOMMENDATIONS + ACTIVATION GUIDE ('চালু করার গাইড'): function setup_recommendations() evaluates live DB state and returns recommended switches/settings with Bangla reason + status; one-tap apply with audit; readiness checks before switching a module on (e.g. accounting needs opening balances + mappings; stock tracking needs conversions + costs; production needs recipes approved); post-activation flow checks ('সব ঠিকঠাক বইছে?'); never blocks the owner
+- INT (phase79 = integration fix): integration branch merging B + C chain + C2b + H + E9, re-create production_post/recipe_cost once with ALL changes (phase72 + phase74 + phase73 approval gate), full regression
 
 ## Open owner decisions (collect from agent reports)
 - start stock tracking + accounting_on: before or after Part 1? (live DB empty; risk rises once enabled)
