@@ -31,8 +31,8 @@ for s in $SUITES; do
   f="$REPO/supabase/${s}_test.sql"; [ -f "$f" ] || { echo "$s: no such suite"; bad=$((bad+1)); continue; }
   DB=rq_${ME}_$(echo "$s" | tr -c 'a-z0-9\n' '_'); $PSQL -q -c "drop database if exists $DB" -c "create database $DB template $TPL" >/dev/null 2>&1 || { echo "$s: clone failed"; bad=$((bad+1)); continue; }
   (cd "$REPO" && timeout "$TIMEOUT" $PSQL -d "$DB" -qAt -f "$f") > "$LOGDIR/$s.log" 2>&1; rc=$?
-  res=$(grep -E '^RESULT [0-9]+ pass [0-9]+ fail' "$LOGDIR/$s.log" | tail -1)
-  if [ -n "$res" ]; then p=$(echo "$res" | awk '{print $2}'); fl=$(echo "$res" | awk '{print $4}')
+  res=$(grep -E '^RESULT [0-9]+ pass[ ,/]+[0-9]+ fail' "$LOGDIR/$s.log" | tail -1)   # 'RESULT 96 pass, 2 fail' / 'RESULT 65 pass / 0 fail' / 'RESULT 8 pass 1 fail'
+  if [ -n "$res" ]; then p=$(echo "$res" | sed -E 's/^RESULT ([0-9]+) pass[ ,\/]+([0-9]+) fail.*/\1/'); fl=$(echo "$res" | sed -E 's/^RESULT ([0-9]+) pass[ ,\/]+([0-9]+) fail.*/\2/')
   else p=$(grep -cE '(^|NOTICE: +)PASS ' "$LOGDIR/$s.log"); fl=$(grep -cE '(^|NOTICE: +)FAIL ' "$LOGDIR/$s.log"); fi
   [ $rc -eq 124 ] && v="TIMEOUT" || v=""
   b=$(awk -v s="$s" '$1==s{print $2}' "$BASE")
