@@ -164,6 +164,7 @@ const IA = [
   rec('catreport', 'reports', ['Category অনুযায়ী রিপোর্ট', 'Report by Category', 'Category অনুযায়ী report'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true, kw: ['category report', 'sales by category', 'stock value by category', 'sub category report', 'ক্যাটাগরি রিপোর্ট', 'ক্যাটাগরি অনুযায়ী বিক্রি'], verbs: ['sales by category'] }),
   rec('purchaseprint', 'purch', ['ক্রয় বিল প্রিন্ট ও পাঠান', 'Print and send purchase bills', 'Purchase Bill Print ও পাঠান'], { icon: 'doc', ok: locOk, kw: ['purchase bill print', 'grn print', 'print bill', 'send bill', 'supplier bill', 'whatsapp bill', 'ক্রয় বিল প্রিন্ট', 'বিল পাঠান', 'প্রিন্ট'] }),
   rec('itemimg', 'settings', ['আইটেমের ছবি', 'Item photos', 'Item এর photo'], { icon: 'settings', ok: owner, kw: ['item photo', 'item image', 'item picture', 'pos photo', 'thumbnail', 'image cache', 'show photos', 'ছবি', 'আইটেমের ছবি', 'থাম্বনেইল'] }),
+  rec('whatsnew', 'dash', ['নতুন কী আছে', "What's new", "What's new"], { icon: 'doc', kw: ['new', 'whats new', 'update', 'feature', 'নতুন', 'নতুন কী', 'আপডেট', 'নতুন ফিচার'] }),
 ];
 // settings2 sub pages: searchable and listed on the Administration page, not in the drawer
 [['fiscal', ['অর্থবছর ও সপ্তাহ', 'Fiscal year & week', 'Fiscal year ও week'], ['fiscal', 'year', 'week', 'অর্থবছর', 'বছর']], ['vat', ['ভ্যাট', 'VAT', 'VAT'], ['vat', 'tax', 'ভ্যাট', 'কর']],
