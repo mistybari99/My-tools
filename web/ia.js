@@ -152,11 +152,9 @@ const IA = [
   rec('costunknown', 'reports', ['অজানা খরচ', 'Unknown costs', 'অজানা cost'], { icon: 'doc', ok: (c) => c.own || c.P('ITEM_COST', 'view'), kw: ['unknown cost', 'cost missing', 'provisional profit', 'no cost', 'cost_missing', 'খরচ অজানা', 'সাময়িক', 'লাভ'], verbs: ['find unknown costs'] }),
   rec('packflags', 'cust', ['অনলাইন অর্ডার যাচাই', 'Online order review', 'Online order যাচাই'], { icon: 'doc', ok: pos, kw: ['pack warning', 'stock short', 'voided sale', 'order flag', 'duplicate order', 'প্যাক', 'যাচাই', 'অর্ডার'], verbs: ['review online order flags'] }),
   rec('posfailed', 'appr', ['Offline POS — আটকে যাওয়া sale', 'Offline POS - refused sales', 'Offline POS — আটকে যাওয়া sale'], { icon: 'doc', ok: owner, kw: ['offline pos', 'failed sale', 'refused sale', 'override', 'আটকে', 'অফলাইন'], verbs: ['see refused offline sales'] }),
-<<<<<<< HEAD
   rec('invoiceview', 'sale', ['ইনভয়েস দেখুন ও পাঠান', 'View and send invoices', 'Invoice দেখুন ও পাঠান'], { icon: 'doc', ok: pos, mob: 3, kw: ['invoice', 'receipt', 'reprint', 'print', 'email', 'sms', 'whatsapp', 'share', 'ইনভয়েস', 'রসিদ', 'প্রিন্ট', 'হোয়াটসঅ্যাপ'], verbs: ['show the invoice', 'send the invoice'] }),
-=======
   rec('books85', 'acc', ['কার্ড সেটেলমেন্ট ও অটো পোস্ট', 'Card settlement & auto posting', 'Card settlement ও auto post'], { icon: 'money', ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true, kw: ['card settlement', 'pos card', 'auto post', 'scheduler', 'pending alert', 'stock adjust', 'opening stock', 'transit loss', 'purchase variance', 'কার্ড', 'অটো পোস্ট', 'সুইচ'] }),
->>>>>>> origin/fix/phase-Dscr
+  rec('books96', 'acc', ['শুরুর স্টক ও খরচের অপেক্ষা', 'Opening stock & cost waiting', 'Opening stock ও cost-এর অপেক্ষা'], { icon: 'money', ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true || c.GF.view_cost === true, kw: ['opening stock', 'double count', 'opening balance', 'owner capital', 'cost waiting', 'cost missing', 'uncosted', 'wastage cost', 'supply cost', 'waiting list', 'শুরুর স্টক', 'খরচ', 'অপেক্ষা', 'দুইবার'] }),
 ];
 // settings2 sub pages: searchable and listed on the Administration page, not in the drawer
 [['fiscal', ['অর্থবছর ও সপ্তাহ', 'Fiscal year & week', 'Fiscal year ও week'], ['fiscal', 'year', 'week', 'অর্থবছর', 'বছর']], ['vat', ['ভ্যাট', 'VAT', 'VAT'], ['vat', 'tax', 'ভ্যাট', 'কর']],
