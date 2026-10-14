@@ -15,7 +15,7 @@
 //
 // Secrets (NAMES only - set with `supabase secrets set NAME=...`, never in the repo or chat):
 //   INTAKE_BOT_EMAIL, INTAKE_BOT_PASSWORD        (required; SUPABASE_URL and SUPABASE_ANON_KEY are provided by Supabase; service_role is NOT used)
-//   TELEGRAM_SECRET_TOKEN                        (optional second check: if set, this function also compares the header with it before calling the database)
+//   TELEGRAM_SECRET_TOKEN                        (REQUIRED since bos94: the header is compared with it before any sign-in; unset = every call is answered 403)
 //   TELEGRAM_BOT_TOKEN                           (NOT read by this function. Keep it only for the owner's own setWebhook / getWebhookInfo calls, or as a Supabase secret for a future file-download step.)
 // The secret_token itself must ALSO be given to the app once (Inbox > Channels > "Set secret token" -> telegram_secret_set); the database stores only its SHA-256.
 // Deploy (needs a computer):  supabase functions deploy telegram-webhook --no-verify-jwt     (Telegram cannot send a Supabase login token)
@@ -55,6 +55,16 @@ function parse(body: any): Msg | null {
     time: typeof m.date === "number" && m.date > 0 ? new Date(m.date * 1000).toISOString() : null, attachment: attachment ? attachment.slice(0, 500) : null };
 }
 
+// bos94: the signed-in client is kept between calls of the same instance (one Auth sign-in per instance, not per request); dropped on any database error so the next call signs in again
+let botDb: any = null;
+async function bot() {
+  if (botDb) return botDb;
+  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { auth: { persistSession: false } });
+  const login = await db.auth.signInWithPassword({ email: Deno.env.get("INTAKE_BOT_EMAIL") || "", password: Deno.env.get("INTAKE_BOT_PASSWORD") || "" });
+  if (login.error) return null;
+  botDb = db; return db;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return new Response("method", { status: 405 });
   const code = new URL(req.url).searchParams.get("c") || "";
@@ -63,31 +73,23 @@ Deno.serve(async (req: Request) => {
   const header = req.headers.get("x-telegram-bot-api-secret-token");
   const hash = header ? await sha256hex(header) : null;
 
-  // optional extra check with the Supabase secret (defence in depth); the database check below always applies
+  // bos94: the Supabase secret is checked FIRST and is required (fails closed when unset). A forged call is answered 403 before any sign-in or database call,
+  // so a flood cannot use up the bot login's Auth rate limit or fill the failed list. The database check (stored hash per channel) still applies below.
   const envTok = Deno.env.get("TELEGRAM_SECRET_TOKEN");
-  const envOk = !envTok || (!!hash && ctEq(hash, await sha256hex(envTok)));
+  if (!envTok || !hash || !ctEq(hash, await sha256hex(envTok))) return new Response("forbidden", { status: 403 });
 
-  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { auth: { persistSession: false } });
-  const login = await db.auth.signInWithPassword({ email: Deno.env.get("INTAKE_BOT_EMAIL") || "", password: Deno.env.get("INTAKE_BOT_PASSWORD") || "" });
-  if (login.error) return new Response("bot_login", { status: 503 });           // Telegram will retry
+  const db = await bot();
+  if (!db) return new Response("bot_login", { status: 503 });                   // Telegram will retry
 
   let body: any = null;
   try { body = JSON.parse(raw); } catch { /* handled below */ }
   const msg = body ? parse(body) : null;
-  // the database needs an update id to log a rejection against; a body without one is logged with 0
-  const probeId = typeof body?.update_id === "number" ? body.update_id : 0;
-
-  if (!hash || !envOk) {
-    await db.rpc("telegram_message_receive", { p_channel_code: code, p_secret_hash: hash, p_update_id: probeId, p_chat_id: 0, p_username: null, p_name: null,
-      p_text: null, p_msg_time: null, p_attachment: null });
-    return new Response("forbidden", { status: 403 });
-  }
   if (!body) return new Response("bad json", { status: 400 });
   if (!msg) return new Response("ignored", { status: 200 });                    // not a private text/media message: acknowledge so Telegram does not resend
 
   const r = await db.rpc("telegram_message_receive", { p_channel_code: code, p_secret_hash: hash, p_update_id: msg.updateId, p_chat_id: msg.chatId, p_username: msg.username,
     p_name: msg.name, p_text: msg.text, p_msg_time: msg.time, p_attachment: msg.attachment });
-  if (r.error) return new Response("retry", { status: 503 });                  // database unreachable / denied: ask Telegram to send again
+  if (r.error) { botDb = null; return new Response("retry", { status: 503 }); }   // database unreachable / denied: ask Telegram to send again
   if (r.data?.off) return new Response("retry", { status: 503 });              // switch is off: not stored; Telegram keeps and resends for a while
   if (r.data?.rejected) return new Response("forbidden", { status: 403 });     // wrong token (database check) / unknown or secret-less channel
   // r.data.queued = stored in the failed list, the database retries it itself (intake_retry_due); r.data.duplicate = already had it

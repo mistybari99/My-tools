@@ -33,11 +33,15 @@ This is the order that was built and tested from nothing (fresh Postgres 16, see
 | 17 | phase88.sql | 72..79, 82, 83, 84 | guard inside |
 | 18 | phase90.sql | foundation .. 84 | guard inside (lists the missing phases) |
 | 19 | phase91.sql | 86 | guard inside (checks its tables) |
-| 20 | **phase89.sql - LAST** | 72..88, 90, 91 | guard raises `phase89 needs phases 72..88, 90, 91 pasted first ... missing: <numbers>` if any is absent |
+| 20 | **phase89.sql** (merged function bodies) | 72..88, 90, 91 | guard raises `phase89 needs phases 72..88, 90, 91 pasted first ... missing: <numbers>` if any is absent |
+| 21 | phase92.sql | 72..88 | guard inside (invoice on screen) |
+| 22 | phase93.sql | base schema | guard inside (print templates) |
+| 23 | phase95.sql | base + 8 | guard inside (cash drawer option) |
+| 24 | **phase94.sql - LAST** | 76, 80, 81, 85, 86, 89, 90, 92, 93 | guard raises `phase94 needs phases 76, 80, 81, 85, 86, 89, 90, 92, 93 pasted first ...`. Security step (docs/briefs_p2p3/step_Sec_REPORT.md): re-creates 9 functions with the tag bos94 (none of them is in phase89's list) and gives `inbound_message_receive` / `web_order_submit` one extra defaulted argument. Do NOT paste phase76 again afterwards (it would bring back the old signatures next to the new ones). |
 
-(The number 89 is out of sequence on purpose: it was reserved for this integration fix. It is pasted last.)
+(The number 89 is out of sequence on purpose: it was reserved for this integration fix. It is pasted after 90 and 91; 92, 93, 95 and then 94 (the security step, also out of sequence) follow. `tests/sql/final_build.sh` builds exactly this order.)
 
-## C. Why phase89 must be last
+## C. Why phase89 comes after 90 and 91
 
 Each phase was written on its own branch, from the function text that existed there, so a later number could silently put an older body back.
 Found by comparing `pg_get_functiondef` after every phase on a fresh build: phase83 dropped the phase82 `unit_conv_required` rule from `_sale_stock_out`,
@@ -47,6 +51,6 @@ After phase89 the only functions whose text differs from "numeric order without 
 
 ## D. Rules for the next phase (92, 93, ...)
 
-1. Paste it after phase89, then compare `pg_get_functiondef` before/after for every function it re-creates; if it re-creates one that appears in phase89, merge the new lines into the phase89 text (or paste a new phase89 version) and keep every `bosNN` tag.
-2. Run `supabase/phase89_test.sql` (T0 lists 50 function/tag pairs) after the new phase; a lost tag shows up as a FAIL.
+1. Paste it after phase94 (or, if it re-creates a function of phase94, merge into that text), then compare `pg_get_functiondef` before/after for every function it re-creates; if it re-creates one that appears in phase89, merge the new lines into the phase89 text (or paste a new phase89 version) and keep every `bosNN` tag.
+2. Run `supabase/phase89_test.sql` (T0 lists 50 function/tag pairs) and `supabase/phase94_test.sql` after the new phase; a lost tag shows up as a FAIL.
 3. Never edit an old phase file; add a `phaseNNb_test.sql` copy when an old assertion becomes false by design (done for 72b, 73b, 76b).
