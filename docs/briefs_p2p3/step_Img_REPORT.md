@@ -1,0 +1,51 @@
+# Step Img (phase102) - item photos on cards and pickers
+
+Branch `fix/phase-Img` (from `integration/p72-p79`, phase99 and phase101 already merged). Owner option, default OFF = today's behaviour.
+
+## What was built
+* `supabase/phase102.sql` (tag bos102, additive, paste twice safe, guard needs 72..98, no existing function re-created):
+  * rules `item_images_mode` (off | pos_only | everywhere, default off), `item_images_thumb_only` (on | off, default on), `item_images_cache_hours` (number the owner types 1..720, blank = this session only).
+  * 3 rows in `setup_rec_defs81` (phase '102', sort 361..363, ON CONFLICT DO NOTHING): mode recommends **pos_only**, thumb **on**, hours no value.
+    Reason for pos_only: photos use mobile data; on the POS the number of cards on screen is limited and a photo helps to pick the right item in busy hours, while long lists load many pictures. Switch to everywhere later if the data is good. No MB figure is invented.
+  * RPC `items_first_image(item_ids uuid[]) returns (item_id uuid, path text)`, SECURITY INVOKER (items RLS / grants apply as for a select), authenticated only (anon revoked), max 500 ids, no cost / price / stock column. NOTE: the brief said `int[]`; `items.id` is **uuid** in this schema, so the argument is `uuid[]`.
+* `web/itemimg.js` (`B.itemimg`) - a DECORATOR, no existing screen rewritten:
+  * `decorate(root)` + a MutationObserver on `document.body` (batched, 30 ms). Mode off: the observer returns at once, nothing is added to the DOM (not even the style tag); switching to off removes everything it added.
+  * pos_only: `.pos-item[data-v]`. everywhere: + item list rows (`data-act=itemedit`), stock lookup rows (`lk_item`), scan matches (`scan_itempick`), any element with `data-iimg-id="<item id>"` (hook for other screens, e.g. Cat), and a 44px preview next to item pickers (text box with datalist, or `select[data-sxl=item]`) once an item is chosen.
+  * Data: ids -> ONE `items_first_image` call (chunks of 500) -> ONE `createSignedUrls` call per screen (thumbnail path + `.t.jpg` and original together; thumbnail used when it exists, else the original).
+  * Loading: IntersectionObserver (240px margin), max 4 pictures at once, picture appended only after it loaded (no broken-image icon), fade-in; slot has a fixed size so nothing shifts when the picture arrives. Placeholder = first letter on a colour derived from the item id (hue hash, white letter).
+  * Cache: memory for the session. With `item_images_cache_hours` set: paths + signed links (expiry respected, 60 s margin) in localStorage `bos_iimg1`, picture bytes in the Cache API `bos-itemimg` (with timestamp), so pictures already seen show with no network call. Every failure (rpc missing, offline, storage blocked) leaves the letter avatar; failed rpc / sign calls back off 60 s / 30 s.
+  * Picker preview needs code -> id: one lazy `items` select of `id,code` (paged by 1000) the first time a picker value matches its datalist, only in everywhere mode.
+  * Page `#/itemimg` (owner): mode chips Off / POS only / Everywhere with the recommendation text, thumbnail On/Off, hours input (save / clear, 1..720), Clear image cache, "Pictures loaded this session: N" (a real counter, no estimated MB). Saves through `set_rule`, then `B.reloadRules`. data-act prefix `img_`.
+* `web/items2.js`: ONE added line tagged `bos103` in `addImage`: after the photo upload, a ~160px (q 0.7) copy is uploaded at `<path>.t.jpg`, failure swallowed. Storage policies work on the first two path segments, so the suffix is allowed.
+* `web/ia.js`: `rec('itemimg', ...)` appended at the END (owner only, with keywords). `web/index.html`: `itemimg.js` appended as the LAST script.
+* No other existing file touched (pos.js, stock2.js, purchase.js, recipes.js, scan.js, landed.js, salesx.js, forms_stock.js, app.js unchanged): every needed item id was already in the markup, so no id attribute edit was needed.
+
+## Layout notes (360px)
+POS card: the slot is 44px at the top-right; while the mode applies, the name gets `padding-right:50px` and the small category dot is hidden, so long names wrap onto more lines (card gets a little taller once, when the option is switched on; it does not change when pictures arrive or the grid redraws - measured equal). The cart quantity badge stays on top of the corner. Item list row and lookup row: 44px slot on the left, content takes the rest. Scan chip: 28px inline. The slot ignores taps (`pointer-events:none`), so tap targets are the same. Avatar colours are fixed hsl with white letter, same in light / dark / classic.
+
+## Language
+All texts are `L(bn, en, mix)`; English mode has no Bangla (checked by `itemimg_static_test.js` and in the browser on the settings page); Bangla mode keeps common words English (Item, POS, cache, thumbnail, Off, On, Save, Clear); mix = Bng/Eng. No existing text rewritten.
+
+## যাচাই হয়েছে (verified by running)
+* SQL (fresh build, canonical order + phase99 + phase101 + phase102, Postgres 16 port 5544): `phase102_test.sql` **13 pass / 0 fail** (defaults, choices, no built-in number, advisor rows + pos_only recommendation, RPC first path only, empty / null / over 500 ids, authenticated staff can call, anon cannot, invoker, returned columns). Paste twice: no error, still 3 rules / 3 rows.
+* Older suites: all 77 `supabase/phase*_test.sql` run on a clone of a build WITHOUT phase102 (baseline) and WITH it: identical pass / fail in every file (baseline 6524 pass / 36 fail incl. phase102_test 0/7 absent-phase; with phase102 6531 / 29 + the 13 new = the same carried fails as step INT3: phase8, 10, 15, 19, 21, 21b, 22, 23, 47, 72, 73, 76, 89, 89c, 101 T-rows that already fail on the base). Note: running a test file twice on one DB gives false fails (fixtures) - always on a fresh clone.
+* `tests/web/itemimg_test.js` (Chromium 360x760, mocked sb.storage / rpc, real DOM): **46 pass / 0 fail, page errors none**: mode off (default and explicit) = identical card HTML, no extra node / style / rpc / sign call; pos_only = every card has a slot, exactly 1 rpc + 1 createSignedUrls call for all cards, thumb used when it exists and original when it is missing, letter avatar in a 44px slot, re-render = cache hit (no new call), card heights equal, selling still works, no horizontal overflow; item list not decorated in pos_only; everywhere = list rows decorated with one batched call, no overflow, explicit `data-iimg-id`, picker preview appears / disappears; fail soft (rpc missing, signed urls fail): letters stay and the item can still be sold; slow image network: grid and selling immediate; cache hours: localStorage + Cache API filled, after reload the pictures show with 0 rpc / 0 sign calls, clear cache empties it; settings page (3 chips, recommendation, English-only, set_rule save, 999 refused, 12 saved, clear button, count); dark and light colour schemes.
+* `tests/web/itemimg_static_test.js` **17 pass / 0 fail** (language rule, act prefix, ia / index order, exactly one bos103 line, untouched files, RPC text).
+* Screenshots (360px): `tests/web/img_pos_before_360.png`, `img_pos_after_360.png`, `img_items_everywhere_360.png`, `img_itemimg_page_360.png`.
+* Existing web tests, run from copies pointed at this worktree, one at a time, compared with the base commit: `pos_units` 0 fail, `posfail` 23/0, `invoiceview` 65/0, `items3` 0 fail, `nav2` 0 fail, `navfold` 21/0, `ia` 0 fail, `lang_en` 91 strings 0 Bangla, `kbd` 69/0, `setupadvisor` 22/0, `pos2` the one known fail (`old queued payload sent`, same as base). Tests that changed BY DESIGN (precedent: landed_b): `optionsx_test` and `landed_b_test` assert "optionsx.js / the optionsx rec is LAST" -> adapted copies `optionsx_b_test.js` (409/0) and `landed_c_test.js` (18/0); `items2_test` asserts exactly one upload -> `items2_b_test.js` (0 fail; checks the second upload `<path>.t.jpg`). The originals are untouched and now fail those 1 / 2 / 1 lines on purpose.
+* `nav_test.js` times out at line 47 on this machine both on the base commit and here (identical, not caused by this step; not investigated).
+* `node --check web/*.js` 0 errors; no conflict markers in web / supabase / docs.
+
+## পড়ে বোঝা (checked by reading, not run)
+* The set_rule number rule: `item_images_cache_hours` min 1 / max 720 comes from the rule row; the page validates the same range and the server validates again.
+* RLS: with `items_read` = `is_active()` (schema.sql) every active staff member can read item rows, so the RPC (invoker) exposes nothing more than a select on `items.images`.
+* Storage read of `ITEMS/<loc>/...` objects goes through `photo_ok(name, 'view')`, which only looks at the first two path segments; the `.t.jpg` suffix therefore follows the same permission as the original.
+* Photos in the picker previews rely on option text "CODE · name" (stock2, purchase, recipes all use it); a picker with another text format simply shows no preview.
+
+## যাচাই হয়নি (not verified)
+* Real phone, real mobile data, real Supabase storage (signed URL JSON shape taken from supabase-js docs: `{path, signedUrl, error}` per entry; a missing thumbnail is assumed to come back without `signedUrl`). No real bandwidth measurement.
+* Cache API / localStorage behaviour in private mode or iOS storage eviction; offline POS with a real Service Worker.
+* Existing photos have no `.t.jpg` thumbnail (only new uploads get one); until re-uploaded they load at original size.
+* Price list, landed cost and costing screens: the price list is not a separate screen with an item id in this codebase, and landed / costing rows carry no item id attribute (text only), so they are NOT decorated (adding the attribute would be a one-line edit per screen; the `data-iimg-id` hook is ready). Stock issue / transfer / count / wastage, purchase line and recipe ingredient use the picker preview (covered by the generic test, not each screen individually). Online order item select (`select[data-sxl=item]`) is decorated by the same code, not opened in a browser test.
+* The Cat agent's pickers: the decorator is selector-based; if Cat changes markup (ids / classes) the selectors in `ALL` need a look.
+* Paste order: phase102 after phase101 (and phase100 when it lands); it creates only rows and one function, so order against 100 does not matter; `docs/PASTE_ORDER.md` is not edited (INT3 owns it).
