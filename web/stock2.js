@@ -55,6 +55,15 @@ const X = {
   waNote: L('নামঞ্জুরের কারণ (লাগবেই)', 'Reason for rejecting (required)', 'Reject-এর reason (লাগবেই)'), waMine: L('আমার অনুরোধ', 'My request', 'আমার request'), waBy: L('অনুরোধ', 'Requested by', 'Request করেছেন'),
   waDone: L('সিদ্ধান্ত হয়েছে', 'Decision saved', 'Decision saved'), waWho: L('অন্য কেউ অ্যাপ্রুভ দেবেন', 'Someone else must approve', 'অন্য কেউ approve করবেন'), more2: L('আরও অপশন', 'More options', 'আরও option'),
   scan: L('স্ক্যান', 'Scan', 'Scan'), buyU: L('কেনা', 'Buy', 'Buy'), sellU: L('বিক্রি', 'Sell', 'Sell'), ledgerOpen: L('স্টকের খাতা দেখুন', 'Open the ledger', 'Ledger দেখুন'),
+  printCh: L('চালান প্রিন্ট করুন', 'Print challan', 'Challan print করুন'), printFail: L('প্রিন্ট শুরু করা যায়নি', 'Could not start printing', 'Print শুরু করা যায়নি'),
+  chNo: L('চালান নং', 'Challan no.', 'Challan no.'), chVeh: L('গাড়ি', 'Vehicle', 'Vehicle'),
+  retTog: L('আগে পাওয়া মাল ফেরত', 'Return of goods received earlier', 'আগে পাওয়া মাল return'), retReason: L('ফেরতের কারণ', 'Reason for the return', 'Return-এর reason'),
+  retRef: L('মূল ট্রান্সফার (ঐচ্ছিক)', 'Original transfer (optional)', 'মূল transfer (optional)'), retNoRef: L('— কোনো লিংক নয় —', '— no link —', '— কোনো link নয় —'),
+  retOther: L('"অন্যান্য" হলে নোট লিখতে হবে।', 'A note is needed when the reason is Other.', '"Other" হলে note লিখতে হবে।'), needRet: L('ফেরতের কারণ বাছুন', 'Choose the reason for the return', 'Return-এর reason বাছুন'),
+  retSent: L('ফেরত পাঠানো হয়েছে — গ্রহণের অপেক্ষায়', 'Return sent — waiting to be received', 'Return sent — receive-এর অপেক্ষায়'),
+  rr_damaged: L('ক্ষতিগ্রস্ত', 'Damaged', 'Damaged'), rr_expired: L('মেয়াদ শেষ', 'Expired', 'Expired'), rr_excess: L('বাড়তি মাল', 'Excess stock', 'Excess stock'), rr_wrong_item: L('ভুল মাল', 'Wrong item', 'ভুল item'), rr_other: L('অন্যান্য', 'Other', 'Other'),
+  batchH: L('ব্যাচের হিসাব', 'Batch check', 'Batch check'), batchOk: L('ব্যাচ মিলেছে ✓', 'Batches match the stock ✓', 'Batch মিলেছে ✓'), batchBad: L('ব্যাচে গরমিল', 'Batch mismatch', 'Batch-এ গরমিল'),
+  balQty: L('মজুত', 'stock', 'stock'), batchSum: L('ব্যাচ', 'batches', 'batches'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), sqlMissing: L('স্টকের ডেটাবেস অংশ এখনও চালু হয়নি (phase10)', 'The stock database part is not installed yet (phase10)', 'Stock-এর database অংশ চালু হয়নি (phase10)'),
 };
 const T = (k) => lab(X[k]);
@@ -64,6 +73,9 @@ const RS = { opening: L('প্রারম্ভিক', 'Opening', 'Opening'),
   transfer_out: L('পাঠানো', 'Transfer out', 'Transfer out'), transfer_in: L('গ্রহণ', 'Transfer in', 'Transfer in'), wastage: L('নষ্ট', 'Wastage', 'Wastage'), count_adjust: L('গণনা ঠিক', 'Count', 'Count adjust'), reversal: L('উল্টানো', 'Reversal', 'Reversal') };
 // server error text -> friendly (shared with purchase.js). Order matters little: keys are whole words.
 const ERR = {
+  reason_required: L('ফেরতের কারণ বাছুন', 'Choose the reason for the return', 'Return-এর reason বাছুন'), note_needed: L('নোট লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a note (at least 3 letters)', 'Note লিখুন (কমপক্ষে ৩ অক্ষর)'),
+  bad_ref: L('মূল ট্রান্সফার মেলেনি', 'The original transfer does not match', 'মূল transfer মেলেনি'), return_exceeds_receipt: L('পাওয়া পরিমাণের বেশি ফেরত দেওয়া যায় না', 'Cannot return more than was received', 'পাওয়া quantity-র বেশি return হয় না'),
+  feature_off: L('এই সুবিধা চালু নেই', 'This feature is switched off', 'এই feature চালু নেই'),
   item_not_counted: L('এই আইটেম ব্যবসার হিসাবে ধরা নয় (সম্পদ / ভোগ্য / যন্ত্রপাতি) — স্টকে আসে না', 'This item is not counted in the business (asset / consumable / tool) — it has no stock', 'এই Item business-এর হিসাবে ধরা নয় — stock-এ আসে না'),
   asset_qty_too_large: L('এক লাইনে ২০০-র বেশি সম্পদ হয় না — লাইন ভাগ করুন', 'More than 200 assets on one line is not allowed — split the line', 'এক line-এ ২০০-র বেশি asset হয় না — line ভাগ করুন'),
   unit_unknown: L('এই এককের রূপান্তর জানা নেই — পণ্যের বেস এককে লিখুন বা রূপান্তর বসান', 'This unit has no conversion for the item — use the base unit or add a conversion', 'এই unit-এর conversion জানা নেই — base unit-এ লিখুন বা conversion বসান'),
@@ -186,6 +198,7 @@ const unitSel = (id, cur) => `<div><label for="${id}">${esc(T('unit'))}</label><
 const locSel = (id, label, cur, rows) => (rows.length > 1 ? `<div><label for="${id}">${esc(label)}</label><select id="${id}">${optHTML(rows.map((l) => [l.id, nm(l)]), cur)}</select></div>` : `<input type="hidden" id="${id}" value="${rows[0] ? rows[0].id : ''}">`);
 const scanOn = () => { try { return !!(B.barcode && B.barcode.enabled()); } catch (e) { return false; } };
 const itemFld = (items, id, preset, label) => `<div><label for="${id}">${esc(label || T('item'))}</label><div class="p2-inl"><input id="${id}" list="${id}_dl" autocomplete="off" value="${esc(preset ? itemText(preset) : '')}" placeholder="${esc(T('itemph'))}">${scanOn() ? `<button type="button" class="mini" data-act="s2_scan" data-t="${id}" aria-label="${esc(T('scan'))}">▮▮ ${esc(T('scan'))}</button>` : ''}</div><datalist id="${id}_dl">${items.map((i) => `<option value="${esc(itemText(i))}"></option>`).join('')}</datalist><div class="hint" id="${id}_h">${preset ? esc(T('baseIs') + ': ' + unitLabel(baseOf(preset))) : ''}</div></div>`;
+document.addEventListener('change', (e) => { if ((e.target.id === 'a_to' || e.target.id === 'a_item') && isRet()) loadRetRefs(); });
 document.addEventListener('change', (e) => {
   const el = e.target; if (!el.id || !/^[a-z]+_item$/.test(el.id) || !ITEMS) return;
   const it = itemFrom(ITEMS, el.value), h = $('#' + el.id + '_h'); if (h) h.textContent = it ? T('baseIs') + ': ' + unitLabel(baseOf(it)) : '';
@@ -214,7 +227,7 @@ async function scanInto(id) {
 B.s2 = { X, T, ERR, scanInto, errToast, rid, shrink, uploadPhoto, thumb, grant, costOk, lists, rowL, unitLabel, unitSel, optHTML, locSel, LOCS, allLocs, npMode, trackedItems, itemFrom, itemFld, itemText, baseOf, nnum, norm, money, q4, dt, LOCK, SH, sheetStart, submit, photoForm };
 
 // ---------- hub state ----------
-const D = { loc: undefined, tab: 'levels', rows: [], cats: [], q: '', f: { category: '', below: false, zero: false }, shown: 50, expH: 24, exp: [], tr: [], wa: [], acts: null, sqlMissing: false, canApprove: false, nPending: 0 };
+const D = { loc: undefined, tab: 'levels', rows: [], cats: [], q: '', f: { category: '', below: false, zero: false }, shown: 50, expH: 24, exp: [], tr: [], wa: [], acts: null, sqlMissing: false, canApprove: false, nPending: 0, nIncoming: 0 };
 let CONV = [];
 const ACTS = [['open', 'stock_opening', 'a_open'], ['waste', 'wastage_write_off', 'a_waste'], ['count', 'stock_count_adjust', 'a_count'], ['issue', 'stock_issue', 'a_issue'], ['prod', 'stock_production', 'a_prod'], ['xfer', 'stock_transfer', 'a_xfer']];
 const actLoc = () => (D.loc !== undefined && D.loc !== null ? D.loc : (LOCS()[0] || {}).id);
@@ -227,7 +240,7 @@ async function view() {
   if (D.loc === undefined) D.loc = (LOCS()[0] || {}).id;       // one location first (zero-stock items show there); "all" is one tap away
   D.acts = null; GR.clear();
   await Promise.all([trackedItems(), refreshActs(), loadConv()]);
-  await loadPendingCount();
+  await loadPendingCount(); await loadIncoming();
   draw();
 }
 async function refreshActs() {
@@ -239,6 +252,12 @@ async function loadConv() { try { const r = await sb.from('unit_conversions').se
 async function loadPendingCount() {
   try { const r = await sb.rpc('wastage_pending', { p_loc: D.loc === undefined ? null : D.loc, p_status: 'pending' }); D.wa = r && !r.error && r.data ? r.data : []; } catch (e) { D.wa = []; }
   D.nPending = D.wa.length;
+}
+// bos115 (transfer_notify_receiver): when on, the In transit tab shows how many transfers are waiting to be received at my places. Off or any problem = no number.
+async function loadIncoming() {
+  D.nIncoming = 0; if (B.rule('transfer_notify_receiver', false) !== true) return;
+  try { const r = await sb.rpc('stock_in_transit', { p_loc: null }); const mine = (S.ctx.locations || []);
+    D.nIncoming = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => allLocs() || mine.includes(x.to_location_id)).length : 0; } catch (e) { D.nIncoming = 0; }
 }
 // category label from the editable list (the code is only a fallback); units of an item from the conversions
 const catLabel = (code) => { if (!code) return ''; const r = lists('item_categories').find((x) => x.value_code === code); return r ? lab(rowL(r)) : code; };
@@ -258,7 +277,7 @@ function draw() {
   const locs = LOCS(), filters = (D.f.category ? 1 : 0) + (D.f.below ? 1 : 0) + (D.f.zero ? 1 : 0);
   const anyAct = D.acts && Object.values(D.acts).some(Boolean), showActs = anyAct || npMode() === 'lock';
   shell(T('title'), `${locs.length > 1 || allLocs() ? `<div style="margin-bottom:8px"><select id="s2_loc" aria-label="${esc(T('location'))}">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(locs.map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}
-    <div class="ptabs s2t" role="tablist">${[['levels', 'levels'], ['exp', 'expiring'], ['tr', 'transit'], ...(D.canApprove || D.nPending ? [['wa', 'wa']] : [])].map(([k, l]) => `<button role="tab" data-act="s2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}${k === 'wa' && D.nPending ? ` <span class="cnt">${D.nPending}</span>` : ''}</button>`).join('')}</div>
+    <div class="ptabs s2t" role="tablist">${[['levels', 'levels'], ['exp', 'expiring'], ['tr', 'transit'], ...(D.canApprove || D.nPending ? [['wa', 'wa']] : [])].map(([k, l]) => `<button role="tab" data-act="s2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}${k === 'wa' && D.nPending ? ` <span class="cnt">${D.nPending}</span>` : ''}${k === 'tr' && D.nIncoming ? ` <span class="cnt" id="s2_incnt">${D.nIncoming}</span>` : ''}</button>`).join('')}</div>
     <div id="s2_main"></div>
     <div class="s2-bar">${showActs ? `<button class="primary" data-act="s2_actions">${esc(T('actions'))}</button>` : ''}${S.ctx.is_owner ? `<button class="sec" data-act="s2_recon">${esc(T('recon'))}</button>` : ''}</div>`, true);
   void filters; drawTab();
@@ -332,7 +351,7 @@ async function loadTransit() {
     const canR = g[x.to_location_id] && (allLocs() || (S.ctx.locations || []).includes(x.to_location_id)), canC = g[x.from_location_id] || x.sent_staff === me || S.ctx.is_owner;
     return `<div class="card stack mk info"><div class="row between"><b>${esc(nm(x))}</b><b>${q4(x.qty)} ${esc(u)}</b></div>
       <div class="sub muted" style="font-size:.85rem">${esc(x.code)} · ${esc(locName(x.from_location_id))} → ${esc(locName(x.to_location_id))} · ${esc(dt(x.sent_at))}${x.sent_staff ? ' · ' + esc(x.sent_staff) : ''}${x.note ? ' · ' + esc(x.note) : ''}</div>
-      <div class="row">${canC ? `<button class="full" data-act="s2_xcancel" data-i="${i}">${esc(T('cancelX'))}</button>` : ''}${canR ? `<button class="full" data-act="s2_xrecv" data-i="${i}">${esc(T('receive'))}</button>` : ''}</div></div>`;
+      <div class="row"><button class="full" data-act="s2_chal" data-i="${i}">${esc(T('printCh'))}</button></div><div class="row">${canC ? `<button class="full" data-act="s2_xcancel" data-i="${i}">${esc(T('cancelX'))}</button>` : ''}${canR ? `<button class="full" data-act="s2_xrecv" data-i="${i}">${esc(T('receive'))}</button>` : ''}</div></div>`;
   }).join('') || `<p class="muted center">${esc(T('trEmpty'))}</p>`;
 }
 
@@ -394,7 +413,7 @@ async function openAction(kind, preset) {
   } else if (kind === 'xfer') {
     const others = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []);
     body = head('a_xfer') + `<div class="stack">${locSel('a_loc', T('fromLoc'), loc, locs)}<div><label for="a_to">${esc(T('toLoc'))}</label><select id="a_to"><option value="">—</option>${optHTML(others.filter((l) => l.id !== loc).map((l) => [l.id, nm(l)]), '')}</select></div>${itemFld(items, 'a_item', pit)}
-      <div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}</div>${foot('s2_go_xfer')}`;
+      <div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}${retSection()}</div>${foot('s2_go_xfer')}`;
   }
   openSheet(body);
   if (kind === 'waste') { drawPhoto(); wireReason(); }
@@ -454,10 +473,70 @@ async function goProd(btn) {
   const m = ($('#a_made') || {}).value, loc = gloc(); const madeAt = m ? m + ':00+06:00' : null;
   await submit(btn, () => sb.rpc('stock_production_in', { p_item: it.id, p_loc: loc, p_qty: q, p_made_at: madeAt, p_unit: unitVal(), p_note: noteVal(), p_client: SH.client, p_unit_cost: c }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_production', loc, context: { item: it.code } });
 }
+// ----- marked return (bos115, rule transfer_return_marker) and the transfer challan print -----
+const RET_REASONS = ['damaged', 'expired', 'excess', 'wrong_item', 'other'];
+const retOn = () => { try { return B.rule('transfer_return_marker', false) === true; } catch (e) { return false; } };
+function retSection() {
+  if (!retOn()) return '';
+  return `<button type="button" class="tog" id="a_ret" data-act="s2_rettog" aria-pressed="false" style="width:100%;justify-content:flex-start">${esc(T('retTog'))}</button>
+    <div id="a_retbox" class="stack" hidden><div><label for="a_rreason">${esc(T('retReason'))}</label><select id="a_rreason"><option value="">—</option>${optHTML(RET_REASONS.map((c) => [c, T('rr_' + c)]), '')}</select></div>
+      <div><label for="a_rref">${esc(T('retRef'))}</label><select id="a_rref"><option value="">${esc(T('retNoRef'))}</option></select></div><div class="hint">${esc(T('retOther'))}</div></div>`;
+}
+const isRet = () => { const b = $('#a_ret'); return !!(b && b.classList.contains('on')); };
+// received transfers that sent this item from the chosen "to" place to this place (RLS shows only my places); nothing found / refused = no link choice, the return still works
+async function loadRetRefs() {
+  const sel = $('#a_rref'); if (!sel) return; const cur = sel.value;
+  const it = itemFrom(ITEMS || [], ($('#a_item') || {}).value), to = Number(($('#a_to') || {}).value), from = gloc();
+  let rows = [];
+  if (it && to && from) {
+    try { const r = await sb.from('stock_transfers').select('id,qty,received_qty,sent_at,kind').eq('item_id', it.id).eq('from_location_id', to).eq('to_location_id', from).eq('status', 'received').order('sent_at', { ascending: false }).limit(20);
+      rows = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => !x.kind) : []; } catch (e) { rows = []; }
+  }
+  const u = it ? unitLabel(baseOf(it)) : '';
+  sel.innerHTML = `<option value="">${esc(T('retNoRef'))}</option>` + rows.map((x) => `<option value="${esc(x.id)}">${esc(dt(x.sent_at) + ' · ' + q4(x.received_qty === null || x.received_qty === undefined ? x.qty : x.received_qty) + ' ' + u)}</option>`).join('');
+  if (cur && rows.some((x) => x.id === cur)) sel.value = cur;
+}
+const chNo = (id) => 'TR-' + String(id || '').replace(/-/g, '').slice(0, 8).toUpperCase();
+function chModel(m) { return { id: m.id, no: chNo(m.id), date: m.date, from: m.from, to: m.to, items: [{ code: m.code, name: m.name, qty: m.qty, unit: m.unit }], note: m.note || '' }; }
+function chBuiltin(d) {   // used only when no print template can be rendered; quantities only, no cost
+  const td = (v, r) => `<td style="border-bottom:1px solid #ccc;padding:4px 6px;text-align:${r ? 'right' : 'left'}">${esc(String(v ?? ''))}</td>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(d.no)}</title><style>html,body{margin:0;background:#fff}@page{margin:10mm}</style></head><body>
+    <div data-ch="builtin" style="font:14px system-ui,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:8px"><div style="text-align:center;font-size:16px;font-weight:700;margin-bottom:8px">${esc(T('a_xfer'))}</div>
+    <div>${esc(T('chNo'))}: <b>${esc(d.no)}</b> · ${esc(d.date)}</div><div>${esc(d.from)} → <b>${esc(d.to)}</b></div>
+    <table style="width:100%;border-collapse:collapse;margin-top:8px"><tbody>${d.items.map((l) => `<tr>${td(l.code)}${td(l.name)}${td(q4(l.qty), 1)}${td(l.unit)}</tr>`).join('')}</tbody></table>
+    ${d.note ? `<div style="margin-top:8px">${esc(d.note)}</div>` : ''}</div></body></html>`;
+}
+async function printChallan(m) {
+  const d = chModel(m);
+  try {
+    if (B.tpl && B.tpl.printHTML) {
+      try { if (B.tpl.ensure) await B.tpl.ensure(sb); } catch (e) { /* no choice known: built-in sheet */ }
+      if (B.tpl.printHTML('stock_transfer', d, undefined, { lang: S.lang, loc: m.from_id, shop: {} }) && B.tpl.print('stock_transfer', d, undefined, { lang: S.lang, loc: m.from_id, shop: {} })) return true;
+    }
+  } catch (e) { /* fall through to the built-in sheet */ }
+  try {
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
+    f.srcdoc = chBuiltin(d); f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { /* print blocked */ } setTimeout(() => f.remove(), 2000); };
+    return true;
+  } catch (e) { toast(T('printFail')); return false; }
+}
+let LASTX = null;   // the transfer just sent from the sheet (for the Print challan button)
+function sentSheet(ret) {
+  openSheet(`<h2>${esc(T(ret ? 'retSent' : 'sentOk'))}</h2><p class="muted">${esc(LASTX.name)} · ${q4(LASTX.qty)} ${esc(LASTX.unit)} · ${esc(LASTX.from)} → ${esc(LASTX.to)}</p>
+    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="primary full" id="s2_chbtn" data-act="s2_chal_last">${esc(T('printCh'))}</button></div>`);
+}
 async function goXfer(btn) {
   const items = await trackedItems(), it = readItem(items, 'a_item'); if (!it) return; const q = readQty('a_qty'); if (isNaN(q)) return;
   const to = Number(($('#a_to') || {}).value); if (!to) return toast(T('needTo')); const from = gloc();
-  await submit(btn, () => sb.rpc('stock_transfer', { p_from: from, p_to: to, p_item: it.id, p_qty: q, p_unit: unitVal(), p_note: noteVal(), p_client: SH.client }), () => { toast(T('sentOk')); afterWrite(); }, { grant: 'stock_transfer', loc: from, context: { item: it.code } });
+  const ret = retOn() && isRet(), unit = unitVal(), note = noteVal();
+  const keep = (r) => { LASTX = { id: r.id, code: it.code, name: nm(it), qty: q, unit: unitLabel(unit || baseOf(it)), from: locName(from), to: locName(to), from_id: from, date: dt(new Date().toISOString()), note: note || '' }; };
+  if (ret) {
+    const reason = ($('#a_rreason') || {}).value; if (!reason) return toast(T('needRet')); if (reason === 'other' && String(note || '').trim().length < 3) return toast(T('needNote'));
+    const ref = ($('#a_rref') || {}).value || null;
+    return submit(btn, () => sb.rpc('stock_return_transfer', { p_from: from, p_to: to, p_item: it.id, p_qty: q, p_reason: reason, p_ref: ref, p_unit: unit, p_note: note, p_client: SH.client }),
+      (r) => { toast(T('retSent')); afterWrite(); if (r && r.id) { keep(r); sentSheet(true); } }, { grant: 'stock_transfer', loc: from, context: { item: it.code } });
+  }
+  await submit(btn, () => sb.rpc('stock_transfer', { p_from: from, p_to: to, p_item: it.id, p_qty: q, p_unit: unit, p_note: note, p_client: SH.client }), (r) => { toast(T('sentOk')); afterWrite(); if (r && r.id) { keep(r); sentSheet(false); } }, { grant: 'stock_transfer', loc: from, context: { item: it.code } });
 }
 function afterWrite() { if ($('#s2_main')) drawTab(); }
 
@@ -520,7 +599,17 @@ async function reconSheet() {
   openSheet(`<h2>${esc(T('recon'))}</h2>${rows.length ? `<div class="notice bad">${esc(T('reconBad'))}: ${rows.length}</div>${rows.map((x) => { const it = items.find((i) => i.id === x.item_id);
     return `<div class="s2-led"><div>${esc(it ? nm(it) : x.item_id)}<div class="sub">${esc(locName(x.location_id))}</div></div><div class="q">${esc(T('ledgerQty'))} ${q4(x.ledger_qty)} / ${esc(T('cachedQty'))} ${q4(x.cached_qty)}</div></div>`; }).join('')}
     <button class="danger full" style="margin-top:10px" data-act="s2_fix">${esc(T('reconFix'))}</button>` : `<div class="notice ok">${esc(T('reconOk'))}</div>`}
-    <button class="full" style="margin-top:10px" data-act="closesheet">${esc(T('close'))}</button>`);
+    ${await batchBlock(items)}<button class="full" style="margin-top:10px" data-act="closesheet">${esc(T('close'))}</button>`);
+}
+// bos114 stock_batch_reconcile (owner, read-only here): batch sum vs balance. Function missing / refused / no answer = nothing is shown.
+async function batchBlock(items) {
+  if (!S.ctx.is_owner) return '';
+  try {
+    const r = await sb.rpc('stock_batch_reconcile', { p_fix: false }); if (!r || r.error || !Array.isArray(r.data)) return '';
+    if (!r.data.length) return `<div class="notice ok" id="s2_batchok" style="margin-top:10px">${esc(T('batchOk'))}</div>`;
+    return `<div id="s2_batchbad" style="margin-top:10px"><div class="notice bad">${esc(T('batchH'))} · ${esc(T('batchBad'))}: ${r.data.length}</div>${r.data.map((x) => { const it = items.find((i) => i.id === x.item_id);
+      return `<div class="s2-led"><div>${esc(it ? nm(it) : x.item_id)}<div class="sub">${esc(locName(x.location_id))}</div></div><div class="q">${esc(T('balQty'))} ${q4(x.balance)} / ${esc(T('batchSum'))} ${q4(x.batch_sum)}</div></div>`; }).join('')}</div>`;
+  } catch (e) { return ''; }
 }
 
 Object.assign(H, {
@@ -538,6 +627,10 @@ Object.assign(H, {
   s2_expwo: (a) => { const x = D.exp[Number(a.dataset.i)]; if (x) expireSheet(x); },
   s2_go_expwo: async (a) => { const x = D.exp[Number(a.dataset.i)]; if (!x) return;
     await submit(a, () => sb.rpc('stock_expire_batch', { p_batch: x.batch_id, p_reason: ($('#a_reason') || {}).value || 'expired', p_note: reasonNote(noteVal()), p_photo: SH.photo }), () => { toast(T('saved')); afterWrite(); }, { grant: 'wastage_write_off', loc: x.location_id, context: { batch: x.batch_id } }); },
+  s2_chal: (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; const it = (ITEMS || []).find((y) => y.id === x.item_id);
+    return printChallan({ id: x.id, code: x.code, name: nm(x), qty: x.qty, unit: unitLabel(baseOf(it)), from: locName(x.from_location_id), to: locName(x.to_location_id), from_id: x.from_location_id, date: dt(x.sent_at), note: x.note }); },
+  s2_chal_last: () => { if (LASTX) return printChallan(LASTX); },
+  s2_rettog: (a) => { const on = !a.classList.contains('on'); a.classList.toggle('on', on); a.setAttribute('aria-pressed', String(on)); const b = $('#a_retbox'); if (b) b.hidden = !on; if (on) loadRetRefs(); },
   s2_xrecv: (a) => { const x = D.tr[Number(a.dataset.i)]; if (x) recvSheet(x); },
   s2_go_recv: async (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; const v = nnum(($('#r_qty') || {}).value); if (!(v >= 0)) return toast(T('needQty'));
     await submit(a, () => sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal() }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.to_location_id, context: { transfer: x.id } }); },
