@@ -78,3 +78,13 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] Owner "push": publish setup-run-16..20 in order; paste each Run and its Check.
 - [ ] Switch-on order: org setup -> map locations -> businesses / users scopes -> org_scope_preflight -> org_scope_on -> module switches one per day.
 - [ ] C2 global masters, per-business rules, remaining unscoped RPCs, dealer POS, GL posting (schemes, import-export), fashion slices, Stage E (OFF), Stage F dashboard, fashion_apparel template seed.
+
+## I. Reports (local-rpt) - docs/audit_rpt/PLAN.md
+- [x] I1 Audit of the 193 reporting requirements (REPORT_MATRIX.md, PLAN.md, tools/rpt_matrix_gen.py).
+- [x] I2 Stage 1 built locally: phase131 (197/0), web/reports131.js, setup-run-21.html. Not pushed, not pasted.
+- [ ] I3 Owner "push": publish setup-run-21 after Run 20; paste Run 21 + Check; give report grants, `view_stock_recon`, `accounts_view`; set `report_aging_buckets`; turn `rpt131_on` ON.
+- [ ] I4 Stage 2 (missing reports on existing data): below-cost list, price history, purchase registers (payments, returns, PPV), loyalty, employee advances / OT / roster, order cancellations / channel, shelf-life / batch ageing, returns by reason.
+- [ ] I5 Stage 3 repairs: daily_digest scope + ledger cost, receivable_aging return credit, item_sales net of returns, A4-G02 automatic day close, A4-G06 card settlement, A2-G10 re-dated sales flag.
+- [ ] I6 Stage 4 new data capture (owner MCQ first): targets, cake orders + delivery, production plan / date, leftover count, hours worked, campaigns.
+- [ ] I7 Stage 5 number tests for the jsonb-form reports (production, temperature, hygiene, purchase scorecard, expense heads, orders).
+- [ ] I8 Owner phone UAT of #/reports131 at 360 px; Bangla wording review.
