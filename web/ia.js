@@ -59,6 +59,10 @@ const IA = [
   rec('settings2/suppliers', 'purch', ['সরবরাহকারী (সেটিংস)', 'Suppliers (settings)', 'Supplier (settings)'], { icon: 'settings', ok: owner, drawer: false, parent: 'settings2', kw: ['supplier', 'সরবরাহকারী'] }),
   // Factory & production
   rec('recipes', 'factory', ['রেসিপি ও উৎপাদন', 'Recipes & production', 'Recipe ও Production'], { icon: 'doc', ok: locOk, kw: ['recipe', 'bom', 'production', 'factory', 'produce', 'রেসিপি', 'উৎপাদন', 'কারখানা', 'তৈরি'] }),
+  rec('recipebook', 'factory', ['কারিগরের রেসিপি বই', 'Artisan recipe book', 'Artisan-এর recipe book'], { icon: 'doc', ok: (c) => c.own || c.GF.recipe_view === true || c.GF.recipe_manage === true, kw: ['artisan', 'recipe book', 'steps', 'karigor', 'কারিগর', 'রেসিপি বই', 'ধাপ', 'শেফ'] }),
+  rec('costing', 'factory', ['খরচ ও ওভারহেড', 'Costing & overhead', 'Costing ও overhead'], { icon: 'money', ok: (c) => c.own || c.GF.view_cost === true, kw: ['cost', 'overhead', 'conversion', 'gas', 'electricity', 'labour', 'pool', 'absorbed', 'খরচ', 'ওভারহেড', 'গ্যাস', 'বিদ্যুৎ', 'রূপান্তর'] }),
+  rec('costsources', 'factory', ['খরচের সোর্স ও ভাগ', 'Cost sources & allocation', 'Cost source ও ভাগ'], { icon: 'money', ok: (c) => c.own || c.GF.view_cost === true, kw: ['electricity', 'gas', 'rent', 'licence', 'bill', 'allocation', 'shared meter', 'বিদ্যুৎ', 'গ্যাস', 'ভাড়া', 'বিল', 'ভাগ', 'অভাগিত'] }),
+  rec('costattrib', 'factory', ['খরচ কোন শাখার', 'Which showroom a cost belongs to', 'খরচ কোন শাখার'], { icon: 'money', ok: (c) => c.own || c.GF.view_cost === true, kw: ['attribution', 'branch cost', 'main centre', 'allocate', 'reassign', 'approval', 'শাখা', 'মূল কেন্দ্র', 'খরচ ভাগ', 'অনুমোদন', 'ঝুঁকি'] }),
   // Sales & POS
   rec('pos', 'sale', 't:pos', { ok: pos, mob: 1, mod: 1, home: { biz: 1 }, kw: ['pos', 'sell', 'sale', 'cashier', 'receipt', 'বিক্রি', 'সেল', 'ক্যাশ', 'রসিদ'] }),
   rec('salereturn', 'sale', ['বিক্রি ফেরত', 'Sale returns', 'Sale return'], { icon: 'doc', ok: pos, kw: ['return', 'refund', 'ফেরত', 'রিফান্ড', 'বিক্রি ফেরত'] }),
@@ -72,6 +76,7 @@ const IA = [
   rec('eqcheck', 'appr', ['সার্ভারে হিসাব মেলানো', 'Server re-check of totals', 'Server-এ হিসাব মেলানো'], { icon: 'check', ok: (c) => c.own || c.anyApprove(), kw: ['equation', 'total', 'recompute', 'mismatch', '10-2', '02-2', 'হিসাব', 'মেলানো'] }),
   rec('stockx', 'stock', ['স্টক রিপোর্ট ও কোয়ালিটি', 'Stock reports & quality', 'Stock report ও quality'], { icon: 'items', ok: locOk, kw: ['reorder', 'expiry', 'batch', 'fefo', 'wastage reason', 'quality', 'qc', 'রিঅর্ডার', 'মেয়াদ', 'ব্যাচ', 'নষ্টের কারণ', 'কোয়ালিটি'] }),
   rec('onlineorders', 'sale', ['অনলাইন অর্ডার', 'Online orders', 'Online অর্ডার'], { icon: 'doc', ok: pos, kw: ['online order', 'facebook', 'whatsapp', 'delivery', 'advance', 'অনলাইন', 'অর্ডার', 'ডেলিভারি'] }),
+  rec('inbox', 'sale', ['বার্তা ইনবক্স', 'Message inbox', 'Message inbox'], { icon: 'doc', ok: pos, kw: ['inbox', 'message', 'facebook', 'messenger', 'instagram', 'whatsapp', 'web form', 'বার্তা', 'ইনবক্স', 'অর্ডার'] }),
   rec('saleforms', 'settings', ['ফর্ম 20-১/২/৪ ↔ বিক্রি', 'Forms 20-1/2/4 <-> sales', 'Form 20-1/2/4 ↔ sale'], { icon: 'doc', ok: owner, kw: ['20-1', '20-2', '20-4', 'link', 'shadow', 'order form', 'invoice', 'জোড়া'] }),
   rec('benefitsx', 'people', ['কর্মীর সুবিধা (রিপোর্ট)', 'Employee benefits (report)', 'Employee সুবিধা (report)'], { icon: 'users', ok: (c) => c.own || c.GF.employee_manage === true || c.GF.salary_view === true, kw: ['benefit', 'allowance', 'eligible', 'festival', 'সুবিধা', 'ভাতা'] }),
   rec('biexport', 'reports', ['BI এক্সপোর্ট', 'BI export', 'BI export'], { icon: 'doc', ok: (c) => c.own || c.GF.export_data === true, kw: ['export', 'csv', 'json', 'bi', 'power bi', 'sheet', 'এক্সপোর্ট'] }),

@@ -10,7 +10,7 @@ const WEB = path.join(SP, '..', '..', 'web'); const OUT = process.argv[3] || SP;
 const base = C.baseData(SP), PORT = 8378;
 const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f = path.join(WEB, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
-    if (u === '/' || u === '/index.html') b = Buffer.from(b.toString('utf8').replace('</body>', '<script src="costattrib.js"></script></body>'));
+    if (u === '/' || u === '/index.html') b = Buffer.from((b.toString('utf8').includes('src="costattrib.js"') ? b.toString('utf8') : b.toString('utf8').replace('</body>', '<script src="costattrib.js"></script></body>')));
     const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const ym = new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 7);
 const nx = (() => { const d = new Date(Date.now() + 6 * 3600e3); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + 1); return d.toISOString().slice(0, 7); })();
