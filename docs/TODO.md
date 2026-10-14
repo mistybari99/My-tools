@@ -42,3 +42,12 @@ Rule: real data comes after the software is complete. Every task = write → dry
 * D1 partly: purchase / salereturn / stock2 / itemmaster (unit, asset condition) / pay wallets wired. NOT wired: item type + class (own table / free text), new-item category, unit-conversion inputs (datalist), recipes + bulkitems unit cells, customer_types picker.
 * D2 flows, D3 delegation board + "start from my last one" (items / suppliers only), D4 service worker (https only), D5 tests fixed (pos_test retired -> pos2_test; engine_test asserts; tests/sql/p9/run_regress.sh = 0 differences).
 * Still open: E (owner data + device checks), the blind-count book figure is still readable from stock_balance by a storekeeper, "packaging line on receipt" (unclear), per-form paper check docs/forms/*.
+
+
+## F. After the audits (phases 112-121) - details in docs/HANDOVER_6.md
+- [x] F1 Audit A1-A5 (docs/audit2/*), fix batches 1-4 = phases 112-118, security fixes = phase121, setup-run-15 pasted by the owner (8/8 checks).
+- [ ] F2 Merge impl/c4 = phase120 (report speed), renumber after 118, build setup-run-16, owner paste.
+- [ ] F3 Switch roll-out, one at a time (docs/guide/AUDIT_SWITCHES.md) + UAT checks 65-94.
+- [ ] F4 Remaining audit gaps by owner priority (list in HANDOVER_6 PENDING P3); extend probes for the 23 gaps with no probe.
+- [ ] F5 Update baseline_fails.txt for phase16/18/21/21b once the clock cause is confirmed; real-phone check of web build 1a9e6c6b70; re-enable CSP decision.
+- [ ] F6 Multi-business: keep all new work location/business scoped (HANDOVER_6, GROUP_ERP_STAGE_A.md in PR #3; do not edit it).

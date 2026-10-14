@@ -36,3 +36,7 @@ P4 (platform / ops)
 - Set item prices; switch `tools_stock_on`, `blind_count_on`, `pin_signature_on`, `forms_post_to_ledger`, `packaging_consume_on` only when ready; give grants (see_expected, rollout_manage, change_approve, list_manage, location_manage…).
 - Resume `mishti_factory` (paused) when needed; run docs/DEVICE_CHECKLIST.md on a real phone/printer.
 - Design pass (colours/typography/layout) — deliberately last.
+
+
+## UPDATE after audits (phases 112-121) - see docs/HANDOVER_6.md for the full list
+Built and live: audit fix batches 1-4 (phases 112-118) + security fixes (121), all switches default OFF. PENDING: phase120 (impl/c4, tested, not merged), switch roll-out (docs/guide/AUDIT_SWITCHES.md), remaining audit gaps (A1 G5/G9/G11-G14, A2 G7/G10-G15, A3 G7/G11-G17, A4 G02/G06/G07/G09-G20, A5 GAP-5/7/11-13), 23 gaps without probes, old HANDOFF_6 items (wording, Category phase 2, dashboard phase 2, security leftovers, accounting review, phone-only steps).
