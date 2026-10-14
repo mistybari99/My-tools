@@ -17,3 +17,49 @@ Owner style as in HANDOVER_6 (Bangla, phone only, short MCQ; docs/backend Englis
 ## NOT VERIFIED
 - Nothing ran on the owner's live Supabase or on a phone; all numbers are from scratch databases with synthetic data. The Run 17 page was checked for syntax, SQL equality with the file and the CHECK query, not clicked on a phone.
 - Names of the seeded units ("Sweets business") are placeholders; the owner renames them through `org_unit_save`. The trade licence is left empty (not invented).
+
+# STAGE C1 first slice (business isolation behind `org_scope_on`) - built locally on branch `local-c1`, cut from `local-b1` (9c60baa). NOT pushed, NOT pasted.
+Audit that sized it: `docs/audit_c1/RLS_ISOLATION_AUDIT.md` on branch `local-audit-rls` (14 negative tests + prioritized list). Files: `supabase/phase123.sql` (marker scope123, canonical row 51), `supabase/phase123_test.sql`, `tests/sql/c1_before_after.sh`, PASTE_ORDER row 51 + N7, `setup-run-18.html` (built locally in /home/user/work-c4-out/, locked behind Run 17, read-only CHECK, NOT published).
+Default OFF: with the switch off every re-created function returns what it returned before (its OFF branch is the old text verbatim; `c1_before_after.sh` fingerprints can_loc / has_grant / the readers per user and place before and after the paste = identical; with the switch ON the owner's fingerprints are identical too).
+
+## What is scoped when `org_scope_on` = ON
+- New table `user_org_scopes` (user, org unit, role; status active|revoked, history kept, audit, no hard delete) + owner functions `org_scope_grant / org_scope_revoke / org_scope_list / org_scope_preflight`; helpers `can_scope(unit, role)`, `business_of_location(loc)`. A scope row is live only while the user still holds that role in `user_roles`.
+- `can_loc`: owner = all; others = own `user_locations` row, or a live `management` scope covering the location's unit (management = all places of ITS business, also through branches), or an approved `loc_access` window for a place of one of their businesses. `can_loc(null)` = owner only. Because ~210 functions and 85 table policies call `can_loc`, they all became business-safe at once.
+- `_all_locs()` and `_acct_all()` = owner only (journal-wide and company-wide paths). `has_grant(code, loc)`: the place must belong to one of the caller's businesses; a personal grant with NULL location means "my businesses", not the database. `_notif_ok`: manager-audience notes with no place = owner only. `decide_emergency`: the approver must belong to the request's business.
+- Readers now filtered by caller's places: `customer_dues`, `customer_ledger`, `fa_register`, `fa_schedule` (same "not found" as a missing id), `year_close_list` (owner only), `items_with_cost` + `item_cost_status88` (non-owner: costs from the caller's own stock only), `drawer_report`, `staff_directory` (people of the caller's businesses), `profit_truth112` (a place that is not yours is refused).
+- Restrictive read policies `*_scope123` (AND-ed, true while OFF) on: locations, location_settings, att_site_geo, blind_count_cfg, doc_template_choice, form_rollout, holidays, path_switch, report_brand_map, sales_channels, shifts, invoice_templates + print_profiles (read and write), location_setup_steps, paper_books, print_notes, settings_sheets, budget_log, payment_intents, payroll_bonus_events, emergency_requests. Trigger `stock_transfers_biz123`: a transfer between two businesses (or to an unmapped place) is refused.
+- First paste only: every existing `management` user gets a management scope on SWEETS (marker in the SWEETS attrs; never revives a revoked row). Users added later need `org_scope_grant` by the owner.
+
+## Ambiguities resolved the STRICTER way (owner may relax later)
+1. A `management` user without a scope row has NO access when ON (the old role bypass is gone, not "management of everything unmapped").
+2. Rows with NULL place in the scoped config tables (e.g. a group-wide holiday) are owner-only when ON; copy them per place before switching on (`org_scope_preflight()` counts them).
+3. A user with neither a place nor a scope has no business: sees no location and only herself in `staff_directory`. An unmapped location (`org_unit_id` null) is owner-only.
+4. Emergency requests with no place (form_access, closed_period_edit) can be decided by the owner only when ON.
+5. `_all_locs` / `_acct_all` owner-only means a business accountant sees journals place by place (through can_loc), not company-wide; year closes and bank reconciliation stay owner-only until per-entity books (C2).
+6. Cross-business stock transfer refused even for the owner (intercompany is Stage E).
+7. `items_with_cost` for a non-owner lists only items the caller's places hold (items are still ONE global master).
+
+## DEFERRED (not done in this slice; each is a known gap, listed so nobody assumes it is closed)
+- Global masters without an owner column (Stage C2): `items`, `item_*`, `customers` (and `find_customer`, `customer_balance`, unique `customers.mobile`, `items.code`, barcode), `suppliers`, `recipes*`, `artisans`, `coa_accounts`, `acct_mappings`, `year_closes`, `option_lists`, `list_defs`, `item_categories`, `customer_tiers`, `gift_rules`, `unit_conversions`, `shelf_life_rules`, `staff_roles`, `leave_types`, `benefit_types`, cost-type vocabularies. They stay readable by any active user (about 31 of the 44 any-active tables).
+- Truly global configuration left readable on purpose: `rules`, `rule_grants`, `grant_defs`, `roles`, `role_form_perms`, `settings*`, `forms*`, `report_defs3`, `pin_sig_cfg`, `path_domains`, `role_favourites`. Per-business values (rule scope column, `rule_val` resolver, per-business roles and grants) are Stage C2/D.
+- The other ~170 unscoped reader RPCs of Appendix B of the audit (only the 10 confirmed ones plus profit_truth112 were fixed), owner-only RPC families (partners, notify_scan, daily_digest ...: still group-wide, correct for the group owner), `count_unsubmitted_scan`, `control_counts`.
+- Storage bucket `photos` path layout, edge functions and Telegram/intake bot identity per business, login throttle keyed by staff id (audit tests 11 and 13) - not tested here.
+- Per-business rules (audit test 10: `set_rule` in A must not change B) and uniqueness per business (audit test 9) need C2.
+- Web: nothing changed (B2 owns web/*). `locations` list for a user with no business is empty when ON - the screens need the Organization UI (B2) before the switch is turned on in production.
+
+## Tests (scratch databases, synthetic data)
+- `phase123_test` 171 pass / 0 fail (two businesses A/B made by `org_unit_save`, six scoped users + owner; OFF hand numbers, ON isolation, emergency windows, scope revoke / dormant role / backfill, deactivation keeps history, paste twice). `phase122_test` 111/0 unchanged.
+- Full `run_all_sql.sh`: 8657 pass / 89 fail (B1 tip: 8486 / 89) = exactly the documented environment fails: phase16 7, phase18 1, phase21 17, phase21b 17, phase118 V10 1 (inside its baseline), phase10 improved 1 -> 0; `baseline_fails.txt` NOT edited. e2e def 206/0 and rec 205/0 (the same rec count a build WITHOUT phase123 gives with the same file list; the 207 quoted above was counted another way). `tests/sql/tag_loss_check.sh` NET LOST TAGS 0; `tools/check_paste_order.py` OK; `c1_before_after.sh` OK (OFF identical for 6 users x places, ON identical for the owner).
+- The re-paste suites (phase89h, 94b, 98d, 98e, 103b, 103d, 110b, 112, 113b, 115b, 119) got `\i supabase/phase123.sql` after their repair tail (phase121) because re-pasting an older phase puts the old body of customer_dues / profit_truth112 back; this is the PASTE_ORDER N7 rule. No expected value in those suites changed.
+- Cost: the switch is read inline in `can_loc` / `has_grant` (one indexed lookup, +7% on 100k calls on the scratch box).
+Run: `bash tests/sql/final_build.sh <db>` then `psql ... -f supabase/phase123_test.sql | grep -E 'FAIL|RESULT'`; proof of OFF = identical: `bash tests/sql/c1_before_after.sh <db built WITHOUT phase123>`.
+Audit tests covered by `phase123_test`: 1 (generated per-table check over every table with a location_id, for 6 users), 2, 3, 4, 5, 6, 7, 8, 12, 14; 9, 10, 11, 13 deferred (above). Deactivation keeps history (T14), paste twice (T13/T15), first-paste backfill (T13).
+phase122_test T2 (two "untouched" checks) now yields to phase123 once `can_scope` exists (can_loc reads the layer by design from phase123 on); nothing else in phase122_test changed.
+
+## NOT VERIFIED
+- Nothing ran on the owner's live Supabase or a phone. The Supabase default-grant assumption of the audit (functions without an explicit revoke stay executable by `authenticated`) is unverified; the new helpers are revoked explicitly.
+- Query cost of the extra switch lookup in `can_loc` / `has_grant` on production-size tables: measured on scratch only (see report), not on the live database.
+- The second business in the tests is synthetic (HARDWARE, locations hw1/hw2); no real second business exists yet.
+
+## BEFORE TURNING THE SWITCH ON (owner checklist)
+1. Paste Run 16, 17, 18; run the Checks. 2. As owner run `select org_scope_preflight();` and fix what it lists (unmapped places, management users without scope, NULL-place config rows, personal NULL grants). 3. For every new business: `org_unit_save` its units, map its locations (`locations.org_unit_id`), `org_scope_grant` its managers, `user_locations` its staff. 4. Only then set `org_scope_on` ON in #/switchboard; set it OFF to go back instantly.

@@ -36,8 +36,8 @@ select tt.t('T1 org_manage is a known grant', exists (select 1 from grant_defs w
 
 \echo == T2 zero behaviour change
 select tt.t('T2 org_scope_on exists, is a switch and is OFF', (select kind = 'switch' and default_value = 'false'::jsonb from rules where key = 'org_scope_on') and not rule_on('org_scope_on'));
-select tt.t('T2 can_loc is untouched: it knows nothing about the organization layer', pg_get_functiondef('public.can_loc'::regproc) !~* 'org_');
-select tt.t('T2 no existing function or policy refers to the new objects', not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$)' and p.prosrc ~* 'org_units|org_scope|legal_entities|business_templates')
+select tt.t('T2 can_loc is untouched: it knows nothing about the organization layer', to_regprocedure('public.can_scope(bigint,text)') is not null or pg_get_functiondef('public.can_loc'::regproc) !~* 'org_');   -- from phase123 on can_loc reads the layer by design (phase123_test covers it)
+select tt.t('T2 no existing function or policy refers to the new objects', to_regprocedure('public.can_scope(bigint,text)') is not null or not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$)' and p.prosrc ~* 'org_units|org_scope|legal_entities|business_templates')
   and not exists (select 1 from pg_policies where schemaname = 'public' and tablename not in ('org_units', 'legal_entities', 'business_templates') and (qual ~* 'org_unit' or with_check ~* 'org_unit')));
 create temp table h0 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$)';
 create temp table k0 as select (select count(*) from rules) rules_n, (select count(*) from grant_defs) gd_n, (select count(*) from setup_rec_defs81) adv_n, (select count(*) from locations) loc_n,
