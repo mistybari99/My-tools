@@ -40,3 +40,6 @@ P4 (platform / ops)
 
 ## UPDATE after audits (phases 112-121) - see docs/HANDOVER_6.md for the full list
 Built and live: audit fix batches 1-4 (phases 112-118) + security fixes (121), all switches default OFF. PENDING: phase120 is merged and tested on local-c4 (setup-run-16 built, owner must say "push", then paste Run 16 and Check), switch roll-out (docs/guide/AUDIT_SWITCHES.md), remaining audit gaps (A1 G5/G9/G11-G14, A2 G7/G10-G15, A3 G7/G11-G17, A4 G02/G06/G07/G09-G20, A5 GAP-5/7/11-13), 23 gaps without probes, old HANDOFF_6 items (wording, Category phase 2, dashboard phase 2, security leftovers, accounting review, phone-only steps).
+
+## UPDATE Group ERP (Stage B1) - see docs/HANDOVER_7.md and docs/GROUP_ERP_STAGE_A.md (sections 10-11)
+Built locally on branch local-b1, NOT pushed, NOT pasted: phase122 (organization tables org_units / legal_entities / business_templates, locations.org_unit_id, rule org_scope_on OFF, grant org_manage, org_tree / org_unit_scope / org_unit_save / org_unit_deactivate), phase122_test 111/0, setup-run-17 built locally. No behaviour change. NOT built: B2 organization UI + DB-driven brand/location lists, C1 scope-based access and RLS tightening, C2 master-data scope and per-entity chart of accounts, D templates/modules, E intercompany (default OFF), F owner-only group dashboard, partnerships (my share), all industry workflows.

@@ -51,4 +51,7 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] F3 Switch roll-out, one at a time (docs/guide/AUDIT_SWITCHES.md) + UAT checks 65-94.
 - [ ] F4 Remaining audit gaps by owner priority (list in HANDOVER_6 PENDING P3); extend probes for the 23 gaps with no probe.
 - [ ] F5 Update baseline_fails.txt for phase16/18/21/21b once the clock cause is confirmed; real-phone check of web build 1a9e6c6b70; re-enable CSP decision.
-- [ ] F6 Multi-business: keep all new work location/business scoped (HANDOVER_6, GROUP_ERP_STAGE_A.md in PR #3; do not edit it).
+- [ ] F6 Multi-business: keep all new work location/business scoped (HANDOVER_6, GROUP_ERP_STAGE_A.md sections 10-11 on branch ccr-46b26d91-81vl9s).
+- [x] G1 Group ERP B1: phase122 organization layer + phase122_test (111/0) + setup-run-17 built locally (docs/HANDOVER_7.md). Not pushed.
+- [ ] G2 Owner says "push": publish setup-run-16 then setup-run-17; owner pastes Run 16, Run 17 and the Checks.
+- [ ] G3 B2 organization UI + DB-driven brands/locations; C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.

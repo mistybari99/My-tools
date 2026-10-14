@@ -1,4 +1,5 @@
 # HANDOVER 6 - audit + fix batches done and live; read first
+> UPDATE: Group ERP Stage B1 (phase122, organization tables, local only) is described in docs/HANDOVER_7.md; the MULTI-BUSINESS section below is the context for it.
 Branch `ccr-9c1f9be7-3s9qnz` (same content as `int/audit-fixes`). Older handovers: HANDOVER_5.md (P1 shadow paths), HANDOFF_6.md (state before the audits; still valid for rules and how-to-work).
 Owner style: Bangla, phone only, short answers, MCQ for decisions. Backend/docs in English. Owner pushes/deploys only on an explicit "push"/"deploy" each time.
 
