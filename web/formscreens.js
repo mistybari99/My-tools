@@ -52,6 +52,9 @@ const X = {
   fromTo: L('থেকে →', 'From →', 'From →'), resolve: L('লস হিসেবে তুলুন', 'Book as loss', 'Loss হিসেবে তুলুন'), why: L('কারণ লিখুন (জরুরি)', 'Reason (required)', 'কারণ লিখুন (required)'),
   trHint: L('ঘাটতি তুললে ট্রান্সফারের কস্টে স্টকে loss সারি যায়; একবারই হয়।', 'Booking writes a loss row at the transfer cost; it can happen once only.', 'Book করলে transfer-এর cost-এ loss row যায়; একবারই হয়।'),
   booked: L('লস তোলা হয়েছে', 'Loss booked', 'Loss book হয়েছে'), dup: L('আগেই তোলা আছে', 'Already booked', 'আগেই book আছে'),
+  moreBtn: L('বাকি মাল গ্রহণ করুন', 'Receive the rest', 'বাকি মাল receive করুন'), moreQty: L('এখন কত এসেছে', 'Quantity that arrived now', 'এখন কত এসেছে'),
+  moreHint: L('শুধু ঘাটতির মধ্যে। ঘাটতি আগে লস হিসেবে তোলা হয়ে থাকলে আর নেওয়া যায় না।', 'Up to the shortage only. Once the shortage was booked as a loss it can no longer be received.', 'শুধু ঘাটতির মধ্যে। ঘাটতি আগে loss হিসেবে book হয়ে থাকলে আর নেওয়া যায় না।'),
+  moreDone: L('গ্রহণ হয়েছে', 'Received', 'Receive হয়েছে'),
   ownerOnly: L('শুধু মালিক দেখতে পারেন', 'Owner only', 'শুধু owner দেখতে পারেন'),
 };
 const T = (k) => lab(X[k]);
@@ -150,11 +153,25 @@ async function viewTransit() {
     ${sh.length ? sh.map((r) => `<div class="card"><div><b>${esc(W.nmItem(r))}</b></div>
       <div>${esc(T('sent'))} ${esc(W.q(r.sent))} · ${esc(T('recv'))} ${esc(W.q(r.received))} · <b>${esc(T('short'))} ${esc(W.q(r.short))}</b>${r.value === null || r.value === undefined ? '' : ' · ' + esc(T('value')) + ' ' + esc(W.q(r.value))}</div>
       <div class="muted">${esc(W.locName(r.from_location_id))} → ${esc(W.locName(r.to_location_id))} · ${esc(W.day(r.received_at))}</div>
+      ${B.rule('transfer_late_receive', false) === true ? `<button class="full" data-act="wfg_tr_more" data-v="${esc(r.transfer_id)}" data-q="${esc(String(r.short))}">${esc(T('moreBtn'))}</button>` : ''}
       <button class="full" data-act="wfg_tr_resolve" data-v="${esc(r.transfer_id)}">${esc(T('resolve'))}</button></div>`).join('') : `<p class="muted">${esc(W.T('none'))}</p>`}`;
 }
 function trResolve(id) {
   openSheet(`<h2>${esc(T('resolve'))}</h2><p class="muted">${esc(T('trHint'))}</p><label>${esc(T('why'))}</label><textarea id="wfg_why" rows="3"></textarea>
     <div class="row" style="margin-top:10px"><button class="full" data-act="closesheet">${esc(W.T('close'))}</button><button class="primary full" data-act="wfg_tr_go" data-v="${esc(id)}">${esc(T('resolve'))}</button></div>`);
+}
+function trMore(id, q) {
+  openSheet(`<h2>${esc(T('moreBtn'))}</h2><p class="muted">${esc(T('moreHint'))}</p><label>${esc(T('moreQty'))}</label><input id="wfg_mq" type="number" inputmode="decimal" step="any" min="0" value="${esc(q || '')}">
+    <div class="row" style="margin-top:10px"><button class="full" data-act="closesheet">${esc(W.T('close'))}</button><button class="primary full" data-act="wfg_tr_more_go" data-v="${esc(id)}">${esc(T('moreBtn'))}</button></div>`);
+}
+let moreClient = null;   // one id per open sheet: a double tap or a retry can never receive twice
+async function trMoreGo(id) {
+  const q = Number(($('#wfg_mq') || {}).value);
+  if (!(q > 0)) return toast(W.errText({ message: 'bad_qty' }));
+  moreClient = moreClient || (crypto.randomUUID ? crypto.randomUUID() : null);
+  const { data, error } = await sb.rpc('stock_receive_more', { p_id: id, p_qty: q, p_note: null, p_client: moreClient });
+  if (error) return fail(error);
+  moreClient = null; closeSheet(); toast(T('moreDone')); return viewTransit();
 }
 async function trGo(id) {
   const note = (($('#wfg_why') || {}).value || '').trim();
@@ -170,6 +187,7 @@ Object.assign(A.H, {
   wfg_sync: async () => { const { data, error } = await sb.rpc('unmatched_forms_sync'); if (error) return fail(error); toast(T('synced') + ': ' + (data ? data.confirmed : 0)); return drawUnmatched(); },
   wfg_el_check: (a) => elCheck(a.dataset.v), wfg_el_apply: (a) => elApply(a.dataset.v),
   wfg_tr_resolve: (a) => trResolve(a.dataset.v), wfg_tr_go: (a) => trGo(a.dataset.v),
+  wfg_tr_more: (a) => { moreClient = null; return trMore(a.dataset.v, a.dataset.q); }, wfg_tr_more_go: (a) => trMoreGo(a.dataset.v),
 });
 B.formscreens = { X, T, recCards, CH, KIND };
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { unmatched: viewUnmatched, formguard: viewGuard, expenselink: viewLink, transitshort: viewTransit });
