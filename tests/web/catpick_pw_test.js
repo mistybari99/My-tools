@@ -184,6 +184,15 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.selectOption('[data-catbar-c]', ''); await wait(p, 200); ok(await p.locator('#pu_dl option').count() === pn0, 'purchase: All restores the whole list');
   await p.close();
 
+  // ---------- online order form: item selects (not datalists) are filtered too, also lines added later ----------
+  p = await open({}, '#/onlineorders'); await p.click('[data-act=sx_new]'); await wait(p, 600);
+  ok(await p.locator('.cat-bar').count() === 1, 'online order: one Category + Sub-category bar above the lines');
+  const so0 = await p.locator('[data-sxl=item] option').count(); await p.selectOption('[data-catbar-c]', 'sweet_pc'); await wait(p, 250);
+  const so1 = await p.locator('[data-sxl=item] option').count(); ok(so1 >= 1 && so1 < so0, 'online order: Category narrows the item select (' + so1 + ' of ' + so0 + ')');
+  await p.click('[data-act=sx_addline]'); await wait(p, 400); ok(await p.locator('[data-sxl=item]').count() === 2 && await p.locator('[data-sxl=item] >> nth=1').evaluate((e) => e.options.length) === so1, 'online order: a line added later is filtered the same way');
+  ok(await p.locator('.cat-bar').count() === 1, 'online order: still one bar'); await noOverflow(p, 'online order form');
+  await p.close();
+
   // ---------- recipe list: Category filter + Category shown on each row ----------
   p = await open({}, '#/home'); await p.evaluate(() => { location.hash = '#/recipes'; }); await wait(p, 800);   // the tree is preloaded a moment after sign-in; the page is opened after that
   ok(await p.locator('.rc-row').count() === 2, 'recipes: two rows'); ok(await p.locator('[data-cfr-c]').count() === 1 && await p.locator('[data-cfr-s]').count() === 1, 'recipes: Category + Sub-category filter row');

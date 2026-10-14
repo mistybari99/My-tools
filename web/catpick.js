@@ -221,17 +221,20 @@ function attachDL(dl) {
   if (lb && lb.parentElement && lb.parentElement.contains(dl)) lb.parentElement.parentElement.insertBefore(el, lb.parentElement); else dl.insertAdjacentElement('afterend', el);
   applyDL(dl, sel);
 }
-function attachSEL(first) {
-  if (first.dataset.cat100) return; $$(SELP).forEach((s) => { s.dataset.cat100 = '1'; });
+function attachSEL() {
+  const fresh = $$(SELP).filter((s) => !s.dataset.cat100); if (!fresh.length) return;
+  fresh.forEach((s) => { s.dataset.cat100 = '1'; });
   if (!(C.tree || []).length) return;
-  const key = 'sel:item', last = memGet(key) || {}, sel = { cat: catByCode(last.cat) ? last.cat : '', sub: '' }; if (sel.cat && last.sub && subByCode(sel.cat, last.sub)) sel.sub = last.sub;
-  BARS[key] = { sel, sels: true, memKey: key };
-  const wrap = first.closest('#sx_lines') || first.parentElement, bar = document.createElement('div'); bar.innerHTML = barHTML(key, sel);
-  wrap.parentElement.insertBefore(bar.firstChild, wrap);
-  applySEL($$(SELP), sel);
+  const key = 'sel:item'; let b = BARS[key];
+  if (!b || !document.querySelector('[data-catbar="' + key + '"]')) {   // a new form: a new bar (starts from the remembered choice)
+    const last = memGet(key) || {}, sel = { cat: catByCode(last.cat) ? last.cat : '', sub: '' }; if (sel.cat && last.sub && subByCode(sel.cat, last.sub)) sel.sub = last.sub;
+    b = BARS[key] = { sel, sels: true, memKey: key };
+    const wrap = fresh[0].closest('#sx_lines') || fresh[0].parentElement, bar = document.createElement('div'); bar.innerHTML = barHTML(key, sel);
+    wrap.parentElement.insertBefore(bar.firstChild, wrap);
+  }
+  applySEL(fresh, b.sel);   // lines added later are filtered with the same choice
 }
 // Sub-category selects that follow a Category select (data-cat-for) and the item editor's own pair (#p_cat / #p_sub)
-const PAIRS = { p_cat: 'p_sub' };
 function fillSub(s) {
   const forId = s.getAttribute('data-cat-for'), cs = forId && document.getElementById(forId); if (!cs) return;
   const cur = s.getAttribute('data-cat-cur') || s.value || '';
@@ -258,7 +261,7 @@ function scan() {
   if (busy) { again = true; return; } busy = true;
   try {
     $$(DL).forEach(attachDL);
-    const s1 = document.querySelector(SELP); if (s1) attachSEL(s1);
+    attachSEL();
     $$('select[data-cat-for]').forEach((s) => { if (s.dataset.catFilled !== String(C.ver)) fillSub(s); });
     $$('select[data-cfr-c]').forEach((cs) => { const k = cs.getAttribute('data-cfr-c'), fr = FR[k], ss = document.querySelector('[data-cfr-s="' + k + '"]'); if (!fr || cs.dataset.cfrFilled === String(C.ver)) return;
       cs.innerHTML = catOptions(fr.sel.cat, T('cat') + ': ' + T('all')); if (ss) ss.innerHTML = subOptions(fr.sel.cat, fr.sel.sub, T('sub') + ': ' + T('all')); cs.dataset.cfrFilled = String(C.ver); });
