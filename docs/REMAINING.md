@@ -43,3 +43,6 @@ Built and live: audit fix batches 1-4 (phases 112-118) + security fixes (121), a
 
 ## UPDATE Group ERP (Stage B1) - see docs/HANDOVER_7.md and docs/GROUP_ERP_STAGE_A.md (sections 10-11)
 Built locally on branch local-b1, NOT pushed, NOT pasted: phase122 (organization tables org_units / legal_entities / business_templates, locations.org_unit_id, rule org_scope_on OFF, grant org_manage, org_tree / org_unit_scope / org_unit_save / org_unit_deactivate), phase122_test 111/0, setup-run-17 built locally. No behaviour change. NOT built: B2 organization UI + DB-driven brand/location lists, C1 scope-based access and RLS tightening, C2 master-data scope and per-entity chart of accounts, D templates/modules, E intercompany (default OFF), F owner-only group dashboard, partnerships (my share), all industry workflows.
+
+## UPDATE Group ERP (Stage B2) - see docs/HANDOVER_7.md (STAGE B2)
+Built locally on branch local-b2 (from local-b1), NOT pushed: #/organization screen reconciled with phase122, web/bizctx.js business context + drawer switcher (hidden for one business), business-filtered B.ENV.locs, brand/title/receipt names from the business (legacy names while the placeholder name stands), DB-driven brand lists with the old lists as fallback. Still open: SQL items in HANDOVER_7 'needs SQL (C1/B3)', raw locations readers, offline queue keys, report scoping (C1).

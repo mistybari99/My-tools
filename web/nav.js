@@ -252,6 +252,12 @@ function drawLocBox() {
   box.innerHTML = `<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label>
     <select id="nav_loc" aria-label="${esc(T('locsw'))}" style="width:100%;min-height:44px"><option value="all" ${cur === null ? 'selected' : ''}>${esc(T('all_loc'))}</option>${ch.map((l) => `<option value="${l.id}" ${cur === l.id ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
 }
+// business switch (bizctx): the drawer is redrawn, the open screen draws again with the new business' places
+function afterBiz() {
+  setDrawer(false); HS.data = null; try { sig = ''; if (drawerOpen) dr_body(); } catch (e) { /* drawer redraws on open */ }
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') loadStats(); else window.dispatchEvent(new HashChangeEvent('hashchange'));
+  if ($('#hv_sheets')) loadSheets();
+}
 document.addEventListener('change', (e) => {
   if (!e.target || e.target.id !== 'nav_loc') return;
   setCurLoc(e.target.value === 'all' ? null : Number(e.target.value));
@@ -321,10 +327,11 @@ function renderDrawer() {
   dr_body();
 }
 function dr_shell() {
-  const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : ''); if (s === sig && el.drawer.firstChild) return; sig = s;
+  const bz = B.biz ? B.biz.sig() : ''; const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : '') + '|' + bz; if (s === sig && el.drawer.firstChild) return; sig = s;
   el.drawer.setAttribute('aria-label', T('menu'));
-  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(BRAND.bn)}</b><i>${esc(BRAND.en)}</i></div>
+  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(((B.biz && B.biz.brand()) || BRAND).bn)}</b><i>${esc(((B.biz && B.biz.brand()) || BRAND).en)}</i></div>
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
+    ${B.biz ? B.biz.switcherHTML() : ''}
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
     <div class="dr-foot${footOpen() ? ' open' : ''}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${footOpen()}" aria-controls="nav_fx" aria-label="${esc(T('foot_t'))}" title="${esc(T('foot_t'))}">${IC.cv.replace('<svg', '<svg class="cv"')}</button><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${footOpen() ? '' : ' inert'}><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
@@ -862,5 +869,5 @@ H.lang = (a) => { sig = ''; return prevLang(a); };
 })();
 
 B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
-window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
+window.BOS_NAV = { afterBiz, loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
 })();

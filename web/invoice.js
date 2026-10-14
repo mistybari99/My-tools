@@ -95,7 +95,7 @@ function renderDoc(tpl, d, lang) {
   const loc = typeof d.loc === 'string' ? d.loc : wl(d.loc, lang);
   return `<div class="ivdoc ${th ? 'ivth' : 'iva4'}" style="width:${w}mm;padding:${m.top ?? 4}mm ${m.right ?? 4}mm ${m.bottom ?? 4}mm ${m.left ?? 4}mm;font-size:${fs}px">
     ${fl.logo !== false && tpl.logo_ref ? `<div class="ivc"><img class="ivlogo" src="${esc(tpl.logo_ref)}" alt=""></div>` : ''}
-    ${fl.brand !== false ? `<div class="ivc ivbrand">${esc(lang === 'en' ? BRAND.en : BRAND.bn)}</div>` : ''}
+    ${fl.brand !== false ? `<div class="ivc ivbrand">${esc(lang === 'en' ? ((B.biz && B.biz.brand()) || BRAND).en : ((B.biz && B.biz.brand()) || BRAND).bn)}</div>` : ''}
     ${invoice ? `<div class="ivc ivtitle">${l('d_invoice')}</div>` : ''}
     ${head ? `<div class="ivc ivtxt">${head}</div>` : ''}${fl.location !== false && loc ? `<div class="ivc">${esc(loc)}</div>` : ''}
     <div class="ivmeta">${metaRows.map((x) => `<div>${x}</div>`).join('')}</div><div class="ivhr"></div>${lines}<div class="ivhr"></div>

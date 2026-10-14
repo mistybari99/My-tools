@@ -9,24 +9,24 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const WEB = _P.WEB_DIR;
 const MOCK = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const O = window.__ORG;
  const clone = (x) => JSON.parse(JSON.stringify(x));
- const build = (pid) => O.units.filter((u) => (u.parent_id || null) === pid).map((u) => Object.assign(clone(u), { children: build(u.id) }));
+ const build = () => clone(O.units); // REAL shape: flat rows like phase122 org_tree()
  c.rpc = async (fn, args) => {
   (window.__ACO = window.__ACO || []).push([fn, clone(args || {})]);
   if (fn === 'has_grant') return { data: !!O.grant, error: null };
-  if (fn === 'org_tree') return { data: build(null), error: null };
+  if (fn === 'org_tree') return { data: build(), error: null };
   if (fn === 'org_unit_save') { if (O.err) { const m = O.err; O.err = null; return { data: null, error: { message: m, code: 'P0001' } }; }
-    if (args.p_id) { const u = O.units.find((x) => x.id === args.p_id); Object.assign(u, { code: args.p_code, name_bn: args.p_name_bn, name_en: args.p_name_en, template_code: args.p_template }); return { data: { id: u.id }, error: null }; }
+    if (args.p_id) { const u = O.units.find((x) => x.id === args.p_id); Object.assign(u, { code: args.p_code, name_bn: args.p_name_bn, name_en: args.p_name_en, template_code: args.p_template }); if (args.p_le && args.p_le.trade_licence_ref !== undefined) u.trade_licence_ref = args.p_le.trade_licence_ref; return { data: { id: u.id }, error: null }; }
     const id = 100 + O.units.length; O.units.push({ id, parent_id: args.p_parent, kind: args.p_kind, code: args.p_code, name_bn: args.p_name_bn, name_en: args.p_name_en, template_code: args.p_template, status: 'active', attrs: args.p_attrs }); return { data: { id }, error: null }; }
   if (fn === 'org_unit_deactivate') { if (O.err) { const m = O.err; O.err = null; return { data: null, error: { message: m, code: 'P0001' } }; } const u = O.units.find((x) => x.id === args.p_id); u.status = 'inactive'; return { data: { id: u.id }, error: null }; }
   return rpc(fn, args);
  }; return c; }; })();`;
 const units = (o) => o.empty ? [] : [
   { id: 1, parent_id: null, kind: 'group', code: 'GRP', name_bn: 'গ্রুপ <b>x</b>', name_en: 'Main <b>group</b>', status: 'active', attrs: {} },
-  { id: 2, parent_id: 1, kind: 'business', code: 'BIZ1', name_bn: 'ব্যবসা এক', name_en: 'Business One', template_code: 'tpl_ok', status: 'active', attrs: {} },
-  { id: 3, parent_id: 1, kind: 'business', code: 'BIZ2', name_bn: 'ব্যবসা দুই', name_en: 'Business Two', template_code: 'tpl_no', status: 'active', attrs: {} },
+  { id: 2, parent_id: 1, kind: 'business', code: 'BIZ1', name_bn: 'ব্যবসা এক', name_en: 'Business One', template_code: 'tpl_ok', template_status: 'available', status: 'active', attrs: {} },
+  { id: 3, parent_id: 1, kind: 'business', code: 'BIZ2', name_bn: 'ব্যবসা দুই', name_en: 'Business Two', template_code: 'tpl_no', template_status: 'not_implemented', status: 'active', attrs: {} },
   { id: 4, parent_id: 2, kind: 'branch', code: 'BR1', name_bn: 'শাখা', name_en: 'A very long branch name that must wrap inside a narrow phone screen without any sideways scrolling at all', status: 'active', attrs: { k: 1 } },
   { id: 5, parent_id: 4, kind: 'site', code: 'ST1', name_bn: 'সাইট', name_en: 'Site', status: 'inactive', attrs: {} },
-  { id: 6, parent_id: null, kind: 'legal_entity', code: 'LE1', name_bn: 'প্রতিষ্ঠান', name_en: 'Entity', status: 'active', attrs: {}, legal_entity: { trade_licence_ref: 'TL-77', owner_pct: 60, fiscal_start: '07-01', base_currency: 'BDT' } }];
+  { id: 6, parent_id: 1, kind: 'legal_entity', code: 'LE1', name_bn: 'প্রতিষ্ঠান', name_en: 'Entity', status: 'active', attrs: {}, trade_licence_ref: 'TL-77', owner_pct: 60, fiscal_start: '2026-07-01', base_currency: 'BDT' }];
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -49,7 +49,7 @@ const units = (o) => o.empty ? [] : [
 
   let p = await open('#/organization');
   let t = await text(p);
-  ok(await p.locator('.og-node').count() === 6, 'six nodes drawn');
+  ok(await p.locator('.og-node').count() === 6, 'six nodes drawn from the flat org_tree rows');
   ok(/Group/.test(t) && /Business/.test(t) && /Branch/.test(t) && /Legal entity/.test(t), 'kind badges');
   ok(!(await p.locator('#og_body b >> text=x').count()) && /Main <b>group<\/b>/.test(t), 'names escaped, not injected as HTML');
   ok(/Ready Template · Available/.test(t), 'available template badge');
@@ -66,25 +66,32 @@ const units = (o) => o.empty ? [] : [
   await p.click('[data-act=og_save]'); await wait(p, 100); ok(/Enter a code/.test(await p.textContent('#og_err')) && !(await calls(p, 'org_unit_save')).length, 'code validation, no call');
   await p.fill('#og_code', 'NEW1'); await p.click('[data-act=og_save]'); await wait(p, 100); ok(/Enter a name/.test(await p.textContent('#og_err')), 'name validation');
   await p.fill('#og_nen', 'New Branch'); await p.evaluate(() => { document.getElementById('og_from').value = ''; });
-  await p.evaluate(() => { window.__ORG.err = 'code_duplicate'; }); await p.click('[data-act=og_save]'); await wait(p, 300);
+  await p.evaluate(() => { window.__ORG.err = 'code_taken'; }); await p.click('[data-act=og_save]'); await wait(p, 300);
   ok(/already used/.test(await p.textContent('#og_err')) && await p.locator('#og_form').count() === 1, 'known server code shown friendly, sheet stays');
   await p.evaluate(() => { window.__ORG.err = 'weird_server_text 42'; }); await p.click('[data-act=og_save]'); await wait(p, 300);
   ok(/weird_server_text 42/.test(await p.textContent('#og_err')), 'unknown server message shown raw');
   await p.click('[data-act=og_save]'); await wait(p, 600);
   let c = await calls(p, 'org_unit_save'); const last = c[c.length - 1];
-  ok(c.length === 3 && last.p_parent === 2 && last.p_kind === 'branch' && last.p_code === 'NEW1' && last.p_name_en === 'New Branch' && last.p_id === null && last.p_client && last.p_template === null, 'create sends correct args with client id');
+  ok(c.length === 3 && last.p_parent === 2 && last.p_kind === 'branch' && last.p_code === 'NEW1' && last.p_name_en === 'New Branch' && last.p_id === null && last.p_client && last.p_template === null && last.p_from === undefined || last.p_from === null, 'create sends correct args with client id (p_from, real param names)');
   ok(/New Branch/.test(await text(p)) && await p.locator('#sheet').count() === 0, 'new unit listed, sheet closed');
-  // business create with template: not_implemented option disabled
+  // group node: only legal entities can be added, no deactivate; legal entity form carries licence + owner pct
+  ok(await p.locator('.og-node[data-id="1"] > .card [data-act=og_off]').count() === 0, 'group cannot be deactivated here');
   await p.click('.og-node[data-id="1"] [data-act=og_add]'); await wait(p, 200);
-  await p.selectOption('#og_kind', 'business'); await wait(p, 100);
-  ok(await p.locator('#og_tplw').isVisible() && await p.locator('#og_tpl option[value=tpl_no]').isDisabled(), 'template picker shown for business, unbuilt one disabled');
+  ok(await p.locator('#og_kind option').allTextContents().then((a) => a.length === 1 && a[0] === 'Legal entity') && await p.locator('#og_lew').isVisible(), 'group offers legal entity only, licence field shown');
+  await p.fill('#og_code', 'le2'); await p.fill('#og_nen', 'Second Entity'); await p.fill('#og_lic', 'TL-9'); await p.fill('#og_pct', '150'); await p.click('[data-act=og_save]'); await wait(p, 100);
+  ok(/0 to 100/.test(await p.textContent('#og_err')), 'owner pct validated');
+  await p.fill('#og_pct', '60'); await p.click('[data-act=og_save]'); await wait(p, 500);
+  c = await calls(p, 'org_unit_save'); const le2 = c[c.length - 1]; ok(le2.p_kind === 'legal_entity' && le2.p_parent === 1 && le2.p_le && le2.p_le.trade_licence_ref === 'TL-9' && le2.p_le.owner_pct === 60, 'legal entity create sends p_le');
+  // business create with template: not_implemented option disabled
+  await p.click('.og-node[data-id="6"] [data-act=og_add]'); await wait(p, 200); await wait(p, 100);
+  ok(await p.locator('#og_tplw').isVisible() && await p.locator('#og_tpl option[value=tpl_no]').isDisabled(), 'legal entity offers business; template picker shown, unbuilt one disabled');
   await p.keyboard.press('Escape'); await p.click('[data-act=closesheet]').catch(() => {});
   // rename
   await p.click('.og-node[data-id="2"] [data-act=og_edit]'); await wait(p, 200);
   ok(await p.inputValue('#og_code') === 'BIZ1' && await p.locator('#og_kind').isDisabled(), 'rename prefilled, kind locked');
   await p.fill('#og_nen', 'Renamed One'); await p.click('[data-act=og_save]'); await wait(p, 600);
   c = await calls(p, 'org_unit_save'); const rn = c[c.length - 1]; ok(rn.p_id === 2 && rn.p_parent === 1 && rn.p_name_en === 'Renamed One' && rn.p_template === 'tpl_ok', 'rename keeps id, parent, template');
-  ok(/Renamed One/.test(await text(p)), 'renamed shown');
+  ok(/Renamed One/.test(await text(p)), 'renamed shown'); ok(rn.p_kind === 'business' && rn.p_le === null, 'rename sends kind, no legal block');
   // deactivate
   await p.click('.og-node[data-id="4"] [data-act=og_off]'); await wait(p, 200);
   await p.click('[data-act=og_offgo]'); await wait(p, 100); ok(/at least 3/.test(await p.textContent('#og_err')) && !(await calls(p, 'org_unit_deactivate')).length, 'reason required');
@@ -97,12 +104,12 @@ const units = (o) => o.empty ? [] : [
 
   // empty state
   p = await open('#/organization', { empty: true });
-  ok(await p.locator('#og_empty').count() === 1 && /No organization added yet/.test(await text(p)) && await p.locator('[data-act=og_add]').count() === 1, 'empty state with add button');
-  await p.click('[data-act=og_add]'); await wait(p, 200); ok(await p.locator('#og_kind option').count() === 3, 'root kinds: group / legal entity / business'); await noOverflow(p, 'empty + sheet');
+  ok(await p.locator('#og_empty').count() === 1 && /No organization added yet/.test(await text(p)), 'empty state');
+  ok(await p.locator('[data-act=og_add]').count() === 0, 'no add button without a seeded group (group is seeded by phase122, never created here)'); await noOverflow(p, 'empty');
 
   // non-owner
   p = await open('#/organization', { owner: false });
-  ok(await p.locator('#og_noperm').count() === 1 && !(await calls(p, 'org_tree')).length && await p.locator('[data-act=og_add]').count() === 0, 'non-owner blocked, tree never fetched');
+  ok(await p.locator('#og_noperm').count() === 1 && await p.locator('.og-node').count() === 0 && await p.locator('[data-act=og_add]').count() === 0, 'non-owner blocked, no tree drawn (org_tree is also read by bizctx for the business context)');
   p = await open('#/organization', { owner: false, grant: true });
   ok(await p.locator('.og-node').count() === 6, 'grant org_manage opens the page');
 

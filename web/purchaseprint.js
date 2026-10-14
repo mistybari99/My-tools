@@ -20,7 +20,7 @@ const $ = (s, el = document) => el.querySelector(s);
 const r2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
 const money = (n) => '৳ ' + fmt(r2(n));
 const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };
-const brandText = () => (S.lang === 'en' ? BRAND.en : BRAND.bn);
+const brandText = (locId) => { const b = B.biz ? (locId ? B.biz.brandFor(locId) : B.biz.brand()) : BRAND; return S.lang === 'en' ? b.en : b.bn; };   // bizctx: business name of the document's place
 
 const X = {
   title: L('ক্রয় বিল প্রিন্ট ও পাঠান', 'Print and send purchase bills', 'Purchase Bill Print ও পাঠান'),
@@ -99,7 +99,7 @@ function builtin(m, grn) {
   const tr = (k, v, bold) => `<tr><td style="padding:2px 6px;${bold ? 'font-weight:700;' : ''}">${esc(k)}</td><td style="padding:2px 6px;text-align:right;${bold ? 'font-weight:700;' : ''}">${esc(money(v))}</td></tr>`;
   const sign = (grn ? [W.recv, W.chk] : [W.prep, W.auth]).map((s) => `<div style="flex:1;border-top:1px solid #333;padding-top:4px;text-align:center">${esc(s)}</div>`).join('');
   const meta = [[W.no, m.no || '—'], [W.date, m.date], [W.sup, m.supplier.name], [W.loc, m.location]].filter((x) => x[1]).map((x) => `<div><span style="color:#555">${esc(x[0])}: </span><b>${esc(x[1])}</b></div>`).join('');
-  return `<div data-pbp="builtin" style="font:14px system-ui,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:8px"><div style="text-align:center;font-weight:700;font-size:18px">${esc(brandText())}</div>
+  return `<div data-pbp="builtin" style="font:14px system-ui,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:8px"><div style="text-align:center;font-weight:700;font-size:18px">${esc(brandText(m.loc_id))}</div>
     <div style="text-align:center;font-size:16px;margin:2px 0 10px">${esc(docTitle(m, grn))}</div>${band(m)}<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:10px">${meta}</div>
     <table style="width:100%;border-collapse:collapse"><thead><tr>${th(W.item)}${th(W.qty, 1)}${th(W.unit)}${grn ? '' : th(W.rate, 1) + th(W.amount, 1)}</tr></thead><tbody>${rows}</tbody></table>
     ${grn ? '' : `<table style="margin:10px 0 0 auto;border-collapse:collapse;min-width:220px">${tr(W.sub, m.subtotal)}${m.discount ? tr(W.disc, -m.discount) : ''}${tr(W.total, m.total, 1)}${m.paid !== null ? tr(W.paid, m.paid) + tr(W.due, m.due) : ''}</table>`}
@@ -110,7 +110,7 @@ async function fragment(m, grn) {   // -> { html, used: 'tpl' | 'builtin' }
   try {
     if (B.tpl && B.tpl.render) {
       try { if (B.tpl.ensure) await B.tpl.ensure(sb); } catch (e) { /* keep going: no choice known */ }
-      const h = B.tpl.render(grn ? 'grn' : 'purchase_bill', tplData(m, grn), undefined, { lang: S.lang, loc: m.loc_id, shop: { name: brandText() } });
+      const h = B.tpl.render(grn ? 'grn' : 'purchase_bill', tplData(m, grn), undefined, { lang: S.lang, loc: m.loc_id, shop: { name: brandText(m.loc_id) } });
       if (typeof h === 'string' && h) return { html: band(m) + h, used: 'tpl' };
     }
   } catch (e) { /* fall through to the built-in layout */ }
@@ -118,7 +118,7 @@ async function fragment(m, grn) {   // -> { html, used: 'tpl' | 'builtin' }
 }
 const pageOf = (frag, m, grn) => `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(docTitle(m, grn) + ' ' + (m.no || ''))}</title><style>html,body{margin:0;background:#fff}@page{margin:10mm}</style></head><body>${frag}</body></html>`;
 function textOf(m, grn) {
-  const out = [`${docTitle(m, grn)} ${m.no || ''}`.trim(), brandText(), `${W.sup}: ${m.supplier.name}`, `${W.date}: ${m.date}`];
+  const out = [`${docTitle(m, grn)} ${m.no || ''}`.trim(), brandText(m.loc_id), `${W.sup}: ${m.supplier.name}`, `${W.date}: ${m.date}`];
   if (statusLine(m)) out.push(statusLine(m));
   for (const l of m.items) out.push(grn ? `- ${l.name}: ${fmt(l.qty)} ${l.unit}`.trim() : `- ${l.name}: ${fmt(l.qty)} ${l.unit} x ${money(l.rate)} = ${money(l.amount)}`.replace(/ +/g, ' '));
   if (!grn) { out.push(`${W.total}: ${money(m.total)}`); if (m.paid !== null) out.push(`${W.paid}: ${money(m.paid)}`, `${W.due}: ${money(m.due)}`); }
