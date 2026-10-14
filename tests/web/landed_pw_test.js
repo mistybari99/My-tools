@@ -12,7 +12,7 @@ const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
     if (u === '/' || u === '/index.html') b = Buffer.from(b.toString('utf8').includes('src="landed.js"') ? b.toString('utf8') : b.toString('utf8').replace('</body>', '<script src="landed.js"></script></body>'));
     const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
-const BILL1 = '11111111-1111-4111-8111-111111111111', BILL2 = '22222222-2222-4222-8222-222222222222', COST1 = '33333333-3333-4333-8333-333333333333', COSTP = '44444444-4444-4444-8444-444444444444';
+const RET1 = '55555555-5555-4555-8555-555555555555', BILL1 = '11111111-1111-4111-8111-111111111111', BILL2 = '22222222-2222-4222-8222-222222222222', COST1 = '33333333-3333-4333-8333-333333333333', COSTP = '44444444-4444-4444-8444-444444444444';
 function mk(o = {}) { const data = C.mkData(base, o); data.tables.suppliers = [{ id: 'sp1', name: 'Importer Ltd', active: true }, { id: 'sp2', name: 'Transporter', active: true }]; return data; }
 // the in-page server stand-in: the same hand numbers as the SQL test (LA 20 kg @ 10 weight 20 kg, LB 30 pc @ 20 weight 12 kg)
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const L = window.__LC = Object.assign({ calls: [], err: {}, info: { mode: 'manual', alloc_default: 'value', late_mode: 'split_remaining_and_cogs', requires_approval: 'warn', reminder_on: true, base_currency: 'BDT', can_entry: true, can_approve: true, journal_ready: true,
@@ -57,8 +57,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'landed_reminders') return { data: { on: !!L.info.reminder_on, mode: L.info.mode, days: 30, count: 2, rows: [{ bill_id: '${BILL1}', bill_no: 'B-1', bill_date: '2026-10-12', total: 800, supplier: 'Importer Ltd', why: 'supplier_imported', in_progress: false }, { bill_id: '${BILL2}', bill_no: 'B-2', bill_date: '2026-10-13', total: 300, supplier: 'Local Co', why: 'every_bill', in_progress: true }] }, error: null };
   if (fn === 'landed_skip' || fn === 'landed_supplier_flag_set' || fn === 'landed_charge_type_save') return { data: { ok: true }, error: null };
   if (fn === 'landed_return_info') return { data: { original: '${BILL1}', has_landed: true, items: [{ item_id: 'ia', code: 'L97-A', returned_qty: 4, lot_qty: 20, landed_per_unit: 3.625, landed_on_returned: 14.5 }], total: 14.5, note: { bn: 'ফেরতের মালের landed cost সরবরাহকারী ফেরত দেয় না।', mix: 'Return-এর মালের landed cost supplier ফেরত দেয় না।', en: 'The landed cost carried by the returned goods is not refunded by the supplier.' } }, error: null };
-  if (fn === 'purchase_list') return { data: [{ id: '${BILL1}', kind: 'bill', supplier_id: 'sp1', supplier_name: 'Importer Ltd', bill_no: 'B-1', bill_date: '2026-10-12', location_id: 1, status: 'posted', total: 800 }, { id: '${BILL2}', kind: 'bill', supplier_id: 'sp2', supplier_name: 'Local Co', bill_no: 'B-2', bill_date: '2026-10-13', location_id: 1, status: 'posted', total: 300 }, { id: 'r1', kind: 'return', supplier_id: 'sp1', supplier_name: 'Importer Ltd', bill_no: 'R-1', bill_date: '2026-10-13', location_id: 1, status: 'posted', total: 50 }], error: null };
-  if (fn === 'purchase_get') { const ret = args.p_id === 'r1'; return { data: { id: args.p_id, kind: ret ? 'return' : 'bill', status: 'posted', supplier_id: args.p_id === '${BILL2}' ? 'sp2' : 'sp1', supplier_name: args.p_id === '${BILL2}' ? 'Local Co' : 'Importer Ltd', bill_no: 'B-1', bill_date: '2026-10-12', location_id: 1, subtotal: 800, discount: 0, total: 800, paid: 0, due: 800, lines: [], payments: [] }, error: null }; }
+  if (fn === 'purchase_list') return { data: [{ id: '${BILL1}', kind: 'bill', supplier_id: 'sp1', supplier_name: 'Importer Ltd', bill_no: 'B-1', bill_date: '2026-10-12', location_id: 1, status: 'posted', total: 800 }, { id: '${BILL2}', kind: 'bill', supplier_id: 'sp2', supplier_name: 'Local Co', bill_no: 'B-2', bill_date: '2026-10-13', location_id: 1, status: 'posted', total: 300 }, { id: '${RET1}', kind: 'return', supplier_id: 'sp1', supplier_name: 'Importer Ltd', bill_no: 'R-1', bill_date: '2026-10-13', location_id: 1, status: 'posted', total: 50 }], error: null };
+  if (fn === 'purchase_get') { const ret = args.p_id === '${RET1}'; return { data: { id: args.p_id, kind: ret ? 'return' : 'bill', status: 'posted', supplier_id: args.p_id === '${BILL2}' ? 'sp2' : 'sp1', supplier_name: args.p_id === '${BILL2}' ? 'Local Co' : 'Importer Ltd', bill_no: 'B-1', bill_date: '2026-10-12', location_id: 1, subtotal: 800, discount: 0, total: 800, paid: 0, due: 800, lines: [], payments: [] }, error: null }; }
   if (fn === 'set_rule') { if (args.p_key === 'landed_cost_mode') L.info.mode = args.p_value; if (args.p_key === 'landed_reminder_on') L.info.reminder_on = args.p_value; return { data: null, error: null }; }
   return { data: null, error: null }; };
  return c; }; })();`;
@@ -67,7 +67,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const errors = []; const log = (...a) => console.log(...a); let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; log('FAIL:', m); } };
   const BN = /[ঀ-৲৴-৿]/;      // Bangla letters; the taka sign (U+09F3) is the currency mark the whole English UI already uses
   async function open(o, hash) {
-    const ctx = await br.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
+    const ctx = await br.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2 }); const p = await ctx.newPage(); p.setDefaultTimeout(6000);
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|favicon/.test(m.text())) errors.push('console: ' + m.text()); }); p.on('dialog', (d) => d.accept());
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
@@ -79,6 +79,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const noOverflow = async (p, m) => { const r = await p.evaluate(() => { const w = window.innerWidth; const out = []; document.querySelectorAll('body *').forEach((e) => { const b = e.getBoundingClientRect(); if (b.width && b.right > w + 1 && !e.closest('.sheet')) out.push(e.tagName + '.' + e.className); }); return { sw: document.documentElement.scrollWidth, w, out: out.slice(0, 3) }; }); ok(r.sw <= r.w + 1, 'no horizontal overflow: ' + m + ' ' + JSON.stringify(r)); };
   const txt = (p, sel) => p.textContent(sel).then((s) => (s || '').replace(/\s+/g, ' '));
 
+  log('-- 1. list, mode banner, English has no Bangla letters');
   // ---- 1. list, mode banner, English has no Bangla letters
   let p = await open({}, '#/landed');
   ok(/Landed cost/.test(await txt(p, 'header.top h1')), 'title');
@@ -88,6 +89,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(!BN.test(await p.evaluate(() => document.getElementById('app').innerText.replace(/৳/g, ''))), 'English mode: no Bangla letters on the list screen');
   await noOverflow(p, 'list'); await p.screenshot({ path: OUT + '/lc_list.png' }); await p.close();
 
+  log('-- 2. mode OFF = today: banner, new button disabled, bil');
   // ---- 2. mode OFF = today: banner, new button disabled, bill page link opens the same message
   p = await open({ lc: { info: { mode: 'off', alloc_default: 'value', late_mode: 'split_remaining_and_cogs', requires_approval: 'warn', reminder_on: false, base_currency: 'BDT', can_entry: true, can_approve: true, charge_types: [] } } }, '#/landed');
   ok(/Off/.test(await txt(p, '#lc_modechip')) && /Nothing is added to any bill price/.test(await txt(p, '#app')) && await p.locator('[data-act=lc_new][disabled]').count() === 1, 'off: banner + disabled new button');
@@ -95,6 +97,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(/Landed cost is off/.test(await txt(p, '#app')) && (await calls(p, 'landed_preview')).length === 0, 'off: the editor refuses and nothing is previewed');
   await p.close();
 
+  log('-- 3. pick bills -> editor -> live preview');
   // ---- 3. pick bills -> editor -> live preview
   p = await open({}, '#/landed'); await p.click('[data-act=lc_new]'); await wait(p, 500);
   ok(await p.locator('[data-lcpk]').count() === 2, 'pick sheet lists the posted purchase bills only (the return is not offered)');
@@ -149,13 +152,15 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const sv = (await calls(p, 'landed_save'))[0]; ok(sv && typeof sv.p_client === 'string' && sv.p_id === null && sv.p_header.shipment_ref === 'SHIP-9' && sv.p_header.alloc_method === 'weight' && sv.p_docs[0].id === BILL1 && sv.p_lines.length === 2 && sv.p_basis.length === 1, 'save: client id, header, docs, lines, basis');
   await p.close();
 
+  log('-- 4. unknown weight: method unavailable, warning lists ');
   // ---- 4. unknown weight: method unavailable, warning lists the item, nothing invented
   p = await open({ lc: { weightKnown: false } }, `#/landed/new/${BILL1}`); await p.fill('[data-lc=amount][data-i="0"]', '100'); await wait(p, 900);
   ok(await p.locator('[data-act=lc_method][data-v=weight]').innerText().then((t) => /\?/.test(t) && !/★/.test(t)), 'weight chip is marked ? and not recommended');
   ok(/never guessed/.test(await txt(p, '.lc-reco')) && /L97-B/.test(await txt(p, '.lc-warn')), 'fallback reason + the item with no weight is listed');
-  ok(/unknown/.test(await txt(p, '[data-src="102"]')) && !/unknown/.test(await txt(p, '[data-src="101"]')), 'the line with no weight says unknown');
+  ok(/Weight: unknown/.test(await txt(p, '[data-src="102"]')) && /Weight: 20 kg/.test(await txt(p, '[data-src="101"]')), 'the line with no weight says unknown, the other shows 20 kg');
   await p.close();
 
+  log('-- 5. late goods: split chips and the warning');
   // ---- 5. late goods: split chips and the warning
   p = await open({ lc: { late: true } }, `#/landed/new/${BILL1}`); await p.fill('[data-lc=amount][data-i="0"]', '100'); await wait(p, 900);
   ok(/already sold or used/.test(await txt(p, '#lc_pv')) && await p.locator('[data-act=lc_late]').count() === 3, 'late warning + three late-mode chips');
@@ -163,6 +168,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   c = await calls(p, 'landed_preview'); ok(c[c.length - 1].p_late === 'variance_account', 'late mode sent to the preview');
   await p.close();
 
+  log('-- 6. open a draft: approve -> post -> void flow (warn m');
   // ---- 6. open a draft: approve -> post -> void flow (warn mode)
   p = await open({}, `#/landed/${COST1}`); await wait(p, 500);
   ok(await p.locator('[data-lc=type]').count() === 2 && (await p.locator('[data-lc=amount][data-i="0"]').inputValue()) === '100', 'a saved draft loads its charges');
@@ -171,7 +177,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok((await calls(p, 'landed_approve')).length === 1 && (await calls(p, 'landed_save')).length === 1, 'approve saves first, then approves');
   await p.click('[data-act=lc_post]'); await wait(p, 900);
   const po = await calls(p, 'landed_post'); ok(po.length === 1 && typeof po[0].p_client === 'string', 'post sent with a client id');
-  await p.evaluate(() => { window.__LC.status = null; window.__LC.getStatus = 'posted'; }); await p.goto(`http://localhost:${PORT}/#/landed/${COST1}`); await wait(p, 100); await p.evaluate(() => location.reload()); await wait(p, 1200);
+  await p.close(); p = await open({ lc: { getStatus: 'posted' } }, `#/landed/${COST1}`); await wait(p, 500);
   ok(await p.locator('[data-lc=amount]:not([disabled])').count() === 0 && /Result of the posting/.test(await txt(p, '#lc_pv')) && /13\.625/.test(await txt(p, '#lc_pv')), 'a posted cost is read-only and shows the average before and after');
   await p.click('[data-act=lc_void]'); await wait(p, 300); await p.fill('#lc_vwhy', 'x'); await p.click('[data-act=lc_voidgo]'); await wait(p, 300);
   ok((await calls(p, 'landed_void')).length === 0, 'void needs a reason of 3+ letters');
@@ -183,6 +189,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(await p.locator('[data-act=lc_post]').count() === 0 && await p.locator('[data-act=lc_approve]').count() === 0, 'required approval and no approve right: neither Post nor Approve is offered on a draft');
   await p.close();
 
+  log('-- 7. reminders');
   // ---- 7. reminders
   p = await open({}, '#/landed/rem'); await wait(p, 400);
   ok(await p.locator('[data-act=lc_remopen]').count() === 2 && /supplier|imported/i.test(await txt(p, '#app')) && /draft in progress/.test(await txt(p, '#app')), 'reminder rows, why, in-progress mark');
@@ -193,12 +200,14 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(/This list is off/.test(await txt(p, '#app')), 'reminder switch off: explained');
   await p.close();
 
+  log('-- 8. owner settings sheet writes the rules');
   // ---- 8. owner settings sheet writes the rules
   p = await open({}, '#/landed'); await p.click('[data-act=lc_settings]'); await wait(p, 300);
   await p.selectOption('#lcs_mode', 'per_shipment'); await p.selectOption('#lcs_appr', 'required'); await p.selectOption('#lcs_rem', 'off'); await p.click('[data-act=lc_settings_go]'); await wait(p, 900);
   c = await calls(p, 'set_rule'); ok(c.some((x) => x.p_key === 'landed_cost_mode' && x.p_value === 'per_shipment') && c.some((x) => x.p_key === 'landed_cost_requires_approval' && x.p_value === 'required') && c.some((x) => x.p_key === 'landed_reminder_on' && x.p_value === false), 'settings call set_rule for each switch');
   await p.close();
 
+  log('-- 9. the guarded link on the purchase bill page (purcha');
   // ---- 9. the guarded link on the purchase bill page (purchase.js untouched)
   p = await open({ m: { list: [{ id: BILL1, kind: 'bill', supplier_id: 'sp1', supplier_name: 'Importer Ltd', bill_no: 'B-1', bill_date: '2026-10-12', location_id: 1, status: 'posted', total: 800, discount: 0, paid: 0, due: 800 }] } }, `#/purchase/${BILL1}`); await wait(p, 1800);
   const hasLink = await p.locator('[data-act=lc_add]').count(); ok(hasLink === 1, 'a posted bill page gets the "Add landed costs" button');
@@ -211,11 +220,13 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(await p.locator('[data-act=lc_add]').count() === 0 && await p.locator('[data-act=pu_void], [data-act=pu_retvs], .s2-bar').count() > 0, 'phase97 not installed: the bill page is untouched, no button, no error');
   await p.close();
 
+  log('-- 10. return of such a purchase');
   // ---- 10. return of such a purchase
-  p = await open({}, '#/landed/new/r1'); await wait(p, 900);
+  p = await open({}, `#/landed/new/${RET1}`); await wait(p, 900);
   ok(/Landed cost of returned goods/.test(await txt(p, 'header.top h1')) && /14\.5/.test(await txt(p, '#app')) && /not refunded by the supplier/.test(await txt(p, '#app')), 'a return bill shows the landed cost carried by the returned goods');
   await p.close();
 
+  log('-- 11. languages');
   // ---- 11. languages
   p = await open({ lang: 'bn' }, '#/landed'); await wait(p, 300);
   ok(BN.test(await txt(p, '#lc_modechip')) && /Landed cost/.test(await txt(p, 'header.top h1')), 'Bangla mode: Bangla words, common words stay English');

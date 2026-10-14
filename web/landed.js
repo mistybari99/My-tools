@@ -17,6 +17,7 @@ const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩�
 const num = (v) => { const s = norm(v).replace(/,/g, ''); if (s === '') return null; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
 const q = (n, d = 4) => (n === null || n === undefined || !Number.isFinite(Number(n)) ? '—' : Number(n).toLocaleString('en-IN', { maximumFractionDigits: d }));
 const money = (n) => (n === null || n === undefined || !Number.isFinite(Number(n)) ? '—' : '৳ ' + q(n, 2));
+const unit = (n) => (n === null || n === undefined || !Number.isFinite(Number(n)) ? '—' : '৳ ' + q(n, 4));      // a cost per unit keeps up to 4 decimals (13.125, not 13.13)
 const rid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
 const today = () => new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 10);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -197,9 +198,9 @@ function chargeHtml(c, i) {
       <div class="hint" id="lc_th${i}">${t ? esc(T('t_' + t.treatment)) + (typeHint(t) ? ' · ' + esc(typeHint(t)) : '') : ''}</div></div>
     <div class="row wrap"><div style="flex:2;min-width:120px"><label>${esc(T('amount'))}</label><input data-lc="amount" data-i="${i}" inputmode="decimal" autocomplete="off" value="${esc(c.amount)}" ${ro}></div>
       <div style="flex:1;min-width:70px"><label>${esc(T('ccy'))}</label><input data-lc="ccy" data-i="${i}" maxlength="3" autocomplete="off" value="${esc(c.ccy)}" ${ro}></div>
-      ${foreign ? `<div style="flex:1;min-width:90px"><label>${esc(T('rate'))}</label><input data-lc="rate" data-i="${i}" inputmode="decimal" autocomplete="off" value="${esc(c.rate)}" ${ro}></div>` : ''}</div>
+      <div style="flex:1;min-width:90px" data-ratebox="${i}" ${foreign ? '' : 'hidden'}><label>${esc(T('rate'))}</label><input data-lc="rate" data-i="${i}" inputmode="decimal" autocomplete="off" value="${esc(c.rate)}" ${ro}></div></div>
     <div class="row wrap"><div style="flex:1;min-width:130px"><label>${esc(T('payMode'))}</label><select data-lc="pay" data-i="${i}" ${ro}>${['payable', 'cash', 'bank', 'mobile'].map((m) => `<option value="${m}" ${m === c.pay ? 'selected' : ''}>${esc(T('p_' + m))}</option>`).join('')}</select></div>
-      ${c.pay === 'payable' ? `<div style="flex:1;min-width:130px"><label>${esc(T('sup'))}</label><select data-lc="sup" data-i="${i}" ${ro}><option value="">${esc(T('noSup'))}</option>${sups.map((s) => `<option value="${esc(s.id)}" ${s.id === c.sup ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></div>` : ''}
+      <div style="flex:1;min-width:130px" data-supbox="${i}" ${c.pay === 'payable' ? '' : 'hidden'}><label>${esc(T('sup'))}</label><select data-lc="sup" data-i="${i}" ${ro}><option value="">${esc(T('noSup'))}</option>${sups.map((s) => `<option value="${esc(s.id)}" ${s.id === c.sup ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></div>
       <div style="flex:1;min-width:130px"><label>${esc(T('chMeth'))}</label><select data-lc="meth" data-i="${i}" ${ro}><option value="">${esc(T('hdrMeth'))}</option>${METHODS.map((m) => `<option value="${m}" ${m === c.meth ? 'selected' : ''}>${esc(methodName(m))}</option>`).join('')}</select></div></div>
     ${editable() && D.charges.length > 1 ? `<button data-act="lc_chrm" data-i="${i}">${esc(T('rmCh'))}</button>` : ''}</div></div>`;
 }
@@ -275,11 +276,11 @@ function drawPv() {
   const per = lines.filter((l) => l.in_scope).map((l) => {
     const ms = METHODS.filter((m) => l.methods && l.methods[m]);
     return `<div class="card lc-line"><div class="row between"><b>${esc(l.code || '—')} · ${esc(lab({ bn: l.name_bn, mix: l.name_bn, en: l.name_en || l.name_bn }))}</b><span class="hint">${esc(q(l.base_qty))} ${esc(l.unit || '')}</span></div>
-      <div class="row between"><span class="muted">${esc(T('now'))}</span><b>${esc(money(l.ucb_net))}</b></div>
-      ${ms.map((m) => `<div class="row between lc-m ${m === D.method ? 'on' : ''}"><span>${m === D.method ? '▸ ' : ''}${esc(methodName(m))}</span><span>${esc(T('alloc'))} ${esc(money(l.methods[m].alloc))}</span><b>${esc(money(l.methods[m].new_unit_cost))}${l.methods[m].pct_up != null ? ` <span class="hint">+${esc(q(l.methods[m].pct_up, 2))}%</span>` : ''}</b></div>`).join('')}
+      <div class="row between"><span class="muted">${esc(T('now'))}</span><b>${esc(unit(l.ucb_net))}</b></div>
+      ${ms.map((m) => `<div class="row between lc-m ${m === D.method ? 'on' : ''}"><span>${m === D.method ? '▸ ' : ''}${esc(methodName(m))}</span><span>${esc(T('alloc'))} ${esc(money(l.methods[m].alloc))}</span><b>${esc(unit(l.methods[m].new_unit_cost))}${l.methods[m].pct_up != null ? ` <span class="hint">+${esc(q(l.methods[m].pct_up, 2))}%</span>` : ''}</b></div>`).join('')}
       ${l.chosen && Number(l.chosen.cogs) ? `<div class="hint">${esc(T('toStock'))} ${esc(money(l.chosen.stock))} · ${esc(T('toVar'))} ${esc(money(l.chosen.cogs))}</div>` : ''}</div>`;
   }).join('');
-  const items = (pv.items || []).map((it) => `<div class="row between wrap"><span>${esc(itemLabel(lines, it.item_id))}</span><span class="hint">${esc(T('onHand'))} ${esc(q(it.on_hand))}${Number(it.late_qty) > 0 ? ' · ' + esc(T('lateQty')) + ' ' + esc(q(it.late_qty)) : ''}</span><span>${esc(T('avgNow'))} ${esc(it.avg == null ? '—' : money(it.avg))} → <b>${esc(it.avg_after == null ? '—' : money(it.avg_after))}</b></span></div>`).join('');
+  const items = (pv.items || []).map((it) => `<div class="row between wrap"><span>${esc(itemLabel(lines, it.item_id))}</span><span class="hint">${esc(T('onHand'))} ${esc(q(it.on_hand))}${Number(it.late_qty) > 0 ? ' · ' + esc(T('lateQty')) + ' ' + esc(q(it.late_qty)) : ''}</span><span>${esc(T('avgNow'))} ${esc(it.avg == null ? '—' : unit(it.avg))} → <b>${esc(it.avg_after == null ? '—' : unit(it.avg_after))}</b></span></div>`).join('');
   const hasLate = (pv.items || []).some((it) => Number(it.late_qty) > 0);
   const lateBox = `<div class="card stack"><h3 style="margin:0">${esc(T('late'))}</h3><div class="row wrap lc-chips">${LATE.map((m) => `<button class="tog ${(D.late || pv.late_mode) === m ? 'on' : ''}" data-act="lc_late" data-v="${m}" aria-pressed="${(D.late || pv.late_mode) === m}" ${editable() ? '' : 'disabled'}>${esc(T({ split_remaining_and_cogs: 'l_split', post_to_remaining_stock: 'l_post', variance_account: 'l_var' }[m]))}${m === reco.late_mode && hasLate ? ' ★' : ''}</button>`).join('')}</div></div>`;
   const tot = pv.totals || {};
@@ -314,7 +315,7 @@ function postedHtml() {
   const st = (g.stock || []).filter((s) => s.kind === 'post');
   return `<div class="card stack"><h3 style="margin:0">${esc(T('postedSum'))}</h3>${g.lines.map((l) => `<div class="row between"><span>${esc(typeName(typeOf(l.charge_type) || { name_bn: l.charge_type, name_en: l.charge_type }))}</span><b>${esc(money(l.amount))}</b></div>`).join('')}
     <div class="row between"><span>${esc(T('totals'))}</span><b>${esc(money(g.header.total))}</b></div>
-    ${st.map((s) => `<div class="hint">${esc(T('avgNow'))} ${esc(s.avg_before == null ? '—' : money(s.avg_before))} → <b>${esc(s.avg_after == null ? '—' : money(s.avg_after))}</b> · ${esc(T('stockAdded'))} ${esc(money(s.stock_value))} · ${esc(T('toVariance'))} ${esc(money(s.cogs_value))}</div>`).join('')}
+    ${st.map((s) => `<div class="hint">${esc(T('avgNow'))} ${esc(s.avg_before == null ? '—' : unit(s.avg_before))} → <b>${esc(s.avg_after == null ? '—' : unit(s.avg_after))}</b> · ${esc(T('stockAdded'))} ${esc(money(s.stock_value))} · ${esc(T('toVariance'))} ${esc(money(s.cogs_value))}</div>`).join('')}
     ${g.header.status === 'void' ? `<div class="notice bad">${esc(T('voided'))}: ${esc(g.header.void_reason || '')}</div>` : ''}</div>`;
 }
 
@@ -371,13 +372,14 @@ async function remView() {
 }
 async function returnView(id) {
   let r; try { r = await call('landed_return_info', { p_bill: id }); } catch (e) { errMsg(e); return; }
-  shell(T('retTitle'), `<div class="card stack">${r.has_landed ? r.items.map((x) => `<div class="row between wrap"><span>${esc(x.code)}</span><span class="hint">${esc(T('retQty'))} ${esc(q(x.returned_qty))}</span><span>${esc(T('retUnit'))} ${esc(money(x.landed_per_unit))}</span><b>${esc(money(x.landed_on_returned))}</b></div>`).join('') + `<div class="row between"><span>${esc(T('totals'))}</span><b>${esc(money(r.total))}</b></div><div class="notice warn">${esc(txt(r.note))}</div>` : `<p class="muted center">${esc(T('retNone'))}</p>`}</div>`, 'landed');
+  shell(T('retTitle'), `<div class="card stack">${r.has_landed ? r.items.map((x) => `<div class="row between wrap"><span>${esc(x.code)}</span><span class="hint">${esc(T('retQty'))} ${esc(q(x.returned_qty))}</span><span>${esc(T('retUnit'))} ${esc(unit(x.landed_per_unit))}</span><b>${esc(money(x.landed_on_returned))}</b></div>`).join('') + `<div class="row between"><span>${esc(T('totals'))}</span><b>${esc(money(r.total))}</b></div><div class="notice warn">${esc(txt(r.note))}</div>` : `<p class="muted center">${esc(T('retNone'))}</p>`}</div>`, 'landed');
 }
 
 // ---------- typing updates the working copy only ----------
 document.addEventListener('input', (e) => {
   const t = e.target; if (!t || !t.dataset) return;
-  if (t.dataset.lc && D.charges[Number(t.dataset.i)]) { const c = D.charges[Number(t.dataset.i)]; c[t.dataset.lc === 'meth' ? 'meth' : t.dataset.lc] = t.value; if (t.dataset.lc === 'amount' || t.dataset.lc === 'rate' || t.dataset.lc === 'ccy') schedule(); return; }
+  if (t.dataset.lc && D.charges[Number(t.dataset.i)]) { const c = D.charges[Number(t.dataset.i)]; c[t.dataset.lc === 'meth' ? 'meth' : t.dataset.lc] = t.value; if (t.dataset.lc === 'ccy') { const rb = $(`[data-ratebox="${t.dataset.i}"]`); if (rb) rb.hidden = String(t.value || '').toUpperCase() === baseCcy() || String(t.value || '').trim() === ''; }
+    if (t.dataset.lc === 'amount' || t.dataset.lc === 'rate' || t.dataset.lc === 'ccy') schedule(); return; }
   if (t.dataset.lcb) { const o = D.basis[t.dataset.lcb] = D.basis[t.dataset.lcb] || {}; o[t.dataset.k] = t.value; schedule(); return; }
   if (t.id === 'lc_ref') D.ref = t.value; if (t.id === 'lc_ttl') D.title = t.value; if (t.id === 'lc_dt') D.date = t.value;
 });
@@ -385,7 +387,9 @@ document.addEventListener('change', (e) => {
   const t = e.target; if (!t) return;
   if (t.dataset && t.dataset.lcpk !== undefined) { const id = t.dataset.lcpk; D.pick = t.checked ? D.pick.concat(id) : D.pick.filter((x) => x !== id); return; }
   if (t.dataset && t.dataset.lc && D.charges[Number(t.dataset.i)]) { const c = D.charges[Number(t.dataset.i)]; c[t.dataset.lc] = t.value;
-    if (t.dataset.lc === 'type' || t.dataset.lc === 'pay' || t.dataset.lc === 'ccy') { const b = $('#lc_ch'); if (b) b.innerHTML = D.charges.map(chargeHtml).join(''); }
+    // never redraw the list here: a redraw on blur would swallow the next tap / keystroke. Only small parts are toggled in place.
+    if (t.dataset.lc === 'type') { const x = typeOf(t.value), h = $(`#lc_th${t.dataset.i}`); if (h) h.textContent = x ? T('t_' + x.treatment) + (typeHint(x) ? ' · ' + typeHint(x) : '') : ''; }
+    if (t.dataset.lc === 'pay') { const sb2 = $(`[data-supbox="${t.dataset.i}"]`); if (sb2) sb2.hidden = t.value !== 'payable'; }
     schedule(); }
 });
 

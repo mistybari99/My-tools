@@ -497,6 +497,9 @@ select landed_save(null, :'cr'::uuid, '{}'::jsonb, format('[{"type":"bill","id":
 reset role;
 select tt.chk('E2 sold-out lot: recommendation says all sold -> variance account; the split post puts all 25 to variance, no ledger pair, avg unchanged', exists (select 1 from jsonb_array_elements(:'rcx'::jsonb->'warnings') w where w->>'code'='late_all_sold') and :'rcx'::jsonb->>'late_mode'='variance_account'
   and (:'pox'::jsonb->>'stock_added')::numeric=0 and (:'pox'::jsonb->>'to_variance')::numeric=25 and not exists (select 1 from stock_ledger where reason='cost_adjust' and item_id=:'ix'::uuid) and (select qty from stock_balance where item_id=:'ix'::uuid)=0);
+select (landed_save(gen_random_uuid(), null, format('{"cost_date":"%s"}', tt.today()-9)::jsonb, format('[{"type":"bill","id":"%s"}]',:'t3b')::jsonb, '[{"charge_type":"loading","amount":6}]')->>'id')::uuid as cbs \gset
+select tt.err('E2 a cost dated before the accounting start cannot be posted (its entry could never be made)', format($$select landed_post('%s')$$, :'cbs'), 'before_start');
+select tt.err('E2 a date more than a day ahead is refused', format($$select landed_save(null,null,'{"cost_date":"%s"}'::jsonb,'[{"type":"bill","id":"%s"}]','[{"charge_type":"loading","amount":6}]')$$, tt.today()+5, :'t3b'), 'bad_date');
 select tt.chk('E2 an approved cost saved again returns to draft, approval cleared, new total 9', :'apr'='approved' and :'rst'='draft' and (select status='draft' and approved_by is null and total=9 from landed_costs where id=:'cr'::uuid));
 
 \echo == W1 other places, untracked lines, switch back off

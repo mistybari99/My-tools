@@ -958,6 +958,7 @@ begin
   if req = 'required' and h.status <> 'approved' then raise exception 'approval_required'; end if;
   perform public.lock_check(h.cost_date);
   if public.rule_on('accounting_on') and not public._landed_journal_ready97() then raise exception 'journal_not_ready' using hint = 'Paste phase97 again (phase89 was pasted after it)'; end if;
+  if public.rule_on('accounting_on') and public._acct_start() is not null and h.cost_date < public._acct_start() then raise exception 'before_start' using hint = 'The date is before the accounting start: the entry could never be posted. Use a later date'; end if;
   perform 1 from public.stock_balance b where b.location_id = h.location_id
       and b.item_id in (select pl2.item_id from public.landed_cost_docs d join public.purchase_lines pl2 on pl2.bill_id = d.bill_id where d.cost_id = p_id and pl2.item_id is not null) order by b.item_id for update;
   s := public._landed_saved97(p_id, false);
