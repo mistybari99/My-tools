@@ -13,15 +13,16 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="theme.css">
 <script>/* theme first (no flash): bos_theme = dark | light | classic; first run follows prefers-color-scheme (light -> Premium Light, otherwise Premium Dark) */
-(function(){var K='bos_theme',V={dark:1,light:1,classic:1},h=document.documentElement;
+(function(){var K='bos_theme',V={dark:1,light:1,classic:1,'glass-light':1,'glass-dark':1}/* bos109 */,h=document.documentElement;
 function rd(){try{var v=localStorage.getItem(K);return V[v]?v:null}catch(e){return null}}
 function first(){try{return matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}catch(e){return 'dark'}}
 function ap(v){h.setAttribute('data-theme',v);if(v==='classic')h.removeAttribute('data-skin');else h.setAttribute('data-skin','1');
-var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',v==='dark'?'#17181c':v==='light'?'#fbf5ee':'#a1111e')}
+var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',v==='dark'?'#17181c':v==='light'?'#fbf5ee':v==='glass-dark'?'#0b1020':v==='glass-light'?'#e8f0fb':'#a1111e')}
 ap(rd()||first());
-window.BOS_THEME={KEY:K,list:['dark','light','classic'],get:function(){return h.getAttribute('data-theme')||'dark'},set:function(v){if(!V[v])return;try{localStorage.setItem(K,v)}catch(e){}ap(v)}};
+window.BOS_THEME={KEY:K,list:['dark','light','classic','glass-light','glass-dark'],get:function(){return h.getAttribute('data-theme')||'dark'},set:function(v){if(!V[v])return;try{localStorage.setItem(K,v)}catch(e){}ap(v)}};
 })();</script>
 <link rel="stylesheet" href="controls.css">
+<link rel="stylesheet" href="theme_glass.css"><script src="theme_glass.js"></script><!-- bos109 Liquid Glass -->
 </head>
 <body>
 <div id="app"><p class="muted center pad">…</p></div>
