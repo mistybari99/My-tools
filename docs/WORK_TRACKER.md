@@ -39,8 +39,8 @@ layer 1 raw material = average cost (+ separate "আজকের কেনা �
 ### Part 3 - online orders & messages (agent running in worktree)
 | step | scope | status | branch / migration |
 |---|---|---|---|
-| H | sales_channels, inbound_messages (inbox), web/landing form endpoint (server-side price, idempotent), Facebook/Instagram/WhatsApp webhook receiver + signature check (verify Meta docs; unverified stays "যাচাই হয়নি"), staff confirms orders, optional auto-draft default OFF, duplicate flag, phone/address visibility + audit, failed-webhook retry, "শেষ বার্তা কখন" alert | RUNNING (agent) | fix/phase-H, phase76 |
-| E9 | pack-time stock warn, keep order price option, void-sale flag on order, packaging-return PROPOSAL | RUNNING (agent) | fix/phase-E9, phase77 |
+| H | sales_channels, inbound_messages (inbox), web/landing form endpoint (server-side price, idempotent), Facebook/Instagram/WhatsApp webhook receiver + signature check (verify Meta docs; unverified stays "যাচাই হয়নি"), staff confirms orders, optional auto-draft default OFF, duplicate flag, phone/address visibility + audit, failed-webhook retry, "শেষ বার্তা কখন" alert | DONE, pushed, NOT merged, NOT live (phase76: 108 tests, web 29; edge fns source only) | fix/phase-H, phase76 |
+| E9 | pack-time stock warn, keep order price option, void-sale flag on order, packaging-return PROPOSAL | DONE, pushed, NOT merged, NOT live (phase77: 26 tests) | fix/phase-E9, phase77 |
 ### Final
 | G | regression tests of the audit scenarios (a1-F1 hand calc 661/10=66.10, a3 main scenario, a4 mixed scenario), negative-stock sweep function, whole suite before/after numbers | TODO | fix/phase-G |
 
