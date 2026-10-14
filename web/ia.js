@@ -55,6 +55,7 @@ const IA = [
   rec('purchase', 'purch', ['ক্রয় বিল', 'Purchase bills', 'Purchase Bill'], { icon: 'doc', ok: locOk, mob: 2, kw: ['purchase', 'bill', 'buy', 'grn', 'ক্রয়', 'কেনা', 'বিল', 'মাল গ্রহণ'], qa: [{ route: 'purchase/new', label: ['নতুন ক্রয় বিল', 'New purchase bill', 'নতুন Purchase bill'], ok: locOk }] }),
   rec('purchase/new', 'purch', ['নতুন ক্রয় বিল', 'New purchase bill', 'নতুন Purchase bill'], { icon: 'plus', ok: locOk, kw: ['new purchase', 'নতুন ক্রয়'] }),
   rec('purchase/return', 'purch', ['ক্রয় ফেরত', 'Purchase return', 'Purchase return'], { icon: 'doc', ok: locOk, kw: ['return', 'supplier return', 'ফেরত', 'ক্রয় ফেরত'] }),
+  rec('scan', 'purch', ['ছবি থেকে এন্ট্রি (Scan)', 'Scan a bill or list', 'ছবি থেকে Entry (Scan)'], { icon: 'doc', ok: locOk, kw: ['scan', 'photo', 'camera', 'ocr', 'bill photo', 'invoice photo', 'product list', 'ছবি', 'স্ক্যান', 'বিলের ছবি', 'ক্যামেরা'] }),
   rec('payables', 'purch', ['সরবরাহকারীর পাওনা', 'Supplier payables', 'Supplier-এর Payable'], { icon: 'dues', ok: locOk, home: { acc: 7 }, kw: ['supplier', 'payable', 'owe', 'pay supplier', 'সরবরাহকারী', 'পাওনা', 'বাকি', 'পরিশোধ'] }),
   rec('settings2/suppliers', 'purch', ['সরবরাহকারী (সেটিংস)', 'Suppliers (settings)', 'Supplier (settings)'], { icon: 'settings', ok: owner, drawer: false, parent: 'settings2', kw: ['supplier', 'সরবরাহকারী'] }),
   // Factory & production
