@@ -62,6 +62,10 @@ This is the order that was built and tested from nothing (fresh Postgres 16, see
 | 42 | phase117.sql | 72..111, 116 | guard inside. BATCH 3 (factory overhead in the books): `pool_gl_post117` (pool rows posted Dr expense / Cr 2400, reversed when retired) and `factory_labour_absorbed117` (branch P&L), both OFF; `pool_vs_gl117`, `overhead_trueup117`. Re-creates `pool_set`, `_cs_push_pools`, `_p27_pl` (tag bos117). Test: `supabase/phase117_test.sql`. |
 
 **Invariant: phase111 closes the INT4 chain (phase110 sits between 109 and 111); the batch phases 112 / 113 (rows 41-42) follow it.** If phase89, phase94, phase96, phase97, phase98, phase103, phase105 or phase109 is ever pasted again, paste the chain after it again (98 after 89 / 94 / 96 / 97; 103 then 105 then 109 then 111) - phase103 alone puts older `_inb_mask_phones103`, `_cust_pii103`, `customer_directory` back and phase105 re-creates them.
+| 40 | **phase111.sql** | 72..109 (110 optional) | guard inside (marker objects of 72..107 and 109; raises `phase111 needs phases 72..110 pasted first ... missing: <numbers>`; body guard refuses an unknown tag). Step INT4: 3-way merge of `_bp_pay99` (phase103 body + bos105 L4 line + bos109 supplier lock), tags bos105 + bos109 + bos111. Nothing else. See docs/briefs_p2p3/step_INT4_REPORT.md |
+| 41 | phase118.sql | 72..103 | guard inside (functions of 72 / 78 / 80 / 82 / 85 / 88 and the tables stock_ledger, stock_transfers, card_settlements85). Step B4: three READ-ONLY reconciliation reports (`stock_recon_statement`, `stock_sales_unmatched`, `factory_branch_statement`, `net_profit_report`) + `recon_export_log118`; grants `view_stock_recon`, `view_branch_statement`, `view_net_profit`; rules `profit_variable_heads`, `branch_stmt_ageing_hours` (+ 2 advisor rows). Tag bos118; no existing function is re-created. See section N |
+
+**Invariant: phase111 comes after phase110 and every other file that re-creates a function of rows 27-40; phase118 (read-only, re-creates nothing) goes after phase111.** If phase89, phase94, phase96, phase97, phase98, phase103, phase105 or phase109 is ever pasted again, paste the chain after it again (98 after 89 / 94 / 96 / 97; 103 then 105 then 109 then 111) - phase103 alone puts older `_inb_mask_phones103`, `_cust_pii103`, `customer_directory` back and phase105 re-creates them.
 
 (The number 89 is out of sequence on purpose; it is pasted after 90 and 91. `tests/sql/final_build.sh` builds exactly this order.)
 
@@ -89,7 +93,7 @@ Method: fresh build to phase71, then every phase in the order above, `md5(pg_get
 Same as D, but the last file is now phase98: a phase that re-creates `_acct_docs`, `_acct_inv_split72`, `_acct_stock_moves85`, `_pvar85` or `inventory_vs_gl` must merge into the phase98 text (new phase98 version) and keep every `bosNN` tag; run phase89c_test, phase94_test, phase96_test, phase97_test and phase98_test.
 
 
-## G. Rules for the next phase (112, ...) - the last file is phase111
+## G. Rules for the next phase (119, ...) - phase111 is the last file that re-creates older functions; phase118 follows it
 
 Same as D and F: a phase that re-creates a function listed in rows 27-40 must merge into the existing text (a new version of the phase that owns the function, or a new phase111 version) and keep every `bosNN` tag. Check with `bash tests/sql/tag_loss_check.sh` (fresh build in the owner order, `md5(pg_get_functiondef)` + bosNN tags after every phase, reports every lost tag). Run phase89c_test, phase89d_test, phase94_test, phase96..99_test, phase103b_test, phase105_test, phase109_test, phase111_test.
 Tests that assert a state later phases change by design have `b` / `c` / `d` copies (phase103b, phase103c, phase89f, phase89g, phase98c, phase46b ...); old tests are never edited. Build: `bash tests/sql/final_build.sh <db>` (order from tests/sql/paste_order.env).
@@ -97,7 +101,7 @@ Tests that assert a state later phases change by design have `b` / `c` / `d` cop
 ## H. Live status (not a table of files - see section B for the order)
 
 - Installed on the owner's live database: phase72 .. phase103 (all 32 new files, each once, in the order of rows 1-32). Checked with `python3 tools/check_paste_order.py`.
-- Pending, to paste in this order: phase104, phase105, phase106, phase107, phase108, phase109, phase110, phase111.
+- Pending, to paste in this order: phase104, phase105, phase106, phase107, phase108, phase109, phase110, phase111, phase118.
 - Next free number after the pending ones: phase112.
 
 ## I. phase106 (backup / restore-drill coverage)
@@ -134,3 +138,6 @@ Both go after phase111 (any order between them). Every behaviour change is a rul
 
 `supabase/phase116.sql` and `supabase/phase117.sql` go after phase111 (rows 41-42; the numbers 112-115 and 118-121 belong to other batches and are merged by the integrator - keep these two numbers). Every behaviour is behind a rules switch whose default is today's behaviour; the setup advisor has a row for each. Report: `docs/audit2/B3_REPORT.md`. Tests: `phase116_test`, `phase117_test`.
 **Re-paste rule**: a re-paste of phase19 / 73 / 74 / 79 / 96 / 109 (they re-create `production_post`, `_conv_cost`, `cost_wait_supply96` ...) puts the older body back: paste phase116 and phase117 again after it. Both files stop with a message if a function they re-create carries a bosNN tag they do not know (a later phase changed it: merge that change into the phase116 / 117 text first).
+## N. phase118 (reconciliation reports, step B4)
+
+`supabase/phase118.sql` goes after phase111 (it needs only 72..103 and re-creates nothing, so it is also safe right after phase103). Guard inside. Everything is read-only: the four report functions are `stable`, the only write is the audit row of `recon_export_log118`. Grants: `view_stock_recon` (stock statement + sales lines not matched in the stock ledger), `view_branch_statement` (factory-to-branch statement), `view_net_profit` (net profit per branch and product; also needs `biz_cost_ok()`). Cost keys of the two stock statements appear only for `biz_cost_ok()` holders. Test: `supabase/phase118_test.sql` (A3 hand numbers + A5 supply moves; `bash tests/sql/run_all_sql.sh phase118`). Web: `web/recon118.js`, routes `#/stockrecon`, `#/branchstmt`, `#/netprofit`.
