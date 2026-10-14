@@ -8,6 +8,8 @@
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, esc, toast, fail, shell, openSheet, closeSheet } = A;
 const H = A.H, L = B.L, lab = B.lab;
+// owner approving his own change: the server (phase87) allows it and returns a NON-blocking suggestion to ask another approver
+const selfHint = (d) => (d && d.suggestion ? ' · ' + lab({ bn: d.suggestion_bn, mix: d.suggestion_mix, en: d.suggestion_en }) : '');
 const $ = (s, el = document) => el.querySelector(s);
 const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).trim();
 const nnum = (v) => { const s = norm(v); if (s === '') return null; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
@@ -231,7 +233,7 @@ Object.assign(H, {
     const r = await sb.rpc('recipe_steps_save', { p_recipe: a.dataset.id, p_steps: steps, p_client: rid() });
     if (r.error) return errMsg(r.error); toast(T('saved')); closeSheet(); await refresh();
   },
-  rb_approve: async (a) => { const r = await sb.rpc('recipe_approve', { p_recipe: a.dataset.id, p_note: null }); if (r.error) return errMsg(r.error); toast(T('approved')); closeSheet(); await refresh(); },
+  rb_approve: async (a) => { const r = await sb.rpc('recipe_approve', { p_recipe: a.dataset.id, p_note: null }); if (r.error) return errMsg(r.error); toast(T('approved') + selfHint(r.data)); closeSheet(); await refresh(); },
   rb_anew: () => artisanSheet(null),
   rb_aedit: (a) => artisanSheet(D.reg.find((x) => String(x.id) === a.dataset.id)),
   rb_asave: async (a) => {

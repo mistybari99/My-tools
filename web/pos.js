@@ -72,7 +72,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable|unit_unknown|production_negative_reason_needed|client_id_taken)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
