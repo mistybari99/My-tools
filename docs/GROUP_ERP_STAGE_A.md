@@ -1,6 +1,6 @@
 # Group ERP — Stage A: audit and architecture blueprint (READ-ONLY, no code changed)
 
-Status: **DRAFT for owner approval.** Nothing below has been implemented. Evidence = repo paths at branch `ccr-46b26d91-81vl9s` (HEAD `dbecc25`).
+Status: **Stage A APPROVED by the owner with the changes in section 10; Stage B1 approved (scope in section 11).** Sections 1-9 are the original audit; where section 10 differs, section 10 wins. Only B1 is being built; nothing else below is implemented. Evidence = repo paths at branch `ccr-46b26d91-81vl9s` (HEAD `dbecc25`).
 Honesty note: this audit is a *sampled* read (docs, schema.sql, phase2/7/16/40 SQL, greps over `supabase/*.sql` and `web/*.js`), not a line-by-line review of all 705 files.
 Items marked **[unverified]** need a deeper read or a live-database check before they are relied on.
 No live Supabase was available, so nothing here is verified against real data.
@@ -42,8 +42,7 @@ No live Supabase was available, so nothing here is verified against real data.
 | Isolation | RLS by org scope (must be proven by tests) | physical isolation |
 | Group dashboard | simple SQL | needs cross-project sync/ETL (hard on free tier) |
 | Risk to sweets | schema change on live system | none |
-Recommendation: **A**, built *additively*, with a **read-only owner view** first. Revisit B only if a business needs hard physical separation (e.g. separate legal owners/partners). **Owner decision needed.**
-
+Recommendation: **A**, built *additively*, with a **read-only owner view** first. **Owner approved A, with strict isolation (section 10).** Revisit B only if a business needs hard physical separation (e.g. separate legal owners/partners). 
 ### 3.2 Org model (additive, idempotent, no table rewrites)
 ```
 org_units(id, parent_id, kind[group|legal_entity|business|branch|site|department|cost_centre|project],
@@ -108,10 +107,54 @@ Keep "all writes through SECURITY DEFINER RPCs" (no REST table writes). New RPCs
 - Dashboard includes new unit automatically; unimplemented modules show "not implemented", never 0.
 - Deactivating a unit keeps all history; all new tables RLS + audit trigger + idempotent re-run.
 
-## 9. Open questions for the owner (block Stage B)
+## 9. Open questions for the owner (ANSWERED in section 10; kept for history)
 1. Legal reality: are the future businesses separate legal entities (separate trade licence/tax/partners) or one proprietorship?
 2. Approve option A (one DB) vs B (project per business)?
-3. Which branch/phase numbers is the other chat using? Reserve phase80+ for this work?
+3. Which branch/phase numbers is the other chat using? Reserve phase80+ for this work? (ANSWERED: phase122+, see section 10d.)
 4. Is the existing sweets accounting (`accounting_on`) actually switched on and in use on the live DB? (changes migration risk)
 5. Free-plan limits (DB size, connections) acceptable for group growth, or is a paid plan authorised later?
 6. Should `management` role stay group-wide, or become per-business?
+
+## 10. Owner decisions (recorded after Stage A review)
+### 10a. Business model
+- Every business is a **separate legal entity** (own trade licence, own books), all owned by the one owner. Partnerships may come later (see below).
+- **Strict data isolation** between businesses. Option A (one database with an org layer) is approved, but isolation must be strict and proven by tests (a user of business A gets nothing from B by direct select, RPC parameter swap or id guess).
+- **No cross-business transactions today.** Each business keeps its own books.
+- **Master (group) dashboard is visible to the owner only.**
+- **Partnerships later:** ownership percentage per business (`legal_entities.owner_pct`, default 100) plus a "my share" view. Not built beyond the column in B1.
+- **Build about 70% generic foundation now** (org tree, scope, templates, accounting dimensions). **Industry workflows (dealership, hardware+paint, technology, construction, online store) are NOT built now**; they exist only as `not_implemented` template records.
+
+### 10b. INTERCOMPANY (kept as planned; default OFF; not in B1; built in Stage E)
+- Paired entries, one in each business's books, bound together by one **link id**.
+- **Per-pair enable by the owner**; the whole feature stays OFF until the owner enables a pair.
+- **Owner or an explicit grant only, with approval** before posting.
+- **Elimination** of the pair in group totals.
+- **Due-from / due-to accounts must match**; a mismatch raises an alert.
+- **Only amount and date cross the boundary** between the two businesses; no other data is visible to the other side.
+- Needs accountant review before use (as in 3.3).
+
+### 10c. New risks from docs/HANDOVER_6.md (MULTI-BUSINESS section, branch origin/ccr-9c1f9be7-3s9qnz)
+1. **Global `rules` and grants**: all ~31 audit switches, `grant_defs` and `profit_variable_heads` / `branch_stmt_ageing_hours` are global, not per business.
+2. **`management` role bypasses `can_loc`** (leak across businesses once a second business exists).
+3. **Single chart of accounts**: new GL accounts (5800 cash short, 5810 bank fee, 4900 bank interest, 2400 overhead pool, transit loss 5110-5140) go into one global chart; `journal_entries` has no legal-entity column.
+4. **`profit_truth112` is company-wide**: one net profit across all locations; must become per business (also the dashboard tile).
+5. **Global item master** (items, customers, suppliers, recipes, pools, cost types, `location_cost_cfg`); phase116 semi-finished / ingredient rules assume one item master.
+6. **Hardcoded brand lists** remain in `web/app.js`, `forms_cash.js`, `forms_factory.js`, `forms_sales.js`; location `kind` is a closed set; new screens (recon118, cost116) have no business switcher.
+7. Paste chain is one chain for one database; the public web repo ships one bundle for all businesses.
+New read functions (stock_recon_statement, factory_branch_statement, net_profit_report) already scope by `can_loc` + `has_grant(code, loc)`; that is the base to extend.
+
+### 10d. Phase numbering
+**phase122 and above** for this work. phase121 is the last used; phase119 is a test file only; phase120 is installed (merged, report speed). Keep one chat on `supabase/phaseNN.sql` numbering at a time.
+
+## 11. Stage B1 (approved): scope, non-scope, rollback, acceptance
+**Scope (additive only, zero behaviour change), `supabase/phase122.sql` + `phase122_test.sql`:**
+- New tables `org_units`, `legal_entities` (with `trade_licence_ref`, `owner_pct`), `business_templates`; nullable `locations.org_unit_id`.
+- Seed one group, one legal entity + business for the existing sweets business; map existing locations by code (idempotent, fills nulls only). Seed templates: `food_manufacturing` = available (sweets), the five other industries = not_implemented.
+- Rule `org_scope_on`, default OFF. Read functions `org_tree()`, `org_unit_scope(location_id)`; write functions `org_unit_save`, `org_unit_deactivate` (owner or grant `org_manage`; SECURITY DEFINER, idempotent `p_client`, audit, no hard delete).
+- RLS on all new tables, no direct writes, anon has no access.
+
+**Non-scope (not touched in B1):** `can_loc`, any existing function or report, RLS of existing tables, accounting (`legal_entity_id`), master-data scope, UI, intercompany, group dashboard, industry workflows.
+
+**Rollback:** rule stays OFF and nothing reads the new objects, so old behaviour is unchanged. To remove: drop the new functions and tables and the nullable `locations.org_unit_id` column; no existing data is changed. Backup before pasting (as in section 6).
+
+**Acceptance tests (phase122_test):** (1) second business plus branches created through the functions with no code change; (2) deactivation keeps history; (3) non-owner without `org_manage` is refused; (4) anon cannot execute; (5) second paste = no error; (6) every existing sweets location is mapped; (7) sweets report totals unchanged before/after; (8) idempotency key returns the same result without a second row. Full SQL suite and both e2e modes must stay at baseline.
