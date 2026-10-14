@@ -95,6 +95,10 @@ Deno.serve(async (req: Request) => {
   if (j.engine !== "ai_vision") return json(409, { ok: false, error: "engine_is_not_ai_vision" });
   if (!["purchase_bill", "product_list", "expense", "other"].includes(j.kind) || !/^SCAN\/[0-9]+\/[A-Za-z0-9_.-]+$/.test(j.image_path)) return json(400, { ok: false, error: "bad_job" });
 
+  // bos94: every paid AI call is counted BEFORE it is made; the owner's limits (scan_ai_max_per_job / scan_ai_max_per_user_day) are applied by the database. Empty limits = unlimited = as before.
+  const gate = await db.rpc("scan_ai_gate94", { p_id: jobId });
+  if (gate.error) return json(/too_many_attempts/.test(String(gate.error.message)) ? 429 : 409, { ok: false, error: /too_many_attempts/.test(String(gate.error.message)) ? "too_many_attempts" : "not_open" });
+
   const fail = async (why: string) => { await db.rpc("scan_set_extracted", { p_id: jobId, p_extracted: null, p_confidence: null, p_engine: "ai_vision", p_error: why.slice(0, 280) }); return json(502, { ok: false, error: why }); };
 
   const dl = await db.storage.from("photos").download(j.image_path);
@@ -135,6 +139,6 @@ Deno.serve(async (req: Request) => {
   let v;
   try { v = validate(j.kind, out); } catch { return await fail("bad_model_output"); }
   const r = await db.rpc("scan_set_extracted", { p_id: jobId, p_extracted: v.extracted, p_confidence: v.confidence, p_engine: "ai_vision", p_error: null });
-  if (r.error) return json(422, { ok: false, error: String(r.error.message).slice(0, 120) });
+  if (r.error) return json(422, { ok: false, error: "save_failed" });                // bos94: a fixed code, never the database text
   return json(200, { ok: true, lines: (v.extracted.lines as unknown[] | undefined)?.length ?? 0 });
 });

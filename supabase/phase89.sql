@@ -2,6 +2,8 @@
 -- Phase 89 (bos89) - INTEGRATION FIX: the final body of every function that more than one phase re-created (72..88, 90, 91).
 -- Run LAST, after phase91 (and re-check after any later phase 92/93). Paste twice = no error (create or replace only).
 -- No table, no data, no rule, no privilege is touched; every default stays as today. Old phase files are NOT edited.
+-- Step Sec (phase94): the 3 lines tagged bos94 in _sale_stock_out (rule offline_sale_max_age, empty = as before) are merged here too, byte for byte the same as in phase94, so pasting phase89 again
+-- after phase94 does not bring the older text back. Before phase94 the rule does not exist and the lines do nothing.
 --
 -- Why: each phase was built on its own branch from the function text that existed THERE, so a later file silently put the older text back
 -- (found by comparing pg_get_functiondef after every phase on a fresh build, see docs/briefs_p2p3/step_INT2_G_REPORT.md):
@@ -537,6 +539,9 @@ begin
   if new.status <> 'done' or new.lines is null or jsonb_typeof(new.lines) <> 'array' then return new; end if;
   -- a sale that syncs late (an offline phone) has already happened: it is recorded, it never blocks (a yellow line still tells the owner)
   neg := case when new.sold_at < now() - interval '2 minutes' then 'soft' else 'full' end;
+  -- bos94: owner can limit how old a sale may be and still count as a late sync (rule offline_sale_max_age, hours; empty = no limit = as before). A manager replay override stays soft.
+  if neg = 'soft' and public.rule_num('offline_sale_max_age') is not null and new.sold_at < now() - make_interval(hours => public.rule_num('offline_sale_max_age')::int)
+     and coalesce(current_setting('bos.replay_override', true), '') <> '1' then neg := 'full'; end if;   -- bos94
   -- bos83: a sale replayed from the offline queue (record_sale_offline / manager override) is soft too when the owner switch offline_soft_stock is on (override: always) - flagged below
   if neg = 'full' and coalesce(current_setting('bos.offline_replay', true), '') = '1'
      and (public.rule_on('offline_soft_stock') or coalesce(current_setting('bos.replay_override', true), '') = '1') then neg := 'soft'; soft83 := true; end if;

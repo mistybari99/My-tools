@@ -259,7 +259,9 @@ async function loadCard() {
 async function loadAlert() { try { D.alert = await rpc('acct_pending_alert85', { p_limit: 50 }); } catch (e) { D.alert = null; } }   // the alert is advice: a failure must not hide the screen
 async function loadAuto() {
   await loadAlert();
-  try { const r = await sb.from('acct_autopost_runs85').select('*').order('ran_at', { ascending: false }).limit(20); D.runs = r.error ? null : (r.data || []); } catch (e) { D.runs = null; }
+  D.runs = null;
+  try { const f = await sb.rpc('acct_autopost_runs_list', { p_limit: 20 }); if (!f.error && Array.isArray(f.data)) D.runs = f.data; } catch (e) { /* bos94: phase94 not pasted yet - fall back to the table read below */ }
+  if (D.runs === null) { try { const r = await sb.from('acct_autopost_runs85').select('*').order('ran_at', { ascending: false }).limit(20); D.runs = r.error ? null : (r.data || []); } catch (e) { D.runs = null; } }
 }
 async function loadRules() {
   const r = await sb.from('rules').select('key,value,default_value').in('key', SW.map((s) => s.key).concat(['acct_scheduler_on']));

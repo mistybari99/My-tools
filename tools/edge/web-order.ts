@@ -9,7 +9,7 @@
 //          (the raw address is never stored); captcha: if CAPTCHA_VERIFY_URL + CAPTCHA_SECRET are set, the token is checked and the result passed as p_captcha_ok.
 //   It signs in as the intake bot (limited user). It never writes a table, never confirms an order: the order enters as status "new" for staff.
 //
-// Secrets (NAMES only): INTAKE_BOT_EMAIL, INTAKE_BOT_PASSWORD, WEB_FORM_SALT, CAPTCHA_SECRET (optional), CAPTCHA_VERIFY_URL (optional; provider specific - UNVERIFIED)
+// Secrets (NAMES only): INTAKE_BOT_EMAIL, INTAKE_BOT_PASSWORD, INTAKE_PROOF_SECRET (optional, bos94), WEB_FORM_SALT, CAPTCHA_SECRET (optional), CAPTCHA_VERIFY_URL (optional; provider specific - UNVERIFIED)
 // Deploy (needs a computer):  supabase functions deploy web-order --no-verify-jwt    then put its URL in the setting "web_form_public_url".
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -52,6 +52,7 @@ Deno.serve(async (req: Request) => {
   try { b = await req.json(); } catch { return J(400, { ok: false, error: "bad_json" }); }
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "";
   const keyHash = await sha256((Deno.env.get("WEB_FORM_SALT") || "") + "|" + ip);
+  const ps = Deno.env.get("INTAKE_PROOF_SECRET"), proof = ps ? await sha256(ps) : null;   // bos94: optional; the owner stores its hash with intake_proof_set94('web_form', ...); not set = null = as before
   let captcha: boolean | null = null;
   const cs = Deno.env.get("CAPTCHA_SECRET"), cu = Deno.env.get("CAPTCHA_VERIFY_URL");
   if (cs && cu) {
@@ -61,7 +62,7 @@ Deno.serve(async (req: Request) => {
   const lines = Array.isArray(b.lines) ? b.lines.slice(0, 100).map((l: any) => ({ item_id: String(l.item_id), qty: Number(l.qty) })) : [];
   const r = await db.rpc("web_order_submit", { p_channel: String(b.c || ""), p_submission: String(b.submission || ""), p_name: String(b.name || ""), p_mobile: String(b.mobile || ""),
     p_address: b.address ? String(b.address) : null, p_delivery_mode: String(b.delivery_mode || "pickup"), p_lines: lines, p_note: b.note ? String(b.note) : null,
-    p_source: b.source ? String(b.source) : null, p_pay_mode: b.pay_mode ? String(b.pay_mode) : null, p_pay_ref: b.pay_ref ? String(b.pay_ref) : null, p_key_hash: keyHash, p_captcha_ok: captcha });
+    p_source: b.source ? String(b.source) : null, p_pay_mode: b.pay_mode ? String(b.pay_mode) : null, p_pay_ref: b.pay_ref ? String(b.pay_ref) : null, p_key_hash: keyHash, p_captcha_ok: captcha, p_proof_hash: proof });
   if (r.error) return J(500, { ok: false, error: "server" });
   if (r.data?.off) return J(503, { ok: false, error: "closed" });
   if (r.data?.queued) return J(202, { ok: true, queued: true, order_no: null, subtotal: null });   // saved in the failed list; the system retries it
