@@ -14,7 +14,7 @@ Updated: 2026-10-14. Read this first in any new session. Basis: AUDIT_REPORT_FUL
 10 phone-impossible setups (external accounts, approvals, secrets, deploy) listed separately; secrets never in code/repo/chat
 11 partial work or missing external connection is stated plainly; a design is never called "running"
 12 NO real person names in code, seeds, tests, docs: roles and ids only (artisan names only in the artisan register)
-13 UI labels: language follows the software language setting (বাংলা selected => Bangla, English selected => English, mix mode => Bng-Eng) via B.L(bn,en,mix); NEVER hard-code one language; every new screen/message/error must have all three; check English mode shows English
+13 LANGUAGE RULE (software-wide, common): English mode = 100% English words, NO Bangla characters; Bng/Eng (mix) = natural Bangla with common technical English words (stock, cost, bill, order, switch, report, batch...) mixed in; Bangla mode = Bangla; via B.L(bn,en,mix), never one language hard-coded; every new test asserts English-mode strings contain no Bangla characters. Details: UI labels: language follows the software language setting (বাংলা selected => Bangla, English selected => English, mix mode => Bng-Eng) via B.L(bn,en,mix); NEVER hard-code one language; every new screen/message/error must have all three; check English mode shows English
 
 ## Cost structure (code must follow)
 layer 1 raw material = average cost (+ separate "আজকের কেনা দাম"); layer 2 factory conversion cost (labour, gas/fuel, electricity, factory rent, licence & fees, machine repair, depreciation, other) goes INTO product cost; layer 3 showroom + admin cost NOT in product cost (branch P&L). Product cost = material cost + conversion rate x quantity.
