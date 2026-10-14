@@ -60,6 +60,25 @@ a4: F1 GL vs ledger->B5/D1; F2 GRN->E1; F3 bill void->E2; F4 form vs screen->E5;
 7 keep location_cost_cfg; ADD built-in 'which cost belongs to which showroom' + ability to CHANGE it (reason + audit + history)
 -> built as step C-2b (branch fix/phase-C2b, phase78) - agent running in worktree /home/user/wt-c2b
 
+## OWNER DELEGATED ALL REMAINING DECISIONS TO THE LEAD (14 Oct) - rule: build EVERYTHING in, keep every option switchable; at real use the app shows a RECOMMENDED choice with a Bangla reason ('কোনটা ভালো/যুক্তিসঙ্গত'), the owner may choose anything; once a system is switched on, data must flow the correct way automatically.
+Lead's chosen defaults / recommendations (UI shows them as 'প্রস্তাবিত'; never force; stored defaults stay OFF/today's behaviour until the owner taps 'প্রস্তাবিত প্রয়োগ'):
+- cost 0: treated as UNKNOWN unless the item is marked 'খরচ সত্যিই শূন্য' (new per-item flag) - recommended
+- production_requires_cost: default warn; RECOMMENDED refuse once ingredient costs are entered; add Bangla label for cost_missing
+- reports item_costs fallback: keep as fallback, always labelled 'অনুমান'; recommend entering ledger cost
+- partner profit-share base with fallback numbers: switch warn|refuse; default warn, recommend refuse for settlements
+- D bookings (recommended): count_adjust -> stock gain/loss account (stock_adjust); opening -> owner capital via opening entry; transfers -> location-tagged pair with inter-location clearing (switch to company-wide alternative); purchase-return variance -> purchase_variance
+- channels: all built; recommended to start: web form + phone + walk-in; Messenger/Instagram/WhatsApp stay off until connection exists (phone-impossible setup)
+- phone/address guard: recommend ON; contact-view grant to POS-enter roles of that branch + owner
+- drafts: built, recommend OFF at start
+- intake bot: DEDICATED minimal role that can call only intake functions (NOT POS enter) - redesign in follow-up
+- E9: recommend pack_warn ON, keep_order_price ON (price_override approver = manager role), sale-return flag ON
+- packaging on sale return: option B (packaging_return_mode none|restore|wastage), default none, recommend 'wastage' first
+- web form rate limit / captcha / silence hours: values live in settings; UI shows suggested ranges, owner taps to apply
+NEW STEPS:
+- S1 (phase79) decision follow-ups: per-item free-cost flag, cost_missing label, partner-base switch, packaging_return_mode, intake-bot role redesign
+- S2 (phase80) RECOMMENDATIONS + ACTIVATION GUIDE ('চালু করার গাইড'): function setup_recommendations() evaluates live DB state and returns recommended switches/settings with Bangla reason + status; one-tap apply with audit; readiness checks before switching a module on (e.g. accounting needs opening balances + mappings; stock tracking needs conversions + costs; production needs recipes approved); post-activation flow checks ('সব ঠিকঠাক বইছে?'); never blocks the owner
+- INT: integration branch merging B + C chain + C2b + H + E9, re-create production_post/recipe_cost once with ALL changes (phase72 + phase74 + phase73 approval gate), full regression
+
 ## Open owner decisions (collect from agent reports)
 - start stock tracking + accounting_on: before or after Part 1? (live DB empty; risk rises once enabled)
 - D1 transfers: location-tagged vs company-wide balance sheet
