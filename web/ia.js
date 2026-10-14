@@ -11,16 +11,16 @@ const GROUPS = [
   { id: 'dash', label: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard') },
   { id: 'item', label: L('আইটেম ও মাস্টার ডেটা', 'Items & Master Data', 'Item ও Master Data') },
   { id: 'stock', label: L('ইনভেন্টরি ও স্টক', 'Inventory & Stock', 'Inventory ও Stock') },
-  { id: 'purch', label: L('ক্রয় ও সরবরাহকারী', 'Purchasing & Suppliers', 'Purchase ও Supplier') },
+  { id: 'purch', label: L('ক্রয় ও সাপ্লায়ার', 'Purchasing & Suppliers', 'Purchase ও Supplier') },
   { id: 'factory', label: L('কারখানা ও উৎপাদন', 'Factory & Production', 'Factory ও Production') },
-  { id: 'sale', label: L('বিক্রি ও POS', 'Sales & POS', 'Sale ও POS') },
-  { id: 'cust', label: L('গ্রাহক, অর্ডার ও ইনভয়েস', 'Customers, Orders & Invoices', 'Customer, Order ও Invoice') },
+  { id: 'sale', label: L('সেল ও POS', 'Sales & POS', 'Sale ও POS') },
+  { id: 'cust', label: L('কাস্টমার, অর্ডার ও ইনভয়েস', 'Customers, Orders & Invoices', 'Customer, Order ও Invoice') },
   { id: 'acc', label: L('হিসাব ও অর্থ', 'Accounting & Finance', 'Accounting ও Finance') },
-  { id: 'appr', label: L('অনুমোদন ও ব্যতিক্রম', 'Approvals & Exceptions', 'Approval ও Exception') },
+  { id: 'appr', label: L('অ্যাপ্রুভাল ও এক্সেপশন', 'Approvals & Exceptions', 'Approval ও Exception') },
   { id: 'reports', label: L('রিপোর্ট ও বিশ্লেষণ', 'Reports & Analytics', 'Report ও Analytics') },
-  { id: 'people', label: L('স্টাফ, ভূমিকা ও অনুমতি', 'Staff, Roles & Permissions', 'Staff, Role ও Permission') },
+  { id: 'people', label: L('স্টাফ, রোল ও অনুমতি', 'Staff, Roles & Permissions', 'Staff, Role ও Permission') },
   { id: 'loc', label: L('লোকেশন', 'Locations', 'Location') },
-  { id: 'settings', label: L('প্রশাসন ও সেটিংস', 'Administration & Settings', 'Administration ও Settings') },
+  { id: 'settings', label: L('অ্যাডমিন ও সেটিংস', 'Administration & Settings', 'Admin ও Settings') },
 ];
 const GID = GROUPS.map((g) => g.id);
 // paper-form areas (forms table) -> category
@@ -167,6 +167,7 @@ const IA = [
   rec('whatsnew', 'dash', ['নতুন কী আছে', "What's new", "What's new"], { icon: 'doc', kw: ['new', 'whats new', 'update', 'feature', 'নতুন', 'নতুন কী', 'আপডেট', 'নতুন ফিচার'] }),
   rec('reportproblem', 'settings', ['সমস্যা জানান', 'Report a problem', 'Problem জানান'], { icon: 'doc', ok: any, kw: ['report a problem', 'problem', 'bug', 'error', 'something broke', 'feedback', 'সমস্যা', 'সমস্যা জানান', 'ভুল', 'ভেঙে গেছে'] }),
   rec('problems', 'settings', ['অ্যাপের সমস্যা', 'App problems', 'App এর problems'], { icon: 'check', ok: (c) => c.own || c.GF.view_client_errors === true, kw: ['app problems', 'error log', 'errors', 'crash', 'bug', 'reports', 'client errors', 'সমস্যা', 'ত্রুটি', 'ভুলের তালিকা'] }),
+  rec('dashx', 'reports', ['মালিকের ড্যাশবোর্ড', 'Owner dashboard', 'Owner dashboard'], { icon: 'biz', ok: (c) => c.own || c.GF.view_reports === true, kw: ['dashboard', 'chart', 'graph', 'tiles', 'kpi', 'gauge', 'donut', 'treemap', 'widget', 'drag', 'ড্যাশবোর্ড', 'চার্ট', 'গ্রাফ', 'মালিক'] }),
 ];
 // settings2 sub pages: searchable and listed on the Administration page, not in the drawer
 [['fiscal', ['অর্থবছর ও সপ্তাহ', 'Fiscal year & week', 'Fiscal year ও week'], ['fiscal', 'year', 'week', 'অর্থবছর', 'বছর']], ['vat', ['ভ্যাট', 'VAT', 'VAT'], ['vat', 'tax', 'ভ্যাট', 'কর']],
