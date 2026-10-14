@@ -167,6 +167,7 @@ const IA = [
   rec('whatsnew', 'dash', ['নতুন কী আছে', "What's new", "What's new"], { icon: 'doc', kw: ['new', 'whats new', 'update', 'feature', 'নতুন', 'নতুন কী', 'আপডেট', 'নতুন ফিচার'] }),
   rec('reportproblem', 'settings', ['সমস্যা জানান', 'Report a problem', 'Problem জানান'], { icon: 'doc', ok: any, kw: ['report a problem', 'problem', 'bug', 'error', 'something broke', 'feedback', 'সমস্যা', 'সমস্যা জানান', 'ভুল', 'ভেঙে গেছে'] }),
   rec('problems', 'settings', ['অ্যাপের সমস্যা', 'App problems', 'App এর problems'], { icon: 'check', ok: (c) => c.own || c.GF.view_client_errors === true, kw: ['app problems', 'error log', 'errors', 'crash', 'bug', 'reports', 'client errors', 'সমস্যা', 'ত্রুটি', 'ভুলের তালিকা'] }),
+  rec('dashx', 'reports', ['মালিকের ড্যাশবোর্ড', 'Owner dashboard', 'Owner dashboard'], { icon: 'biz', ok: (c) => c.own || c.GF.view_reports === true, kw: ['dashboard', 'chart', 'graph', 'tiles', 'kpi', 'gauge', 'donut', 'treemap', 'widget', 'drag', 'ড্যাশবোর্ড', 'চার্ট', 'গ্রাফ', 'মালিক'] }),
 ];
 // settings2 sub pages: searchable and listed on the Administration page, not in the drawer
 [['fiscal', ['অর্থবছর ও সপ্তাহ', 'Fiscal year & week', 'Fiscal year ও week'], ['fiscal', 'year', 'week', 'অর্থবছর', 'বছর']], ['vat', ['ভ্যাট', 'VAT', 'VAT'], ['vat', 'tax', 'ভ্যাট', 'কর']],
