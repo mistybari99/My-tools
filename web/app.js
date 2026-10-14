@@ -17,7 +17,8 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (k) => (T[k] && (T[k][S.lang] || T[k].bn)) || k;
 const nm = (o) => !o ? '' : (S.lang === 'en' ? (o.name_en || o.name_bn) : S.lang === 'mix' ? (o.name_mix || o.name_bn) : o.name_bn);
-const fmt = (n) => (n === null || n === undefined) ? '—' : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const NF_IN = (() => { try { return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }); } catch (e) { return null; } })();   // bos114: one formatter (toLocaleString built a new one on every call: 1369 POS cards = 200 ms on a phone)
+const fmt = (n) => (n === null || n === undefined) ? '—' : (NF_IN ? NF_IN.format(Number(n)) : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }));
 const AREAS = ['master', 'showroom', 'cash', 'stock', 'purchase', 'factory', 'sales', 'staff', 'assets', 'owner', 'settings'];
 const CAT = {
   sweet_kg: { bn: 'মিষ্টি (কেজি)', mix: 'মিষ্টি (KG)', en: 'Sweets (KG)' },
@@ -243,6 +244,7 @@ async function hasAnyGrant(codes) {
   return false;
 }
 function route() {
+  S.lzTok = (S.lzTok || 0) + 1;   // bos114: a screen script that arrives late for an older route must not draw
   if (!S.ctx) return viewAuth();
   S.csNeeds = false; if (CS()) CS().paint();   // bos112
   const st = S.ctx.profile.status;
@@ -263,7 +265,10 @@ function dispatch(page) {
   const extra = window.BOS_PAGES || {};
   if (page === 'exceptions' && !S.ctx.is_owner && !Object.values(S.ctx.perms).some((p) => p.approve)) return viewHome();
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
-  (local[page] || extra[page] || viewHome)();
+  const Z = window.BOS_LAZY;   // bos114: lazy.js - fetch the screen's script first when the build made it lazy; loading bar / "slow connection" notice for every screen that waits
+  const draw = () => { const r = (local[page] || extra[page] || viewHome)(); if (Z) Z.track(r, page); };
+  if (Z) { Z.first(); if (Z.need(page)) { const tok = (S.lzTok = (S.lzTok || 0) + 1); return Z.track(Z.load(page).then(() => { if (tok === S.lzTok && (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === page) dispatch(page); }, () => { if (tok === S.lzTok) Z.fail(page); }), page); } }
+  draw();
 }
 window.__navCount = 1; window.addEventListener('hashchange', () => { window.__navCount = (window.__navCount || 1) + 1; route(); });
 try { if (sb.auth.onAuthStateChange) sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT' && window.BOS_CS) window.BOS_CS.clear(); }); } catch (e) { /* bos112: stub or old client */ }

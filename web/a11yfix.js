@@ -244,6 +244,8 @@
   function scan(root) {
     if (root.nodeType !== 1) return;
     if (root.matches('#app > header.top')) hdr(root);
+    var any = root.firstElementChild && root.querySelector('#app > header.top,[data-act],label,' + CTRL + ',' + TOG);   // bos114: one query decides whether the ten below can find anything (POS cards, table rows ...)
+    if (!any) { if (root.matches('[data-act]')) row(root); if (root.matches('label')) label(root); if (root.matches(CTRL)) nameField(root); if (root.matches(TOG)) tog(root); if (root.matches('[data-act="nav_open"]')) syncExpanded(); return; }
     Array.prototype.forEach.call(root.querySelectorAll('#app > header.top'), hdr);
     if (root.matches('[data-act]')) row(root);
     Array.prototype.forEach.call(root.querySelectorAll('[data-act]'), row);
@@ -264,6 +266,7 @@
   }
   function queue(n) { pend.push(n); if (!raf) raf = requestAnimationFrame(flush); }
   var mo = new MutationObserver(function (list) {
+    if (list.every(function (m) { return m.type === 'childList' && m.target.closest && m.target.closest('#pos_items'); })) { list.forEach(function (m) { Array.prototype.forEach.call(m.addedNodes, function (n) { if (n.nodeType === 1) queue(n); }); }); return; }   // bos114: POS cards drawn in chunks: label them, skip the sheet/drawer checks
     var d = doc.getElementById('sheet');
     if (d && !d._a11y) { try { setupSheet(d); } catch (e) { /* ignore */ } } else if (d && d.firstElementChild && !d.firstElementChild.hasAttribute('aria-labelledby') && !d.firstElementChild.hasAttribute('aria-label')) { try { setupSheet(d); } catch (e) { /* ignore */ } }
     if (sheet && !sheet.isConnected) { sheet = null; sheetGone(); }

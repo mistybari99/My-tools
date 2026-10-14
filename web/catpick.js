@@ -279,7 +279,7 @@ document.addEventListener('change', (e) => {
   if (t.id) { $$('select[data-cat-for="' + t.id + '"]').forEach((s) => { s.setAttribute('data-cat-cur', ''); fillSub(s); }); if (t.id === 'p_cat') followEditor(true); }
 });
 let tmr = null;
-try { if (window.MutationObserver && document.body) new MutationObserver(() => { if (tmr) return; tmr = setTimeout(() => { tmr = null; scan(); }, 60); }).observe(document.body, { childList: true, subtree: true }); } catch (e) { /* no observer: the filters are simply not added */ }
+try { if (window.MutationObserver && document.body) new MutationObserver((recs) => { if (recs.every((r) => r.target.closest && r.target.closest('#pos_items'))) return; /* bos114: POS cards hold no category list */ if (tmr) return; tmr = setTimeout(() => { tmr = null; scan(); }, 60); }).observe(document.body, { childList: true, subtree: true }); } catch (e) { /* no observer: the filters are simply not added */ }
 
 // a ready-made Category + Sub-category filter row for any list: filterRow(id, sel, act). On change the screen's own handler H[act] gets an element-like { dataset: { cat, sub, w } }.
 const FR = {};
