@@ -49,7 +49,7 @@ const git = require('child_process').spawnSync('git', ['-C', path.join(ROOT, '..
 chk('purchase.js, app.js and nav.js are not edited by this step', git.status !== 0 || git.stdout.trim() === '');
 const ia = fs.readFileSync(path.join(ROOT, 'ia.js'), 'utf8'), idx = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 chk('ia.js has the landed rec, followed only by the three phase99 recs (optionsx, billpay, inboxpii) before the closing bracket', /rec\('landed', 'purch'[^\n]*\n  rec\('optionsx'[^\n]*\n  rec\('billpay'[^\n]*\n  rec\('inboxpii'[^\n]*\n\];\n\/\/ settings2 sub pages/.test(ia));
-chk('index.html loads landed.js, then only optionsx.js (the last script)', /<script src="landed\.js"><\/script><script src="optionsx\.js"><\/script>\s*\n?<\/body>/.test(idx));
+chk('index.html loads landed.js, then only optionsx.js (the last script)', /<script src="landed\.js"><\/script><script src="optionsx\.js"><\/script>(<script src="(landed_q4|badges107|setupundo)\.js"><\/script>)*\s*\n?<\/body>/.test(idx));   // bos107 q4: later steps append their scripts after optionsx.js
 chk('the module does not use inline onclick / eval', !/onclick=|eval\(|new Function/.test(src));
 console.log(`landed_test: ${pass} pass / ${failn} fail`);
 process.exit(failn ? 1 : 0);
