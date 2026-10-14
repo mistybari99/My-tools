@@ -308,8 +308,8 @@ function build(o) {
 }
 const clean = (p) => { const { _t, _total, _paid, ...r } = p; return r; };
 const NOFN = /record_sale2|Could not find the function|PGRST202|schema cache/i;
-async function send(p) {
-  let r = await sb.rpc('record_sale2', clean(p));
+async function send(p, replay) {
+  let r = await ((replay && B.posfail) ? B.posfail.sendOffline(clean(p)) : sb.rpc('record_sale2', clean(p)));   // bos83: a queue replay goes through record_sale_offline when posfail.js is loaded
   if (r.error && NOFN.test(r.error.message || '') && 'p_discount_kind' in p) { const { p_discount_kind, p_discount_input, ...old } = clean(p); r = await sb.rpc('record_sale2', old); }   // database without the new pair: same sale, old shape
   if (r.error && NOFN.test(r.error.message || '')) {
     // database not updated yet: only a full single-mode payment can still be recorded the old way
@@ -350,7 +350,7 @@ async function flush() {
   const done = new Set(), bad = [], tried = new Map();
   try {
     for (const p of q) {
-      const { error } = await send(p);
+      const { error } = await send(p, true);   // bos83: replay flag
       if (!error) { done.add(p.p_client); continue; }
       const m = (error && error.message) || '';
       if (BUSINESS.test(m)) { done.add(p.p_client); bad.push({ ...p, _err: T2(error) || m }); continue; }   // refused by the rules: kept visible, never lost
@@ -360,7 +360,7 @@ async function flush() {
     }
   } finally {
     setQueue(queue().filter((x) => !done.has(x.p_client)).map((x) => tried.get(x.p_client) || x));
-    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); }
+    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); if (B.posfail) B.posfail.report(bad); /* bos83 */ }
     flushing = false;
   }
   if (bad.length && location.hash.startsWith('#/pos')) drawPos();
@@ -384,7 +384,7 @@ async function drawToday() {
   $('#pos_body').innerHTML = `<div class="card"><div class="row between"><span>${esc(T('day'))}</span><b style="font-size:1.5rem">${money(tot)}</b></div>
     <div class="muted">${ok.length} ${esc(T('count'))}</div>
     <div class="row wrap" style="margin-top:6px">${['cash', 'mobile', 'card'].map((m) => `<span class="chip">${esc(lab(MODEL[m]))} ${money(by(m))}</span>`).join('')}<span class="chip warn">${esc(T('dueword'))} ${money(dueT)}</span>${coll ? `<span class="chip ok">${esc(T('collect'))} ${money(coll)}</span>` : ''}</div></div>
-    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button></div></div>`).join('')}
+    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button>${B.posfail ? B.posfail.buttons(x) : ''/* bos83 */}</div></div>`).join('')}
     ${pend.length ? `<div class="notice warn">${pend.length} ${esc(T('pending'))}: ${money(pend.reduce((a, p) => a + (p._total || 0), 0))}</div>` : ''}
     ${P.day.length ? P.day.map((s) => `<div class="card item" data-act="pos_open" data-v="${s.id}" style="${s.status === 'void' ? 'opacity:.55' : ''}"><div><div class="nm">#${s.receipt} · ${hhmm(s.sold_at)} ${s.quick ? '⚡' : ''}${s.sale_type === 'wholesale' ? ' ◆' : ''}</div>
         <div class="muted" style="font-size:.85rem">${esc(lab(MODEL[s.pay_mode]))} · ${esc(s.created_staff || '')}${s.customer ? ' · ' + esc(s.customer) : ''}</div></div>
@@ -477,7 +477,7 @@ Object.assign(A.H, {
   pos_open: (a) => saleSheet(a.dataset.v),
   pos_share: async () => { const txt = P.shareText || ''; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('✓'); } } catch (e) { /* cancelled */ } },
   pos_print: (a) => B.invoice.printSaleId(a.dataset.v, P.loc),
-  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); drawToday(); },
+  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); if (B.posfail) B.posfail.discarded(a.dataset.v); /* bos83 */ drawToday(); },
   pos_return: (a) => { closeSheet(); B.saleReturn.open(a.dataset.v); },
   pos_void: async (a) => { const n = ($('#void_note').value || '').trim(); if (!n) return toast(T('needNote'));
     const { error } = await sb.rpc('void_sale', { p_id: a.dataset.v, p_note: n }); if (error) return fail(error); closeSheet(); toast(T('voided')); drawToday(); },
