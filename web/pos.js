@@ -105,7 +105,9 @@ async function load() {
   // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
   let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
   if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
+  if (it.error && B.cs && isNet(it.error)) { const c = B.cs.itemsLoad(); if (c) it = { data: c, error: null }; }   // bos112: no internet: the item list saved by the last good load
   if (it.error) throw it.error;
+  if (B.cs && !it.error && it.data && it.data.length) B.cs.itemsSave(it.data);   // bos112
   try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = []; }
   P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
   const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;
