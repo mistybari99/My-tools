@@ -22,5 +22,34 @@ cost_attrib_in_pl = true                 # A3 G6
 manual_journal_guard = "on"              # A4 G09
 # card_settle_over_mode (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
 
-# --- new rules of the fix batches (phases 112-118): add here, e.g.
-# some_new_rule = true
+# --- phases 112-118 (integration): every new rule with the value that switches it ON (defaults stay OFF in the files) ---
+profit_truth_mode = "on"                 # 112 batch 1a
+cost_share_prorate_mode = "on"           # 112
+items_net_of_returns = "on"              # 112
+drawer_short_post = "on"                 # 113 batch 1b
+dues_net_advance = "on"                  # 113
+period_lock_owner_mode = "warn"          # 113
+period_lock_late_warn = "on"             # 113
+daybook_align_mode = "on"                # 113
+bank_stmt_post_on = "on"                 # 113
+late_sale_follows_block = true           # 114 batch 2
+transfer_needs_stock = true              # 114
+return_uses_sale_rows = true             # 114
+item_unit_change_needs_zero = true       # 114
+item_lifecycle_needs_zero = true         # 114
+batch_for_adjustments = true             # 114
+batch_refill_cap = true                  # 114
+transfer_late_receive = true             # 115
+transfer_return_marker = true            # 115
+transfer_notify_receiver = true          # 115
+transit_loss_gl_fix = true               # 115
+semi_finished_ingredient116 = true       # 116 batch 3
+packaging_on_actual_yield116 = true      # 116
+std_cost_true116 = true                  # 116
+std_snapshot_auto116 = true              # 116
+pool_drivers116 = true                   # 116
+conv_provisional116 = true               # 116
+cost_supply_to_avg116 = true             # 116
+pool_gl_post117 = true                   # 117
+factory_labour_absorbed117 = true        # 117
+# phase118 (batch 4, read-only reports): profit_variable_heads and branch_stmt_ageing_hours are text parameters, not switches - they stay at their defaults.
