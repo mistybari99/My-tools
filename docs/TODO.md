@@ -65,3 +65,8 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [x] G7 Variants: phase125 + phase126 + tests (139/0, 53/0, before/after identical, web mocked test) + 20k timings (local-var, not pushed).
 - [ ] G8 Lead: apply docs/regs/variants125.md (ia.js rec line, index.html script tag); merge PASTE_ORDER rows (...122, 123, 124, 125, 126).
 - [ ] G9 Variants next slice: price_for125 into POS / invoices / online, grid entry in purchase and POS, item lists on items_search, per-business item codes (relax plan in the regs file), bulk import of styles.
+- [x] H1 Dealer business: phase127 cheque / PDC, phase128 principal schemes, phase129 tinting + tests + 3 screens (local-dl, not pushed). See docs/HANDOVER_7.md.
+- [ ] H2 Lead: apply docs/regs/dealer127.md (ia.js lines + index.html script tags); add the three routes to the lazy list if the build uses it.
+- [ ] H3 Owner decisions: when to turn on dealer_cheque_on / dealer_scheme_on / dealer_tint_on (one business at a time, after paste); accountant: how scheme accruals and principal receipts are booked.
+- [ ] H4 Later: per-business customer / supplier master data (C2), dealer POS screens, scheme sale-return netting, cheque bounce charge billing to the customer.
+
