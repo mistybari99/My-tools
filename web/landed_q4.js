@@ -14,7 +14,7 @@ const X = {
   load: L('GRN-এর তালিকা দেখুন', 'Show GRNs', 'GRN list দেখুন'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
   none: L('কোনো GRN পাওয়া যায়নি', 'No GRNs found', 'কোনো GRN পাওয়া যায়নি'),
-  hint: L('GRN-এ দাম থাকে না; তার সাথে যুক্ত ক্রয় বিলটি যোগ হবে।', 'A GRN has no prices; the purchase bill linked to it is added.', 'GRN-এ price থাকে না; তার সাথে linked purchase bill যোগ হবে।'),
+  hint: L('GRN-এ প্রাইস থাকে না; তার সাথে যুক্ত ক্রয় বিলটি যোগ হবে।', 'A GRN has no prices; the purchase bill linked to it is added.', 'GRN-এ price থাকে না; তার সাথে linked purchase bill যোগ হবে।'),
   add: L('টিক দেওয়া GRN-এর বিল যোগ', 'Add the bills of the ticked GRNs', 'Ticked GRN-এর bill যোগ'),
   tickFirst: L('আগে একটি GRN টিক দিন', 'Tick a GRN first', 'আগে একটি GRN টিক দিন'),
   added: L('বিল যোগ হয়েছে', 'Bill added', 'Bill যোগ হয়েছে'),

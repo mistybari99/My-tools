@@ -11,16 +11,16 @@ const GROUPS = [
   { id: 'dash', label: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard') },
   { id: 'item', label: L('আইটেম ও মাস্টার ডেটা', 'Items & Master Data', 'Item ও Master Data') },
   { id: 'stock', label: L('ইনভেন্টরি ও স্টক', 'Inventory & Stock', 'Inventory ও Stock') },
-  { id: 'purch', label: L('ক্রয় ও সরবরাহকারী', 'Purchasing & Suppliers', 'Purchase ও Supplier') },
+  { id: 'purch', label: L('ক্রয় ও সাপ্লায়ার', 'Purchasing & Suppliers', 'Purchase ও Supplier') },
   { id: 'factory', label: L('কারখানা ও উৎপাদন', 'Factory & Production', 'Factory ও Production') },
-  { id: 'sale', label: L('বিক্রি ও POS', 'Sales & POS', 'Sale ও POS') },
-  { id: 'cust', label: L('গ্রাহক, অর্ডার ও ইনভয়েস', 'Customers, Orders & Invoices', 'Customer, Order ও Invoice') },
+  { id: 'sale', label: L('সেল ও POS', 'Sales & POS', 'Sale ও POS') },
+  { id: 'cust', label: L('কাস্টমার, অর্ডার ও ইনভয়েস', 'Customers, Orders & Invoices', 'Customer, Order ও Invoice') },
   { id: 'acc', label: L('হিসাব ও অর্থ', 'Accounting & Finance', 'Accounting ও Finance') },
-  { id: 'appr', label: L('অনুমোদন ও ব্যতিক্রম', 'Approvals & Exceptions', 'Approval ও Exception') },
+  { id: 'appr', label: L('অ্যাপ্রুভাল ও এক্সেপশন', 'Approvals & Exceptions', 'Approval ও Exception') },
   { id: 'reports', label: L('রিপোর্ট ও বিশ্লেষণ', 'Reports & Analytics', 'Report ও Analytics') },
-  { id: 'people', label: L('স্টাফ, ভূমিকা ও অনুমতি', 'Staff, Roles & Permissions', 'Staff, Role ও Permission') },
+  { id: 'people', label: L('স্টাফ, রোল ও অনুমতি', 'Staff, Roles & Permissions', 'Staff, Role ও Permission') },
   { id: 'loc', label: L('লোকেশন', 'Locations', 'Location') },
-  { id: 'settings', label: L('প্রশাসন ও সেটিংস', 'Administration & Settings', 'Administration ও Settings') },
+  { id: 'settings', label: L('অ্যাডমিন ও সেটিংস', 'Administration & Settings', 'Admin ও Settings') },
 ];
 const GID = GROUPS.map((g) => g.id);
 // paper-form areas (forms table) -> category

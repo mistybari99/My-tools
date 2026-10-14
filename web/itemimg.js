@@ -20,15 +20,15 @@ const L = B.L, lab = B.lab;
 const $ = (s, el) => (el || document).querySelector(s);
 
 const X = {
-  title: L('আইটেমের ছবি', 'Item photos', 'Item এর photo'),
+  title: L('আইটেমের ছবি', 'Item photos', 'Item-এর photo'),
   intro: L('আইটেম কার্ড ও তালিকায় ছবি দেখানো হবে কি না আপনি ঠিক করুন। বন্ধ থাকলে সব আগের মতোই চলে। ছবি না থাকলে নামের প্রথম অক্ষর দেখায়। ছবি না এলেও বিক্রি কখনো আটকায় না।',
     'Choose whether item cards and lists show photos. While Off, everything works as before. An item without a photo shows the first letter of its name. If a photo does not load, selling is never blocked.',
     'Item card ও list এ photo দেখানো হবে কি না আপনি ঠিক করুন। Off থাকলে সব আগের মতোই চলে। Photo না থাকলে নামের প্রথম অক্ষর দেখায়। Photo না এলেও sale কখনো আটকায় না।'),
   mode: L('কোথায় ছবি দেখাবে', 'Where to show photos', 'কোথায় photo দেখাবে'),
   m_off: L('বন্ধ', 'Off', 'Off'), m_pos_only: L('শুধু POS', 'POS only', 'শুধু POS'), m_everywhere: L('সব জায়গায়', 'Everywhere', 'সব জায়গায়'),
-  d_off: L('আগের মতো: ছবি শুধু আইটেমের ফর্মে।', 'As before: photos only in the item form.', 'আগের মতো: photo শুধু item form এ।'),
-  d_pos_only: L('শুধু POS-এর আইটেম কার্ডে ছবি।', 'Photos on the POS item cards only.', 'শুধু POS এর item card এ photo।'),
-  d_everywhere: L('POS, আইটেম তালিকা, stock বাছাই, purchase, recipe, scan ও online order-এ ছবি।', 'Photos on POS, item list, stock pickers, purchase, recipe, scan and online order.', 'POS, item list, stock বাছাই, purchase, recipe, scan ও online order এ photo।'),
+  d_off: L('আগের মতো: ছবি শুধু আইটেমের ফর্মে।', 'As before: photos only in the item form.', 'আগের মতো: photo শুধু item form-এ।'),
+  d_pos_only: L('শুধু POS-এর আইটেম কার্ডে ছবি।', 'Photos on the POS item cards only.', 'শুধু POS-এর item card-এ photo।'),
+  d_everywhere: L('POS, আইটেম তালিকা, স্টক বাছাই, purchase, recipe, স্ক্যান ও online order-এ ছবি।', 'Photos on POS, item list, stock pickers, purchase, recipe, scan and online order.', 'POS, item list, stock বাছাই, purchase, recipe, scan ও online order-এ photo।'),
   rec: L('প্রস্তাবিত', 'Recommended', 'Recommended'),
   recWhy: L('ছবি মোবাইল ডেটা খরচ করে। POS-এ কার্ডের সংখ্যা সীমিত আর ব্যস্ত সময়ে ঠিক আইটেম চেনা সহজ হয়; লম্বা তালিকায় অনেক ছবি লোড হয়। তাই শুরুতে শুধু POS। নেট ভালো হলে পরে সব জায়গায় দিতে পারেন।',
     'Photos use mobile data. On the POS the number of cards is limited and a photo helps to pick the right item in busy hours, while long lists load many pictures. So start with POS only; switch to Everywhere later if your data is good.',
@@ -42,15 +42,15 @@ const X = {
   hoursH: L('আপনি লিখবেন; ফাঁকা = শুধু এই সেশন। ঘণ্টা দিলে ধীর বা অফলাইন নেটেও আগে দেখা ছবি আসে, কিন্তু বদলানো ছবি দেরিতে দেখা যায়।',
     'You type it; blank = this session only. With hours set, pictures already seen also show on slow or offline data, but a changed photo shows later.',
     'আপনি লিখবেন; ফাঁকা = শুধু এই session। Hours দিলে slow বা offline net এও আগে দেখা photo আসে, কিন্তু বদলানো photo দেরিতে দেখা যায়।'),
-  save: L('রাখুন', 'Save', 'Save'), clear: L('ফাঁকা করুন', 'Clear', 'Clear'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  save: L('রাখুন', 'Save', 'Save'), clear: L('ফাঁকা করুন', 'Clear', 'Clear'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
   clearCache: L('ছবির cache মুছুন', 'Clear image cache', 'Image cache মুছুন'), cleared: L('ছবির cache মোছা হয়েছে', 'Image cache cleared', 'Image cache মোছা হয়েছে'),
-  usage: L('এই সেশনে লোড হওয়া ছবি', 'Pictures loaded this session', 'এই session এ load হওয়া photo'),
+  usage: L('এই সেশনে লোড হওয়া ছবি', 'Pictures loaded this session', 'এই session-এ load হওয়া photo'),
   usageH: L('ডেটা কতটা লাগে তা আপনার নেট ও ছবির সংখ্যার উপর নির্ভর করে, তাই আনুমানিক MB দেখানো হয় না।',
     'Data used depends on your network and the number of pictures, so no estimated MB is shown.', 'Data কতটা লাগে তা আপনার net ও photo র সংখ্যার উপর নির্ভর করে, তাই আনুমানিক MB দেখানো হয় না।'),
   cur: L('এখন', 'Current', 'Current'),
   ownerOnly: L('এটি করতে মালিক লাগবে।', 'Only the owner can do this.', 'এটা করতে owner লাগবে।'),
   bad: L('১ থেকে ৭২০ এর মধ্যে সংখ্যা লিখুন।', 'Type a number from 1 to 720.', '১ থেকে ৭২০ এর মধ্যে number লিখুন।'),
-  err: L('সংরক্ষণ হয়নি', 'Could not save', 'Save হয়নি'),
+  err: L('সেভ হয়নি', 'Could not save', 'Save হয়নি'),
 };
 const T = (k) => (X[k] ? lab(X[k]) : k);
 
