@@ -106,3 +106,6 @@ phase103c 0 68
 # post-Step-Perf suites (build = docs/PASTE_ORDER.md up to phase108 + phase110 LAST), measured in step Perf:
 phase110 0 45
 # NOTE phase89e 2 63 and phase103 1 67: with phase110 on top, 'phase89 then phase103 = identical bodies' (phase89e P2, P2a) and 'phase103 pasted twice = no body changes' (phase103 T9) are false by design (phase110 re-creates _cogs_lines72, inbox_list and _acct_stock_moves85; a re-paste of 89 / 103 puts the older text back, results identical, only slow). phase89f_test / phase103b_test are their replacements (they paste phase110 again after phase103). Never edit the old files.
+# C4 (perf of phase112..118): phase120 on a build up to phase118 + phase120 (phase118 is on its own branch; this line is for the merged chain):
+phase120 0 38
+# NOTE phase118_test V10 ('paste twice: no function body changes') is false by design once phase120 is on top (re-pasting 118 puts the older bodies of 3 functions back; 156 pass / 1 fail): run phase118_test on a build WITHOUT phase120, or paste phase120 after it.
