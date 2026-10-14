@@ -402,3 +402,4 @@ Not confirmed / limits: no real Supabase or phone; Now strip rows are ordered by
 * One-paste SQL for the owner (database already at phase 22): supabase/ALL_NEW9.sql = phases 23-28, tested: DB built to phase22, file applied twice, test files 23-28 all pass.
 - P1 (phase48-51): path switches + shadow-copy engine, payroll/expense/stock/production/owner-money rules, day book vs journal and duplicate reports; web/paths.js (#/paths, #/quickexp); tools/kit_match.py. See docs/HANDOVER_5.md.
 * Stage B2 (local-b2): web/org122.js #/organization (registered in ia.js: rec 'organization', group settings) + web/bizctx.js business context/switcher; brand and location lists DB-driven with fallbacks. See HANDOVER_7.
+- 2026-10-14 integration: registered impexp, variants, cheques, schemes, tinting (docs/regs) in web/ia.js and script tags in web/index.html after org122.js.
