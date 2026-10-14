@@ -327,7 +327,7 @@ async function submitSale(p, change) {
   try {
     const { data, error } = await send(p);
     if (error) {
-      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); return afterSale(); }
+      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); if (B.invoiceview) B.invoiceview.afterSale({ p, pending: true }); /* bos92 */ return afterSale(); }
       if (btn) btn.disabled = false;
       const m = T2(error);
       if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: g === 'discount_over_limit' ? { amount: p.p_discount, total: p._total } : g === 'credit_over_limit' ? { amount: Math.max(0, Math.round((p._total - p._paid) * 100) / 100), total: p._total } : { total: p._total }, message: m }); return toast(m); }
@@ -337,6 +337,7 @@ async function submitSale(p, change) {
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
+    if (B.invoiceview) B.invoiceview.afterSale({ p, data, change });   // bos92: invoice on screen (rule pos_show_invoice_after_sale; never = nothing happens)
     afterSale();
   } finally { P.busy = false; }
 }
@@ -411,6 +412,7 @@ async function saleSheet(id) {
       ${Number(s.due_amount) > 0 && s.status === 'done' ? `<div class="notice warn">${esc(T('dueword'))}: <b>${money(s.due_amount)}</b></div>` : ''}
       <div class="muted">${esc(T('by'))}: ${esc(s.created_staff || '')}${cu.data ? ' · ' + esc(cu.data.name) + ' ' + esc(cu.data.mobile) : s.customer ? ' · ' + esc(s.customer) : ''}${s.note ? ' · ' + esc(s.note) : ''}</div>
       ${s.status === 'void' ? `<div class="notice bad">${esc(T('voided'))}: ${esc(s.void_note || '')} (${esc(s.void_staff || '')})</div>` : ''}
+      ${B.invoiceview ? `<button class="full" data-act="iv92_open" data-v="${s.id}">${esc(B.invoiceview.T('openHist'))}</button>` : ''}   <!-- bos92 -->
       <button class="full" data-act="pos_share">${esc(T('share'))}</button>
       ${B.invoice && B.invoice.printSaleId ? `<button class="full" data-act="pos_print" data-v="${s.id}">${esc(T('print'))}</button>` : ''}
       ${B.saleReturn && s.status === 'done' ? `<button class="full" data-act="pos_return" data-v="${s.id}">${esc(lab(L('মাল ফেরত নিন', 'Return goods', 'মাল return নিন')))}</button>` : ''}
