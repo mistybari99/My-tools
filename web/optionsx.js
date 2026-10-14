@@ -175,14 +175,14 @@ function payTab() {
     + ruleCard('cost_bill_creates_payment', 'r_cost') + ruleCard('purchase_bill_creates_payment', 'r_purchase') + ruleCard('bill_void_payment_mode', 'r_void')
     + `<div class="card stack" data-opx="credit"><label class="row"><input type="checkbox" id="opx_cr" ${s.bill_pay_auto_credit_ok ? 'checked' : ''} data-act="opx_credit"> <b>${esc(T('creditOk'))}</b></label><div class="muted" style="font-size:.85rem">${esc(T('creditOkH'))}</div></div>`
     + numBox('bill_pay_large_amount', 'nLarge', 'nHint') + numBox('bill_pay_small_cash_max', 'nSmall', 'nHint') + defsCard()
-    + `<div class="card stack" data-opx="unpaid"><b>${esc(T('unpaid'))}: ${esc((s.unpaid_cost || 0) + (s.unpaid_purchase || 0))} ${esc(T('unpaidN'))}</b><a class="btn" href="#/billpay">${esc(T('openList'))}</a></div>`;
+    + `<div class="card stack" data-opx="unpaid"><b>${esc(T('unpaid'))}: ${esc((s.unpaid_cost || 0) + (s.unpaid_purchase || 0))} ${esc(T('unpaidN'))}</b><a class="btn opx-lnk" href="#/billpay">${esc(T('openList'))}</a></div>`;
 }
 function piiTab() {
   const s = D.st || {};
   return `<p class="muted">${esc(T('intro'))}</p><h3>${esc(T('d2'))}</h3>` + ruleCard('inbox_pii_mode', 'd2')
     + `<div class="notice" data-opx="piinote">${esc(T('piiNote'))}</div><div class="notice" data-opx="piiguard">${esc(T('piiGuard'))}</div>`
     + numBox('inbox_unmask_daily_max', 'nMax', 'nMaxH')
-    + `<div class="card stack"><span class="chip">${esc(T('revToday'))}: ${esc(s.reveals_today || 0)}</span><span class="chip">${esc(T('blkToday'))}: ${esc(s.blocked_today || 0)}</span><a class="btn" href="#/inboxpii">${esc(T('openPii'))}</a></div>`;
+    + `<div class="card stack"><span class="chip">${esc(T('revToday'))}: ${esc(s.reveals_today || 0)}</span><span class="chip">${esc(T('blkToday'))}: ${esc(s.blocked_today || 0)}</span><a class="btn opx-lnk" href="#/inboxpii">${esc(T('openPii'))}</a></div>`;
 }
 function logTab() {
   const rows = (D.log || []).map((r) => `<div class="card stack" data-opx="logrow"><div class="row between"><b>${esc(r.staff || String(r.user_id || '').slice(0, 8))}</b><span class="chip ${r.outcome === 'blocked' ? 'warn' : ''}">${esc(T('o_' + r.outcome))}</span></div>

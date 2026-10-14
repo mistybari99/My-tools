@@ -21,7 +21,7 @@ const HEADS = ['staff_meal', 'transport', 'hospitality', 'repair', 'labour', 'so
 const X = {
   title: L('ছবি থেকে এন্ট্রি (Scan)', 'Scan a bill or list', 'ছবি থেকে Entry (Scan)'),
   intro: L('বিল বা তালিকার ছবি তুলুন। আপনি দেখে ঠিক করে Confirm না করা পর্যন্ত কিছুই ঢোকে না।', 'Take a photo of a bill or list. Nothing is entered until you check it and press Confirm.', 'Bill বা list-এর ছবি তুলুন। আপনি দেখে ঠিক করে Confirm না করা পর্যন্ত কিছুই ঢোকে না।'),
-  off: L('Scan এখন বন্ধ। মালিক Switchboard থেকে "scan_enabled" চালু করলে ব্যবহার করা যাবে।', 'Scan is switched off. The owner can turn on "scan_enabled" in the Switchboard.', 'Scan এখন বন্ধ। Owner Switchboard থেকে "scan_enabled" চালু করলে ব্যবহার করা যাবে।'),
+  off: L('Scan এখন বন্ধ। মালিক Switchboard থেকে Scan সুইচ চালু করলে ব্যবহার করা যাবে।', 'Scan is switched off. The owner can turn on the Scan switch in the Switchboard.', 'Scan এখন বন্ধ। Owner Switchboard থেকে Scan switch চালু করলে ব্যবহার করা যাবে।'),
   newScan: L('নতুন ছবি', 'New photo', 'নতুন photo'), kind: L('কীসের ছবি', 'What is it', 'কীসের photo'), place: L('জায়গা', 'Place', 'Place'),
   k_purchase_bill: L('ক্রয় বিল', 'Purchase bill', 'Purchase bill'), k_product_list: L('পণ্যের তালিকা', 'Product list', 'Product list'), k_expense: L('খরচের রসিদ', 'Expense slip', 'Expense slip'), k_other: L('অন্য কাগজ / রিপোর্ট', 'Other paper / report', 'অন্য paper / report'),
   take: L('ক্যামেরায় ছবি তুলুন', 'Take a photo', 'Camera-য় photo তুলুন'), gallery: L('গ্যালারি থেকে নিন', 'Choose from gallery', 'Gallery থেকে নিন'),
