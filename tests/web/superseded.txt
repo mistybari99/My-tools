@@ -8,4 +8,3 @@ landed_test       order_test + landed_pw_test
 landed_b_test     order_test + landed_pw_test
 landed_c_test     order_test + landed_pw_test
 optionsx_test     order_test
-optionsx_b_test   order_test
