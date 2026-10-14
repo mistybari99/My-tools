@@ -110,3 +110,18 @@ Tests: phase99_test, phase105_test, `tests/sql/p105_conc.sh <db built through 10
 ## L. Step INT4 - what the per-phase diff showed
 
 Fresh build to phase103 (owner order), then 104, 105, 106, 107, 108, 109 with `md5(pg_get_functiondef)` + bosNN tags of all public functions stored after each phase (`tests/sql/tag_loss_check.sh`). Result: phase104, 106 (only `_backup_tables`), 107, 108 touch no function of another phase; phase105 and phase109 both re-create `_bp_pay99` - phase109 as shipped RAISED on it (body guard) and, without the guard, would have erased the bos105 L4 line. After INT4: no bosNN tag lost between the 103 baseline and the final build. Details: docs/briefs_p2p3/step_INT4_REPORT.md.
+## J. phase104 .. phase110 (after phase103; each is independent unless said otherwise)
+
+Numeric order for the Run pages. The first column is a name, not a number, on purpose: `tests/sql/run_all_sql.sh` reads only rows whose first column is a plain number (section B) and appends every `supabase/phase1NN.sql` that exists, in numeric order.
+
+| file | status | what | needs |
+|------|--------|------|-------|
+| phase104 | on branch, not installed | owner dashboard layouts (`dash_layouts`), see docs/briefs_p2p3/step_Dash_REPORT.md | 72..103 |
+| phase105 | RESERVED / PENDING (branch fix/phase-Sec2, not merged) | security fixes #2 (re-creates `_bp_*99`, `inbox_unmask`, customer PII functions); not yet a file in this branch | 72..103 |
+| phase106 | on branch, not installed | backup coverage (section I) | 72..103 |
+| phase107 | on branch, not installed | quiet error log | 72..103 |
+| phase108 | on branch, not installed | Bangla wording of the seed rows of 72..103 | 72..103 |
+| phase109 | RESERVED / PENDING (branch fix/phase-Conc, not merged) | concurrency fixes (purchase / supplier payment / production paths); not yet a file in this branch | 72..103 |
+| **phase110** | on branch, not installed | **performance**: 8 indexes FIRST, then six function patches (`_cogs_lines72`, `_item_cost_eff88`, `_rcs88`, `rpt_agg_sql`, `inbox_list`, `_acct_stock_moves85`); results identical to before. Report: docs/briefs_p2p3/step_Perf_REPORT.md | 72..103 |
+
+phase110 goes after phase109 (or after phase108 while 105 / 109 are not merged). It touches no function of phase104..109 (checked against the phase105 and phase109 drafts: neither re-creates one of its six functions). **Run it at a quiet time**: every index build blocks writes to its table for a moment (about 1-2 s per million stock_ledger rows, 2.5 s per million audit_log rows). The file stops, before the patches, if one of the six functions carries a `bosNN` tag it does not know; a later phase that re-creates one of the six must merge into the phase110 text (rule G applies, with phase110 as the owner of these six). **Re-paste rule**: a re-paste of phase88 / phase89 / phase103 puts the older text of `_rcs88`, `_cogs_lines72`, `inbox_list`, `_acct_stock_moves85` back (results identical, only slow): paste phase110 again after it. `inbox_list` and `_acct_stock_moves85` carry the marker `perf110`, not a bosNN tag, so phase103's body guard still accepts them. Old assertions that are false by design with phase110 in the chain (phase89e P2 / P2a, phase103 T9) are copied to `phase89f_test.sql` / `phase103b_test.sql` (baseline_fails.txt). Test: `supabase/phase110_test.sql`; equality / budget: `tests/sql/perf/README.md`.
