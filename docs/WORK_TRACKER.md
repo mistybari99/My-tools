@@ -1,0 +1,65 @@
+# WORK TRACKER - audit fixes, costing, recipes, online orders (single source of memory)
+Updated: 2026-10-14. Read this first in any new session. Basis: AUDIT_REPORT_FULL.md findings (a1..a4). Owner: phone only, Bangla, short honest replies, never give him scripts/terminal/computer work; he pastes SQL via the copy-button pages and sends screenshots.
+
+## Owner rules (apply to every step)
+1 one step = one branch (fix/phase-X); after a step STOP and report; no merge / deploy / next step without the owner's "merge" or "next step"
+2 only NEW migrations (phase72+); old phase files untouched; all changes additive, paste-twice safe
+3 nothing runs on the live Supabase except step A (SELECT only); tests on scratch DBs
+4 new rules default = today's behaviour (warn/off); no limit, rate or amount in code (location settings only)
+5 never invent numbers/rates/recipes/data; every cost field starts BLANK, blank is flagged "অসম্পূর্ণ/অনুমান"
+6 keep cost-secrecy (view_cost), RLS, grants, client_id idempotency, immutable ledger, audit log; every new write path has client_id + audit
+7 each step: SQL tests on a fresh DB (phase50_test style) + re-run older suites, show pass/fail numbers; no "pollution" excuses
+8 report = 3 separate parts: যাচাই হয়েছে (run) / পড়ে বোঝা (code read) / যাচাই হয়নি, with file refs
+9 match printed forms (05-3, 05-4, 10-2, web/forms_factory.js:169-215): one place holds detail, the other only a number; mismatches go to the report, never auto-changed
+10 phone-impossible setups (external accounts, approvals, secrets, deploy) listed separately; secrets never in code/repo/chat
+11 partial work or missing external connection is stated plainly; a design is never called "running"
+12 NO real person names in code, seeds, tests, docs: roles and ids only (artisan names only in the artisan register)
+13 UI labels Bangla, phone-width
+
+## Cost structure (code must follow)
+layer 1 raw material = average cost (+ separate "আজকের কেনা দাম"); layer 2 factory conversion cost (labour, gas/fuel, electricity, factory rent, licence & fees, machine repair, depreciation, other) goes INTO product cost; layer 3 showroom + admin cost NOT in product cost (branch P&L). Product cost = material cost + conversion rate x quantity.
+
+## Live state (owner pasted): phases 48-71 in Supabase (check box: all 8 parts OK). Live DB is nearly empty: 0 tracked items, 0 recipes, 0 online orders, accounting_on=false (start date 2026-10-14), 2 sales not in journal; report COGS (item_costs) 1072.21 vs journal 0 for Oct. Public page https://mistybari99.github.io/islamia-bos-app/ (setup-sql.html phases 48-71, audit-a.html).
+
+## Plan in 3 parts
+### Part 1 - correct accounts & safety
+| step | scope | status | branch / migration |
+|---|---|---|---|
+| A | live read-only SELECT checks | DONE (results reported) | fix/phase-A, supabase/audit_phaseA_readonly.sql |
+| B | B1 rounding + autopost errors visible; B2 one COGS source (ledger; item_costs fallback flagged) in biz_daily/_p27_pl/l2_margin/brand_pnl/partner profit/phase50:543; B3 return margin with discount share; B4 unknown-cost "সাময়িক" + production_requires_cost (warn|refuse); B5 inventory_vs_gl read-only + reconcile tab; B6 posting status strip | RUNNING (agent) | fix/phase-B, phase72 |
+| D | D1 missing stock moves to GL (count_adjust, stock_opening, issue_out, transit_loss, purchase-return variance; keys stock_adjust, purchase_variance; transfers: PROPOSE location-tagged pairs vs company-wide BS, owner decides); D2 inventory opening helper + warning; D3 uncosted wastage/production waiting; D4 manual-journal guard (reason code, party mandatory on payable/receivable); D5 autopost scheduler + >1 day pending alert, locked docs list; D6 card settlement to bank, expense voucher payment mode | TODO | fix/phase-D |
+| E | E1 GRN vs purchase exclusivity; E2 block void of posted bill after use (refund/credit not auto-void payment); E3 unit-conversion required at sale; E4 negative-stock (sell_below_zero use logged, production negatives, never-opened list); E5 form vs screen (05-1 consumes ingredients or refuses; NULL-cost flag; pending shadow links; unmatched-form list); E6 expense double-count (dup_suspects expense branch); E7 transit shortage; E8 offline POS failed cards (manager override resend, JSON export, board); E9 online order gaps -> done in Part 3 | TODO | fix/phase-E |
+| F | audit trail: log_change + no-delete on stock_balance/stock_batches/purchase_lines/stock_transfers/stock_wastage; production_runs void audit; stock_reconcile(true) audit rows; service_role path = "যাচাই হয়নি" | TODO | fix/phase-F |
+### Part 2 - costing & recipes (agent running in worktree)
+| step | scope | status | branch / migration |
+|---|---|---|---|
+| C-0 | artisans register (roles + owner-typed names only there), recipe artisan pick (+ "অন্য"), recipe_versions + approval (changer != approver), recipe_steps (ordered, minutes x people = SUGGESTED labour hours only), artisan recipe book (no cost by default), grant recipe_view | RUNNING (agent) | fix/phase-C0, phase73 |
+| C | recipe_cost_components, factory_cost_pools + normal_monthly_output (pool rate), production_post adds conversion cost, production_runs cost columns (cost-right only), recipe_cost = same _recipe_need (packaging separate rows), today's purchase price row, GL overhead_absorbed + true-up "অনাবশোষিত ওভারহেড", p_actual_yield + variance, manual production path reason; C9 (recost, landed cost) = owner decision only | RUNNING (agent) | fix/phase-C, phase74 |
+| C-2ক | cost_sources + cost_source_bills (separate/shared bills), allocation rules (meter/percent/area/headcount/output/one site/other), destinations factory/showroom/admin, sum=100 else refuse, "অভাগিত" row, effective-date rule changes (no history rewrite), factory share -> pools, "বিল বাকি", no averaging guesses, 10-2 duplicate flag, entry person != rule approver | RUNNING (agent) | fix/phase-C2a, phase75 |
+### Part 3 - online orders & messages (agent running in worktree)
+| step | scope | status | branch / migration |
+|---|---|---|---|
+| H | sales_channels, inbound_messages (inbox), web/landing form endpoint (server-side price, idempotent), Facebook/Instagram/WhatsApp webhook receiver + signature check (verify Meta docs; unverified stays "যাচাই হয়নি"), staff confirms orders, optional auto-draft default OFF, duplicate flag, phone/address visibility + audit, failed-webhook retry, "শেষ বার্তা কখন" alert | RUNNING (agent) | fix/phase-H, phase76 |
+| E9 | pack-time stock warn, keep order price option, void-sale flag on order, packaging-return PROPOSAL | RUNNING (agent) | fix/phase-E9, phase77 |
+### Final
+| G | regression tests of the audit scenarios (a1-F1 hand calc 661/10=66.10, a3 main scenario, a4 mixed scenario), negative-stock sweep function, whole suite before/after numbers | TODO | fix/phase-G |
+
+## Finding -> step map (nothing may be dropped)
+a1: F1 method note->C; F2 no overhead->C/C-2ক; F3 NULL cost never back-filled->B4/C9; F4 actual yield->C7; F5 recipe_cost packaging->C4; F6 two cost sources->B2; F7 manual production->C8; F9 landed cost->C9 (decision); F10 negative->E4; F11 cost columns->C3.
+a2: F1 unit conversion->E3; F2 negative policy->E4; F3 offline failed->E8; F4 return margin->B3; F5 COGS source->B2; F6 online order->E9; F7 packaging return->E9 proposal.
+a3: F1 two profit numbers->B2; F2 costed_rev gross returns->B3; F3 unknown cost->B4; F4 uncosted waiting->D3; F5 rounding->B1; F6 inventory GL->B5 (report) + D1 (posting); F7 opening->D2; F8 autopost delay->B6 + D5; F9 locked docs->D5; F10 manual journal->D4; F12 overhead->C; F13 card settlement/expense mode->D6.
+a4: F1 GL vs ledger->B5/D1; F2 GRN->E1; F3 bill void->E2; F4 form vs screen->E5; F5 expense double->E6; F6 transit shortage->E7; F7 manual journal payable->D4; F8 autopost->D5; F9 audit triggers->F; F10 shadow pairing->E5.
+
+## Open owner decisions (collect from agent reports)
+- start stock tracking + accounting_on: before or after Part 1? (live DB empty; risk rises once enabled)
+- D1 transfers: location-tagged vs company-wide balance sheet
+- negative stock block mode where; C9 recost + landed cost; packaging return on sale return; Meta app/business verification path
+
+## Phone-impossible setups (never given to the owner as his task)
+Meta app + business verification + webhook subscription; edge-function deployment and secret-store entries; scheduler (pg_cron / edge schedule) activation; any server access.
+
+## Process memory
+- agents write only inside their own worktree/branch; lead merges; live deploy only on explicit "merge"/"deploy" from the owner
+- public repo islamia-bos-app publishes web files + setup pages; pushing it = production deploy
+- 2FA TOTP + restore drill (#17/#18) built, phases 70/71 pasted; real Supabase drill/enrol UNVERIFIED
+- #16 PIN hardening postponed by owner
