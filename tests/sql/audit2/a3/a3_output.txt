@@ -1,0 +1,151 @@
+14: NOTICE:  table "ea" does not exist, skipping
+== mode = def
+== A3 setup
+77: NOTICE:  PASS P0 factory unit cost of A = (300+100)/10 exp=40 act=40.000000
+82: NOTICE:  PASS P0 S1 stock of A 10 @ 40 exp=40 act=40.000000
+83: NOTICE:  PASS P0 S2 stock of A 10 @ 40 exp=40 act=40.000000
+== A3 sales / return / wastage / fee / expenses
+89: NOTICE:  PASS X1 sale1 total (500-50) exp=450 act=450.00
+96: NOTICE:  PASS X1 sale4 total (800-160) exp=640 act=640.00
+99: NOTICE:  PASS X2 return amount keeps the discount share (90, not 100) exp=90 act=90.00
+== A3 shared cost bills (electricity headcount 2:1, internet fixed 70:30, admin share of S1 -> main centre)
+123: NOTICE:  PASS B1 electricity shares sum to bill exp=600 act=600.00
+124: NOTICE:  PASS B1 electricity S1 share 2/3 of 600 exp=400 act=400.00
+125: NOTICE:  PASS B1 internet S1 share 70 % of 300 exp=210 act=210.00
+126: NOTICE:  PASS B2 sales-share allocation method is not offered (bad_value)
+== A3 post to books
+== A3 FIGURES THE SYSTEM SHOWS (cost-attribution switch OFF)
+-- biz_daily (loc, n, revenue, discount, costed_rev, cogs)
+biz_daily|2|3|920.00|50.00|720.00|360.00
+biz_daily|3|1|640.00|160.00|640.00|320.00
+-- _p27_pl (loc, gross, ret, net, costed, cogs, exp, sal, fixed)
+_p27_pl|2|1010.00|90.00|920.00|720.00|360.00|150|300|
+_p27_pl|3|640.00|0|640.00|640.00|320.00|40||
+_p27_pl|6|0|0|0|0.00|0.00||200|
+-- shop P&L report row (_r3q_l3_shop_pnl)
+_r3q_l3|2|920.00|360.00|150.00|300.00|110.00|11.96|21.74|fixed, cogs(uncosted)|
+_r3q_l3|3|640.00|320.00|40.00||280.00|43.75|0.00|salary, fixed|
+_r3q_l3|6|0.00|0.00||200.00|-200.00|||expenses, fixed|
+-- biz_items (code, qty, revenue, cogs)
+biz_items|FG-A|13|1090.00|520.00
+biz_items|RS-B|4|360.00|200.00
+biz_items|RS-C|2|200.00|
+biz_items_S1|FG-A|5|450.00|200.00
+biz_items_S1|RS-B|4|360.00|200.00
+biz_items_S1|RS-C|2|200.00|
+-- biz_items_by_category
+by_cat|cake_lb|10|0|0.00|0
+by_cat|cake_pc|6|560.00|200.00|1
+by_cat|doi|9|0|0.00|0
+by_cat|sweet_kg|17|1090.00|520.00|0
+by_cat|sweet_pc|18|0|0.00|0
+-- margin report by item (_r3q_l2_margin)
+_r3q_l2|category||cake_pc|560.00|200.00|160.00|44.44|35.71
+_r3q_l2|category||sweet_kg|1000.00|480.00|520.00|52.00|0.00
+_r3q_l2|item|FG-A|sweet_kg|1000.00|480.00|520.00|52.00|0.00
+_r3q_l2|item|RS-B|cake_pc|360.00|200.00|160.00|44.44|0.00
+_r3q_l2|item|RS-C|cake_pc|200.00||||100.00
+-- brand_pnl
+brand_pnl|islamiya|920.00|50.00|720.00|360.00|360.00|50.00
+brand_pnl|misty_bari|640.00|160.00|640.00|320.00|320.00|50.00
+-- acct_income_statement per loc: total_income total_expense cogs gross_profit net_profit
+gl_all|{"to": "2026-10-14", "cogs": 680.00, "from": "2026-10-14", "net_profit": 842.80, "location_id": null, "provisional": true, "cogs_missing": 1, "gross_profit": 880.00, "total_income": 1560.00, "total_expense": 717.20, "unknown_cost_rev": 200.00, "cogs_estimate_missing": 0.00}
+gl_S1|{"to": "2026-10-14", "cogs": 360.00, "from": "2026-10-14", "net_profit": 402.80, "location_id": 2, "provisional": true, "cogs_missing": 1, "gross_profit": 560.00, "total_income": 920.00, "total_expense": 517.20, "unknown_cost_rev": 200.00, "cogs_estimate_missing": 0.00}
+gl_S2|{"to": "2026-10-14", "cogs": 320.00, "from": "2026-10-14", "net_profit": 240.00, "location_id": 3, "provisional": false, "cogs_missing": 0, "gross_profit": 320.00, "total_income": 640.00, "total_expense": 400.00, "unknown_cost_rev": 0.00, "cogs_estimate_missing": 0.00}
+gl_F|{"to": "2026-10-14", "cogs": 0, "from": "2026-10-14", "net_profit": 200.00, "location_id": 6, "provisional": false, "cogs_missing": 0, "gross_profit": 0, "total_income": 0, "total_expense": -200.00, "unknown_cost_rev": 0.00, "cogs_estimate_missing": 0.00}
+gl_lines_S1|4000|Income|920.00
+gl_lines_S1|4100|Sales|1060.00
+gl_lines_S1|4110|Sales returns (contra)|-90.00
+gl_lines_S1|4120|Sales discounts (contra)|-50.00
+gl_lines_S1x|5000|Cost of goods sold|360.00
+gl_lines_S1x|5810|Bank charges|7.20
+gl_lines_S1x|5900|Other expenses|150.00
+gl_lines_S2x|5000|Cost of goods sold|320.00
+gl_lines_S2x|5100|Wastage loss|40.00
+gl_lines_S2x|5700|Transport|40.00
+-- profit_source_check
+psc|{"to": "2026-10-14", "from": "2026-10-14", "agree": false, "notes": ["unknown_cost"], "difference": 0.00, "ledger_cogs": 680.00, "location_id": null, "net_revenue": 1560.00, "report_cogs": 680.00, "fallback_rev": 0.00, "journal_cogs": 680.00, "pending_docs": 0, "compared_from": "2026-10-14", "fallback_cogs": 0.00, "unknown_cost_rev": 200.00, "compared_report_cogs": 680.00}
+-- branch_cost_view (switch off)
+bcv|[{"amount": 1020.00, "dest_kind": "unallocated", "dest_location": null}]
+== A3 PART 2: cost attribution (switch cost_attrib_in_pl) ======================================
+-- branch_cost_view after the settings, switch still OFF
+bcv_off|false|[{"amount": 610.00, "dest_kind": "location", "dest_location": 2}, {"amount": 290.00, "dest_kind": "location", "dest_location": 3}, {"amount": 120.00, "dest_kind": "main_centre", "dest_location": 1}]
+-- shop P&L rows with switch OFF (cost shares must be absent)
+l3_off|0
+_r3q_l3_on|1|ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory · cost share: Other: ______ (main centre)|120.00|-120.00|cost_share|main_centre
+_r3q_l3_on|2|ISLAMIYA MISTY GHAR — 2nd Branch · cost share: Electricity|400.00|-400.00|cost_share|location
+_r3q_l3_on|2|ISLAMIYA MISTY GHAR — 2nd Branch · cost share: Internet|210.00|-210.00|cost_share|location
+_r3q_l3_on|2|ISLAMIYA MISTY GHAR — 2nd Branch|150.00|110.00||
+_r3q_l3_on|3|MISTY BARI · cost share: Internet|90.00|-90.00|cost_share|location
+_r3q_l3_on|3|MISTY BARI · cost share: Electricity|200.00|-200.00|cost_share|location
+_r3q_l3_on|3|MISTY BARI|40.00|280.00||
+_r3q_l3_on|6|Cake Factory (below the residence)||-200.00||
+-- partner_calculate base after switch ON: does it include the shares? (use a location venture)
+pnl_1m|2|150|300
+pnl_1m|3|40|
+-- re-assign the S1 admin share (120) from main centre to showroom S2 (audited)
+dest_before|main_centre|1
+dest_after|location|3
+audit_reassign_rows|1
+audit_log_rows|5
+l3_after_reassign|2|210.00|cost_share|location
+l3_after_reassign|2|400.00|cost_share|location
+l3_after_reassign|3|90.00|cost_share|location
+l3_after_reassign|3|120.00|cost_share|location
+l3_after_reassign|3|200.00|cost_share|location
+-- re-assign again after the period was closed? (period lock)
+-- history: cost_attrib_set for a PAST month is refused (cannot restate)
+186: NOTICE:  PASS H1 attribution setting for a past month refused (effective_in_past)
+-- partner base: venture on location 2
+partner_tables|partner_agreements
+partner_tables|partner_capital
+partner_tables|partner_parties
+partner_tables|partner_rules
+partner_tables|partner_settlement_lines
+partner_tables|partner_settlement_payments
+partner_tables|partner_settlements
+partner_tables|partner_templates
+partner_tables|partner_ventures
+== A3 PART 3: product x branch, partner base, period cut-off, card fee/waste placement ====
+-- product profit per branch from the report builder (item_sales group item, one location at a time)
+rb_S1|FG-A|450.00|200.00|250.00|55.56|0.00
+rb_S1|RS-B|360.00|200.00|160.00|44.44|0.00
+rb_S1|RS-C|200.00||||100.00
+rb_S2|FG-A|640.00|320.00|320.00|50.00
+rb_by_location|2|1010.00|400.00|410.00
+rb_by_location|3|640.00|320.00|320.00
+-- dashboard tiles (dashx_metrics.js formulas replayed in SQL on the same RPCs)
+dash_gross_profit|680.00|1360.00|50.00
+dash_net_profit_books|842.80|717.20|true
+margin_S1|FG-A|360.00|160.00|200.00
+margin_S1|RS-B|360.00|200.00|160.00
+margin_S1|RS-C|200.00||
+margin_S2|FG-A|640.00|320.00|320.00
+-- partner statement base for a venture on place 2 (net_profit)
+partner_S1|{"cogs": 360.00, "salary": 300, "expenses": 150, "net_sales": 920.00, "fixed_cost": null, "gross_sales": 1010.00, "gross_profit": null, "net_profit_before_fees": null}|[{"msg": "Some sold items have no cost price, so gross profit cannot be computed honestly. Type a manual base.", "code": "uncosted_sales", "detail": 200.00}, {"msg": "This base cannot be computed from the books - type a manual base.", "base": "net_profit", "code": "base_unavailable", "step_no": 1}]
+-- period cut-off: a day with NO activity (yesterday, same month) - what does the shop P&L show?
+yday_l3|ISLAMIYA MISTY GHAR — 2nd Branch · cost share: Electricity|400.00|-400.00|cost_share
+yday_l3|ISLAMIYA MISTY GHAR — 2nd Branch · cost share: Internet|210.00|-210.00|cost_share
+yday_l3|MISTY BARI · cost share: Electricity|200.00|-200.00|cost_share
+yday_l3|MISTY BARI · cost share: Internet|90.00|-90.00|cost_share
+yday_l3|MISTY BARI · cost share: Other: ______|120.00|-120.00|cost_share
+-- the same cost shares in a one-day report and in a whole-month report (not pro-rated)
+shares_1day|1020.00
+shares_month|1020.00
+-- a quick expense dated yesterday is outside a today-only report
+exp_today_only|150
+exp_two_days|175
+-- consistency sums (switch ON, shares included)
+sum_branch_profit_with_shares|-830.00
+gl_company_net|842.80
+sum_gl_by_loc|842.80
+sum_p27_profit|190.00
+-- product sums vs branch revenue
+sum_biz_items|1650.00|720.00
+sum_biz_daily|1560.00|680.00
+sum_margin_items|1560.00|680.00
+-- GL after the cost-share reassign: nothing moves in the books (shares are report-only)
+gl_S1_after|402.80
+gl_S2_after|240.00
+-- settings table of the location (fixed cost per month) and what the report does with it
+t
