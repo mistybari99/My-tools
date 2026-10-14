@@ -44,7 +44,7 @@ This is the order that was built and tested from nothing (fresh Postgres 16, see
 | 28 | phase99.sql | 72..98 | guard inside (one marker object per phase 72..97 + `bos89` + `bos98` in `_acct_docs`; raises `phase99 needs phases 72..98 pasted first ... missing: <numbers>`). Step Opt: two OPTIONS (bill payment, inbox masking), all default OFF. Re-creates 5 functions only (`inbox_list`, `inbox_get`, `online_orders_list`, `online_order_get`, `telegram_chat_info`, tag bos99) - none of them is touched by phase98, and phase99 does not touch `_acct_docs`. If a later phase re-creates one of the five, merge into the phase99 text. See docs/briefs_p2p3/step_Opt_REPORT.md |
 | 29 | phase100.sql | 72..97 | guard inside (Step Cat: one category / sub-category master, rule `category_required_on_item`). Re-creates no existing function. See docs/briefs_p2p3/step_Cat_REPORT.md |
 | 30 | phase101.sql | 72..98 | guard inside (Step Rec: setup advisor rows for every rule of phases 82..98; only `setup_rec_defs81` rows, ON CONFLICT DO NOTHING). See docs/briefs_p2p3/step_Rec_REPORT.md |
-| (31) | phase102.sql | built in parallel on branch `fix/phase-Img` (item images); re-creates no accounting function | NOT in this branch. When it is merged it goes between 101 and 103; phase103 does not need it |
+| 31 | phase102.sql | item images (built on branch `fix/phase-Img`, now in this branch); re-creates no accounting function | goes between 101 and 103; phase103 does not need it |
 | 32 | **phase103.sql - LAST** | 72..101 | guard inside (one marker object per phase 72..99 + `bos98` in `_acct_docs` + `item_categories` (100) + the phase101 advisor row; raises `phase103 needs phases 72..101 pasted first ... missing: <numbers>`). Step E2E: defects D-1..D-8 of the independent end-to-end run. Re-creates 20 functions from their LATEST bodies (`_acct_docs`, `_acct_stock_moves85`, `inventory_vs_gl`, `_cw_docs96`, `_cw_rows96`, `_cw_posted96`, `_ob_rows96`, `_ob_plan96`, `opening_stock_apply96`, `recipe_cost`, `_setup_chk81`, `setup_recommendations`, `setup_recommend_apply`, `_inb_pii_f99`, `_inb_pii_json99`, `inbox_list`, `customer_directory`, `find_customer`, and `online_order_get` / `online_orders_list` byte-identical so one paste repairs a re-paste of phase89; every older bosNN tag kept, new tag bos103), adds 3 internal helpers, 1 switch `acct_manual_prod_in103` (default OFF), 1 flow check row, 1 grant def, 1 append-only table `opening_stock_followups103` + view `opening_covered103`. A body with a tag it does not know stops the paste. See docs/briefs_p2p3/step_E2E_REPORT.md |
 
 **Invariant: phase103 is the last file (it re-creates the final bodies of what phase96 / 98 / 99 / 81 / 73 / 74 re-create). If phase89, phase94, phase96, phase97, phase98 or phase99 is ever pasted again, paste phase98 (if it was 89 / 94 / 96 / 97) and then phase103 again after it** (phase89 alone puts the older `_acct_docs` and `inventory_vs_gl` back; phase97 alone drops the bos96 lines).
@@ -78,3 +78,16 @@ Same as D, but the last file is now phase98: a phase that re-creates `_acct_docs
 
 Same as D and F, with phase103 as the last file: a phase that re-creates any of the 20 functions listed in row 32 (or `_acct_docs`, `inventory_vs_gl`, `recipe_cost`, `_setup_chk81`, `setup_recommendations`, `setup_recommend_apply`, `inbox_list`, `customer_directory`, `find_customer`) must merge into the phase103 text (a new phase103 version) and keep every `bosNN` tag. Run phase89c_test, phase89d_test, phase94_test, phase96_test, phase98_test, phase99_test, phase101_test and phase103_test. Old assertions that are false by design once phase103 exists are copied to a `phaseNNb_test.sql` (never edit the old file); see docs/briefs_p2p3/step_E2E_REPORT.md for the list.
 Build: `bash tests/sql/final_build.sh <db> "<canonical order ... phase98 phase99 phase100 phase101 phase103>"` (tests/sql/run_all_sql.sh appends every `supabase/phase1NN.sql` that is not in the table above, in numeric order).
+
+## H. Live status
+
+Installed on the owner's live database, in this order (72..103 - all 32 new files, each once). Checked with `python3 tools/check_paste_order.py`.
+
+| order | file | status |
+|-------|------|--------|
+| 1-10 | phase72 .. phase81 | installed |
+| 11-27 | phase82, 83, 84, 85, 86, 87, 88, 90, 91, 89, 92, 93, 95, 94, 96, 97, 98 | installed |
+| 28-31 | phase99, phase100, phase101, phase102 | installed |
+| 32 | phase103 (LAST) | installed |
+
+Next file: phase104 (see section G).
