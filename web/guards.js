@@ -29,7 +29,7 @@ const ERR = {
 };
 B.guardMsg = (code) => (ERR[code] ? lab(ERR[code]) : null);
 B.guardErrCodes = Object.keys(ERR);
-const NAMES = { purchase_grn_guard: ['GRN উৎস হলে bill-এর stock', 'Bill stock when GRN is the source'], purchase_void_guard: ['Posted bill বাতিলে সুরক্ষা', 'Voiding a posted bill'], purchase_void_payments: ['Bill বাতিলে payment', 'Payments on a voided bill'],
+const NAMES = { production_requires_recipe: ['Recipe ছাড়া production', 'Production without a recipe'], production_double_issue_guard: ['উৎপাদন ও issue-তে দুবার কাটা', 'Double deduction (production + issue)'], production_requires_cost: ['Cost অজানা থাকলে production', 'Production with an unknown cost'], purchase_grn_guard: ['GRN উৎস হলে bill-এর stock', 'Bill stock when GRN is the source'], purchase_void_guard: ['Posted bill বাতিলে সুরক্ষা', 'Voiding a posted bill'], purchase_void_payments: ['Bill বাতিলে payment', 'Payments on a voided bill'],
   unit_conv_required: ['Conversion ছাড়া বিক্রি', 'Sale without unit conversion'], neg_grant_log: ['Below-zero permission log', 'Log of the below-zero permission'], production_negative_reason: ['Production negative-এ reason', 'Reason when production goes negative'], stock_negative_mode: ['Stock-এর বেশি বিক্রি', 'Selling above stock'] };
 const D = { rec: [], unit: null, neg: null, pend: null };
 const val = (v) => (v === null || v === undefined ? '-' : String(v));
@@ -50,6 +50,7 @@ async function load() {
   const [a, b, c, d] = await Promise.all([sb.rpc('guard_recommendations'), sb.rpc('unit_unknown_items'), sb.rpc('never_opened_negative_items'), sb.rpc('grn_pending_report', { p_days: 60 })]);
   for (const r of [a, b, c, d]) if (r.error) throw r.error;
   D.rec = a.data || []; D.unit = b.data; D.neg = c.data; D.pend = d.data;
+  try { const p = await sb.rpc('production_recommendations'); if (!p.error && Array.isArray(p.data)) D.rec = D.rec.concat(p.data); } catch (e) { /* phase87 not pasted yet: the page works without the production rows */ }
 }
 Object.assign(H, {
   gd_apply: async (a) => {

@@ -7,6 +7,8 @@
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, esc, toast, fail, shell, openSheet, closeSheet } = A;
 const H = A.H, L = B.L, lab = B.lab;
+// owner approving his own change: the server (phase87) allows it and returns a NON-blocking suggestion to ask another approver
+const selfHint = (d) => (d && d.suggestion ? ' · ' + lab({ bn: d.suggestion_bn, mix: d.suggestion_mix, en: d.suggestion_en }) : '');
 const $ = (s, el = document) => el.querySelector(s);
 const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).trim();
 const num = (v) => { const s = norm(v); if (s === '') return null; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
@@ -171,7 +173,7 @@ Object.assign(H, {
     const r = await sb.rpc('cost_rule_save', { p_source: Number($('#cr_src').value), p_method: $('#cr_meth').value, p_effective: $('#cr_eff').value, p_shares: shares, p_note: null, p_client: rid() });
     if (r.error) return errMsg(r.error); toast(T('saved')); closeSheet(); await refresh();
   },
-  cb_rapp: async (a) => { const r = await sb.rpc('cost_rule_approve', { p_rule: Number(a.dataset.id), p_note: null }); if (r.error) return errMsg(r.error); toast(T('approved')); await refresh(); },
+  cb_rapp: async (a) => { const r = await sb.rpc('cost_rule_approve', { p_rule: Number(a.dataset.id), p_note: null }); if (r.error) return errMsg(r.error); toast(T('approved') + selfHint(r.data)); await refresh(); },
   cb_bsave: async () => {
     const sid = Number($('#cb_src').value); if (!sid) return toast(T('needSrc')); const amt = num($('#cb_amt').value); if (amt === null || Number.isNaN(amt) || amt <= 0) return toast(T('needAmt'));
     const r = await sb.rpc('cost_bill_add', { p_source: sid, p_period_kind: $('#cb_pk').value, p_month: ($('#cb_pm').value || D.month) + '-01', p_amount: amt, p_pay_mode: $('#cb_mode').value || null, p_bill_no: $('#cb_no').value || null, p_bill_date: $('#cb_date').value || null,
