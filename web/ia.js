@@ -152,6 +152,7 @@ const IA = [
   rec('costunknown', 'reports', ['অজানা খরচ', 'Unknown costs', 'অজানা cost'], { icon: 'doc', ok: (c) => c.own || c.P('ITEM_COST', 'view'), kw: ['unknown cost', 'cost missing', 'provisional profit', 'no cost', 'cost_missing', 'খরচ অজানা', 'সাময়িক', 'লাভ'], verbs: ['find unknown costs'] }),
   rec('packflags', 'cust', ['অনলাইন অর্ডার যাচাই', 'Online order review', 'Online order যাচাই'], { icon: 'doc', ok: pos, kw: ['pack warning', 'stock short', 'voided sale', 'order flag', 'duplicate order', 'প্যাক', 'যাচাই', 'অর্ডার'], verbs: ['review online order flags'] }),
   rec('posfailed', 'appr', ['Offline POS — আটকে যাওয়া sale', 'Offline POS - refused sales', 'Offline POS — আটকে যাওয়া sale'], { icon: 'doc', ok: owner, kw: ['offline pos', 'failed sale', 'refused sale', 'override', 'আটকে', 'অফলাইন'], verbs: ['see refused offline sales'] }),
+  rec('invoiceview', 'sale', ['ইনভয়েস দেখুন ও পাঠান', 'View and send invoices', 'Invoice দেখুন ও পাঠান'], { icon: 'doc', ok: pos, mob: 3, kw: ['invoice', 'receipt', 'reprint', 'print', 'email', 'sms', 'whatsapp', 'share', 'ইনভয়েস', 'রসিদ', 'প্রিন্ট', 'হোয়াটসঅ্যাপ'], verbs: ['show the invoice', 'send the invoice'] }),
 ];
 // settings2 sub pages: searchable and listed on the Administration page, not in the drawer
 [['fiscal', ['অর্থবছর ও সপ্তাহ', 'Fiscal year & week', 'Fiscal year ও week'], ['fiscal', 'year', 'week', 'অর্থবছর', 'বছর']], ['vat', ['ভ্যাট', 'VAT', 'VAT'], ['vat', 'tax', 'ভ্যাট', 'কর']],
