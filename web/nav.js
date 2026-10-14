@@ -11,7 +11,7 @@ const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en:
 
 // ---------- labels (3 modes) ----------
 const X = {
-  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'),
+  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'), /* bos109 */ th_glass_light: L('লিকুইড গ্লাস লাইট', 'Liquid Glass Light', 'Liquid Glass Light'), th_glass_dark: L('লিকুইড গ্লাস ডার্ক', 'Liquid Glass Dark', 'Liquid Glass Dark'),
   menu: L('মেনু', 'Menu', 'Menu'), me: L('আমি', 'Me', 'Me'), search: L('মেনু খুঁজুন…', 'Search menu…', 'Menu খুঁজুন…'), close: L('বন্ধ করুন', 'Close', 'Close'),
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
   foot_t: L('নিচের অংশ দেখান/লুকান', 'Show or hide menu options', 'Menu options দেখান/লুকান'),
@@ -306,7 +306,7 @@ function mount() {
 const groupOpen = () => { if (!openGroups) { openGroups = jget('bos_navg_' + uid(), null); if (!openGroups) openGroups = { dash: true }; } return openGroups; };
 // ---------- theme control (Premium Dark / Premium Light / Classic): compact dropdown in the drawer footer and the Me sheet ----------
 const themeSel = (id) => { const TH = window.BOS_THEME; if (!TH) return ''; const cur = TH.get();
-  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic']].map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
+  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic'], ['glass-light', 'th_glass_light'], ['glass-dark', 'th_glass_dark']]  /* bos109 */.map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
 document.addEventListener('change', (ev) => {
   const t0 = ev.target; if (!t0 || !t0.matches || !t0.matches('[data-theme-pick]') || !window.BOS_THEME) return;
   window.BOS_THEME.set(t0.value); sig = '';
