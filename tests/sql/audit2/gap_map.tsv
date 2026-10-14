@@ -1,65 +1,96 @@
 # gap_id<TAB>kind<TAB>probe-label regex<TAB>title.  kind: A = assertion of the correct behaviour (FAIL = gap open); N = like A but a FAIL means the feature is NOT SUPPORTED;
 # P = pin of today's (gap) behaviour (PASS = gap still open, FAIL = behaviour changed, gap presumably closed - re-read the probe); - = no machine probe yet (doc / code-read only).
+# kinds added after the batch fixes: Q = pin of today's behaviour, judged only in the defaults pass (switches OFF); S = superseded probe (it looks for an old name / old path; kept in the suite, not judged).
+# S rows also cover old regression guards that assert the OLD number and therefore FAIL once the batch switch is on (e.g. A1 'C4 oil FG unit cost (1200+30)/27').
+# FX<suite>-... rows are the fix probes (fix_*.sql in each suite directory), written after the batch fixes.
 # The regex is matched (re.search) against the probe label (text after PASS/FAIL, before ' exp='). Add rows here when a batch agent adds probes.
-A1-G1	P	^C2 finished good	Semi-finished goods cannot be an ingredient
-A1-G1	P	^C5 	Semi-finished goods cannot be an ingredient
-A1-G2	A	^L2 cost bill creates	Pool/cost bills are memos: no matching expense posting
-A1-G2	P	^B1 pool journal effect	Pool/cost bills are memos: no matching expense posting
-A1-G2	P	^B5 GL: no entry ever debits	Pool/cost bills are memos: no matching expense posting
-A1-G3	P	^B5 NO month-end journal	Unabsorbed overhead not booked / not repriced
-A1-G3	P	^B6 pool_set	Unabsorbed overhead not booked / not repriced
-A1-G4	P	^B7 	Runs before the month pool exists book conversion 0
+A1-G1	Q	^C2 finished good	Semi-finished goods cannot be an ingredient
+A1-G1	Q	^C5 	Semi-finished goods cannot be an ingredient
+A1-G1	A	^FX1-G1 	Semi-finished goods cannot be an ingredient
+A1-G2	S	^L2 cost bill creates	Pool/cost bills are memos: no matching expense posting
+A1-G2	Q	^B1 pool journal effect	Pool/cost bills are memos: no matching expense posting
+A1-G2	Q	^B5 GL: no entry ever debits	Pool/cost bills are memos: no matching expense posting
+A1-G2	A	^FX1-G2 	Pool/cost bills are memos: no matching expense posting
+A1-G3	Q	^B5 NO month-end journal	Unabsorbed overhead not booked / not repriced
+A1-G3	Q	^B6 pool_set	Unabsorbed overhead not booked / not repriced
+A1-G3	A	^FX1-G3 	Unabsorbed overhead not booked / not repriced
+A1-G4	Q	^B7 	Runs before the month pool exists book conversion 0
+A1-G4	A	^FX1-G4 	Runs before the month pool exists book conversion 0
 A1-G5	-		Overhead driver is output kg only
-A1-G6	P	^B3 P3 	Pool mode ignores non-kg products
-A1-G7	A	^G2 the uncosted	Unknown-cost ingredient: supplied cost does not reach item/runs
-A1-G7	A	^G3 (RM-NC|FG-NC|production_runs|second run)	Unknown-cost ingredient: supplied cost does not reach item/runs
-A1-G8	A	^A4 	No standard-vs-actual cost report (money value of yield loss, stored standard)
-A1-G8	A	^V4 	No standard-vs-actual cost report (money value of yield loss, stored standard)
+A1-G6	Q	^B3 P3 	Pool mode ignores non-kg products
+A1-G6	A	^FX1-G6 	Pool mode ignores non-kg products
+A1-G7	S	^G2 the uncosted	Unknown-cost ingredient: supplied cost does not reach item/runs
+A1-G7	S	^G3 (RM-NC|FG-NC|production_runs|second run)	Unknown-cost ingredient: supplied cost does not reach item/runs
+A1-G7	A	^FX1-G7 	Unknown-cost ingredient: supplied cost does not reach item/runs
+A1-G7	S	^H1 	Unknown-cost ingredient: supplied cost does not reach item/runs
+A1-G8	S	^A4 	No standard-vs-actual cost report (money value of yield loss, stored standard)
+A1-G8	S	^V4 	No standard-vs-actual cost report (money value of yield loss, stored standard)
+A1-G8	A	^FX1-G8 	No standard-vs-actual cost report (money value of yield loss, stored standard)
+A1-G8	S	^A2 std_cost	No standard-vs-actual cost report (money value of yield loss, stored standard)
 A1-G9	P	^C3 	No by-product / co-product output
-A1-G10	P	^C4 pouch left	Packaging consumed on planned yield
+A1-G10	Q	^C4 pouch left	Packaging consumed on planned yield
+A1-G10	A	^FX1-G10 	Packaging consumed on planned yield
+A1-G10	S	^C4 oil FG	Packaging consumed on planned yield
 A1-G11	-		packaging_consume_on is global, not per product
 A1-G12	N	^V5 	Labour not tied to production (hours/workers/payroll)
 A1-G13	A	^D4 today-price	Today-price view excludes freight
 A1-G14	N	^E1 stock has an owner	Partner/customer-supplied material not modelled
 A1-G15	P	^A6 	Yield-variance alert / waste-required rules OFF by default
 A1-G16	P	^F4 	report_cost_source=item_costs can split reports from books
-A2-G1	N	^l1 a stock movement	No stock movement statement (opening + moves = closing, per item/location/period)
-A2-G1	A	^l1 report k3_store_ledger	No stock movement statement (opening + moves = closing, per item/location/period)
-A2-G2	A	^a2b no conversion	No sales-vs-stock reconciliation
-A2-G2	A	^k5 sale made	No sales-vs-stock reconciliation
-A2-G2	N	^l4 a report	No sales-vs-stock reconciliation
-A2-G2	A	^l4 sold	No sales-vs-stock reconciliation
+A2-G1	S	^l1 a stock movement	No stock movement statement (opening + moves = closing, per item/location/period)
+A2-G1	S	^l1 report k3_store_ledger	No stock movement statement (opening + moves = closing, per item/location/period)
+A2-G1	A	^FX2-G1 	No stock movement statement (opening + moves = closing, per item/location/period)
+A2-G2	S	^a2b no conversion	No sales-vs-stock reconciliation
+A2-G2	S	^k5 sale made	No sales-vs-stock reconciliation
+A2-G2	S	^l4 a report	No sales-vs-stock reconciliation
+A2-G2	S	^l4 sold	No sales-vs-stock reconciliation
+A2-G2	A	^FX2-G2 	No sales-vs-stock reconciliation
 A2-G3	A	^i4b (block mode|N-OFF)	stock_negative_mode=block bypassed by client-controlled sold_at
+A2-G3	A	^FX2-G3 	stock_negative_mode=block bypassed by client-controlled sold_at
 A2-G4	A	^a2b no conversion	Unit-unknown sale accepted and stock not reduced by default
-A2-G5	A	^d7 	Return after unit-factor edit restores wrong qty; base_unit editable with stock
-A2-G5	A	^k0 base_unit change	Return after unit-factor edit restores wrong qty; base_unit editable with stock
-A2-G6	A	^g8 	Transfer above sender stock accepted in default mode
+A2-G5	S	^d7 	Return after unit-factor edit restores wrong qty; base_unit editable with stock
+A2-G5	S	^k0 base_unit change	Return after unit-factor edit restores wrong qty; base_unit editable with stock
+A2-G5	A	^FX2-G5 	Return after unit-factor edit restores wrong qty; base_unit editable with stock
+A2-G6	S	^g8 	Transfer above sender stock accepted in default mode
+A2-G6	A	^FX2-G6 	Transfer above sender stock accepted in default mode
 A2-G7	A	^a3b selling 1 combo	No combo/kit (BOM-on-sale)
-A2-G8	A	^h6 gain	Batch table not reconciled with balance (gain/refill/opening create no batch)
-A2-G8	A	^j7 batch remaining	Batch table not reconciled with balance (gain/refill/opening create no batch)
-A2-G8	A	^x1 balance	Batch table not reconciled with balance (gain/refill/opening create no batch)
-A2-G8	A	^l3 batches	Batch table not reconciled with balance (gain/refill/opening create no batch)
-A2-G8	N	^l3 any function	Batch table not reconciled with balance (gain/refill/opening create no batch)
-A2-G9	A	^k4 deactivated	Item lifecycle breaks stock silently (untrack, deactivate, no merge)
-A2-G9	A	^k5 toggling	Item lifecycle breaks stock silently (untrack, deactivate, no merge)
-A2-G9	A	^k6 	Item lifecycle breaks stock silently (untrack, deactivate, no merge)
+A2-G8	S	^h6 gain	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	S	^j7 batch remaining	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	S	^x1 balance	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	S	^l3 batches	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	S	^l3 any function	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	A	^FX2-G8 	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	S	^x1 A-KG	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G8	S	^w1 named batch	Batch table not reconciled with balance (gain/refill/opening create no batch)
+A2-G9	S	^k4 deactivated	Item lifecycle breaks stock silently (untrack, deactivate closed by 114; an item merge function is not built)
+A2-G9	S	^k5 toggling	Item lifecycle breaks stock silently (untrack, deactivate closed by 114; an item merge function is not built)
+A2-G9	S	^k6 	Item lifecycle breaks stock silently (untrack, deactivate closed by 114; an item merge function is not built)
+A2-G9	A	^FX2-G9 	Item lifecycle breaks stock silently (untrack, deactivate closed by 114; an item merge function is not built)
 A2-G10	A	^i5 	Offline sale older than 72 h re-dated to now, unflagged
 A2-G11	P	^g2 all-location stock	Transit shortage drops out of every view after receive
+A2-G11	S	^g2 shortage listed	Transit shortage drops out of every view after receive
 A2-G12	P	^h3 count variance	Monitoring rules off by default
 A2-G12	P	^j4 grant use	Monitoring rules off by default
 A2-G12	P	^j2 warn: a second	Monitoring rules off by default
 A2-G13	-		Server trusts the phone unit conversion
 A2-G14	-		Online order link does not compare lines
 A2-G15	-		Form 05-x/04-3 shadow paths only checked for skipped lines
-A3-G1	A	^C11 	No single true-profit statement (branch P&L vs books)
-A3-G2	A	^C9 	Salary in two stores (sheet 02-2 vs payroll app)
+A3-G1	S	^C11 	No single true-profit statement (branch P&L vs books)
+A3-G1	A	^FX3-G1 	No single true-profit statement (branch P&L vs books)
+A3-G2	S	^C9 	Salary in two stores (sheet 02-2 vs payroll app)
+A3-G2	A	^FX3-G2 	Salary in two stores (sheet 02-2 vs payroll app)
 A3-G3	A	^C7 	Wastage/expiry/count loss not in branch P&L
+A3-G3	A	^FX3-G3 	Wastage/expiry/count loss not in branch P&L
 A3-G4	A	^C8 	Card/wallet fees not in branch/product profit
-A3-G5	A	^C10 	Revenue with unknown cost counted at 0 cost in profit
+A3-G4	A	^FX3-G4 	Card/wallet fees not in branch/product profit
+A3-G5	S	^C10 	Revenue with unknown cost counted at 0 cost in profit
+A3-G5	A	^FX3-G5 	Revenue with unknown cost counted at 0 cost in profit
 A3-G6	A	^C6 	cost_attrib_in_pl default OFF; shares not in branch profit
 A3-G7	-		Unallocated shared costs vanish from every P&L
-A3-G8	A	^C15 	Shared-cost shares not pro-rated by period
+A3-G8	S	^C15 	Shared-cost shares not pro-rated by period
+A3-G8	A	^FX3-G8 	Shared-cost shares not pro-rated by period
 A3-G9	A	^C12 	Returns not netted in product sales reports
+A3-G9	A	^FX3-G9 	Returns not netted in product sales reports
 A3-G10	A	^C5 	Factory conversion default off/silent; labour not linked to payroll
 A3-G11	N	^C16 	No sales-share allocation method
 A3-G12	-		Reassign applies to closed months (no snapshot)
@@ -68,21 +99,26 @@ A3-G14	A	^C26 	Expense heads rent/utilities have no account mapping
 A3-G15	N	^C25 	Delivery has no revenue or cost model
 A3-G16	-		Bill duplicate guard only checks form 10-2
 A3-G17	-		Margin screens share one switch but labels say Gross profit
-A4-G01	P	^E1 cash short/over 5800	Drawer shortage/overage never reaches the books
+A4-G01	Q	^E1 cash short/over 5800	Drawer shortage/overage never reaches the books
+A4-G01	A	^FX4-G01 	Drawer shortage/overage never reaches the books
 A4-G02	P	^W1 expected drawer cash	No automatic day-end cash close (expected cash typed)
-A4-G03	A	^R1 customer_dues total	customer_dues ignores advances used (double clearing)
-A4-G03	P	^V0 	customer_dues ignores advances used (double clearing)
-A4-G03	P	^V1 	customer_dues ignores advances used (double clearing)
-A4-G04	P	^L2 	Period lock bypassed by owner; scheduler skips locked docs silently
-A4-G04	P	^L3 	Period lock bypassed by owner; scheduler skips locked docs silently
+A4-G03	S	^R1 customer_dues total	customer_dues ignores advances used (double clearing)
+A4-G03	Q	^V0 	customer_dues ignores advances used (double clearing)
+A4-G03	Q	^V1 	customer_dues ignores advances used (double clearing)
+A4-G03	A	^FX4-G03 	customer_dues ignores advances used (double clearing)
+A4-G04	Q	^L2 	Period lock bypassed by owner; scheduler skips locked docs silently
+A4-G04	Q	^L3 	Period lock bypassed by owner; scheduler skips locked docs silently
+A4-G04	A	^FX4-G04 	Period lock bypassed by owner; scheduler skips locked docs silently
 A4-G05	A	^D1 	Day book and journal disagree
 A4-G05	A	^D2 	Day book and journal disagree
 A4-G05	A	^EX2 	Day book and journal disagree
+A4-G05	A	^FX4-G05 	Day book and journal disagree
 A4-G06	A	^C3 	Card settlement not matched to card sales; over-settlement accepted
 A4-G06	P	^C1 over-settlement	Card settlement not matched to card sales; over-settlement accepted
 A4-G06	P	^V3 	Card settlement not matched to card sales; over-settlement accepted
 A4-G07	P	^V5 	Void/reversal booked on the void date
-A4-G08	N	^B3 a statement line	No bank charge/interest posting from a statement line
+A4-G08	S	^B3 a statement line	No bank charge/interest posting from a statement line
+A4-G08	A	^FX4-G08 	No bank charge/interest posting from a statement line
 A4-G09	-		Manual journal guard default off
 A4-G10	-		Partner profit-share payments not in GL / day book
 A4-G11	-		No tax in the ledger (VAT memo only)
@@ -95,13 +131,18 @@ A4-G17	P	^ST1 	GL may be stale while reconciliation reads only posted entries
 A4-G18	-		vat_report bucket uses created_at::date (session zone)
 A4-G19	-		No single close-the-day reconciliation screen
 A4-G20	-		Expenses are cash-basis only (no accrual)
-A5-GAP-1	P	^E13b 	No factory-to-branch statement report
-A5-GAP-2	A	^E1c 	Second/partial receive ignored
-A5-GAP-2	P	^E1d 	Second/partial receive ignored
-A5-GAP-3	-		Return to factory is an unmarked reverse transfer
+A5-GAP-1	Q	^E13b 	No factory-to-branch statement report
+A5-GAP-1	A	^FX5-GAP-1 	No factory-to-branch statement report
+A5-GAP-2	S	^E1c 	Second/partial receive ignored
+A5-GAP-2	Q	^E1d 	Second/partial receive ignored
+A5-GAP-2	A	^FX5-GAP-2 	Second/partial receive ignored
+A5-GAP-3	A	^FX5-GAP-3 	Return to factory is an unmarked reverse transfer
 A5-GAP-4	A	^(E7c|E7e|E7g|E7h|E8c|E8e|E8f) 	Mode loss and transit_short_resolve break the GL (location-tagged)
+A5-GAP-4	S	^M11 	Mode loss and transit_short_resolve break the GL (location-tagged)
+A5-GAP-4	S	^M12 	Mode loss and transit_short_resolve break the GL (location-tagged)
 A5-GAP-5	A	^E4c2 	Send to a PAUSED location accepted
-A5-GAP-6	P	^E9d 	No notification to the receiving branch on send
+A5-GAP-6	S	^E9d 	No notification to the receiving branch on send
+A5-GAP-6	A	^FX5-GAP-6 	No notification to the receiving branch on send
 A5-GAP-7	-		One item per transfer, no challan header
 A5-GAP-8	A	^(E6a|E6b) 	Negative stock allowed on send / sale of in-transit goods
 A5-GAP-9	P	^E10c 	No transfer price / mark-up

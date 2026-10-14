@@ -43,7 +43,7 @@ run_pass() {  # $1 = template DB, $2 = suffix, $3 = out dir
   TEMPLATE=$T bash "$HERE/a2/run_a2.sh" b5_a2$S > $D/a2.txt 2>&1
   $P -qc "drop database if exists b5_a3$S" -c "create database b5_a3$S template $T" >/dev/null 2>&1; bash "$HERE/a3/run.sh" b5_a3$S > $D/a3.txt 2>&1
   bash "$HERE/a4/run_a4.sh" $T > $D/a4.txt 2>&1
-  $P -qc "drop database if exists b5_a5$S" -c "create database b5_a5$S template $T" >/dev/null 2>&1; bash "$HERE/a5/run.sh" b5_a5$S > $D/a5.txt 2>&1
+  $P -qc "drop database if exists b5_a5$S" -c "create database b5_a5$S template $T" >/dev/null 2>&1; TEMPLATE=$T bash "$HERE/a5/run.sh" b5_a5$S > $D/a5.txt 2>&1
   for n in 1 2 3 4 5; do echo "a$n: $(grep -cE '(^|NOTICE: +)PASS ' $D/a$n.txt) pass, $(grep -cE '(^|NOTICE: +)FAIL ' $D/a$n.txt) fail"; done
 }
 echo "== pass 1: defaults"; run_pass $DB "" $W/def
