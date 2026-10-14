@@ -13,15 +13,15 @@ const m = (n) => T.money(n, 'en').replace('Tk ', '');                 // number 
 const price = (d, lg) => (Number.isFinite(Number(d.price)) ? T.money(d.price, lg) : '');
 function shopName(o) { const s = Object.assign({}, T.shop, o.shop || {}); return T.has(s.name) ? esc(s.name) : esc(T.lbl('ph_shop', T.lang(o))); }
 function bars(d, w, h) { return T.has(d.code) ? T.barcodeSVG(d.code, w, h) : ''; }
-function codeTxt(d) { const b = T.has(d.code) ? T.barcodeModules(d.code) : null; return b ? esc(b.text) : ''; }
+function codeTxt(d) { if (!T.has(d.code)) return ''; const b = T.barcodeModules(d.code); return esc(b ? b.text : d.code); }   // when no bars can be drawn the typed number is still printed
 const SIZES = {};
 // each layout: [w mm, h mm, sheet cols (0 = one per page), css, html(d, lg, o)]
 SIZES.barcode_label = {
-  label_50x30: [50, 30, 0, '.u{padding:1.5mm 2mm}.sn{font-size:6px;color:#444}.nm{font-size:9px;font-weight:700;line-height:1.1;max-height:2.3em;overflow:hidden}.pr{font-size:13px;font-weight:800;text-align:right}.cd{font:7px monospace;text-align:center}',
+  label_50x30: [50, 30, 0, '.u{padding:1.5mm 2mm}.sn{font-size:7px;color:#444}.nm{font-size:9px;font-weight:700;line-height:1.1;max-height:2.3em;overflow:hidden}.pr{font-size:13px;font-weight:800;text-align:right}.cd{font:7px monospace;text-align:center}',
     (d, lg, o) => `<div class="sn">${shopName(o)}</div><div class="nm">${esc(d.name)}</div>${bars(d, 44, 10)}<div class="cd">${codeTxt(d)}</div><div class="pr">${price(d, lg)}</div>`],
-  label_38x25: [38, 25, 0, '.u{padding:1mm 1.5mm}.nm{font-size:7.5px;font-weight:700;line-height:1.1;max-height:2.2em;overflow:hidden}.pr{font-size:10px;font-weight:800;text-align:right}.cd{font:6px monospace;text-align:center}',
+  label_38x25: [38, 25, 0, '.u{padding:1mm 1.5mm}.nm{font-size:7.5px;font-weight:700;line-height:1.1;max-height:2.2em;overflow:hidden}.pr{font-size:10px;font-weight:800;text-align:right}.cd{font:7px monospace;text-align:center}',
     (d, lg) => `<div class="nm">${esc(d.name)}</div>${bars(d, 34, 8)}<div class="cd">${codeTxt(d)}</div><div class="pr">${price(d, lg)}</div>`],
-  label_40x20: [40, 20, 0, '.u{padding:.8mm 1.5mm;text-align:center}.cd{font:6px monospace}.pr{font-size:9px;font-weight:800}',
+  label_40x20: [40, 20, 0, '.u{padding:.8mm 1.5mm;text-align:center}.cd{font:7px monospace}.pr{font-size:9px;font-weight:800}',
     (d, lg) => `${bars(d, 36, 9)}<div class="cd">${codeTxt(d)}</div><div class="pr">${price(d, lg)}</div>`],
   label_58x40: [58, 40, 0, '.u{padding:2mm 3mm}.sn{font-size:8px;text-align:center;color:#444}.nm{font-size:12px;font-weight:700;text-align:center;line-height:1.15;max-height:2.4em;overflow:hidden}.pr{font-size:18px;font-weight:800;text-align:center}.cd{font:8px monospace;text-align:center}.un{font-size:8px;text-align:center;color:#444}',
     (d, lg, o) => `<div class="sn">${shopName(o)}</div><div class="nm">${esc(d.name)}</div><div style="text-align:center">${bars(d, 50, 13)}</div><div class="cd">${codeTxt(d)}</div><div class="pr">${price(d, lg)}</div>${T.has(d.unit) ? `<div class="un">${esc(T.lbl('lb_unit', lg))} ${esc(d.unit)}</div>` : ''}`],
@@ -37,7 +37,7 @@ SIZES.price_tag = {
     (d, lg, o) => `<div class="sn">${shopName(o)}</div><div class="nm">${esc(d.name)}</div><div class="pr">${price(d, lg)}</div>${T.has(d.unit) ? `<div class="un">${esc(T.lbl('lb_unit', lg))} ${esc(d.unit)}</div>` : ''}`],
   shelf_70x35: [70, 35, 0, '.u{padding:3mm;display:flex;align-items:center;gap:3mm;border-left:3mm solid #0f6b4f}.a{flex:1}.nm{font-size:12px;font-weight:700;line-height:1.15;max-height:3.5em;overflow:hidden}.cd{font:7px monospace;color:#444}.pr{font-size:28px;font-weight:800}',
     (d, lg) => `<div class="a"><div class="nm">${esc(d.name)}</div>${bars(d, 30, 7)}<div class="cd">${codeTxt(d)}</div></div><div class="pr">${price(d, lg)}</div>`],
-  hang_30x50: [30, 50, 0, '.u{padding:2mm;text-align:center}.nm{font-size:9px;font-weight:700;max-height:3.4em;overflow:hidden;line-height:1.15}.pr{font-size:17px;font-weight:800;margin:3mm 0}.cd{font:6px monospace}',
+  hang_30x50: [30, 50, 0, '.u{padding:2mm;text-align:center}.nm{font-size:9px;font-weight:700;max-height:3.4em;overflow:hidden;line-height:1.15}.pr{font-size:17px;font-weight:800;margin:3mm 0}.cd{font:7px monospace}',
     (d, lg) => `<div class="nm">${esc(d.name)}</div><div class="pr">${price(d, lg)}</div>${bars(d, 24, 9)}<div class="cd">${codeTxt(d)}</div>`],
   sale_50x30: [50, 30, 0, '.u{padding:2mm;text-align:center;border:.5mm dashed #b00020}.sl{font-size:9px;font-weight:800;color:#b00020;letter-spacing:.1em}.nm{font-size:9px;font-weight:700;max-height:2.2em;overflow:hidden;line-height:1.1}.ow{font-size:9px;color:#444;text-decoration:line-through}.pr{font-size:19px;font-weight:800}',
     (d, lg) => `<div class="sl">${esc(T.lbl('lb_sale', lg))}</div><div class="nm">${esc(d.name)}</div>${T.has(d.old_price) ? `<div class="ow">${esc(T.lbl('lb_was', lg))} ${T.money(d.old_price, lg)}</div>` : ''}<div class="pr">${price(d, lg)}</div>`],
@@ -52,20 +52,22 @@ const NAMES = {
 };
 function labelRender(group) {
   return (tp, d, o) => {
-    const [w, h, cols, css, fn] = SIZES[group][tp.id], lg = T.lang(o), copies = Math.max(1, Math.min(200, Math.floor(T.num(d.copies)) || 1));
+    const [w, h, cols, css, fn] = SIZES[group][tp.id], lg = T.lang(o), copies = Math.max(1, Math.min(500, Math.floor(T.num(d.copies)) || 1));
     const unit = `<div class="u">${fn(d, lg, o)}</div>`;
     const sheet = cols > 0, rows = sheet ? Math.floor(297 / h) : 0, per = sheet ? cols * rows : 1;
     const pageCss = sheet ? '@page{size:A4;margin:0}' : `@page{size:${w}mm ${h}mm;margin:0}`;
     const P = '.tl-' + tp.id;
     const base = `${P}{font:10px system-ui,"Noto Sans Bengali",sans-serif;color:#000;background:#fff;box-sizing:border-box}${P} *{box-sizing:border-box}${P} .c{width:${w}mm;height:${h}mm;overflow:hidden;${sheet ? '' : 'page-break-after:always;break-after:page;'}}`
-      + `${P} .g{display:grid;grid-template-columns:repeat(${cols || 1},${w}mm);width:${w * (cols || 1)}mm}${P} .c .u{height:100%}${P} .tp-bc{display:block;margin:0 auto}${P} .a{min-width:0}`;
-    let cells = ''; const n = sheet ? Math.min(copies, per) : copies;
-    for (let i = 0; i < n; i++) cells += `<div class="c">${unit}</div>`;
-    return `<style>${pageCss}${base}${css.replace(/(^|\})\./g, '$1' + P + ' .')}</style><div class="tl tl-${esc(tp.id)}" data-doc="${esc(group)}" data-tpl="${esc(tp.id)}">${sheet ? `<div class="g">${cells}</div>` : cells}</div>`;
+      + `${P} .g{display:grid;grid-template-columns:repeat(${cols || 1},${w}mm);width:${w * (cols || 1)}mm}${P} .c .u{height:100%}${P} .tp-bc{display:block;margin:0 auto}${P} .a{min-width:0}${P} .u,${P} .nm,${P} .pr,${P} .a,${P} .cd{overflow-wrap:anywhere;word-break:break-word;min-width:0}`;
+    const mk = (k) => { let c = ''; for (let i = 0; i < k; i++) c += `<div class="c">${unit}</div>`; return c; };
+    if (!sheet) return `<style>${pageCss}${base}${css.replace(/(^|\})\./g, '$1' + P + ' .')}</style><div class="tl tl-${esc(tp.id)}" data-doc="${esc(group)}" data-tpl="${esc(tp.id)}">${mk(copies)}</div>`;
+    let pages = '', left = copies; while (left > 0) { pages += `<div class="g">${mk(Math.min(left, per))}</div>`; left -= per; }   // as many A4 pages as the copies need
+    return `<style>${pageCss}${base}${P} .g{page-break-after:always;break-after:page}${P} .g:last-child{page-break-after:auto;break-after:auto}${css.replace(/(^|\})\./g, '$1' + P + ' .')}</style><div class="tl tl-${esc(tp.id)}" data-doc="${esc(group)}" data-tpl="${esc(tp.id)}">${pages}</div>`;
   };
 }
 const tpls = (g) => Object.keys(SIZES[g]).map((id) => ({ id, name: NAMES[id], page: 'label', look: id }));
 T.defineDoc({ id: 'barcode_label', kind: 'label', group: 'grp_label', title: 'd_blabel', rec: ['label_50x30', 'r_blabel'], templates: tpls('barcode_label'), render: labelRender('barcode_label') });
 T.defineDoc({ id: 'price_tag', kind: 'label', group: 'grp_label', title: 'd_ptag', rec: ['shelf_70x35', 'r_ptag'], templates: tpls('price_tag'), render: labelRender('price_tag') });
 void m;
+T.finishLabels();
 })();

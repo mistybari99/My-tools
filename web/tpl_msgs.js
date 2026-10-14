@@ -12,12 +12,15 @@ T.addLabels({
   r_msgdue: ['Friendly first, Formal only for an old due.', 'প্রথমবার বন্ধুসুলভ, পুরনো বাকিতে তবেই আনুষ্ঠানিক।', 'প্রথমবার Friendly, পুরনো due-তে তবেই Formal।'],
 });
 const cl = (s) => String(s === null || s === undefined ? '' : s).replace(/[\u0000-\u001f\u007f<>]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+// a link is kept whole: only http(s), no spaces / control characters / angle brackets / quotes, no length cap
+const link = (u) => { u = String(u === null || u === undefined ? '' : u).replace(/[\u0000-\u0020\u007f<>"']+/g, ''); return /^https?:\/\/[^\s]+$/i.test(u) ? u : ''; };
+T.waUrl = (text) => 'https://wa.me/?text=' + encodeURIComponent(String(text === null || text === undefined ? '' : text));
 const NAMES = { short: ['Short', 'সংক্ষিপ্ত', 'Short'], medium: ['Medium', 'মাঝারি', 'Medium'], detailed: ['Detailed', 'বিস্তারিত', 'Detailed'], friendly: ['Friendly', 'বন্ধুসুলভ', 'Friendly'], formal: ['Formal', 'আনুষ্ঠানিক', 'Formal'], bilingual: ['Bilingual (Bangla + English)', 'দুই ভাষায় (বাংলা + English)', 'দুই ভাষায় (Bangla + English)'] };
 const mkT = () => Object.keys(NAMES).map((id) => ({ id, name: NAMES[id], page: 'text', look: id }));
 function vals(d, lg) {
   const shop = Object.assign({}, T.shop, d.shop || {}), M = (v) => (T.has(v) && Number.isFinite(Number(v)) ? T.money(v, lg) : '');
-  return { shop: cl(shop.name) || T.lbl('ph_shop', lg), cu: cl(d.customer), no: cl(d.no), date: cl(d.date), due_date: cl(d.due_date), total: M(d.total), paid: M(d.paid), due: M(d.due), link: cl(d.link),
-    items: Array.isArray(d.items) ? d.items.slice(0, 12).map((i) => cl(i.name) + ' x' + cl(i.qty) + (T.has(i.amount) ? ' ' + M(i.amount) : '')) : [] };
+  return { shop: cl(shop.name) || T.lbl('ph_shop', lg), cu: cl(d.customer), no: cl(d.no), date: cl(d.date), due_date: cl(d.due_date), total: M(d.total), paid: M(d.paid), due: M(d.due), link: link(d.link),
+    items: Array.isArray(d.items) ? d.items.filter((i) => i && typeof i === 'object').slice(0, 12).map((i) => cl(i.name) + ' x' + cl(i.qty) + (T.has(i.amount) ? ' ' + M(i.amount) : '')) : [] };
 }
 // text banks: EN = pure English; BN = Bangla with the common words kept in English (Invoice, Tk, Due ...)
 const INV = {
@@ -70,4 +73,5 @@ function build(bank, kind) {
 }
 T.defineDoc({ id: 'msg_invoice', kind: 'text', group: 'grp_msg', title: 'd_msginv', rec: ['medium', 'r_msginv'], templates: mkT(), render: build(INV, 'inv') });
 T.defineDoc({ id: 'msg_due', kind: 'text', group: 'grp_msg', title: 'd_msgdue', rec: ['friendly', 'r_msgdue'], templates: mkT(), render: build(DUE, 'due') });
+T.finishLabels();
 })();

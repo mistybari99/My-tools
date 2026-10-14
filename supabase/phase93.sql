@@ -1,6 +1,6 @@
 -- ============================================================
 -- Phase 93 (bos93) - STEP Tpl: selectable print / message templates per document type (and optionally per location).
---   Needs phases 72..79 and 88 pasted first (guard below). Additive, paste-twice safe: one table, two functions, nothing else is touched.
+--   Needs only the base schema (guard below: is_owner, is_active, audit_log, locations). Additive, paste-twice safe: one table, two functions, nothing else is touched.
 --   The templates themselves live in the web app (web/tpl_*.js); the database only remembers WHICH template id the owner picked.
 --   No row = no choice = today's output, unchanged (the app falls back to what it printed before).
 --   A location row beats the all-locations row (location_id null) of the same document type.
@@ -8,14 +8,9 @@
 -- ============================================================
 
 do $g$ begin
-  if to_regprocedure('public.is_owner()') is null
-     or to_regclass('public.audit_log') is null
-     or to_regclass('public.locations') is null
-     or to_regprocedure('public._cogs_lines72(date, date, int[])') is null          -- 72
-     or to_regprocedure('public._recipe_gate73(uuid)') is null                      -- 73
-     or to_regprocedure('public._c78_rows(date, date)') is null                     -- 78
-     or to_regprocedure('public._rcs88()') is null then                             -- 88
-    raise exception 'phase93 needs phases 72..79 and 88 pasted first';
+  if to_regprocedure('public.is_owner()') is null or to_regprocedure('public.is_active()') is null
+     or to_regclass('public.audit_log') is null or to_regclass('public.locations') is null then
+    raise exception 'phase93 needs the base schema (is_owner, is_active, audit_log, locations)';
   end if;
 end $g$;
 
@@ -45,6 +40,7 @@ begin
   if p_doc_type is null or p_doc_type !~ '^[a-z][a-z0-9_]{1,40}$' then raise exception 'bad_doc_type'; end if;
   if p_template_id is not null and p_template_id !~ '^[a-z][a-z0-9_]{1,40}$' then raise exception 'bad_template_id'; end if;
   if p_location_id is not null and not exists (select 1 from public.locations where id = p_location_id) then raise exception 'bad_location'; end if;
+  select staff_id into sid from public.profiles where id = auth.uid();
   select template_id into old from public.doc_template_choice where doc_type = p_doc_type and coalesce(location_id, 0) = coalesce(p_location_id, 0);
   if p_template_id is null then
     delete from public.doc_template_choice where doc_type = p_doc_type and coalesce(location_id, 0) = coalesce(p_location_id, 0);

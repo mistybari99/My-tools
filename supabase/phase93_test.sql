@@ -52,6 +52,7 @@ select set_doc_template('pos_receipt',null,1) ->> 'old' as old \gset
 select tt.chk('T11 clear removes the location row (old value reported)', :'old' = 'thermal58_slim' and (select count(*) from doc_template_choice where doc_type='pos_receipt') = 1);
 reset role;
 select tt.chk('T12 audit rows written (3 sets + 1 clear)', (select count(*) from audit_log where table_name='doc_template_choice') = 4 and (select count(*) from audit_log where action='doc_template_clear') = 1);
+select tt.chk('T12b audit staff_id filled', (select count(*) from audit_log where table_name='doc_template_choice' and staff_id is not null) = 4 or (select staff_id from profiles where id=:'o'::uuid) is null);
 select tt.chk('T13 set_by recorded', (select set_by from doc_template_choice limit 1) = :'o'::uuid);
 \echo == paste twice
 \i supabase/phase93.sql

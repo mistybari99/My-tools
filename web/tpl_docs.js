@@ -68,7 +68,7 @@ mk('purchase_bill', 'grp_purch', 'd_pbill', ['a4_formal', 'r_pbill'], ['a4:class
   meta: [['m_no', 'no'], ['m_date', 'date'], ['m_bill', 'supplier_bill_no'], ['m_loc', 'location']], party: [['p_sup', 'supplier']],
   cols: [['code', 'c_code'], ['name', 'c_item'], ['qty', 'c_qty', 'num'], ['unit', 'c_unit'], ['rate', 'c_rate', 'money'], ['amount', 'c_amt', 'money']],
   totals: [['t_sub', 'subtotal'], ['t_disc', 'discount'], ['t_vat', 'vat'], ['t_total', 'total', 1], ['t_paid', 'paid'], ['t_due', 'due']], note: 'note', sign: ['g_prep', 'g_auth'] });
-mk('grn', 'grp_purch', 'd_grn', ['a4_classic', 'r_grn'], ['a4:classic', 'a4:boxed', 'a4:formal', 'a4:minimal', 'a5:compact', 'a4:modern'], {
+mk('grn', 'grp_purch', 'd_grn', ['a4_classic', 'r_grn'], ['a4:classic', 'a4:boxed', 'a4:formal', 'a5:split', 'a5:compact', 'a4:modern'], {
   meta: [['m_no', 'no'], ['m_date', 'date'], ['m_ref', 'po_no'], ['m_loc', 'location']], party: [['p_sup', 'supplier']],
   cols: [['code', 'c_code'], ['name', 'c_item'], ['ordered', 'c_ord', 'num'], ['qty', 'c_recv', 'num'], ['unit', 'c_unit']], note: 'note', sign: ['g_recv', 'g_chk'] });
 // ---- stock (quantities only, no value)
@@ -99,4 +99,5 @@ mk('daily_report', 'grp_acc', 'd_daily', ['thermal80_slip', 'r_daily'], ['therma
 mk('pnl', 'grp_acc', 'd_pnl', ['a4_classic', 'r_acc'], ['a4:classic', 'a4:formal', 'a4:modern', 'a4:minimal', 'a4:boxed', 'a4:compact'], ACC);
 mk('balance_sheet', 'grp_acc', 'd_bs', ['a4_formal', 'r_acc'], ['a4:formal', 'a4:classic', 'a4:modern', 'a4:minimal', 'a4:boxed', 'a4:compact'], ACC);
 // partner statement / sales return etc. rows may be absent; the engine skips what is missing
+T.finishLabels();
 })();
