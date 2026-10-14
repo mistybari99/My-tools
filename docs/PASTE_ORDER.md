@@ -78,3 +78,8 @@ Same as D, but the last file is now phase98: a phase that re-creates `_acct_docs
 
 Same as D and F, with phase103 as the last file: a phase that re-creates any of the 20 functions listed in row 32 (or `_acct_docs`, `inventory_vs_gl`, `recipe_cost`, `_setup_chk81`, `setup_recommendations`, `setup_recommend_apply`, `inbox_list`, `customer_directory`, `find_customer`) must merge into the phase103 text (a new phase103 version) and keep every `bosNN` tag. Run phase89c_test, phase89d_test, phase94_test, phase96_test, phase98_test, phase99_test, phase101_test and phase103_test. Old assertions that are false by design once phase103 exists are copied to a `phaseNNb_test.sql` (never edit the old file); see docs/briefs_p2p3/step_E2E_REPORT.md for the list.
 Build: `bash tests/sql/final_build.sh <db> "<canonical order ... phase98 phase99 phase100 phase101 phase103>"` (tests/sql/run_all_sql.sh appends every `supabase/phase1NN.sql` that is not in the table above, in numeric order).
+
+## H. phase106 (backup / restore-drill coverage)
+
+`supabase/phase106.sql` goes after phase103 (and phase102 if used); guard inside (72..103). Re-creates only `_backup_tables()` (latest body = phase70, one change: `token_a`/`token_b` are not secrets) and adds `backup_coverage106()`. Independent of phase104 / 105. Audit: docs/backend/BACKUP_COVERAGE.md. Test: `supabase/phase106_test.sql`.
+phase106 makes `phase46_test` F13 false by design (perm_conflict rows carry `token_a` / `token_b` keys): `supabase/phase46b_test.sql` is the copy with F13 allowing them; tests/sql/baseline_fails.txt: phase46 1 known fail, phase46b 0.
