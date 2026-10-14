@@ -80,9 +80,14 @@ phase101 3 54
 # NOTE phase89c is 65/0 on the 72..98 chain (INT3) but 63/2 once phase99 (+101) is on top (P2/P2a: phase99 re-creates online_order_get / online_orders_list); phase89d_test is its replacement for the 72..99 chain.
 # NOTE phase101 3 fails: its T0/T3 count rows assuming the build 72..98 + 101 without phase99 (tests/sql/phase101_run.sh); with 99 in the chain they differ by design.
 # post-Step-E2E suites (build = docs/PASTE_ORDER.md 72..101 + phase103), measured in step E2E:
-phase89e 0 65
+phase89e 2 63
 phase98b 0 27
 phase100 0 80
-phase103 0 67
+phase103 1 67
 # NOTE phase98 2 25 and phase89d 2 63: with phase103 on top, 'phase97 then phase98 = identical hash' (phase98 P1b, G1 last) and 'phase89 then 98 then 99 = identical' (phase89d P2, P2a) are false by design (phase103 re-creates those bodies); phase98b_test / phase89e_test are their replacements. Never edit the old files.
 phase106 0 20
+# post-Step-Perf suites (build = docs/PASTE_ORDER.md up to phase108 + phase110 LAST), measured in step Perf:
+phase110 0 45
+phase89f 0 65
+phase103b 0 68
+# NOTE phase89e 2 63 and phase103 1 67: with phase110 on top, 'phase89 then phase103 = identical bodies' (phase89e P2, P2a) and 'phase103 pasted twice = no body changes' (phase103 T9) are false by design (phase110 re-creates _cogs_lines72, inbox_list and _acct_stock_moves85; a re-paste of 89 / 103 puts the older text back, results identical, only slow). phase89f_test / phase103b_test are their replacements (they paste phase110 again after phase103). Never edit the old files.
