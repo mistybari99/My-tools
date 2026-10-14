@@ -139,14 +139,13 @@ function loadAll(force) {
 const niceMax = (v) => { if (!(v > 0)) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
 function cssVar(n, d) { try { return getComputedStyle(document.documentElement).getPropertyValue(n).trim() || d; } catch (e) { return d; } }
 function baseSpec(t, m, d) {
-  const sp = { type: 'line', title: tileTitle(t), format: MX.fmtOf(m, true), theme: 'auto', height: HEIGHT[t.size] || HEIGHT.M, mini: t.size === 'S' };
+  const sp = { type: 'line', format: MX.fmtOf(m, true), theme: 'auto', height: HEIGHT[t.size] || HEIGHT.M, mini: t.size === 'S' };
   if (m.shape === 'series') sp.series = d.series.map((s) => ({ name: s.name, points: (s.points || []).map((p) => ({ x: p.x, y: N(p.y) })) }));
   else if (m.shape === 'slices') sp.slices = d.slices.map((s) => ({ label: s.label, value: N(s.value) }));
   else {
     const mx = Math.max(N(d.value), N(d.prev), N(t.target));
     sp.value = N(d.value); sp.min = d.min !== undefined ? d.min : 0; sp.max = d.max !== undefined ? d.max : niceMax(t.target ? Math.max(N(t.target) * 1.25, N(d.value)) : mx * 1.25);
     if (t.target) { sp.target = N(t.target); sp.ranges = [{ to: sp.target * 0.5, color: cssVar('--bad', '#ef4444') }, { to: sp.target * 0.8, color: cssVar('--warn', '#f59e0b') }, { to: sp.max, color: cssVar('--ok', '#22c55e') }]; }
-    if (Array.isArray(d.spark) && d.spark.length > 1) sp.series = [{ name: tileTitle(t), points: d.spark.map((p) => ({ x: p.x, y: N(p.y) })) }];
   }
   return sp;
 }

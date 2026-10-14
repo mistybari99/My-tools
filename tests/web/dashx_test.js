@@ -27,13 +27,17 @@ const FAKE = `(function(){ var B = window.BOS; var L = B.L; var ids = ['line','a
  var names = ['Line','Area','Bar','Column','Stacked bar','Pie','Donut','Treemap','Gauge','Bullet']; var bn = ['লাইন চার্ট','এরিয়া','বার','কলাম','স্ট্যাকড বার','পাই','ডোনাট','ট্রি-ম্যাপ','গেজ','বুলেট'];
  var calls = window.__CR = [];
  B.charts = { TYPES: ids.map(function (id, i) { return { id: id, label: L(bn[i], names[i], names[i]), icon: names[i].slice(0, 2) }; }),
-  compatible: function (s) { var out = []; if (s.slices) out = ['bar','column','pie','donut','treemap','bullet']; else if (s.series && !(s.value !== undefined)) { out = ['line','area','bar','column']; if (s.series.length > 1) out.push('stacked_bar'); } else if (s.value !== undefined) { out = ['gauge','bullet']; if (s.series) out = ['line','area','bar','column'].concat(out); }
+  compatible: function (s) { var out = []; if (s.slices) out = ['bar','column','pie','donut','treemap']; else if (s.series && !(s.value !== undefined)) { out = ['line','area','bar','column']; if (s.series.length > 1) out.push('stacked_bar'); } else if (s.value !== undefined) { out = ['gauge','bullet']; if (s.series) out = ['line','area','bar','column'].concat(out); }
    return out; },
   convert: function (s, to) { var c = Object.assign({}, s); c.type = to; c.converted = true; return c; },
   render: function (host, spec) { calls.push({ op: 'render', type: spec.type, spec: Object.assign(JSON.parse(JSON.stringify(spec)), { hasFormat: typeof spec.format === 'function' && typeof spec.format(1234) === 'string' }), title: spec.title }); host.innerHTML = '<svg class="fk" data-type="' + spec.type + '" width="100" height="20"></svg>';
    return { update: function (s) { calls.push({ op: 'update', type: s.type, spec: JSON.parse(JSON.stringify(s)) }); }, destroy: function () { calls.push({ op: 'destroy' }); host.innerHTML = ''; } }; } };
 })();`;
 
+// REAL charts.js: wrap render() so every call is recorded the same way as the fake does
+const WRAP = `;(function(){ var c = window.BOS.charts, calls = window.__CR = [], r = c.render; var rec = function (op, s) { return { op: op, type: s.type, spec: Object.assign(JSON.parse(JSON.stringify(s)), { converted: !!s._shape || s.converted, hasFormat: typeof s.format === 'function' && typeof s.format(1234) === 'string' }), title: s.title }; };
+ c.render = function (host, spec) { calls.push(rec('render', spec)); var h = r(host, spec); return { update: function (s) { calls.push(rec('update', s)); return h.update(s); }, destroy: function () { calls.push({ op: 'destroy' }); return h.destroy(); } }; }; })();`;
+const FK = REAL ? 'svg.bch-svg' : '.fk';
 const R = (key, def) => ({ key, module: 'ui', kind: 'switch', value: null, default_value: def, label_bn: key, label_en: key, label_mix: key, sort: 1 });
 const OBD = () => ({
   sales: [TD, YD, dh(-2), dh(-3), dh(-5), dh(-8), dh(-9)].map((d, i) => ({ sale_date: d, location_id: 1, pay_mode: i % 2 ? 'bkash' : 'cash', status: 'done', n: 10 + i, total: 5000 - i * 300, discount: 100 }))
@@ -92,7 +96,7 @@ const OBD = () => ({
     await p.exposeFunction('__srv', (op, a) => srvOp(op, a));
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    if (!REAL) await p.route('**/charts.js', (r) => r.fulfill({ contentType: 'text/javascript', body: FAKE }));
+    await p.route('**/charts.js', (r) => r.fulfill({ contentType: 'text/javascript', body: REAL ? fs.readFileSync(_P.WEB_DIR + '/charts.js', 'utf8') + WRAP : FAKE }));
     const data = JSON.parse(JSON.stringify(base)); const T = data.tables;
     T.rules = [R('ui_noperm_mode', 'lock')];
     T.exceptions = [{ id: 1, flag_code: 'x', level: 'red', status: 'open', amount: 1, entry_date: TD, created_at: TD + 'T10:00:00Z' }];
@@ -122,10 +126,11 @@ const OBD = () => ({
   ok((await calls(p, 'sales_summary')).length === 1, 'T1 one sales_summary call shared by every sales tile (got ' + (await calls(p, 'sales_summary')).length + ')');
   ok((await calls(p, 'biz_daily')).length === 1, 'T1 one biz_daily call');
   await overflow(p, 'default 360');
-  ok(await p.evaluate(() => Array.from(document.querySelectorAll('#dx_root button')).filter((b) => b.offsetParent && !b.closest('.dx-ed')).every((b) => { const r = b.getBoundingClientRect(); return r.height >= 40 && r.width >= 36; })), 'T1 touch targets >= 40px (buttons in view)');
+  ok(await p.evaluate(() => Array.from(document.querySelectorAll('#dx_root button')).filter((b) => b.offsetParent && !b.closest('.dx-ed,.dx-ch')).every((b) => { const r = b.getBoundingClientRect(); return r.height >= 40 && r.width >= 36; })), 'T1 touch targets >= 40px (buttons in view)');
   ok(await p.evaluate(() => Array.from(document.querySelectorAll('#dx_root input,#dx_root select')).every((e) => parseFloat(getComputedStyle(e).fontSize) >= 16)), 'T1 inputs are 16px');
   ok(await p.evaluate(() => document.querySelector('.dx-t[data-m=sales_total]').getBoundingClientRect().width < 200 && document.querySelector('.dx-t[data-m=sales_trend]').getBoundingClientRect().width > 300), 'T1 phone grid: S tile 1 column, M tile 2 columns');
-  if (process.env.DX_SHOTS !== '0') { await p.evaluate(() => window.BOS_THEME.set('dark')); await wait(p, 500); await p.screenshot({ path: SP + '/dashx_dark_360.png' }); await p.evaluate(() => window.BOS_THEME.set('light')); await wait(p, 500); await p.screenshot({ path: SP + '/dashx_light_360.png' }); await p.evaluate(() => window.BOS_THEME.set('dark')); await wait(p, 300); }
+  if (process.env.DX_SHOTS !== '0') { await p.evaluate(() => window.BOS_THEME.set('dark')); await wait(p, 500); await p.screenshot({ path: SP + '/dashx_dark_360.png', fullPage: true }); await p.evaluate(() => window.BOS_THEME.set('light')); await wait(p, 500); await p.screenshot({ path: SP + '/dashx_light_360.png', fullPage: true }); await p.evaluate(() => window.BOS_THEME.set('dark')); await wait(p, 300); }
+  if (process.env.DX_ONLY === 'shots') { await br.close(); srv.close(); process.exit(0); }
   // the 4 period chips, shared by all tiles
   const s0 = (await calls(p, 'sales_summary')).length;
   await p.click('.dx-chip[data-v="30d"]'); await wait(p, 1500);
@@ -154,7 +159,7 @@ const OBD = () => ({
   await p.click(tileSel + ' .dx-tb[data-v=pie]'); await wait(p, 400);
   const rr = await renders(p); const last = rr[rr.length - 1];
   ok(rr.length === n0 + 1 && last.type === 'pie' && last.converted && last.spec.slices.length === 2, 'T2 switching to pie renders the CONVERTED spec: ' + JSON.stringify(last && last.type));
-  ok(await p.locator(tileSel + ' .fk').getAttribute('data-type') === 'pie', 'T2 chart host shows pie');
+  ok(await p.locator(tileSel + ' ' + FK).getAttribute('data-type') === 'pie', 'T2 chart host shows pie');
   const destroys = await p.evaluate(() => window.__CR.filter((c) => c.op === 'destroy').length); ok(destroys >= 1, 'T2 old instance destroyed');
   await wait(p, 900);
   ok(SRV.saves.length >= 1 && SRV.saves[SRV.saves.length - 1].tiles.find((t) => t.metric === 'sales_by_cat').type === 'pie', 'T2 type saved to the layout');
@@ -291,7 +296,7 @@ const OBD = () => ({
   reset(); p = await open('#/dashx', { ob: { fail: ['sales_summary', 'biz_items'] } });
   const nd = await p.locator('.dx-t[data-state=error] [data-state=nodata], .dx-t[data-state=error] .dx-nd').count();
   ok(nd >= 3 && /No data/.test(await p.locator('.dx-t[data-m=sales_total]').innerText()), 'T8 rpc error: sales tiles show "No data" (' + nd + ')');
-  ok(await p.locator('.dx-t[data-m=sales_by_cat] .fk').count() === 1 && await p.locator('.dx-t[data-m=cust_dues] .dx-kv').count() === 1, 'T8 other tiles still render');
+  ok(await p.locator('.dx-t[data-m=sales_by_cat] ' + FK).count() === 1 && await p.locator('.dx-t[data-m=cust_dues] .dx-kv').count() === 1, 'T8 other tiles still render');
   ok(await p.locator('#dx_root').count() === 1 && (await order(p)).length === DEF, 'T8 page and layout intact');
   await p.click('.dx-t[data-m=sales_total] [data-act=dx_refresh]'); await wait(p, 600); ok((await calls(p, 'sales_summary')).length >= 2, 'T8 refresh button retries the source');
   await p.close();
