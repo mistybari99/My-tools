@@ -15,3 +15,7 @@ Old tests below break each time a file is appended (they assert "X is the LAST s
 | optionsx_b_test | order_test | same |
 
 `order_test.js` asserts: required scripts present exactly once, no duplicate or missing script files, entry before kbdfix before pos, pos before posfail, charts before dashx (when present), integrations before setupadvisor and twofa, tpl_registry before every tpl_* consumer, landed before optionsx, ia.js before nav.js, theme.css loaded after styles.css, ia.js rec ids unique, runtime IA ids/routes unique, every non-soon route has a page handler.
+
+## Maintained
+
+- `lang_all_test.js` (+ `lang_baseline.json`): static acorn scan of every `web/*.js` for `L(bn,en,mix)` calls and `{bn,en,mix}` label tables (en has no Bangla letters and is non-empty, bn/mix non-empty, 3-arg form) plus `label_en`/`hint_en` cells of INSERT rows in `supabase/phase72..103.sql`. Fails only on violations not in the baseline (old texts are not edited); prints per-file baseline counts and a Latin-only-bn report (not enforced). Rebuild the baseline deliberately with `LANG_BASELINE_WRITE=1 node tests/web/lang_all_test.js`.
