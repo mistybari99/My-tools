@@ -24,7 +24,7 @@ const brandText = () => (S.lang === 'en' ? BRAND.en : BRAND.bn);
 
 const X = {
   title: L('ক্রয় বিল প্রিন্ট ও পাঠান', 'Print and send purchase bills', 'Purchase Bill Print ও পাঠান'),
-  intro: L('একটি বিল বেছে নিন — Print, Share, Download, Email, SMS, WhatsApp।', 'Pick a bill to print, share, download, email, SMS or WhatsApp.', 'একটি Bill বেছে নিন — Print, Share, Download, Email, SMS, WhatsApp।'),
+  intro: L('একটি বিল বেছে নিন — প্রিন্ট, শেয়ার, ডাউনলোড, Email, SMS, WhatsApp।', 'Pick a bill to print, share, download, email, SMS or WhatsApp.', 'একটি Bill বেছে নিন — Print, Share, Download, Email, SMS, WhatsApp।'),
   none: L('কোনো বিল নেই', 'No bills', 'কোনো Bill নেই'), loading: L('আনা হচ্ছে…', 'Loading…', 'আনা হচ্ছে…'),
   noperm: L('এই বিল দেখার অনুমতি নেই', 'You are not allowed to see purchase bills', 'Purchase Bill দেখার অনুমতি নেই'),
   loadFail: L('বিল আনা যায়নি। নেট দেখে আবার চেষ্টা করুন।', 'Could not load the bill. Check the connection and try again.', 'Bill আনা যায়নি। নেট দেখে আবার চেষ্টা করুন।'),
