@@ -299,19 +299,37 @@ select tt.chk('T5 a real autopost balances (debit - credit = 0) and posts journa
 \echo == T6 paste twice, and a body with an unknown tag stops the paste
 create temp table hh as select oid, md5(pg_get_functiondef(oid)) h from pg_proc where pronamespace = 'public'::regnamespace;
 \i supabase/phase110.sql
+\i supabase/phase112.sql
+\i supabase/phase113.sql
+\i supabase/phase114.sql
 \i supabase/phase115.sql
+\i supabase/phase116.sql
+\i supabase/phase117.sql
+\i supabase/phase118.sql
 select tt.chk('T6 second paste changes no function at all', not exists (select 1 from pg_proc p join hh on hh.oid = p.oid where md5(pg_get_functiondef(p.oid)) <> hh.h));
 select tt.chk('T6 second paste: still eight indexes, one of each', (select count(*) from pg_class where relname in ('stock_ledger_reason_made_idx','stock_ledger_refid_idx','stock_ledger_item_loc_reason_idx','production_runs_idtext_idx','purchase_bills_idtext_idx','stock_ledger_lastcost_idx','audit_log_tbl_rec_id_idx','audit_log_view_at_idx')) = 8);
 insert into tt.cur values ('moves2', pg_get_functiondef('public._acct_stock_moves85(date)'::regprocedure));
 do $$ begin execute replace(replace((select def from tt.cur where name = 'moves2'), 'bos96', 'bos999'), 'perf110', 'perf111'); end $$;
 begin;   -- like the Supabase SQL editor: one error and nothing of the paste stays
 \i supabase/phase110.sql
+\i supabase/phase112.sql
+\i supabase/phase113.sql
+\i supabase/phase114.sql
 \i supabase/phase115.sql
+\i supabase/phase116.sql
+\i supabase/phase117.sql
+\i supabase/phase118.sql
 rollback;
 select tt.chk('T6 an unknown tag (bos999) in a target body stops the paste: the body is not replaced', (select prosrc like '%bos999%' and prosrc not like '%perf110%' and prosrc like '%perf111%' from pg_proc where proname = '_acct_stock_moves85'));
 do $$ begin execute (select def from tt.cur where name = 'moves2'); end $$;
 \i supabase/phase110.sql
+\i supabase/phase112.sql
+\i supabase/phase113.sql
+\i supabase/phase114.sql
 \i supabase/phase115.sql
+\i supabase/phase116.sql
+\i supabase/phase117.sql
+\i supabase/phase118.sql
 select tt.chk('T6 with the tag gone the paste works again (perf110 in the body)', (select prosrc like '%perf110%' and prosrc not like '%bos999%' from pg_proc where proname = '_acct_stock_moves85'));
 select tt.chk('T6 no function outside the six changed by phase110 (compared with the snapshot of T6)', not exists (select 1 from pg_proc p join hh on hh.oid = p.oid where md5(pg_get_functiondef(p.oid)) <> hh.h));
 
