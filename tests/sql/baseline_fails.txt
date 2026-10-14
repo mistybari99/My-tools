@@ -122,3 +122,9 @@ phase103d 0 68
 phase110b 0 45
 phase114 0 52
 phase115 0 47
+# BATCH 3 (phase116 / phase117, after phase111): phase89g 2 and phase103c 1 are false by design now: phase109's body guard REFUSES to overwrite production_post once it carries the tag bos116, so the re-paste chain
+#   103, 105, 109 ... no longer restores every bos109 body (re-pasting 89 also puts back pool_set). Replacement for the 89 case: phase89h_test (chain ends with 116, 117; 10 functions). The 103 case has no replacement
+#   until phase109's guard is taught bos116 on production_post (skip that one function, as INT4 did for _bp_pay99) - an edit of an old phase, outside batch 3.
+phase89h 0 65
+phase116 0 87
+phase117 0 36
