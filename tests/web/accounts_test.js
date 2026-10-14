@@ -15,7 +15,7 @@ const MAPS = [{ key: 'pay_cash', account_id: 2, label_bn: 'নগদ টাক�
 const MOCK = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const A = window.__ACC;
  c.rpc = async (fn, args) => {
   (window.__ACALLS = window.__ACALLS || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);
-  if (!/^acct_|^set_rule$/.test(fn)) return rpc(fn, args);
+  if (!/^acct_|^set_rule$|^inventory_vs_gl$/.test(fn)) return rpc(fn, args);
   const err = (m) => ({ data: null, error: { message: m, code: 'P0001' } });
   if (A.fail && A.fail[fn]) { const m = A.fail[fn]; if (!A.keep) delete A.fail[fn]; return err(m); }
   if (fn === 'acct_status') return { data: A.status, error: null };
@@ -28,6 +28,7 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   if (fn === 'acct_journal_book') return { data: A.book, error: null };
   if (fn === 'acct_party_ledger') return { data: A.party, error: null };
   if (fn === 'acct_reconcile') return { data: A.reco, error: null };
+  if (fn === 'inventory_vs_gl') return { data: A.inv, error: null };
   if (fn === 'acct_post_pending') return { data: args.p_dry ? A.dry : A.real, error: null };
   if (fn === 'acct_set_start') { A.status.start = args.p_date; return { data: { start: args.p_date }, error: null }; }
   if (fn === 'set_rule') { if (args.p_key === 'accounting_on') A.status.on = args.p_value; if (args.p_key === 'accounting_autopost') A.status.autopost = args.p_value; return { data: null, error: null }; }
@@ -46,7 +47,7 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   return { data: null, error: null }; };
  return c; }; })();`;
 const IS = (o) => ({ from: '2026-10-01', to: '2026-10-13', income: [{ id: 7, code: '4100', name_bn: 'বিক্রয়', name_en: 'Sales', parent_id: null, is_group: false, amount: 2050 }], expense: [{ id: 8, code: '5300', name_bn: 'ভাড়া', name_en: 'Rent', parent_id: null, is_group: false, amount: 1400 }],
-  total_income: 2050, total_expense: 1400, cogs: 900, gross_profit: 1150, net_profit: 650, cogs_missing: o.cm || 0 });
+  total_income: 2050, total_expense: 1400, cogs: 900, gross_profit: 1150, net_profit: 650, cogs_missing: o.cm || 0, unknown_cost_rev: o.unk || 0, cogs_estimate_missing: o.unk ? 200 : 0, provisional: !!o.unk });
 const BS = (o = {}) => ({ as_of: '2026-10-13', assets: [{ id: 1, code: '1000', name_bn: 'সম্পদ', name_en: 'Assets', parent_id: null, is_group: true, amount: 10180 }, { id: 2, code: '1110', name_bn: 'হাতে নগদ', name_en: 'Cash in hand', parent_id: 1, is_group: false, amount: 10180 }],
   liabilities: [{ id: 5, code: '2100', name_bn: 'সরবরাহকারীর পাওনা', name_en: 'Supplier payables', parent_id: null, is_group: false, amount: 3800 }], equity: [{ id: 6, code: '3100', name_bn: 'মালিকের মূলধন', name_en: 'Owner capital', parent_id: null, is_group: false, amount: 5730 }],
   total_assets: 10180, total_liabilities: 3800, total_equity: 5730, retained_earnings: 650, total_equity_and_earnings: 6380, total_liabilities_and_equity: 10180, unbalanced: !!o.unbal, difference: o.unbal ? 25 : 0, cogs_missing: o.cm || 0 });
@@ -61,11 +62,14 @@ function acc(o = {}) {
     book: { from: '2026-10-01', to: '2026-10-13', total: 2, rows: [{ id: 9, date: '2026-10-05', location_id: 1, source_type: 'manual', source_id: 'x1', memo: 'Rent for October', status: 'posted', reverses_id: null, flags: null, lines: [{ line_no: 1, code: '5300', name_bn: 'ভাড়া', name_en: 'Rent', debit: 3000, credit: 0 }, { line_no: 2, code: '1110', name_bn: 'হাতে নগদ', name_en: 'Cash in hand', debit: 0, credit: 3000 }] },
       { id: 8, date: '2026-10-04', location_id: 1, source_type: 'sale', source_id: 'abcdef12-0000', memo: 'Receipt 1', status: 'posted', reverses_id: null, flags: 'cogs_missing', lines: [{ line_no: 1, code: '1110', name_bn: 'হাতে নগদ', name_en: 'Cash in hand', debit: 500, credit: 0 }, { line_no: 2, code: '4100', name_bn: 'বিক্রয়', name_en: 'Sales', debit: 0, credit: 500 }] }] },
     party: { party_type: 'customer', party_id: 'c1', from: '2026-10-01', to: '2026-10-13', opening: 0, closing: 150, rows: [{ date: '2026-10-04', entry_id: 8, memo: 'Receipt 2', source_type: 'sale', source_id: 'aaaa1111', account_code: '1210', debit: 250, credit: 0, balance: 250 }, { date: '2026-10-05', entry_id: 10, memo: 'Due collection', source_type: 'collection', source_id: '7', account_code: '1210', debit: 0, credit: 100, balance: 150 }] },
+    inv: { as_of: '2026-10-13', location_id: null, start: '2026-10-01', valuation_basis: 'average_cost', agree: false, total: { gl: 3040, valuation: 2940, diff: 100, unexplained: 0 },
+      rows: [{ key: 'inv_raw', code: '1320', name_bn: 'মজুত: কাঁচামাল', name_en: 'Raw materials', gl: 3040, valuation: 2940, ledger_value: 2940, diff: 100, unexplained: 0,
+        reasons: [{ code: 'count_adjust', amount: 150 }, { code: 'opening', amount: -250 }, { code: 'transfer', amount: 300 }, { code: 'manual_journal', amount: 40 }, { code: 'mystery_new_code', amount: -140 }] }] },
     reco: { start: '2026-10-01', customers: [], customers_off: 0, suppliers: [{ party_id: 's1', name: 'Sugar Co', journal: 3800, existing: 3100, difference: 700, unexplained: 700 }], suppliers_off: 1, unattributed_receivable: 0 },
     dry: { dry: true, start: '2026-10-01', posted: 3, reversed: 1, by_type: { sale: 2, purchase: 1, sale_reversed: 1 }, locked: 0, waiting: { cost_missing: 1 }, cogs_missing: 1, errors: [], more: false, total_debit: 1500, total_credit: 1500,
       trial: [{ code: '1110', name_bn: 'হাতে নগদ', name_en: 'Cash in hand', debit: 1500, credit: 0 }, { code: '4100', name_bn: 'বিক্রয়', name_en: 'Sales', debit: 0, credit: 1500 }],
       preview: [{ date: '2026-10-13', source_type: 'sale', source_id: 's1', memo: 'Receipt 7', lines: [{ code: '1110', debit: 1500, credit: 0 }, { code: '4100', debit: 0, credit: 1500 }] }] },
-    real: { dry: false, posted: 3, reversed: 1, by_type: {}, locked: 0, waiting: {}, cogs_missing: 1, errors: [], more: false, skipped_sources: [] }, fail: o.fail || {} };
+    real: { dry: false, posted: 3, reversed: 1, by_type: {}, locked: 0, waiting: {}, cogs_missing: 1, errors: o.realErr || [], more: false, skipped_sources: [] }, fail: o.fail || {} };
 }
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
@@ -118,6 +122,19 @@ function acc(o = {}) {
   ok(/does not balance/.test(t) && /25\.00/.test(t), 'unbalanced warning with the difference'); ok(/2 sale\(s\)\/movement\(s\) have no known cost/.test(t), 'cogs missing note');
   ok((await calls(p, 'acct_post_pending')).length === 0, 'no auto post when the switch is off');
 
+  // ---- phase 72: status strip, failed-posting banner (autopost no longer swallows errors), provisional profit ----
+  p = await open('#/accounts', { status: { pending: 2, errors: 1, locked: 1, last_post_at: '2026-10-13T08:00:00Z', error_list: [{ source_type: 'sale', source_id: 'abcdef1234', error: 'unbalanced', tries: 2 }] }, realErr: [{ source_type: 'sale', source_id: 'abcdef1234', error: 'unbalanced' }], unk: 427 });
+  t = (await text(p)).replace(/\s+/g, ' ');
+  ok(/Last post: 13\/10\/2026/.test(t) && /Pending 2/.test(t) && /Errors 1/.test(t) && /Held by a closed period 1/.test(t), 'status strip: last post, pending, errors, held');
+  ok(/1 entries were not posted/.test(t) && /unbalanced/.test(t), 'failed-posting banner with the reason');
+  ok(/Provisional: sales with no known cost: ৳ 427\.00/.test(t) && /estimate from the typed cost: ৳ 200\.00/.test(t), 'overview shows the provisional unknown-cost figure');
+  await noOverflow(p, 'strip');
+  c = await calls(p, 'acct_post_pending'); const b4 = c.length; await p.click('#ac_failbanner [data-act=ac_post]'); await wait(p, 400);
+  c = await calls(p, 'acct_post_pending'); ok(c.length === b4 + 1 && c[c.length - 1].p_dry === true, 'the banner link opens the Post now panel (dry run first)');
+  p = await open('#/accounts', { status: { autopost: false, pending: 0, errors: 0, last_post_at: null }, unk: 100 });
+  t = (await text(p)).replace(/\s+/g, ' '); ok(/Last post: not yet/.test(t) && /Pending 0/.test(t) && /Errors 0/.test(t) && !(await p.locator('#ac_failbanner').count()), 'quiet strip when nothing failed');
+  await tab(p, 'pl'); t = (await text(p)).replace(/\s+/g, ' '); ok(/Gross profit \(income − cost of goods\) \(provisional\)/.test(t) && /Provisional: sales with no known cost: ৳ 100\.00/.test(t), 'P&L marks the gross profit provisional');
+
   // ---- tabs ----
   await tab(p, 'bs'); t = await text(p); ok(/Total liabilities/.test(t) && /Earnings to date/.test(t), 'balance sheet tab'); await noOverflow(p, 'bs');
   await p.fill('#ac_asof', '2026-10-10'); await p.dispatchEvent('#ac_asof', 'change'); await wait(p, 300);
@@ -136,6 +153,10 @@ function acc(o = {}) {
   await tab(p, 'parties'); await p.fill('#ac_pmob', '01711111111'); await p.click('[data-act=ac_pshow]'); await wait(p, 400);
   c = await calls(p, 'acct_party_ledger'); ok(c.length >= 1 && c[c.length - 1].p_type === 'customer' && c[c.length - 1].p_id === 'c1', 'customer found by mobile'); ok(/Due collection/.test(await text(p)), 'party rows shown');
   await p.click('[data-act=ac_reco]'); await wait(p, 400); t = await text(p); ok(/Sugar Co/.test(t) && /700\.00/.test(t), 'reconciliation shows the supplier difference'); ok(/Everything agrees/.test(t), 'customers agree text'); await noOverflow(p, 'parties');
+  // phase 72: stock vs books section in the reconcile tab (read only)
+  c = await calls(p, 'inventory_vs_gl'); ok(c.length === 1 && c[0].p_loc === 1 && /^\d{4}-\d{2}-\d{2}$/.test(c[0].p_date), 'stock-vs-books asked with the as-of date and the chosen place (1)');
+  t = await text(p).then((x) => x.replace(/\s+/g, ' ')); ok(/Reconcile: stock vs books/.test(t) && /Raw materials/.test(t) && /3,040\.00/.test(t) && /2,940\.00/.test(t) && /Stock-count adjustment/.test(t) && /-250\.00/.test(t) && /mystery_new_code/.test(t), 'stock-vs-books table with reasons (unknown code falls back to the code)');
+  ok(/Nothing is posted here/.test(t), 'stock-vs-books says it posts nothing');
 
   // ---- manual journal ----
   await tab(p, 'new');
