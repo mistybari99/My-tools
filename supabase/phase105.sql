@@ -52,7 +52,7 @@ begin
   for r in select * from (values
     ('public._bp_uuid99(text,text)', array['bos99', 'bos105']::text[]),                       -- 'bos99' = the text of the literal 'bos99auto:'
     ('public._bp_auto99(text,text,integer,text,text,text,integer,text)', array['bos105']::text[]),
-    ('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)', array['bos105']::text[]),
+    ('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)', array['bos105', 'bos109', 'bos111']::text[]),   -- (INT4) bos109 / bos111 = a re-paste of this file on the final database: that merged body is left alone (see the skip before the create below)
     ('public._bp_sp_void99()', array['bos105']::text[]),
     ('public.inbox_unmask(text,text,text)', array['bos105']::text[]),
     ('public._inb_mask_phones103(text)', array['bos105']::text[]),
@@ -140,7 +140,8 @@ begin
 end $function$
 $f$; end if; end $p105$;
 
-do $p105$ begin if current_setting('phase105.ok', true) = 'on' then execute $f$
+-- (INT4) skipped when phase109 / phase111 already merged this function (tag bos109): a re-paste of phase105 must not take the supplier lock fix back out.
+do $p105$ begin if current_setting('phase105.ok', true) = 'on' and position('bos109' in pg_get_functiondef('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)'::regprocedure)) = 0 then execute $f$
 CREATE OR REPLACE FUNCTION public._bp_pay99(p_kind text, p_ref text, p_mode text, p_amount numeric, p_origin text, p_client uuid, p_note text, p_confirm boolean)
  RETURNS jsonb
  LANGUAGE plpgsql

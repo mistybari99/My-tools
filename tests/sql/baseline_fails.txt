@@ -81,17 +81,25 @@ phase101 3 54
 # NOTE phase101 3 fails: its T0/T3 count rows assuming the build 72..98 + 101 without phase99 (tests/sql/phase101_run.sh); with 99 in the chain they differ by design.
 # post-Step-E2E suites (build = docs/PASTE_ORDER.md 72..101 + phase103), measured in step E2E:
 phase89e 1 64
-phase98b 2 25
+phase98b 0 27
 phase100 0 80
 phase103 1 67
 # NOTE phase98 2 25 and phase89d 2 63: with phase103 on top, 'phase97 then phase98 = identical hash' (phase98 P1b, G1 last) and 'phase89 then 98 then 99 = identical' (phase89d P2, P2a) are false by design (phase103 re-creates those bodies); phase98b_test / phase89e_test are their replacements. Never edit the old files.
 phase106 0 20
 # post-Step-Sec2 suites (build = docs/PASTE_ORDER.md 72..103 + phase105 LAST):
 phase105 0 52
-phase103b 0 68
-phase89f 0 65
+phase103b 1 67
+phase89f 2 63
 phase98c 0 27
 # NOTE phase89e 1, phase98b 2, phase103 1: these three re-paste phase103 as the LAST step and expect it to repair; once phase105 is on top that final state is phase103's text, not phase105's, so the 'identical hash' / 'recipe_cost restored' checks differ by design.
 #      Replacements (same assertions, every phase103 paste is followed by phase105): phase89f_test, phase98c_test, phase103b_test. Never edit the old files. phase103_test itself is 0 fail on a build WITHOUT phase105 (TEMPLATE=<db through 103>).
 # NOTE phase105_test.sql pastes phase105 itself; on this chain (105 already built in) it is a second paste, so the 'before' probes are marked (F) = real only on a build without phase105 (run it on <db through 103> to see the 26 failing-before assertions).
 phase109 0 23
+phase104 0 22
+phase107 0 56
+phase108 0 11
+phase111 0 9
+phase89g 0 65
+phase103c 0 68
+# INT4: phase89g_test / phase103c_test replace phase89f / phase103b for the chain 72..109 + phase111 (re-pasting 89 or 103 now needs 103,105,109,111 after it); phase98b is 0 fails on the final chain.
+# INT4 NOTE: phase89f 2 and phase103b 1 are false by design once phase109/111 exist (re-pasting 89 / 103 changes functions 109 re-creates); replacements phase89g_test / phase103c_test.
