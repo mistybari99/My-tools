@@ -230,7 +230,7 @@
   var OLD = { home: 1, items: 1, staff: 1, matrix: 1, rules: 1, settings: 1, logs: 1, backup: 1, itemreq: 1, pos: 1, '': 1 };
   var lastHash = null;
   function scope() {
-    var h = location.hash; if (h === lastHash && (!B.IA || lastHash !== null)) return; lastHash = h;
+    var h = location.hash; if (!B.IA || h === lastHash) return; lastHash = h;
     var a = doc.getElementById('app'); if (!a) return;
     var base = h.replace(/^#\/?/, '').split('/')[0].split('?')[0];
     var isNew = !OLD[base] && !!(B.IA || []).some(function (r) { return r.route.split('/')[0] === base; });
@@ -290,7 +290,9 @@
     // NEW screens only: 44px targets, 320px reflow (old screens keep their look)
     'html body #app[data-a11y-new] :is(button.mini,a.mini,.s2-dots,button.q4b-chip){min-height:44px;min-width:44px}' +
     'html body #app[data-a11y-new] a.mini{display:inline-flex;align-items:center;justify-content:center}' +
-    'html body #app[data-a11y-new] :is(input,select,textarea){min-width:0;max-width:100%}';
+    'html body #app[data-a11y-new] :is(input,select,textarea){min-width:0;max-width:100%}' +
+    'html body [data-doc] .tp-sec h3{color:inherit}html body [data-doc].tp-modern .tp-sec h3{color:#0f6b4f}' +   /* template previews are white paper: dark-theme page ink on white failed contrast; .tp-modern keeps its own green */
+    'html body #app[data-a11y-new] > header.top h1{min-width:0;overflow:hidden;text-overflow:ellipsis}';
   (doc.head || doc.documentElement).appendChild(css);
 
   window.BOS_A11Y = { scan: scan, trap: trap, version: 1 };

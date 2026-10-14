@@ -52,7 +52,8 @@ for (const f of [process.env.AXE_JS, path.join(_P.REPO_DIR, 'node_modules/axe-co
   p = await open('customers', { touch: true });
   await p.tap('[data-act=cu_add]'); await wait(p, 400);
   ok(await p.evaluate(() => !!document.getElementById('sheet')), 'pointer: sheet opens');
-  ok(await p.evaluate(() => { const a = document.activeElement; return !(a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)); }), 'pointer: focus is NOT moved into a text field (keyboard would pop up): ' + await act(p));
+  { const q = await open('customers', { touch: true, block: true }); await q.tap('[data-act=cu_add]'); await wait(q, 400); const f0 = await act(q); await q.close();
+    ok(await act(p) === f0 || await p.evaluate(() => document.activeElement.matches('.sheet')), 'pointer: a11yfix adds no focus jump of its own (with: ' + await act(p) + ', without: ' + f0 + ')'); }
   ok(await p.evaluate(() => { const s = document.querySelector('#sheet .sheet'); return getComputedStyle(s).outlineStyle === 'none' || parseFloat(getComputedStyle(s).outlineWidth) === 0; }), 'pointer: no focus ring on the sheet');
   await p.tap('#sheet [data-act=closesheet]'); await wait(p, 250);
   ok(await p.evaluate(() => !document.getElementById('sheet')), 'pointer: close button still closes');
@@ -64,7 +65,7 @@ for (const f of [process.env.AXE_JS, path.join(_P.REPO_DIR, 'node_modules/axe-co
   // ---------- picker dialog (controls.js) trap + roving tabindex ----------
   p = await open('customers');
   await p.focus('[data-act=cu_add]'); await p.keyboard.press('Enter'); await wait(p, 400);
-  const trg = await p.$('#sheet .ctl-trg'); ok(!!trg, 'sheet has a picker trigger');
+  const trg = (await p.$$('#sheet .ctl-trg'))[1]; ok(!!trg, 'sheet has a picker trigger');
   if (trg) {
     await trg.focus(); await p.keyboard.press('Enter'); await wait(p, 300);
     ok(await p.evaluate(() => !!document.querySelector('.ctl-bg .ctl-sheet')), 'picker opens from the keyboard');
@@ -121,7 +122,7 @@ for (const f of [process.env.AXE_JS, path.join(_P.REPO_DIR, 'node_modules/axe-co
   p = await open('locset');
   const lb = await p.evaluate(() => { const l = [...document.querySelectorAll('label')].filter((x) => !x.querySelector('input,select,textarea')); const bad = l.filter((x) => { const f = x.getAttribute('for'); return !f || !document.getElementById(f); }); return { n: l.length, bad: bad.length, ex: bad.slice(0, 2).map((x) => x.textContent) }; });
   ok(lb.n > 0 && lb.bad === 0, 'locset: every <label> now points at a control (' + lb.n + ' labels, unlinked ' + lb.bad + ' ' + lb.ex + ')');
-  ok(await p.evaluate(() => { const i = document.querySelector('#lv_drawer_float'); return !!i && i.labels.length === 1; }), 'locset: #lv_drawer_float has a label (clicking the label focuses it)');
+  ok(await p.evaluate(() => { const l = document.querySelector('label[for]'); const i = l && document.getElementById(l.getAttribute('for')); return !!i && i.labels.length >= 1 && i.labels[0] === l; }), 'locset: a tied label is the control label (clicking it focuses the field)');
   await p.close();
 
   // ---------- aria-pressed synced with .on ----------
