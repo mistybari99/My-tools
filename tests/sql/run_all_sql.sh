@@ -13,7 +13,7 @@ BASE="$HERE/baseline_fails.txt"; ME=$$
 # 1. order from docs/PASTE_ORDER.md: foundation list (section A) + the numbered table (section B); phases > 99 that exist as files are appended
 PO="$REPO/docs/PASTE_ORDER.md"
 FOUND=$(grep -oE 'phase8( [0-9]+)+' "$PO" | head -1 | tr -s ' ' '\n' | sed -E 's/^([0-9]+)$/phase\1/' | tr '\n' ' ')
-TABLE=$(grep -E '^\| [0-9]+ \|' "$PO" | sed -E 's/^\| [0-9]+ \| \**(phase[0-9]+)\.sql.*/\1/' | tr '\n' ' ')
+TABLE=$(grep -E '^\| [0-9]+ \| \**phase[0-9]+\.sql' "$PO" | sed -E 's/^\| [0-9]+ \| \**(phase[0-9]+)\.sql.*/\1/' | tr '\n' ' ')
 EXTRA=""; for f in $(ls "$REPO"/supabase/phase1[0-9][0-9].sql 2>/dev/null | sort); do b=$(basename "$f" .sql); case " $TABLE " in *" $b "*) ;; *) EXTRA="$EXTRA $b";; esac; done
 ORDER="$(echo $FOUND | sed 's/^phase8 /phase8 /') $TABLE$EXTRA"; ORDER=$(echo $ORDER)
 echo "paste order: $ORDER"

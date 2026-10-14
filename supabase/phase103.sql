@@ -65,7 +65,7 @@ begin
     ('public.opening_stock_apply96(text,integer,text,date,text,uuid)', array['bos103']::text[]),
     ('public._setup_chk81(text)', array['bos103']::text[]),
     ('public.setup_recommendations()', array['bos103']::text[]),
-    ('public.setup_recommend_apply(uuid,text[],boolean,boolean)', array['bos103']::text[]),
+    ('public.setup_recommend_apply(uuid,text[],boolean,boolean)', array['bos103', 'bos109']::text[]),
     ('public._inb_pii_f99(text,text)', array['bos103']::text[]),
     ('public._inb_pii_json99(jsonb)', array['bos103']::text[]),
     ('public.inbox_list(integer,text,integer)', array['bos103', 'bos99']::text[]),

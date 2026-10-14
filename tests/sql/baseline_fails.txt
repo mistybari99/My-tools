@@ -86,3 +86,4 @@ phase100 0 80
 phase103 0 67
 # NOTE phase98 2 25 and phase89d 2 63: with phase103 on top, 'phase97 then phase98 = identical hash' (phase98 P1b, G1 last) and 'phase89 then 98 then 99 = identical' (phase89d P2, P2a) are false by design (phase103 re-creates those bodies); phase98b_test / phase89e_test are their replacements. Never edit the old files.
 phase106 0 20
+phase109 0 23
