@@ -1,6 +1,6 @@
 -- Phase 96 (step D23): the two items step D left unbuilt.
--- Additive, paste-twice safe. Paste AFTER phase85 (and after phase89 when it exists: this file re-creates functions from their latest definition,
--- the file is produced by tests/sql/gen_phase96.py from a database built through the last earlier phase - see the BODY GUARD below).
+-- Additive, paste-twice safe. Paste AFTER phase89 (which comes after phase91/92/93): this file re-creates functions from their latest definition (the phase89 bodies),
+-- the file is produced by tests/sql/gen_phase96.py from a database built through phase89 - see the BODY GUARD below.
 --
 --   D2 OPENING STOCK HELPER   Before / when the switch acct_stock_opening is turned on: detect whether the opening stock is already inside the opening journal (acct_opening)
 --                             = double count risk, and show per place: opening stock value, what the opening journal already carries on the inventory accounts, the GL inventory,
@@ -28,6 +28,9 @@ do $g$ begin
   end if;
   if position('bos85' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) = 0 then
     raise exception 'phase96 needs phase85 pasted first (_acct_docs carries no bos85 line)';
+  end if;
+  if position('bos89' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) = 0 then
+    raise exception 'phase96 needs phase89 pasted first (the re-created functions below are built on the phase89 bodies)';
   end if;
 end $g$;
 

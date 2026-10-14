@@ -44,6 +44,7 @@ with i as (insert into items (code,name_bn,name_en,unit,base_unit,sell_price,tra
 with i as (insert into items (code,name_bn,name_en,unit,base_unit,sell_price,tracked,item_type) values ('I96-GX','Glaze','Glaze','kg','kg',0,true,'raw_material') returning id) select id as gx from i \gset
 with i as (insert into items (code,name_bn,name_en,unit,base_unit,sell_price,tracked,item_type) values ('I96-C2','Cake two','Cake two','pc','pc',100,true,'finished_good') returning id) select id as c2 from i \gset
 with i as (insert into items (code,name_bn,name_en,unit,base_unit,sell_price,tracked,item_type) values ('I96-SK','Skip item','Skip item','kg','kg',0,true,'raw_material') returning id) select id as sk from i \gset
+with i as (insert into items (code,name_bn,name_en,unit,base_unit,sell_price,tracked,item_type) values ('I96-FZ','Free item','Free item','kg','kg',0,true,'raw_material') returning id) select id as fz from i \gset
 with i as (insert into suppliers (name) values ('Sup') returning id) select id as sup from i \gset
 
 \echo == T0 shape and defaults
@@ -496,4 +497,13 @@ select tt.chk('D3 accounting off: the cost (sugar average 30) is kept, nothing p
   and :'nadj0'::int=3 and (select count(*) from jsonb_array_elements(:'lst4'::jsonb->'items') x where x->>'ref'=:'offid'::text)=0);
 select tt.chk('D3 accounting on again: the posting run books it once (Dr 1320 30 / Cr 5110 30), a second run posts nothing', (:'pq'::jsonb->'by_type'->>'stock_adjust')::int=1 and tt.n('stock_adjust')=4
   and tt.jt('stock_adjust','1320','d')=:'adj_before'::numeric+30 and (:'pq2'::jsonb->>'posted')::int=0 and tt.unbalanced_entries()=0);
+
+\echo == D3 an item marked "cost really zero" (phase80) is a KNOWN cost: it never waits
+set role authenticated; select tt.as(:'o');
+select stock_opening(:'fz'::uuid,1,4,null) is not null as ofz \gset
+select cost_wait_list96() as lz1 \gset
+select item_cost_free_set(:'fz'::uuid, true, 'free sample', '00000000-0000-0000-0000-0000000000c2') is not null as fzset \gset
+select cost_wait_list96() as lz2 \gset
+reset role;
+select tt.chk('D3 before the flag the opening of the free item waits (1 document); after "cost really zero" it does not wait', :'ofz' and :'fzset' and (:'lz1'::jsonb->>'total')::int=1 and (:'lz2'::jsonb->>'total')::int=0);
 select 'RESULT ' || count(*) filter (where ok) || ' pass / ' || count(*) filter (where not ok) || ' fail' from tt.res;

@@ -1,6 +1,6 @@
 -- Phase 96 (step D23): the two items step D left unbuilt.
--- Additive, paste-twice safe. Paste AFTER phase85 (and after phase89 when it exists: this file re-creates functions from their latest definition,
--- the file is produced by tests/sql/gen_phase96.py from a database built through the last earlier phase - see the BODY GUARD below).
+-- Additive, paste-twice safe. Paste AFTER phase89 (which comes after phase91/92/93): this file re-creates functions from their latest definition (the phase89 bodies),
+-- the file is produced by tests/sql/gen_phase96.py from a database built through phase89 - see the BODY GUARD below.
 --
 --   D2 OPENING STOCK HELPER   Before / when the switch acct_stock_opening is turned on: detect whether the opening stock is already inside the opening journal (acct_opening)
 --                             = double count risk, and show per place: opening stock value, what the opening journal already carries on the inventory accounts, the GL inventory,
@@ -29,6 +29,9 @@ do $g$ begin
   if position('bos85' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) = 0 then
     raise exception 'phase96 needs phase85 pasted first (_acct_docs carries no bos85 line)';
   end if;
+  if position('bos89' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) = 0 then
+    raise exception 'phase96 needs phase89 pasted first (the re-created functions below are built on the phase89 bodies)';
+  end if;
 end $g$;
 
 -- BODY GUARD: the live function must not carry a tag this file does not know (it would be overwritten by an older body)
@@ -51,7 +54,7 @@ do $g$ declare d text; t text[]; ok boolean := true; begin
   d := pg_get_functiondef('public._acct_docs(date)'::regprocedure);
   if position('bos96' in d) = 0 then
     select array_agg(distinct m[1]) into t from regexp_matches(d, 'bos[0-9]+', 'g') m;
-    if t is not null and not (t <@ array['bos50', 'bos52', 'bos72', 'bos74', 'bos85']::text[]) then raise exception 'phase96: _acct_docs carries tags newer than the ones this file was built from (%); re-run tests/sql/gen_phase96.py on a database built through the latest phase', t; end if;
+    if t is not null and not (t <@ array['bos50', 'bos52', 'bos72', 'bos74', 'bos80', 'bos85', 'bos89']::text[]) then raise exception 'phase96: _acct_docs carries tags newer than the ones this file was built from (%); re-run tests/sql/gen_phase96.py on a database built through the latest phase', t; end if;
   end if;
   d := pg_get_functiondef('public.inventory_vs_gl(date,integer)'::regprocedure);
   if position('bos96' in d) = 0 then
@@ -186,13 +189,14 @@ CREATE OR REPLACE FUNCTION public._acct_docs(p_start date)
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
+-- bos89: merge of phase80 (free-cost) and phase85 (stock moves, card, voucher mode) bodies; every bos50/52/72/74/80/85 line kept
 begin
   -- sales (payments split, discount, revenue, COGS only from real unit costs)
   return query
   select 'sale'::text, s.id::text, s.sale_date, s.location_id, ('Receipt ' || s.receipt)::text, null::text, s.status = 'done', (s.void_at at time zone 'Asia/Dhaka')::date,
     case when s.status = 'done' and exists (select 1 from jsonb_array_elements(case when jsonb_typeof(s.lines) = 'array' then s.lines else '[]'::jsonb end) e
                  where nullif(e->>'item_id', '') is not null and not exists (select 1 from public.stock_ledger l where l.ref_type = 'sale' and l.ref_id = s.id::text and l.reason = 'sale_out'
-                   and l.item_id = (e->>'item_id')::uuid and coalesce(l.unit_cost, 0) > 0)) then 'cogs_missing' end, /* bos72: cost 0 = unknown */
+                   and l.item_id = (e->>'item_id')::uuid and coalesce(l.unit_cost, 0) > 0) and not public._cost_free80((e->>'item_id')::uuid)) then 'cogs_missing' end, /* bos72: cost 0 = unknown; bos80: free-cost item is a known cost */
     null::text,
     case when s.status = 'done' then (
       select coalesce(jsonb_agg(j order by o), '[]'::jsonb) from (
@@ -211,7 +215,7 @@ begin
   select 'sale_return'::text, r.id::text, (r.created_at at time zone 'Asia/Dhaka')::date, r.location_id, ('Return of receipt ' || coalesce(s.receipt::text, '-'))::text, null::text, r.status = 'done', (r.void_at at time zone 'Asia/Dhaka')::date,
     case when r.status = 'done' and exists (select 1 from jsonb_array_elements(case when jsonb_typeof(r.lines) = 'array' then r.lines else '[]'::jsonb end) e
                  where nullif(e->>'item_id', '') is not null and not exists (select 1 from public.stock_ledger l where l.ref_type = 'sale_return' and l.ref_id = r.id::text and l.reason = 'sale_return'
-                   and l.item_id = (e->>'item_id')::uuid and coalesce(l.unit_cost, 0) > 0)) then 'cogs_missing' end, /* bos72: cost 0 = unknown */
+                   and l.item_id = (e->>'item_id')::uuid and coalesce(l.unit_cost, 0) > 0) and not public._cost_free80((e->>'item_id')::uuid)) then 'cogs_missing' end, /* bos72: cost 0 = unknown; bos80: free-cost item is a known cost */
     null::text,
     case when r.status = 'done' then (
       select coalesce(jsonb_agg(j order by o), '[]'::jsonb) from (
@@ -321,7 +325,7 @@ begin
           from public._acct_inv_split72(array['wastage'], w.id::text, array['wastage'], -1) z where z.amt > 0 /* bos72 */
       ) y) end
   from public.stock_wastage w cross join lateral (
-    select round(sum(-l.qty_delta * l.unit_cost) filter (where l.unit_cost is not null), 2) amt, count(*) filter (where coalesce(l.unit_cost, 0) = 0) nulls /* bos72 */
+    select round(sum(-l.qty_delta * l.unit_cost) filter (where l.unit_cost is not null), 2) amt, count(*) filter (where coalesce(l.unit_cost, 0) = 0 and not public._cost_free80(l.item_id)) nulls /* bos72 */ /* bos80 */
     from public.stock_ledger_eff96 l /* bos96 */ where l.ref_type = 'wastage' and l.ref_id = w.id::text and l.reason = 'wastage') c
   where (w.made_at at time zone 'Asia/Dhaka')::date >= p_start and public._acct_need('wastage', w.id::text, true);
 
@@ -338,7 +342,7 @@ begin
         union all select 3, jsonb_build_object('a', 'overhead_absorbed', 'c', round(r.conversion_cost, 2)) where coalesce(r.conversion_cost, 0) >= 0.005 /* bos74: Cr overhead absorbed */
       ) y) end
   from public.production_runs r cross join lateral (
-    select round(sum(-l.qty_delta * l.unit_cost) filter (where l.unit_cost is not null), 2) amt, count(*) filter (where coalesce(l.unit_cost, 0) = 0) nulls /* bos72 */
+    select round(sum(-l.qty_delta * l.unit_cost) filter (where l.unit_cost is not null), 2) amt, count(*) filter (where coalesce(l.unit_cost, 0) = 0 and not public._cost_free80(l.item_id)) nulls /* bos72 */ /* bos80 */
     from public.stock_ledger_eff96 l /* bos96 */ where l.ref_type = 'production' and l.ref_id = r.id::text and l.reason = 'issue_out') c
   where (r.made_at at time zone 'Asia/Dhaka')::date >= p_start and public._acct_need('production', r.id::text, r.status = 'done');
 
