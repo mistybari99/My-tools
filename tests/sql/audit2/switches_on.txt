@@ -1,0 +1,26 @@
+# Recommended switches for the "switches ON" pass of run_all.sh --matrix.
+# Format:  rule_key = <json value>     (# comment).  The value becomes the rule DEFAULT in the scratch DB (rules.default_value),
+#          so scenarios that reset a rule to default still see it ON.  A key that does not exist (yet) is reported and skipped.
+# Directive:  @auto_new_switches on|off   (default on) = every rule that is NOT in rules_baseline.txt and has kind 'switch' is
+#          also turned ON (so batch phases 112+ are covered even before their key is listed here).  A line  !key  keeps one rule at its default.
+# Batch agents: append the rule names of your phase below (one per line).
+@auto_new_switches on
+
+# --- existing rules recommended by the audit reports (A1..A5) ---
+# production_requires_cost (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+recipe_waste_required = true             # A1 G15
+yield_variance_warn_pct = 5              # A1 G15
+# unit_conv_required (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+count_tolerance_pct = 2                  # A2 G12
+neg_grant_log = true                     # A2 G12
+# stock_negative_mode (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+transit_open_hours = 24                  # A5 GAP-6
+transit_short_mode = "loss"              # A5 GAP-4 (the defect case)
+acct_transfer_mode = "location_tagged"   # A5 GAP-16
+acct_transit_loss = true                 # A5 GAP-16
+cost_attrib_in_pl = true                 # A3 G6
+manual_journal_guard = "on"              # A4 G09
+# card_settle_over_mode (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+
+# --- new rules of the fix batches (phases 112-118): add here, e.g.
+# some_new_rule = true
