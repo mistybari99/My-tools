@@ -174,3 +174,9 @@ New read functions (stock_recon_statement, factory_branch_statement, net_profit_
 - Foundation requirement (must not be blocked by today's design): the item master must support **variants** (one style -> size x colour x fabric SKUs, barcode per variant, stock per variant per location). Today `items` is flat and `items.code` is globally unique (see audit_c1/RLS_ISOLATION_AUDIT.md), so B-stage work must allow per-business item codes and a style/variant parent-child link via `attrs`/`attr_defs` or a `parent_item_id`, without changing sweets items.
 - Planned later (not built): season/collection, size-colour matrix entry (purchase, stock, POS), exchange/return rules, consignment/wholesale price lists, tailoring/custom orders, fabric/raw material and cut-make-trim costing (reuse the existing recipe/BOM + costing engine as a manufacturing template if the owner produces garments), aged-stock/markdown reports.
 - Open owner questions before building: retail only or also wholesale/manufacturing/tailoring; online sales needed; sizes/colour scheme per product group.
+
+### 13.1 Owner answers (Fashion / Cloth) - all options wanted
+- Retail AND wholesale AND manufacturing AND tailoring/custom orders (all four, as modules the owner can switch on per business).
+- Online sales needed (needs the later online-store template/channel stock sync; stock per variant is the shared source of truth).
+- Size/colour scheme: configurable per product group, owner edits the lists; support every common scheme (alpha S/M/L, numeric, free-size, kids age bands, colour + fabric attributes).
+- Consequence for foundation: variant (style -> SKU) model, per-business item codes, price lists by channel (retail / wholesale / online), and recipe/BOM-based costing are required ahead of the fashion template going beyond `not_implemented`. Build order stays: foundation (B/C stages) -> variant item model -> fashion retail slice -> wholesale/online -> manufacturing/tailoring.
