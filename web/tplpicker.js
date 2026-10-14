@@ -19,6 +19,7 @@ const X = {
   sms: L('SMS', 'SMS', 'SMS'), wa: L('WhatsApp', 'WhatsApp', 'WhatsApp'), em: L('Email', 'Email', 'Email'), plain: L('শুধু লেখা, কোনো ছবি বা কোড নেই', 'Plain text only', 'Plain text only'),
   sql: L('এই অংশ চালু করতে নতুন SQL (phase93) চালাতে হবে।', 'The new SQL (phase93) must be run to switch this part on.', 'এই অংশ চালু করতে নতুন SQL (phase93) চালাতে হবে।'),
 };
+for (const k of Object.keys(X)) X[k].bn = X[k].mix || X[k].bn;   // Bangla mode keeps the common words English, same as the mix text
 const TX = (k) => lab(X[k]);
 const lg = () => (A.S && A.S.lang) || 'bn';
 const D = { rows: [], loc: null, idx: {}, chan: 'sms', ready: false, shop: null };
