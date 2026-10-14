@@ -95,6 +95,19 @@ T.load = async (sb, loc) => {
   if (r.error) throw r.error; T.setChoices(r.data); return CH;
 };
 
+/* bos98: fetch the owner choices ONCE per session for the output screens (2-second cap, cached; a failure or timeout is not cached for long and
+   never throws: the caller then keeps today's output). Resolves to true when choices are loaded. */
+let ENS = null, ENS_FAIL = 0;
+T.ensure = (sb, ms) => {
+  if (ENS) return ENS;
+  if (ENS_FAIL && Date.now() - ENS_FAIL < 30000) return Promise.resolve(false);
+  const cap = new Promise((res) => setTimeout(() => res(false), ms || 2000));
+  const run = Promise.resolve().then(() => T.load(sb, null)).then(() => true, () => false);
+  ENS = Promise.race([run, cap]).then((ok) => { if (!ok) { ENS = null; ENS_FAIL = Date.now(); } return ok; });
+  return ENS;
+};
+T.ensureReset = () => { ENS = null; ENS_FAIL = 0; };
+
 /* ---------- shop block (logo / name / footer / tax id come from settings; placeholders if empty) ---------- */
 T.shop = {};
 T.setShop = (s) => { T.shop = Object.assign({}, s || {}); };

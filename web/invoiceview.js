@@ -175,12 +175,12 @@ async function fetchServer(args) {
   return fromServer(r.data);
 }
 async function openSale(id) {   // from today's list / history
-  const tok = ++V.tok; V.d = null; V.err = false; V.noPrint = false; draw();
+  const tok = ++V.tok; V.d = null; V.err = false; V.noPrint = false; tplReady(); draw();
   try { const d = await fetchServer({ p_sale: id }); if (tok !== V.tok) return; V.d = d; draw(); flushShares(); }
   catch (e) { if (tok !== V.tok) return; V.err = true; V.retryId = id; draw(); }
 }
 async function openInfo(info) {   // right after a sale: draw at once from the cart, then replace by the server copy
-  const tok = ++V.tok; V.d = fromPayload(info); V.err = false; V.noPrint = false; V.last = info; draw();
+  const tok = ++V.tok; V.d = fromPayload(info); V.err = false; V.noPrint = false; V.last = info; tplReady(); draw();
   if (V.d.pending) return;
   try { const d = await fetchServer({ p_sale: info.data.id }); if (tok !== V.tok || !$('#iv92_card')) return; d.change = V.d.change; V.d = d; redrawKeepInputs(); } catch (e) { /* the local copy stays (old database or no net) */ }
   flushShares();
@@ -225,9 +225,30 @@ function toDoc(d) {   // the shape B.invoice.renderDoc draws
     lines: d.lines.map((l) => ({ code: l.code, name: lineName(l), qty: l.qty, unit: l.unit, price: l.price, amount: l.amount })), subtotal: d.subtotal, discount: d.discount, total: d.total,
     pays: d.pays.map((p) => ({ mode: p.mode, amount: p.amount })), due: d.due };
 }
+// bos98: template system hooks. Every one is guarded: no B.tpl, no owner choice, or any error -> today's output, unchanged. No cost field ever goes in (the card has none).
+function tplReady() { try { if (B.tpl && B.tpl.ensure) B.tpl.ensure(sb); } catch (e) { /* offline-safe: nothing */ } }
+function tplOpts(d) { return { lang: S.lang, loc: d.loc_id, shop: { name: brandText() } }; }
+function tplRecvData(d) {   // pos_receipt data: customer-facing numbers only
+  return { no: d.receipt, date: d.date + ' ' + d.time, cashier: d.cashier, location: wl(d.loc), customer: d.cust ? { name: d.cust.name, phone: d.cust.mobile || '' } : null,
+    items: d.lines.map((l) => ({ name: lineName(l), qty: l.qty, price: l.price, amount: l.amount })), subtotal: d.subtotal, discount: d.discount, vat: d.vat ? d.vat.amount : 0, total: d.total, paid: d.paid, change: d.change, due: d.due };
+}
+function tplMsg(d, channel) {   // msg_invoice text for sms / whatsapp / email, or null (nothing chosen)
+  try {
+    if (!B.tpl || !B.tpl.render) return null;
+    const t = B.tpl.render('msg_invoice', { customer: d.cust ? d.cust.name : '', no: d.receipt, date: d.date, total: d.total, paid: d.paid, due: d.due, shop: { name: brandText() },
+      items: d.lines.map((l) => ({ name: lineName(l), qty: l.qty, amount: l.amount })) }, undefined, { lang: S.lang, loc: d.loc_id, channel });
+    return typeof t === 'string' && t ? t : null;
+  } catch (e) { return null; }
+}
+function tplPage(d) {   // the full printable document of the chosen receipt template, or null
+  try { return B.tpl && B.tpl.printHTML ? B.tpl.printHTML('pos_receipt', tplRecvData(d), undefined, tplOpts(d)) : null; } catch (e) { return null; }
+}
 async function doPrint() {
   if (!need()) return; const d = V.d;
   logShare('print');
+  if (B.tpl && B.tpl.ensure && typeof window.print === 'function') {   // bos98
+    try { await B.tpl.ensure(sb); if (tplPage(d) && B.tpl.print('pos_receipt', tplRecvData(d), undefined, tplOpts(d))) return; } catch (e) { /* keep today's print path */ }
+  }
   const iv = B.invoice;
   if (!iv || !iv.renderDoc || !iv.printHtml || typeof window.print !== 'function') return noPrinter();
   try {
@@ -239,10 +260,13 @@ function noPrinter() { V.noPrint = true; const el = $('#iv92_np'); if (el) el.in
 
 function phoneNum() { const v = ($('#iv92_phone') || {}).value || ''; const n = intlNumber(v); if (!n) { toast(T('needPhone')); return null; } return n; }
 function doSms() { if (!need()) return; const n = phoneNum(); if (!n) return; const ios = /iPhone|iPad|iPod/i.test((window.navigator && window.navigator.userAgent) || '');
-  logShare('sms'); go(`sms:+${n}${ios ? '&' : '?'}body=${encodeURIComponent(text(V.d, true))}`); toast(T('opened')); }
-function doWa() { if (!need()) return; const n = phoneNum(); if (!n) return; logShare('whatsapp'); go(`https://wa.me/${n}?text=${encodeURIComponent(text(V.d))}`, true); toast(T('opened')); }
+  logShare('sms'); go(`sms:+${n}${ios ? '&' : '?'}body=${encodeURIComponent((B.tpl && tplMsg(V.d, 'sms')) || text(V.d, true))}`); toast(T('opened')); }   // bos98: chosen sms template, else today's text
+function doWa() { if (!need()) return; const n = phoneNum(); if (!n) return; logShare('whatsapp'); const wm = B.tpl && B.tpl.waUrl ? tplMsg(V.d, 'whatsapp') : null;   // bos98
+  go(wm ? B.tpl.waUrl(wm).replace('https://wa.me/?', `https://wa.me/${n}?`) : `https://wa.me/${n}?text=${encodeURIComponent(text(V.d))}`, true); toast(T('opened')); }
 function doEmail() { if (!need()) return; const e = (($('#iv92_email') || {}).value || '').trim(); if (!okMail(e)) return toast(T('needMail'));
-  logShare('email'); go(`mailto:${e}?subject=${encodeURIComponent(`${brandText()} · ${T('receipt')} ${V.d.receipt}`)}&body=${encodeURIComponent(text(V.d))}`); toast(T('opened')); }
+  logShare('email'); let sj = `${brandText()} · ${T('receipt')} ${V.d.receipt}`, bd = text(V.d);
+  { const tm = B.tpl && tplMsg(V.d, 'email'), m = tm && /^Subject: ([^\n]*)\n\n([\s\S]*)$/.exec(tm); if (m) { sj = m[1]; bd = m[2]; } }   // bos98
+  go(`mailto:${e}?subject=${encodeURIComponent(sj)}&body=${encodeURIComponent(bd)}`); toast(T('opened')); }
 async function copyText(txt) {
   try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(txt); return true; } } catch (e) { /* fall through */ }
   try { const ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand && document.execCommand('copy'); ta.remove(); return !!ok; } catch (e) { return false; }
@@ -261,7 +285,7 @@ function fileHtml(d) {
 function doDl() {
   if (!need()) return; const d = V.d;
   try {
-    const blob = new Blob([fileHtml(d)], { type: 'text/html' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+    const blob = new Blob([(B.tpl && tplPage(d)) || fileHtml(d)], { type: 'text/html' }),   /* bos98 */ url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = `invoice-${String(d.receipt).replace(/[^A-Za-z0-9_-]/g, '_')}.html`; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000); logShare('download'); toast(T('dlDone'));
   } catch (e) { toast(T('shareFail')); }
