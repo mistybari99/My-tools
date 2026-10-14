@@ -66,7 +66,7 @@ const X = {
   retired: L('বন্ধ', 'retired', 'বন্ধ'), retire: L('বন্ধ করুন', 'Retire', 'বন্ধ করুন'), reopen: L('আবার চালু', 'Reactivate', 'আবার চালু'), rename: L('নাম বদলান', 'Rename', 'নাম বদলান'),
   sys: L('সিস্টেম', 'system', 'system'), hdr: L('গ্রুপ', 'header', 'group'), noParent: L('(কোনোটিই নয়)', '(none)', '(কোনোটিই নয়)'),
   // new journal
-  nj: L('হাতে জার্নাল এন্ট্রি', 'Manual journal entry', 'Hate Journal entry'), jmemo: L('বিবরণ (কেন এই এন্ট্রি)', 'Memo (why this entry)', 'Memo (কেন)'), addLine: L('+ লাইন যোগ', '+ Add a line', '+ Line যোগ'),
+  nj: L('হাতে জার্নাল এন্ট্রি', 'Manual journal entry', 'Hate Journal entry'), jmemo: L('বিবরণ (কেন এই এন্ট্রি)', 'Memo (why this entry)', 'Memo (কেন)'), jreason: L('কারণ-কোড (পাহারা চালু থাকলে লাগে)', 'Reason code (needed when the guard is on)', 'Reason code (guard চালু থাকলে লাগে)'), addLine: L('+ লাইন যোগ', '+ Add a line', '+ Line যোগ'),
   line: L('লাইন', 'Line', 'Line'), debit: L('ডেবিট', 'Debit', 'Debit'), credit: L('ক্রেডিট', 'Credit', 'Credit'), party: L('পক্ষ', 'Party', 'Party'),
   ptNone: L('(কেউ নয়)', '(none)', '(কেউ নয়)'), ptCust: L('গ্রাহক', 'Customer', 'Customer'), ptSup: L('সরবরাহকারী', 'Supplier', 'Supplier'), ptStaff: L('স্টাফ', 'Staff', 'Staff'), ptPart: L('অংশীদার', 'Partner', 'Partner'),
   custMob: L('গ্রাহকের মোবাইল', 'Customer mobile', 'Customer mobile'), staffId: L('স্টাফ/অংশীদার আইডি', 'Staff / partner id', 'Staff/partner id'),
@@ -114,12 +114,17 @@ const X = {
 const T = (k) => lab(X[k]);
 const SRC = { sale: L('বিক্রি', 'Sale', 'Sale'), sale_return: L('বিক্রি ফেরত', 'Sale return', 'Sale return'), collection: L('বাকি আদায়', 'Collection', 'Collection'), purchase: L('ক্রয়', 'Purchase', 'Purchase'),
   supplier_payment: L('সরবরাহকারীকে দেওয়া', 'Supplier payment', 'Supplier payment'), supplier_refund: L('সরবরাহকারীর ফেরত', 'Supplier refund', 'Supplier refund'), expense_voucher: L('ব্যয় ভাউচার', 'Expense voucher', 'Expense voucher'),
-  cash_move: L('ক্যাশ/ব্যাংক', 'Cash move', 'Cash move'), wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), production: L('উৎপাদন', 'Production', 'Production'), manual: L('হাতে লেখা', 'Manual', 'Manual'), opening: L('শুরুর জের', 'Opening', 'Opening') };
+  cash_move: L('ক্যাশ/ব্যাংক', 'Cash move', 'Cash move'), wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), production: L('উৎপাদন', 'Production', 'Production'), manual: L('হাতে লেখা', 'Manual', 'Manual'), opening: L('শুরুর জের', 'Opening', 'Opening'),
+  stock_adjust: L('স্টক গণনার পার্থক্য', 'Stock count adjustment', 'Stock count adjustment'), stock_opening: L('Opening stock', 'Opening stock', 'Opening stock'), stock_issue: L('নিজের কাজে stock', 'Stock issued for own use', 'Stock issued for own use'),
+  stock_transfer: L('Stock transfer', 'Stock transfer', 'Stock transfer'), transit_loss: L('পথে কম পৌঁছানো stock', 'Stock short in transit', 'Stock short in transit'), purchase_variance: L('ক্রয় ফেরতের দামের পার্থক্য', 'Purchase price variance', 'Purchase price variance'),
+  card_settlement: L('কার্ড settlement', 'Card settlement', 'Card settlement') };
 const sl = (k) => (SRC[k] ? lab(SRC[k]) : k);
 const LINKS = { sale: '#/pos', sale_return: '#/salereturn', collection: '#/dues', purchase: '#/purchase', supplier_payment: '#/payables', supplier_refund: '#/payables', expense_voucher: '#/daybook', cash_move: '#/cashmoves' };
 const link = (st, sid) => (LINKS[st] ? `<a href="${LINKS[st]}" class="ac-src">${esc(sl(st))}</a> <span class="ac-id">${esc(String(sid).slice(0, 8))}</span>` : `<span class="ac-src">${esc(sl(st))}</span>`);
 
 const ERR = {
+  reason_required: L('কারণ-কোড বেছে নিন (পাহারা চালু আছে)', 'Pick a reason code (the guard is on)', 'Reason code বেছে নিন (guard চালু)'), bad_reason: L('কারণ-কোড ঠিক নয়', 'That reason code is not valid', 'Reason code ঠিক নয়'),
+  party_required: L('payable / receivable লাইনে পক্ষ (party) লাগবে', 'A payable / receivable line needs a party', 'Payable / receivable line এ party লাগবে'),
   not_allowed: L('অনুমতি নেই', 'Not allowed', 'অনুমতি নেই'), data_needed: X.needH, accounting_off: L('হিসাবরক্ষণ বন্ধ — আগে চালু করুন', 'Accounting is off - switch it on first', 'Accounting off — আগে on করুন'),
   unbalanced: L('ডেবিট আর ক্রেডিট সমান নয়', 'Debit and credit are not equal', 'Debit আর Credit সমান নয়'), line_debit_xor_credit: L('প্রতি লাইনে ডেবিট বা ক্রেডিট — একটিই', 'Each line is either debit or credit, not both', 'প্রতি line-এ Debit বা Credit — একটিই'),
   need_two_lines: L('কমপক্ষে দুটি লাইন লাগবে', 'At least two lines are needed', 'কমপক্ষে দুটি line'), memo_required: L('বিবরণ লিখুন', 'Write a memo', 'Memo লিখুন'), bad_amount: L('অঙ্ক ঠিক নয়', 'An amount is not valid', 'অঙ্ক ঠিক নয়'),
@@ -394,12 +399,14 @@ async function tNew() {
   if (!D.accounts.length) await loadAccounts();
   if (D.sups === null) { const r = await sb.from('suppliers').select('id,name').order('name'); D.sups = r.data || []; }
   if (!isMgr()) return `<p class="muted">${esc(T('noacc'))}</p>`;
+  if (D.reasons === undefined) { try { D.reasons = (await rpc('manual_reasons85')).filter((x) => x.active); } catch (e) { D.reasons = []; } }   // bos85: reason codes for the manual-journal guard (empty when phase85 is not pasted)
   if (!D.lines.length) D.lines = [newLine(), newLine()];
   const ls = locs();
   return `<div class="card stack"><h3>${esc(T('nj'))}</h3>
     <div><label for="ac_jdate">${esc(T('date'))}</label><input id="ac_jdate" type="date" value="${esc(D.jdate || today())}"></div>
     <div><label for="ac_jloc">${esc(T('place'))}</label><select id="ac_jloc"><option value="">${esc(T('company'))}</option>${ls.map((l) => `<option value="${l.id}" ${String(l.id) === String(D.jloc || '') ? 'selected' : ''}>${esc(locName(l.id))}</option>`).join('')}</select></div>
     <div><label for="ac_jmemo">${esc(T('jmemo'))}</label><input id="ac_jmemo" autocomplete="off" value="${esc(D.jmemo || '')}"></div>
+    ${D.reasons && D.reasons.length ? `<div><label for="ac_jreason">${esc(T('jreason'))}</label><select id="ac_jreason"><option value="">—</option>${D.reasons.map((x) => `<option value="${esc(x.code)}">${esc(lab(L(x.label_bn, x.label_en, x.label_mix || x.label_bn)))}</option>`).join('')}</select></div>` : ''}
     <div id="ac_lines">${D.lines.map(lineHtml).join('')}</div>
     <button class="full" data-act="ac_addline">${esc(T('addLine'))}</button>
     <div id="ac_tot" role="status"></div>
@@ -570,7 +577,7 @@ async function jSubmit(dry) {
     D.jdate = ($('#ac_jdate') || {}).value; D.jloc = ($('#ac_jloc') || {}).value; D.jmemo = (($('#ac_jmemo') || {}).value || '').trim();
     const t = totals();
     if (t.diff !== 0) return toast(lab(ERR.unbalanced) + ' (' + fm(t.d) + ' / ' + fm(t.c) + ')');
-    const r = await rpc('acct_journal_post', { p_date: D.jdate, p_loc: D.jloc ? Number(D.jloc) : null, p_memo: D.jmemo, p_lines: lines, p_client: dry ? null : D.client, p_photo: D.jphoto || null, p_dry: !!dry });
+    const r = await rpc('acct_journal_post', { p_date: D.jdate, p_loc: D.jloc ? Number(D.jloc) : null, p_memo: D.jmemo, p_lines: lines, p_client: dry ? null : D.client, p_photo: D.jphoto || null, p_dry: !!dry, ...(($('#ac_jreason') || {}).value ? { p_reason: $('#ac_jreason').value } : {}) });
     if (dry) { $('#ac_jout').textContent = T('dryOk') + ` (${fm(r.total_debit)} = ${fm(r.total_credit)})`; return; }
     toast(T('saved')); D.client = rid(); D.lines = []; D.jmemo = ''; D.jphoto = ''; D.tab = 'journal'; D.st = await rpc('acct_status'); await draw();
   } catch (e) { toast(eText(e)); }
