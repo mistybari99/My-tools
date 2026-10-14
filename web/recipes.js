@@ -70,7 +70,7 @@ const ERRS = {
 const ERRKEYS = Object.keys(ERRS);
 function errMsg(e, ctx) {
   const m = String((e && e.message) || '');
-  for (const k of ERRKEYS) if (new RegExp('\\b' + k + '\\b').test(m)) return toast(lab(ERRS[k]));
+  for (const k of ERRKEYS) if (new RegExp('\\b' + k + '\\b').test(m)) return toast(lab(ERRS[k]) + (k === 'cost_missing' && e && e.details ? ' (' + String(e.details).slice(0, 120) + ')' : ''));   // bos107 q4: name the ingredient(s) whose cost is unknown (the server puts them in details)
   if (/could not find the function|schema cache|does not exist/i.test(m)) return toast(T('sqlMissing'));
   if (S2().errToast) return S2().errToast(e, ctx);
   return fail(e);
