@@ -50,6 +50,16 @@ a2: F1 unit conversion->E3; F2 negative policy->E4; F3 offline failed->E8; F4 re
 a3: F1 two profit numbers->B2; F2 costed_rev gross returns->B3; F3 unknown cost->B4; F4 uncosted waiting->D3; F5 rounding->B1; F6 inventory GL->B5 (report) + D1 (posting); F7 opening->D2; F8 autopost delay->B6 + D5; F9 locked docs->D5; F10 manual journal->D4; F12 overhead->C; F13 card settlement/expense mode->D6.
 a4: F1 GL vs ledger->B5/D1; F2 GRN->E1; F3 bill void->E2; F4 form vs screen->E5; F5 expense double->E6; F6 transit shortage->E7; F7 manual journal payable->D4; F8 autopost->D5; F9 audit triggers->F; F10 shadow pairing->E5.
 
+## OWNER DECISIONS RECEIVED (14 Oct) - Part 2
+1 recipe approval: owner can approve himself OR grant permission to others; when granting, system shows a SUGGESTION to give approval to someone else (non-blocking; owner can always do everything)
+2 recipe_approval_required: both warn and required stay as owner-selectable switch
+3 costing method per place: all options (off / recipe rate / monthly pool) stay selectable from the app
+4 production_requires_recipe: option exists; owner decides in the field who does what
+5 bill entry / rule approval permissions: granted later by owner, with the same separation suggestion
+6 profit/cost attribution: per showroom AND main centre, app option whether showroom/admin cost shares are charged to a showroom or kept at main centre; backend fully built-in even when unused
+7 keep location_cost_cfg; ADD built-in 'which cost belongs to which showroom' + ability to CHANGE it (reason + audit + history)
+-> built as step C-2b (branch fix/phase-C2b, phase78) - agent running in worktree /home/user/wt-c2b
+
 ## Open owner decisions (collect from agent reports)
 - start stock tracking + accounting_on: before or after Part 1? (live DB empty; risk rises once enabled)
 - D1 transfers: location-tagged vs company-wide balance sheet
