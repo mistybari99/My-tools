@@ -1,6 +1,7 @@
 -- ============================================================
 -- Phase 99 (bos99) - STEP Opt: two OPTIONS the owner can switch at any time (both default = today's behaviour; the system only shows a recommendation).
---   Needs phases 72..97 (guard below; phase98, if it exists, is a re-assert of merged bodies and is not required). Paste order: ... phase94, phase97, phase99 (LAST).
+--   Needs phases 72..98 (guard below; phase98 = step INT3, the final merge of _acct_docs of 96 + 97). Paste order: ... phase94, phase96, phase97, phase98, phase99 (LAST).
+--   phase98 does not touch the five functions re-created here, and phase99 does not touch _acct_docs; if phase98 or phase89 is ever pasted again nothing of phase99 is lost.
 --   Additive + paste-twice safe. Re-created (latest definitions, only lines tagged bos99 differ): inbox_list, inbox_get, online_orders_list, online_order_get, telegram_chat_info.
 --   Nothing else existing is re-created: the payment hooks are TRIGGERS on cost_source_bills / purchase_bills / supplier_payments (no function of phase75/82/87/89 is touched).
 --
@@ -41,12 +42,13 @@ begin
   if to_regclass('public.drawer_events') is null then miss := miss || ' 95'; end if;
   if to_regclass('public.opening_stock_actions96') is null then miss := miss || ' 96'; end if;
   if to_regclass('public.landed_costs') is null then miss := miss || ' 97'; end if;
+  if to_regprocedure('public._acct_docs(date)') is null or pg_get_functiondef('public._acct_docs(date)'::regprocedure) not like '%bos98%' then miss := miss || ' 98'; end if;
   if to_regprocedure('public.production_post(integer,uuid,numeric,uuid,timestamp with time zone,text,numeric)') is null
      or pg_get_functiondef('public.production_post(integer,uuid,numeric,uuid,timestamp with time zone,text,numeric)'::regprocedure) not like '%bos72%' then miss := miss || ' 79'; end if;
   if to_regprocedure('public._cogs_lines72(date,date,integer[])') is not null
      and pg_get_functiondef('public._cogs_lines72(date,date,integer[])'::regprocedure) not like '%bos89%' then miss := miss || ' 89'; end if;
   if miss <> '' then
-    raise exception 'phase99 needs phases 72..97 pasted first (see docs/PASTE_ORDER.md); missing:%', miss;
+    raise exception 'phase99 needs phases 72..98 pasted first (see docs/PASTE_ORDER.md); missing:%', miss;
   end if;
 end $g$;
 
