@@ -485,7 +485,7 @@ function paintReport() {
     <tr class="cat-tot"><td><b>${esc(T('rpTotal'))}</b></td>${sub ? '<td></td>' : ''}<td class="n">${esc(q2(t.items))}</td>${sales ? `<td class="n"><b>${esc(q2(t.rev))}</b></td><td class="n">${t.cost === null ? '—' : esc(q2(t.cost))}</td><td></td>` : `<td class="n"><b>${esc(q2(t.rev))}</b></td>`}</tr></tbody></table></div>
     ${sales && t.cost === null ? `<div class="notice info">${esc(T('rpNoCost'))}</div>` : ''}${sales && t.unk ? `<div class="muted">${esc(T('rpUnk'))}: ${t.unk}</div>` : ''}`;
 }
-const csvCell = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+const csvCell = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && isNaN(Number(s))) s = "'" + s; return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };   // bos111 (L1): a name that starts with = + - @ is text in Excel, never a formula
 function csvText() {
   const rows = R.rows || [], sales = R.kind === 'sales', sub = R.level === 'sub';
   const head = ['category'].concat(sub ? ['sub_category'] : [], ['items'], sales ? ['revenue', 'cost', 'share_pct'] : ['value']);

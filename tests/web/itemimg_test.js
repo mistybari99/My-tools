@@ -1,4 +1,5 @@
 // Item photos decorator (web/itemimg.js, phase102 step Img) in Chromium with a mocked sb.storage / rpc.
+// bos111: the mocked picture host is mock.supabase.co (the CSP of index.html allows images from *.supabase.co only); it was mock.local.
 // Run: node tests/web/itemimg_test.js <abs tests/web dir>      (serves ../../web of this checkout)
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
@@ -16,7 +17,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'set_rule') { const t = window.__DATA.tables.rules; const r = t.find((x) => x.key === args.p_key); if (r) r.value = args.p_value; else t.push({ key: args.p_key, value: args.p_value }); return { data: null, error: null }; }
   return rpc(fn, args); };
  c.storage = { from: () => ({ createSignedUrls: async (paths) => { const I = window.__IMG || {}; window.__SIGN.push(paths.slice()); if (I.failSign) throw new Error('offline');
-    return { data: paths.map((p) => { const isT = /\\.t\\.jpg$/.test(p), base = p.replace(/\\.t\\.jpg$/, ''); const ok = isT ? (I.thumbs || []).includes(base) : true; return ok ? { path: p, signedUrl: 'https://mock.local/' + p + '?t=1', error: null } : { path: p, signedUrl: null, error: 'Object not found' }; }), error: null }; },
+    return { data: paths.map((p) => { const isT = /\\.t\\.jpg$/.test(p), base = p.replace(/\\.t\\.jpg$/, ''); const ok = isT ? (I.thumbs || []).includes(base) : true; return ok ? { path: p, signedUrl: 'https://mock.supabase.co/' + p + '?t=1', error: null } : { path: p, signedUrl: null, error: 'Object not found' }; }), error: null }; },
    upload: async (p) => { (window.__UP = window.__UP || []).push(p); return { data: { path: p }, error: null }; } }) };
  return c; }; })();`;
 (async () => {
@@ -31,7 +32,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|ERR_/.test(m.text())) errors.push('console: ' + m.text()); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    await p.route('https://mock.local/**', (r) => { if (opts.slow) return setTimeout(() => r.fulfill({ contentType: 'image/png', body: PNG }), opts.slow); return r.fulfill({ contentType: 'image/png', body: PNG }); });
+    await p.route('https://mock.supabase.co/**', (r) => { if (opts.slow) return setTimeout(() => r.fulfill({ contentType: 'image/png', body: PNG }), opts.slow); return r.fulfill({ contentType: 'image/png', body: PNG }); });
     const map = {}; withImg.forEach((i, k) => { map[i.id] = 'ITEMS/1/p' + k + '.jpg'; });
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__IMG=${JSON.stringify(Object.assign({ map, thumbs: [map[withImg[0].id]] }, img || {}))};try{localStorage.setItem('bos_lang','en');}catch(e){}`);
     await p.goto('http://localhost:8087/' + hash); await p.waitForTimeout(1300);
