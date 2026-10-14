@@ -1,0 +1,213 @@
+psql:/tmp/a1_run.sql:14: NOTICE:  table "ea" does not exist, skipping
+== mode = def
+== S0 setup: users, items, accounting, purchases (hand: see comments)
+
+psql:/tmp/a1_run.sql:74: NOTICE:  PASS S0 bill total exp=33900 act=33900.00
+
+psql:/tmp/a1_run.sql:76: NOTICE:  PASS S0 inventory GL raw+pack = 33900 exp=33900 act=33900.00
+
+== S1 (a) recipe with 3 raw + packaging + waste% + yield loss, 2 batches, actual yield 18.5 (mode=recipe)
+psql:/tmp/a1_run.sql:92: NOTICE:  PASS A1 recipe_cost material (raw row incl box) exp=1500 act=1500.0000
+
+psql:/tmp/a1_run.sql:93: NOTICE:  PASS A1 recipe_cost conversion exp=120 act=120.0000
+
+psql:/tmp/a1_run.sql:94: NOTICE:  PASS A1 recipe_cost unit cost exp=162 act=162.000000
+
+
+psql:/tmp/a1_run.sql:99: NOTICE:  PASS A2 booked qty = actual yield exp=18.5 act=18.5000
+
+psql:/tmp/a1_run.sql:100: NOTICE:  PASS A2 flour left exp=86.8 act=86.8000
+
+psql:/tmp/a1_run.sql:100: NOTICE:  PASS A2 sugar left exp=44 act=44.0000
+
+psql:/tmp/a1_run.sql:100: NOTICE:  PASS A2 butter left exp=15.8 act=15.8000
+
+psql:/tmp/a1_run.sql:100: NOTICE:  PASS A2 box left exp=196 act=196.0000
+
+psql:/tmp/a1_run.sql:101: NOTICE:  PASS A2 run material_cost exp=3000 act=3000.0000
+
+psql:/tmp/a1_run.sql:102: NOTICE:  PASS A2 run conversion_cost exp=237 act=237.0000
+
+psql:/tmp/a1_run.sql:103: NOTICE:  PASS A2 FG unit cost on actual yield exp=174.973 act=174.972973
+
+psql:/tmp/a1_run.sql:104: NOTICE:  PASS A2 std_cost column exp=161.85 act=161.850000
+
+psql:/tmp/a1_run.sql:105: NOTICE:  PASS A2 yield_var_pct exp=-7.5 act=-7.50
+
+psql:/tmp/a1_run.sql:107: NOTICE:  PASS A3 journal Dr 1310 for the run exp=3237 act=3237.00
+
+psql:/tmp/a1_run.sql:108: NOTICE:  PASS A3 journal Cr 1320 exp=2988 act=2988.00
+
+psql:/tmp/a1_run.sql:109: NOTICE:  PASS A3 journal Cr 1330 exp=12 act=12.00
+
+psql:/tmp/a1_run.sql:110: NOTICE:  PASS A3 journal Cr 5950 overhead absorbed exp=237 act=237.00
+
+psql:/tmp/a1_run.sql:111: NOTICE:  PASS A3 unbalanced entries exp=0 act=0
+
+RUN_COSTS_ROW: {"code": "FG-CAKE", "output": 18.5000, "run_id": "0f1497c2-fc18-4f68-b817-391bc0d99a5a", "status": "done", "batches": 2, "item_id": "f545cca9-0a0e-4f62-8eea-46296232ccba", "made_at": "2026-10-14T15:55:01.255167+00:00", "std_cost": 161.850000, "unit_cost": 174.972973, "yield_std": 20.0000, "actual_cost": 174.972973, "yield_actual": 18.5, "material_cost": 3000.0000, "yield_var_pct": -7.50, "conversion_cost": 237.0000, "conversion_mode": "recipe", "conversion_detail": [{"note": null, "type": "gas", "basis": "per_unit", "amount": 37.000000, "incomplete": false}, {"note": null, "type": "labour", "basis": "per_labour_hour", "amount": 200.000000, "incomplete": false}], "conversion_complete": true}
+psql:/tmp/a1_run.sql:115: NOTICE:  FAIL A4 run-cost report has a money field for yield loss no (only yield_var_pct %)
+
+psql:/tmp/a1_run.sql:119: NOTICE:  PASS A5 over-yield 10.8 kg unit cost exp=150.148 act=150.148148
+
+psql:/tmp/a1_run.sql:121: NOTICE:  PASS A6 yield_variance_warn_pct default (no alert unless set) null
+
+== S2 (b) conversion cost pools: labour/gas/electricity/rent, allocation by output kg, smoothing, trueup (mode=pool, normal output 1000 kg/month)
+psql:/tmp/a1_run.sql:136: NOTICE:  PASS B1 pool gas smoothed (6000+9000)/2 exp=7500 act=7500.0000000000000000
+
+psql:/tmp/a1_run.sql:137: NOTICE:  PASS B1 pool journal effect of pool_set: expense accounts debited = 0 (pool is a memo, not a posting) exp=0 act=0
+
+psql:/tmp/a1_run.sql:139: NOTICE:  PASS B2 recipe_cost in pool mode: conversion = 46.5 x 10 exp=465 act=465.0000
+
+psql:/tmp/a1_run.sql:141: NOTICE:  PASS B3 P1 unit cost exp=196.5 act=196.500000
+
+psql:/tmp/a1_run.sql:147: NOTICE:  PASS B3 P2 sweet unit cost (same rate/kg) exp=96.5 act=96.500000
+
+psql:/tmp/a1_run.sql:151: NOTICE:  PASS B3 P3 piece item unit cost = material only (no conversion) exp=4 act=4.000000
+
+psql:/tmp/a1_run.sql:152: NOTICE:  PASS B3 P3 conversion_complete flag exp=false act=false
+
+psql:/tmp/a1_run.sql:153: NOTICE:  PASS B3 P3 yellow flag raised (conversion_incomplete) 1
+
+TRUEUP: {"note": "showroom and admin cost are not absorbed into products", "rows": [{"note": null, "type": "electricity", "actual": 4000, "absorbed": 80.00, "label_bn": "বিদ্যুৎ", "label_en": "Electricity", "unabsorbed": 3920.00}, {"note": null, "type": "factory_rent", "actual": 5000, "absorbed": 100.00, "label_bn": "কারখানার ভাড়া", "label_en": "Factory rent", "unabsorbed": 4900.00}, {"note": null, "type": "gas", "actual": 6000, "absorbed": 208.60, "label_bn": "গ্যাস / জ্বালানি", "label_en": "Gas / fuel", "unabsorbed": 5791.40}, {"note": null, "type": "labour", "actual": 30000, "absorbed": 900.00, "label_bn": "শ্রম / মজুরি", "label_en": "Labour", "unabsorbed": 29100.00}], "month": "2026-10-01", "location_id": 1, "actual_total": 45000.00, "one_off_rows": 0, "absorbed_total": 1288.60, "absorbed_matched": 1288.60, "unabsorbed_label_bn": "অনাবশোষিত ওভারহেড", "unabsorbed_label_en": "Unabsorbed overhead", "unabsorbed_overhead": 43711.40, "absorbed_without_actual": 0.00}
+psql:/tmp/a1_run.sql:156: NOTICE:  PASS B4 trueup actual total exp=45000 act=45000.00
+
+psql:/tmp/a1_run.sql:157: NOTICE:  PASS B4 trueup absorbed total (recipe-mode + pool-mode runs mixed in one month) exp=1288.6 act=1288.60
+
+psql:/tmp/a1_run.sql:158: NOTICE:  PASS B4 trueup unabsorbed exp=43711.4 act=43711.40
+
+psql:/tmp/a1_run.sql:160: NOTICE:  PASS B5 GL 5950 (credit balance) = absorbed 1288.6 exp=-1288.6 act=-1288.60
+
+psql:/tmp/a1_run.sql:161: NOTICE:  PASS B5 GL: no entry ever debits an actual overhead expense for the pool (pool_set is memo) -> expense accts excl 5950 exp=0 act=0
+
+psql:/tmp/a1_run.sql:162: NOTICE:  PASS B5 NO month-end journal exists for unabsorbed overhead (variance stays only in the report) 0
+
+psql:/tmp/a1_run.sql:164: NOTICE:  PASS B6 pool_set for a month already used by runs re-prices old runs? 196.500000
+
+psql:/tmp/a1_run.sql:167: NOTICE:  PASS B7 run in a month with no pool typed: unit cost = material only exp=150 act=150.000000
+
+psql:/tmp/a1_run.sql:168: NOTICE:  PASS B7 conversion_complete exp=false act=false
+
+psql:/tmp/a1_run.sql:169: NOTICE:  PASS B7 conversion_detail empty (the reason no_pool is not stored on the run) exp=[] act=[]
+
+== S3 (c) multi-stage, by-product, packaging at packing stage
+psql:/tmp/a1_run.sql:177: NOTICE:  PASS C1 chhana unit cost 1600/3 exp=533.3333 act=533.333333
+
+psql:/tmp/a1_run.sql:178: NOTICE:  PASS C2 finished good (chhana) as ingredient of another recipe is refused (bad_ingredient_type)
+
+psql:/tmp/a1_run.sql:180: NOTICE:  PASS C3 co/by-product support: production_runs has a single output item and no output-lines table 0
+
+psql:/tmp/a1_run.sql:191: NOTICE:  PASS C4 pouch left 300-30 (planned yield) exp=270 act=270.0000
+
+psql:/tmp/a1_run.sql:192: NOTICE:  PASS C4 oil FG unit cost (1200+30)/27 exp=45.5556 act=45.555556
+
+psql:/tmp/a1_run.sql:193: NOTICE:  PASS C4 oil left 100-30 exp=70 act=70.0000
+
+psql:/tmp/a1_run.sql:198: NOTICE:  PASS C5 manual production-in 3kg x 533.33 posts Cr 5950 (overhead absorbed) = 1599.99 although no milk was consumed exp=1599.99 act=1599.99
+
+psql:/tmp/a1_run.sql:199: NOTICE:  PASS C5 milk still in stock (never consumed) = 180 ltr, yet chhana value added to 1310 exp=180 act=180.0000
+
+== S4 (d) price change mid-month, today-price view, landed cost freight, raw-material return; (e) partner material
+psql:/tmp/a1_run.sql:205: NOTICE:  PASS D1 oil qty 120 exp=120 act=120.0000
+
+psql:/tmp/a1_run.sql:206: NOTICE:  PASS D1 oil weighted avg after price change exp=45 act=45.000000
+
+psql:/tmp/a1_run.sql:209: NOTICE:  PASS D2 oil FG batch cost uses weighted avg 45: unit exp=46 act=46.000000
+
+psql:/tmp/a1_run.sql:212: NOTICE:  PASS D3 recipe_cost book unit cost (avg) exp=46 act=46.000000
+
+psql:/tmp/a1_run.sql:213: NOTICE:  PASS D3 today-price unit cost (last purchase) exp=53 act=53.000000
+
+psql:/tmp/a1_run.sql:214: NOTICE:  PASS D3 gap pct exp=15.22 act=15.22
+
+LANDED_POST: {"id": "7412a58e-4408-40a9-8174-c6cd83c59f28", "dup": false, "late": false, "total": 600.00, "posted": 1, "status": "posted", "stock_added": 600.00, "to_variance": 0.00, "items_adjusted": 1}
+psql:/tmp/a1_run.sql:222: NOTICE:  PASS D4 oil avg after freight exp=50.4545 act=50.454545
+
+psql:/tmp/a1_run.sql:223: NOTICE:  FAIL D4 today-price view still the invoice price 52 (freight not in it; landed price would be 52 + 600/50 = 64) exp=64 act=52.000000
+
+psql:/tmp/a1_run.sql:224: NOTICE:  PASS D4 earlier run (D2) not re-priced: still 46 exp=46 act=46.000000
+
+RETURN_POST: {"id": "aa42caef-389c-4a2f-beab-46e855fc5413", "due": 260.00, "paid": 0, "total": 260.00, "status": "posted", "assets_added": 0, "assets_returned": 0}
+psql:/tmp/a1_run.sql:229: NOTICE:  PASS D5 oil qty after return exp=105 act=105.0000
+
+psql:/tmp/a1_run.sql:230: NOTICE:  PASS D5 oil avg unchanged by the return exp=50.4545 act=50.454545
+
+psql:/tmp/a1_run.sql:231: NOTICE:  PASS D5 purchase variance recorded on the return bill exp=7.73 act=7.73
+
+psql:/tmp/a1_run.sql:234: NOTICE:  PASS D6 next oil run unit cost exp=51.4545 act=51.454545
+
+psql:/tmp/a1_run.sql:236: NOTICE:  FAIL E1 stock has an owner / consignment column none
+
+psql:/tmp/a1_run.sql:237: NOTICE:  PASS E1 partner_capital kind in_kind exists (contribution in goods)? CHECK (((amount > (0)::numeric) AND (amount <= ('1000000000000'::bigint)::numeric))) | CHECK (((description IS NULL) OR (length(description) <= 500))) | CHECK ((kind = ANY (ARRAY['contribution'::text, 'return_of_capital'::text, 'loan_in'::text, 'loan_repayment'::text, 'owner_drawing'::text]))) | CHECK ((mode = ANY (ARRAY['cash'::text, 'bank'::text, 'mobile'::text, 'in_kind'::text]))) | CHECK (((ref IS NULL) OR (length(ref) <= 200))) | CHECK ((status = ANY (ARRAY['posted'::text, 'void'::text])))
+
+== S5 (f) report cost == journal == ledger ; unknown-cost production ; cost wait
+psql:/tmp/a1_run.sql:240: NOTICE:  PASS F0 cake value 8323.6 / 49.3 exp=168.8357 act=168.835700
+
+psql:/tmp/a1_run.sql:243: NOTICE:  PASS F1 journal COGS 5000 for the sale exp=844.18 act=844.18
+
+psql:/tmp/a1_run.sql:245: NOTICE:  PASS F1 biz_daily COGS == journal exp=844.18 act=844.18
+
+psql:/tmp/a1_run.sql:247: NOTICE:  PASS F1 ledger sale_out value == journal exp=844.18 act=844.18
+
+psql:/tmp/a1_run.sql:249: NOTICE:  PASS F1 profit_source_check agree true
+
+psql:/tmp/a1_run.sql:252: NOTICE:  PASS F2 sum |run (material+conversion) - ledger production_in value| over all runs exp=0 act=0.00
+
+psql:/tmp/a1_run.sql:254: NOTICE:  PASS F2 sum |run total - journal Dr inventory| over all costed runs exp=0 act=0.00
+
+INV_VS_GL: {"note": "Read only: nothing is posted. Reasons are movements the books or the stock ledger do not have; \"unexplained\" is what is left.", "rows": [{"gl": 13888.96, "key": "inv_finished", "code": "1310", "diff": 0.00, "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "reasons": [], "valuation": 13888.96, "unexplained": 0.00, "ledger_value": 13888.96}, {"gl": 28175.45, "key": "inv_raw", "code": "1320", "diff": -7.73, "name_bn": "মজুত: কাঁচামাল", "name_en": "Inventory: raw materials", "reasons": [{"code": "purchase_return_variance", "amount": -7.73}], "valuation": 28183.18, "unexplained": 0.00, "ledger_value": 28183.18}, {"gl": 820.00, "key": "inv_pack", "code": "1330", "diff": 0.00, "name_bn": "মজুত: প্যাকেজিং", "name_en": "Inventory: packaging", "reasons": [], "valuation": 820.00, "unexplained": 0.00, "ledger_value": 820.00}], "agree": false, "as_of": "2026-10-14", "start": "2026-07-06", "total": {"gl": 42884.41, "diff": -7.73, "valuation": 42892.14, "unexplained": 0.00}, "location_id": 1, "accounting_on": true, "valuation_basis": "average_cost"}
+psql:/tmp/a1_run.sql:257: NOTICE:  PASS F3 inventory_vs_gl total unexplained exp=0 act=0.00
+
+REPORT_COST_SOURCE_DEFAULT=ledger_then_item_costs
+psql:/tmp/a1_run.sql:264: NOTICE:  PASS F4 mode item_costs: report COGS (5 x 120 = 600) differs from journal COGS 844.18 600.00
+
+psql:/tmp/a1_run.sql:274: NOTICE:  PASS G1 uncosted ingredient: cost_complete false exp=false act=false
+
+psql:/tmp/a1_run.sql:275: NOTICE:  PASS G1 uncosted ingredient: unit_cost is NULL (not silently 30 = sugar only) null
+
+psql:/tmp/a1_run.sql:276: NOTICE:  PASS G1 FG-NC stock avg_cost is NULL (a sale of it would have no COGS) null
+
+psql:/tmp/a1_run.sql:278: NOTICE:  PASS G2 production journal posted with partial cost? (Dr 1310 amount; flags) cogs_missing D=300.00
+
+psql:/tmp/a1_run.sql:279: NOTICE:  FAIL G2 the uncosted PRODUCTION run is on the cost-waiting list (not only the opening row) ledger/opening
+
+COST_WAIT: {"as_of": "2026-10-14", "items": [{"ref": "50", "date": "2026-10-14", "kind": "ledger", "move": "opening", "rows": 1, "items": [{"qty": 50.0000, "code": "RM-NC", "unit": "kg", "item_id": "a044da42-543c-4a47-b108-9bcf4cb6bb26", "name_bn": "Uncosted rm", "name_en": "Uncosted rm"}], "gl_post": false, "age_days": 0, "over_alert": null, "location_id": 1}], "shown": 1, "total": 1, "by_kind": {"ledger": 1}, "old_count": null, "alert_days": null, "oldest_days": 0, "alert_enabled": false}
+psql:/tmp/a1_run.sql:285: NOTICE:  FAIL G3 RM-NC avg cost now 20 exp=20 act=<NULL>
+
+psql:/tmp/a1_run.sql:286: NOTICE:  FAIL G3 FG-NC first run (made before the cost was known) is re-costed to 40 exp=40 act=<NULL>
+
+psql:/tmp/a1_run.sql:287: NOTICE:  FAIL G3 production_runs row of that run updated after the cost arrived null
+
+psql:/tmp/a1_run.sql:290: NOTICE:  FAIL G3 second run after the cost was supplied: unit cost exp=40 act=<NULL>
+
+IVG_AFTER_UNCOSTED: {"gl": 42884.41, "diff": 592.27, "valuation": 42292.14, "unexplained": 0.00}
+psql:/tmp/a1_run.sql:294: NOTICE:  PASS G3 inventory_vs_gl unexplained after all (should be explained, not hidden) exp=0 act=0.00
+
+psql:/tmp/a1_run.sql:298: NOTICE:  PASS H1 free-cost flagged ingredient: unit cost known exp=30 act=30.000000
+
+psql:/tmp/a1_run.sql:299: NOTICE:  PASS H1 cost_complete exp=true act=true
+
+== S6 layer 3 (showroom/admin) NOT in product cost, recipe versions / approval, cost sources
+COST_BILL: {"id": 1, "shares": [{"pct": 50.0000, "dest": "factory", "flag": null, "kind": "share", "amount": 5000.00, "location_id": 1}, {"pct": 30.0000, "dest": "showroom", "flag": null, "kind": "share", "amount": 3000.00, "location_id": 1}, {"pct": 20.0000, "dest": "factory", "flag": null, "kind": "share", "amount": 2000.00, "location_id": 6}], "dup_voucher": false, "unallocated": 0, "dup_voucher_id": null}
+psql:/tmp/a1_run.sql:308: NOTICE:  PASS L1 pool other, place 1 (factory share only) exp=5000 act=5000.00
+
+psql:/tmp/a1_run.sql:309: NOTICE:  PASS L1 pool other, place 6 exp=2000 act=2000.00
+
+psql:/tmp/a1_run.sql:310: NOTICE:  PASS L1 branch_overhead place 1 showroom row exp=3000 act=3000.00
+
+psql:/tmp/a1_run.sql:311: NOTICE:  PASS L1 branch_overhead place 1 factory row (=pool) exp=5000 act=5000.00
+
+psql:/tmp/a1_run.sql:313: NOTICE:  FAIL L2 cost bill creates an expense journal (Dr expense) so that absorbed credit has a matching actual cost 0
+
+psql:/tmp/a1_run.sql:314: NOTICE:  PASS L2b cost bill pay_mode null -> no payment; total expense accounts debit 844.18
+
+RECIPE_SELF_APPROVE_DEFAULT=f
+psql:/tmp/a1_run.sql:319: NOTICE:  PASS V1 copy is version 2 exp=2 act=2
+
+psql:/tmp/a1_run.sql:321: NOTICE:  PASS V2 approval=on: unapproved version refused in production (recipe_not_approved)
+
+psql:/tmp/a1_run.sql:322: NOTICE:  PASS V3 approved recipe cannot be edited (recipe_approved)
+
+psql:/tmp/a1_run.sql:325: NOTICE:  FAIL V4 stored standard cost per recipe version (history of standard)? none
+
+psql:/tmp/a1_run.sql:327: NOTICE:  FAIL V5 attendance / payroll hours linked to production_runs none
+
