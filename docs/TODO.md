@@ -73,3 +73,8 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [x] G3a B2 (local-b2): organization UI, business context + switcher, DB-driven brands, business name in receipts/title (HANDOVER_7 STAGE B2). Not pushed.
 - [ ] G3b B2 leftovers (raw locations readers, offline queue keys, SQL list in HANDOVER_7)
 - [ ] G3 C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+
+## G. After integration (local-int) - details in docs/INTEGRATION_REPORT_7.md
+- [ ] Owner "push": publish setup-run-16..20 in order; paste each Run and its Check.
+- [ ] Switch-on order: org setup -> map locations -> businesses / users scopes -> org_scope_preflight -> org_scope_on -> module switches one per day.
+- [ ] C2 global masters, per-business rules, remaining unscoped RPCs, dealer POS, GL posting (schemes, import-export), fashion slices, Stage E (OFF), Stage F dashboard, fashion_apparel template seed.

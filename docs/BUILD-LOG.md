@@ -403,3 +403,4 @@ Not confirmed / limits: no real Supabase or phone; Now strip rows are ordered by
 - P1 (phase48-51): path switches + shadow-copy engine, payroll/expense/stock/production/owner-money rules, day book vs journal and duplicate reports; web/paths.js (#/paths, #/quickexp); tools/kit_match.py. See docs/HANDOVER_5.md.
 * Stage B2 (local-b2): web/org122.js #/organization (registered in ia.js: rec 'organization', group settings) + web/bizctx.js business context/switcher; brand and location lists DB-driven with fallbacks. See HANDOVER_7.
 - 2026-10-14 integration: registered impexp, variants, cheques, schemes, tinting (docs/regs) in web/ia.js and script tags in web/index.html after org122.js.
+- 2026-10-14 integration local-int: INTEGRATION_REPORT_7.md, phase130_integration_test.sql (test only), lang fixes in impexp124.js / variants125.js.

@@ -55,3 +55,6 @@ Built locally on branch local-dl, NOT pushed, NOT pasted: cheque / PDC register 
 
 ## UPDATE Group ERP (Stage B2) - see docs/HANDOVER_7.md (STAGE B2)
 Built locally on branch local-b2 (from local-b1), NOT pushed: #/organization screen reconciled with phase122, web/bizctx.js business context + drawer switcher (hidden for one business), business-filtered B.ENV.locs, brand/title/receipt names from the business (legacy names while the placeholder name stands), DB-driven brand lists with the old lists as fallback. Still open: SQL items in HANDOVER_7 'needs SQL (C1/B3)', raw locations readers, offline queue keys, report scoping (C1).
+
+## UPDATE Integration (local-int) - see docs/INTEGRATION_REPORT_7.md section 9
+Open: deferred global masters (C2), per-business rules / roles / grants, ~170 unscoped reader RPCs, dealer POS, GL posting for schemes and import-export, fashion slices (retail / wholesale / online / tailoring), Stage E intercompany (default OFF), Stage F master owner dashboard with data_status, fashion_apparel template seed.

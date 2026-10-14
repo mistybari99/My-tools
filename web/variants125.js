@@ -25,7 +25,7 @@ const X = {
   addSet: L('নতুন অপশন তালিকা', 'New option list', 'নতুন option list'), addVals: L('মান যোগ', 'Add values', 'Value যোগ'), code: L('কোড (বড় ইংরেজি অক্ষর/সংখ্যা)', 'Code (capital letters / digits)', 'Code (capital letters / digits)'),
   nbn: L('নাম (বাংলা)', 'Name (Bangla)', 'নাম (বাংলা)'), nen: L('নাম (ইংরেজি)', 'Name (English)', 'নাম (English)'), kind: L('ধরন', 'Kind', 'Kind'), group: L('পণ্যের গ্রুপ (ক্যাটাগরি)', 'Product group (category)', 'Product group (category)'),
   kSize: L('সাইজ', 'Size', 'Size'), kColour: L('রং', 'Colour', 'Colour'), kFabric: L('কাপড়', 'Fabric', 'Fabric'), kAge: L('বয়স', 'Age band', 'Age band'), kOther: L('অন্য', 'Other', 'Other'),
-  valsHelp: L('প্রতি লাইনে একটি: কোড, বাংলা নাম, ইংরেজি নাম (নাম না দিলে কোডই নাম)। যেমন: M, মাঝারি, Medium', 'One per line: code, Bangla label, English label (label optional). Example: M, মাঝারি, Medium', 'প্রতি line-এ একটি: code, বাংলা নাম, English নাম। যেমন: M, মাঝারি, Medium'),
+  valsHelp: L('প্রতি লাইনে একটি: কোড, বাংলা নাম, ইংরেজি নাম (নাম না দিলে কোডই নাম)। যেমন: M, মাঝারি, Medium', 'One per line: code, Bangla label, English label (label optional). Example: M, Medium, Medium', 'প্রতি line-এ একটি: code, বাংলা নাম, English নাম। যেমন: M, মাঝারি, Medium'),
   addStyle: L('নতুন স্টাইল', 'New style', 'নতুন style'), price: L('দাম (ডিফল্ট)', 'Default price', 'Default price'), axis: L('অপশন তালিকা', 'Option list', 'Option list'), none1: L('— নেই —', '— none —', '— নেই —'),
   axesHelp: L('১ম তালিকা সারি, ২য় তালিকা কলাম হবে (সর্বোচ্চ ৪টি)।', 'The 1st list makes the rows, the 2nd the columns (up to 4 lists).', '১ম list সারি, ২য় list কলাম (max ৪টি)।'),
   variants: L('ভ্যারিয়েন্ট', 'variants', 'variants'), open: L('খুলুন', 'Open', 'Open'), matrix: L('ম্যাট্রিক্স (স্টক)', 'Matrix (stock)', 'Matrix (stock)'), missing: L('এখনো তৈরি হয়নি', 'Not created yet', 'এখনো তৈরি হয়নি'),
@@ -38,12 +38,12 @@ const X = {
 };
 const T = (k) => lab(X[k]);
 const ERR = {
-  variants_off: X.off, 'not allowed': L('অনুমতি নেই', 'Not allowed'), code_taken: L('এই কোড আগেই আছে (আইটেমের কোড সব ব্যবসায় আলাদা হতে হবে)', 'This code is already used (item codes are still unique across businesses)'),
-  bad_code: L('কোড ঠিক নয় (বড় ইংরেজি অক্ষর, সংখ্যা)', 'Code is not valid (capital letters and digits)'), bad_name: L('নাম ঠিক নয়', 'Name is not valid'), bad_axes: L('অপশন তালিকা ঠিক নয় (১-৪টি, আলাদা)', 'Option lists are not valid (1-4, all different)'),
-  axes_locked: L('ভ্যারিয়েন্ট তৈরি হয়ে গেছে, তালিকা বদলানো যায় না', 'Variants exist, the lists can no longer change'), too_many: L('একবারে ৫০০-র বেশি হবে না; কিছু মান বাদ দিন', 'More than 500 at once; leave some values out'),
-  no_values: L('কোনো মান নেই; আগে অপশন তালিকায় মান যোগ করুন', 'No values; add values to the option lists first'), no_axes: L('স্টাইলে অপশন তালিকা নেই', 'The style has no option lists'),
-  bad_price: L('দাম ঠিক নয়', 'Price is not valid'), bad_date: L('তারিখ ঠিক নয়', 'Date is not valid'), bad_channel: L('চ্যানেল বাছুন', 'Choose a channel'), bad_values: L('মান লিখুন (১-২০০ লাইন)', 'Enter values (1-200 lines)'),
-  style_inactive: L('স্টাইল বন্ধ', 'The style is inactive'), client_id_needed: L('আবার চেষ্টা করুন', 'Please try again'), item_not_in_business: L('আইটেম এই ব্যবসার নয়', 'The item is not in this business'),
+  variants_off: X.off, 'not allowed': L('অনুমতি নেই', 'Not allowed', 'Not allowed'), code_taken: L('এই কোড আগেই আছে (আইটেমের কোড সব ব্যবসায় আলাদা হতে হবে)', 'This code is already used (item codes are still unique across businesses)', 'This code is already used (item codes are still unique across businesses)'),
+  bad_code: L('কোড ঠিক নয় (বড় ইংরেজি অক্ষর, সংখ্যা)', 'Code is not valid (capital letters and digits)', 'Code is not valid (capital letters and digits)'), bad_name: L('নাম ঠিক নয়', 'Name is not valid', 'Name is not valid'), bad_axes: L('অপশন তালিকা ঠিক নয় (১-৪টি, আলাদা)', 'Option lists are not valid (1-4, all different)', 'Option lists are not valid (1-4, all different)'),
+  axes_locked: L('ভ্যারিয়েন্ট তৈরি হয়ে গেছে, তালিকা বদলানো যায় না', 'Variants exist, the lists can no longer change', 'Variants exist, the lists can no longer change'), too_many: L('একবারে ৫০০-র বেশি হবে না; কিছু মান বাদ দিন', 'More than 500 at once; leave some values out', 'More than 500 at once; leave some values out'),
+  no_values: L('কোনো মান নেই; আগে অপশন তালিকায় মান যোগ করুন', 'No values; add values to the option lists first', 'No values; add values to the option lists first'), no_axes: L('স্টাইলে অপশন তালিকা নেই', 'The style has no option lists', 'The style has no option lists'),
+  bad_price: L('দাম ঠিক নয়', 'Price is not valid', 'Price is not valid'), bad_date: L('তারিখ ঠিক নয়', 'Date is not valid', 'Date is not valid'), bad_channel: L('চ্যানেল বাছুন', 'Choose a channel', 'Choose a channel'), bad_values: L('মান লিখুন (১-২০০ লাইন)', 'Enter values (1-200 lines)', 'Enter values (1-200 lines)'),
+  style_inactive: L('স্টাইল বন্ধ', 'The style is inactive', 'The style is inactive'), client_id_needed: L('আবার চেষ্টা করুন', 'Please try again', 'Please try again'), item_not_in_business: L('আইটেম এই ব্যবসার নয়', 'The item is not in this business', 'The item is not in this business'),
 };
 const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? lab(ERR[k]) : m || 'error'; };
 const KINDS = [['size', 'kSize'], ['colour', 'kColour'], ['fabric', 'kFabric'], ['age', 'kAge'], ['other', 'kOther']];

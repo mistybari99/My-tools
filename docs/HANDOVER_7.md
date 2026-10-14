@@ -121,3 +121,6 @@ Purpose: one database, many fully separate businesses; this adds the first indus
 4. org_unit filter parameter for report_run / daily_digest / profit_truth112 / staff_directory / option_lists / rules (per business rules and lists, audit items G2-G4, J1-J9).
 5. Per business forms catalogue (forms.org_unit_id or template) and `location_kinds`.
 6. Unique-ness of locations.code across businesses (entry serial prefix uses loc.code).
+
+# INTEGRATION (branch `local-int`, cut from local-b1; NOTHING pushed or pasted) - read docs/INTEGRATION_REPORT_7.md first
+Merged local-c1, local-ie, local-var, local-dl, local-b2 (+b2ui) and the two C1 audit docs. Canonical order ...121, 122, 123, 124, 125, 126, 127, 128, 129 (paste_order.env = PASTE_ORDER.md, check_paste_order OK, tag loss 0). Every re-paste tail contains 120..129. Web: the five new screens are registered in web/ia.js + web/index.html. Tests: run_all_sql 9255 pass / 89 fail (= known env fails only), phase130_integration_test 28/0, e2e 206/0 + 205/0, web tests green (lang_all regression in impexp124.js / variants125.js fixed). Setup pages: setup-run-19 (phases 124-126) and setup-run-20 (127-129) in /home/user/work-c4-out/, chain-locked, CHECK 0/N -> N/N on scratch. Owner decisions pending: see the MCQ list in the report.
