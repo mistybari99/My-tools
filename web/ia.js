@@ -117,6 +117,7 @@ const IA = [
   rec('rollout', 'loc', ['কাগজ / পাশাপাশি / অ্যাপ', 'Paper / Parallel / App', 'Paper / Parallel / App'], { icon: 'control', ok: (c) => c.own || c.GF.rollout_manage === true, kw: ['rollout', 'paper', 'parallel', 'go live', 'কাগজ', 'পাশাপাশি', 'অ্যাপ'] }),
   // Administration & settings
   rec('control', 'settings', ['কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'], { icon: 'control', ok: (c) => c.ctlOk(), cnt: 'ctl', tone: 'info', kw: ['control', 'admin', 'কন্ট্রোল', 'নিয়ন্ত্রণ'] }),
+  rec('optviews', 'settings', ['কে কী দেখবে (দেখান / লুকান / তালা)', 'Who sees what (Show / Hide / Locked)', 'কে কী দেখবে (Show / Hide / Locked)'], { icon: 'control', ok: owner, kw: ['show', 'hide', 'locked', 'visibility', 'view', 'menu', 'option', 'দেখান', 'লুকান', 'তালা', 'দৃশ্যমান', 'মেনু'] }),
   rec('rulehub', 'settings', 't:rulehub', { ok: owner, mod: 14, kw: ['rules', 'switch', 'grants', 'নিয়ম', 'অপশন', 'অনুমতি'] }),
   rec('owner', 'settings', ['মালিকের বোর্ড', 'Owner mode board', 'Owner mode board'], { icon: 'control', ok: owner, kw: ['owner', 'board', 'must check', 'daily check', 'morning', 'মালিক', 'বোর্ড', 'প্রতিদিন', 'দেখুন'] }),
   rec('switchboard', 'settings', ['সুইচবোর্ড (সব চালু/বন্ধ)', 'Switchboard (all on/off)', 'Switchboard (সব on/off)'], { icon: 'settings', ok: owner, kw: ['switch', 'on off', 'toggle', 'blind', 'pin', 'flag', 'সুইচ', 'চালু', 'বন্ধ', 'অন', 'অফ', 'সেটিংস'] }),
@@ -250,7 +251,7 @@ function resolve(path) {
   if (!p.length) return byRoute.get('home');
   return (p[1] && byRoute.get(p[0] + '/' + p[1])) || byRoute.get(p[0]) || null;
 }
-const visible = (r, c) => { try { return !!r.ok(c); } catch (e) { return false; } };
+const visible = (r, c) => { try { return !!r.ok(c) && !(B.optviews && B.optviews.hidden && B.optviews.hidden('r:' + r.route)); } catch (e) { return false; } };   // bos91: owner's Hide choice (optviews.js); no data = as before
 
 // ---------- search: label > keyword > route > category; every word of the query must hit something ----------
 const norm = (x) => String(x || '').toLowerCase().trim();

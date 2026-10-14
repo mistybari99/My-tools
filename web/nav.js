@@ -91,7 +91,7 @@ function entries() {
     const live = f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code]);
     out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code, drawer: true });
   });
-  return out;
+  return B.optviews && B.optviews.apply ? B.optviews.apply(out) : out;   // bos91: owner's Hide / Locked choices (no data = unchanged)
 }
 const byKey = (k) => entries().find((e) => e.key === k);
 function keyOfHash() {
@@ -221,6 +221,7 @@ function ensureStatic() {
     if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
     try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
     syncFavs();
+    try { if (B.optviews && B.optviews.load) await B.optviews.load(); } catch (e) { /* views unavailable: everything shows as before */ }   // bos91
     await loadGrantFlags();
   })();
   return staticP;
