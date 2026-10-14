@@ -70,3 +70,6 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] H3 Owner decisions: when to turn on dealer_cheque_on / dealer_scheme_on / dealer_tint_on (one business at a time, after paste); accountant: how scheme accruals and principal receipts are booked.
 - [ ] H4 Later: per-business customer / supplier master data (C2), dealer POS screens, scheme sale-return netting, cheque bounce charge billing to the customer.
 
+- [x] G3a B2 (local-b2): organization UI, business context + switcher, DB-driven brands, business name in receipts/title (HANDOVER_7 STAGE B2). Not pushed.
+- [ ] G3b B2 leftovers (raw locations readers, offline queue keys, SQL list in HANDOVER_7)
+- [ ] G3 C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.

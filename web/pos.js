@@ -454,7 +454,8 @@ async function drawToday() {
 }
 function receiptText(s, pays, cust) {
   const loc = B.ENV.locs.find((l) => l.id === s.location_id) || {}, lines = (s.lines || []).map((l) => `${l.name}${l.item_id || l.custom ? ` ${fmt(l.qty)} × ${fmt(l.price)}` : ''} = ${fmt(l.amount)}`);
-  return [`${A.BRAND_TEXT || 'ইসলামিয়া মিষ্টি ঘর'}`, `ISLAMIYA MISTY GHAR`, `${nm(loc)}`, `${T('receipt')} ${loc.code || ''}-${s.receipt} · ${s.sale_date} ${hhmm(s.sold_at)}`, '—', ...lines,
+  const bd = B.biz ? B.biz.brandFor(s.location_id) : { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };   // bizctx: the business of the sale's place; legacy name when none is set
+  return [`${A.BRAND_TEXT || bd.bn}`, `${bd.en}`, `${nm(loc)}`, `${T('receipt')} ${loc.code || ''}-${s.receipt} · ${s.sale_date} ${hhmm(s.sold_at)}`, '—', ...lines,
     Number(s.discount) ? `${lab(L('ডিসকাউন্ট', 'Discount', 'Discount'))}: -${fmt(s.discount)}` : null, `${T('total')}: ${fmt(s.total)}`,
     ...(pays || []).map((p) => `${lab(MODEL[p.mode])}${p.wallet ? ' (' + p.wallet + ')' : ''}: ${fmt(p.amount)}`), Number(s.due_amount) > 0 ? `${T('dueword')}: ${fmt(s.due_amount)}` : null,
     cust ? `${T('cust')}: ${cust.name} ${cust.mobile}` : null, lab(L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'))].filter(Boolean).join('\n');
