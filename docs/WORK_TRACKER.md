@@ -92,3 +92,9 @@ Meta app + business verification + webhook subscription; edge-function deploymen
 - public repo islamia-bos-app publishes web files + setup pages; pushing it = production deploy
 - 2FA TOTP + restore drill (#17/#18) built, phases 70/71 pasted; real Supabase drill/enrol UNVERIFIED
 - #16 PIN hardening postponed by owner
+
+## Update (latest)
+- integration/p72-p79 now holds: 72-79, 82 (Ea), 83 (Eb), 84 (F); QA report in docs/briefs_p2p3/QA_COVERAGE.md. Default branch ccr-78d03e25-k7ksyo fast-forwarded to dbecc25 (72-79) on owner "Merge". Nothing in live DB / public pages yet.
+- Running: S1(80) S2(81) D(85) Tg(86 telegram) X(87 QA fixups: owner-always-approve, unassigned findings, wiring).
+- TODO INT2 (phase89): phase83 re-creates _sale_stock_out WITHOUT bos82 lines -> re-apply bos82+bos83 together; re-check every function overwritten by 80-87 (pg_get_functiondef diff); fix phase21/22 fixture (phase84 forbids stock_balance delete); wiring posfail.js (index.html after pos.js, ia.js posfailed rec).
+- Production answer: recipe path auto-deducts raw/pack, no-recipe path does not; recommend production_requires_recipe ON; double-issue risk -> X guard.
