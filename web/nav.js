@@ -4,6 +4,7 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, t, esc, nm, fmt, store, openSheet, closeSheet, fail } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
 const H = A.H;
 const $ = (s, el = document) => el.querySelector(s);
 const L = B.L, lab = B.lab;
@@ -692,7 +693,7 @@ async function loadStats() {
   box.innerHTML = `<p class="muted">${esc(t('loading'))}</p>`;
   if (!HS.data || HS.dataFrom !== key) {
     const qq = (x) => x.then((r) => (r && !r.error ? r.data || [] : []), () => []);
-    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(sb.rpc('customer_dues'))]);
+    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(sb.rpc(duesFn()))]);
     HS.data = { s, pay, dues }; HS.dataFrom = key;
   }
   drawStats();

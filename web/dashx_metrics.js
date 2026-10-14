@@ -10,6 +10,7 @@
 const A = window.BOS_APP, B = window.BOS;
 if (!A || !B) return;
 const { sb, S } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
 const L = B.L, lab = B.lab;
 
 // ---------- small helpers ----------
@@ -94,7 +95,7 @@ const done = (rows) => rows.filter((x) => x.st === 'done');
 const bizDaily = async (c) => arr(await rpc('biz_daily', { p_from: c.r.pfrom, p_to: c.r.to, p_loc: c.loc || null }, c.signal));
 const income = (c) => rpc('acct_income_statement', { p_from: c.r.from, p_to: c.r.to, p_loc: c.loc || null }, c.signal);
 const payRows = async (c) => arr(await rpc('payments_summary', { p_from: c.r.pfrom }, c.signal)).filter((x) => !c.loc || String(x.location_id) === String(c.loc));
-const custDues = async (c) => arr(await rpc('customer_dues', {}, c.signal));
+const custDues = async (c) => arr(await rpc(duesFn(), {}, c.signal));
 const orders = async (c) => arr(await rpc('online_orders_list', { p_loc: c.loc || null, p_status: null, p_from: c.r.from, p_to: c.r.to, p_limit: 500 }, c.signal));
 
 // ---------- the catalogue ----------
@@ -138,8 +139,15 @@ M('cogs', 'profit', L('বিক্রিত মালের খরচ (COGS)', 
 M('gross_margin', 'profit', L('লাভের হার', 'Gross margin %', 'Gross margin %'), 'value', 'gauge', 'pct', { cost: true }, async (c) => {
   const rows = dailyGp(await bizDaily(c)), p = (a, b) => { const rv = sumBy(rows, 'd', a, b, (x) => x.rev), g = sumBy(rows, 'd', a, b, (x) => x.gp); return rv > 0 ? 100 * g / rv : 0; };
   return { value: p(c.r.from, c.r.to), prev: p(c.r.pfrom, c.r.pto), min: 0, max: 100, spark: [] }; });
+// bos112: rule profit_truth_mode = on -> the ONE net profit (profit_truth112: wastage, card fees, payroll, shared bills included, unknown-cost sales left out) and a "provisional" note; off = the books figure as before
+const truthOn = () => { try { return B.rule ? B.rule('profit_truth_mode', 'off') === 'on' : false; } catch (e) { return false; } };
+const PROV = L('অস্থায়ী: কিছু বিক্রির খরচ জানা নেই বা কিছু শেয়ার্ড বিল ভাগ হয়নি', 'Provisional: some sales have no known cost or some shared bills are not allocated', 'Provisional: কিছু বিক্রির cost জানা নেই বা কিছু shared bill ভাগ হয়নি');
 M('net_profit', 'profit', L('নিট লাভ (হিসাব খাতা)', 'Net profit (books)', 'Net profit (books)'), 'value', 'kpi', 'money', { cost: true, grant: ['accounts_view'] }, async (c) => {
-  const d = await income(c); if (!d || d.data_needed) return null; return { value: N(d.net_profit), spark: [] }; });
+  if (truthOn()) {
+    const t = await rpc('profit_truth112', { p_from: c.r.from, p_to: c.r.to, p_loc: c.loc || null }, c.signal);
+    if (t && t.company) return { value: N(t.company.net_profit), spark: [], note: t.provisional ? lab(PROV) : '' };
+  }
+  const d = await income(c); if (!d || d.data_needed) return null; return { value: N(d.net_profit), spark: [], note: truthOn() && d.provisional ? lab(PROV) : '' }; });
 M('stock_value_cat', 'profit', L('ক্যাটাগরি অনুযায়ী স্টকের মূল্য', 'Stock value by category', 'Category অনুযায়ী stock value'), 'slices', 'treemap', 'money', { cost: true }, async (c) => {
   const d = arr(await rpc('stock_valuation_by_category', { p_loc: c.loc || null, p_level: 'category' }, c.signal));
   return { slices: top(d.map((x) => ({ label: nameOf(x, 'cat_name_bn', 'cat_name_en', 'category') || lab(L('অন্য', 'Uncategorised', 'Uncategorised')), value: N(x.value) })), 10, OTHER) }; });

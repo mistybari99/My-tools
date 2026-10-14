@@ -102,6 +102,8 @@ const X = {
   b_find: L('মিল খুঁজুন', 'Find a match', 'Match খুঁজুন'), b_match: L('মেলান', 'Match', 'মেলান'), b_unmatch: L('মিল ভাঙুন', 'Unmatch', 'Unmatch'), b_cand: L('সম্ভাব্য খাতার লাইন (একই টাকা)', 'Possible book lines (same amount)', 'সম্ভাব্য book line (একই টাকা)'),
   b_nocand: L('একই টাকার কোনো লাইন নেই। স্টেটমেন্টের জন্য আলাদা জার্নাল Accounts পাতায় লিখুন।', 'No book line with this exact amount. Post the journal on the Accounts page first.', 'একই টাকার line নেই। আগে Accounts page-এ journal লিখুন।'),
   b_sum: L('সারসংক্ষেপ', 'Summary', 'Summary'), b_stt: L('স্টেটমেন্ট টোটাল', 'Statement total', 'Statement total'), b_bkt: L('খাতা টোটাল', 'Books total', 'Books total'), b_diff: L('পার্থক্য', 'Difference', 'Difference'), b_matched: L('মিলেছে', 'Matched', 'Matched'),
+  b_postfee: L('ব্যাংক চার্জ হিসেবে তুলুন', 'Post as bank charge', 'Bank charge হিসেবে post করুন'), b_postint: L('সুদ হিসেবে তুলুন', 'Post as interest', 'Interest হিসেবে post করুন'),
+  b_postask: L('এই স্টেটমেন্ট লাইনটি হিসাব খাতায় তুলে মিলিয়ে দেওয়া হবে। ঠিক আছে?', 'This statement line will be posted to the books and matched. Continue?', 'এই statement line books-এ post হয়ে match হবে। Continue?'),
   b_nopost: L('কিছু নিজে পোস্ট হয় না — মেলানো শুধু চিহ্ন।', 'Nothing is posted by itself - matching only marks lines.', 'কিছু auto post হয় না — match শুধু চিহ্ন।'),
   /* close */
   c_help: L('আগে হিসাব-বন্ধের ডেট (Rules) বছর শেষ পর্যন্ত দিন। প্রিভিউ দেখে নিশ্চিত করুন। ভুল হলে উল্টানো যায়।', 'First set the books-closed date (Rules) to the year end. Preview, then confirm. It can be reversed.', 'আগে books-closed date বছর শেষ পর্যন্ত দিন। Preview দেখে confirm। ভুল হলে reverse করা যায়।'),
@@ -168,10 +170,10 @@ const lbl = (k, inner) => `<label class="stack">${esc(T(k))}${inner}</label>`;
 async function loadBase() {
   if (B.loadStatic) await B.loadStatic();
   D.locs = (B.liveLocs && B.ENV ? B.liveLocs(B.ENV.locs) : (B.ENV && B.ENV.locs) || []);
-  const [acc, rules] = await Promise.all([sb.from('coa_accounts').select('id,code,name_bn,name_en,type,is_group,active,parent_id').order('code'), sb.from('rules').select('key,value,default_value').in('key', ['bank_recon_on', 'year_close_on', 'fixed_assets_on', 'budgets_on', 'vat_on', 'vat_rate', 'period_closed_until'])]);
+  const [acc, rules] = await Promise.all([sb.from('coa_accounts').select('id,code,name_bn,name_en,type,is_group,active,parent_id').order('code'), sb.from('rules').select('key,value,default_value').in('key', ['bank_recon_on', 'bank_stmt_post_on', 'year_close_on', 'fixed_assets_on', 'budgets_on', 'vat_on', 'vat_rate', 'period_closed_until'])]);
   D.accts = (acc.data || []).filter((a) => a.active !== false);
   const sv = {}; (rules.data || []).forEach((r) => { const v = r.value != null ? r.value : r.default_value; sv[r.key] = v; });
-  D.sw = { bank_recon_on: sv.bank_recon_on === true, year_close_on: sv.year_close_on === true, fixed_assets_on: sv.fixed_assets_on === true, budgets_on: sv.budgets_on === true, vat_on: sv.vat_on === true, vat_rate: sv.vat_rate, lock: sv.period_closed_until };
+  D.sw = { bank_recon_on: sv.bank_recon_on === true, bank_post: sv.bank_stmt_post_on === 'on', year_close_on: sv.year_close_on === true, fixed_assets_on: sv.fixed_assets_on === true, budgets_on: sv.budgets_on === true, vat_on: sv.vat_on === true, vat_rate: sv.vat_rate, lock: sv.period_closed_until };
   const y = Number(today().slice(0, 4)); const t0 = today();
   D.close.from = D.close.from || `${y - 1}-01-01`; D.close.to = D.close.to || `${y - 1}-12-31`;
   D.vat.from = D.vat.from || mstart(t0); D.vat.to = D.vat.to || t0;
@@ -209,7 +211,7 @@ async function drawBank() {
     h += `<div class="card stack"><b>${esc(T('b_sum'))}</b><div class="row wrap">${chip(T('b_matched') + ': ' + rep.matched_count, 'ok')}${chip(T('b_unm') + ': ' + rep.statement_unmatched_count, rep.statement_unmatched_count ? 'warn' : '')}${chip(T('b_book') + ': ' + rep.book_unmatched_count, rep.book_unmatched_count ? 'warn' : '')}</div>
       <div class="muted">${esc(T('b_stt'))}: ${esc(fm(rep.statement_total))} · ${esc(T('b_bkt'))}: ${esc(fm(rep.book_total))} · ${esc(T('b_diff'))}: ${esc(fm(rep.difference))}</div>
       <button type="button" class="btn" data-act="f2_bsugg">${esc(T('b_sugg'))}</button><div id="f2_sugg">${suggHtml()}</div></div>`;
-    h += `<div class="card stack"><b>${esc(T('b_unm'))}</b>${rep.statement_unmatched.length ? tbl(th('', '', '') , rep.statement_unmatched.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(r.reference || r.description || '')}</td><td class="n">${esc(fm(r.amount))}</td><td><button type="button" class="mini" data-act="f2_bfind" data-id="${r.id}">${esc(T('b_find'))}</button></td></tr>`).join('')) : `<p class="muted">${esc(T('none'))}</p>`}</div>`;
+    h += `<div class="card stack"><b>${esc(T('b_unm'))}</b>${rep.statement_unmatched.length ? tbl(th('', '', '') , rep.statement_unmatched.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(r.reference || r.description || '')}</td><td class="n">${esc(fm(r.amount))}</td><td><button type="button" class="mini" data-act="f2_bfind" data-id="${r.id}">${esc(T('b_find'))}</button>${D.sw.bank_post ? `<button type="button" class="mini" data-act="f2_bpost" data-id="${r.id}" data-k="${Number(r.amount) < 0 ? 'fee' : 'interest'}">${esc(T(Number(r.amount) < 0 ? 'b_postfee' : 'b_postint'))}</button>` : ''}</td></tr>`).join('')) : `<p class="muted">${esc(T('none'))}</p>`}</div>`;
     h += `<div class="card stack"><b>${esc(T('b_book'))}</b>${rep.book_unmatched.length ? tbl('', rep.book_unmatched.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(r.memo || '')}</td><td class="n">${esc(fm(r.amount))}</td></tr>`).join('')) : `<p class="muted">${esc(T('none'))}</p>`}</div>`;
     h += `<div class="card stack"><b>${esc(T('b_matched'))}</b>${lines.length ? tbl('', lines.map((r) => `<tr><td>${esc(r.date)}</td><td>${esc(r.reference || r.description || '')}</td><td class="n">${esc(fm(r.amount))}</td><td><button type="button" class="mini" data-act="f2_bunm" data-id="${r.id}">${esc(T('b_unmatch'))}</button></td></tr>`).join('')) : `<p class="muted">${esc(T('none'))}</p>`}</div>`;
   }
@@ -250,6 +252,10 @@ Object.assign(H, {
       const c = await rpc('bank_recon_candidates', { p_line: Number(a.dataset.id), p_days: 10 });
       openSheet(`<h2>${esc(T('b_cand'))}</h2><div class="stack f2">${c.length ? c.map((x) => `<div class="card stack"><div>${esc(x.date)} · ${esc(x.memo || '')}</div><div class="muted">${esc(x.source_type)} · ${esc(fm(x.amount))} · ${x.days_off > 0 ? '+' : ''}${x.days_off}d ${x.ref_hit ? '· ref ✓' : ''}</div><button type="button" class="btn primary" data-act="f2_bmatch" data-id="${esc(a.dataset.id)}" data-e="${x.entry_id}" data-n="${x.line_no}">${esc(T('b_match'))}</button></div>`).join('') : `<p class="muted">${esc(T('b_nocand'))}</p>`}</div>`);
     } catch (e) { toast(eText(e)); }
+  },
+  f2_bpost: async (a) => {   // bos113: rule bank_stmt_post_on = on -> a fee / interest line of the statement is posted to the books and matched in one step
+    if (!window.confirm(T('b_postask'))) return;
+    try { await rpc('bank_stmt_post113', { p_line: Number(a.dataset.id), p_kind: a.dataset.k, p_loc: null, p_note: null, p_client: rid() }); toast(T('saved')); await draw(); } catch (e) { toast(eText(e)); }
   },
   f2_bmatch: async (a) => {
     try { await rpc('bank_recon_match', { p_line: Number(a.dataset.id), p_entry: Number(a.dataset.e), p_line_no: Number(a.dataset.n), p_note: null }); closeSheet(); toast(T('saved')); await draw(); } catch (e) { toast(eText(e)); }

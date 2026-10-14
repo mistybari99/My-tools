@@ -7,6 +7,7 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, esc, toast, fail, shell, H, store, openSheet, closeSheet } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
 const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const REFRESH_MS = () => Number(window.__OB_REFRESH_MS) || 120000;
@@ -104,7 +105,7 @@ const KINDS = {
     const [en, rel, itm, em] = await Promise.all([cnt(sb.from('entries').select('id', { count: 'exact', head: true }).eq('status', 'submitted')), q('release_requests', 'pending'), q('item_changes', 'pending'), q('emergency_requests', 'pending')]);
     const tot = en + rel + itm + em; return { value: String(tot), num: tot, tone: tot ? 'warn' : 'ok', sub: tot ? `${lab(L('ফর্ম', 'forms', 'forms'))} ${en} · ${lab(L('ছাড়', 'release', 'release'))} ${rel} · ${lab(L('আইটেম', 'items', 'items'))} ${itm}` : T('clear'), route: 'pending' }; } },
   cust_dues: { g: 'money', num: true, l: L('কাস্টমারের বাকি (টোটাল ও মেয়াদ শেষ)', 'Customer dues (total & overdue)', 'Customer due (total ও overdue)'), route: 'dues', async load(env, cfg) {
-    const rows = arr(await rpc('customer_dues')).filter((c) => N(c.balance) > 0), days = N(cfg.days) > 0 ? N(cfg.days) : 30;
+    const rows = arr(await rpc(duesFn())).filter((c) => N(c.balance) > 0), days = N(cfg.days) > 0 ? N(cfg.days) : 30;
     const tot = rows.reduce((s, c) => s + N(c.balance), 0), od = rows.filter((c) => c.oldest && daysBetween(c.oldest, env.td) > days).reduce((s, c) => s + N(c.balance), 0);
     return { value: money(tot), num: tot, tone: od > 0 ? 'warn' : 'info', sub: `${rows.length} ${T('cust')} · ${T('od')} (>${days}d) ${money(od)}`, route: 'dues' }; } },
   supp_dues: { g: 'money', num: true, l: L('সাপ্লায়ারের পাওনা', 'Supplier dues', 'Supplier-এর পাওনা'), route: 'payables', async load() {

@@ -171,7 +171,7 @@ function kpiHtml(t, m, d) {
   const f = MX.fmtOf(m, false), pv = d.prev, hasPrev = pv !== undefined && pv !== null && N(pv) > 0 && ST.layout.period !== undefined;
   const pct = hasPrev ? ((N(d.value) - N(pv)) / N(pv)) * 100 : null, up = pct !== null && pct >= 0, bad = INV.has(m.id) ? up : !up;
   const delta = pct === null ? '' : `<div class="dx-dl ${Math.abs(pct) < 0.05 ? 'z' : bad ? 'bad' : 'ok'}"><span aria-hidden="true">${up ? '▲' : '▼'}</span> ${esc((Math.round(Math.abs(pct) * 10) / 10) + '%')} <small>${esc(T('vs'))}</small></div>`;
-  return `<div class="dx-kpi"><div class="dx-kv">${esc(f(d.value))}</div>${delta}${spark(d.spark)}</div>`;
+  return `<div class="dx-kpi"><div class="dx-kv">${esc(f(d.value))}</div>${delta}${d.note ? `<div class="dx-note">${esc(d.note)}</div>` : ''}${spark(d.spark)}</div>`;   /* bos112: optional note under the value (provisional profit) */
 }
 function typeRow(t, m, spec, enabled) {
   const ts = types(); const btn = (id, icon, label, on, ok, why) => `<button type="button" class="dx-tb ${on ? 'on' : ''} ${ok ? '' : 'off'}" data-act="dx_type" data-id="${esc(t.id)}" data-v="${esc(id)}" aria-pressed="${on ? 'true' : 'false'}" ${ok ? '' : 'aria-disabled="true"'} title="${esc(ok ? label : label + ' - ' + why)}" aria-label="${esc(ok ? label : label + ' - ' + why)}">${icon}</button>`;
@@ -250,7 +250,7 @@ function css() {
 .dx-t[data-size="S"] .dx-bd{min-height:128px}.dx-t[data-size="M"] .dx-bd{min-height:192px}.dx-t[data-size="L"] .dx-bd{min-height:280px}
 .dx-kpi{display:flex;flex-direction:column;gap:4px;min-height:100px;justify-content:flex-end}.dx-kv{font-size:1.5rem;font-weight:800;line-height:1.15;overflow-wrap:anywhere;font-variant-numeric:lining-nums tabular-nums;color:var(--dx-ink)}
 .dx-t[data-size="S"] .dx-kv{font-size:1.25rem}
-.dx-dl{font-size:12px;font-weight:700}.dx-dl small{font-weight:400;color:var(--dx-mut)}.dx-dl.ok{color:var(--ok,#16a34a)}.dx-dl.bad{color:var(--bad,#dc2626)}.dx-dl.z{color:var(--dx-mut)}
+.dx-note{font-size:11px;line-height:1.3;color:var(--warn,#b45309)}.dx-dl{font-size:12px;font-weight:700}.dx-dl small{font-weight:400;color:var(--dx-mut)}.dx-dl.ok{color:var(--ok,#16a34a)}.dx-dl.bad{color:var(--bad,#dc2626)}.dx-dl.z{color:var(--dx-mut)}
 .dx-sp{width:100%;height:34px;margin-top:2px}.dx-sp .l{fill:none;stroke:var(--dx-a);stroke-width:2;vector-effect:non-scaling-stroke}.dx-sp .a{fill:var(--dx-a);opacity:.15}
 .dx-sk{height:96px;border-radius:12px;background:linear-gradient(90deg,transparent,rgba(127,127,127,.18),transparent) var(--dx-bd);background-size:200% 100%;animation:dxsk 1.2s linear infinite}
 @keyframes dxsk{from{background-position:200% 0}to{background-position:-200% 0}}@media (prefers-reduced-motion:reduce){.dx-sk{animation:none}}
