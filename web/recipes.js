@@ -62,6 +62,7 @@ const ERRS = {
   bad_product_type: L('শুধু তৈরি পণ্যের রেসিপি হয়', 'Only a finished product can have a recipe', 'শুধু finished product-এর recipe'), bad_waste: L('অপচয় % ০–১০০ হতে হবে', 'Waste % must be 0–100', 'Waste % ০–১০০'),
   dup_ingredient: L('একই উপকরণ দুবার', 'The same ingredient twice', 'একই ingredient দুবার'), no_lines: L('অন্তত একটি উপকরণ লাগবে', 'Add at least one ingredient', 'অন্তত একটি ingredient'),
   ingredient_is_product: L('পণ্য নিজেই নিজের উপকরণ হতে পারে না', 'A product cannot be its own ingredient', 'Product নিজের ingredient নয়'), ingredient_not_tracked: L('উপকরণের স্টক ট্র্যাক বন্ধ', 'Stock tracking is off for an ingredient', 'Ingredient-এ stock track বন্ধ'),
+  cost_missing: L('কোনো উপকরণের খরচ অজানা — আগে খরচ বসান (বা খরচ সত্যিই শূন্য হলে চিহ্ন দিন)', 'An ingredient cost is unknown - enter the cost first (or mark the item as cost really zero)', 'কোনো ingredient-এর cost অজানা — আগে cost বসান (বা cost সত্যিই শূন্য হলে mark দিন)'),
   waste_needed: L('রেসিপিতে অপচয় % বসানো নেই (সেটিং চালু)', 'A recipe line has no waste % (setting is on)', 'Recipe-এ waste % নেই (setting on)'), too_many_lines: L('১০০-র বেশি উপকরণ হয় না', 'More than 100 ingredients', '১০০-র বেশি ingredient'),
 };
 const ERRKEYS = Object.keys(ERRS);
