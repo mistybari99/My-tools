@@ -54,4 +54,7 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] F6 Multi-business: keep all new work location/business scoped (HANDOVER_6, GROUP_ERP_STAGE_A.md sections 10-11 on branch ccr-46b26d91-81vl9s).
 - [x] G1 Group ERP B1: phase122 organization layer + phase122_test (111/0) + setup-run-17 built locally (docs/HANDOVER_7.md). Not pushed.
 - [ ] G2 Owner says "push": publish setup-run-16 then setup-run-17; owner pastes Run 16, Run 17 and the Checks.
-- [ ] G3 B2 organization UI + DB-driven brands/locations; C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+- [x] G4 Group ERP C1 first slice: phase123 + phase123_test (171/0) + c1_before_after.sh + setup-run-18 built locally (docs/HANDOVER_7.md, branch local-c1). Not pushed. Switch org_scope_on stays OFF.
+- [ ] G5 Owner says "push": publish setup-run-16, 17, 18 in that order; owner pastes Run 16, 17, 18 and the Checks. Before switching org_scope_on ON read `select org_scope_preflight();` (HANDOVER_7 checklist).
+- [ ] G6 C1 rest: the ~170 unscoped reader RPCs, per-business rules/roles/grants, storage + bot identity, audit tests 9, 10, 11, 13; needs C2 for masters.
+- [ ] G3 B2 organization UI + DB-driven brands/locations; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.

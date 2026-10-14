@@ -54,6 +54,7 @@ select tt.chk('P1a phase97 again: _acct_docs lost bos96 (this is the defect phas
 \i supabase/phase118.sql
 \i supabase/phase120.sql
 \i supabase/phase121.sql
+\i supabase/phase123.sql
 \i supabase/phase105.sql
 select tt.chk('P1b phase98 then phase103 after it: bos96 and bos97 back, identical hash as before', (select h from k0) = md5(pg_get_functiondef('public._acct_docs(date)'::regprocedure))
   and position('bos96' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) > 0 and position('bos97' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) > 0);
@@ -93,6 +94,7 @@ select :'origdef' \gexec
 \i supabase/phase118.sql
 \i supabase/phase120.sql
 \i supabase/phase121.sql
+\i supabase/phase123.sql
 \i supabase/phase105.sql
 select tt.chk('G1 (phase103 world: phase89 puts the older bodies back, ONE paste of phase103 repairs them) after the body is right again, the merged _acct_docs is back (bos96 + bos97 + bos98 present)', position('bos98' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) > 0 and position('bos96' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) > 0 and position('bos97' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) > 0);
 
