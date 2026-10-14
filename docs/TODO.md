@@ -55,3 +55,6 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [x] G1 Group ERP B1: phase122 organization layer + phase122_test (111/0) + setup-run-17 built locally (docs/HANDOVER_7.md). Not pushed.
 - [ ] G2 Owner says "push": publish setup-run-16 then setup-run-17; owner pastes Run 16, Run 17 and the Checks.
 - [ ] G3 B2 organization UI + DB-driven brands/locations; C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+- [x] G7 Variants: phase125 + phase126 + tests (139/0, 53/0, before/after identical, web mocked test) + 20k timings (local-var, not pushed).
+- [ ] G8 Lead: apply docs/regs/variants125.md (ia.js rec line, index.html script tag); merge PASTE_ORDER rows (...122, 123, 124, 125, 126).
+- [ ] G9 Variants next slice: price_for125 into POS / invoices / online, grid entry in purchase and POS, item lists on items_search, per-business item codes (relax plan in the regs file), bulk import of styles.

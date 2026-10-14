@@ -37,9 +37,9 @@ select tt.t('T1 org_manage is a known grant', exists (select 1 from grant_defs w
 \echo == T2 zero behaviour change
 select tt.t('T2 org_scope_on exists, is a switch and is OFF', (select kind = 'switch' and default_value = 'false'::jsonb from rules where key = 'org_scope_on') and not rule_on('org_scope_on'));
 select tt.t('T2 can_loc is untouched: it knows nothing about the organization layer', pg_get_functiondef('public.can_loc'::regproc) !~* 'org_');
-select tt.t('T2 no existing function or policy refers to the new objects', not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$)' and p.prosrc ~* 'org_units|org_scope|legal_entities|business_templates')
-  and not exists (select 1 from pg_policies where schemaname = 'public' and tablename not in ('org_units', 'legal_entities', 'business_templates') and (qual ~* 'org_unit' or with_check ~* 'org_unit')));
-create temp table h0 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$)';
+select tt.t('T2 no existing function or policy refers to the new objects', not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$|^_biz_|^_my_biz125$|^_var_gate125$|^_items_org125$|^option_|^style_save$|^variants_|^variant_matrix$|^my_businesses125$|^price_list|^price_for125$|^items_search)' and p.prosrc ~* 'org_units|org_scope|legal_entities|business_templates')
+  and not exists (select 1 from pg_policies where schemaname = 'public' and tablename not in ('org_units', 'legal_entities', 'business_templates', 'items', 'option_sets', 'option_values', 'item_styles', 'style_axes', 'price_lists', 'price_list_items') and (qual ~* 'org_unit' or with_check ~* 'org_unit')));
+create temp table h0 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$|^_biz_|^_my_biz125$|^_var_gate125$|^_items_org125$|^option_|^style_save$|^variants_|^variant_matrix$|^my_businesses125$|^price_list|^price_for125$|^items_search)';
 create temp table k0 as select (select count(*) from rules) rules_n, (select count(*) from grant_defs) gd_n, (select count(*) from setup_rec_defs81) adv_n, (select count(*) from locations) loc_n,
   (select count(*) from org_units) ou_n, (select count(*) from legal_entities) le_n, (select count(*) from business_templates) bt_n,
   (select md5(string_agg(to_jsonb(u)::text, '|' order by id)) from org_units u) ou_h, (select md5(string_agg(to_jsonb(l)::text, '|' order by id)) from locations l) loc_h,
@@ -187,7 +187,7 @@ select tt.is('T9 a location created after the first paste stays unmapped (fill-n
 select tt.eq('T9 still exactly one group, one SWEETS', 2, (select count(*) from org_units where kind = 'group' or code = 'SWEETS'));
 select tt.is('T9 org_unit_scope of the unmapped location says so', 'false', org_unit_scope((select id from locations where code = 'hw_shop'))->>'mapped');
 select tt.t('T9 no existing function body changed by the second paste', not exists (select 1 from pg_proc p join h0 on h0.fn = p.oid::regprocedure::text where p.pronamespace = 'public'::regnamespace and md5(pg_get_functiondef(p.oid)) <> h0.h));
-select tt.t('T9 ... and no function was added except ours', not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$)' and p.oid::regprocedure::text not in (select fn from h0)));
+select tt.t('T9 ... and no function was added except ours', not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname !~ '(^org_|^_org_|^_le_kind_check122$|^_biz_|^_my_biz125$|^_var_gate125$|^_items_org125$|^option_|^style_save$|^variants_|^variant_matrix$|^my_businesses125$|^price_list|^price_for125$|^items_search)' and p.oid::regprocedure::text not in (select fn from h0)));
 
 \echo == T10 sweets numbers unchanged
 select tt.t('T10 the 7 sweets locations still map to SWEETS after everything above', (select count(*) = 7 from locations l join org_units b on b.id = l.org_unit_id and b.code = 'SWEETS'));
