@@ -168,3 +168,9 @@ New read functions (stock_recon_statement, factory_branch_statement, net_profit_
 - Both import and export.
 - Currencies: a small configurable list of common currencies (base currency plus a few; the owner edits the list, none hardcoded).
 - Goods flowing into another of the owner's businesses: not needed now. Keep it simple; the Stage E intercompany feature stays planned, default OFF, not built.
+
+## 13. Added by owner: Fashion / Cloth business (template `fashion_apparel`)
+- Separate business, own legal entity and books. Template record, status `not_implemented`; seeded with `import_export` in the later template-seed phase. Nothing built now.
+- Foundation requirement (must not be blocked by today's design): the item master must support **variants** (one style -> size x colour x fabric SKUs, barcode per variant, stock per variant per location). Today `items` is flat and `items.code` is globally unique (see audit_c1/RLS_ISOLATION_AUDIT.md), so B-stage work must allow per-business item codes and a style/variant parent-child link via `attrs`/`attr_defs` or a `parent_item_id`, without changing sweets items.
+- Planned later (not built): season/collection, size-colour matrix entry (purchase, stock, POS), exchange/return rules, consignment/wholesale price lists, tailoring/custom orders, fabric/raw material and cut-make-trim costing (reuse the existing recipe/BOM + costing engine as a manufacturing template if the owner produces garments), aged-stock/markdown reports.
+- Open owner questions before building: retail only or also wholesale/manufacturing/tailoring; online sales needed; sizes/colour scheme per product group.
