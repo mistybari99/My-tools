@@ -160,7 +160,14 @@ select tt.chk('P2a phase89 pasted again on the full chain puts back older bodies
 \i supabase/phase118.sql
 \i supabase/phase120.sql
 \i supabase/phase121.sql
+\i supabase/phase122.sql
 \i supabase/phase123.sql
+\i supabase/phase124.sql
+\i supabase/phase125.sql
+\i supabase/phase126.sql
+\i supabase/phase127.sql
+\i supabase/phase128.sql
+\i supabase/phase129.sql
 create temp table h3 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.prokind='f';
 select tt.chk('P2 second paste (89 then 103; phase103 carries the final text of all five, phase98 would refuse over bos103): identical function bodies', (select count(*) from h1 full join h3 using (fn) where h1.h is distinct from h3.h) = 0);
 

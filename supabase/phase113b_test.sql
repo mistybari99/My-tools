@@ -155,8 +155,16 @@ create temp table f0 as select p.oid::regprocedure::text fn, md5(pg_get_function
 \i supabase/phase113.sql
 \i supabase/phase114.sql
 \i supabase/phase115.sql
+\i supabase/phase120.sql
 \i supabase/phase121.sql
+\i supabase/phase122.sql
 \i supabase/phase123.sql
+\i supabase/phase124.sql
+\i supabase/phase125.sql
+\i supabase/phase126.sql
+\i supabase/phase127.sql
+\i supabase/phase128.sql
+\i supabase/phase129.sql
 select tt.t('T9 no function changed by pasting phase113 again (followed by 114, 115: they patch _acct_docs / stock functions 113 re-creates)', (select count(*) from pg_proc p join f0 on f0.fn = p.oid::regprocedure::text where p.pronamespace = 'public'::regnamespace and md5(pg_get_functiondef(p.oid)) <> f0.h) = 0);
 select tt.t('T9 no rule / mapping row duplicated', (select count(*) from rules where key in ('drawer_short_post','dues_net_advance','period_lock_owner_mode','period_lock_late_warn','daybook_align_mode','bank_stmt_post_on'))=6 and (select count(*) from acct_mappings where key='cash_short')=1);
 

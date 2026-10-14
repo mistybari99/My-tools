@@ -169,8 +169,16 @@ select tt.chk('T4 stock_reconcile: 0 differences', (select count(*) = 0 from sto
 create temp table h1 as select proname, md5(pg_get_functiondef(oid)) h from pg_proc where pronamespace = 'public'::regnamespace and proname in ('stock_transfer','_acct_docs','_acct_stock_moves85','stock_receive_more','stock_return_transfer');
 select count(*) as nrec1 from setup_rec_defs81 \gset
 \i supabase/phase115.sql
+\i supabase/phase120.sql
 \i supabase/phase121.sql
+\i supabase/phase122.sql
 \i supabase/phase123.sql
+\i supabase/phase124.sql
+\i supabase/phase125.sql
+\i supabase/phase126.sql
+\i supabase/phase127.sql
+\i supabase/phase128.sql
+\i supabase/phase129.sql
 select tt.chk('T5 paste twice: same function bodies', (select count(*) = 5 from h1 where exists (select 1 from pg_proc p where p.proname = h1.proname and p.pronamespace = 'public'::regnamespace and md5(pg_get_functiondef(p.oid)) = h1.h)));
 select tt.chk('T5 paste twice: same advisor rows, rules keep their values', (select count(*) from setup_rec_defs81) = :nrec1 and (select value from rules where key = 'transit_loss_gl_fix') = 'true'::jsonb);
 
