@@ -1,4 +1,4 @@
--- REPLACEMENT of phase89f_test.sql for the final chain (INT4: ...105, 106, 107, 108, 109, 111). Phase109 re-creates production_post, _post_purchase_p13 and _void_purchase_p13, which phase89 also re-asserts, and phase103 re-creates setup_recommend_apply (phase109 changed it): so P2a lists 8 functions and the repair is 'paste 103, 105, 109, 111 after 89'. Same assertions otherwise.
+-- REPLACEMENT of phase89f_test.sql for the final chain (INT4: ...105..109, 110, 111). Re-pasting 89 changes 9 functions (96/97/99/103/109/110 re-create them); the repair is paste 103, 105, 109, 110, 111 after it. Same assertions otherwise.
 -- REPLACEMENT of phase89e_test.sql for a chain that ends with phase105 (Step Sec2): every paste of phase103 is followed by a paste of phase105. Same assertions.
 -- FRESH DB ONLY. phase89e_test.sql = phase89d_test.sql for the chain that ends with phase103 (Step E2E): phase89 alone puts back the older text of FIVE functions (P2a lists them) and ONE paste of phase103 repairs all of them (the chain 89, 98, 99 is blocked by the body guard of phase98, which does not know bos103). Phase89d_test.sql itself is NOT edited.
 -- Earlier header: phase89d_test.sql = phase89c_test.sql for the chain that ends with phase99 (step Opt): phase99 re-creates online_order_get and online_orders_list, which phase89 also re-asserts, so phase89 alone puts the older text of FOUR functions back (P2a) and the stable end of the re-paste is 89 then 98 then 99 (P2). Everything else is identical to phase89c_test.sql.
@@ -144,10 +144,11 @@ select tt.chk('S2 card settlement journalled: bank 588 + charges 12 = card recei
 create temp table h1 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.prokind='f';
 \i supabase/phase89.sql
 create temp table h2 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.prokind='f';
-select tt.chk('P2a phase89 pasted again on the full chain puts back older bodies of exactly 8 functions (phase96/97/99/103/109 touch them)', (select array_agg(fn order by fn) from h1 full join h2 using (fn) where h1.h is distinct from h2.h) = array['_acct_docs(date)','_post_purchase_p13(uuid,jsonb)','_void_purchase_p13(uuid,text)','inventory_vs_gl(date,integer)','online_order_get(uuid)','online_orders_list(integer,text,date,date,integer)','production_post(integer,uuid,numeric,uuid,timestamp with time zone,text,numeric)','recipe_cost(uuid,integer)']);
+select tt.chk('P2a phase89 pasted again on the full chain puts back older bodies of exactly 9 functions (phase96/97/99/103/109/110 touch them)', (select array_agg(fn order by fn) from h1 full join h2 using (fn) where h1.h is distinct from h2.h) = array['_acct_docs(date)','_cogs_lines72(date,date,integer[])','_post_purchase_p13(uuid,jsonb)','_void_purchase_p13(uuid,text)','inventory_vs_gl(date,integer)','online_order_get(uuid)','online_orders_list(integer,text,date,date,integer)','production_post(integer,uuid,numeric,uuid,timestamp with time zone,text,numeric)','recipe_cost(uuid,integer)']);
 \i supabase/phase103.sql
 \i supabase/phase105.sql
 \i supabase/phase109.sql
+\i supabase/phase110.sql
 \i supabase/phase111.sql
 create temp table h3 as select p.oid::regprocedure::text fn, md5(pg_get_functiondef(p.oid)) h from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.prokind='f';
 select tt.chk('P2 second paste (89 then 103; phase103 carries the final text of all five, phase98 would refuse over bos103): identical function bodies', (select count(*) from h1 full join h3 using (fn) where h1.h is distinct from h3.h) = 0);

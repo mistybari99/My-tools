@@ -4,7 +4,7 @@
 --   `client_id_reused` (tag bos105), 109 changes the supplier lock to FOR NO KEY UPDATE (tag bos109). Built from a fresh database in the order
 --   72..103, 104, 105, 106, 107, 108, 109 (tests/sql/tag_loss_check.sh) the diff of pg_get_functiondef + bosNN tags after every phase showed exactly one such function.
 --   phase109 (as shipped in INT4) leaves a body that carries bos105 untouched; this file then creates the 3-way merge: base = phase103 body, + bos105 line, + bos109 line.
---   Needs phases 72..109 pasted first (guard below; 72..110 once phase110 exists - the guard also accepts the phase110 text on the function).
+--   Needs phases 72..109 pasted first (guard below). phase110 (performance) may come before or after this file: it re-creates none of the functions here and this file none of its six, so the guard does not require it (canonical order 109, 110, 111; the owner may also paste 111 first and 110 later).
 --   Additive, paste-twice safe: one function re-created, no table, rule, data, privilege or trigger. Goes LAST. Tag: bos111.
 --   Body guard: a live body with a tag this file does not know is never overwritten.
 -- ============================================================

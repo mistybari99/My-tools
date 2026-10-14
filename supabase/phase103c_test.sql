@@ -1,4 +1,4 @@
--- REPLACEMENT of phase103b_test.sql for the final chain (INT4): every re-paste of phase103 + phase105 is followed by phase109 and phase111 (phase103 puts back the older setup_recommend_apply). Same assertions.
+-- REPLACEMENT of phase103b_test.sql for the final chain (INT4): every re-paste of phase103 + phase105 is followed by 109, 110, 111. Same assertions.
 -- FRESH DB ONLY. REPLACEMENT of phase103_test.sql for a chain that ends with phase105 (Step Sec2): the same file, every re-paste of phase103 is followed by a paste of phase105 (docs/PASTE_ORDER.md section H). Phase 103 tests (Step E2E: the defects of the independent end-to-end run, D-1 .. D-8; see docs/briefs_p2p3/step_E2E_REPORT.md).
 --   Build: bash tests/sql/final_build.sh <db> "<canonical order ... phase98 phase99 phase100 phase101 phase103>"   (phase103 pasted last; docs/PASTE_ORDER.md)
 --   Run from the REPO ROOT (the last block pastes phase103.sql again):
@@ -271,6 +271,7 @@ select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regpro
 \i supabase/phase103.sql
 \i supabase/phase105.sql
 \i supabase/phase109.sql
+\i supabase/phase110.sql
 \i supabase/phase111.sql
 select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fa1 from pg_proc p where p.pronamespace = 'public'::regnamespace \gset
 select tt.chk('T9 paste twice: no function body changes', :'fa0' = :'fa1');
@@ -285,12 +286,14 @@ create or replace function public.recipe_cost(p_recipe uuid, p_loc integer defau
 \i supabase/phase103.sql
 \i supabase/phase105.sql
 \i supabase/phase109.sql
+\i supabase/phase110.sql
 \i supabase/phase111.sql
 select tt.chk('T9 guard: with the phase99 marker missing the paste raises and re-creates nothing (the held recipe_cost stays)', (recipe_cost(null) ->> 'held') = 'true' and current_setting('phase103.ok') = 'off');
 alter function public._inb_pii_f99_hold103(text, text) rename to _inb_pii_f99;
 \i supabase/phase103.sql
 \i supabase/phase105.sql
 \i supabase/phase109.sql
+\i supabase/phase110.sql
 \i supabase/phase111.sql
 select tt.chk('T9 with the markers back it works again: recipe_cost restored to the phase103 body', md5(pg_get_functiondef('public.recipe_cost(uuid,integer)'::regprocedure)) = :'rc0');
 

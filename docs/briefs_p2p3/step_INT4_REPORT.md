@@ -20,7 +20,7 @@ Fresh build to the owner's state (72..103), then 104, 105, 106, 107, 108, 109 on
 - Paste-twice on a DB built exactly as the owner's (72..103, owner order): each of 104, 105, 106, 107, 108, 109, 111 pasted twice in sequence; md5 over all function definitions identical after the second paste of every phase (no error on any second paste).
 - Re-paste chains: `103 105 109 111`, `89 103 105 109 111`, `89 98 103 105 109 111` on the final DB change no function.
 
-## 4. FINAL paste list (owner pastes in this order)
+## 4. FINAL paste list (phase110 merged; canonical order 104,105,106,107,108,109,110,111)
 | # | phase | bytes | sha256 |
 |---|-------|------:|--------|
 | 1 | phase104.sql | 7284 | 4832bf18b4cd0fc1428368794d23f0b84991f8fedb3e8e925d4c2ba040e3ebbe |
@@ -29,16 +29,24 @@ Fresh build to the owner's state (72..103), then 104, 105, 106, 107, 108, 109 on
 | 4 | phase107.sql | 27576 | 5285df741bacb3583edc13c9eeaf4c6b6fff018cba8c6edd9403fa3132bd537f |
 | 5 | phase108.sql | 38713 | f2a6686ce7966815b0644f241edd1a9aad3e841524d0e7728ccb77be234cfd04 |
 | 6 | phase109.sql | 63402 | 5123cd02eda8362e52da20aff4a2d7e48cbc21305e92412fce4318a87c52540b |
-| 7 | phase111.sql | 10251 | d3e824359485c5f7b1e4e927de6c88d0cf002be77933bccb44494ab7eaa06a01 |
+| 7 | phase110.sql | 27778 | 2a116c98f4664bd41f1a892a6b714bb0acc6e817c1a31fd6593c325bc045b096 |
+| 8 | phase111.sql | 10409 | 63b73ce03b489271df67ace67175c4ba4f92f50f064b06488322152874900f1f |
 
-Total 197,333 bytes (192.7 KiB). With phase110 (27,298 bytes in the unpushed WIP, size will change) the total is about 224 KB.
+Total 225,269 bytes (220 KiB). phase111 changed (guard comment only; it does NOT require 110) so its hash differs from the first INT4 report.
 
-## 5. Run 12 paste pages (<= 200 KB each)
-All seven files together are 197,333 bytes: they would fit ONE page only with a 2.7 KB margin (no room for page wrapper text) and phase110 cannot be added, so use **2 pages** (never split a file):
-- Page 1 (123,680 bytes): phase104, phase105, phase106, phase107, phase108.
-- Page 2 (73,653 bytes): phase109, phase111 (+ phase110 between them when it exists: about 101 KB). 
-Page 2 must be pasted after page 1 completes; phase111 is always the last paste.
+## 5. Run pages (<= 200 KB each)
+- Run 12 = 104, 105, 106, 107, 108 (123,680 bytes).
+- Run 13 = 109, 111 (73,811 bytes).
+- Run 14 = 110 alone (27,778 bytes). Run 13 + 14 together would be 101,589 bytes (one page also possible); the owner's plan 13 then 14 is fine.
+Run 14 content is exactly phase110.sql, nothing else: verified that 72..103, 104..109, 111 and then 110 gives function hashes IDENTICAL to the canonical-order build (md5 of pg_get_functiondef for all public functions, 0 differences). phase110 re-creates none of the functions of 105/109/111 and 111 none of 110's six, so no phase111 re-paste is needed. phase110 builds 8 indexes: paste it at a quiet time (it blocks writes to the tables while each index builds).
+Re-paste rule: after any re-paste of phase89 or phase103 paste 103,105,109,110,111 again (phase89 puts back older _cogs_lines72; phase103 older inbox_list / _acct_stock_moves85 / setup_recommend_apply).
 
-## 6. Full run_all_sql result
-`bash tests/sql/run_all_sql.sh` on the final order (72..109 + 111, 97 suites incl. new ones): TOTAL pass=7369 fail=37, equal to baseline_fails.txt in every suite (0 REGRESSION, 0 NEW FAILS, 0 IMPROVED). The 37 known failures are the documented ones of step_INT3_REPORT plus the by-design ones listed above.
+## 6. Phase110 and the tag check
+tests/sql/tag_loss_check.sh with 110: phase110 changes exactly its six functions (_cogs_lines72, _item_cost_eff88, _rcs88, rpt_agg_sql: tag bos110; inbox_list and _acct_stock_moves85: marker perf110 in the text); none of them is touched by 104..109 or 111, no tag lost anywhere (net 0), perf110 markers present in the final build. phase111 stays the only merge.
+
+## 7. Tests (final set, one maintained replacement per old test)
+phase89f/phase103b (originals, kept as in INT3) fail by design on the final chain (baseline 2 / 1); replacements phase89g_test (89 re-paste changes 9 functions; repair 103,105,109,110,111) and phase103c_test (103,105,109,110,111) are 0 fail. Perf's own same-named copies were dropped in the merge in favour of these. phase110_test 0 fail. Full `run_all_sql.sh`: TOTAL pass=7413 fail=38 = baseline, 0 regression. e2e rec 0 FAIL, def 0 FAIL (two runs of 4 hit the known V1 cost-fingerprint coincidence, 0 on rerun); trial balance diff 0.00, unbalanced 0. verify_fixes: before 47/10, after 57/0. Paste-twice 104..111 (each twice, owner-order DB 72..103): identical function-hash md5 after every second paste.
+
+## 8. Perf on the final order (tests/sql/perf, seeded perf_pre = everything except 110, perf_post = + phase110)
+equality.sh: 133 EQ lines, pre and post IDENTICAL. budget.py (CPU ms, median of 5; box shared with other runs): BUDGET OK, 0 over. biz_items 30d 256 ms (budget 1000), biz_items 365d 2314 (5000), item_sales 365d 2153 (5000), sales_summary 365d 2003 (5000), category_sales 365d 2171 (5000), inventory_vs_gl 530 (3000; pre 21336), unmatched_forms 365d 182 (3000; pre 24995), record_sale2 32-37 (60), stock paths 9-13 (300), production_post 36-45 (300).
 
