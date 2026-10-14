@@ -1,0 +1,11 @@
+# Old brittle tests that run_all.sh SKIPS. Format: <test name without .js>  <maintained replacement(s)>
+# They assert "X is the LAST script/rec" or hit UI state that later steps changed. Do not edit them; set RUN_SUPERSEDED=1 to run them anyway.
+nav_test          nav_b_test
+pos2_test         pos2b_test
+optviews_ui_test  optviews_ui2_test
+items2_test       items2_b_test
+landed_test       order_test + landed_pw_test
+landed_b_test     order_test + landed_pw_test
+landed_c_test     order_test + landed_pw_test
+optionsx_test     order_test
+optionsx_b_test   order_test
