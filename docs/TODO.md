@@ -55,3 +55,8 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [x] G1 Group ERP B1: phase122 organization layer + phase122_test (111/0) + setup-run-17 built locally (docs/HANDOVER_7.md). Not pushed.
 - [ ] G2 Owner says "push": publish setup-run-16 then setup-run-17; owner pastes Run 16, Run 17 and the Checks.
 - [ ] G3 B2 organization UI + DB-driven brands/locations; C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+- [x] H1 Dealer business: phase127 cheque / PDC, phase128 principal schemes, phase129 tinting + tests + 3 screens (local-dl, not pushed). See docs/HANDOVER_7.md.
+- [ ] H2 Lead: apply docs/regs/dealer127.md (ia.js lines + index.html script tags); add the three routes to the lazy list if the build uses it.
+- [ ] H3 Owner decisions: when to turn on dealer_cheque_on / dealer_scheme_on / dealer_tint_on (one business at a time, after paste); accountant: how scheme accruals and principal receipts are booked.
+- [ ] H4 Later: per-business customer / supplier master data (C2), dealer POS screens, scheme sale-return netting, cheque bounce charge billing to the customer.
+
