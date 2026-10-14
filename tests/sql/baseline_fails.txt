@@ -117,7 +117,7 @@ phase115b 0 47
 phase121 0 34
 phase116 0 87
 phase117 0 36
-phase118 0 157
+phase118 1 156
 phase119 0 19
 phase89h 0 65
 phase94b 0 80
@@ -131,4 +131,4 @@ phase110b 0 45
 #   Replacements (same assertions + the repair tail 112..118): phase89h, phase98d, phase103d, phase113b, phase94b / phase98e / phase110b; phase119 proves the rule itself (hash compare against the fresh build for every re-paste of 89, 94, 96, 97, 98, 103, 105, 109, 110, 111). Never edit the old files.
 # C4 phase120 (report speed) integrated after phase118, before phase121:
 phase120 0 38
-# NOTE phase118_test V10 ('paste twice: no function body changes') is false by design once phase120 is on top (re-pasting 118 puts the older bodies of 3 functions back): see the phase118 line above for the measured count on the merged chain.
+# NOTE phase118_test V10 ('paste twice: no function body, rule, advisor row or grant row changes') is false BY DESIGN once phase120 is on top: re-pasting 118 puts the older bodies of _rc118_buckets, _rc118_gap and stock_sales_unmatched back (verified: 157/0 on a build without phase120, 156/1 with it). Baseline line above = 1 fail / 156 pass. The repair-tail replacement suites (phase89h 94b 98d 98e 103d 110b 119) now paste phase120 after phase118 and are 0-fail.

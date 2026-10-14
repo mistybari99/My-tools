@@ -39,4 +39,4 @@ P4 (platform / ops)
 
 
 ## UPDATE after audits (phases 112-121) - see docs/HANDOVER_6.md for the full list
-Built and live: audit fix batches 1-4 (phases 112-118) + security fixes (121), all switches default OFF. PENDING: phase120 (impl/c4, tested, not merged), switch roll-out (docs/guide/AUDIT_SWITCHES.md), remaining audit gaps (A1 G5/G9/G11-G14, A2 G7/G10-G15, A3 G7/G11-G17, A4 G02/G06/G07/G09-G20, A5 GAP-5/7/11-13), 23 gaps without probes, old HANDOFF_6 items (wording, Category phase 2, dashboard phase 2, security leftovers, accounting review, phone-only steps).
+Built and live: audit fix batches 1-4 (phases 112-118) + security fixes (121), all switches default OFF. PENDING: phase120 is merged and tested on local-c4 (setup-run-16 built, owner must say "push", then paste Run 16 and Check), switch roll-out (docs/guide/AUDIT_SWITCHES.md), remaining audit gaps (A1 G5/G9/G11-G14, A2 G7/G10-G15, A3 G7/G11-G17, A4 G02/G06/G07/G09-G20, A5 GAP-5/7/11-13), 23 gaps without probes, old HANDOFF_6 items (wording, Category phase 2, dashboard phase 2, security leftovers, accounting review, phone-only steps).

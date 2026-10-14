@@ -322,6 +322,7 @@ create temp table fh as select string_agg(p.oid::regprocedure::text || md5(pg_ge
 \i supabase/phase116.sql
 \i supabase/phase117.sql
 \i supabase/phase118.sql
+\i supabase/phase120.sql
 \i supabase/phase121.sql
 select tt.chk('M6 after the second paste: no function body changed (paste-twice safe)', (select h from fh) = (select string_agg(p.oid::regprocedure::text || md5(pg_get_functiondef(p.oid)), ',' order by p.oid::regprocedure::text) from pg_proc p where p.pronamespace='public'::regnamespace and p.prokind='f'));
 select tt.chk('M6 after: anon and public cannot execute any of the 12, signed-in users still can',
