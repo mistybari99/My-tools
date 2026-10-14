@@ -163,3 +163,8 @@ New read functions (stock_recon_statement, factory_branch_statement, net_profit_
 - Separate business, own legal entity and books like all others. Registered as a **business template record, status `not_implemented`**; no workflows are built in B1/B2/C1. Seeded by a small later phase (after phase123) so it does not collide with the work in flight.
 - Foundation needs it will use (planned, not built): multi-currency (document currency + base currency, FX rate per document, realised/unrealised FX gain-loss accounts), shipment/consignment as a project-like cost centre, landed cost (reuse existing phase97 landed-cost design), customs duty/VAT/tax lines as configurable (never invented), letter-of-credit / advance-payment tracking, bank guarantee and payment-terms schedules, HS code and country-of-origin attributes via `attrs`/`attr_defs`, document set (invoice, packing list, bill of lading) as attachments, supplier/buyer parties scoped to this business only, inventory in transit.
 - Open owner questions before building: import, export or both; which currencies; customs agent/CNF workflow; whether goods ever flow to another of the owner's businesses (would require the Stage E intercompany feature).
+
+### 12.1 Owner answers (Import-Export)
+- Both import and export.
+- Currencies: a small configurable list of common currencies (base currency plus a few; the owner edits the list, none hardcoded).
+- Goods flowing into another of the owner's businesses: not needed now. Keep it simple; the Stage E intercompany feature stays planned, default OFF, not built.
