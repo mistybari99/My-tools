@@ -2,8 +2,9 @@
 // Checks: language rule (English has no Bangla, 3 modes present), unique opx_ data-act names, registry (ia.js / index.html at the END), owner cards with the recommendation next to each option,
 // the "Record payment now?" sheet (hook reads the answer of two save calls only, never sends a call twice, rule off = nothing), part payment, duplicate warning + confirm, reveal flow (audited call, rate limit), error mapping.
 // Run: node tests/web/optionsx_test.js
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const WEB = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const WEB = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let n = 0, bad = 0;
 const ck = (name, ok) => { n++; if (!ok) { bad++; console.log('FAIL ' + name); } };
 const src = fs.readFileSync(path.join(WEB, 'optionsx.js'), 'utf8');

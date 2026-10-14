@@ -1,12 +1,13 @@
 // Module G: business assistant (#/assistant). Router accuracy on tests/web/assistant_intents.json, calculation accuracy (no invented figures),
 // comparison + financial-position composition, access (hidden / refused tools, location pass-through), prompt injection + secret redaction,
 // errors (offline, RPC error, empty, timeout), KB playbooks, export, layout at 360 px, performance (router + composer p50 / p95).
-// Run: timeout 250 node tests/web/assistant_test.js /home/user/My-tools/tests/web
+// Run: timeout 250 node tests/web/assistant_test.js tests/web
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8371, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const INTENTS = JSON.parse(fs.readFileSync(SP + '/assistant_intents.json', 'utf8'));
 
 // ---------- in-page mock of the server functions (fixtures with distinctive numbers) ----------
@@ -89,7 +90,7 @@ const HEALTH = [{ code: 'vat_no_rate', severity: 'bad', title_bn: 'ভ্যা�
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + MOCK }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     // the lead registers the scripts later (docs/regs/assistant.md); the test adds them to the served page
-    await p.route((u) => u.pathname === '/' || u.pathname === '/index.html', (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync('/home/user/My-tools/web/index.html', 'utf8').replace('</body>', '<script src="assistant_tools.js"></script><script src="assistant.js"></script></body>') }));
+    await p.route((u) => u.pathname === '/' || u.pathname === '/index.html', (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(_P.WEB_DIR + '/index.html', 'utf8').replace('</body>', '<script src="assistant_tools.js"></script><script src="assistant.js"></script></body>') }));
     const data = C.mk(base, {}); const T = data.tables;
     T.locations = [{ id: 1, code: 'main', name_bn: 'ইসলামিয়া মেইন', name_mix: 'ইসলামিয়া Main', name_en: 'Islamia Main', sort: 1, status: 'live' }, { id: 2, code: 'branch2', name_bn: '২য় শাখা', name_mix: '২য় Branch', name_en: '2nd Branch', sort: 2, status: 'live' }];
     T.items.unshift({ id: 'r1', code: 'I-900', name_bn: 'রসগোল্লা', name_en: 'Rasgolla', unit: 'pc', sell_price: 25, is_active: true });

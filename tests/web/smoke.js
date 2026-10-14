@@ -1,9 +1,11 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 // sample data from the real seed files
-const csv = fs.readFileSync('/home/user/My-tools/data/items_seed.csv', 'utf8').trim().split('\n').slice(1).map((l, i) => { const c = l.split(','); return { id: 'i' + i, code: 'I-' + String(i + 1).padStart(3, '0'), name_bn: c[0], name_en: null, name_mix: null, category: ({ 'Misty / KG': 'sweet_kg', 'Misty / Piece': 'sweet_pc', 'Doi': 'doi', 'Cake / Pound': 'cake_lb', 'Cake / Piece': 'cake_pc' })[c[1]], category_bn: c[1], unit: (({ 'Misty / KG': 'kg', 'Cake / Pound': 'lb' })[c[1]] || 'pc'), sell_price: +c[2], cost_price: +c[3], is_active: true }; });
-const sql = fs.readFileSync('/home/user/My-tools/supabase/schema.sql', 'utf8');
+const csv = fs.readFileSync(process.env.BOS_REPO_DIR + '/data/items_seed.csv', 'utf8').trim().split('\n').slice(1).map((l, i) => { const c = l.split(','); return { id: 'i' + i, code: 'I-' + String(i + 1).padStart(3, '0'), name_bn: c[0], name_en: null, name_mix: null, category: ({ 'Misty / KG': 'sweet_kg', 'Misty / Piece': 'sweet_pc', 'Doi': 'doi', 'Cake / Pound': 'cake_lb', 'Cake / Piece': 'cake_pc' })[c[1]], category_bn: c[1], unit: (({ 'Misty / KG': 'kg', 'Cake / Pound': 'lb' })[c[1]] || 'pc'), sell_price: +c[2], cost_price: +c[3], is_active: true }; });
+const sql = fs.readFileSync(process.env.BOS_REPO_DIR + '/supabase/schema.sql', 'utf8');
 const forms = [...sql.matchAll(/^\s+\('([^']+)','(\w+)','([^']*)','([^']*)','([^']*)','([^']*)',(\d+)\)/gm)].map((m) => ({ code: m[1], area: m[2], name_bn: m[3], name_mix: m[4], name_en: m[5], version: m[6], sort: +m[7], count_first: true, red_block: true, enabled: true }));
 const roles = [...sql.matchAll(/^\s+\('(\w+)','([^']+)','([^']+)','([^']+)',(\d+)\)/gm)].filter((m) => ['owner','management','cash_controller','showroom_manager','salesperson','storekeeper','factory_incharge','purchasing','party_coordinator','carrier','hr'].includes(m[1])).map((m) => ({ code: m[1], name_bn: m[2], name_mix: m[3], name_en: m[4], sort: +m[5], allow_self_approve: false }));
 const data = { tables: { forms, roles, items: csv,
@@ -13,7 +15,7 @@ const data = { tables: { forms, roles, items: csv,
   role_form_perms: [{ role_code: 'cash_controller', form_code: '10-1', can_view: true, can_enter: true, can_approve: true }], settings: [{ key: 'max_fails', value: 5, label_bn: 'ভুল PIN কতবার হলে লক হবে', label_mix: 'x', label_en: 'Wrong PIN attempts' }, { key: 'x', value: null, label_bn: 'খালি সেটিং', label_mix: 'x', label_en: 'Empty' }],
   item_costs: csv.map((c) => ({ item_id: c.id, cost_price: c.cost_price })), item_changes: [{ id: 1, item_id: 'i0', patch: { sell_price: 300, cost_price: 240 }, note: 'rate up', status: 'pending', requested_by: 'u9', requested_staff: 'buyer3', requested_at: '2026-10-12T05:00:00Z' }, { id: 2, item_id: null, patch: { name_bn: 'নতুন মিষ্টি', sell_price: 50, unit: 'pc' }, status: 'approved', requested_by: 'u9', requested_staff: 'buyer3', requested_at: '2026-10-12T04:00:00Z', decided_staff: 'owner1' }],
   audit_log: [{ id: 1, at: '2026-10-11T08:00:00Z', staff_id: 'owner1', action: 'update', table_name: 'items', record_id: 'abc', detail: { old: { sell_price: 260 }, new: { sell_price: 270 } } }] } };
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : f.endsWith('.css') ? 'text/css' : f.endsWith('.json') ? 'application/json' : 'text/html' }); r.end(b); }); }).listen(8077);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : f.endsWith('.css') ? 'text/css' : f.endsWith('.json') ? 'application/json' : 'text/html' }); r.end(b); }); }).listen(PORT);
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' }).catch(() => chromium.launch());
   const errors = [];
@@ -23,7 +25,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
     p.on('pageerror', (e) => errors.push(name + ': ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errors.push(name + ' console: ' + m.text()); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};${init};try{localStorage.setItem('bos_lang','${lang || 'bn'}')}catch(e){}`);
-    await p.goto('http://localhost:8077/' + (hash || '')); await p.waitForTimeout(500);
+    await p.goto('http://localhost:' + PORT + '/' + (hash || '')); await p.waitForTimeout(500);
     return p;
   }
   let p = await page('window.__SESSION=false', '', 'login'); await p.screenshot({ path: SP + '/s_login.png' });

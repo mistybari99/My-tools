@@ -2,12 +2,13 @@
 // Screens: list + mode banner, pick bills, editor (charges, method chips, live side-by-side preview, recommendation, basis inputs, late chips), save / approve / post / void,
 // reminder list, the guarded link on the purchase bill page, owner settings, three languages, English without Bangla letters, no horizontal overflow.
 // Run on its own: node tests/web/landed_pw_test.js <abs tests/web dir> [shots dir]      (serves ../../web of THIS checkout)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
 const SP = process.argv[2] || __dirname;
 const C = require(SP + '/s10_common.js');
-const WEB = path.join(SP, '..', '..', 'web'); const OUT = process.argv[3] || SP;
-const base = C.baseData(SP), PORT = 8497;
+const WEB = _P.WEB_DIR; const OUT = process.argv[3] || SP;
+const base = C.baseData(SP), PORT = _P.freePort();
 const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f = path.join(WEB, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
     if (u === '/' || u === '/index.html') b = Buffer.from(b.toString('utf8').includes('src="landed.js"') ? b.toString('utf8') : b.toString('utf8').replace('</body>', '<script src="landed.js"></script></body>'));

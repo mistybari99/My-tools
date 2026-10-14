@@ -1,8 +1,10 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8092);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 
 // ---- mock of the phase9 report functions (runs inside the page) ----
 function MOCK() {
@@ -87,7 +89,7 @@ function MOCK() {
     window.__BLOBS=[];const _c=URL.createObjectURL.bind(URL);URL.createObjectURL=(b)=>{ if(b&&b.text){ b.arrayBuffer().then(ab=>{window.__BLOBS.push({head:Array.from(new Uint8Array(ab).slice(0,3)),type:b.type});}); b.text().then(t=>{(window.__BLOBS_T=window.__BLOBS_T||[]).push(t);}); } return _c(b); };
     window.__PRINTED=0;window.print=()=>{window.__PRINTED++; const e=document.getElementById('rp_print'); window.__PRINTHTML=e?e.innerText:null;};`);
   const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) errors.push('assert: ' + m); };
-  await p.goto('http://localhost:8092/#/home'); await p.waitForTimeout(900);
+  await p.goto('http://localhost:' + PORT + '/#/home'); await p.waitForTimeout(900);
 
   // 1 home tile + hub
   ok(await p.locator('.qm', { hasText: 'রিপোর্ট' }).count() > 0, 'home has a Reports tile');
@@ -184,7 +186,7 @@ function MOCK() {
   ok(csv.includes('Asia/Dhaka'), 'CSV footer has export time');
 
   // 10 paging + print + raw report + locked export
-  await p.goto('http://localhost:8092/#/report/item_sales'); await p.waitForTimeout(800);
+  await p.goto('http://localhost:' + PORT + '/#/report/item_sales'); await p.waitForTimeout(800);
   ok(await p.locator('#rp_tbl tbody tr').count() === 50, 'item_sales first page 50 rows');
   await p.click('[data-act=rp_more]'); await p.waitForTimeout(500);
   ok(await p.locator('#rp_tbl tbody tr').count() === 100, 'more -> 100 rows');
@@ -194,25 +196,25 @@ function MOCK() {
   await p.click('[data-act=rp_csv]'); await p.waitForTimeout(800);
   const b2 = await p.evaluate(() => window.__BLOBS_T); const csv2 = b2[b2.length - 1];
   ok(csv2.trim().split('\r\n').filter((l) => l.startsWith('I-')).length === 120, 'CSV exports all pages (120 rows)');
-  await p.goto('http://localhost:8092/#/report/receipt_register'); await p.waitForTimeout(700);
+  await p.goto('http://localhost:' + PORT + '/#/report/receipt_register'); await p.waitForTimeout(700);
   await p.click('[data-act=rp_csv]'); await p.waitForTimeout(700);
   const b3 = await p.evaluate(() => window.__BLOBS_T); const csv3 = b3[b3.length - 1];
   ok(csv3.includes(`"'=cmd|calc"`) || csv3.includes("'=cmd|calc"), 'CSV neutralises formula text');
   ok(csv3.includes('"Rina, ""VIP"""'), 'CSV quotes commas/quotes');
   ok(await p.locator('.rp-note').count() === 1, 'server note shown (mobile masked)');
-  await p.goto('http://localhost:8092/#/report/customer_dues'); await p.waitForTimeout(500);
+  await p.goto('http://localhost:' + PORT + '/#/report/customer_dues'); await p.waitForTimeout(500);
   ok(await p.locator('.notice').count() === 1, 'locked report page shows no-permission');
 
   // 11 non-owner without export grant
-  await p.goto('http://localhost:8092/#/report/sales_summary'); await p.waitForTimeout(600);
+  await p.goto('http://localhost:' + PORT + '/#/report/sales_summary'); await p.waitForTimeout(600);
   await p.evaluate(() => { window.BOS_APP.S.ctx.is_owner = false; });
-  await p.goto('http://localhost:8092/#/reports'); await p.waitForTimeout(300);
+  await p.goto('http://localhost:' + PORT + '/#/reports'); await p.waitForTimeout(300);
   await p.screenshot({ path: SP + '/rp_en.png', fullPage: false });
 
   // 12 languages
   await p.evaluate(() => { window.BOS_APP.S.ctx.is_owner = true; });
   for (const lang of ['en', 'mix']) {
-    await p.goto('http://localhost:8092/#/report/sales_summary'); await p.evaluate((l) => { try { localStorage.setItem('bos_lang', l); } catch (e) { /* */ } }, lang);
+    await p.goto('http://localhost:' + PORT + '/#/report/sales_summary'); await p.evaluate((l) => { try { localStorage.setItem('bos_lang', l); } catch (e) { /* */ } }, lang);
     await p.reload(); await p.waitForTimeout(900); await p.screenshot({ path: SP + `/rp_${lang}.png`, fullPage: true });
   }
   console.log('errors:', errors.length ? errors : 'none'); await br.close(); srv.close();

@@ -1,10 +1,11 @@
 // Step Vis: real nav.js + ia.js + optviews.js in a browser (stub backend). Hide removes a permitted option everywhere in the drawer / search, Locked keeps it and opens the ask-the-owner sheet,
 // no data = nothing changes, the owner screen opens. Run: node tests/web/optviews_ui_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5_common.js');
-const base = C.baseData(SP), PORT = 8473, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const OV = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const r = c.rpc;
  c.rpc = async (fn, args) => { if (fn === 'my_option_views') { window.__OVC = (window.__OVC || 0) + 1; return window.__OV === 'err' ? { data: null, error: { message: 'Could not find the function' } } : { data: window.__OV || [], error: null }; } return r(fn, args); }; return c; }; })();`;
 (async () => { try {

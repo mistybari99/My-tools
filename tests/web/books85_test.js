@@ -1,7 +1,8 @@
 // Phase 85 web pieces: new strings follow the language rule (English text has no Bangla characters, every string has all modes) and the 10-2 form has the optional pay_mode field.
 // Run: node tests/web/books85_test.js
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path');
-const WEB = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const WEB = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let n = 0, bad = 0;
 const ck = (name, ok) => { n++; if (!ok) { bad++; console.log('FAIL ' + name); } };
 const acc = fs.readFileSync(path.join(WEB, 'accounts.js'), 'utf8'), frm = fs.readFileSync(path.join(WEB, 'forms.js'), 'utf8');

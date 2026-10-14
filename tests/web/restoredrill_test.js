@@ -1,10 +1,11 @@
 // Restore drill web piece (#/restoredrill, owner): status + warning, 3-step how-to in bn/mix/en, record form, history, owner-only, 360px width.
 // Run: node restoredrill_test.js <abs tests/web dir>      (web/restoredrill.js is injected into index.html here; the lead adds the real <script> tag)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8481, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc;
  const R = window.__RD = window.__RD || { calls: [], rows: [], status: { warn_days: 90, drills: 0, last: null, age_days: null, last_pass_age_days: null, never: true, warn: true, last_failed: false }, err: null, missing: false };
  c.rpc = async (fn, args) => {

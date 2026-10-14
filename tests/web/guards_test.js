@@ -1,6 +1,7 @@
 // Phase 82 web: node tests/web/guards_test.js   (plain node, no browser): 3-language texts, English has no Bangla letters, page renders, apply calls set_rule.
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'web', 'guards.js'), 'utf8');
+const src = fs.readFileSync(path.join(_P.WEB_DIR, 'guards.js'), 'utf8');
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('FAIL:', m); } };
 const BN = /[ঀ-৿]/;
 function run(lang) {

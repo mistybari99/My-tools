@@ -1,7 +1,8 @@
 // Step E-b / E8: web/posfail.js (offline POS failed cards: manager override re-send, JSON export, board count, replay through record_sale_offline).
 // Plain node, no browser: node tests/web/posfail_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const ROOT = path.join(__dirname, '..', '..', 'web');
+const ROOT = _P.WEB_DIR;
 let pass = 0, failn = 0;
 const chk = (n, ok) => { if (ok) pass++; else { failn++; console.log('FAIL', n); } };
 const BN = /[ঀ-৿]/;

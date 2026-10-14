@@ -1,10 +1,11 @@
 // P3a: stock extras page (#/stockx via BOS_PAGES.stockx): reorder, near-expiry + batch capture + FEFO, wastage by reason, QC.
 // Run: node stockx_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8373, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const i0 = base.tables.items[0].id;
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const M = window.__M; const X = M.x = Object.assign({ err: {}, qcOn: false, qc: [{ id: 'q1', source_type: 'grn', source_id: 'g1', location_id: 1, status: 'hold', checks: [], note: 'smells off', created_at: '2026-10-12T05:00:00Z', created_staff: 's', history_n: 2 }] }, window.__X || {});
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
@@ -34,7 +35,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(C.mkData(base, {}))};window.__X=${JSON.stringify(o.x || {})};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
     await p.goto(`http://localhost:${PORT}/#/home`); await p.waitForTimeout(1100);
-    await p.addScriptTag({ path: '/home/user/My-tools/web/stockx.js' });
+    await p.addScriptTag({ path: _P.WEB_DIR + '/stockx.js' });
     await p.evaluate(() => window.BOS_PAGES.stockx()); await p.waitForTimeout(500); return p;
   }
   const wait = (p, n = 300) => p.waitForTimeout(n);

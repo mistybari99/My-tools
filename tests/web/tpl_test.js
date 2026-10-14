@@ -1,7 +1,8 @@
 // Phase 93 web: node tests/web/tpl_test.js   (plain node, no browser, no screenshots)
 // Registry: counts, every template renders from SAMPLE data, XSS escaped, no cost field/key ever shown, language rule (en = no Bangla, bn/mix labelled), @page sizes, barcode encoders, choices resolution.
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const W = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const W = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('FAIL:', m); } };
 function load() {
   const win = { BOS: {} }; const ctx = vm.createContext({ window: win, console, document: undefined });

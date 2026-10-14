@@ -1,6 +1,7 @@
 // Step Inv (bos92): web/invoiceview.js with mocked rpc, no browser. Run on its own: node tests/web/invoiceview_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const ROOT = path.join(__dirname, '..', '..', 'web');
+const ROOT = _P.WEB_DIR;
 let pass = 0, failn = 0;
 const chk = (n, ok) => { if (ok) pass++; else { failn++; console.log('FAIL', n); } };
 const BN = /[ঀ-৲৴-৿]/;   // Bangla letters; the taka sign (U+09F3) is the currency mark the whole English UI already uses

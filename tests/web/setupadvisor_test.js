@@ -1,7 +1,8 @@
 // web/setupadvisor.js - stub-DOM test (no browser): tabs render from mocked RPCs in 3 language modes, apply buttons, confirm flow, friendly errors, no Bangla in English mode.
 // Run: node tests/web/setupadvisor_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'web', 'setupadvisor.js'), 'utf8');
+const src = fs.readFileSync(path.join(_P.WEB_DIR, 'setupadvisor.js'), 'utf8');
 let pass = 0, fail = 0; const ok = (n, c) => { if (c) pass++; else { fail++; console.log('FAIL ' + n); } };
 const BN = /[ঀ-৿]/;
 const body = { innerHTML: '' }, acts = {}, toasts = [], calls = [];

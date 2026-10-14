@@ -2,8 +2,9 @@
 // Checks: language rule (English has no Bangla, 3 modes present), unique d23_ data-act names, route registry, owner / cost-right gating, opening-stock helper
 // (check, recommendation, 4 options, dry-run preview, apply with idempotent client id), cost waiting (list, aging alert number, supply sheet with recommended method, dry run, manual reason), error mapping.
 // Run: node tests/web/books96_test.js
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const WEB = path.join(__dirname, '..', '..', 'web'); const BN = /[ঀ-৿]/;
+const WEB = _P.WEB_DIR; const BN = /[ঀ-৿]/;
 let n = 0, bad = 0;
 const ck = (name, ok) => { n++; if (!ok) { bad++; console.log('FAIL ' + name); } };
 const src = fs.readFileSync(path.join(WEB, 'books96.js'), 'utf8');
