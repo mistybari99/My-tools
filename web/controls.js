@@ -288,7 +288,7 @@ function schedule() {
 }
 function run() { if (busy) return; busy = true; last = Date.now(); try { enhance(document.body); } catch (e) { /* never break the app */ if (window.console) console.warn('ctl', e && e.message); } busy = false; }
 function start() {
-  sync(); const mo = new MutationObserver((recs) => { if (!on()) { sync(); return; } if (recs.every((r) => r.target.closest && r.target.closest('.ctl-bg'))) return; schedule(); });
+  sync(); const mo = new MutationObserver((recs) => { if (!on()) { sync(); return; } if (recs.every((r) => r.target.closest && r.target.closest('.ctl-bg,#pos_items'))) return; schedule(); });   /* bos114: POS cards (drawn in chunks) hold nothing to enhance */
   mo.observe(document.body, { childList: true, subtree: true }); run();
 }
 

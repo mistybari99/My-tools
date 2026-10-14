@@ -100,27 +100,55 @@ const discIn = () => Math.max(0, nnum(($('#cart_disc') || {}).value || 0));     
 const discVal = () => { const v = discIn(); return P.dk === 'percent' ? r2(cartSub() * Math.min(v, 100) / 100) : v; };               // the amount that comes off
 const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
 
-async function load() {
-  await B.loadStatic();
-  // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
-  let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
-  if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
-  if (it.error && B.cs && isNet(it.error)) { const c = B.cs.itemsLoad(); if (c) it = { data: c, error: null }; }   // bos112: no internet: the item list saved by the last good load
-  if (it.error) throw it.error;
-  if (B.cs && !it.error && it.data && it.data.length) B.cs.itemsSave(it.data);   // bos112
-  try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = []; }
-  P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
+const SELLABLE = (i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material';
+/* bos114 (WebLoad): the item list, the unit conversions and the static data (locations, rules ...) are read AT THE SAME TIME (they were one after the other = 3-5 round trips on mobile data).
+   Stale-while-revalidate: when this phone already has the list (opened POS before, or the saved copy of the last good load), the POS draws from it at once and the fresh list replaces it
+   as soon as it arrives (redraw only if something changed). The server prices every sale, so a card is never the authority on a price. */
+function fetchItems() {
+  return (async () => {
+    // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
+    let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
+    if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
+    if (it.error && B.cs && isNet(it.error)) { const c = B.cs.itemsLoad(); if (c) it = { data: c, error: null }; }   // bos112: no internet: the item list saved by the last good load
+    if (it.error) throw it.error;
+    if (B.cs && !it.error && it.data && it.data.length) B.cs.itemsSave(it.data);   // bos112
+    return it.data.filter(SELLABLE);
+  })();
+}
+async function fetchConv() {
+  try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = P.conv || JSON.parse(store.get('bos_pos_conv') || '[]'); }
+}
+const itemsSig = (l) => l.length + '|' + l.map((i) => [i.id, i.sell_price, i.name_bn, i.name_en, i.name_mix, i.category, i.sub_category, i.unit, i.barcode].join('~')).join('|');
+function setLocs() {
   const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;
   P.locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? all : all.filter((l) => S.ctx.locations.includes(l.id));
   if (!P.loc || !P.locs.find((l) => l.id === P.loc)) P.loc = store.get('bos_pos_loc') ? Number(store.get('bos_pos_loc')) : (P.locs[0] || {}).id;
   if (!P.locs.find((l) => l.id === P.loc)) P.loc = (P.locs[0] || {}).id;
+}
+async function load() {
+  const fresh = fetchItems(), conv = fetchConv(), stat = B.loadStatic();
+  let early = null;
+  if (navigator.onLine !== false && !S.offline) {
+    early = P.items.length ? P.items : ((B.cs && B.cs.itemsLoad && B.cs.itemsLoad()) || []).filter(SELLABLE);
+    if (!early.length) early = null;
+  }
+  fresh.catch(() => {}); conv.catch(() => {});   // handled below (awaited) or ignored on the early path
+  await stat;
+  if (early) {
+    P.items = early; if (!P.conv) P.conv = JSON.parse(store.get('bos_pos_conv') || '[]'); setLocs(); B.pay.loadWallets();
+    Promise.all([fresh, conv]).then(([l]) => {
+      if (itemsSig(l) === itemsSig(P.items)) return;
+      P.items = l; if (P.tab === 'sell' && $('#pos_items') && !$('#sheet')) { drawSell(perms().enter || S.ctx.is_owner); } }).catch(() => { /* the list on screen stays */ });
+    return;
+  }
+  P.items = await fresh; await conv; setLocs();
   B.pay.loadWallets();
 }
 
 // ---------- page ----------
 async function viewPos() {
   if (!perms().view && !S.ctx.is_owner) return (location.hash = '#/home');
-  shell(T('title'), `<p class="muted">${esc(t('loading'))}</p>`, true);
+  shell(T('title'), `<p class="muted" role="status">${esc(t('loading'))}</p><div class="pos-grid" aria-hidden="true">${'<div class="sk-card"></div>'.repeat(8)}</div>`, true);   // bos114: skeleton cards while the list loads
   try { await load(); } catch (e) { return fail(e); }
   if (!P.loc) return shell(T('title'), `<div class="notice bad">${esc(T('noloc'))}</div>`, true);
   drawPos();
@@ -159,10 +187,28 @@ function visibleItems() {
   if (P.cat === '_f') l = l.filter((i) => f[i.id]).sort((a, z) => f[z.id] - f[a.id]).slice(0, 24);
   return l;
 }
+/* bos114 (WebLoad): 1369 items drew 1369 buttons in one go (a 2.5 s freeze on a mid-range phone). The first cards are drawn at once, the rest follow in small chunks
+   (a new search / category / redraw cancels the old chunks); a tap on a card only updates that card (no full redraw, no scroll jump). Same cards, same order, same markup. */
+const CARD_FIRST = 72, CARD_STEP = 72;
+const cardHtml = (i, inCart, can) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-cat="${esc(i.category || '')}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
+      <span class="pn">${esc(nm(i))}</span><span class="pp"><span class="cur">৳</span>${fmt(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`;
+const cartMap = () => new Map(P.cart.filter((l) => l.kind === 'item').map((l) => [l.item_id, l.qty]));
 function drawItems(can) {
-  const inCart = new Map(P.cart.filter((l) => l.kind === 'item').map((l) => [l.item_id, l.qty]));
-  $('#pos_items').innerHTML = visibleItems().map((i) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-cat="${esc(i.category || '')}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
-      <span class="pn">${esc(nm(i))}</span><span class="pp"><span class="cur">৳</span>${fmt(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`).join('') || `<p class="muted center">—</p>`;
+  const host = $('#pos_items'); if (!host) return;
+  const list = visibleItems(), tok = (P.dtok = (P.dtok || 0) + 1); P.shown = list;
+  if (P.io) { P.io.disconnect(); P.io = null; } const old = $('#pos_more'); if (old) old.remove();
+  if (!list.length) { host.innerHTML = `<p class="muted center">—</p>`; return; }
+  host.innerHTML = list.slice(0, CARD_FIRST).map((i) => cardHtml(i, cartMap(), can)).join('');
+  let k = CARD_FIRST; if (list.length <= k) return;
+  // the rest is drawn as the list is scrolled (a sentinel under the grid); without IntersectionObserver the chunks follow on a timer
+  const sent = document.createElement('div'); sent.id = 'pos_more'; sent.setAttribute('aria-hidden', 'true'); sent.style.cssText = 'height:1px'; host.after(sent);
+  const more = () => {
+    if (tok !== P.dtok || !host.isConnected) return;
+    host.insertAdjacentHTML('beforeend', list.slice(k, k + CARD_STEP).map((i) => cardHtml(i, cartMap(), can)).join('')); k += CARD_STEP;
+    if (k >= list.length) { if (P.io) { P.io.disconnect(); P.io = null; } sent.remove(); return; }
+    if (P.io) { P.io.unobserve(sent); P.io.observe(sent); } else setTimeout(more, 0);
+  };
+  if (window.IntersectionObserver) { P.io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) more(); }, { rootMargin: '900px 0px' }); P.io.observe(sent); } else setTimeout(more, 0);
 }
 function drawBar(can) {
   const n = P.cart.length, sub = cartSub();
@@ -170,7 +216,16 @@ function drawBar(can) {
   b.innerHTML = `<div><div class="muted" style="font-size:.8rem">${n ? n + ' · ' + esc(T('lines')) : esc(T('cart'))}</div><b style="font-size:1.25rem">${money(sub)}</b></div>
     <button class="primary" data-act="pos_cart" ${n && can ? '' : 'disabled'}>${esc(T('pay'))} →</button>`;
 }
-function refreshSell() { if (P.tab !== 'sell' || !$('#pos_items')) return; drawItems(true); drawBar(true); }
+function refreshSell() {
+  if (P.tab !== 'sell' || !$('#pos_items')) return;
+  const vis = visibleItems(), cur = P.shown;
+  if (cur && cur.length === vis.length && vis.every((x, n) => x === cur[n])) {   // same cards: only the "in cart" mark and quantity change (bos114)
+    const inCart = cartMap();
+    $('#pos_items').querySelectorAll('.pos-item').forEach((b) => { const q = inCart.get(b.getAttribute('data-v')), has = inCart.has(b.getAttribute('data-v')), old = b.querySelector('.pq');
+      b.classList.toggle('in', has); if (!has) { if (old) old.remove(); } else if (old) old.textContent = fmt(q); else { const sp = document.createElement('span'); sp.className = 'pq'; sp.textContent = fmt(q); b.appendChild(sp); } });
+  } else drawItems(true);
+  drawBar(true);
+}
 // scan (camera or device) or a typed code + Enter in the search box: add the item whose items.barcode matches
 function scanAdd(code) {
   const i = B.barcode && B.barcode.find(code, P.items);
