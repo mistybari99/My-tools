@@ -207,7 +207,7 @@ async function counts(force) {
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use'];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use', 'view_reports',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
