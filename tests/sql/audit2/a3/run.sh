@@ -4,5 +4,5 @@ HERE="$(cd "$(dirname "$0")" && pwd)"; REPO="$(cd "$HERE/../../../.." && pwd)"; 
 P="psql -h /tmp -p 5544 -U postgres"
 $P -Atc "select 1 from pg_database where datname='$DB'" | grep -q 1 || bash $REPO/tests/sql/final_build.sh $DB >/dev/null
 cd $HERE
-cat $REPO/tests/sql/e2e/00_common.sql a3_scenario.sql a3_probes.sql > /tmp/a3_run_$DB.sql
+cat $REPO/tests/sql/e2e/00_common.sql a3_scenario.sql a3_probes.sql $(ls fix_*.sql 2>/dev/null) > /tmp/a3_run_$DB.sql
 $P -d $DB -v mode=def -qAt -f /tmp/a3_run_$DB.sql 2>&1
