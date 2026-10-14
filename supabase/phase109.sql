@@ -48,7 +48,7 @@ begin
   for r in select * from (values    ('public.production_post(integer,uuid,numeric,uuid,timestamp with time zone,text,numeric)', array['bos72', 'bos73', 'bos74', 'bos80', 'bos109']::text[]),
     ('public._post_purchase_p13(uuid,jsonb)', array['bos82', 'bos87', 'bos109']::text[]),
     ('public._void_purchase_p13(uuid,text)', array['bos82', 'bos109']::text[]),
-    ('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)', array['bos109']::text[]),
+    ('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)', array['bos105', 'bos109', 'bos111']::text[]),   -- bos105 = phase105 (L4 client_id_reused); that body is NOT overwritten here, phase111 re-asserts the merge (105 + 109)
     ('public.pay_supplier(uuid,integer,jsonb,uuid,text)', array['bos109']::text[]),
     ('public.void_supplier_payment(bigint,text)', array['bos109']::text[]),
     ('public.supplier_refund(uuid,integer,numeric,text,text,text,text,text,uuid)', array['bos109']::text[]),
@@ -370,7 +370,8 @@ end $function$
 $f$; end if; end $p109$;
 
 -- public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)
-do $p109$ begin if current_setting('phase109.ok', true) = 'on' then execute $f$
+-- (INT4) skipped when phase105 is already on it (tag bos105): this text was built before phase105 and would erase the L4 line. phase111 creates the merged body (bos105 + bos109).
+do $p109$ begin if current_setting('phase109.ok', true) = 'on' and position('bos105' in pg_get_functiondef('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)'::regprocedure)) = 0 then execute $f$
 CREATE OR REPLACE FUNCTION public._bp_pay99(p_kind text, p_ref text, p_mode text, p_amount numeric, p_origin text, p_client uuid, p_note text, p_confirm boolean)
  RETURNS jsonb
  LANGUAGE plpgsql
