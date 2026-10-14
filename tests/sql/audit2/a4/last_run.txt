@@ -1,0 +1,280 @@
+psql:/tmp/a4_run.sql:14: NOTICE:  table "ea" does not exist, skipping
+== mode = rec
+== A4-01 setup + one business day D (= yesterday, Asia/Dhaka)
+
+psql:/tmp/a4_run.sql:65: NOTICE:  PASS S0 opening posted 
+
+
+psql:/tmp/a4_run.sql:80: NOTICE:  PASS S3b POS payment mode bank refused (bad_mode)
+
+
+
+
+
+
+psql:/tmp/a4_run.sql:103: NOTICE:  PASS S7 vouchers approved exp=approved/approved act=approved/approved
+
+
+
+
+DRAWER_COUNT: {"diff": -10, "match": false, "counted": 1770, "section": "drawer", "expected": 1780}
+
+POST_PENDING: {"dry": false, "more": false, "start": "2026-10-09", "errors": [], "locked": 0, "posted": 16, "by_type": {"sale": 6, "purchase": 1, "cash_move": 3, "sale_return": 1, "quick_expense": 1, "card_settlement": 1, "expense_voucher": 2, "supplier_payment": 1}, "waiting": {}, "reversed": 0, "cogs_missing": 0, "skipped_sources": ["staff_advances", "salary_payments"]}
+psql:/tmp/a4_run.sql:124: NOTICE:  PASS G0 second pending run posts nothing exp=0 act=0
+
+psql:/tmp/a4_run.sql:125: NOTICE:  PASS G0 no unbalanced journal entry exp=0 act=0
+
+== A4-02 hand-computed expectations vs system (end of today, after settlement)
+psql:/tmp/a4_run.sql:131: NOTICE:  PASS E1 cash 1110 exp=20360 act=20360.00
+
+psql:/tmp/a4_run.sql:132: NOTICE:  PASS E1 bank 1120 exp=50146 act=50146.00
+
+psql:/tmp/a4_run.sql:133: NOTICE:  PASS E1 mobile 1130 exp=100 act=100.00
+
+psql:/tmp/a4_run.sql:134: NOTICE:  PASS E1 card receivable 1140 exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:135: NOTICE:  PASS E1 customer receivable 1210 exp=300 act=300.00
+
+psql:/tmp/a4_run.sql:136: NOTICE:  PASS E1 customer advance 2300 (credit) exp=-300 act=-300.00
+
+psql:/tmp/a4_run.sql:137: NOTICE:  PASS E1 supplier payable 2100 (credit) exp=-300 act=-300.00
+
+psql:/tmp/a4_run.sql:138: NOTICE:  PASS E1 sales 4100 (credit) exp=-1300 act=-1300.00
+
+psql:/tmp/a4_run.sql:139: NOTICE:  PASS E1 discount 4120 exp=20 act=20.00
+
+psql:/tmp/a4_run.sql:140: NOTICE:  PASS E1 returns 4110 exp=100 act=100.00
+
+psql:/tmp/a4_run.sql:141: NOTICE:  PASS E1 COGS 5000 exp=720 act=720.00
+
+psql:/tmp/a4_run.sql:142: NOTICE:  PASS E1 transport 5700 exp=200 act=200.00
+
+psql:/tmp/a4_run.sql:143: NOTICE:  PASS E1 repair 5600 exp=70 act=70.00
+
+psql:/tmp/a4_run.sql:144: NOTICE:  PASS E1 bank charges 5810 exp=4 act=4.00
+
+psql:/tmp/a4_run.sql:145: NOTICE:  PASS E1 inventory 1310+1320+1330 exp=5880 act=5880.00
+
+psql:/tmp/a4_run.sql:146: NOTICE:  PASS E1 cash short/over 5800 (physical shortage 10 NOT booked) exp=0 act=0
+
+psql:/tmp/a4_run.sql:147: NOTICE:  PASS E1 trial balance Dr-Cr exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:148: NOTICE:  PASS E1 profit (income - expense accounts) exp=186 act=186.00
+
+ACCT_RECONCILE: {"note": "A difference equal to a balance that existed before the start date means that party has no opening balance in the books yet.", "start": "2026-10-09", "customers": [], "suppliers": [], "customers_off": 0, "suppliers_off": 0, "unattributed_receivable": 0}
+psql:/tmp/a4_run.sql:152: NOTICE:  PASS R1 receivable subledger vs GL: customers differing exp=0 act=0
+
+psql:/tmp/a4_run.sql:153: NOTICE:  PASS R1 payables subledger vs GL: suppliers differing exp=0 act=0
+
+psql:/tmp/a4_run.sql:154: NOTICE:  FAIL R1 customer_dues total (dues list) vs GL receivable exp=300 act=500.00
+
+psql:/tmp/a4_run.sql:155: NOTICE:  PASS R1 payables_summary total vs GL exp=300 act=300.00
+
+psql:/tmp/a4_run.sql:157: NOTICE:  PASS P1 sale_payments cash (sale kind) = 300+80+100 exp=480 act=480.00
+
+psql:/tmp/a4_run.sql:158: NOTICE:  PASS P1 sale_payments card exp=200 act=200.00
+
+psql:/tmp/a4_run.sql:159: NOTICE:  PASS P1 sale_payments mobile exp=100 act=100.00
+
+psql:/tmp/a4_run.sql:160: NOTICE:  PASS P2 sum(sales.total) = sum(payments sale kind) + due exp=1280.00 act=1280.00
+
+psql:/tmp/a4_run.sql:161: NOTICE:  PASS P2 sales.total sum = 1280 (1300 - 20 disc) exp=1280 act=1280.00
+
+psql:/tmp/a4_run.sql:162: NOTICE:  PASS P3 GL (sales - discount) = sales.total sum exp=1280.00 act=1280.00
+
+psql:/tmp/a4_run.sql:164: NOTICE:  PASS T1 midnight sale (00:30 Dhaka D) has sale_date = D exp=1 act=1
+
+psql:/tmp/a4_run.sql:165: NOTICE:  PASS T1 its journal entry_date = D exp=1 act=1
+
+psql:/tmp/a4_run.sql:166: NOTICE:  PASS T1 its UTC date would be D-1 (cut-off hazard if reports used UTC) exp=1 act=1
+
+DAYBOOK_VS_JOURNAL: {"to": "2026-10-14", "from": "2026-10-12", "note": "Day book counts a 10-2 voucher when submitted, the journal only when approved. Payroll payments (salary), staff advances (advance) and partner capital are posted from phase52; paper-form salary / advance lines (salary_form, advance_form) are day-book only; partner capital without a place shows as unplaced_*. Reversals post on the day they are made.", "rows": [{"diff": 4.00, "kind": "card_settlement", "mode": "bank", "daybook": 0, "journal": -4.00, "hub_internal": 0}, {"diff": 150.00, "kind": "expense", "mode": "bank", "daybook": 0, "journal": -150.00, "hub_internal": 0}, {"diff": -150.00, "kind": "expense", "mode": "cash", "daybook": -270, "journal": -120.00, "hub_internal": 0}], "total": {"diff": 4.00, "daybook": 610.00, "journal": 606.00, "kinds_checked": 11, "kinds_differing": 3}, "location_id": null, "accounting_start": "2026-10-09"}
+psql:/tmp/a4_run.sql:170: NOTICE:  FAIL D1 daybook_vs_journal kinds differing (expected 0 if both views agree) exp=0 act=3
+
+DAY_BOOK_TOTALS: {"to": "2026-10-14", "loc": null, "days": [{"in": {"bank": 600.00, "cash": 980.00, "total": 1680.00, "mobile": 100.00}, "out": {"bank": 0, "cash": 670.00, "total": 670.00, "mobile": 0}, "date": "2026-10-13", "open": {"bank": 50000, "cash": 20000, "total": 70000, "mobile": 0}, "close": {"bank": 50600.00, "cash": 20310.00, "total": 71010.00, "mobile": 100.00}, "lines": [{"at": "2026-10-12T18:30:00+00:00", "dir": "in", "loc": 1, "ref": "#5", "src": "sale", "who": "seller", "mode": "cash", "text": null, "type": "sale", "amount": 100.00, "src_id": "1b882372-48f6-4d9c-a609-f1d29990f151", "internal": false, "sensitive": false}, {"at": "2026-10-13T06:00:00+00:00", "dir": "in", "loc": 1, "ref": "#1", "src": "sale", "who": "seller", "mode": "cash", "text": null, "type": "sale", "amount": 300.00, "src_id": "fcb47714-d8e3-482f-8d84-83363c1b893e", "internal": false, "sensitive": false}, {"at": "2026-10-13T06:00:00+00:00", "dir": "in", "loc": 1, "ref": "#2", "src": "sale", "who": "seller", "mode": "bank", "text": null, "type": "sale", "amount": 200.00, "src_id": "2b32bbcf-05bf-4701-8489-0133f5bb16fb", "internal": false, "sensitive": false}, {"at": "2026-10-13T06:00:00+00:00", "dir": "in", "loc": 1, "ref": "#3", "src": "sale", "who": "seller", "mode": "mobile", "text": "bkash · TX1", "type": "sale", "amount": 100.00, "src_id": "6212d37e-7dae-4c4d-8df5-13b301470f6c", "internal": false, "sensitive": false}, {"at": "2026-10-13T06:00:00+00:00", "dir": "in", "loc": 1, "ref": "#4", "src": "sale", "who": "owner", "mode": "cash", "text": "Cust One", "type": "sale", "amount": 80.00, "src_id": "b94988c6-a3ca-42ea-a74a-411dc42f1f19", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.373533+00:00", "dir": "in", "loc": 1, "ref": null, "src": "customer", "who": "owner", "mode": "cash", "text": "Cust Two · adv", "type": "cust_advance", "amount": 500.00, "src_id": "c24ffe36-52ac-4b83-9ad9-37ae0bd00054", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.412803+00:00", "dir": "out", "loc": 1, "ref": "#1", "src": "entry", "who": "owner", "mode": "cash", "text": "1 line(s)", "type": "expense", "amount": 150, "src_id": "29ac3fb0-76de-453b-ac8c-23c92c6de348", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.429119+00:00", "dir": "out", "loc": 1, "ref": "#2", "src": "entry", "who": "owner", "mode": "cash", "text": "1 line(s)", "type": "expense", "amount": 70, "src_id": "f9581c88-5828-4e7b-95e3-1c3658aa24e4", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.438753+00:00", "dir": "out", "loc": 1, "ref": "Q-45274605", "src": "quick_expense", "who": "owner", "mode": "cash", "text": "rickshaw · transport · a4 quick", "type": "expense", "amount": 50, "src_id": "45274605-6517-437f-90c1-36e2d86903e9", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.47198+00:00", "dir": "out", "loc": 1, "ref": null, "src": "cash_move", "who": "owner", "mode": "cash", "text": "dep", "type": "bank_deposit", "amount": 400.00, "src_id": "be7f5d00-0399-43b6-a79b-8820ce57dc6a", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.47198+00:00", "dir": "in", "loc": 1, "ref": null, "src": "cash_move", "who": "owner", "mode": "bank", "text": "dep", "type": "bank_deposit", "amount": 400.00, "src_id": "be7f5d00-0399-43b6-a79b-8820ce57dc6a", "internal": false, "sensitive": false}], "net_open": {"bank": 0, "cash": 0, "total": 0, "mobile": 0}, "net_close": {"bank": 600.00, "cash": 310.00, "total": 1010.00, "mobile": 100.00}, "transfers": 0}, {"in": {"bank": 0, "cash": 0, "total": 0, "mobile": 0}, "out": {"bank": 300.00, "cash": 100.00, "total": 400.00, "mobile": 0}, "date": "2026-10-14", "open": {"bank": 50600.00, "cash": 20310.00, "total": 71010.00, "mobile": 100.00}, "close": {"bank": 50300.00, "cash": 20210.00, "total": 70610.00, "mobile": 100.00}, "lines": [{"at": "2026-10-14T15:55:10.391795+00:00", "dir": "out", "loc": 1, "ref": "#1", "src": "sale", "who": "owner", "mode": "cash", "text": null, "type": "sale_return", "amount": 100.00, "src_id": "fcb47714-d8e3-482f-8d84-83363c1b893e", "internal": false, "sensitive": false}, {"at": "2026-10-14T15:55:10.465926+00:00", "dir": "out", "loc": 1, "ref": null, "src": "supplier", "who": "buyer", "mode": "bank", "text": "Sup A4", "type": "supplier", "amount": 300.00, "src_id": "9fc0ef17-fc45-46c1-95ec-c866f149abbe", "internal": false, "sensitive": false}], "net_open": {"bank": 600.00, "cash": 310.00, "total": 1010.00, "mobile": 100.00}, "net_close": {"bank": 300.00, "cash": 210.00, "total": 610.00, "mobile": 100.00}, "transfers": 0}], "from": "2026-10-13", "notes": ["card_as_bank", "imprest_in_cash", "hub_receipt_not_recorded", "bank_deposit_not_dated", "drafts_excluded", "refunds_included", "future_dates_capped"], "start": "2026-10-09", "capped": false, "totals": {"in": {"bank": 600.00, "cash": 980.00, "total": 1680.00, "mobile": 100.00}, "out": {"bank": 300.00, "cash": 770.00, "total": 1070.00, "mobile": 0}, "open": {"bank": 50000, "cash": 20000, "total": 70000, "mobile": 0}, "close": {"bank": 50300.00, "cash": 20210.00, "total": 70610.00, "mobile": 100.00}, "net_open": {"bank": 0, "cash": 0, "total": 0, "mobile": 0}, "net_close": {"bank": 300.00, "cash": 210.00, "total": 610.00, "mobile": 100.00}, "transfers": 0}, "enabled": true, "balances": true, "names_masked": false, "skipped_rows": 0, "opening_known": true, "salary_hidden": false}
+psql:/tmp/a4_run.sql:175: NOTICE:  FAIL D2 day_book CLOSE cash+bank+mobile (opening 20000/50000/0) vs GL cash+bank+mobile+card exp=70606.00 act=70610.00
+
+psql:/tmp/a4_run.sql:176: NOTICE:  FAIL D2 day_book bank closing net (D..today) vs GL bank movement excl opening exp=146 act=300.00
+
+psql:/tmp/a4_run.sql:177: NOTICE:  FAIL D2 day_book cash net_close vs GL cash movement exp=360 act=210.00
+
+psql:/tmp/a4_run.sql:178: NOTICE:  PASS D2 day_book mobile net_close exp=100 act=100.00
+
+psql:/tmp/a4_run.sql:180: NOTICE:  PASS W1 drawer counted 1770, expected 1780, diff -10 recorded in entry_counts exp=-10 act=-10
+
+psql:/tmp/a4_run.sql:181: NOTICE:  PASS W1 expected drawer cash (typed form figures) vs GL cash movement on D for the till (300+100+80+500-100-400 deposit = 480; + float 1000) exp=1780 act=1780
+
+CARD_SETTLEMENT_LIST: {"rows": [{"id": "6ab5548d-7e6b-44cb-af6c-ccd5ae012f25", "fee": 4.00, "net": 196.00, "date": "2026-10-14", "note": "batch D", "gross": 200.00, "status": "done", "bank_mode": "bank"}], "unsettled": 0.00, "location_id": 1}
+ACCT_OVERVIEW: {"on": true, "start": "2026-10-09", "status": {"on": true, "owner": true, "start": "2026-10-09", "errors": 0, "locked": 0, "entries": 17, "opening": true, "pending": 0, "waiting": 0, "accounts": 59, "autopost": true, "last_post": "2026-10-14T15:55:10.490628+00:00", "scheduler": {"on": false, "last_run": null}, "can_manage": true, "error_list": [], "last_post_at": "2026-10-14T15:55:10.490628+00:00"}, "income_month": {"cogs": 720.00, "from": "2026-10-09", "net_profit": 186.00, "provisional": false, "gross_profit": 460.00, "total_income": 1180.00, "total_expense": 994.00, "unknown_cost_rev": 0.00}, "balance_sheet": {"difference": 0.00, "unbalanced": false, "cogs_missing": 0, "total_assets": 76786.00, "total_equity": 76186.00, "total_liabilities": 600.00}}
+TRIAL_BALANCE_KEYS: {"to": "2026-10-14", "diff": 0.00, "from": "2026-10-09", "rows": [{"cr": 2250.00, "dr": 79036.00, "id": 1, "code": "1000", "type": "asset", "name_bn": "সম্পদ", "name_en": "Assets", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 76786.00, "is_group": true, "parent_id": null}, {"cr": 1270.00, "dr": 71876.00, "id": 2, "code": "1100", "type": "asset", "name_bn": "নগদ ও ব্যাংক", "name_en": "Cash and bank", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 70606.00, "is_group": true, "parent_id": 1}, {"cr": 620.00, "dr": 20980.00, "id": 3, "code": "1110", "type": "asset", "name_bn": "হাতে নগদ", "name_en": "Cash in hand", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 20360.00, "is_group": false, "parent_id": 2}, {"cr": 450.00, "dr": 50596.00, "id": 4, "code": "1120", "type": "asset", "name_bn": "ব্যাংক", "name_en": "Bank", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 50146.00, "is_group": false, "parent_id": 2}, {"cr": 0.00, "dr": 100.00, "id": 5, "code": "1130", "type": "asset", "name_bn": "মোবাইল ওয়ালেট (বিকাশ/নগদ)", "name_en": "Mobile wallets (bKash / Nagad)", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 100.00, "is_group": false, "parent_id": 2}, {"cr": 200.00, "dr": 200.00, "id": 6, "code": "1140", "type": "asset", "name_bn": "কার্ডের পাওনা", "name_en": "Card receivable", "open_cr": 0, "open_dr": 0, "close_cr": 0.00, "close_dr": 0.00, "is_group": false, "parent_id": 2}, {"cr": 200.00, "dr": 500.00, "id": 7, "code": "1200", "type": "asset", "name_bn": "পাওনা ও অগ্রিম", "name_en": "Receivables and advances", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 300.00, "is_group": true, "parent_id": 1}, {"cr": 200.00, "dr": 500.00, "id": 8, "code": "1210", "type": "asset", "name_bn": "গ্রাহকের বাকি", "name_en": "Customer receivables", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 300.00, "is_group": false, "parent_id": 7}, {"cr": 780.00, "dr": 6660.00, "id": 11, "code": "1300", "type": "asset", "name_bn": "মজুত মাল", "name_en": "Inventory", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 5880.00, "is_group": true, "parent_id": 1}, {"cr": 780.00, "dr": 6660.00, "id": 12, "code": "1310", "type": "asset", "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 5880.00, "is_group": false, "parent_id": 11}, {"cr": 1100.00, "dr": 500.00, "id": 19, "code": "2000", "type": "liability", "name_bn": "দায়", "name_en": "Liabilities", "open_cr": 0, "open_dr": 0, "close_cr": 600.00, "close_dr": 0, "is_group": true, "parent_id": null}, {"cr": 600.00, "dr": 300.00, "id": 20, "code": "2100", "type": "liability", "name_bn": "সরবরাহকারীর পাওনা", "name_en": "Supplier payables", "open_cr": 0, "open_dr": 0, "close_cr": 300.00, "close_dr": 0, "is_group": false, "parent_id": 19}, {"cr": 500.00, "dr": 200.00, "id": 22, "code": "2300", "type": "liability", "name_bn": "গ্রাহকের অগ্রিম (আমাদের দায়)", "name_en": "Customer advances (liability)", "open_cr": 0, "open_dr": 0, "close_cr": 300.00, "close_dr": 0, "is_group": false, "parent_id": 19}, {"cr": 76000.00, "dr": 0.00, "id": 24, "code": "3000", "type": "equity", "name_bn": "মালিকানা", "name_en": "Equity", "open_cr": 0, "open_dr": 0, "close_cr": 76000.00, "close_dr": 0, "is_group": true, "parent_id": null}, {"cr": 76000.00, "dr": 0.00, "id": 25, "code": "3100", "type": "equity", "name_bn": "মালিকের মূলধন", "name_en": "Owner capital", "open_cr": 0, "open_dr": 0, "close_cr": 76000.00, "close_dr": 0, "is_group": false, "parent_id": 24}, {"cr": 1300.00, "dr": 120.00, "id": 29, "code": "4000", "type": "income", "name_bn": "আয়", "name_en": "Income", "open_cr": 0, "open_dr": 0, "close_cr": 1180.00, "close_dr": 0, "is_group": true, "parent_id": null}, {"cr": 1300.00, "dr": 0.00, "id": 30, "code": "4100", "type": "income", "name_bn": "বিক্রয়", "name_en": "Sales", "open_cr": 0, "open_dr": 0, "close_cr": 1300.00, "close_dr": 0, "is_group": false, "parent_id": 29}, {"cr": 0.00, "dr": 100.00, "id": 31, "code": "4110", "type": "income", "name_bn": "বিক্রি ফেরত (বিয়োগ)", "name_en": "Sales returns (contra)", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 100.00, "is_group": false, "parent_id": 29}, {"cr": 0.00, "dr": 20.00, "id": 32, "code": "4120", "type": "income", "name_bn": "বিক্রয় ছাড় / ডিসকাউন্ট (বিয়োগ)", "name_en": "Sales discounts (contra)", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 20.00, "is_group": false, "parent_id": 29}, {"cr": 60.00, "dr": 780.00, "id": 34, "code": "5000", "type": "expense", "name_bn": "বিক্রীত পণ্যের খরচ (COGS)", "name_en": "Cost of goods sold", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 720.00, "is_group": false, "parent_id": null}, {"cr": 0.00, "dr": 70.00, "id": 40, "code": "5600", "type": "expense", "name_bn": "মেরামত ও রক্ষণাবেক্ষণ", "name_en": "Repairs and maintenance", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 70.00, "is_group": false, "parent_id": null}, {"cr": 0.00, "dr": 200.00, "id": 41, "code": "5700", "type": "expense", "name_bn": "যাতায়াত ও পরিবহন", "name_en": "Transport", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 200.00, "is_group": false, "parent_id": null}, {"cr": 0.00, "dr": 4.00, "id": 43, "code": "5810", "type": "expense", "name_bn": "ব্যাংক চার্জ", "name_en": "Bank charges", "open_cr": 0, "open_dr": 0, "close_cr": 0, "close_dr": 4.00, "is_group": false, "parent_id": null}], "balanced": true, "location_id": null, "total_debit": 77900.00, "total_credit": 77900.00}
+BALANCE_SHEET: {"as_of": "2026-10-14", "assets": [{"id": 1, "code": "1000", "amount": 76786.00, "name_bn": "সম্পদ", "name_en": "Assets", "is_group": true, "parent_id": null}, {"id": 2, "code": "1100", "amount": 70606.00, "name_bn": "নগদ ও ব্যাংক", "name_en": "Cash and bank", "is_group": true, "parent_id": 1}, {"id": 3, "code": "1110", "amount": 20360.00, "name_bn": "হাতে নগদ", "name_en": "Cash in hand", "is_group": false, "parent_id": 2}, {"id": 4, "code": "1120", "amount": 50146.00, "name_bn": "ব্যাংক", "name_en": "Bank", "is_group": false, "parent_id": 2}, {"id": 5, "code": "1130", "amount": 100.00, "name_bn": "মোবাইল ওয়ালেট (বিকাশ/নগদ)", "name_en": "Mobile wallets (bKash / Nagad)", "is_group": false, "parent_id": 2}, {"id": 6, "code": "1140", "amount": 0.00, "name_bn": "কার্ডের পাওনা", "name_en": "Card receivable", "is_group": false, "parent_id": 2}, {"id": 7, "code": "1200", "amount": 300.00, "name_bn": "পাওনা ও অগ্রিম", "name_en": "Receivables and advances", "is_group": true, "parent_id": 1}, {"id": 8, "code": "1210", "amount": 300.00, "name_bn": "গ্রাহকের বাকি", "name_en": "Customer receivables", "is_group": false, "parent_id": 7}, {"id": 11, "code": "1300", "amount": 5880.00, "name_bn": "মজুত মাল", "name_en": "Inventory", "is_group": true, "parent_id": 1}, {"id": 12, "code": "1310", "amount": 5880.00, "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "is_group": false, "parent_id": 11}], "equity": [{"id": 24, "code": "3000", "amount": 76000.00, "name_bn": "মালিকানা", "name_en": "Equity", "is_group": true, "parent_id": null}, {"id": 25, "code": "3100", "amount": 76000.00, "name_bn": "মালিকের মূলধন", "name_en": "Owner capital", "is_group": false, "parent_id": 24}], "difference": 0.00, "unbalanced": false, "liabilities": [{"id": 19, "code": "2000", "amount": 600.00, "name_bn": "দায়", "name_en": "Liabilities", "is_group": true, "parent_id": null}, {"id": 20, "code": "2100", "amount": 300.00, "name_bn": "সরবরাহকারীর পাওনা", "name_en": "Supplier payables", "is_group": false, "parent_id": 19}, {"id": 22, "code": "2300", "amount": 300.00, "name_bn": "গ্রাহকের অগ্রিম (আমাদের দায়)", "name_en": "Customer advances (liability)", "is_group": false, "parent_id": 19}], "location_id": null, "cogs_missing": 0, "total_assets": 76786.00, "total_equity": 76000.00, "retained_earnings": 186.00, "total_liabilities": 600.00, "total_equity_and_earnings": 76186.00, "total_liabilities_and_equity": 76786.00}
+INVENTORY_VS_GL: {"note": "Read only: nothing is posted. Reasons are movements the books or the stock ledger do not have; \"unexplained\" is what is left.", "rows": [{"gl": 5880.00, "key": "inv_finished", "code": "1310", "diff": 0.00, "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "reasons": [], "valuation": 5880.00, "unexplained": 0.00, "ledger_value": 5880.00}, {"gl": 0.00, "key": "inv_raw", "code": "1320", "diff": 0.00, "name_bn": "মজুত: কাঁচামাল", "name_en": "Inventory: raw materials", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}, {"gl": 0.00, "key": "inv_pack", "code": "1330", "diff": 0.00, "name_bn": "মজুত: প্যাকেজিং", "name_en": "Inventory: packaging", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}], "agree": true, "as_of": "2026-10-14", "start": "2026-10-09", "total": {"gl": 5880.00, "diff": 0.00, "valuation": 5880.00, "unexplained": 0.00}, "location_id": 1, "accounting_on": true, "valuation_basis": "average_cost"}
+PROFIT_SOURCE_CHECK: {"to": "2026-10-14", "from": "2026-10-09", "agree": true, "notes": [], "difference": 0.00, "ledger_cogs": 720.00, "location_id": 1, "net_revenue": 1180.00, "report_cogs": 720.00, "fallback_rev": 0.00, "journal_cogs": 720.00, "pending_docs": 0, "compared_from": "2026-10-09", "fallback_cogs": 0.00, "unknown_cost_rev": 0.00, "compared_report_cogs": 720.00}
+ACCT_CASH_FLOW: {"to": "2026-10-14", "from": "2026-10-09", "rows": [{"in": 400.00, "net": 0.00, "out": 400.00, "category": "bank_deposit"}, {"in": 196.00, "net": 196.00, "out": 0.00, "category": "card_settlement"}, {"in": 500.00, "net": 500.00, "out": 0.00, "category": "cust_advance"}, {"in": 0.00, "net": -220.00, "out": 220.00, "category": "expense_voucher"}, {"in": 70000.00, "net": 70000.00, "out": 0.00, "category": "opening"}, {"in": 0.00, "net": -50.00, "out": 50.00, "category": "quick_expense"}, {"in": 580.00, "net": 580.00, "out": 0.00, "category": "sale"}, {"in": 0.00, "net": -100.00, "out": 100.00, "category": "sale_return"}, {"in": 0.00, "net": -300.00, "out": 300.00, "category": "supplier_payment"}], "closing": 70606.00, "opening": 0, "total_in": 71676.00, "total_out": 1070.00}
+== A4-03 bank statement, over-settlement, voids, collections, locks, rounding, manual journal
+
+BANK_IMPORT: {"rows": 5, "sum_in": 596.00, "sum_out": -462.50, "batch_id": "89b7a77b-55ed-4434-98ca-1e108d33039c", "imported": 5, "duplicate": 0}
+BANK_SUGGEST_COUNT: {"count": 4, "suggestions": [{"memo": "Cash move: bank_deposit", "amount": 400.00, "line_id": 1, "line_no": 1, "ref_hit": true, "days_off": 0, "entry_id": 4, "confident": true, "line_date": "2026-10-13", "reference": "DEP", "candidates": 1, "entry_date": "2026-10-13"}, {"memo": "Expense voucher 1", "amount": -150.00, "line_id": 2, "line_no": 2, "ref_hit": false, "days_off": 0, "entry_id": 5, "confident": true, "line_date": "2026-10-13", "reference": "V1", "candidates": 1, "entry_date": "2026-10-13"}, {"memo": "Supplier payment", "amount": -300.00, "line_id": 3, "line_no": 1, "ref_hit": false, "days_off": 0, "entry_id": 17, "confident": true, "line_date": "2026-10-14", "reference": null, "candidates": 1, "entry_date": "2026-10-14"}, {"memo": "Card settlement", "amount": 196.00, "line_id": 4, "line_no": 2, "ref_hit": true, "days_off": 0, "entry_id": 15, "confident": true, "line_date": "2026-10-14", "reference": "CARD", "candidates": 1, "entry_date": "2026-10-14"}]}
+psql:/tmp/a4_run.sql:209: NOTICE:  PASS B1 bank statement total (400-150-300+196-12.5 = 133.5) is shown exp=133.5 act=133.50
+
+psql:/tmp/a4_run.sql:210: NOTICE:  PASS B1 book movement on 1120 excluding opening journal = 146 exp=146 act=146.00
+
+psql:/tmp/a4_run.sql:211: NOTICE:  PASS B1 unmatched statement lines BEFORE matching = 5 exp=5 act=5
+
+BANK_MATCH_MANY: {"ok": 4, "dry": false, "failed": 0, "failures": []}
+psql:/tmp/a4_run.sql:216: NOTICE:  PASS B2 after matching: unmatched statement lines = 1 (the 12.5 fee not in books) exp=1 act=1
+
+psql:/tmp/a4_run.sql:217: NOTICE:  PASS B2 unmatched book lines (opening 50000 is not on the statement) exp=1 act=1
+
+psql:/tmp/a4_run.sql:219: NOTICE:  FAIL B3 a statement line without ledger entry can be turned into a journal entry from the reconciliation screen NOT SUPPORTED
+
+psql:/tmp/a4_run.sql:220: NOTICE:  PASS B3 multi bank accounts: pay_bank maps ONE account exp=1 act=1
+
+OVER_SETTLE_DEFAULT: {"id": "84645328-45d5-4e1e-8771-5499fa389313", "over": true, "unsettled": 0.00}
+psql:/tmp/a4_run.sql:225: NOTICE:  PASS C1 over-settlement 5000 with nothing unsettled accepted by default (card_settle_over_mode off) 
+
+psql:/tmp/a4_run.sql:227: NOTICE:  PASS C1 card receivable 1140 is now negative exp=-5000 act=-5000.00
+
+psql:/tmp/a4_run.sql:230: NOTICE:  PASS C1 void settlement reverses it exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:232: NOTICE:  PASS C2 over_settlement refused when rule = refuse (over_settlement)
+
+psql:/tmp/a4_run.sql:233: NOTICE:  PASS C2 second settlement of the same 200 refused (nothing unsettled) (over_settlement)
+
+psql:/tmp/a4_run.sql:235: NOTICE:  FAIL C3 card settlement is typed by a person: no link to the card sales it settles (no per-sale / per-batch matching, no terminal statement import) NOT SUPPORTED
+
+psql:/tmp/a4_run.sql:238: NOTICE:  PASS V0 customer_dues shows Cust Two owing 200 although advance 500-200 applied exp=200 act=200.00
+
+psql:/tmp/a4_run.sql:241: NOTICE:  PASS V1 GL receivable of Cust Two after collection = -200 (debt cleared twice: advance_used + cash) exp=-200 act=-200.00
+
+psql:/tmp/a4_run.sql:242: NOTICE:  PASS V1 advance liability of Cust Two still 300 (customer holds credit AND was charged) exp=-300 act=-300.00
+
+psql:/tmp/a4_run.sql:248: NOTICE:  PASS V2 void_sale of a sale that has a return is refused (sale_has_returns) (sale_has_returns)
+
+psql:/tmp/a4_run.sql:254: NOTICE:  PASS V2b void due sale: cash -80 exp=-80 act=-80.00
+
+psql:/tmp/a4_run.sql:255: NOTICE:  PASS V2b void due sale: Cust One receivable back to 0 exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:256: NOTICE:  PASS V2b void due sale: stock +4 exp=4 act=4.0000
+
+psql:/tmp/a4_run.sql:257: NOTICE:  PASS V2b void due sale: customer_dues list no longer has Cust One exp=0 act=0
+
+psql:/tmp/a4_run.sql:261: NOTICE:  PASS V3 void of an already settled card sale: card receivable goes negative (-200); bank keeps the payout exp=-200 act=-200.00
+
+psql:/tmp/a4_run.sql:266: NOTICE:  PASS V4 payable back to 600 after void of the 300 payment exp=-600 act=-600.00
+
+psql:/tmp/a4_run.sql:267: NOTICE:  PASS V4 trial balance still balanced exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:270: NOTICE:  PASS V5 GL sales credit dated D still 1300 after voids of sale 2 and 4 (reversals are dated today, not D) exp=1300 act=1300.00
+
+BIZ_DAILY_AFTER_VOID: (2026-10-13,1,4,700.00,0.00,2,580.00,700.00,420.00)
+psql:/tmp/a4_run.sql:275: NOTICE:  PASS J1 duplicate journal entry for the same source (je_source_uq) (duplicate key value violates unique constraint "je_source_uq)
+
+psql:/tmp/a4_run.sql:276: NOTICE:  PASS J2 journal line cannot be edited (append_only: journal_lines is a record, it cannot be changed)
+
+psql:/tmp/a4_run.sql:277: NOTICE:  PASS J2 journal line cannot be deleted (append_only: journal_lines is a record, it cannot be changed)
+
+MANUAL_JOURNAL_GUARD_DEFAULT: off
+MANUAL_JOURNAL: {"id": 26, "total": 5.00}
+DAYBOOK_VS_JOURNAL_AFTER_MANUAL: {"to": "2026-10-14", "from": "2026-10-14", "note": "Day book counts a 10-2 voucher when submitted, the journal only when approved. Payroll payments (salary), staff advances (advance) and partner capital are posted from phase52; paper-form salary / advance lines (salary_form, advance_form) are day-book only; partner capital without a place shows as unplaced_*. Reversals post on the day they are made.", "rows": [{"diff": 4.00, "kind": "card_settlement", "mode": "bank", "daybook": 0, "journal": -4.00, "hub_internal": 0}, {"diff": -5.00, "kind": "manual", "mode": "cash", "daybook": 0, "journal": 5.00, "hub_internal": 0}, {"diff": 200.00, "kind": "sale", "mode": "bank", "daybook": 0, "journal": -200.00, "hub_internal": 0}, {"diff": 80.00, "kind": "sale", "mode": "cash", "daybook": 0, "journal": -80.00, "hub_internal": 0}], "total": {"diff": 279.00, "daybook": -100.00, "journal": -379.00, "kinds_checked": 7, "kinds_differing": 4}, "location_id": null, "accounting_start": "2026-10-09"}
+psql:/tmp/a4_run.sql:286: NOTICE:  PASS M1 manual journal touching cash is visible to daybook_vs_journal as a difference 
+
+
+psql:/tmp/a4_run.sql:291: NOTICE:  PASS L1 seller: new sale dated inside the closed period refused (period_closed)
+
+psql:/tmp/a4_run.sql:292: NOTICE:  PASS L1 void of a sale of a closed period is refused for non-owners (trigger sales_lock: lock_check(old.sale_date) on UPDATE; not executed here, seller lacks sale_void in this fixture) sales_lock()
+
+psql:/tmp/a4_run.sql:293: NOTICE:  PASS L1 seller: cash_move dated in closed period refused (period_closed)
+
+
+psql:/tmp/a4_run.sql:297: NOTICE:  PASS L2 owner can sell INTO a closed period (is_owner bypass in lock_check) 
+
+psql:/tmp/a4_run.sql:299: NOTICE:  PASS L2 owner-run autopost posts that late sale into the closed period (entry_date = D) exp=1 act=1
+
+
+SCHEDULER_RUN_IN_CLOSED_PERIOD: {"dry": false, "more": false, "start": "2026-10-09", "errors": [], "locked": 1, "posted": 0, "by_type": {}, "waiting": {}, "reversed": 0, "cogs_missing": 0, "skipped_sources": ["staff_advances", "salary_payments"]}
+psql:/tmp/a4_run.sql:308: NOTICE:  PASS L3 scheduler run: late sale of closed period NOT posted, counted as locked exp=1 act=1
+
+psql:/tmp/a4_run.sql:309: NOTICE:  PASS L3 the sale exists in sales/payments but has no journal entry (cash in drawer, not in GL) exp=0 act=0
+
+psql:/tmp/a4_run.sql:310: NOTICE:  PASS L4 sale_return in a closed period is checked against TODAY, not the sale date lock_check(today) in sale_return
+
+psql:/tmp/a4_run.sql:313: NOTICE:  PASS L5 after reopening the period the pending sale posts exp=1 act=1
+
+
+ROUNDING_SALE: {"id": "0b986cec-6dda-4aa9-ae93-c95f1da71aef", "due": 0.00, "paid": 289.99, "total": 289.99, "receipt": 9, "discount": 10.01, "customer_id": null}
+psql:/tmp/a4_run.sql:320: NOTICE:  PASS Q1 percent discount 3.337% of 300 = 10.01, total 289.99 exp=289.99 act=289.99
+
+psql:/tmp/a4_run.sql:323: NOTICE:  PASS Q2 partial returns add up to the sale total 289.99 (96.66 + 193.33) exp=289.99 act=289.99
+
+psql:/tmp/a4_run.sql:325: NOTICE:  PASS Q3 net revenue of the rounding sale in GL is 0 after full return exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:326: NOTICE:  PASS Q3 trial balance balanced after all mutations exp=0 act=0.00
+
+FINAL_STATUS: {"on": true, "owner": true, "start": "2026-10-09", "errors": 0, "locked": 0, "entries": 30, "opening": true, "pending": 0, "waiting": 0, "accounts": 59, "autopost": true, "last_post": "2026-10-14T15:55:11.177646+00:00", "scheduler": {"on": false, "last_run": null}, "can_manage": true, "error_list": [], "last_post_at": "2026-10-14T15:55:11.177646+00:00"}
+FINAL_RECONCILE: {"note": "A difference equal to a balance that existed before the start date means that party has no opening balance in the books yet.", "start": "2026-10-09", "customers": [], "suppliers": [], "customers_off": 0, "suppliers_off": 0, "unattributed_receivable": 0}
+FINAL_INV_VS_GL_AGREE: {"note": "Read only: nothing is posted. Reasons are movements the books or the stock ledger do not have; \"unexplained\" is what is left.", "rows": [{"gl": 6120.00, "key": "inv_finished", "code": "1310", "diff": 0.00, "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "reasons": [], "valuation": 6120.00, "unexplained": 0.00, "ledger_value": 6120.00}, {"gl": 0.00, "key": "inv_raw", "code": "1320", "diff": 0.00, "name_bn": "মজুত: কাঁচামাল", "name_en": "Inventory: raw materials", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}, {"gl": 0.00, "key": "inv_pack", "code": "1330", "diff": 0.00, "name_bn": "মজুত: প্যাকেজিং", "name_en": "Inventory: packaging", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}], "agree": true, "as_of": "2026-10-14", "start": "2026-10-09", "total": {"gl": 6120.00, "diff": 0.00, "valuation": 6120.00, "unexplained": 0.00}, "location_id": 1, "accounting_on": true, "valuation_basis": "average_cost"}
+== A4-04 rounding drift on 3-decimal cost, stale GL before posting, per-cashier dimension
+
+
+
+INV_VS_GL_AFTER_50_FRACTIONAL_SALES: {"note": "Read only: nothing is posted. Reasons are movements the books or the stock ledger do not have; \"unexplained\" is what is left.", "rows": [{"gl": 46006.80, "key": "inv_finished", "code": "1310", "diff": 0.17, "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "reasons": [], "valuation": 46006.63, "unexplained": 0.17, "ledger_value": 46006.63}, {"gl": 0.00, "key": "inv_raw", "code": "1320", "diff": 0.00, "name_bn": "মজুত: কাঁচামাল", "name_en": "Inventory: raw materials", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}, {"gl": 0.00, "key": "inv_pack", "code": "1330", "diff": 0.00, "name_bn": "মজুত: প্যাকেজিং", "name_en": "Inventory: packaging", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}], "agree": false, "as_of": "2026-10-14", "start": "2026-10-09", "total": {"gl": 46006.80, "diff": 0.17, "valuation": 46006.63, "unexplained": 0.17}, "location_id": 1, "accounting_on": true, "valuation_basis": "average_cost"}
+psql:/tmp/a4_run.sql:347: NOTICE:  FAIL RD1 inventory_vs_gl unexplained after 50 sales at cost 41.3333 x 0.7 (rounding drift tolerance) exp=0 act=0.17
+
+psql:/tmp/a4_run.sql:348: NOTICE:  FAIL RD1 GL vs stock-ledger valuation drift (total diff) exp=0 act=0.17
+
+psql:/tmp/a4_run.sql:349: NOTICE:  PASS RD2 trial balance still balanced exp=0 act=0.00
+
+
+
+psql:/tmp/a4_run.sql:356: NOTICE:  PASS ST1 reconcile before posting: customers differing (GL lags the sub-ledger) exp=1 act=1
+
+psql:/tmp/a4_run.sql:357: NOTICE:  PASS ST1 status strip shows pending documents exp=1 act=1
+
+psql:/tmp/a4_run.sql:359: NOTICE:  PASS ST2 after posting the difference is gone exp=0 act=0
+
+psql:/tmp/a4_run.sql:361: NOTICE:  FAIL PC1 journal_entries carries the cashier who made the sale only created_by/created_staff = POSTER
+
+psql:/tmp/a4_run.sql:362: NOTICE:  PASS PC2 journal_entries.created_staff of sale entries filled with the cashier staff id (count of sale entries whose created_staff = seller staff) exp=0 act=0
+
+SALES_CREATED_STAFF_DISTINCT: 2
+psql:/tmp/a4_run.sql:365: NOTICE:  PASS PC3 sale_payments by cashier and mode can be summed from sale_payments (supported) exp=1 act=1
+
+== A4-05 bill auto-payment (phase99) + manual payment: one payment counted once
+
+psql:/tmp/a4_run.sql:373: NOTICE:  PASS BP1 auto_cash: bill 100 paid at posting exp=100 act=100.00
+
+psql:/tmp/a4_run.sql:375: NOTICE:  PASS BP1 GL cash -100 for the auto payment exp=-100 act=-100.00
+
+psql:/tmp/a4_run.sql:376: NOTICE:  PASS BP1 GL payable net change 0 (bill +100, payment -100) exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:377: NOTICE:  PASS BP2 manual payment on the already paid bill refused (overpaid) (nothing_due)
+
+psql:/tmp/a4_run.sql:379: NOTICE:  PASS BP3 pay_supplier not tied to a bill is accepted (no bill-level overpay control on the generic payment) accepted
+
+psql:/tmp/a4_run.sql:381: NOTICE:  PASS BP4 supplier sub-ledger == GL payable after all this (suppliers differing) exp=0 act=0
+
+== A4-06 expense paid by mobile/card, 10-2 vs daybook mode
+psql:/tmp/a4_run.sql:390: NOTICE:  PASS EX1 voucher paid by mobile: GL mobile -40 exp=-40 act=-40.00
+
+psql:/tmp/a4_run.sql:391: NOTICE:  PASS EX1 voucher paid by mobile: GL cash unchanged exp=0 act=0.00
+
+psql:/tmp/a4_run.sql:393: NOTICE:  FAIL EX2 day_book shows the mobile-paid voucher as cash out (mode hard-coded cash): mobile out today exp=40 act=0
+
+psql:/tmp/a4_run.sql:395: NOTICE:  PASS EX3 submitted-but-not-approved vouchers are counted by the day book as money out, but not in GL note in daybook_vs_journal
+
+psql:/tmp/a4_run.sql:396: NOTICE:  PASS EX4 daybook_vs_journal lists the expense mode difference 
+
+== A4-09 summary
+SUMMARY pass=94 fail=11 total=105
+26|R1 customer_dues total (dues list) vs GL receivable|300|500.00
+37|D1 daybook_vs_journal kinds differing (expected 0 if both views agree)|0|3
+38|D2 day_book CLOSE cash+bank+mobile (opening 20000/50000/0) vs GL cash+bank+mobile+card|70606.00|70610.00
+39|D2 day_book bank closing net (D..today) vs GL bank movement excl opening|146|300.00
+40|D2 day_book cash net_close vs GL cash movement|360|210.00
+49|B3 a statement line without ledger entry can be turned into a journal entry from the reconciliation screen|supported|NOT SUPPORTED
+56|C3 card settlement is typed by a person: no link to the card sales it settles (no per-sale / per-batch matching, no terminal statement import)|supported|NOT SUPPORTED
+86|RD1 inventory_vs_gl unexplained after 50 sales at cost 41.3333 x 0.7 (rounding drift tolerance)|0|0.17
+87|RD1 GL vs stock-ledger valuation drift (total diff)|0|0.17
+92|PC1 journal_entries carries the cashier who made the sale|column|only created_by/created_staff = POSTER
+103|EX2 day_book shows the mobile-paid voucher as cash out (mode hard-coded cash): mobile out today|40|0
