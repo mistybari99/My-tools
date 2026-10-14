@@ -58,3 +58,7 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] G5 Owner says "push": publish setup-run-16, 17, 18 in that order; owner pastes Run 16, 17, 18 and the Checks. Before switching org_scope_on ON read `select org_scope_preflight();` (HANDOVER_7 checklist).
 - [ ] G6 C1 rest: the ~170 unscoped reader RPCs, per-business rules/roles/grants, storage + bot identity, audit tests 9, 10, 11, 13; needs C2 for masters.
 - [ ] G3 B2 organization UI + DB-driven brands/locations; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+- [ ] G3 B2 organization UI + DB-driven brands/locations; C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+- [x] G4 Import-Export basic module: phase124 + phase124_test (118/0) + web/impexp124.js + tests/web/impexp124_test.js (local-ie, not pushed).
+- [ ] G5 Lead: apply docs/regs/impexp124.md (ia.js rec line, index.html script tag), merge phase123/124 rows in PASTE_ORDER, then owner creates the import_export business (#/organization), grants, turns impexp_on ON.
+- [ ] G6 Import-Export later: GL posting (per-entity books), LC, customs, stock link, bank payments, owner review of Bangla labels.
