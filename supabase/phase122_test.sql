@@ -156,7 +156,7 @@ select tt.err('T7 a legal_entities row cannot point at a non legal-entity unit',
 select tt.as(:'sp'); set role authenticated;
 select tt.eq('T8 a salesperson reads no row of org_units directly (RLS)', 0, (select count(*) from org_units));
 select tt.eq('T8 ... nor legal_entities', 0, (select count(*) from legal_entities));
-select tt.t('T8 ... but may read the template list', (select count(*) from business_templates) = 6);
+select tt.t('T8 ... but may read the template list', (select count(*) from business_templates) >= 6);
 select tt.err('T8 ... and cannot write a table', $$update org_units set name_bn = 'x'$$, 'permission denied');
 reset role;
 select tt.as(:'o'); set role authenticated;

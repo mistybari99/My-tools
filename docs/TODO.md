@@ -55,3 +55,6 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [x] G1 Group ERP B1: phase122 organization layer + phase122_test (111/0) + setup-run-17 built locally (docs/HANDOVER_7.md). Not pushed.
 - [ ] G2 Owner says "push": publish setup-run-16 then setup-run-17; owner pastes Run 16, Run 17 and the Checks.
 - [ ] G3 B2 organization UI + DB-driven brands/locations; C1 scope-based access + RLS tightening + isolation tests behind org_scope_on; C2 master-data scope + per-entity chart of accounts; D templates; E intercompany (default OFF); F owner-only group dashboard.
+- [x] G4 Import-Export basic module: phase124 + phase124_test (118/0) + web/impexp124.js + tests/web/impexp124_test.js (local-ie, not pushed).
+- [ ] G5 Lead: apply docs/regs/impexp124.md (ia.js rec line, index.html script tag), merge phase123/124 rows in PASTE_ORDER, then owner creates the import_export business (#/organization), grants, turns impexp_on ON.
+- [ ] G6 Import-Export later: GL posting (per-entity books), LC, customs, stock link, bank payments, owner review of Bangla labels.
