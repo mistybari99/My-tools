@@ -88,3 +88,7 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] I6 Stage 4 new data capture (owner MCQ first): targets, cake orders + delivery, production plan / date, leftover count, hours worked, campaigns.
 - [ ] I7 Stage 5 number tests for the jsonb-form reports (production, temperature, hygiene, purchase scorecard, expense heads, orders).
 - [ ] I8 Owner phone UAT of #/reports131 at 360 px; Bangla wording review.
+- [x] G9 Group ERP C2: phase132 (master data per business, switch OFF) + phase132_test + c2_before_after.sh + setup-run-22 built locally (docs/HANDOVER_7.md STAGE C2, docs/audit_c1/C2_COVERAGE.md, branch local-c2). Not pushed.
+- [ ] G10 Owner says "push": paste Run 22 (after Run 21) and its Check. Before switching org_scope_on ON read `select org_scope_preflight();` and `select org_masters_preflight();`; decide whether the same item code / customer mobile must exist in two businesses (then `select org_masters_relax_unique(true);`, dry run first).
+- [ ] G11 C2b: chart of accounts + mapping per legal entity (needs legal-entity books and a rewrite of the posting functions); per-business loyalty ladder; vocabulary primary keys per business; intake bots / web orders per business; business switcher on the master lists (web).
+
