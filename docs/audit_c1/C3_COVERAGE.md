@@ -14,28 +14,28 @@ Plan and audit: `docs/GROUP_ERP_STAGE_A.md` sections 3.4 and 10, `docs/audit_c1/
 
 | Measure | Count |
 |---|---|
-| exposed SECURITY DEFINER functions (this build, after phase133; net 18 more than before) | 826 (13 of them also executable by `anon`: login, device and webhook entry points, reviewed in the C1 audit and in phase94/121) |
-| scope-aware by construction (direct primitive or through a callee) | 520 |
-| NOT scope-aware by construction, reviewed one by one (the list below) | 306 |
+| exposed SECURITY DEFINER functions (this build, after phase133; net 18 more than before) | 837 (13 of them also executable by `anon`: login, device and webhook entry points, reviewed in the C1 audit and in phase94/121) |
+| scope-aware by construction (direct primitive or through a callee) | 570 |
+| NOT scope-aware by construction, reviewed one by one (the list below) | 267 |
 | ... before phase133 the same checker found | 338 of 808 |
 | functions whose body phase133 re-creates or patches (marker `scope133`) | 45 (4 re-created with the old text as the OFF branch, 41 patched by exact-text insert) |
 | border triggers `<table>_xb133` (write side, every table with a place column) | 95 |
 
-Classes of the 306 reviewed functions (the audit asked for: scoped now / truly global / owner-only / deferred):
+Classes of the 267 reviewed functions (the audit asked for: scoped now / truly global / owner-only / deferred):
 
 | Class | Count | Meaning |
 |---|---|---|
-| FIXED | 15 | scoped now by phase133 |
+| FIXED | 12 | scoped now by phase133 |
 | HELPER | 5 | reviewed: scoped through a helper, a trigger or a grant with the place |
-| OWNER | 138 | group owner only (group-wide on purpose) |
+| OWNER | 141 | group owner only (group-wide on purpose) |
 | OWN | 23 | only the caller's own rows |
-| PRIM | 30 | permission / identity / pure helper |
+| PRIM | 26 | permission / identity / pure helper |
 | CONFIG | 17 | configuration / catalogue / vocabulary / diagnostics |
-| INFRA | 18 | bot / device / webhook / queue / scheduler |
-| MASTER | 60 | shared master data, Stage C2 (phase132) |
+| INFRA | 16 | bot / device / webhook / queue / scheduler |
+| MASTER | 27 | shared master data, Stage C2 (phase132) |
 | DEFER | 0 | known gap |
 
-Summary in the audit's words: **scoped now** = the 45 functions that carry the marker (they are scope-aware after the patch; those that only got an owner gate are listed as FIXED) + 95 border triggers + the restrictive policies; **truly global** = PRIM + CONFIG + OWN + INFRA (88); **owner-only** = OWNER (138); **shared master (Stage C2)** = MASTER (60); **deferred with a reason** = section 7.
+Summary in the audit's words: **scoped now** = the 45 functions that carry the marker (they are scope-aware after the patch; those that only got an owner gate are listed as FIXED) + 95 border triggers + the restrictive policies; **truly global** = PRIM + CONFIG + OWN + INFRA (82); **owner-only** = OWNER (135); **shared master (Stage C2)** = MASTER (27); **deferred with a reason** = section 7.
 
 ## 3. What phase133 changed (switch ON only; OFF is byte-identical, proved by `tests/sql/c3_before_after.sh`)
 
@@ -51,7 +51,7 @@ Summary in the audit's words: **scoped now** = the 45 functions that carry the m
 ### FIXED - scoped now by phase133
 
 - owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
-  `acct_account_save`, `acct_mapping_set`, `acct_opening`, `acct_scheduler_disable`, `acct_scheduler_enable`, `bank_recon_lines`, `bank_recon_unmatch`, `bank_stmt_import`, `cost_attrib_main_set`, `notify_cancel`, `notify_outbox_summary`, `setup_flow_check`, `setup_readiness`, `setup_recommendations`
+  `acct_account_save`, `acct_mapping_set`, `acct_opening`, `acct_scheduler_disable`, `acct_scheduler_enable`, `bank_recon_lines`, `bank_recon_unmatch`, `bank_stmt_import`, `cost_attrib_main_set`, `notify_cancel`, `notify_outbox_summary`
 - patched in phase133: place filter / business check on the rows it reads or writes (old text kept as the OFF branch)
   `login_failed`
 
@@ -69,7 +69,7 @@ Summary in the audit's words: **scoped now** = the 45 functions that carry the m
 ### OWNER - group owner only (group-wide on purpose)
 
 - owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
-  `backup_coverage106`, `backup_status`, `backup_stock_balance`, `backup_stock_ledger`, `bi_export_log_list`, `bill_pay_default_set99`, `bill_pay_defaults_list99`, `biz_suggest`, `dup_suspects`, `guard_recommendations`, `inbox_unmask_log_list99`, `intake_bot_check`, `intake_bot_create`, `intake_bot_set`, `intake_failure_dismiss`, `intake_proof_set94`, `intake_proof_status94`, `intake_purge`, `never_opened_negative_items`, `opening_stock_apply96`, `owner_board_get`, `owner_board_save`, `paper_serial_collisions`, `parallel_waiting`, `payroll_approve`, `payroll_payment_void`, `production_recommendations`, `receipt_duplicates`, `report_fact_rebuild`, `restore_drill_list`, `restore_drill_record`, `restore_drill_status`, `sale_form_unlink`, `setup_apply_history`, `setup_recommend_apply`, `shadow_count_once_check`, `shadow_void`, `stock_batch_reconcile`, `stock_reconcile`, `telegram_secret_set`, `telegram_status`, `unit_unknown_items`, `web_form_embed`
+  `backup_coverage106`, `backup_status`, `backup_stock_balance`, `backup_stock_ledger`, `bi_export_log_list`, `bill_pay_default_set99`, `bill_pay_defaults_list99`, `biz_suggest`, `dup_suspects`, `guard_recommendations`, `inbox_unmask_log_list99`, `intake_bot_check`, `intake_bot_create`, `intake_bot_set`, `intake_failure_dismiss`, `intake_proof_set94`, `intake_proof_status94`, `intake_purge`, `never_opened_negative_items`, `opening_stock_apply96`, `owner_board_get`, `owner_board_save`, `paper_serial_collisions`, `parallel_waiting`, `payroll_approve`, `payroll_payment_void`, `production_recommendations`, `receipt_duplicates`, `report_fact_rebuild`, `restore_drill_list`, `restore_drill_record`, `restore_drill_status`, `sale_form_unlink`, `setup_apply_history`, `shadow_count_once_check`, `shadow_void`, `stock_batch_reconcile`, `stock_reconcile`, `telegram_secret_set`, `telegram_status`, `web_form_embed`
 - owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
   `anon_exec_audit94`, `assistant_access_list`, `assistant_note_retire`, `assistant_note_save`, `assistant_usage_summary`, `grant_separation_hint`, `grant_separation_report`, `ops_account_set`, `owner_self_approve_set`, `permission_recommendations`, `pii_exposure_report94`, `reco_apply`, `reco_conflict_set`, `reco_ignore_set`, `reco_role_set`, `role_option_views`, `set_grant`, `set_option_view`, `set_option_view_bulk`, `set_role_option_view`, `set_role_option_view_bulk`, `set_rule`, `set_user_grant`, `staff_role_save`, `twofa_status_report`, `unlock_staff`
 - owner only (hard gate): configuration of a place / of the books written by the group owner
@@ -77,10 +77,10 @@ Summary in the audit's words: **scoped now** = the 45 functions that carry the m
 - partners module: every function starts with _a44_guard() = owner only
   `partner_agreement_activate`, `partner_agreement_amend`, `partner_agreement_close`, `partner_agreement_from_template`, `partner_agreement_party_set`, `partner_agreement_save`, `partner_calculate`, `partner_capital_add`, `partner_capital_balances`, `partner_capital_void`, `partner_overview`, `partner_party_save`, `partner_party_statement`, `partner_rule_save`, `partner_rule_validate`, `partner_rules_reorder`, `partner_settlement_approve`, `partner_settlement_pay`, `partner_settlement_save`, `partner_settlement_void`, `partner_venture_save`
 - owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
-  `category_merge`, `category_rename`, `gift_rule_save`, `item_class_map_set`, `item_mapping_autolink`, `item_mapping_load`, `item_master_import_apply`, `item_master_import_preview`, `item_type_set`, `list_def_set`, `list_manager_set`, `set_unit_conversion`, `tier_reorder`, `tier_save`
+  `category_merge`, `category_rename`, `gift_rule_save`, `item_class_map_set`, `item_mapping_load`, `item_master_import_apply`, `item_master_import_preview`, `item_type_set`, `list_def_set`, `list_manager_set`, `set_unit_conversion`, `tier_reorder`, `tier_save`
 - owner only (new in phase133): per-business settings, coverage checker, storage overview
   `grant_scope_set133`, `role_form_override_set133`, `role_scope_set133`, `rule_grant_override_set133`, `rule_override_set133`, `scope_gaps133`
-- [c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
+- owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
   `master_scope_report132`, `master_share_create`, `master_share_list`, `master_share_revoke`, `org_masters_relax_unique`, `org_masters_restore_unique`
 - group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
   `org_scope_grant`, `org_scope_list`, `org_scope_revoke`, `org_tree`, `org_unit_deactivate`, `org_unit_save`
@@ -95,7 +95,7 @@ Summary in the audit's words: **scoped now** = the 45 functions that carry the m
 - permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
   `_a53_mgr`, `_acct_view`, `_assistant_ok`, `_cs_view`, `_i62_ok`, `_i62_pay_ok`, `_is_ops`, `_list_mgr`, `_loc_mgr`, `_org_on123`, `_other_approver_exists`, `_recipe_cost_ok`, `_recipe_read`, `_recipe_view_ok`, `_setup_view81`, `_sheet_viewer`, `biz_cost_ok`, `biz_ok`, `is_active`, `is_owner`, `rule_num`, `rule_on`, `rule_txt`
 - pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
-  `convert_qty`, `fiscal_year_end`, `fiscal_year_start`, `shelf_life_for`, `shelf_life_hours`, `unit_factor`, `week_start_date`
+  `fiscal_year_end`, `fiscal_year_start`, `week_start_date`
 
 ### CONFIG - configuration / catalogue / vocabulary / diagnostics
 
@@ -105,12 +105,12 @@ Summary in the audit's words: **scoped now** = the 45 functions that carry the m
 ### INFRA - bot / device / webhook / queue / scheduler
 
 - bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
-  `acct_autopost_runs_list`, `assistant_proxy_check`, `attendance_punch_push`, `backup_dump`, `backup_log`, `backup_manifest`, `inbound_message_receive`, `login_precheck`, `notifications_mark_emailed`, `notify_config`, `notify_enqueue`, `notify_optin_set`, `notify_outbox_claim`, `notify_outbox_report`, `payment_webhook_receive`, `telegram_message_receive`, `urgent_alerts`, `web_form_catalog`
+  `acct_autopost_runs_list`, `assistant_proxy_check`, `attendance_punch_push`, `backup_dump`, `backup_log`, `backup_manifest`, `inbound_message_receive`, `login_precheck`, `notifications_mark_emailed`, `notify_config`, `notify_outbox_claim`, `notify_outbox_report`, `payment_webhook_receive`, `telegram_message_receive`, `urgent_alerts`, `web_form_catalog`
 
 ### MASTER - shared master data, Stage C2 (phase132)
 
 - [c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-  `artisan_list`, `artisan_register`, `artisan_save`, `artisan_set_active`, `category_list`, `category_move`, `category_reorder`, `category_rule_state`, `category_save`, `category_sync100`, `customer_points`, `customer_points_adjust`, `customer_points_redeem`, `customer_save`, `customer_set_tier`, `decide_item_change`, `gift_issue`, `item_apply`, `item_cost_free_set`, `item_dup_check`, `item_map_accept_confident`, `item_map_decide2`, `item_mapping_decide`, `item_new`, `item_next_code`, `item_set_category`, `item_set_category_bulk`, `items_bulk_apply`, `items_missing_category`, `items_search_info126`, `landed_logistics_set`, `landed_supplier_flag_set`, `list_queue_counts`, `option_add`, `option_other_log`, `option_other_resolve`, `option_reactivate`, `option_reorder`, `option_request_decide`, `option_retire`, `option_similar`, `option_update`, `packaging_set`, `recipe_approve`, `recipe_copy`, `recipe_cost_component_retire`, `recipe_cost_component_set`, `recipe_cost_components_get`, `recipe_labour_suggest`, `recipe_save`, `recipe_save_full`, `recipe_set_active`, `recipe_set_artisan`, `recipe_steps_save`, `recipe_unassigned`, `save_supplier`, `scan_match_items`, `scan_match_suppliers`, `submit_item_change`, `supplier_pick`
+  `artisan_register`, `artisan_save`, `artisan_set_active`, `category_move`, `category_reorder`, `category_rule_state`, `category_save`, `category_sync100`, `customer_points`, `item_next_code`, `items_missing_category`, `items_search_info126`, `list_queue_counts`, `option_add`, `option_other_log`, `option_other_resolve`, `option_reactivate`, `option_reorder`, `option_request_decide`, `option_retire`, `option_similar`, `option_update`, `recipe_cost_component_retire`, `recipe_cost_components_get`, `recipe_labour_suggest`, `recipe_set_active`, `recipe_unassigned`
 
 ## 5. Functions patched or re-created by phase133 (marker `scope133`)
 

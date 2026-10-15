@@ -1,4 +1,4 @@
--- FRESH DB ONLY (full canonical build 72..129). Integration test (Group ERP): with org_scope_on ON and two extra businesses
+-- FRESH DB ONLY (full canonical build 72..133; T4 added at integration 8 for phases 131-133). Integration test (Group ERP): with org_scope_on ON and two extra businesses
 -- (HW = hardware/paint dealer, IE = import-export) the functions of phases 124-129 stay isolated, and with the switch OFF again the owner's numbers are identical.
 -- Adds NO SQL phase (test only).   bash tests/sql/final_build.sh <db>;  psql -h /tmp -p 5544 -U postgres -d <db> -qAt -f supabase/phase130_integration_test.sql | grep -E 'FAIL|RESULT'
 \i tests/sql/e2e/00_common.sql
@@ -88,6 +88,84 @@ select tt.t('T3 owner numbers identical to the first snapshot', (select ch = (se
   and tf = (select count(*) from tint_formula_list(:'hwb'::bigint,null,null)) and allitems = (select count(*) from items) and tb = (select md5(acct_trial_balance(null,null)::text)) from k0));
 select tt.as(:'swm');
 select tt.eq('T3 OFF: sweets manager sees no dealer cheque (phase 127 has its own business gate)', 0, (select count(*) from cheque_list(null)));
+
+\echo == T4 phases 131-133 (reports, masters, rules / grants / digest) with the switch ON
+-- data made while the switch is OFF (as the existing sweets data is): customers and suppliers of both businesses, one sale at each business
+select tt.as(:'o');
+select acct_set_start(tt.today()-5)->>'start' as sd4 \gset
+insert into items (code,name_bn,sell_price,tracked) values ('S-I130','মিষ্টি',100,true);
+insert into customers (id,mobile,name,org_unit_id) values ('00000000-0000-0000-0000-00000000f002','01700013002','Cust130HW',:'hwb'::bigint);
+insert into suppliers (id,name,opening_balance,org_unit_id) values ('00000000-0000-0000-0000-00000000f102','Principal130HW',0,:'hwb'::bigint);
+select stock_opening((select id from items where code='S-I130'),1,50,40) is not null as so1 \gset
+select stock_opening((select id from items where code='HW-I1'),:hw1::int,50,60) is not null as so2 \gset
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":2,"price":100}]',(select id from items where code='S-I130'))::jsonb,0,'[{"mode":"cash","amount":200}]','01700013001','Cust130','retail',null,false) ->> 'id' as s_sw \gset
+select record_sale2(gen_random_uuid(),:hw1::int,format('[{"item_id":"%s","qty":3,"price":100}]',(select id from items where code='HW-I1'))::jsonb,0,'[{"mode":"cash","amount":300}]','01700013002','Cust130HW','retail',null,false) ->> 'id' as s_hw \gset
+select tt.t('T4 setup: a sale exists at the sweets place and at the hardware place', :'so1'::boolean and :'so2'::boolean and :'s_sw' is not null and :'s_hw' is not null);
+select set_rule('rpt131_on','true') is null as r131 \gset
+insert into user_roles values (:'hwm','management'),(:'swm','management') on conflict do nothing;
+select org_scope_grant(:'swm'::uuid,:'swb'::bigint,'management','sweets mgr',gen_random_uuid()) is not null as scg \gset
+select count(set_user_grant(u, g)) as gr from (values (:'hwm'::uuid), (:'swm'::uuid)) v(u), unnest(array['view_reports','customer_manage','supplier_manage']) g \gset
+create temp table k4 as select (select count(*) from customers) ncust, (select count(*) from suppliers) nsup, (select (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric) rsales,
+  (select md5(acct_trial_balance(null,null)::text)) tb, (select count(*) from sales) nsales, (select md5(coalesce(string_agg(key || coalesce(value::text,''), ',' order by key),'')) from rules where key not in ('org_scope_on')) rules_md5;
+select tt.eq('T4 owner (OFF): outlet sales report = 200 + 300', 500, rsales) from k4;
+update rules set value='true'::jsonb where key='org_scope_on';
+
+\echo -- T4a reports131 isolation
+select tt.as(:'hwm');
+select tt.eq('T4a HW manager: rpt131_sales net = only the hardware sale 300', 300, (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric);
+select tt.eq('T4a HW manager: only the hw place row', 1, jsonb_array_length(rpt131_sales(tt.today()-1, tt.today(), null, 'outlet')->'rows'));
+select tt.err('T4a HW manager: asking for the sweets place 1 is refused', $q$select rpt131_sales(tt.today()-1, tt.today(), array[1], 'outlet')$q$, 'not allowed for this location');
+select tt.as(:'swm');
+select tt.eq('T4a sweets manager: rpt131_sales net = only the sweets sale 200', 200, (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric);
+select tt.t('T4a sweets manager: item profit does not list the hardware item', not exists (select 1 from jsonb_array_elements(rpt131_item_profit(tt.today()-1, tt.today(), null)->'rows') r where r::text like '%HW-I1%'));
+select tt.as(:'o');
+select tt.eq('T4a owner (ON): same total as OFF', 500, (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric);
+
+\echo -- T4b masters (phase132)
+select tt.as(:'hwm');
+set role authenticated;
+select tt.eq('T4b HW manager direct select: only the HW customer', 1, (select count(*)::int from customers where name in ('Cust130','Cust130HW')));
+select tt.t('T4b HW manager direct select: the sweets customer is invisible', not exists (select 1 from customers where name = 'Cust130'));
+select tt.t('T4b HW manager direct select: the sweets supplier is invisible, the HW one visible', not exists (select 1 from suppliers where name = 'Principal130') and exists (select 1 from suppliers where name = 'Principal130HW'));
+select tt.t('T4b HW manager direct select: the sweets item S-I130 is invisible', not exists (select 1 from items where code = 'S-I130'));
+reset role;
+select tt.as(:'swm');
+set role authenticated;
+select tt.t('T4b sweets manager direct select: no HW customer, no HW supplier', not exists (select 1 from customers where name = 'Cust130HW') and not exists (select 1 from suppliers where name = 'Principal130HW'));
+select tt.t('T4b sweets manager direct select: own customer and supplier visible', exists (select 1 from customers where name = 'Cust130') and exists (select 1 from suppliers where name = 'Principal130'));
+reset role;
+select tt.as(:'o');
+select tt.eq('T4b owner (ON): sees every customer and supplier, same counts as OFF', 1, (select count(*)::int from k4 where ncust = (select count(*) from customers) and nsup = (select count(*) from suppliers)));
+
+\echo -- T4c rules, grants and digest (phase133)
+select tt.as(:'o');
+select rule_override_set133(:'hwb'::bigint, 'pos_offline_hours', '48'::jsonb, 'int130', '00000000-0000-0000-0000-0000000130b1') is not null as ov \gset
+select tt.t('T4c override saved', :'ov'::boolean);
+select tt.as(:'hwm');
+select tt.is('T4c HW manager reads the HW value of pos_offline_hours', '48', rule_val('pos_offline_hours') #>> '{}');
+select tt.as(:'swm');
+select tt.t('T4c sweets manager still reads the group value', rule_val('pos_offline_hours') #>> '{}' is distinct from '48');
+select tt.err('T4c sweets manager cannot set an override for HW', format($q$select rule_override_set133(%s,'pos_offline_hours','24'::jsonb,null,gen_random_uuid())$q$,:'hwb'), 'not allowed');
+select tt.as(:'o');
+select tt.t('T4c owner reads the group value', rule_val('pos_offline_hours') #>> '{}' is distinct from '48');
+select tt.t('T4c override listing: owner sees it', exists (select 1 from rule_overrides_list133(:'hwb'::bigint)));
+select tt.as(:'hwm');
+select tt.err('T4c HW manager cannot read the sweets digest', format($q$select daily_digest_biz133(%s, tt.today())$q$,:'swb'), 'not allowed');
+select tt.t('T4c HW manager can read the HW digest', daily_digest_biz133(:'hwb'::bigint, tt.today()) is not null);
+select tt.as(:'swm');
+select tt.err('T4c sweets manager cannot read the HW digest', format($q$select daily_digest_biz133(%s, tt.today())$q$,:'hwb'), 'not allowed');
+-- write border: a sweets manager cannot post to a hardware place whatever the function
+select tt.err('T4c sweets manager cannot sell at the HW place', format($q$select record_sale2(gen_random_uuid(),%s,'[]'::jsonb,0,'[]'::jsonb,null,null,'retail',null,false)$q$,:hw1), 'not allowed');
+
+\echo -- T4d owner totals equal ON / OFF, and OFF again changes nothing
+select tt.as(:'o');
+select tt.t('T4d owner ON: sales rows, trial balance, counts unchanged', (select nsales = (select count(*) from sales) and tb = (select md5(acct_trial_balance(null,null)::text)) and rsales = (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric from k4));
+update rules set value='false'::jsonb where key='org_scope_on';
+select tt.t('T4d OFF again: same totals', (select nsales = (select count(*) from sales) and tb = (select md5(acct_trial_balance(null,null)::text)) and rsales = (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric and ncust = (select count(*) from customers) and nsup = (select count(*) from suppliers) from k4));
+select tt.as(:'swm');
+select tt.eq('T4d OFF: a management user sees both places again (walls down, as before the phases)', 500, (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric);
+select tt.as(:'o');
+select tt.eq('T4d OFF: owner sees both sales', 500, (rpt131_sales(tt.today()-1, tt.today(), null, 'outlet') #>> '{totals,net_sales}')::numeric);
 
 \echo == RESULT
 select 'RESULT ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' from tt.ea;

@@ -101,3 +101,10 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] J5 Web (B2 owner): rule-override editor + Switchboard business selector (`rule_overrides_list133`, `rules_effective133`, `rule_override_set133`), role matrix per business (`role_matrix_list133`), per-business digest tile (`daily_digest_biz133`), Bangla wording for new codes.
 - [ ] J6 C2b: per-entity chart of accounts / bank statements / opening journal (they are owner-only while the switch is ON), per-business SMS outbox, per-business main cost place.
 - [ ] J7 Decide with the owner: one bot per business (recommended) or one group bot that is a member of every business.
+
+## K. Integration 8 (local-int2) - docs/INTEGRATION_REPORT_8.md
+- [x] K1 merged local-c2 + local-c3 on top of local-rpt; order `...129, 131, 132, 133`; tails, allowlist, tests, before/after, one setup page `setup-run-21-23.html` (checks safe before paste).
+- [ ] K2 Owner says "push": publish setup-run-21-23.html after Run 17-20; paste Part 1, 2, 3 with their Checks. Then (when ready) follow the switch-on procedure in INTEGRATION_REPORT_8 section 7.
+- [ ] K3 Web: per-business rule editor, role matrix, master shares, working-business switcher (J5 above).
+- [ ] K4 C2b: per-entity books, loyalty ladder, vocabulary keys, bots / SMS / storage per business.
+- [ ] K5 Owner MCQ list: INTEGRATION_REPORT_8 section 10.

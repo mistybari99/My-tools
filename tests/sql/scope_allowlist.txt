@@ -26,7 +26,6 @@ acct_scheduler_disable|FIXED|owner gate while the switch is ON (company-level bo
 acct_scheduler_enable|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
 acct_set_start|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
 anon_exec_audit94|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
-artisan_list|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 artisan_register|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 artisan_save|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 artisan_set_active|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
@@ -61,7 +60,6 @@ biz_ok|PRIM|permission / identity helper: returns a flag, reads no business row 
 biz_suggest|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 blind_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
 cancel_emergency|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
-category_list|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 category_merge|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 category_move|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 category_rename|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
@@ -75,7 +73,6 @@ client_errors_list|CONFIG|configuration / catalogue / vocabulary / diagnostics: 
 client_errors_purge|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
 client_errors_summary|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
 comparison_pair_save|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
-convert_qty|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
 cost_attrib_main_set|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
 cost_source_type_add|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
 cost_type_add|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
@@ -83,13 +80,8 @@ cost_type_driver_set116|OWNER|owner only (hard gate): configuration of a place /
 cost_type_gl_set117|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
 cost_type_smoothing|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
 customer_points|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-customer_points_adjust|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-customer_points_redeem|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-customer_save|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-customer_set_tier|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 dash_layout_get|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 dash_layout_save|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
-decide_item_change|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 decide_release|HELPER|has_grant(release_decide, <place of the entry>): the place is passed as a sub-select, scoped through has_grant (business border since phase123)
 dup_suspects|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 entry_change_cancel|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
@@ -99,7 +91,6 @@ fav_order_set|OWN|reads / writes only rows of the caller (own favourites, own re
 fiscal_year_end|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
 fiscal_year_start|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
 forms_ledger_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
-gift_issue|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 gift_rule_save|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 grant_scope_set133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
 grant_separation_hint|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
@@ -116,29 +107,16 @@ intake_proof_status94|OWNER|owner only (hard gate): whole-database tool of the g
 intake_purge|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 is_active|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
 is_owner|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
-item_apply|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 item_class_map_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
-item_cost_free_set|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-item_dup_check|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-item_map_accept_confident|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-item_map_decide2|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-item_mapping_autolink|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
-item_mapping_decide|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 item_mapping_load|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 item_master_import_apply|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 item_master_import_preview|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
-item_new|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 item_next_code|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-item_set_category|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-item_set_category_bulk|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 item_type_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
-items_bulk_apply|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 items_missing_category|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 items_search_info126|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 landed_charge_type_save|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
 landed_info|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
-landed_logistics_set|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-landed_supplier_flag_set|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 list_def_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 list_manager_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 list_queue_counts|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
@@ -152,10 +130,10 @@ login_precheck|INFRA|bot / device / webhook / queue / scheduler entry point: bou
 login_success|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 manual_reason_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
 manual_reasons85|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
-master_scope_report132|OWNER|[c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
-master_share_create|OWNER|[c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
-master_share_list|OWNER|[c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
-master_share_revoke|OWNER|[c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
+master_scope_report132|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+master_share_create|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+master_share_list|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+master_share_revoke|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
 my_context|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 my_emergency|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 my_option_views|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
@@ -163,8 +141,6 @@ never_opened_negative_items|OWNER|owner only (hard gate): whole-database tool of
 notifications_mark_emailed|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
 notify_cancel|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
 notify_config|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
-notify_enqueue|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
-notify_optin_set|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
 notify_outbox_claim|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
 notify_outbox_report|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
 notify_outbox_summary|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
@@ -181,8 +157,8 @@ option_retire|MASTER|[c2] shared master data (items, customers, suppliers, recip
 option_similar|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 option_update|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 option_views_for_user|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
-org_masters_relax_unique|OWNER|[c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
-org_masters_restore_unique|OWNER|[c2] owner tool of phase132 (master shares, unique-constraint relaxing, master scope report); present only when phase132 is pasted
+org_masters_relax_unique|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+org_masters_restore_unique|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
 org_scope_grant|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
 org_scope_list|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
 org_scope_revoke|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
@@ -192,7 +168,6 @@ org_unit_save|OWNER|group owner or the group-level org_manage grant (phase122/12
 owner_board_get|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 owner_board_save|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 owner_self_approve_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
-packaging_set|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 paper_serial_collisions|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 parallel_waiting|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 partner_agreement_activate|OWNER|partners module: every function starts with _a44_guard() = owner only
@@ -226,17 +201,10 @@ pin_sig_active|CONFIG|configuration / catalogue / vocabulary / diagnostics: no b
 pin_sig_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
 production_recommendations|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 receipt_duplicates|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
-recipe_approve|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-recipe_copy|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 recipe_cost_component_retire|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-recipe_cost_component_set|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 recipe_cost_components_get|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 recipe_labour_suggest|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-recipe_save|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-recipe_save_full|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 recipe_set_active|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-recipe_set_artisan|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-recipe_steps_save|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 recipe_unassigned|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 reco_apply|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
 reco_conflict_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
@@ -265,9 +233,6 @@ rule_override_set133|OWNER|owner only (new in phase133): per-business settings, 
 rule_txt|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
 sale_form_unlink|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 sales_channel_save|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
-save_supplier|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-scan_match_items|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-scan_match_suppliers|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 scope_gaps133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
 set_daybook_opening|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
 set_daybook_start|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
@@ -283,19 +248,11 @@ set_rule|OWNER|owner only (hard gate): people, roles, grants and group settings 
 set_unit_conversion|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 set_user_grant|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
 setup_apply_history|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
-setup_flow_check|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
-setup_readiness|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
-setup_recommend_apply|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
-setup_recommendations|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
 shadow_count_once_check|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 shadow_void|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
-shelf_life_for|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
-shelf_life_hours|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
 staff_role_save|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
 stock_batch_reconcile|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 stock_reconcile|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
-submit_item_change|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
-supplier_pick|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
 telegram_message_receive|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
 telegram_secret_set|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 telegram_status|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
@@ -304,8 +261,6 @@ tier_save|OWNER|owner only (hard gate) and master data: the owner edits the shar
 touch_favourite|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 twofa_policy|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 twofa_status_report|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
-unit_factor|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
-unit_unknown_items|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 unlock_staff|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
 urgent_alerts|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
 wastage_cancel|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
