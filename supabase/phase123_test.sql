@@ -353,7 +353,9 @@ select tt.as(:'o');
 select tt.err('T11 owner: a transfer from SWEETS to a B place is refused (intercompany is Stage E)', format($q$select stock_transfer(1, %s, tt.iid('C1-X'), 1, null, 'x', gen_random_uuid())$q$, :'hw2'), 'cross_business_transfer');
 select tt.err('T11 owner: a transfer from a B place to SWEETS is refused', format($q$select stock_transfer(%s, 1, tt.iid('C1-X'), 1, null, 'x', gen_random_uuid())$q$, :'hw1'), 'cross_business_transfer');
 select tt.err('T11 owner: a transfer to an unmapped place is refused', format($q$select stock_transfer(1, %s, tt.iid('C1-X'), 1, null, 'x', gen_random_uuid())$q$, :'orph'), 'cross_business_transfer');
-select tt.t('T11 owner: a transfer inside the business works (hw1 -> hw2)', stock_transfer(:'hw1'::int, :'hw2'::int, tt.iid('C1-X'), 1, null, 'x', gen_random_uuid()) is not null);
+insert into items (code,name_bn,name_en,unit,base_unit,item_type,tracked,sell_price,sellable,org_unit_id) values ('C1-H','h','Item H (hardware item)','pc','pc','finished_good',true,10,true,:'hbz'::bigint);   -- phase132: an item belongs to ONE business; the hardware transfer uses a hardware item
+select stock_opening(tt.iid('C1-H'), :'hw1'::int, 20, 10) is not null as sh \gset
+select tt.t('T11 owner: a transfer inside the business works (hw1 -> hw2)', stock_transfer(:'hw1'::int, :'hw2'::int, tt.iid('C1-H'), 1, null, 'x', gen_random_uuid()) is not null);
 select tt.t('T11 owner: a transfer inside SWEETS works (1 -> 2)', stock_transfer(1, 2, tt.iid('C1-X'), 1, null, 'x', gen_random_uuid()) is not null);
 select tt.as(:'bs');
 set role authenticated;

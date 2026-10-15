@@ -332,6 +332,8 @@ create temp table fh as select string_agg(p.oid::regprocedure::text || md5(pg_ge
 \i supabase/phase127.sql
 \i supabase/phase128.sql
 \i supabase/phase129.sql
+\i supabase/phase131.sql
+\i supabase/phase132.sql
 select tt.chk('M6 after the second paste: no function body changed (paste-twice safe)', (select h from fh) = (select string_agg(p.oid::regprocedure::text || md5(pg_get_functiondef(p.oid)), ',' order by p.oid::regprocedure::text) from pg_proc p where p.pronamespace='public'::regnamespace and p.prokind='f'));
 select tt.chk('M6 after: anon and public cannot execute any of the 12, signed-in users still can',
   (select count(*) from pg_proc p where p.pronamespace='public'::regnamespace and p.proname in ('acct_income_statement','acct_overview','acct_post_pending','partner_calculate','partner_settlement_save','sale_return','stock_count_adjust','stock_receive_transfer','record_sale2','urgent_alerts','biz_items','items_with_cost')
