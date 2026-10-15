@@ -277,6 +277,8 @@ select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regpro
 \i supabase/phase127.sql
 \i supabase/phase128.sql
 \i supabase/phase129.sql
+\i supabase/phase131.sql
+\i supabase/phase133.sql
 select md5(string_agg(md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fa1 from pg_proc p where p.pronamespace = 'public'::regnamespace \gset
 select tt.chk('T9 paste twice: no function body changes', :'fa0' = :'fa1');
 select tt.chk('T9 the switch is OFF by default and the new check row is installed once', (select default_value from rules where key = 'acct_manual_prod_in103') = 'false'::jsonb and (select count(*) from setup_check_defs81 where code = 'flw_grn_double103') = 1);

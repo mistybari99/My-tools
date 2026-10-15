@@ -88,3 +88,12 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] I6 Stage 4 new data capture (owner MCQ first): targets, cake orders + delivery, production plan / date, leftover count, hours worked, campaigns.
 - [ ] I7 Stage 5 number tests for the jsonb-form reports (production, temperature, hygiene, purchase scorecard, expense heads, orders).
 - [ ] I8 Owner phone UAT of #/reports131 at 360 px; Bangla wording review.
+
+## J. Group ERP Stage C3 (local-c3) - docs/HANDOVER_7.md (STAGE C3), docs/audit_c1/C3_COVERAGE.md
+- [x] J1 phase133 + phase133_test + differential probe + c3_before_after.sh + reviewed list `tests/sql/scope_allowlist.txt` (local, not pushed, not pasted).
+- [x] J2 setup-run-23.html built locally (no chain lock, read-only CHECK 33 checks).
+- [ ] J3 Lead: merge with C2 (phase132): paste-order rows, re-paste tails 131/132/133, regenerate the reviewed list (`python3 tools/scope_classify133.py <db>`), re-run phase133_test, phase132_test, c3_before_after.sh, c2_before_after.sh.
+- [ ] J4 Owner "push": publish setup-run-22 and setup-run-23 after Run 21; paste each Run and its Check. Nothing changes until `org_scope_on` is turned ON (follow the switch-on order in INTEGRATION_REPORT_7 section 6, add: set per-business rule values with `rule_override_set133`, per-business role grants with `rule_grant_override_set133`, only after `org_scope_preflight()` is empty).
+- [ ] J5 Web (B2 owner): rule-override editor + Switchboard business selector (`rule_overrides_list133`, `rules_effective133`, `rule_override_set133`), role matrix per business (`role_matrix_list133`), per-business digest tile (`daily_digest_biz133`), Bangla wording for new codes.
+- [ ] J6 C2b: per-entity chart of accounts / bank statements / opening journal (they are owner-only while the switch is ON), per-business SMS outbox, per-business main cost place.
+- [ ] J7 Decide with the owner: one bot per business (recommended) or one group bot that is a member of every business.
