@@ -102,8 +102,9 @@ function fromPayload(info) {
 // ---------- text for sharing ----------
 function text(d, short) {
   const loc = wl(d.loc), lines = d.lines.map((l) => `${lineName(l)}${l.qty !== 1 || l.unit ? ` ${fmt(l.qty)}${l.unit ? ' ' + l.unit : ''} × ${fmt(l.price)}` : ''} = ${fmt(l.amount)}`);
-  const head = [brandText(d.loc_id), loc, `${T('receipt')} ${d.receipt}${d.pending ? ' (' + T('prov') + ')' : ''} · ${d.date} ${d.time}`];
-  if (short) return [...head, `${T('total')}: ${fmt(d.total)}`, d.due > 0 ? `${T('due')}: ${fmt(d.due)}` : null, T('thanks')].filter(Boolean).join('\n');
+  const rc = B.biz && B.biz.receipt ? B.biz.receipt(d.loc_id) : {};   // phase134 profile of the business
+  const head = [brandText(d.loc_id), rc.header || null, rc.address || null, loc, `${T('receipt')} ${d.receipt}${d.pending ? ' (' + T('prov') + ')' : ''} · ${d.date} ${d.time}`];
+  if (short) return [...head, `${T('total')}: ${fmt(d.total)}`, d.due > 0 ? `${T('due')}: ${fmt(d.due)}` : null, rc.footer || T('thanks')].filter(Boolean).join('\n');
   return [...head, '—', ...lines, '—', d.discount > 0 ? `${T('discount')}: -${fmt(d.discount)}` : null,
     d.vat ? `${T('vat')} ${d.vat.rate}%${d.vat.included ? ' (' + T('incl') + ')' : ''}: ${fmt(d.vat.amount)}` : null, `${T('total')}: ${fmt(d.total)}`,
     ...d.pays.map((p) => `${lab(X['m_' + p.mode] || L(p.mode, p.mode, p.mode))}${p.wallet ? ' (' + p.wallet + ')' : ''}: ${fmt(p.amount)}`),
@@ -111,10 +112,11 @@ function text(d, short) {
 }
 
 // ---------- the card (what the customer would see on paper) ----------
+function rcH(d) { const rc = B.biz && B.biz.receipt ? B.biz.receipt(d.loc_id) : {}; return [rc.header, rc.address, rc.phone].filter(Boolean).map((x) => `<div class="iv92c">${esc(x)}</div>`).join(''); }
 function card(d) {
   const row = (k, v, b) => `<div class="iv92r${b ? ' iv92b' : ''}"><span>${k}</span><span>${v}</span></div>`;
   return `<div class="iv92doc" data-iv92="card">
-    <div class="iv92c iv92brand">${esc(brandText(d.loc_id))}</div>${wl(d.loc) ? `<div class="iv92c">${esc(wl(d.loc))}</div>` : ''}
+    <div class="iv92c iv92brand">${esc(brandText(d.loc_id))}</div>${rcH(d)}${wl(d.loc) ? `<div class="iv92c">${esc(wl(d.loc))}</div>` : ''}
     <div class="iv92c">${esc(T('receipt'))} <b>${esc(d.receipt)}</b>${d.pending ? ` <span class="iv92tag">${esc(T('prov'))}</span>` : ''}</div>
     <div class="iv92c iv92m">${esc(d.date)} ${esc(d.time)}${d.cashier ? ' · ' + esc(d.cashier) : ''}${d.cust && d.cust.name ? ' · ' + esc(d.cust.name) : ''}</div>
     ${d.status === 'void' ? `<div class="iv92c iv92tag iv92void">${esc(T('voided'))}</div>` : ''}
@@ -127,7 +129,7 @@ function card(d) {
     ${d.pays.map((p) => row(`${modeName(p.mode)}${p.wallet ? ' · ' + esc(p.wallet) : ''}`, fmt(p.amount))).join('')}
     ${d.change > 0 ? row(esc(T('change')), fmt(d.change)) : ''}
     ${d.due > 0 ? row(esc(T('due')), money(d.due), true) : ''}
-    <div class="iv92hr"></div><div class="iv92c">${esc(T('thanks'))}</div></div>`;
+    <div class="iv92hr"></div><div class="iv92c">${esc((B.biz && B.biz.receipt && B.biz.receipt(d.loc_id).footer) || T('thanks'))}</div></div>`;
 }
 const CSS = `.iv92doc{background:#fff;color:#000;border:1px solid #bbb;border-radius:10px;padding:12px;max-width:100%;box-sizing:border-box;font-size:.92rem;line-height:1.35;word-break:break-word}
 .iv92c{text-align:center}.iv92brand{font-weight:700;font-size:1.15em}.iv92m{font-size:.85em;color:#444}.iv92hr{border-top:1px dashed #000;margin:7px 0}

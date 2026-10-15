@@ -130,22 +130,28 @@ select tt.as(:'sp');
 select tt.err('T7 a salesperson without org_manage cannot create', $$select org_unit_save(null, (select id from org_units where code='LE-SWEETS'), 'business', 'NOPE1', 'x', null, null, 'active', null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, null, gen_random_uuid())$$, 'not allowed');
 select tt.err('T7 ... cannot update', $$select org_unit_save((select id from org_units where code='SWEETS'), (select id from org_units where code='LE-SWEETS'), null, null, 'x', null, null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, null, null)$$, 'not allowed');
 select tt.err('T7 ... cannot deactivate', $$select org_unit_deactivate((select id from org_units where code='HARDWARE'), 'x', null)$$, 'not allowed');
-select tt.eq('T7 org_tree for a salesperson of location 1: only the sweets chain (group, legal entity, business)', 3, (select count(*) from org_tree()));
+-- phase134: a person of one business sees only that business, as the ROOT of his tree (no group, no legal entity) - the old expectation (3 = the chain above) was the leak
+select tt.eq('T7 org_tree for a salesperson of location 1: only his business, as the root (phase134)', 1, (select count(*) from org_tree() where kind = 'business' and parent_id is null and code = 'SWEETS'));
+select tt.t('T7 ... no group, no legal entity row', not exists (select 1 from org_tree() where kind in ('group', 'legal_entity')));
 select tt.t('T7 ... no hardware unit visible', not exists (select 1 from org_tree() where code like 'HW%' or code in ('HARDWARE', 'LE-HW')));
 select tt.t('T7 ... no ownership %, tax config, licence, attrs, fiscal start', (select bool_and(owner_pct is null and tax_cfg is null and trade_licence_ref is null and attrs = '{}'::jsonb and fiscal_start is null) from org_tree()));
 select tt.is('T7 org_unit_scope of an assigned location works', 'SWEETS', org_unit_scope(1)->>'business_code');
 select tt.err('T7 org_unit_scope of a location not assigned is refused', $$select org_unit_scope(3)$$, 'not allowed');
 select tt.as(:'ma');
-select tt.eq('T7 a manager of locations 1 and 2 still sees the same 3 units', 3, (select count(*) from org_tree()));
+select tt.eq('T7 a manager of locations 1 and 2 sees the same one business (phase134)', 1, (select count(*) from org_tree()));
 select tt.as(:'o');
 select set_user_grant(:'fm2'::uuid, 'org_manage') is null as gg \gset
 select tt.as(:'fm2');
-select tt.t('T7 with the org_manage grant the user can create a unit', (org_unit_save(null, (select id from org_units where code='HARDWARE'), 'site', 'HW-S1', 'গুদাম', 'Warehouse', null, 'active', null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, null, gen_random_uuid())->>'id') is not null);
-select tt.err('T7 ... but ownership % needs the owner', $$select org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'x', null, null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"owner_pct":10}'::jsonb, null)$$, 'owner_only');
-select tt.err('T7 ... and so does the tax config', $$select org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'x', null, null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"tax_cfg":{"a":1}}'::jsonb, null)$$, 'owner_only');
-select tt.t('T7 ... the licence number can be changed by org_manage', (org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'হার্ডওয়্যার কোম্পানি', 'Hardware Co', null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"trade_licence_ref":"TL-HW-002"}'::jsonb, null)->>'id') is not null);
-select tt.eq('T7 org_manage sees every unit', (select count(*) from org_units)::numeric, (select count(*) from org_tree()));
-select tt.is('T7 ... the licence but not the ownership % of the hardware company', 'TL-HW-002/null', (select trade_licence_ref || '/' || coalesce(owner_pct::text, 'null') from org_tree() where code = 'LE-HW'));
+select org_unit_save(null, (select id from org_units where code='SWEETS'), 'site', 'S1', 'গুদাম', 'Warehouse', null, 'active', null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, null, gen_random_uuid())->>'id' as s1id \gset
+select tt.t('T7 with the org_manage grant the user can create a unit INSIDE his own business (phase134: code namespaced SWEETS-S1)', :'s1id' is not null and exists (select 1 from org_units where code = 'SWEETS-S1'));
+select tt.err('T7 ... but not inside another business (phase134)', $$select org_unit_save(null, (select id from org_units where code='HARDWARE'), 'site', 'HW-S1', 'x', 'x', null, 'active', null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, null, gen_random_uuid())$$, 'bad_parent');
+select tt.err('T7 ... a legal entity belongs to the owner (phase134: ownership %)', $$select org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'x', null, null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"owner_pct":10}'::jsonb, null)$$, 'not allowed');
+select tt.err('T7 ... and so is the tax config', $$select org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'x', null, null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"tax_cfg":{"a":1}}'::jsonb, null)$$, 'not allowed');
+select tt.err('T7 ... and the licence of a legal entity (phase134: above the business)', $$select org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'হার্ডওয়্যার কোম্পানি', 'Hardware Co', null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"trade_licence_ref":"TL-HW-002"}'::jsonb, null)$$, 'not allowed');
+select tt.eq('T7 org_manage sees the units of his own business only (SWEETS and SWEETS-S1 = 2; phase134)', 2, (select count(*) from org_tree()));
+select tt.t('T7 ... nothing of the hardware company (phase134)', not exists (select 1 from org_tree() where code like 'LE-%' or code like 'HW%' or code = 'HARDWARE'));
+select tt.as(:'o');
+select org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'হার্ডওয়্যার কোম্পানি', 'Hardware Co', null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"trade_licence_ref":"TL-HW-002"}'::jsonb, null) is not null as lic \gset
 select tt.as(:'o');
 select tt.is('T7 the owner sees the ownership %', '60.0000', (select owner_pct::text from org_tree() where code = 'LE-HW'));
 select tt.t('T7 the owner can change the ownership %', (org_unit_save((select id from org_units where code='LE-HW'), (select id from org_units where kind='group'), null, null, 'হার্ডওয়্যার কোম্পানি', 'Hardware Co', null, null, null, null, 'BDT', 'Asia/Dhaka', '{}'::jsonb, '{"owner_pct":55.5}'::jsonb, null)->>'id') is not null);

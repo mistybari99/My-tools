@@ -160,11 +160,7 @@ option_views_for_user|OWN|reads / writes only rows of the caller (own favourites
 org_masters_relax_unique|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
 org_masters_restore_unique|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
 org_scope_grant|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
-org_scope_list|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
 org_scope_revoke|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
-org_tree|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
-org_unit_deactivate|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
-org_unit_save|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
 owner_board_get|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 owner_board_save|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 owner_self_approve_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133

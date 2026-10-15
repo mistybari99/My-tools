@@ -416,6 +416,8 @@ select count(*) as n_pol_before from pg_policies where policyname like '%m132' \
 select count(*) as n_trg_before from pg_trigger where tgname in ('a132_scope', 'stock_ledger_xbiz132', 'rules_m132') \gset
 select md5(string_agg(x::text, '|' order by x::text)) as h_cust from (select id, mobile, org_unit_id from customers) x \gset
 \i supabase/phase132.sql
+-- phase134 re-creates master_share_list / master_context_set132 / patches master_scope_report132: it is last in the order, so a re-paste of 132 is followed by it
+\i supabase/phase134.sql
 select tt.t('T9 paste again: no error, same functions (patched ones too), same policies and triggers, same shares, no business moved',
   (select md5(string_agg(p.oid::regprocedure::text || md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) from pg_proc p where p.pronamespace = 'public'::regnamespace) = :'h_fn_before'
   and (select count(*) from pg_policies where policyname like '%m132') = :'n_pol_before'::int

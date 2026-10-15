@@ -643,6 +643,8 @@ select count(*) as trg0 from pg_trigger where tgname like '%\_xb133' \gset
 select count(*) as pol0 from pg_policies where policyname like '%133%' \gset
 reset role;
 \i supabase/phase133.sql
+-- phase134 patches three phase133 functions and is last in the order: a re-paste of 133 is followed by it
+\i supabase/phase134.sql
 select md5(string_agg(p.oid::regprocedure::text || md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fh1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prokind = 'f' \gset
 select tt.t('T14 paste twice: no function body changes', :'fh0' = :'fh1');
 select tt.t('T14 paste twice: the same triggers and policies, the overrides and the switch are untouched', (select count(*) from pg_trigger where tgname like '%\_xb133') = :trg0 and (select count(*) from pg_policies where policyname like '%133%') = :pol0 and rule_on('org_scope_on'));

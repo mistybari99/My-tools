@@ -115,6 +115,7 @@ create temp table f0 as select p.oid::regprocedure::text fn, md5(pg_get_function
 \i supabase/phase131.sql
 \i supabase/phase132.sql
 \i supabase/phase133.sql
+\i supabase/phase134.sql
 select tt.t('T9 no function changed by pasting phase112 again', (select count(*) from pg_proc p join f0 on f0.fn = p.oid::regprocedure::text where p.pronamespace = 'public'::regnamespace and md5(pg_get_functiondef(p.oid)) <> f0.h) = 0);
 select tt.t('T9 no rule row duplicated', (select count(*) from rules where key in ('profit_truth_mode','cost_share_prorate_mode','items_net_of_returns'))=3);
 select tt.t('T9 the books stay balanced', tt.unbalanced()=0);

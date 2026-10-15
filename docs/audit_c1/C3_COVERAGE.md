@@ -14,20 +14,20 @@ Plan and audit: `docs/GROUP_ERP_STAGE_A.md` sections 3.4 and 10, `docs/audit_c1/
 
 | Measure | Count |
 |---|---|
-| exposed SECURITY DEFINER functions (this build, after phase133; net 18 more than before) | 837 (13 of them also executable by `anon`: login, device and webhook entry points, reviewed in the C1 audit and in phase94/121) |
-| scope-aware by construction (direct primitive or through a callee) | 570 |
-| NOT scope-aware by construction, reviewed one by one (the list below) | 267 |
+| exposed SECURITY DEFINER functions (this build, after phase133; net 18 more than before) | 843 (13 of them also executable by `anon`: login, device and webhook entry points, reviewed in the C1 audit and in phase94/121) |
+| scope-aware by construction (direct primitive or through a callee) | 580 |
+| NOT scope-aware by construction, reviewed one by one (the list below) | 263 |
 | ... before phase133 the same checker found | 338 of 808 |
 | functions whose body phase133 re-creates or patches (marker `scope133`) | 45 (4 re-created with the old text as the OFF branch, 41 patched by exact-text insert) |
 | border triggers `<table>_xb133` (write side, every table with a place column) | 95 |
 
-Classes of the 267 reviewed functions (the audit asked for: scoped now / truly global / owner-only / deferred):
+Classes of the 263 reviewed functions (the audit asked for: scoped now / truly global / owner-only / deferred):
 
 | Class | Count | Meaning |
 |---|---|---|
 | FIXED | 12 | scoped now by phase133 |
 | HELPER | 5 | reviewed: scoped through a helper, a trigger or a grant with the place |
-| OWNER | 141 | group owner only (group-wide on purpose) |
+| OWNER | 137 | group owner only (group-wide on purpose) |
 | OWN | 23 | only the caller's own rows |
 | PRIM | 26 | permission / identity / pure helper |
 | CONFIG | 17 | configuration / catalogue / vocabulary / diagnostics |
@@ -35,7 +35,7 @@ Classes of the 267 reviewed functions (the audit asked for: scoped now / truly g
 | MASTER | 27 | shared master data, Stage C2 (phase132) |
 | DEFER | 0 | known gap |
 
-Summary in the audit's words: **scoped now** = the 45 functions that carry the marker (they are scope-aware after the patch; those that only got an owner gate are listed as FIXED) + 95 border triggers + the restrictive policies; **truly global** = PRIM + CONFIG + OWN + INFRA (82); **owner-only** = OWNER (135); **shared master (Stage C2)** = MASTER (27); **deferred with a reason** = section 7.
+Summary in the audit's words: **scoped now** = the 45 functions that carry the marker (they are scope-aware after the patch; those that only got an owner gate are listed as FIXED) + 95 border triggers + the restrictive policies; **truly global** = PRIM + CONFIG + OWN + INFRA (82); **owner-only** = OWNER (131); **shared master (Stage C2)** = MASTER (27); **deferred with a reason** = section 7.
 
 ## 3. What phase133 changed (switch ON only; OFF is byte-identical, proved by `tests/sql/c3_before_after.sh`)
 
@@ -83,7 +83,7 @@ Summary in the audit's words: **scoped now** = the 45 functions that carry the m
 - owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
   `master_scope_report132`, `master_share_create`, `master_share_list`, `master_share_revoke`, `org_masters_relax_unique`, `org_masters_restore_unique`
 - group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
-  `org_scope_grant`, `org_scope_list`, `org_scope_revoke`, `org_tree`, `org_unit_deactivate`, `org_unit_save`
+  `org_scope_grant`, `org_scope_revoke`
 
 ### OWN - only the caller's own rows
 

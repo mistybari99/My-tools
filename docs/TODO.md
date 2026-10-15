@@ -108,3 +108,9 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] K3 Web: per-business rule editor, role matrix, master shares, working-business switcher (J5 above).
 - [ ] K4 C2b: per-entity books, loyalty ladder, vocabulary keys, bots / SMS / storage per business.
 - [ ] K5 Owner MCQ list: INTEGRATION_REPORT_8 section 10.
+---
+## L. Stage D (local-prof) - docs/INTEGRATION_REPORT_9.md
+- [x] L1 phase134 + web profile screen + leak sweep; order `... 133, 134`; tails; allowlist regenerated; `setup-run-24.html` (check safe before paste).
+- [ ] L2 Owner says "push": publish setup-run-24.html after Run 21-23; paste once; Check. Owner opens #/profile for each business and fills logo / address / receipt text.
+- [ ] L3 Owner phone UAT: log in as a one-business user and confirm nothing about the group / other businesses shows (drawer, #/organization, receipts).
+- [ ] L4 Decide: should audit_log / the exceptions screens ever show a business manager the history of his own business profile (today: owner only)?

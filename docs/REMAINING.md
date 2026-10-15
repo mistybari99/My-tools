@@ -69,3 +69,6 @@ Built locally on branch local-c3 (from local-rpt), NOT pushed, NOT pasted: phase
 
 ## UPDATE Integration 8 (phases 131-133 merged on local-int2) - see docs/INTEGRATION_REPORT_8.md
 Still NOT separated between businesses: chart of accounts and mappings (owner-only while the walls are ON), loyalty ladder, vocabulary primary keys, intake bots / web orders / SMS outbox, one storage bucket, web screens that still show GROUP rule values, no per-business rule / role / share UI. Also open: dealer POS, GL posting for schemes and import-export, fashion slices, Stage E intercompany, Stage F dashboard.
+
+## UPDATE Stage D (phase 134 on local-prof) - see docs/INTEGRATION_REPORT_9.md
+Built locally, NOT pushed, NOT pasted: business profile per business and server-side upper-layer blindness. Still open: audit_log is owner-only (not changed); the manifest name is static; a second business's staff see the legacy sweets brand only if the profile list is missing (old server); codes of other businesses cannot be probed through org_unit_save for a non-owner (namespaced) but the unique code index is global; no UI to rename the group (owner uses #/organization); ops bots (notify / backup) see group infrastructure by design; leak sweep covers function answers and table rows with seeded data only.

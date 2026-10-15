@@ -182,6 +182,7 @@ select count(*) as nrec1 from setup_rec_defs81 \gset
 \i supabase/phase131.sql
 \i supabase/phase132.sql
 \i supabase/phase133.sql
+\i supabase/phase134.sql
 select tt.chk('T5 paste twice: same function bodies', (select count(*) = 5 from h1 where exists (select 1 from pg_proc p where p.proname = h1.proname and p.pronamespace = 'public'::regnamespace and md5(pg_get_functiondef(p.oid)) = h1.h)));
 select tt.chk('T5 paste twice: same advisor rows, rules keep their values', (select count(*) from setup_rec_defs81) = :nrec1 and (select value from rules where key = 'transit_loss_gl_fix') = 'true'::jsonb);
 

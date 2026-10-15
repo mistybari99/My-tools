@@ -405,3 +405,4 @@ Not confirmed / limits: no real Supabase or phone; Now strip rows are ordered by
 - 2026-10-14 integration: registered impexp, variants, cheques, schemes, tinting (docs/regs) in web/ia.js and script tags in web/index.html after org122.js.
 - 2026-10-14 integration local-int: INTEGRATION_REPORT_7.md, phase130_integration_test.sql (test only), lang fixes in impexp124.js / variants125.js.
 - 2026-10-14 reports Stage 1 (local-rpt): web/reports131.js #/reports131 registered in web/ia.js (group reports) and web/index.html after recon118.js; server phase131.sql (rule rpt131_on OFF).
+- Stage D (local-prof): `profile` screen (#/profile, web/profile134.js) registered in web/ia.js (group settings, same right as `organization`) and web/index.html; brand / logo / receipt text from the business profile via bizctx; phase134 (business_profiles, upper-layer blindness); see docs/INTEGRATION_REPORT_9.md.

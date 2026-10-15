@@ -225,6 +225,7 @@ select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid)) as h1 from 
 \i supabase/phase131.sql
 \i supabase/phase132.sql
 \i supabase/phase133.sql
+\i supabase/phase134.sql
 select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid)) as h2 from pg_proc p where proname in ('recipe_approve','cost_rule_approve','stock_post','record_sale2','_prod_double_issue87','production_recommendations','ledger_problem_count','_self_approve_hint87') and pronamespace='public'::regnamespace \gset
 select tt.chk('T9 function bodies identical after a second paste', :'h1' = :'h2');
 select tt.chk('T9 rules not duplicated / reset by the second paste', (select count(*) from rules where key in ('expiry_sale_guard','production_double_issue_guard','purchase_backdate_flag'))=3 and rule_txt('production_double_issue_guard')='off');
