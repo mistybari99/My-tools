@@ -1,10 +1,12 @@
 // Forms <-> stock ledger links (forms_stock.js read views + #/ledgerlinks), 06-5 supplier_pick master column, 05-1 output table, brand P&L and discounts pages (reports.js).
-// Run: node forms_links_test.js /home/user/My-tools/tests/web
+// Run: node forms_links_test.js tests/web
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), srv = C.serve(8321);
+const base = C.baseData(SP), srv = C.serve(PORT);
 // extra RPCs of phase20 on top of the phase10 mock
 const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables; const M = window.__M; const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
  const L2 = window.__L2 = Object.assign({ prob: [{ entry_id: 'e1', form_code: '04-2', serial: 7, location_id: 1, entry_date: '2026-10-10', failed: 2, skipped: 1, first_reason: 'insufficient_stock' }],
@@ -38,7 +40,7 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
     d.tables.rules.push({ key: 'forms_post_to_ledger', module: 'stock', kind: 'switch', value: o.on ? true : null, default_value: false, label_bn: 'x', label_en: 'x', label_mix: 'x', sort: 1 });
     d.tables.forms_ledger_cfg = ['04-1', '04-2', '04-3', '03-1', '05-1'].map((c) => ({ form_code: c, is_on: true }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(d)};window.__M0=${JSON.stringify(o.m || {})};window.__NOCOST=${!!o.noCost};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8321/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__M.calls.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const wait = (p, n = 300) => p.waitForTimeout(n);

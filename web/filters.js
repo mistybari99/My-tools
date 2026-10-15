@@ -70,12 +70,13 @@ const presetRange = (k) => (PRE && PRE[k]) || null;
 
 // ---------- option sources (cached for the session) ----------
 const OPT = { brands: null, cats: null, custs: null };
+window.addEventListener('bos:biz', () => { OPT.brands = null; });   // bizctx: the brand list follows the chosen business
 const accessLocs = () => ((B.ENV && B.ENV.locs) || []).filter((l) => S.ctx.is_owner || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).includes(l.id));
 async function preload(allow) {
   const a = new Set(allow || []);
   const jobs = [B.loadStatic ? B.loadStatic() : null, loadPresets()];
   if (a.has('brands') && !OPT.brands) jobs.push(sb.from('report_brand_map').select('*').then((r) => {
-    const m = new Map(); (r.data || []).forEach((x) => { if (!m.has(x.brand_code)) m.set(x.brand_code, x); }); OPT.brands = [...m.values()]; }, () => { OPT.brands = []; }));
+    const m = new Map(); const mine = new Set(((B.ENV && B.ENV.locs) || []).map((l) => l.id)); (r.data || []).forEach((x) => { if ((!B.biz || !B.biz.multi() || mine.has(x.location_id)) && !m.has(x.brand_code)) m.set(x.brand_code, x); }); OPT.brands = [...m.values()]; }, () => { OPT.brands = []; }));
   if (a.has('categories') && !OPT.cats) jobs.push(window.BOS_ALL(sb.from('items').select('category,category_bn').order('code')).then((r) => {
     const m = new Map(); (r.data || []).forEach((x) => { if (x.category && !m.has(x.category)) m.set(x.category, x.category_bn || null); }); OPT.cats = [...m.entries()].map(([c, bn]) => ({ code: c, bn })); }, () => { OPT.cats = []; }));
   if (a.has('customer') && !OPT.custs) jobs.push(sb.from('customers').select('id,name,mobile').order('name').limit(1000).then((r) => { OPT.custs = r.data || []; }, () => { OPT.custs = []; }));

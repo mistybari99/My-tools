@@ -1,10 +1,11 @@
 // Groups A and B web pieces: cash moves page, switchboard, production void button, forms reading the locations table.
 // Run: node groupab_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8353, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  c.rpc = async (fn, args) => {
   (window.__AC8 = window.__AC8 || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);

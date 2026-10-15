@@ -1,10 +1,11 @@
 // Module E: Home cleanup (no Recent, no star marks, favourites in the ⋮ menu) + Owner mode board (#/owner).
 // Run: node ownerboard_test.js <abs tests/web dir>      (server state lives in node: SRV, shared by every page this test opens)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8197, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const dh = (n = 0) => { const d = new Date(Date.now() + n * 86400000); return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' }); };
 const TD = dh(0), YD = dh(-1), WD = dh(-7);
 const R = (key, def) => ({ key, module: 'ui', kind: 'switch', value: null, default_value: def, label_bn: key, label_en: key, label_mix: key, sort: 1 });

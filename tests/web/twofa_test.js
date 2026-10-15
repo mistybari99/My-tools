@@ -1,7 +1,8 @@
 // 2FA screen + login gate with a STUBBED supabase.auth.mfa (no real Supabase). Run: node tests/web/twofa_test.js
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path');
-const SRC = fs.readFileSync(path.join(__dirname, '../../web/twofa.js'), 'utf8');
+const SRC = fs.readFileSync(path.join(_P.WEB_DIR, 'twofa.js'), 'utf8');
 let bad = 0, n = 0; const ok = (c, m) => { n++; if (!c) { bad++; console.log('FAIL:', m); } };
 const STUB = `
 window.__calls = []; window.__toasts = []; window.__lang = 'en';

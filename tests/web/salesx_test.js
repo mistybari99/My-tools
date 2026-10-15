@@ -1,10 +1,11 @@
 // P3 slice b web: online orders (#/onlineorders), forms 20-x <-> sales (#/saleforms), benefits report (#/benefitsx), BI export (#/biexport).
 // Run: timeout 250 node salesx_test.js <abs tests/web dir>      (the test injects <script src="salesx.js"> into index.html; the lead adds the real tag)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8361, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
  const SX = window.__SX = Object.assign({ orders: [], fail: {}, forms: [], linked: [], grants: [], missing: [], exportRes: null }, window.__SX0 || {});
@@ -34,7 +35,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
-  const html = fs.readFileSync('/home/user/My-tools/web/index.html', 'utf8').replace('</body>', '<script src="salesx.js"></script></body>');
+  const html = fs.readFileSync(_P.WEB_DIR + '/index.html', 'utf8').replace('</body>', '<script src="salesx.js"></script></body>');
   async function open(hash, o = {}) {
     const ctx = await br.newContext({ viewport: { width: 360, height: 780 } }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|code: P0001|status of 4/.test(m.text()) && !/^Error: /.test(m.text())) errors.push('console: ' + m.text()); });

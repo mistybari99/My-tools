@@ -1,11 +1,13 @@
 // W3 shared list control (listctl.js) + lists admin page (lists.js ⋮ menus, Other queue, requests). Run: node listctl_test.js <abs tests/web dir>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8');
 const baseData = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(b); }); }).listen(8097);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const HEADS = ['transport', 'fuel', 'repair', 'labour', 'hospitality', 'staff_meal', 'sourcing', 'tea', 'rent', 'phone'].map((c, i) => ({ list_code: 'expense_heads', value_code: c, label_bn: 'খাত ' + (i + 1), label_en: 'Head ' + c, sort: i + 1, active: true, extra: {} }));
 HEADS.push({ list_code: 'expense_heads', value_code: 'oldhead', label_bn: 'পুরনো খাত', label_en: 'Old head', sort: 11, active: false, extra: {}, retired_reason: 'not used', retired_at: '2026-10-01T00:00:00Z' });
 function mk(o = {}) {
@@ -48,7 +50,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(mk(o))};window.__X0=${JSON.stringify(o.x || {})};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}')}catch(e){}`);
-    await p.goto('http://localhost:8097/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__C.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const wait = (p, n = 300) => p.waitForTimeout(n);

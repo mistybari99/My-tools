@@ -1,0 +1,198 @@
+# UAT Checklist - ফোনে ৩০ মিনিটের পরীক্ষা
+
+প্রতিটি rollout ধাপ (`ROLLOUT_PLAN.md`) বা নতুন SQL paste-এর পরে চালান। একটা ঠিকঠাক ফোন, একটা পরীক্ষামূলক ব্যবহারকারী, একটা পরীক্ষামূলক আইটেম নিন। সাধারণ শব্দ English-এ।
+
+**নিয়ম:**
+- আসল গ্রাহকের নম্বর বা আসল বিল দিয়ে পরীক্ষা করবেন না। পরীক্ষামূলক নাম ও `01XXXXXXXXX` ধরনের নকল নম্বর নিন।
+- ফেল হলে থামুন। যে সুইচ সবশেষে বদলেছেন, সেটা আগের মানে ফেরান। তারপর নিচের "স্ক্রিনশট" কলামের ছবি পাঠান।
+- স্ক্রিনশটে password, secret token, key বা গ্রাহকের আসল নম্বর থাকলে ঢেকে দিন।
+- `[সুইচ]` মানে ওই সুইচ চালু থাকলে তবেই পরীক্ষা অর্থবহ।
+- কোনো পরীক্ষা এখনো কোনো আসল ফোনে চালিয়ে দেখা হয়নি। "সঠিক ফল" কোড ও ধাপের রিপোর্ট থেকে নেওয়া। আপনার ফোনে অন্যরকম দেখালে সেটাই জানানোর জিনিস।
+
+**কোন ধাপের পরে কোনগুলো:**
+
+| ধাপ | চালান |
+|---|---|
+| যেকোনো paste বা সুইচের পরে (১০ মিনিট) | ক অংশ (1 থেকে 8) |
+| ইনভয়েস / template / মেনু | খ অংশ (9 থেকে 17) |
+| Recipe, production, cost | গ অংশ (18 থেকে 24) |
+| Inbox, Scan, setup advisor | ঘ অংশ (25 থেকে 31) |
+| Drawer, opening stock, landed, accounts | ঙ অংশ (32 থেকে 38) |
+| Security (phase 94) | চ অংশ (39 থেকে 42) |
+| Category (phase 100) | ছ অংশ (43, 44) |
+| Bill payment, inbox mask (phase 99) | জ অংশ (45 থেকে 52) |
+| আইটেমের ছবি (phase 102) | ঝ অংশ (53 থেকে 55) |
+| End-to-end ঠিক (phase 103) | ঞ অংশ (56 থেকে 59) |
+| Home badge, Undo, Landed GRN, ক্রয় বিল Print | ট অংশ (60 থেকে 64) |
+
+---
+
+## ক. সবসময়ের মূল পরীক্ষা
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 1 | অ্যাপ খুলে লগইন করুন। Home দেখুন। | Home খোলে, লাল error নেই। | Home পুরো পর্দা, উপরে URL সহ |
+| 2 | `#/setupadvisor` খুলুন। | কোনো সারি `not_installed` নয়। | পুরো তালিকা (scroll করে দুটো ছবি) |
+| 3 | `#/setupadvisor` > "Is it all flowing" (flow check) | নতুন `flw_*` লাল নয়। হলুদ থাকলে কারণ পড়ুন। | লাল/হলুদ সারিগুলো |
+| 4 | একটা পরীক্ষামূলক আইটেম ক্যাশে বিক্রি করুন (POS)। | বিক্রি সেভ হয়, receipt/ইনভয়েস নম্বর আসে। | সেভের ঠিক পরের পর্দা |
+| 5 | `#/accounts` খুলুন (accounting চালু থাকলে)। | Trial balance balanced। pending ও error 0 বা ব্যাখ্যাত। | Accounts-এর উপরের স্ট্রিপ |
+| 6 | ভাষা English করুন। দু-তিনটা পর্দা ঘুরুন। | English মোডে বাংলা অক্ষর নেই। | যে পর্দায় বাংলা এসেছে |
+| 7 | Dark theme দিন। POS ও ইনভয়েস দেখুন। | লেখা পড়া যায়, বোতাম দেখা যায়। | পর্দা |
+| 8 | ফোন ঘুরিয়ে (landscape) একটা পর্দা দেখুন। | পাশে scroll নেই, বোতাম কাটা নয়। | পর্দা |
+
+## খ. ইনভয়েস, template, মেনু, কীবোর্ড
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 9 | `[pos_show_invoice_after_sale = always]` একটা ক্যাশ সেল করুন। | সেল শেষে ইনভয়েস পর্দায় আসে (রসিদ-আকারে)। নিচে Print, SMS, WhatsApp, Email, Share, Copy, Download। `ask` হলে "Show invoice" বার আসে, `never` হলে আসে না। | সেল-শেষের পর্দা + `#/switchboard`-এ সুইচের মান |
+| 10 | ইনভয়েসে Copy text চাপুন, কোথাও paste করুন। | লেখা ঠিক। cost নেই। | paste করা লেখা |
+| 11 | নিজের নম্বরে SMS বা WhatsApp বোতাম চাপুন। | ফোনের অ্যাপ খোলে, বার্তা লেখা বসানো। Send আপনি চাপবেন (নিজে যায় না)। | অ্যাপ খোলার পর্দা |
+| 12 | Print চাপুন (প্রিন্টার না থাকলে চলবে)। | প্রিন্ট-ডায়ালগ খোলে, অথবা নরম বার্তা "এই ফোনে Print করা গেল না ... Share বা Download ব্যবহার করুন"। ভাঙা পর্দা নয়। | বার্তা বা ভাঙা পর্দা |
+| 13 | Airplane mode চালু করে একটা সেল করুন। তারপর বন্ধ করুন। | ইনভয়েসে নম্বর `Q-xxxxxx`, "Pending sync"। নেট এলে চূড়ান্ত নম্বর আসে, একটাই সেল। | Q-নম্বরের পর্দা + পরে আজকের তালিকা |
+| 14 | কীবোর্ড পরীক্ষা: POS-এ বা কোনো "নতুন আইটেম" sheet খুলুন, সংখ্যার ঘরে ট্যাপ করুন (কীবোর্ড ওঠে)। | Save/Confirm বোতাম কীবোর্ডের ঠিক উপরে দেখা যায়। যে ঘরে লিখছেন সেটা ঢাকা নয়। Enter চাপলে (সংখ্যার ঘরে) প্রধান বোতাম চাপা হয়। | কীবোর্ড খোলা অবস্থার পর্দা |
+| 15 | মেনু (drawer) খুলুন। নিচের অংশ দেখুন। | ডিফল্টে footer গোটানো: শুধু ছোট বার (তীর + Online ডট)। তীরে ট্যাপ করলে ভাষা, theme, Log out খোলে; আবার ট্যাপে গোটে। অ্যাপ বন্ধ করে খুললেও অবস্থা মনে থাকে। | মেনু গোটানো ও খোলা, দুই অবস্থা |
+| 16 | `#/templates` খুলুন। রসিদের একটা ডিজাইন বাছুন, Preview দেখুন। তারপর একটা সেল করে ইনভয়েসে Print/Download করুন। | Preview ঠিক। Suggested চিহ্ন দেখা যায়। Print/Download বাছা ডিজাইনে। কিছু না বাছলে আগের ছাপাই। | `#/templates` + ছাপা/ডাউনলোড ফল |
+| 17 | `#/optviews` > একজন পরীক্ষামূলক ব্যবহারকারী: একটা মেনু Hide, একটা Locked করুন। তার ফোনে (বা login বদলে) দেখুন। | Hide করা মেনু উধাও। Locked-এ " · locked" চিহ্ন, ট্যাপে "মালিককে জিজ্ঞেস করুন"। Home ও optviews Hide হয় না। Hide-করা পাতার সরাসরি লিংক এখনো খোলে (জানা সীমা, অনুমতি থাকলে)। শেষে "Reset all to default" করুন। | মেনু (দুই ব্যবহারকারীর) + `#/optviews`-এর সারি |
+
+## গ. Recipe, production, cost
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 18 | একটা কাঁচামালের স্টক লিখে রাখুন। Recipe দিয়ে একটা ছোট production করুন (`#/recipes` বা Stock > production)। | তৈরি মাল বাড়ে, **recipe-র হিসাবে কাঁচামাল কমে** (স্টক আগে-পরে মিলিয়ে নিন)। একবারই কাটে। | production-এর আগে ও পরে দুটো স্টক-পর্দা |
+| 19 | একই production দুবার ট্যাপ করুন (দ্রুত)। | একটাই production। | দুটো ট্যাপের পরের তালিকা |
+| 20 | `[production_requires_cost = refuse]` যে উপাদানের cost নেই তা দিয়ে production চেষ্টা করুন। | আটকায়, কারণ লেখা। `warn` হলে হলুদ সতর্কতা, কাজ চলে। | error বা সতর্কতা বার্তা |
+| 21 | cost-ছাড়া একটা আইটেম বিক্রি করুন। তারপর `#/costunknown` খুলুন। | বিক্রি হয়। রিপোর্টে "খরচহীন বিক্রি" বা cost-missing চিহ্ন, আইটেম তালিকায়। কিছু বানানো cost নেই। | `#/costunknown` |
+| 22 | পানির মতো সত্যিই শূন্য-দামের আইটেম `#/s1setup`-এ free-cost চিহ্ন দিন (কারণসহ)। | আইটেম cost-অজানা তালিকা থেকে সরে যায়। production আটকায় না। | `#/s1setup` + তালিকা |
+| 23 | `[recipe_approval_required = warn]` নতুন recipe approve না করে production করুন। | হলুদ `recipe_not_approved`, কাজ আটকায় না। approve করলে হলুদ যায়। | হলুদ সতর্কতা |
+| 24 | `[cost source/শাখা-ভাগ চালু]` `#/costsources`, `#/costattrib` একবার খুলুন। | "ভাগ নির্ধারিত নয়" বা "বিল বাকি" তালিকা খোলে (খালি হলেও চলে)। | তালিকা |
+
+## ঘ. Inbox, Scan, setup advisor, Telegram
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 25 | `#/inbox` খুলুন। `[inbox_on]` একটা হাতে-বানানো অর্ডার (পরীক্ষামূলক নাম) করুন। | অর্ডার inbox/অর্ডার-তালিকায় দেখা যায়। | `#/inbox` |
+| 26 | `[inbox_pii_guard_on]` অনুমতিহীন একজন ব্যবহারকারীতে inbox দেখুন। | গ্রাহকের ফোন/ঠিকানা ঢাকা। অনুমতিধারীর দেখা audit-এ যায়। | ঢাকা নম্বরসহ পর্দা (আসল নম্বর ঢেকে) |
+| 27 | `#/inbox` "failed" তালিকা দেখুন। | খালি বা ব্যাখ্যাত। বারবার একই কারণ থাকলে জানান। | failed তালিকা |
+| 28 | `#/setupadvisor`: একটা নিরাপদ সুইচের "Recommended" ও কারণ পড়ুন। **Apply** চাপুন (শুধু মালিক)। তারপর `#/switchboard`-এ ওই সুইচ দেখুন, আগের মানে ফিরিয়ে দিন (Undo বোতাম নেই, হাতে ফেরাতে হয়)। | মান বসে, ইতিহাসে (`setup_apply_history`) সারি যায়। প্রস্তুতি ঠিক না থাকলে `not_ready` বলে skip। সংখ্যার সীমার সারিতে কোনো সংখ্যা প্রস্তাব নেই। | Apply-এর আগে, পরে, আর `#/switchboard` |
+| 29 | `[scan_enabled, scan_engine = manual]` `#/scan` > একটা পরীক্ষামূলক বিলের ছবি তুলুন। ঘরগুলো নিজে লিখুন। প্রতিটি লাইনে "বিদ্যমান আইটেম / নতুন / শুধু লেখা / বাদ" বাছুন। Confirm। | ক্রয় বিল **খসড়া** হিসেবে ঢোকে (পোস্ট নয়, "পোস্টও করুন" টিক না দিলে)। কিছু নিজে মেলানো হয় না। | Confirm-এর আগের পর্দা + তৈরি খসড়া |
+| 30 | একই Scan দুবার Confirm চাপুন। | একটাই বিল। সদৃশ ধরা পড়লে স্বীকার না করলে Confirm হয় না। | দ্বিতীয় চাপের বার্তা |
+| 31 | `[Telegram চালু থাকলে]` নিজের Telegram থেকে bot-কে "test" পাঠান। | inbox-এ বার্তা আসে। না এলে প্রথমে `TELEGRAM_SECRET_TOKEN` সেট আছে কিনা (Edge function-এ) কম্পিউটারওয়ালার সঙ্গে দেখুন। | inbox + `#/inbox` > Channels > status |
+
+## ঙ. Drawer, opening stock, landed cost, accounts
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 32 | `#/cashdrawer` > **Test open** (ড্রয়ার না লাগিয়ে)। | টোস্ট "Drawer not connected" (নরম ব্যর্থ)। অ্যাপ ঠিক আছে। এরপর একটা সেল করুন: সেল স্বাভাবিকভাবে সেভ হয়। | টোস্ট + পরের সেল |
+| 33 | `[cash_drawer_no_sale_requires_reason চালু]` আজকের সেল ট্যাবে "No sale" চাপুন। | কারণ ছাড়া খোলে না। কারণসহ ইভেন্ট লগে যায় (drawer না থাকলে `failed`)। `#/cashdrawer` রিপোর্টে দেখা যায়। iPhone হলে "not supported" দেখাতে পারে (জানা সীমা)। | No-sale পর্দা + রিপোর্ট |
+| 34 | `#/books96` > Opening stock: একটা জায়গা বাছুন, সংখ্যা ও প্রস্তাব পড়ুন, **Preview** চাপুন (Apply নয়)। | প্রতিটি অপশনের Preview লাইন দেখায়। **কিছু post হয় না** - `#/accounts`-এ trial balance আগের মতো। | Preview পর্দা + আগের ও পরের trial balance |
+| 35 | `#/books96` > Cost waiting তালিকা। একটা সারি খুলে প্রস্তাবিত পদ্ধতির dry run দেখুন। | সারি পুরনো আগে। Preview-এ অঙ্ক দেখায়। কিছু জানা না থাকলে "manual" ও কারণ লাগে। কোনো সংখ্যা বানানো নয়। | তালিকা + Preview |
+| 36 | `[landed_cost_mode = off]` `#/landed` > একটা posted বিল বাছুন, Preview দেখুন, Save চাপুন। | Preview চলে। Save/Post প্রত্যাখ্যাত (`landed_off`)। কিছু বদলায়নি। (mode চালু করলে Save চলে।) | Preview ও প্রত্যাখ্যান-বার্তা |
+| 37 | `#/books85` > Books switches: যেকোনো একটা সুইচ ON চাপুন, **নিশ্চিত করবেন না**, বাতিল করুন। | ON-এর আগে WARNING sheet আসে (backlog পিছিয়ে post হবে ইত্যাদি)। নিশ্চিত না করলে কিছু বদলায় না। OFF সঙ্গে সঙ্গে হয়। প্রতি সুইচের পাশে Now ও Recommended। | WARNING sheet |
+| 38 | `#/books85` > Auto posting ও Card settlement ট্যাব দেখুন। | pending/locked সংখ্যা ও scheduler অবস্থা দেখায়। pg_cron না থাকলে "pg_cron is not on the server" (জানা, ফোনে ঠিক হয় না)। Card settlement-এর ফর্ম খোলে। | দুই ট্যাব |
+
+## চ. Security (phase 94)
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 39 | SQL Editor-এ (মালিক): `select pii_exposure_report94();` | JSON ফেরে। `inbox_pii_guard_on` অবস্থা ও সরাসরি-পড়ার তথ্য আছে। error নয়। | ফল (নম্বর/নাম থাকলে ঢেকে) |
+| 40 | `select anon_exec_audit94();` | তালিকা ফেরে। আশা: `login_precheck`, `login_failed`, `attendance_punch_push` ও পুরনো helper। অচেনা কিছু দেখলে কম্পিউটারওয়ালাকে দেখান। | তালিকা |
+| 41 | `select intake_proof_status94();` | ফেরে; proof না বসানো থাকলে "not set" ধরনের অবস্থা, আগের মতো চলে। | ফল |
+| 42 | `[invoice_own_sales_only চালু]` একজন স্টাফের login থেকে অন্য স্টাফের বিক্রির ইনভয়েস খুলতে চেষ্টা করুন (`#/invoiceview`)। | পায় না (not found)। মালিক বা POS approve-ধারী পায়। | স্টাফের পর্দা |
+
+## ছ. Category / Sub-category (phase 100)
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 43 | `#/categories` খুলুন। আপনার আগের Category-গুলো আছে কিনা মিলিয়ে নিন। POS-এ Category বেছে Sub-category বাছুন। | তালিকা আপনার আইটেমের নামের সঙ্গে মেলে। POS-এ Category বাছলে Sub-chip আসে, filter চলে। কোনো আইটেম হারায়নি। | `#/categories` + POS |
+| 44 | `#/catreport` খুলুন (বিক্রি)। মোট মিলিয়ে নিন। | Category অনুযায়ী মোট = সাধারণ রিপোর্টের মোট। cost কেবল cost-অধিকারী দেখে। | `#/catreport` + তুলনার রিপোর্ট |
+
+## জ. Bill payment, inbox mask (phase 99)
+
+পরীক্ষামূলক নাম আর `01XXXXXXXXX` নম্বর। আসল bill নয়।
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 45 | `#/billpay` খুলুন। | "Bills without payment" তালিকা খোলে। error নেই। | পাতা |
+| 46 | `[cost_bill_creates_payment = ask]` একটা পরীক্ষামূলক cost bill সেভ করুন। | সেভের পর "Record payment now?" sheet। অঙ্ক = যা বাকি। sheet বন্ধ করলে bill থাকে। | sheet |
+| 47 | ওই sheet-এ আংশিক অঙ্ক (cash) দিন, তারপর বাকিটা (bank)। | দ্বিতীয়বার বাকি কমে। বেশি দিলে প্রত্যাখ্যাত। cash book-এ দুটো আলাদা লাইন। | বাকির অঙ্ক ও cash book |
+| 48 | `[purchase_bill_creates_payment = ask]` একটা পরীক্ষামূলক ক্রয় bill পোস্ট করুন, payment দিন। | supplier balance কমে। `#/accounts` balanced। | supplier balance |
+| 49 | `[bill_void_payment_mode = void]` ওই bill void করুন। | payment-ও বাতিল। balance আগের মতো। | bill ও balance |
+| 50 | `[inbox_pii_mode = mask_phone_address]` পরীক্ষামূলক বার্তা সহ `#/inbox` দেখুন। | phone-এর শেষ 3 অক্ষর ছাড়া ঢাকা; address ঢাকা; নামের প্রথম অক্ষর। বার্তার লেখার ভেতরের নম্বরও ঢাকা। | তালিকা (আসল নম্বর ঢেকে) |
+| 51 | `#/inboxpii` > একটা বার্তায় Reveal (কারণ লিখে)। | শুধু ওটা খোলে। "Reveal log"-এ লাইন। পরের পড়ায় আবার ঢাকা। grant ছাড়া ব্যবহারকারী পারে না। | log |
+| 52 | `[inbox_unmask_daily_max = 2]` (পরীক্ষার জন্য) তিনবার Reveal চেষ্টা। | তৃতীয়বার `rate_limited`। owner আটকায় না। পরীক্ষা শেষে সংখ্যা মুছে দিন। | তৃতীয় চেষ্টা |
+
+## ঝ. আইটেমের ছবি (phase 102)
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 53 | `#/itemimg` > `pos_only`। POS খুলুন। | কার্ডে ছবি বা অক্ষর-গোল। ছবি না এলেও বিক্রি চলে। | POS |
+| 54 | Airplane mode চালু করে POS আবার খুলুন। | অক্ষর-গোল থাকে। বিক্রি আটকায় না। | POS |
+| 55 | `#/itemimg` > "Clear image cache"। | cache মোছে। "Pictures loaded this session" গণনা দেখায়। | পাতা |
+
+## ঞ. End-to-end ঠিক (phase 103)
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 56 | `#/setupadvisor` > "Is it all flowing"। | `flw_grn_double103` আছে। GRN উৎস + guard বন্ধ + bill-ও স্টক বাড়ায় এমন হলে হলুদ। | সারি |
+| 57 | `[purchase_grn_guard]` `#/setupadvisor`-এ প্রস্তাব দেখুন। | GRN উৎস হলে `skip`। আপনার নিজের বসানো মান Apply বদলায় না। | সারি |
+| 58 | `#/books96` cost-অপেক্ষা তালিকা। | recipe-ছাড়া production-in সারি আসে। শুধু পানির মতো free উপাদানের production এখানে আটকে থাকে না। | তালিকা |
+| 59 | `[inbox_pii_mode চালু]` অনুমতিহীন ব্যবহারকারীতে গ্রাহক তালিকা। | mobile ঢাকা। grant `view_customer_mobile` থাকলে দেখা যায়। | তালিকা (নম্বর ঢেকে) |
+
+## ট. Home badge, Undo, Landed GRN, ক্রয় বিল Print
+
+| # | কী করবেন | সঠিক ফল | ফেল হলে স্ক্রিনশট |
+|---|---|---|---|
+| 60 | Home খুলুন। | যে সংখ্যা 0-এর বেশি ও মেনুতে খোলা, শুধু সেই chip। ট্যাপে ওই পর্দা খোলে। | Home |
+| 61 | `#/setupadvisor` > History > "Undo this apply" (owner)। | sheet-এ "এখন -> ফিরবে"। নিশ্চিত করলে নিয়ম আগের মানে। অন্য ব্যবহারকারীর বোতামই নেই। | sheet |
+| 62 | `#/landed` > bill বাছার sheet > "Add from a GRN" > Show GRNs। | GRN তালিকা (04-1 submitted/approved)। টিক দিলে bill যোগ হয়। বাঁধা না থাকলে `grn_not_linked`। | sheet |
+| 63 | একটা ক্রয় bill খুলে Print / Send চাপুন। | Print dialog বা Share/Download। বিলে বিক্রির দাম নেই। DRAFT/VOID হলে লাল পটি। | sheet |
+| 64 | ওই sheet-এ WhatsApp বা SMS চাপুন। | ফোনের অ্যাপ খোলে, লেখা বসানো। Send আপনি চাপবেন। অ্যাপ নিজে পাঠায় না। | অ্যাপ |
+
+---
+
+**ফলাফল লিখে রাখুন:** তারিখ, কোন ধাপের পরে, কোন নম্বর ফেল। ফেল হলে স্ক্রিনশট আর কোন সুইচ সবশেষে বদলেছেন তা জানান।
+
+**coming (এখনো পরীক্ষার কিছু নেই):** Phase 105 নিরাপত্তা-ঠিক, `#/dashx` Owner dashboard, Liquid Glass theme। রিপোর্ট এলে অংশ যুক্ত হবে।
+
+**যা এই পরীক্ষায় ধরা যায় না:** আসল প্রিন্টার ও ড্রয়ার হার্ডওয়্যার, Telegram/Meta-র আসল বার্তা, `ai_vision` (Edge function লাগে, কম্পিউটারওয়ালা), pg_cron scheduler। এগুলো `PHONE_ONLY_STEPS.md`-এ।
+
+---
+
+## Audit fixes 112-118
+
+Use only test names and `01XXXXXXXXX` numbers. Turn one switch ON, run its check, then follow the order in `AUDIT_SWITCHES.md`. Do not turn on two switches on the same day. Switches are in `#/switchboard`. If a check fails, set that switch back to OFF and send a screenshot. The default for every switch is OFF.
+
+| # | What to do | Expected result | If it fails (screenshot) |
+|---|---|---|---|
+| 65 | `[period_lock_late_warn]` ON. Ask the developer to make one test document dated in a closed period, then run auto posting (`#/books85`, Auto posting tab). | The document is not booked. A yellow warning `late_docs_locked` appears. | Warnings list |
+| 66 | `[period_lock_owner_mode]` = warn. As owner, change one test document dated in a closed period. Change it again the same day. | The change goes through. One yellow `closed_period_owner` warning for that date. No second warning the same day. | Warnings list |
+| 67 | `[daybook_align_mode]` ON. Record one test 10-2 voucher paid by bank. Open the day book. | The day book shows the voucher as bank, not cash. | Day book row |
+| 68 | `[cost_share_prorate_mode]` ON. Open the shop P&L for today only, then for the full month. | Today's shared bill is a part of the month's bill (about 1/30 for a 30-day month). The full-month figure does not change. | P&L for both ranges |
+| 69 | `[items_net_of_returns]` ON and `[reports_net_of_returns]` ON. Open the top items report for a day with one test return. | The returned item shows less quantity and money for that day. | Top items before and after |
+| 70 | `[profit_truth_mode]` = on. Open the shop P&L and the dashboard "Net profit" tile. | Both show the same net profit figure. If a sale has unknown cost, it is shown apart and the figure is marked provisional. | P&L and tile |
+| 71 | `[drawer_short_post]` ON. Submit a test cash count (form 14-1) that is 50 short. Open the day book. Then submit a count with no difference. | The day book has one "Cash short / over" row of 50. The no-difference count adds no row. `#/accounts` still balanced. | Day book and `#/accounts` strip |
+| 72 | `[dues_net_advance]` ON. Use a test customer whose bill was paid from advance. Open the dues list, then try to collect that bill again. | The bill is not in the dues list. A collection above what is still due is refused. | Dues list and refusal message |
+| 73 | `[bank_stmt_post_on]` ON and `[bank_recon_on]` ON. In bank reconciliation, take one unmatched test line marked "fee". Use the one-step post. | One entry is created and the line is matched. `#/accounts` still balanced. | Line and `#/accounts` strip |
+| 74 | `[std_snapshot_auto116]` ON. Run one test production of a recipe for the first time at a place. | The production completes. The cost you see is the same as before the switch. | Production result |
+| 75 | `[std_cost_true116]` ON. Open the cost of that test production run. | The standard cost per unit is shown. The old number is still kept (developer checks `cost_full_yield116`). | Run cost screen |
+| 76 | `[packaging_on_actual_yield116]` ON. Run a test production that makes less than planned (plan 30, make 27). | Packaging used is for 27, not 30. | Packaging stock before and after |
+| 77 | `[pool_drivers116]` ON. Set the driver for one test place to batches. Run one test production there. | The overhead per unit follows the batch count. | Run cost screen |
+| 78 | `[conv_provisional116]` ON. Run a test production in a month that has no overhead pool yet. | The run is marked PROVISIONAL. | Run screen |
+| 79 | `[cost_supply_to_avg116]` ON. Use a test item with unknown cost in a production. Supply its cost through the cost-waiting list (`#/books96`). | The stock average cost of that item changes. The run is re-costed. | Cost-waiting list and stock list |
+| 80 | `[semi_finished_ingredient116]` ON. Make a test chhana (finished item) and use it in a test sweet recipe. Produce the sweet. Then try to make chhana use the sweet. | The sweet is produced and the chhana stock goes down. The loop is refused (`recipe_cycle`). | Refusal message and stock |
+| 81 | `[batch_for_adjustments]` ON. Do a stock count that gains 5 of a test item. Open the expiry list. | The gained 5 appear in the expiry list, with no expiry date. | Expiry list |
+| 82 | `[batch_refill_cap]` ON. Test item with stock -2. Receive a batch of 10. | The batch keeps 8 (the part really on hand). | Stock list |
+| 83 | `[late_sale_follows_block]` ON and `[stock_negative_mode]` = block. Make an online test sale with an old sale time for an item at zero. | The sale is refused by the block rule. | Refusal message |
+| 84 | `[return_uses_sale_rows]` ON. Sell 2 test units. Return 1. | Stock goes back by 1, the same rows the sale took out. | Stock before and after |
+| 85 | `[item_unit_change_needs_zero]` ON. Try to change the base unit of a test item that has stock. Then try it on an item with zero stock. | With stock: refused (`item_has_stock`). With zero stock: allowed. | Refusal message |
+| 86 | `[item_lifecycle_needs_zero]` ON. Try to set a test item with stock to "not tracked" or inactive. | Refused (`item_has_stock`). | Refusal message |
+| 87 | `[transfer_needs_stock]` ON. Send more of a test item from a test place than it holds. | Refused, unless the user has the sell_below_zero permission or an emergency approval. | Refusal message |
+| 88 | `[transfer_late_receive]` ON. Send 10 test units, receive 8. Later, receive the 2 that came on a second delivery. | The 2 are added at the sent cost. The receiver shows 10. | Transfer before and after |
+| 89 | `[transfer_return_marker]` ON. Send one test return to the factory with reason "damaged". | The transfer shows as a return, with the reason and a link to the original transfer. | Transfer screen |
+| 90 | `[transfer_notify_receiver]` ON. Send one test transfer to a second test place. | The receiving place's manager gets one notice for that transfer. | Notification |
+| 91 | `[transit_loss_gl_fix]` ON. Make a test transfer with a short receipt and mark the loss. Open `#/accounts`. | The trial balance is balanced. No transit-loss entry is stuck on "cost missing". Old entries are not changed. | `#/accounts` strip |
+| 92 | `[pool_gl_post117]` ON (only after confirming no double count). Add one test pool row. | The books show Dr expense and Cr 2400 for that row, dated the last day of the month. `#/accounts` balanced. Retiring the row reverses it. | `#/accounts` and pool row |
+| 93 | `[factory_labour_absorbed117]` ON. Open the branch P&L for a branch with factory salary and absorbed labour (test). | The factory salary line is lower by the absorbed labour. Example: salary 200, absorbed 200, shows 0. | Branch P&L |
+| 94 | After the last check, turn all new switches back to OFF if the owner wants the old behaviour. Open `#/accounts` and `#/setupadvisor`. | `#/accounts` balanced. No `not_installed` rows in `#/setupadvisor`. | `#/accounts` and `#/setupadvisor` |
+
+**Note:** The phase 118 reports (stock reconciliation, factory-branch statement, net profit report) have no switch and no screen named in the phase notes. Ask the developer to check them. Also ask the developer to check `pool_vs_gl117` before turning on `pool_gl_post117`.

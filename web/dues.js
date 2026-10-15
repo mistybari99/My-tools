@@ -4,6 +4,7 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
 const $ = (s, el = document) => el.querySelector(s);
 const L = B.L, lab = B.lab;
 const r2 = (n) => Math.round(n * 100) / 100;
@@ -30,7 +31,7 @@ async function viewDues() {
   if (!(S.ctx.is_owner || (S.ctx.perms.POS && S.ctx.perms.POS.view))) return (location.hash = '#/home');
   shell(T('title'), `<p class="muted">${esc(t('loading'))}</p>`, true);
   await B.loadStatic();
-  const r = await sb.rpc('customer_dues'); if (r.error) return fail(r.error);
+  const r = await sb.rpc(duesFn()); if (r.error) return fail(r.error);
   D.rows = r.data || [];
   const locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? B.ENV.locs : B.ENV.locs.filter((l) => S.ctx.locations.includes(l.id));
   D.loc = D.loc && locs.find((l) => l.id === D.loc) ? D.loc : (locs[0] || {}).id;

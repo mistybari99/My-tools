@@ -14,7 +14,7 @@ const PAGE = 50, CAP = 200;
 const rid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
 
 const X = {
-  title: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('বাতিল', 'Cancel', 'Cancel'),
+  title: L('আইটেম একসাথে বদল', 'Bulk item editor', 'Item একসাথে বদল'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), close: L('বন্ধ', 'Close', 'Close'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'),
   more: L('আরও অপশন', 'More options', 'আরও Option'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'), all: L('সব', 'All', 'All'), yes: L('হ্যাঁ', 'Yes', 'Yes'), no: L('না', 'No', 'No'),
   tab_grid: L('তালিকা', 'Grid', 'Grid'), tab_csv: L('CSV পেস্ট', 'Paste CSV', 'CSV paste'), tab_bn: L('বাংলা নাম', 'Bangla names', 'বাংলা নাম'),
   search: L('কোড বা নাম খুঁজুন', 'Search code or name', 'Code বা নাম খুঁজুন'), f_cat: L('ক্যাটাগরি', 'Category', 'Category'), f_type: L('ধরন', 'Type', 'Type'), f_batch: L('ইমপোর্ট ব্যাচ', 'Import batch', 'Import batch'),
@@ -25,21 +25,21 @@ const X = {
   c_cnt: L('ব্যবসায় গণনা', 'Count in business', 'Count in business'), c_sell: L('বিক্রয়যোগ্য', 'Sellable', 'Sellable'), c_act: L('সক্রিয়', 'Active', 'Active'), c_cost: L('ক্রয় ৳ (মালিক)', 'Cost ৳ (owner)', 'Cost ৳ (owner)'),
   c_state: L('অবস্থা', 'State', 'State'), locked: L('লক', 'Locked', 'Locked'), hidden: L('লুকানো', 'Hidden', 'Hidden'), nodata: L('Data needed', 'Data needed', 'Data needed'),
   cost_show: L('ক্রয়মূল্যের কলাম (মালিক)', 'Cost column (owner)', 'Cost column (owner)'),
-  changed: L('বদলানো সারি', 'rows changed', 'rows বদলানো'), preview: L('প্রিভিউ', 'Preview', 'Preview'), apply: L('প্রয়োগ করুন', 'Apply', 'Apply'), discard: L('বদল বাতিল', 'Discard edits', 'Edits বাতিল'),
+  changed: L('বদলানো সারি', 'rows changed', 'rows বদলানো'), preview: L('প্রিভিউ', 'Preview', 'Preview'), apply: L('অ্যাপ্লাই করুন', 'Apply', 'Apply'), discard: L('বদল বাতিল', 'Discard edits', 'Edits বাতিল'),
   sel: L('বাছাই', 'selected', 'selected'), hide_sel: L('বাছাইগুলো পিকার থেকে লুকান', 'Hide selected from pickers', 'Selected Picker থেকে লুকান'), inact_sel: L('বাছাইগুলো বন্ধ করুন (কারণসহ)', 'Mark selected inactive (with reason)', 'Selected Inactive করুন (reason সহ)'),
   reason: L('কারণ', 'Reason', 'Reason'), reason_need: L('কারণ লিখুন', 'Write the reason', 'Reason লিখুন'), sel_page: L('এই পাতার সব', 'Select this page', 'এই page-এর সব'),
-  page: L('পাতা', 'Page', 'Page'), prev: L('আগের', 'Previous', 'Previous'), next: L('পরের', 'Next', 'Next'), of: L('মোট', 'total', 'total'),
+  page: L('পাতা', 'Page', 'Page'), prev: L('আগের', 'Previous', 'Previous'), next: L('পরের', 'Next', 'Next'), of: L('টোটাল', 'total', 'total'),
   pv_title: L('প্রিভিউ — এখনো কিছু লেখা হয়নি', 'Preview — nothing is written yet', 'Preview — এখনো কিছু লেখা হয়নি'), pv_ok: L('বদলাবে', 'will change', 'বদলাবে'), pv_req: L('অনুমোদনের অনুরোধ হবে', 'will become requests', 'approval request হবে'),
-  pv_skip: L('বাদ', 'skipped', 'skip'), pv_err: L('ভুল', 'errors', 'errors'), pv_mode_req: L('আপনার সরাসরি বদলের অনুমতি নেই: প্রতিটি সারি মালিকের অনুমোদনের অনুরোধ হবে', 'You may not change items directly: each row becomes a request for approval', 'আপনার direct change-এর অনুমতি নেই: প্রতিটি row approval request হবে'),
-  pv_go: L('এখন প্রয়োগ করুন', 'Apply now', 'এখন Apply করুন'), pv_none: L('প্রয়োগ করার মতো কোনো বদল নেই', 'Nothing to apply', 'Apply করার মতো বদল নেই'), done: L('হয়ে গেছে', 'Done', 'Done'),
+  pv_skip: L('বাদ', 'skipped', 'skip'), pv_err: L('ভুল', 'errors', 'errors'), pv_mode_req: L('আপনার সরাসরি বদলের অনুমতি নেই: প্রতিটি সারি মালিকের অ্যাপ্রুভের অনুরোধ হবে', 'You may not change items directly: each row becomes a request for approval', 'আপনার direct change-এর অনুমতি নেই: প্রতিটি row approval request হবে'),
+  pv_go: L('এখন অ্যাপ্লাই করুন', 'Apply now', 'এখন Apply করুন'), pv_none: L('অ্যাপ্লাই করার মতো কোনো বদল নেই', 'Nothing to apply', 'Apply করার মতো বদল নেই'), done: L('হয়ে গেছে', 'Done', 'Done'),
   r_nochange: L('কোনো বদল নেই', 'no change', 'no change'), r_locked: L('লক করা আইটেম', 'locked item', 'locked item'),
   working: L('চলছে…', 'Working…', 'চলছে…'), saved_req: L('অনুরোধ গেছে', 'requests sent', 'requests গেছে'),
-  csv_h: L('প্রতি লাইনে: কোড, দাম [, একক, ট্র্যাক হ্যাঁ/না, ন্যূনতম স্টক]', 'One line each: code, price [, unit, track yes/no, min stock]', 'প্রতি line: code, price [, unit, track yes/no, min stock]'),
+  csv_h: L('প্রতি লাইনে: কোড, প্রাইস [, একক, ট্র্যাক হ্যাঁ/না, ন্যূনতম স্টক]', 'One line each: code, price [, unit, track yes/no, min stock]', 'প্রতি line: code, price [, unit, track yes/no, min stock]'),
   csv_ph: L('14-001,120\n14-002,95.5,kg,yes,5', '14-001,120\n14-002,95.5,kg,yes,5', '14-001,120\n14-002,95.5,kg,yes,5'), csv_go: L('প্রিভিউ', 'Preview', 'Preview'),
   csv_bad: L('বোঝা যায়নি এমন লাইন', 'lines not understood', 'বোঝা যায়নি এমন line'), csv_empty: L('কিছু লেখা নেই', 'Nothing pasted', 'কিছু লেখা নেই'), csv_max: L('একবারে সর্বোচ্চ ৫০০ লাইন', 'At most 500 lines at once', 'একবারে সর্বোচ্চ ৫০০ line'),
   export: L('CSV নামান (ক্রয়মূল্য ছাড়া)', 'Download CSV (no costs)', 'CSV download (cost ছাড়া)'), exporting: L('তৈরি হচ্ছে…', 'Preparing…', 'তৈরি হচ্ছে…'),
   bn_h: L('এই ক্যাটাগরিগুলোর বাংলা নাম লেখা বাকি', 'These categories still need a Bangla name', 'এই category-গুলোর বাংলা নাম বাকি'), bn_none: L('সব ক্যাটাগরির বাংলা নাম আছে ✓', 'Every category has a Bangla name ✓', 'সব category-র বাংলা নাম আছে ✓'),
-  bn_save: L('সংরক্ষণ', 'Save', 'Save'), bn_ph: L('বাংলা নাম', 'Bangla name', 'বাংলা নাম'), bn_list: L('তালিকা ব্যবস্থাপনার অনুমতি লাগবে', 'You need the list-manager right', 'List manage-এর অনুমতি লাগবে'),
+  bn_save: L('সেভ', 'Save', 'Save'), bn_ph: L('বাংলা নাম', 'Bangla name', 'বাংলা নাম'), bn_list: L('তালিকা ব্যবস্থাপনার অনুমতি লাগবে', 'You need the list-manager right', 'List manage-এর অনুমতি লাগবে'),
   nosql: L('ডেটাবেস আপডেট বাকি (phase22.sql)', 'The database update (phase22.sql) is not installed yet', 'Database update (phase22.sql) বাকি'), noright: L('এই পাতা দেখার অনুমতি নেই', 'You do not have access to this page', 'এই page দেখার অনুমতি নেই'),
   link_map: L('পুরনো আইটেম মেলানো', 'Old items to master codes', 'পুরনো Item মেলানো'),
   // mapping page
@@ -54,10 +54,10 @@ const X = {
   fnd_title: L('ডিকশনারি আইটেম বাছুন', 'Choose a dictionary item', 'Dictionary item বাছুন'), fnd_ph: L('বাংলা / ইংরেজি নাম বা ক্যাটাগরি', 'Bangla / English name or category', 'বাংলা / English নাম বা category'),
   fnd_none: L('কিছু মেলেনি', 'Nothing matches', 'কিছু মেলেনি'), fnd_link: L('মেলান', 'Link', 'Link'), fnd_use: L('এটি ব্যবহার', 'Use this', 'Use this'),
   cf_title: L('নিশ্চিত করুন', 'Please confirm', 'Confirm করুন'), cf_old: L('পুরনো আইটেম', 'Old item', 'Old item'), cf_dict: L('ডিকশনারি আইটেম', 'Dictionary item', 'Dictionary item'),
-  cf_e1: L('ডিকশনারি আইটেম পাবে', 'The dictionary item gets', 'Dictionary item পাবে'), cf_e2: L('পুরনো আইটেম বন্ধ হবে (মোছা হয় না; পুরনো কোড ও দামের ইতিহাস থাকে)', 'The old item becomes inactive (not deleted; its code and price history stay)', 'পুরনো item inactive হবে (delete নয়; code ও price history থাকে)'),
-  cf_e3: L('এটি ফেরত নেওয়া যায় (সিদ্ধান্ত ফেরত)', 'This can be undone (Undo the decision)', 'এটি ফেরত নেওয়া যায় (Undo)'), cf_cur: L('এখন দাম', 'price now', 'price now'), cf_go: L('হ্যাঁ, এটি করুন', 'Yes, do it', 'Yes, do it'),
+  cf_e1: L('ডিকশনারি আইটেম পাবে', 'The dictionary item gets', 'Dictionary item পাবে'), cf_e2: L('পুরনো আইটেম বন্ধ হবে (মোছা হয় না; পুরনো কোড ও প্রাইসের ইতিহাস থাকে)', 'The old item becomes inactive (not deleted; its code and price history stay)', 'পুরনো item inactive হবে (delete নয়; code ও price history থাকে)'),
+  cf_e3: L('এটি ফেরত নেওয়া যায় (সিদ্ধান্ত ফেরত)', 'This can be undone (Undo the decision)', 'এটি ফেরত নেওয়া যায় (Undo)'), cf_cur: L('এখন প্রাইস', 'price now', 'price now'), cf_go: L('হ্যাঁ, এটি করুন', 'Yes, do it', 'Yes, do it'),
   dup_rows: L('একই আইটেম একাধিকবার — প্রতিটি একবারই দিন', 'The same item appears twice — give each once', 'একই item একাধিকবার — প্রতিটি একবারই দিন'),
-  saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
 };
 const T = (k) => lab(X[k]);
 const E = {      // server messages -> short text
@@ -66,14 +66,14 @@ const E = {      // server messages -> short text
   nochange: L('কোনো বদল নেই', 'No change', 'No change'), bad_unit: L('একক ঠিক নয়', 'Unknown unit', 'Unit ঠিক নয়'), cost_owner_only: L('ক্রয়মূল্য শুধু মালিক বদলাতে পারেন', 'Only the owner can change cost', 'Cost শুধু Owner বদলাতে পারেন'),
   tracked_needs_count: L('স্টক ট্র্যাক করতে আগে "ব্যবসায় গণনা" চালু', 'Turn on "count in business" before tracking stock', 'Track করতে আগে "count in business" চালু'), item_has_stock: L('স্টক আছে — বন্ধ করা যাবে না', 'Stock exists — cannot switch off', 'Stock আছে — বন্ধ করা যাবে না'),
   type_not_sellable: L('এই ধরন বিক্রি হয় না', 'This type is never sold', 'এই type বিক্রি হয় না'), type_not_counted: L('এই ধরন গণনায় আসে না', 'This type is never counted', 'এই type গণনায় আসে না'), unlink_first: L('আগে মিল সরান', 'Remove the link first', 'আগে link সরান'),
-  master_code_taken: L('এই ডিকশনারি কোড আগেই ব্যবহৃত', 'That dictionary code is already used', 'এই dictionary code আগেই ব্যবহৃত'), master_type_mismatch: L('এই কোড বিক্রির পণ্য নয়', 'That code is not a product for sale', 'এই code বিক্রির product নয়'),
-  legacy_has_stock: L('পুরনো আইটেমে স্টক আছে', 'The old item has stock', 'Old item-এ stock আছে'), legacy_has_no_price: L('পুরনো আইটেমে দাম নেই', 'The old item has no price', 'Old item-এ দাম নেই'), changed_since: L('এর পর ডিকশনারি আইটেমের দাম বদলেছে — ফেরত নেওয়া যায়নি', 'The dictionary price changed since — cannot undo', 'এর পর dictionary price বদলেছে — undo হয়নি'),
-  dict_has_stock: L('ডিকশনারি আইটেমে স্টক আছে', 'The dictionary item has stock', 'Dictionary item-এ stock আছে'), dict_price_differs: L('ডিকশনারি আইটেমের দাম আলাদা — বদলে যাবে', 'The dictionary item has a different price — it will be replaced', 'Dictionary price আলাদা — বদলে যাবে'), dict_unit_differs: L('ডিকশনারি আইটেমের একক আলাদা — বদলে যাবে', 'The dictionary item has a different unit — it will be replaced', 'Dictionary unit আলাদা — বদলে যাবে'),
+  master_code_taken: L('এই ডিকশনারি কোড আগেই ব্যবহৃত', 'That dictionary code is already used', 'এই dictionary code আগেই ব্যবহৃত'), master_type_mismatch: L('এই কোড সেলের পণ্য নয়', 'That code is not a product for sale', 'এই code sale-এর product নয়'),
+  legacy_has_stock: L('পুরনো আইটেমে স্টক আছে', 'The old item has stock', 'Old item-এ stock আছে'), legacy_has_no_price: L('পুরনো আইটেমে প্রাইস নেই', 'The old item has no price', 'Old item-এ price নেই'), changed_since: L('এর পর ডিকশনারি আইটেমের প্রাইস বদলেছে — ফেরত নেওয়া যায়নি', 'The dictionary price changed since — cannot undo', 'এর পর dictionary price বদলেছে — undo হয়নি'),
+  dict_has_stock: L('ডিকশনারি আইটেমে স্টক আছে', 'The dictionary item has stock', 'Dictionary item-এ stock আছে'), dict_price_differs: L('ডিকশনারি আইটেমের প্রাইস আলাদা — বদলে যাবে', 'The dictionary item has a different price — it will be replaced', 'Dictionary price আলাদা — বদলে যাবে'), dict_unit_differs: L('ডিকশনারি আইটেমের একক আলাদা — বদলে যাবে', 'The dictionary item has a different unit — it will be replaced', 'Dictionary unit আলাদা — বদলে যাবে'),
   dict_unit_has_stock: L('ডিকশনারি আইটেমে স্টক আছে, একক আলাদা — করা যাবে না', 'The dictionary item has stock in another unit — not possible', 'Dictionary item-এ stock আছে, unit আলাদা — করা যাবে না'), item_linked: L('মাস্টার কোডের সাথে মেলানো — আগে মিল সরান', 'Linked to a master code — remove the link first', 'Master code-এর সাথে linked — আগে link সরান'), replaced: L('ডিকশনারি আইটেম ব্যবহার করা — আগে ফেরত নিন', 'Replaced by a dictionary item — undo it first', 'Dictionary item ব্যবহার করা — আগে undo'),
   undo_first: L('আগে সিদ্ধান্ত ফেরত নিন', 'Undo the decision first', 'আগে decision undo করুন'), already_replaced: L('আগেই ডিকশনারি আইটেম ব্যবহার করা হয়েছে', 'Already replaced', 'Already replaced'), dict_retired: L('ডিকশনারি আইটেম বন্ধ', 'The dictionary item is retired', 'Dictionary item retired'),
   master_code_not_found: L('ডিকশনারি কোড পাওয়া যায়নি', 'Dictionary code not found', 'Dictionary code পাওয়া যায়নি'), item_inactive: L('আইটেম আগেই বন্ধ', 'Item is already inactive', 'Item আগেই inactive'),
 };
-const errText = (m) => { m = String(m || ''); for (const k of Object.keys(E)) if (m.includes(k)) return lab(E[k]); if (/bad_price/.test(m)) return lab(L('দাম ঠিক নয়', 'Price is not valid', 'Price ঠিক নয়')); if (/bad_flag/.test(m)) return lab(L('হ্যাঁ/না ঠিক নয়', 'Yes/No not valid', 'Yes/No ঠিক নয়')); if (/bad_field/.test(m)) return lab(L('এই ঘর বদলানো যায় না', 'This field cannot be changed here', 'এই field বদলানো যায় না')); return m.slice(0, 80); };
+const errText = (m) => { m = String(m || ''); for (const k of Object.keys(E)) if (m.includes(k)) return lab(E[k]); if (/bad_price/.test(m)) return lab(L('প্রাইস ঠিক নয়', 'Price is not valid', 'Price ঠিক নয়')); if (/bad_flag/.test(m)) return lab(L('হ্যাঁ/না ঠিক নয়', 'Yes/No not valid', 'Yes/No ঠিক নয়')); if (/bad_field/.test(m)) return lab(L('এই ঘর বদলানো যায় না', 'This field cannot be changed here', 'এই field বদলানো যায় না')); return m.slice(0, 80); };
 const rpcFail = (e) => { const m = (e && e.message) || ''; if (/function .*does not exist|Could not find the function|schema cache/i.test(m)) return toast(T('nosql')); if (Object.keys(E).some((k) => m.includes(k)) || /bad_price|bad_flag|bad_field/.test(m)) return toast(errText(m)); return fail(e); };
 
 // ---------- state ----------
@@ -104,6 +104,7 @@ async function initBulk() {
 function applyFilters(q) {
   const f = BK.f;
   if (f.cat) q = q.eq('category', f.cat);
+  if (f.sub) q = q.eq('sub_category', f.sub);   // bos100
   if (f.type) q = q.eq('item_type', f.type);
   if (f.batch) q = q.eq('import_batch', f.batch);
   if (f.fg) { q = q.in('item_type', ['finished_good', 'resale']).is('sell_price', null).eq('is_active', true).eq('hidden', false); }
@@ -114,7 +115,7 @@ function applyFilters(q) {
   if (s) q = q.or(['code', 'name_bn', 'name_en', 'name_mix'].map((c) => c + '.ilike.%' + s + '%').join(','));
   return q;
 }
-const COLS = 'id,code,name_bn,name_en,unit,sell_price,wholesale_price,tracked,min_stock,count_in_business,sellable,is_active,hidden,locked,item_type,category,import_batch';
+const COLS = 'id,code,name_bn,name_en,unit,sell_price,wholesale_price,tracked,min_stock,count_in_business,sellable,is_active,hidden,locked,item_type,category,sub_category,import_batch';   // bos100: sub_category
 async function loadPage() {
   const from = BK.page * PAGE;
   const r = await applyFilters(sb.from('items').select(COLS, { count: 'exact' })).order('code').range(from, from + PAGE - 1);
@@ -150,7 +151,7 @@ function catChoices() {
 function drawGridShell() {
   const f = BK.f, chk = (id, on, l) => `<label class="row" style="gap:6px;align-items:center"><input type="checkbox" id="${id}" ${on ? 'checked' : ''}> <span>${esc(l)}</span></label>`;
   $('#bk_body').innerHTML = `<div class="card stack"><input id="bk_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(f.q)}" aria-label="${esc(T('search'))}">
-    <div class="row wrap" style="gap:8px">${sel('bk_cat', catChoices(), f.cat, T('f_cat'))}${BK.types.length ? sel('bk_type', BK.types.map((x) => [x.code, B.itemMaster.typeLabel(x.code)]), f.type, T('f_type')) : ''}
+    <div class="row wrap" style="gap:8px">${sel('bk_cat', catChoices(), f.cat, T('f_cat'))}${/* bos100 */ B.catpick ? B.catpick.subSelect('bk_sub', f.cat, f.sub, 'bk_cat') : ''}${BK.types.length ? sel('bk_type', BK.types.map((x) => [x.code, B.itemMaster.typeLabel(x.code)]), f.type, T('f_type')) : ''}
       <select id="bk_active"><option value="yes" ${f.active === 'yes' ? 'selected' : ''}>${esc(T('f_active'))}</option><option value="no" ${f.active === 'no' ? 'selected' : ''}>${esc(T('f_inactive'))}</option><option value="" ${f.active === '' ? 'selected' : ''}>${esc(T('f_any'))}</option></select>
       ${BK.batches.length ? sel('bk_batch', BK.batches.map((b) => [b, b]), f.batch, T('f_batch')) : ''}</div>
     <div class="row wrap" style="gap:12px">${chk('bk_unpriced', f.unpriced, T('f_unpriced'))}${chk('bk_untracked', f.untracked, T('f_untracked'))}${chk('bk_fg', f.fg, T('f_fg'))}${isOwner() ? chk('bk_cost', BK.showCost, T('cost_show')) : ''}</div></div>
@@ -167,9 +168,9 @@ function drawGrid() {
   const ck = (r, f) => `<input type="checkbox" class="bk-cell ${edited(r, f) ? 'ed' : ''}" data-id="${esc(r.id)}" data-f="${f}" ${cellVal(r, f) ? 'checked' : ''} ${r.locked ? 'disabled' : ''} aria-label="${esc(r.code)} ${f}">`;
   const un = (r) => { const v = cellVal(r, 'unit') || ''; const o = unitOpts(); if (v && !o.some((x) => x[0] === v)) o.push([v, v]); return `<select class="bk-cell ${edited(r, 'unit') ? 'ed' : ''}" data-id="${esc(r.id)}" data-f="unit" ${r.locked ? 'disabled' : ''} aria-label="${esc(r.code)} unit"><option value=""></option>${o.map(([c, l]) => `<option value="${esc(c)}" ${c === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`; };
   const head = ['', 'c_code', 'c_bn', 'c_en', 'c_unit', 'c_price', 'c_whs', 'c_trk', 'c_min', 'c_cnt', 'c_sell', 'c_act'].concat(showCost ? ['c_cost'] : []);
-  el.innerHTML = BK.rows.length ? `<div class="bk-wrap"><table class="bk-tbl"><thead><tr>${head.map((h) => `<th>${h ? esc(T(h)) : `<input type="checkbox" id="bk_selall" aria-label="${esc(T('sel_page'))}">`}</th>`).join('')}</tr></thead><tbody>${BK.rows.map((r) => `<tr class="${BK.edits.has(r.id) ? 'chg' : ''}" data-row="${esc(r.id)}">
-    <td><input type="checkbox" class="bk-sel" data-id="${esc(r.id)}" ${BK.sel.has(r.id) ? 'checked' : ''} aria-label="select ${esc(r.code)}"></td>
-    <td class="bk-code"><b>${esc(r.code)}</b>${r.locked ? ` <span class="chip warn">${esc(T('locked'))}</span>` : ''}${r.hidden ? ` <span class="chip">${esc(T('hidden'))}</span>` : ''}</td>
+  el.innerHTML = BK.rows.length ? `<div class="bk-wrap"><table class="bk-tbl"><thead><tr>${head.map((h) => `<th>${h ? esc(T(h)) : `<label class="bk-hit"><input type="checkbox" id="bk_selall" aria-label="${esc(T('sel_page'))}"></label>`}</th>`).join('')}</tr></thead><tbody>${BK.rows.map((r) => `<tr class="${BK.edits.has(r.id) ? 'chg' : ''}" data-row="${esc(r.id)}">
+    <td><label class="bk-hit"><input type="checkbox" class="bk-sel" data-id="${esc(r.id)}" ${BK.sel.has(r.id) ? 'checked' : ''} aria-label="select ${esc(r.code)}"></label></td>
+    <td class="bk-code"><b>${esc(r.code)}</b>${/* bos100 */ B.catpick && B.catpick.label(r) ? `<div class="muted" style="font-size:.75rem">${esc(B.catpick.label(r))}</div>` : ''}${r.locked ? ` <span class="chip warn">${esc(T('locked'))}</span>` : ''}${r.hidden ? ` <span class="chip">${esc(T('hidden'))}</span>` : ''}</td>
     <td>${txt(r, 'name_bn')}</td><td>${txt(r, 'name_en')}</td><td>${un(r)}</td><td>${inp(r, 'sell_price', 'n')}</td><td>${inp(r, 'wholesale_price', 'n')}</td><td class="c">${ck(r, 'tracked')}</td><td>${inp(r, 'min_stock', 'n')}</td>
     <td class="c">${ck(r, 'count_in_business')}</td><td class="c">${ck(r, 'sellable')}</td><td class="c">${ck(r, 'is_active')}</td>${showCost ? `<td>${inp({ id: r.id, locked: r.locked, code: r.code, cost_price: BK.costs.get(r.id) }, 'cost_price', 'n')}</td>` : ''}</tr>`).join('')}</tbody></table></div>`
     : `<p class="muted center">${esc(T('none'))}</p>`;
@@ -183,11 +184,11 @@ function drawBar() {
   const n = BK.edits.size, s = BK.sel.size;
   el.innerHTML = (n || s) ? `<div class="card stack bk-bar"><div class="row between"><b id="bk_n">${n} ${esc(T('changed'))}</b><span class="muted">${s} ${esc(T('sel'))}</span></div>
     <div class="row wrap" style="gap:8px">${n ? `<button class="primary" data-act="bk_preview">${esc(T('preview'))}</button><button data-act="bk_discard">${esc(T('discard'))}</button>` : ''}
-    ${s && BK.direct ? `<button data-act="bk_hide_sel">${esc(T('hide_sel'))}</button><button data-act="bk_inact_sel">${esc(T('inact_sel'))}</button>` : ''}</div></div>` : '';
+    ${/* bos100 */ s && BK.direct && B.catpick ? `<button data-act="bk_cat_sel">${esc(B.catpick.T('setFor'))}</button>` : ''}${s && BK.direct ? `<button data-act="bk_hide_sel">${esc(T('hide_sel'))}</button><button data-act="bk_inact_sel">${esc(T('inact_sel'))}</button>` : ''}</div></div>` : '';
 }
 const css = document.createElement('style'); css.id = 'bkcss';
 css.textContent = `.bk-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}.bk-tbl{border-collapse:collapse;font-size:.9rem;min-width:880px}.bk-tbl th,.bk-tbl td{padding:4px;border-bottom:1px solid var(--line,#e3e0d8);text-align:start;vertical-align:middle;white-space:nowrap}
-.bk-tbl th{font-size:.78rem;color:var(--muted)}.bk-tbl td.c{text-align:center}.bk-tbl input.bk-cell:not([type=checkbox]),.bk-tbl select.bk-cell{width:92px;min-height:36px;padding:4px 6px}.bk-tbl input.bk-name{width:150px}.bk-tbl input[type=checkbox]{width:22px;height:22px}
+.bk-tbl th{font-size:.78rem;color:var(--muted)}.bk-tbl td.c{text-align:center}.bk-tbl input.bk-cell:not([type=checkbox]),.bk-tbl select.bk-cell{width:92px;min-height:36px;padding:4px 6px}.bk-tbl input.bk-name{width:150px}.bk-tbl input[type=checkbox]{width:22px;height:22px}.bk-hit{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px}
 .bk-cell.ed{outline:2px solid var(--sig-info,#2f6f9f);background:var(--surface-2,#eef5fa)}.bk-tbl tr.chg td.bk-code{border-inline-start:3px solid var(--sig-info,#2f6f9f)}.bk-bar{position:sticky;bottom:6px;z-index:5}
 .bk-pv td,.bk-pv th{padding:4px 6px;border-bottom:1px solid var(--line,#e3e0d8);text-align:start;font-size:.88rem;vertical-align:top}.bk-pv .bad{color:var(--sig-bad,#b3261e)}.bk-pv .ok{color:var(--sig-ok,#3a7d5c)}
 .bk-ta{width:100%;min-height:150px;font-family:monospace}.mp2 .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.mp2 .acts button{min-height:40px;text-align:start}`;
@@ -311,6 +312,7 @@ Object.assign(H, {
   bk_preview: () => startPreview(collectChanges(), 'grid', null), bk_apply: applyPending,
   bk_discard: () => { BK.edits.clear(); drawGrid(); },
   bk_export: exportCsv,
+  bk_cat_sel: () => B.catpick.bulkSheet([...BK.sel], () => { BK.sel.clear(); reloadGrid(); }),   // bos100
   bk_hide_sel: () => startPreview([...BK.sel].map((id) => ({ item_id: id, hidden: true })), 'hide', null),
   bk_inact_sel: () => openSheet(`<h2>${esc(T('inact_sel'))}</h2><div class="stack"><div><label for="bk_reason">${esc(T('reason'))} *</label><input id="bk_reason" autocomplete="off"></div><div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="bk_inact_go">${esc(T('preview'))}</button></div></div>`),
   bk_inact_go: () => { const r = ($('#bk_reason').value || '').trim(); if (!r) return toast(T('reason_need')); startPreview([...BK.sel].map((id) => ({ item_id: id, is_active: false, reason: r })), 'inactive', r); },
@@ -336,7 +338,7 @@ document.addEventListener('change', (e) => {
   if (el.classList && el.classList.contains('bk-cell') && (el.type === 'checkbox' || el.tagName === 'SELECT')) { setEdit(el.dataset.id, el.dataset.f, el.type === 'checkbox' ? el.checked : el.value); el.classList.toggle('ed', el.dataset.f in (BK.edits.get(el.dataset.id) || {})); const tr = el.closest('tr'); if (tr) tr.classList.toggle('chg', BK.edits.has(el.dataset.id)); drawBar(); return; }
   if (el.classList && el.classList.contains('bk-sel')) { if (el.checked) BK.sel.add(el.dataset.id); else BK.sel.delete(el.dataset.id); drawBar(); return; }
   if (id === 'bk_selall') { BK.rows.forEach((r) => { if (el.checked) BK.sel.add(r.id); else BK.sel.delete(r.id); }); drawGrid(); return; }
-  if (['bk_cat', 'bk_type', 'bk_active', 'bk_batch'].includes(id)) { BK.sel.clear(); BK.f[{ bk_cat: 'cat', bk_type: 'type', bk_active: 'active', bk_batch: 'batch' }[id]] = el.value; BK.page = 0; reloadGrid(); return; }
+  if (['bk_cat', 'bk_sub', 'bk_type', 'bk_active', 'bk_batch'].includes(id)) { BK.sel.clear(); if (id === 'bk_cat') BK.f.sub = ''; /* bos100 */ BK.f[{ bk_cat: 'cat', bk_sub: 'sub', bk_type: 'type', bk_active: 'active', bk_batch: 'batch' }[id]] = el.value; BK.page = 0; reloadGrid(); return; }
   if (['bk_unpriced', 'bk_untracked', 'bk_fg'].includes(id)) { BK.sel.clear(); BK.f[{ bk_unpriced: 'unpriced', bk_untracked: 'untracked', bk_fg: 'fg' }[id]] = el.checked; BK.page = 0; reloadGrid(); return; }
   if (id === 'bk_cost') { BK.showCost = el.checked; reloadGrid(); }
 });
@@ -383,7 +385,7 @@ async function decide(item, action, dict, force) {
   const { error } = await sb.rpc('item_map_decide2', { p_item: item, p_action: action, p_dict: dict || null, p_note: null, p_force: !!force });
   if (error) {
     const fm = /(master_type_mismatch|dict_has_stock|dict_price_differs|dict_unit_differs)/.exec(error.message || '');
-    if (fm && isOwner() && !force && window.confirm(fm[1] === 'master_type_mismatch' ? lab(L('এই কোডটি বিক্রির পণ্য নয়। তবুও করবেন?', 'That code is not a product for sale. Do it anyway?', 'এই code বিক্রির product নয়। তবুও করবেন?')) : errText(fm[1]) + ' — ' + lab(L('তবুও করবেন?', 'Do it anyway?', 'তবুও করবেন?')))) return decide(item, action, dict, true);
+    if (fm && isOwner() && !force && window.confirm(fm[1] === 'master_type_mismatch' ? lab(L('এই কোডটি সেলের পণ্য নয়। তবুও করবেন?', 'That code is not a product for sale. Do it anyway?', 'এই code sale-এর product নয়। তবুও করবেন?')) : errText(fm[1]) + ' — ' + lab(L('তবুও করবেন?', 'Do it anyway?', 'তবুও করবেন?')))) return decide(item, action, dict, true);
     return rpcFail(error);
   }
   closeSheet(); toast(T('saved')); await viewMap(); try { if (B.items2 && B.items2.reload) await B.items2.reload(); } catch (e) { /* list reloads later */ }

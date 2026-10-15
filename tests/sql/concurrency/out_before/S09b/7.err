@@ -1,0 +1,1 @@
+psql:/home/user/wt-int4/tests/sql/concurrency/out_before/S09b/worker.sql:7: ERROR:  deadlock detected
