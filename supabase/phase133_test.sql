@@ -427,10 +427,10 @@ select tt.ok('T5 the server (no login) writes anywhere', format($q$insert into h
 select tt.as(:'bs');
 select tt.ok('T5 the B super user writes at the B place (rollout_set)', format($q$select rollout_set('03-1', %s, 'paper')$q$, :'hw1'));
 select tt.t('T5 every table with a place column carries the border trigger (except the listed system tables)',
-  not exists (select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('locations', 'user_locations', 'user_grants', 'user_org_scopes', 'notifications', 'exceptions', 'sales_fact_t', 'bi_export_log')
+  not exists (select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('locations', 'user_locations', 'user_grants', 'user_org_scopes', 'notifications', 'exceptions', 'sales_fact_t', 'bi_export_log', 'business_place_ops135')
      and exists (select 1 from pg_attribute a where a.attrelid = c.oid and not a.attisdropped and a.attname in ('location_id', 'from_location_id', 'to_location_id', 'primary_location_id'))
      and not exists (select 1 from pg_trigger t where t.tgrelid = c.oid and t.tgname = c.relname || '_xb133')),
-  'true', (select string_agg(c.relname, ',') from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('locations', 'user_locations', 'user_grants', 'user_org_scopes', 'notifications', 'exceptions', 'sales_fact_t', 'bi_export_log', 'items', 'option_sets', 'option_values', 'item_styles', 'price_lists', 'price_list_items', 'legal_entities')
+  'true', (select string_agg(c.relname, ',') from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' and c.relname not in ('locations', 'user_locations', 'user_grants', 'user_org_scopes', 'notifications', 'exceptions', 'sales_fact_t', 'bi_export_log', 'business_place_ops135', 'items', 'option_sets', 'option_values', 'item_styles', 'price_lists', 'price_list_items', 'legal_entities')
      and exists (select 1 from pg_attribute a where a.attrelid = c.oid and not a.attisdropped and a.attname in ('location_id', 'from_location_id', 'to_location_id', 'primary_location_id'))
      and not exists (select 1 from pg_trigger t where t.tgrelid = c.oid and t.tgname = c.relname || '_xb133')));
 
@@ -639,15 +639,16 @@ select tt.is('T13 NO unexpected difference (function names not in tests/sql/scop
 
 \echo == T14 paste phase133 again on this database: nothing changes
 select md5(string_agg(p.oid::regprocedure::text || md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fh0 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prokind = 'f' \gset
-select count(*) as trg0 from pg_trigger where tgname like '%\_xb133' \gset
+select count(*) as trg0 from pg_trigger where tgname like '%\_xb133' and tgrelid <> coalesce(to_regclass('public.business_place_ops135'), 0::regclass) \gset
 select count(*) as pol0 from pg_policies where policyname like '%133%' \gset
 reset role;
 \i supabase/phase133.sql
 -- phase134 patches three phase133 functions and is last in the order: a re-paste of 133 is followed by it
 \i supabase/phase134.sql
+\i supabase/phase135.sql
 select md5(string_agg(p.oid::regprocedure::text || md5(pg_get_functiondef(p.oid)), '|' order by p.oid::regprocedure::text)) as fh1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prokind = 'f' \gset
 select tt.t('T14 paste twice: no function body changes', :'fh0' = :'fh1');
-select tt.t('T14 paste twice: the same triggers and policies, the overrides and the switch are untouched', (select count(*) from pg_trigger where tgname like '%\_xb133') = :trg0 and (select count(*) from pg_policies where policyname like '%133%') = :pol0 and rule_on('org_scope_on'));
+select tt.t('T14 paste twice: the same triggers and policies, the overrides and the switch are untouched', (select count(*) from pg_trigger where tgname like '%\_xb133' and tgrelid <> coalesce(to_regclass('public.business_place_ops135'), 0::regclass)) = :trg0 and (select count(*) from pg_policies where policyname like '%133%') = :pol0 and rule_on('org_scope_on'));
 
 \echo == T15 switching OFF again gives back the first numbers (history and settings are kept)
 update rules set value = 'false'::jsonb where key = 'org_scope_on';

@@ -59,6 +59,7 @@ biz_cost_ok|PRIM|permission / identity helper: returns a flag, reads no business
 biz_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
 biz_suggest|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
 blind_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+business_place_move135|OWNER|owner only (hard gate, phase135): moving a place between businesses is a group-level act; dry-run first, people / open documents / supply links always block, transactions need force
 cancel_emergency|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
 category_merge|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
 category_move|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row

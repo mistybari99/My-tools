@@ -46,6 +46,7 @@ RULES = [
   'OWNER', 'owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)'),
  (r'^(org_scope_grant|org_scope_revoke|org_scope_list|org_tree|org_unit_save|org_unit_deactivate)$', 'OWNER', 'group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places'),
  (r'^(master_share_create|master_share_revoke|master_share_list|master_scope_report132|org_masters_relax_unique|org_masters_restore_unique)$', 'OWNER', 'owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools'),
+ (r'^business_place_move135$', 'OWNER', 'owner only (hard gate, phase135): moving a place between businesses is a group-level act; dry-run first, people / open documents / supply links always block, transactions need force'),
  (r'^partner_', 'OWNER', 'partners module: every function starts with _a44_guard() = owner only'),
  (r'^(tier_reorder|tier_save|gift_rule_save|set_unit_conversion|list_def_set|list_manager_set|item_class_map_set|item_type_set|item_master_import_apply|item_master_import_preview|item_mapping_load|item_mapping_autolink|category_merge|category_rename)$',
   'OWNER', 'owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)'),

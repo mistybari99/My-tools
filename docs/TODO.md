@@ -114,3 +114,10 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [ ] L2 Owner says "push": publish setup-run-24.html after Run 21-23; paste once; Check. Owner opens #/profile for each business and fills logo / address / receipt text.
 - [ ] L3 Owner phone UAT: log in as a one-business user and confirm nothing about the group / other businesses shows (drawer, #/organization, receipts).
 - [ ] L4 Decide: should audit_log / the exceptions screens ever show a business manager the history of his own business profile (today: owner only)?
+---
+## M. Stage D2 (local-loc) - docs/INTEGRATION_REPORT_10.md
+- [x] M1 phase135 + `web/places135.js` (Add place / Places / Move place / guided New business) + tests + `setup-run-25.html` (check safe before paste).
+- [ ] M2 Owner says "push": publish setup-run-25.html after Run 24; paste once; Check. Then create the second business from `#/organization` (steps in INTEGRATION_REPORT_10 section 1).
+- [ ] M3 There is still NO screen for `org_scope_grant` (a person's scope over a business) and none for `org_scope_preflight`; people get a business through their places in Staff. Build a small scope screen before switching `org_scope_on` ON for real users.
+- [ ] M4 The old Places screen (`#/locations`, Add) still creates UNMAPPED places (it is the unchanged phase16 path). Decide: hide its Add button once a second business exists, or add a business picker to it.
+- [ ] M5 Dealer template switches (cheque, schemes, tinting, import-export) are enabled by hand in the Switchboard; a one-click "enable template switches" is not built.

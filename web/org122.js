@@ -84,7 +84,7 @@ function nodeHTML(n, depth) {
   const le = lx.length ? `<div class="muted">${lx.join(' · ')}</div>` : '';
   const nb = tplStatus(n) === 'not_implemented' ? `<div class="muted">${esc(T('tplNote'))}</div>` : '';
   const acts = off ? '' : `<div class="row" style="flex-wrap:wrap;gap:6px">${(CHILD[n.kind] || []).length ? `<button class="mini" style="min-height:40px" data-act="og_add" data-v="${esc(n.id)}">+ ${esc(T('add'))}</button>` : ''}
-      <button class="mini" style="min-height:40px" data-act="og_edit" data-v="${esc(n.id)}">${esc(T('rename'))}</button>${n.kind === 'group' ? '' : `<button class="mini" style="min-height:40px" data-act="og_off" data-v="${esc(n.id)}">${esc(T('off'))}</button>`}</div>`;
+      <button class="mini" style="min-height:40px" data-act="og_edit" data-v="${esc(n.id)}">${esc(T('rename'))}</button>${n.kind === 'group' ? '' : `<button class="mini" style="min-height:40px" data-act="og_off" data-v="${esc(n.id)}">${esc(T('off'))}</button>`}</div>${n.kind === 'business' && window.BOS_PLACES135 ? window.BOS_PLACES135.cardHTML(n) : ''}`;
   return `<div class="og-node" data-id="${esc(n.id)}" style="margin-left:${Math.min(depth, 4) * 12}px"><div class="card ${off ? 'muted' : ''}" style="word-break:break-word;overflow-wrap:anywhere">
     <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center"><span class="chip">${esc(kl(n.kind))}</span><b>${esc(uname(n))}</b>${n.code ? `<span class="muted">${esc(n.code)}</span>` : ''}${off ? `<span class="chip muted">${esc(T('inactive'))}</span>` : ''}${tplBadge(n)}</div>
     ${le}${nb}${acts}</div>${n.children.map((c) => nodeHTML(c, depth + 1)).join('')}</div>`;
@@ -92,6 +92,7 @@ function nodeHTML(n, depth) {
 function draw() {
   const el = $('#og_body'); if (!el) return;
   // the single group is seeded; legal entities / businesses are added inside the tree. Only an empty tree (nothing seeded yet) shows the empty text.
+  const top = $('#og_top'); if (top) top.innerHTML = window.BOS_PLACES135 ? window.BOS_PLACES135.topHTML() : '';   // phase135: "New business" (owner only)
   el.innerHTML = (D.tree.length ? D.tree.map((n) => nodeHTML(n, 0)).join('') : `<div class="card" id="og_empty"><p class="muted">${esc(T('empty'))}</p></div>`);
 }
 function tplOptions(sel) {
@@ -150,13 +151,15 @@ Object.assign(H, {
 });
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'og_kind') { const w = $('#og_tplw'); if (w) w.hidden = e.target.value !== 'business'; const l = $('#og_lew'); if (l) l.hidden = e.target.value !== 'legal_entity'; } });
 async function refresh() { await load(); draw(); }
+// phase135 (web/places135.js) reads the tree through this small door; nothing else is exposed
+window.BOS_ORG122 = { flat: () => D.flat, tpl: () => D.tpl, refresh: async () => { if ($('#og_body')) await refresh(); else await load(); } };
 async function allowed() {
   if (isOwner()) return true;
   try { const r = await sb.rpc('has_grant', { p_code: 'org_manage' }); return !!(r && !r.error && r.data === true); } catch (e) { return false; }
 }
 async function view() {
   if (B.loadStatic) await B.loadStatic();
-  shell(T('title'), '<div id="og_body" class="stack"><p class="muted">…</p></div>', true);
+  shell(T('title'), '<div id="og_top" class="stack"></div><div id="og_body" class="stack"><p class="muted">…</p></div>', true);
   try {
     D.ok = await allowed();
     if (!D.ok) { $('#og_body').innerHTML = `<div class="card" id="og_noperm"><p class="muted">${esc(T('noperm'))}</p></div>`; return; }
