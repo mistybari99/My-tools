@@ -1,0 +1,1741 @@
+{
+ "version": 1,
+ "entries": {
+  "feature:customer_advance": {
+   "title": "Customer advance",
+   "does": "Money a customer pays before buying. It is held as a liability in account 2300. A read-only check compares the journal with the cash moves for each customer.",
+   "why": "An advance is not income until it is used.",
+   "default": "The posting already worked before phase 81. The check changes nothing.",
+   "change": "There is no switch. The full flow of using an advance was not confirmed here.",
+   "who": "People with Accounts view can run the check.",
+   "related": [
+    "screen:shortages",
+    "screen:accounts"
+   ],
+   "verified": false,
+   "src": "phase81.sql (cust_advance_check); B.md"
+  },
+  "feature:exception_reason": {
+   "title": "Override with a reason",
+   "does": "Each control has a way past it that needs a written reason. A use writes one audit line and one row in the Exceptions list. The way is not tied to a person or a role.",
+   "why": "A rule that can never bend gets worked around, so a bend with a reason leaves a trace.",
+   "default": "An override is not available unless the owner grants it.",
+   "change": "There is no switch. The owner's one-off grant needs a reason, works once and expires in 24 hours by default; a journal that does not balance gets no exception.",
+   "who": "The owner gives the grant. The use is logged.",
+   "related": [
+    "screen:exceptions",
+    "feature:payment_source"
+   ],
+   "verified": true,
+   "src": "phase87.sql (money_exception_grant); BUILD-LOG phase 87; UNIFIED_BUILD_PLAN 6.1"
+  },
+  "feature:money_transfer": {
+   "title": "Transfers between money accounts",
+   "does": "Moves money from one money account to another as one balanced entry. You can add a fee, which the account you choose bears. You can void a transfer with a reason, and repeat a transfer every month.",
+   "why": "Money moved between your own accounts is not a sale or an expense.",
+   "default": "Nothing moves until you enter a transfer.",
+   "change": "There is no switch. A void adds a linked reversal and never deletes, and the same account on both sides is refused.",
+   "who": "The owner and people with money rights. The exact grant is not confirmed.",
+   "related": [
+    "screen:moneyaccounts"
+   ],
+   "verified": false,
+   "src": "phase87.sql; BUILD-LOG phase 87"
+  },
+  "feature:opening_balance": {
+   "title": "Opening balance",
+   "does": "Puts what you had on day one into the books: stock, cash, bank, customer dues, supplier dues and capital. It posts as one journal entry. Debit and credit must be equal, or it is refused.",
+   "why": "Every later figure in the books starts from it.",
+   "default": "Nothing is posted until you press Save on the Opening tab. A dry run first shows both totals and writes nothing.",
+   "change": "There is no switch. Only one opening can be posted; later changes need an adjustment with a reason, and past figures never change.",
+   "who": "The owner, or people with the Accounts manage grant. The stock part also needs the stock opening right.",
+   "related": [
+    "screen:accounts",
+    "screen:openparties",
+    "rule:start_date_lock_after_opening"
+   ],
+   "verified": true,
+   "src": "phase80.sql; BUILD-LOG R1; W1-A.md"
+  },
+  "feature:payment_source": {
+   "title": "Payment source",
+   "does": "Lets you pick which money account a payment comes from: cash drawer, wallet or bank. The journal, statements and reports follow that account.",
+   "why": "The owner may pay from a different source each time, and the books should match.",
+   "default": "No default source and no source required. A payment with no account posts as before.",
+   "change": "For each event type the owner can set a default source, stop a different pick, or require a source. Without a source, a required payment is refused.",
+   "who": "The owner sets the defaults. A one-off exception needs an owner grant with a reason.",
+   "related": [
+    "screen:moneyaccounts",
+    "feature:exception_reason"
+   ],
+   "verified": true,
+   "src": "phase87.sql; BUILD-LOG phase 87"
+  },
+  "feature:report_parity": {
+   "title": "Report parity",
+   "does": "Checks if salary and expense totals agree between the day book, the profit report, the expense report and the journal for the same days. A difference is listed by cause.",
+   "why": "Different totals for the same cost make every report doubtful.",
+   "default": "Read only. It changes nothing.",
+   "change": "There is no switch. Three settings bring the reports to one rule: expense_count_on, report_expense_parity_on and report_salary_source.",
+   "who": "People with Accounts view or Accounts manage.",
+   "related": [
+    "screen:profitcheck",
+    "rule:expense_count_on",
+    "rule:report_expense_parity_on",
+    "rule:report_salary_source"
+   ],
+   "verified": true,
+   "src": "phase93.sql; W1-D.md"
+  },
+  "feature:return_restock": {
+   "title": "Return restock rules",
+   "does": "For each item class you can say if returned goods go back on the shelf or are written off. The cashier can also choose. Goods written off go to wastage at the sale cost.",
+   "why": "A returned perishable item should not be sold again by FEFO.",
+   "default": "No class rule. All returned goods go back on the shelf, as today.",
+   "change": "A class can start on a set date. A return that wrote goods off cannot be voided; use a stock adjustment instead.",
+   "who": "The owner sets the class rules.",
+   "related": [
+    "screen:returnrules",
+    "rule:return_expired_restock"
+   ],
+   "verified": true,
+   "src": "phase91.sql; W1-C.md section 4"
+  },
+  "grant:backdate_over_limit": {
+   "title": "Go over the back-date limit",
+   "does": "Lets a person save a record dated further back than the back-date limit.",
+   "why": "Some records are truly late.",
+   "default": "Nobody has it.",
+   "change": "Each use is logged. A one-off owner grant or an override window also works.",
+   "who": "The owner gives it.",
+   "related": [
+    "rule:backdate_max_days_purchase",
+    "rule:backdate_max_days_cash_move"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "grant:closed_period_edit": {
+   "title": "Enter or change something in a closed period",
+   "does": "Lets a person enter or change a record dated in a closed period.",
+   "why": "Sometimes a closed month needs a fix.",
+   "default": "Nobody has it except the owner.",
+   "change": "It is a window grant. An approved emergency request can give it for a short time.",
+   "who": "The owner gives it.",
+   "related": [
+    "rule:period_closed_until",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase7.sql; W1-B.md"
+  },
+  "grant:exit_keep_access": {
+   "title": "Keep a login after the person has left",
+   "does": "Lets a person keep the login of someone who has left, for one case.",
+   "why": "Sometimes a person must keep access for a short time.",
+   "default": "Nobody has it except the owner.",
+   "change": "It needs a reason. It writes an audit line and a yellow Exceptions row.",
+   "who": "The owner gives it.",
+   "related": [
+    "rule:exit_revoke_mode"
+   ],
+   "verified": true,
+   "src": "phase90.sql; W1-C.md"
+  },
+  "grant:late_sale_release": {
+   "title": "Decide a held late sale",
+   "does": "Lets a person accept, re-date or reject a late sale held by the park policy.",
+   "why": "Someone must decide each held sale.",
+   "default": "Only the owner can decide.",
+   "change": "The maker cannot decide the same sale unless the maker is the owner and owner self approve is ON.",
+   "who": "The owner gives it.",
+   "related": [
+    "rule:late_sale_policy"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "grant:return_override": {
+   "title": "Return outside the rules",
+   "does": "Lets a person save a return that breaks the window, the receipt rule, the restock rule or the expired batch rule.",
+   "why": "Some returns are right even if a rule says no.",
+   "default": "Nobody has it except the owner.",
+   "change": "A reason is needed. It writes one audit line and a yellow Exceptions row (red for an expired batch).",
+   "who": "The owner gives it. It is a window grant, so an approved emergency request also works.",
+   "related": [
+    "screen:returnrules",
+    "rule:return_window_hours"
+   ],
+   "verified": true,
+   "src": "phase91.sql; W1-C.md"
+  },
+  "rule:accounting_on": {
+   "title": "Accounting (double-entry books) on",
+   "does": "While OFF, nothing is posted to the books. ON starts posting sales, purchases and expenses to the journal.",
+   "why": "The books must not start before the start date and the opening are ready.",
+   "default": "OFF.",
+   "change": "Set the start date and the opening first. Nothing dated before the start date goes into the books.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:accounting_start_date",
+    "feature:opening_balance",
+    "rule:accounting_on_needs_reason"
+   ],
+   "verified": true,
+   "src": "phase40.sql"
+  },
+  "rule:accounting_on_needs_reason": {
+   "title": "Switching accounting ON needs a reason",
+   "does": "When ON, turning Accounting from OFF to ON is done from the Period lock screen, with a written reason and a preview of the backlog that will be posted.",
+   "why": "Switching accounting on can post a long backlog at once.",
+   "default": "OFF. As today.",
+   "change": "ON adds the preview and the reason step. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:accounting_on",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql"
+  },
+  "rule:accounting_start_date": {
+   "title": "Accounting start date",
+   "does": "Nothing dated before this day goes into the books. Type it as YYYY-MM-DD.",
+   "why": "The books begin on one clear day.",
+   "default": "Blank. The balance check says data is needed.",
+   "change": "Set it before you switch accounting on. After an opening is posted it can be locked from moving.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:accounting_on",
+    "rule:start_date_lock_after_opening"
+   ],
+   "verified": true,
+   "src": "phase40.sql; phase89.sql"
+  },
+  "rule:allow_test_reset": {
+   "title": "Allow test data reset",
+   "does": "When ON, the owner can delete all test data by typing a fixed phrase. The switch turns itself OFF after one reset and a log line is written.",
+   "why": "It clears a test project fast.",
+   "default": "OFF.",
+   "change": "ON lets the owner destroy all transaction records in one step. Items, rules, users, places and the chart of accounts are kept.",
+   "who": "Only the owner.",
+   "related": [
+    "screen:balancecheck"
+   ],
+   "warn": "Test projects only. Never switch this on in the live project. It deletes real records.",
+   "verified": true,
+   "src": "phase84_test_project_only.sql; integration E.md section 3, 4"
+  },
+  "rule:auto_lock_day": {
+   "title": "Automatic lock: lock last month after this day",
+   "does": "Used only when the period lock is auto. Example: with 10, the whole month before is closed from the 11th of each month.",
+   "why": "It closes each month without anyone having to remember.",
+   "default": "Blank. Auto then locks nothing.",
+   "change": "A number from 1 to 28. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:period_lock_mode"
+   ],
+   "verified": true,
+   "src": "phase89.sql"
+  },
+  "rule:backdate_max_days_cash_move": {
+   "title": "Back-date limit: cash move date",
+   "does": "How many days back a new cash move (deposit, withdrawal, owner top-up or draw, advance) may be dated. Over the limit needs an override window, a one-off owner grant or the back-date grant.",
+   "why": "A date far in the past can hide a cost or move profit between months.",
+   "default": "Blank. No limit.",
+   "change": "A number of days from 0 to 3650. It applies to new records only, so past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "grant:backdate_over_limit",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:backdate_max_days_expense": {
+   "title": "Back-date limit: quick expense date",
+   "does": "How many days back a new quick expense may be dated. Over the limit needs an override window, a one-off owner grant or the back-date grant.",
+   "why": "A date far in the past can hide a cost or move profit between months.",
+   "default": "Blank. No limit.",
+   "change": "A number of days from 0 to 3650. It applies to new records only, so past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "grant:backdate_over_limit",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:backdate_max_days_production": {
+   "title": "Back-date limit: production date",
+   "does": "How many days back a production run may be dated (the made-at time). Over the limit needs an override window, a one-off owner grant or the back-date grant.",
+   "why": "A date far in the past can hide a cost or move profit between months.",
+   "default": "Blank. No limit.",
+   "change": "A number of days from 0 to 3650. It applies to new records only, so past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "grant:backdate_over_limit",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:backdate_max_days_purchase": {
+   "title": "Back-date limit: purchase bill date",
+   "does": "How many days back a new purchase bill may be dated. Over the limit needs an override window, a one-off owner grant or the back-date grant.",
+   "why": "A date far in the past can hide a cost or move profit between months.",
+   "default": "Blank. No limit.",
+   "change": "A number of days from 0 to 3650. It applies to new records only, so past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "grant:backdate_over_limit",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:backup_encrypt_on": {
+   "title": "Encrypt the nightly backup files",
+   "does": "When ON, the nightly backup files are encrypted with a passphrase the owner holds. Restore needs the same passphrase.",
+   "why": "The backup holds national ID and bank numbers.",
+   "default": "OFF. Backups are plain files.",
+   "change": "ON with no passphrase makes the backup fail on purpose and never falls back to plain files. Backups already made stay as they are.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:backup_retention_days"
+   ],
+   "warn": "If you lose the passphrase, nobody can open the encrypted backups. Store it safely before you switch this on.",
+   "verified": true,
+   "src": "phase98.sql; W1-G.md section 4.1"
+  },
+  "rule:backup_retention_days": {
+   "title": "Keep dated backup folders for this many days",
+   "does": "A tool lists older dated backup folders and removes them only when told to. The newest folder is never removed.",
+   "why": "Old backups hold old personal data.",
+   "default": "Blank. Every dated folder is kept.",
+   "change": "A number of days from 1 to 36500. Git history still holds the old files, so removing a folder does not free them.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:backup_encrypt_on"
+   ],
+   "verified": true,
+   "src": "phase98.sql; W1-G.md section 4.2"
+  },
+  "rule:bank_move_backdate_days": {
+   "title": "Flag a bank deposit or withdraw dated more than this many days back",
+   "does": "A yellow line in the Exceptions list when a bank deposit or withdraw is dated more days back than this. The entry is still saved.",
+   "why": "A date far back can move money between months.",
+   "default": "Blank. No flag.",
+   "change": "A number sets the limit. It flags new entries only.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:bank_move_large_over"
+   ],
+   "verified": true,
+   "src": "phase94.sql"
+  },
+  "rule:bank_move_large_over": {
+   "title": "Flag a bank deposit or withdraw above this amount",
+   "does": "A yellow line in the Exceptions list for a bank deposit or withdraw above this amount in Tk. The entry is still saved.",
+   "why": "Large bank moves deserve a second look.",
+   "default": "Blank. No flag.",
+   "change": "A number sets the limit. It flags new entries only.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:bank_move_backdate_days"
+   ],
+   "verified": true,
+   "src": "phase94.sql"
+  },
+  "rule:bank_slip_required": {
+   "title": "Bank slip number required on a bank deposit and withdraw",
+   "does": "When ON, the Reference field of a bank deposit or bank withdraw must hold the slip number.",
+   "why": "A slip number links the entry to the bank paper.",
+   "default": "OFF.",
+   "change": "ON refuses these entries without a slip number unless the owner allows one exception. Entries already saved do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:bank_move_large_over"
+   ],
+   "verified": true,
+   "src": "phase94.sql; W1-E.md"
+  },
+  "rule:brand_map_dated_on": {
+   "title": "Brand reports use the brand each place had on each day",
+   "does": "When ON, the brand report uses the brand a place had on each day, not only today's map.",
+   "why": "Changing the brand map should not rewrite old months.",
+   "default": "OFF. Today's map is used for every day.",
+   "change": "ON keeps old months with the brand they had. A map change dated in the past needs a reason, and a future date is refused.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:profitcheck"
+   ],
+   "verified": true,
+   "src": "phase93.sql; W1-D.md section 4"
+  },
+  "rule:cash_short_post_on": {
+   "title": "Post an approved cash short/over to the books",
+   "does": "OFF: approved cases wait and nothing is posted. ON: an approved short or over is posted on the count date.",
+   "why": "The books should show a cash shortage as a cost.",
+   "default": "OFF. Approved cases wait.",
+   "change": "ON posts approved cases from then on. Old cases need a one-time backfill that the owner runs.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:cash_short_treatment",
+    "rule:short_decider",
+    "screen:shortages"
+   ],
+   "verified": true,
+   "src": "phase81.sql; B.md section 4"
+  },
+  "rule:cash_short_treatment": {
+   "title": "How a cash SHORT is booked",
+   "does": "expense: to the cash short and over account (5800). staff_receivable: owed by the named employee (1220). An OVER always goes to 5800.",
+   "why": "The owner decides who bears a cash short.",
+   "default": "expense.",
+   "change": "staff_receivable books the short as money the named employee owes. It applies to cases posted after the change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:cash_short_post_on"
+   ],
+   "verified": true,
+   "src": "phase81.sql; B.md"
+  },
+  "rule:d_material_cost_method": {
+   "title": "How a material's unit cost is taken",
+   "does": "average_purchase: weighted average of purchases. last_purchase: the last purchase bill. fixed_price: a price the owner fixes.",
+   "why": "The recipe cost depends on the material cost.",
+   "default": "average_purchase. It is what the stock already uses.",
+   "change": "Today it drives only the cost helper and the cost-gap report, so stock and profit do not change. An item with no fixed price shows as a gap.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:d_recipe_materials_mode"
+   ],
+   "verified": true,
+   "src": "phase83.sql; D.md section 1 (H4 not wired)"
+  },
+  "rule:d_recipe_materials_mode": {
+   "title": "When a recipe lacks a material its product requires",
+   "does": "off: as today. warn: production is saved with a yellow stock exception. block: recipe activation and production are refused (recipe_missing_material).",
+   "why": "A sweet without milk or packing in its recipe gives a wrong cost.",
+   "default": "off. Nothing is required until the owner enters which products need which materials.",
+   "change": "warn or block checks new recipes and runs. Past runs do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:d_material_cost_method"
+   ],
+   "verified": true,
+   "src": "phase83.sql; D.md"
+  },
+  "rule:d_wallet_fee_treatment": {
+   "title": "Wallet fee treatment",
+   "does": "separate_expense: every fee is booked as expense 5815 and lowers the wallet balance. not_posted: fees are listed in the wallet register but not booked.",
+   "why": "Wallet fees are a real cost.",
+   "default": "separate_expense.",
+   "change": "Switching to not_posted reverses the posted fee entries. Switching back posts them again.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:wallets"
+   ],
+   "verified": true,
+   "src": "phase83.sql; D.md section 4"
+  },
+  "rule:d_wallet_negative_mode": {
+   "title": "When a fee or a move would make a wallet balance negative",
+   "does": "refuse: the fee or move is refused. warn: it is saved and the answer carries a warning.",
+   "why": "A negative wallet is usually a mistake.",
+   "default": "refuse.",
+   "change": "warn lets the entry in. A supplier payment is checked only for a wallet that has an opening date.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:wallets"
+   ],
+   "verified": true,
+   "src": "phase83.sql; phase86.sql (m5)"
+  },
+  "rule:d_wallet_split_on": {
+   "title": "Book each mobile wallet on its own account",
+   "does": "OFF: all mobile money stays on one mobile account (1130), as before. ON: new sales, collections and supplier payments that name a wallet go to that wallet's own account (1131 to 1134).",
+   "why": "The books then match each wallet.",
+   "default": "OFF.",
+   "change": "ON applies to old and new payments, and old ones are moved by new reclass entries. Posted entries are not edited.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:wallets"
+   ],
+   "verified": true,
+   "src": "phase86.sql (M4); phase87.sql"
+  },
+  "rule:employee_pay_change_flag": {
+   "title": "Red line when an employee pay account is changed",
+   "does": "When ON, changing an employee's bank account or wallet number adds a red line to Exceptions. It shows only the last 4 characters of the old and new account.",
+   "why": "A changed pay account is a common way to redirect salary.",
+   "default": "OFF.",
+   "change": "ON flags changes made after the switch. Changes already made are not flagged.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:employee_pay_dup_mode"
+   ],
+   "verified": true,
+   "src": "phase94.sql"
+  },
+  "rule:employee_pay_dup_mode": {
+   "title": "Two employees on one pay account",
+   "does": "off: no check. warn: save it and add a red line to Exceptions. block: refuse it unless the owner allows one exception; employees who left are not compared.",
+   "why": "Two people on one account can mean a made-up employee.",
+   "default": "off. As today.",
+   "change": "warn or block checks new and changed pay accounts only.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:employee_pay_change_flag"
+   ],
+   "verified": true,
+   "src": "phase94.sql"
+  },
+  "rule:exit_alert_hours": {
+   "title": "Hours after leaving before an active login is flagged",
+   "does": "A person who left but still has an active login after this many hours becomes a red line in Exceptions.",
+   "why": "It catches a login that was forgotten.",
+   "default": "Blank. No red line.",
+   "change": "A number of hours from 0 to 8760. The scan runs when the owner presses Check now, or when the notify job runs it.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:exit_revoke_mode"
+   ],
+   "verified": true,
+   "src": "phase90.sql; W1-C.md; I-1.md section 1"
+  },
+  "rule:exit_deactivate_devices": {
+   "title": "Also switch off attendance device tokens the person registered",
+   "does": "When ON, attendance device tokens that this person registered are switched off when they leave.",
+   "why": "A token is shared by everyone at a place, so it is not switched off by default.",
+   "default": "OFF. Tokens are left alone.",
+   "change": "ON switches off only the tokens this person registered. A re-hire does not switch them on again.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:exit_revoke_mode"
+   ],
+   "verified": true,
+   "src": "phase90.sql; W1-C.md"
+  },
+  "rule:exit_revoke_mode": {
+   "title": "When a person leaves: what happens to their login",
+   "does": "off: nothing is touched. alert: only a red line in Exceptions. auto: the login is disabled and the grants end.",
+   "why": "A person who left should not keep access to money and stock.",
+   "default": "off. Nothing is touched, as today.",
+   "change": "auto sets the login to disabled, ends the grants and writes one audit line. A re-hire turns on only a login that this feature turned off.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:exit_revoke_statuses",
+    "rule:exit_alert_hours",
+    "grant:exit_keep_access",
+    "screen:returnrules"
+   ],
+   "verified": true,
+   "src": "phase90.sql; W1-C.md"
+  },
+  "rule:exit_revoke_statuses": {
+   "title": "Which statuses count as leaving",
+   "does": "A comma list of statuses: resigned, terminated, retired, on_leave.",
+   "why": "It decides who is treated as having left.",
+   "default": "resigned, terminated, retired.",
+   "change": "Adding on_leave is allowed but not advised. An unknown status is refused.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:exit_revoke_mode"
+   ],
+   "verified": true,
+   "src": "phase90.sql; W1-C.md"
+  },
+  "rule:expense_count_on": {
+   "title": "Expense vouchers count when they are",
+   "does": "as_today, approved or submitted. One rule for the profit report, the expense reports, the day book and the journal.",
+   "why": "A voucher should count at the same time in every report.",
+   "default": "as_today. The day book counts submitted and approved. The journal counts approved only.",
+   "change": "approved or submitted makes all reports follow one rule. Journal entries already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "feature:report_parity"
+   ],
+   "verified": true,
+   "src": "phase93.sql; W1-D.md section 2"
+  },
+  "rule:forms_post_to_ledger": {
+   "title": "Approved forms post to the stock ledger",
+   "does": "When ON, an approved GRN, issue slip, count sheet, transfer challan or factory sheet adds its lines to the stock ledger. Each form also has its own switch.",
+   "why": "It makes the paper forms the source of stock.",
+   "default": "OFF. Nothing changes.",
+   "change": "ON locks four stock screens: issue, transfer, count and production. They are refused with path_locked unless you set the path on the path switches page.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:ledgerlinks",
+    "screen:paths",
+    "rule:switch_coupling_warning"
+   ],
+   "verified": true,
+   "src": "phase20.sql; phase48.sql; W1-G.md section 1"
+  },
+  "rule:journal_attach_over": {
+   "title": "A manual journal above this total needs an attachment",
+   "does": "Above this total in Tk, a manual journal must carry a photo or file reference.",
+   "why": "A big manual entry should have paper behind it.",
+   "default": "Blank. No attachment is needed.",
+   "change": "A number sets the limit. Journals already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_control_acct_mode"
+   ],
+   "verified": true,
+   "src": "phase95.sql; W1-E.md"
+  },
+  "rule:journal_control_acct_mode": {
+   "title": "Manual journal on a cash, bank, receivable, payable or inventory account",
+   "does": "allow: as today. request: a journal by someone who is not the owner waits for the approver. block: refused unless the owner allows one exception.",
+   "why": "A manual journal can move profit between periods or hide a shortage.",
+   "default": "allow. As today.",
+   "change": "request holds the journal until the approver decides, and journals already posted do not change. A journal that does not balance is refused first.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_control_prefixes",
+    "rule:owner_approval_mode",
+    "screen:moneycontrols"
+   ],
+   "verified": true,
+   "src": "phase95.sql; W1-E.md"
+  },
+  "rule:journal_control_prefixes": {
+   "title": "Chart codes that count as control accounts",
+   "does": "A comma list of chart code beginnings. The default is 11 (cash, bank, wallets), 1210 (customer receivables), 13 (inventory) and 2100 (supplier payables).",
+   "why": "It decides which accounts the journal control watches.",
+   "default": "11,1210,13,2100.",
+   "change": "A change affects new journals only.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_control_acct_mode"
+   ],
+   "verified": true,
+   "src": "phase95.sql"
+  },
+  "rule:journal_loc_check": {
+   "title": "Check the place of every line of a manual journal",
+   "does": "When ON, a person may post a manual journal line only to a place they may use. A line with no place needs the all-places right.",
+   "why": "A branch accountant should not post across the company.",
+   "default": "OFF.",
+   "change": "ON refuses manual journals that break it. Journals already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_control_acct_mode"
+   ],
+   "verified": true,
+   "src": "phase95.sql; W1-E.md"
+  },
+  "rule:journal_sched_post_cap": {
+   "title": "Most documents one scheduled run may post",
+   "does": "A batch size. Documents over it wait for the next run, oldest first.",
+   "why": "One run should not take too long.",
+   "default": "1500, the same batch as Post now.",
+   "change": "A number from 1 to 5000.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_sched_post_on"
+   ],
+   "verified": true,
+   "src": "phase98.sql"
+  },
+  "rule:journal_sched_post_lookback_days": {
+   "title": "Scheduled posting: look back this many days",
+   "does": "Each run looks only at the last N days. Older leftovers need Post now.",
+   "why": "A shorter look-back makes each run faster.",
+   "default": "Blank. Every document since the start date is scanned.",
+   "change": "A number from 1 to 3650.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_sched_post_on"
+   ],
+   "verified": true,
+   "src": "phase98.sql"
+  },
+  "rule:journal_sched_post_on": {
+   "title": "Post new documents to the books on a schedule",
+   "does": "OFF: the books fill only when someone presses Post now or opens Accounts. ON: the 30-minute notify job posts waiting documents by itself.",
+   "why": "The books stay fresh even if nobody opens Accounts.",
+   "default": "OFF.",
+   "change": "ON needs Accounting on and a start date, and it posts what Post now would post. Documents in a closed period are held back.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:freshness",
+    "rule:journal_sched_post_cap",
+    "rule:accounting_on"
+   ],
+   "verified": true,
+   "src": "phase98.sql; W1-G.md"
+  },
+  "rule:journal_sched_post_types": {
+   "title": "Scheduled posting: only these source types",
+   "does": "A comma list such as sale,sale_return. Types left out are still posted by Post now.",
+   "why": "It lets you start with a few kinds of document.",
+   "default": "Blank. Every source type.",
+   "change": "A list limits what the schedule posts.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_sched_post_on"
+   ],
+   "verified": true,
+   "src": "phase98.sql"
+  },
+  "rule:journal_stale_warn_hours": {
+   "title": "Warn when waiting documents are not posted for this many hours",
+   "does": "The \"last posted at\" strip turns red when documents wait and nothing was posted for this long.",
+   "why": "You see a stuck posting early.",
+   "default": "Blank. The strip never turns red by itself.",
+   "change": "A number of hours from 1 to 8760.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:freshness"
+   ],
+   "verified": true,
+   "src": "phase98.sql"
+  },
+  "rule:late_sale_policy": {
+   "title": "Offline sale older than the offline limit",
+   "does": "redate: the sale takes the time it reached the server. redate_flag: same, and a line goes to the Exceptions list. park: the sale is held for the owner, who accepts it with its own time, re-dates it or rejects it.",
+   "why": "A sale made offline days ago should not slide into today without a trace.",
+   "default": "redate. As today.",
+   "change": "park holds the sale, with no receipt and no entry in the books until it is accepted. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:pos_offline_hours",
+    "grant:late_sale_release",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:lock_backward_policy": {
+   "title": "Moving the lock date back",
+   "does": "allow: any time. reason_after_year_close: moving the date back into a closed year needs a written reopen reason. reason_always: any move back needs a reason.",
+   "why": "Moving the lock back reopens closed months.",
+   "default": "allow.",
+   "change": "The stricter choices ask for a reason on each move back. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:period_closed_until"
+   ],
+   "verified": true,
+   "src": "phase89.sql"
+  },
+  "rule:mapping_type_guard": {
+   "title": "Check the account type when a mapping is changed",
+   "does": "When ON, a mapping key (for example sales) may only point to the account types listed for it (for example income).",
+   "why": "A wrong mapping can post to the wrong kind of account.",
+   "default": "OFF.",
+   "change": "ON refuses a mapping to the wrong type and leaves existing mappings alone. The owner can edit the list of types.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:journal_loc_check"
+   ],
+   "verified": true,
+   "src": "phase95.sql; W1-E.md"
+  },
+  "rule:open_parties_adjust_mode": {
+   "title": "Who decides a change of an opening due",
+   "does": "direct: a person with Accounts manage adjusts at once, with a reason. approval: a second person decides.",
+   "why": "It lets you add a second pair of eyes on old dues.",
+   "default": "direct.",
+   "change": "approval: the maker never decides. The owner's own request follows the owner approval setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:open_parties_freeze",
+    "rule:owner_approval_mode"
+   ],
+   "verified": true,
+   "src": "phase88.sql; W1-A.md section 3"
+  },
+  "rule:open_parties_freeze": {
+   "title": "Lock opening dues after the opening batch",
+   "does": "After an opening batch is posted, a direct change of an opening due or payable is refused.",
+   "why": "It stops old dues from being edited quietly after go-live.",
+   "default": "off. Changes are allowed, as today.",
+   "change": "Set to after_opening: you must use an adjustment with a reason. Each adjustment writes a balanced entry, an audit line and a yellow Exceptions row.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:openparties",
+    "rule:open_parties_adjust_mode"
+   ],
+   "verified": true,
+   "src": "phase88.sql; W1-A.md section 3"
+  },
+  "rule:open_parties_link": {
+   "title": "Count opening dues in customer balances",
+   "does": "When ON, the old due you typed is added to the customer balance, the credit limit check, the dues list and the ledger. The customer can then pay it. The opening batch also fills the party list from the posted figures.",
+   "why": "Without it, a customer who owed money before go-live cannot be collected.",
+   "default": "OFF. Customer balances come from sales, collections and returns only.",
+   "change": "ON adds the opening due to customer balances from then on. Entries already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:openparties",
+    "rule:open_parties_freeze"
+   ],
+   "verified": true,
+   "src": "phase88.sql; W1-A.md section 3"
+  },
+  "rule:other_income_from": {
+   "title": "Other income counts from this date",
+   "does": "An entry dated before this day is refused. Type it as YYYY-MM-DD.",
+   "why": "An old month never changes.",
+   "default": "Blank. Any date is accepted.",
+   "change": "A date closes older days to this entry. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:other_income_on"
+   ],
+   "verified": true,
+   "src": "phase96.sql"
+  },
+  "rule:other_income_on": {
+   "title": "Other income entry (scrap, old oil, rent received)",
+   "does": "OFF: the Other income screen refuses entries. ON: staff with the cash move permission can record money that is not a sale.",
+   "why": "It keeps the entry closed until the owner is ready.",
+   "default": "OFF.",
+   "change": "ON opens the entry for new records. Nothing already posted changes.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:otherincome",
+    "rule:other_income_from"
+   ],
+   "verified": true,
+   "src": "phase96.sql"
+  },
+  "rule:owner_approval_mode": {
+   "title": "Approval of the owner's own entries",
+   "does": "Chooses who approves the owner's own entries. self: the owner approves. named: a named role or named people approve; logged: the owner approves and it always shows in the log; off: the control is off.",
+   "why": "It lets someone else check the owner's own entries.",
+   "default": "self. The owner approves, as today.",
+   "change": "named needs an active approver who is not the owner, and the approver is never the maker. Entries already decided do not change.",
+   "who": "Only the owner, through the approval setter. Every change is an audit line.",
+   "related": [
+    "rule:owner_approver_role",
+    "rule:owner_approver_users",
+    "rule:owner_self_approve"
+   ],
+   "verified": true,
+   "src": "phase80.sql; phase86.sql; phase87.sql; BUILD-LOG R1"
+  },
+  "rule:owner_approver_role": {
+   "title": "Named approver role",
+   "does": "The role whose holders approve the owner's entries when the mode is named.",
+   "why": "Named mode cannot work without an approver.",
+   "default": "Blank. Named mode is refused until a role or people are set.",
+   "change": "The owner cannot name a role the owner holds. Entries already decided do not change.",
+   "who": "Only the owner, through the approval setter.",
+   "related": [
+    "rule:owner_approval_mode",
+    "rule:owner_approver_users"
+   ],
+   "verified": true,
+   "src": "phase80.sql; phase86.sql (M2)"
+  },
+  "rule:owner_approver_users": {
+   "title": "Named approver people",
+   "does": "One or more people who approve the owner's entries when the mode is named. They work instead of the role, or with it.",
+   "why": "You can name a person without making a whole role.",
+   "default": "Blank. Nobody is named.",
+   "change": "The owner cannot name himself. Entries already decided do not change.",
+   "who": "Only the owner, through the approval setter.",
+   "related": [
+    "rule:owner_approval_mode",
+    "rule:owner_approver_role"
+   ],
+   "verified": true,
+   "src": "phase87.sql part G"
+  },
+  "rule:owner_closed_period_mode": {
+   "title": "Owner in a closed period",
+   "does": "off: the owner can change closed dates silently. log: allowed, and each use goes to the Exceptions list. reason: refused until the owner opens an override window with a written reason.",
+   "why": "A lock the owner can pass in silence is not a close.",
+   "default": "off. The owner is silent, as today.",
+   "change": "reason makes the owner write a reason first, and each use adds an audit line and an Exceptions row. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:periodlock",
+    "rule:period_override_default_minutes"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:owner_money_entry_mode": {
+   "title": "Who may record an owner draw or an owner top-up",
+   "does": "open: anyone with the cash move right. approval: an entry by someone who is not the owner waits for the approver. owner: only the owner.",
+   "why": "Owner drawings can hide a theft.",
+   "default": "open. As today.",
+   "change": "approval holds the entry, so it is not posted and not in the day book until approved. Entries already saved do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:owner_approval_mode",
+    "screen:moneycontrols"
+   ],
+   "verified": true,
+   "src": "phase94.sql; W1-E.md"
+  },
+  "rule:owner_self_approve": {
+   "title": "Owner may approve own requests",
+   "does": "When ON, the owner can approve the owner's own list requests, releases, emergencies, item changes and entry change requests.",
+   "why": "It decides if the owner needs a second person for these requests.",
+   "default": "ON.",
+   "change": "While the approval mode is named, it cannot be switched ON. It can be switched OFF only while another approver exists.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:owner_approval_mode"
+   ],
+   "verified": true,
+   "src": "phase15.sql; phase80.sql; phase86.sql (M1)"
+  },
+  "rule:partner_accrue_at": {
+   "title": "Book the partner profit at",
+   "does": "approval: the debt is booked when the settlement is approved. payment: it is booked only when it is paid.",
+   "why": "The owner decides when the profit becomes a debt.",
+   "default": "approval.",
+   "change": "A settlement keeps the basis it was first posted with. Settlements already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:partner_settlement_post_on"
+   ],
+   "verified": true,
+   "src": "phase82.sql; C.md"
+  },
+  "rule:partner_settlement_post_on": {
+   "title": "Post partner profit shares to the books",
+   "does": "OFF: nothing is posted, as today. ON: an approved settlement and its payments are posted to the books.",
+   "why": "Partner profit should be in the books.",
+   "default": "OFF.",
+   "change": "ON posts approved settlements. A settlement keeps the basis it was first posted with.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:partner_accrue_at",
+    "rule:profit_source"
+   ],
+   "verified": true,
+   "src": "phase82.sql; C.md"
+  },
+  "rule:payroll_accrual_from": {
+   "title": "First month of salary accrual",
+   "does": "The first month booked as accrual. Type it as YYYY-MM-01.",
+   "why": "It stops old months from changing.",
+   "default": "Blank. Nothing is accrued, even if the switch is ON.",
+   "change": "A month sets where accrual starts. Earlier months keep the old posting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:payroll_accrual_on"
+   ],
+   "verified": true,
+   "src": "phase82.sql; C.md"
+  },
+  "rule:payroll_accrual_on": {
+   "title": "Book salary as a monthly accrual",
+   "does": "OFF: salary is a cost on the day it is paid. ON: an approved payroll run is booked at month end as a cost and as accrued salary, and paying it later clears the accrual.",
+   "why": "A month should carry its own salary cost.",
+   "default": "OFF.",
+   "change": "ON books from the first month you give, and earlier months keep the old posting. Switching never reverses entries already posted.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:payroll_accrual_from",
+    "screen:monthclose"
+   ],
+   "verified": true,
+   "src": "phase82.sql; C.md section 4"
+  },
+  "rule:period_closed_until": {
+   "title": "Books closed until",
+   "does": "Anything dated up to this day needs permission to change. The date is typed.",
+   "why": "It protects months you have already closed.",
+   "default": "Blank. Nothing is closed.",
+   "change": "Setting a date closes everything on or before it for people without permission. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:period_lock_mode",
+    "grant:closed_period_edit",
+    "rule:lock_backward_policy"
+   ],
+   "verified": true,
+   "src": "phase7.sql; phase89.sql"
+  },
+  "rule:period_lock_mode": {
+   "title": "Period lock: how the books are closed",
+   "does": "manual: the date typed in \"Books closed until\". auto: the month before locks by itself after a day you set, and the typed date still counts. off: no lock at all.",
+   "why": "It decides if closing a month is a manual job or automatic.",
+   "default": "manual.",
+   "change": "auto with a blank day locks nothing by itself and cannot be saved, and off lets every date be changed. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:auto_lock_day",
+    "rule:period_closed_until",
+    "screen:periodlock"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "rule:period_override_default_minutes": {
+   "title": "Override window: default length",
+   "does": "How long an override window stays open when no length is typed.",
+   "why": "A window should end by itself.",
+   "default": "60 minutes.",
+   "change": "A number from 5 to 1440 minutes. It affects new windows only.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:owner_closed_period_mode"
+   ],
+   "verified": true,
+   "src": "phase89.sql"
+  },
+  "rule:pos_offline_hours": {
+   "title": "How many hours an offline sale keeps its own time",
+   "does": "A sale made on the phone without internet keeps its own time for this many hours. Older sales follow the late sale policy.",
+   "why": "It sets what counts as a late sale.",
+   "default": "72 hours.",
+   "change": "A number of hours from 1 to 8760. It applies to sales saved after the change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:late_sale_policy"
+   ],
+   "verified": true,
+   "src": "phase7.sql; phase43.sql (record_sale2)"
+  },
+  "rule:profit_loss_billopex": {
+   "title": "Profit counts running costs paid by supplier bill",
+   "does": "The consumable and unclassified part of posted purchase bills. A purchase return reduces it. It acts only while the main switch is ON.",
+   "why": "Each loss can be counted or left out on its own.",
+   "default": "ON. It acts only after the main switch is ON.",
+   "change": "OFF leaves this row out of the profit. Past figures follow the date setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md section 6"
+  },
+  "rule:profit_loss_cashshort": {
+   "title": "Profit counts cash short and over",
+   "does": "Approved cash short or over cases. A short booked as a staff receivable is not a loss. It acts only while the main switch is ON.",
+   "why": "Each loss can be counted or left out on its own.",
+   "default": "ON. It acts only after the main switch is ON.",
+   "change": "OFF leaves this row out of the profit. Past figures follow the date setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md section 6"
+  },
+  "rule:profit_loss_count": {
+   "title": "Profit counts stock count shortages",
+   "does": "Stock a physical count found missing, at its ledger cost. A surplus is not valued. It acts only while the main switch is ON.",
+   "why": "Each loss can be counted or left out on its own.",
+   "default": "ON. It acts only after the main switch is ON.",
+   "change": "OFF leaves this row out of the profit. Past figures follow the date setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md section 6"
+  },
+  "rule:profit_loss_transit": {
+   "title": "Profit counts goods lost in transit",
+   "does": "Transit shortages that were written off. A claim to the carrier is not a loss until it is written off. It acts only while the main switch is ON.",
+   "why": "Each loss can be counted or left out on its own.",
+   "default": "ON. It acts only after the main switch is ON.",
+   "change": "OFF leaves this row out of the profit. Past figures follow the date setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md section 6"
+  },
+  "rule:profit_loss_wastage": {
+   "title": "Profit counts wasted stock",
+   "does": "Stock written off as wastage, at its ledger cost. It acts only while the main switch is ON.",
+   "why": "Each loss can be counted or left out on its own.",
+   "default": "ON. It acts only after the main switch is ON.",
+   "change": "OFF leaves this row out of the profit. Past figures follow the date setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md section 6"
+  },
+  "rule:profit_losses_from": {
+   "title": "Count these extra profit rows from this date",
+   "does": "The extra profit rows count only from this date. Type it as YYYY-MM-DD.",
+   "why": "It keeps closed months as they were.",
+   "default": "Blank. Every date counts once the main switch is ON.",
+   "change": "A date keeps earlier months unchanged. A value that is not a date is ignored.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql"
+  },
+  "rule:profit_one_number_on": {
+   "title": "One profit number: count losses in the profit",
+   "does": "Adds the losses to the management profit: wasted stock, count shortages, goods lost in transit, cash short and over, and running costs paid by supplier bill. It also takes factory overhead out once. Branches, the owner sheet, break-even and partner shares then use it.",
+   "why": "Profit should show the losses that cost money.",
+   "default": "OFF. Every profit figure stays as it is today.",
+   "change": "ON adds the rows from the date set in \"Count these extra profit rows from this date\"; if that date is blank, earlier months change too. No journal entry is written.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_losses_from",
+    "rule:profit_source",
+    "screen:profitcheck"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md sections 4, 6"
+  },
+  "rule:profit_overhead_once": {
+   "title": "Profit counts factory overhead once",
+   "does": "Overhead that conversion costing already put inside the cost of finished goods is taken out of the expenses.",
+   "why": "Without it the overhead is counted twice.",
+   "default": "ON. It acts only after the main switch is ON.",
+   "change": "OFF counts the overhead twice when conversion costing is on. Past figures follow the date setting.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md"
+  },
+  "rule:profit_source": {
+   "title": "Partner shares take the profit from",
+   "does": "management: the management profit, one function for every report. ledger: the journal profit. It acts only while the main switch is ON.",
+   "why": "Partner payouts need one agreed profit figure.",
+   "default": "management.",
+   "change": "Choose ledger only when the journal is posted every day and two clean months agree. Every settlement stores the basis it used.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:profit_one_number_on",
+    "screen:profitcheck"
+   ],
+   "verified": true,
+   "src": "phase92.sql; W1-D.md"
+  },
+  "rule:purchase_separate_poster": {
+   "title": "The person who wrote a bill cannot post it",
+   "does": "When ON, the person who wrote a purchase bill cannot post it. The owner is still allowed.",
+   "why": "Two people must touch a bill.",
+   "default": "OFF.",
+   "change": "ON refuses posting by the maker with poster_must_differ. Bills already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:moneycontrols"
+   ],
+   "verified": true,
+   "src": "phase10.sql; W1-E.md"
+  },
+  "rule:receipt_bank_on": {
+   "title": "Accept bank transfer and cheque from customers",
+   "does": "OFF: a customer payment can only be cash, mobile or card. ON: bank transfer and cheque are accepted on due collections and POS split payments.",
+   "why": "The books then show the bank account the money really reached.",
+   "default": "OFF.",
+   "change": "ON adds bank rows to the payment screens. Old payments are not changed.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:bankreceipt",
+    "rule:receipt_ref_required"
+   ],
+   "verified": true,
+   "src": "phase97.sql; I-1.md section 4"
+  },
+  "rule:receipt_ref_from": {
+   "title": "The reference rule counts from this date",
+   "does": "A payment dated before this day is never asked for a number. Type it as YYYY-MM-DD.",
+   "why": "An old figure is never touched.",
+   "default": "Blank. The rule counts at once.",
+   "change": "A date protects older payments. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:receipt_ref_required"
+   ],
+   "verified": true,
+   "src": "phase97.sql"
+  },
+  "rule:receipt_ref_required": {
+   "title": "Reference number needed on customer bank receipts",
+   "does": "off: never. bank: a bank or cheque receipt needs a transaction or cheque number. bank_mobile: mobile wallet receipts need one too.",
+   "why": "A reference lets you match the bank statement.",
+   "default": "off.",
+   "change": "A missing number can be waived with a written reason. Payments before the \"from\" date are never asked.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:receipt_ref_from",
+    "rule:receipt_bank_on"
+   ],
+   "verified": true,
+   "src": "phase97.sql"
+  },
+  "rule:report_expense_parity_on": {
+   "title": "Expense report counts quick expenses and skips shadow vouchers",
+   "does": "When ON, the expense report and the weak-control report count what the profit report counts: quick expenses in, shadow vouchers out.",
+   "why": "The two reports should show one total.",
+   "default": "OFF.",
+   "change": "ON changes the expense report and the weak-control report. Journal entries already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "feature:report_parity"
+   ],
+   "verified": true,
+   "src": "phase93.sql; W1-D.md"
+  },
+  "rule:report_salary_source": {
+   "title": "Salary in the profit comes from",
+   "does": "legacy: the 02-2 salary sheet. app_first: app payroll runs are the main source and the sheet is used only where no counted run exists.",
+   "why": "A salary should be counted once.",
+   "default": "legacy. As today.",
+   "change": "app_first reads payroll runs first. Journal entries already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "feature:report_parity",
+    "rule:payroll_accrual_on"
+   ],
+   "verified": true,
+   "src": "phase93.sql; W1-D.md"
+  },
+  "rule:return_expired_restock": {
+   "title": "Goods from an expired batch",
+   "does": "allow: they go back on the shelf. writeoff: they are written off automatically. block: the return is refused unless there is an override.",
+   "why": "Expired goods should not be sold again.",
+   "default": "allow. As today.",
+   "change": "writeoff books the goods as wastage with reason customer_return. Past returns do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "feature:return_restock",
+    "grant:return_override"
+   ],
+   "verified": true,
+   "src": "phase91.sql; W1-C.md"
+  },
+  "rule:return_needs_receipt": {
+   "title": "A sale return must show the receipt number",
+   "does": "When ON, the receipt number must be typed and must match the sale. A class can set its own choice.",
+   "why": "It stops a return for a sale that did not happen.",
+   "default": "OFF. Any return of a recorded sale is accepted.",
+   "change": "ON refuses a return with no matching receipt unless the override is used. Returns already saved do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "grant:return_override"
+   ],
+   "verified": true,
+   "src": "phase91.sql; W1-C.md"
+  },
+  "rule:return_window_hours": {
+   "title": "Return window (hours after the sale)",
+   "does": "How many hours after a sale a return is accepted. It is used for every item class that has no window of its own.",
+   "why": "A very old receipt should not be taken back.",
+   "default": "Blank. No limit.",
+   "change": "Past the window, a return needs an override with a reason. Sales and returns already saved do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "grant:return_override",
+    "screen:returnrules"
+   ],
+   "verified": true,
+   "src": "phase91.sql; W1-C.md"
+  },
+  "rule:salary_in_daily_off": {
+   "title": "Keep salary out of the daily profit",
+   "does": "ON: the daily profit leaves salary out and the month carries it. OFF: the daily profit report shows the month salary as a separate line.",
+   "why": "Salary is not a daily cost.",
+   "default": "ON.",
+   "change": "OFF adds a separate salary line to the daily profit report. It is not shared out by day.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:payroll_accrual_on"
+   ],
+   "verified": true,
+   "src": "phase82.sql; C.md"
+  },
+  "rule:salary_pay_source": {
+   "title": "Salary is paid from",
+   "does": "by_payment: the mode picked when paying. cash, mobile or bank: every salary payment goes to that account.",
+   "why": "It decides which money account a salary leaves.",
+   "default": "by_payment.",
+   "change": "It affects entries not yet posted. Entries already posted do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:payroll_accrual_on",
+    "feature:payment_source"
+   ],
+   "verified": true,
+   "src": "phase82.sql; C.md"
+  },
+  "rule:short_decider": {
+   "title": "Who decides cash short and transit short cases",
+   "does": "owner: only the owner. accounts_manager: people with the Accounts manage grant can also decide. Nobody decides a count they made themselves.",
+   "why": "The person who counted should not clear their own count.",
+   "default": "owner.",
+   "change": "accounts_manager widens the group that can decide. Decisions already made do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:shortages"
+   ],
+   "verified": true,
+   "src": "phase81.sql; B.md"
+  },
+  "rule:start_date_lock_after_opening": {
+   "title": "Do not move the accounting start date after the opening is posted",
+   "does": "When ON, once an opening entry exists the accounting start date cannot be changed. Reverse the opening first.",
+   "why": "Moving the start date would break the opening.",
+   "default": "OFF. As today.",
+   "change": "ON blocks the change. Past figures never change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:accounting_start_date",
+    "feature:opening_balance"
+   ],
+   "verified": true,
+   "src": "phase89.sql"
+  },
+  "rule:supplier_dup_mode": {
+   "title": "Second supplier with the same name, mobile or TIN",
+   "does": "off: no check. warn: save it and add a yellow line to Exceptions. block: refuse it unless the owner allows one exception.",
+   "why": "A duplicate supplier can take a double payment.",
+   "default": "off. As today.",
+   "change": "warn or block checks new suppliers only. Suppliers already saved do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:supplier_pay_dup_mode"
+   ],
+   "verified": true,
+   "src": "phase94.sql"
+  },
+  "rule:supplier_pay_dup_hours": {
+   "title": "Window for the repeat-payment check",
+   "does": "How many hours back a payment counts as a repeat. It is used only when the repeat check is not off.",
+   "why": "It sets how wide the check looks.",
+   "default": "Blank. The same calendar day (Asia/Dhaka).",
+   "change": "A number of hours from 1 to 720.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:supplier_pay_dup_mode"
+   ],
+   "verified": true,
+   "src": "phase94.sql"
+  },
+  "rule:supplier_pay_dup_mode": {
+   "title": "Same supplier payment entered twice",
+   "does": "off: no check. flag: save it and add a yellow line to Exceptions. block: refuse it unless the owner allows one exception; a repeat is the same supplier and total inside a time window.",
+   "why": "A payment keyed twice sends money out twice.",
+   "default": "off. As today.",
+   "change": "flag or block compares new payments only. Payments already saved do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:supplier_pay_dup_hours",
+    "rule:supplier_pay_over"
+   ],
+   "verified": true,
+   "src": "phase94.sql; W1-E.md"
+  },
+  "rule:supplier_pay_over": {
+   "title": "A supplier payment above this amount waits for the approver",
+   "does": "A payment above this total, entered by someone who is not the owner, is held until the approver decides. The owner is not held.",
+   "why": "Large payments get a second pair of eyes.",
+   "default": "Blank. No payment waits.",
+   "change": "A number in Tk sets the limit. A held payment is not paid and the supplier balance does not change until approved.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:supplier_pay_dup_mode",
+    "screen:moneycontrols"
+   ],
+   "verified": true,
+   "src": "phase94.sql; W1-E.md"
+  },
+  "rule:switch_coupling_warning": {
+   "title": "Warning before a switch that locks other screens",
+   "does": "off: no warning. warn: the screen shows what a switch will lock or unlock before it is saved. confirm: the owner must also tick a confirmation, and the server checks it.",
+   "why": "Some switches lock other screens and nobody knew.",
+   "default": "warn. It shows text only and blocks nothing.",
+   "change": "confirm refuses turning on the coupled switches without a fresh confirmation. Turning them OFF is never held back.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "rule:forms_post_to_ledger",
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase98.sql; W1-G.md"
+  },
+  "rule:transit_short_bearer": {
+   "title": "Who bears goods short in transit",
+   "does": "ask: the owner chooses for each case. carrier: claim to the carrier first, with no direct write-off. shop: no claim, write off as a loss.",
+   "why": "Goods lost on the way cost money, and someone must carry it.",
+   "default": "ask.",
+   "change": "The choice applies to new cases. Past cases do not change.",
+   "who": "Only the owner, in the Switchboard.",
+   "related": [
+    "screen:shortages",
+    "rule:profit_loss_transit"
+   ],
+   "verified": true,
+   "src": "phase81.sql; B.md"
+  },
+  "screen:accounts": {
+   "title": "Accounts and ledger",
+   "does": "Shows the books: the journal, trial balance, balance sheet and income statement. The Opening tab posts the first balances. You can post new sales, purchases and expenses to the books here.",
+   "why": "This is where the records become the books.",
+   "default": "Accounting is OFF until the owner switches it on and sets a start date. While it is off, nothing is posted.",
+   "change": "Nothing dated before the start date goes into the books. Posted entries are corrected by a reversal, not by a delete.",
+   "who": "The owner and people with Accounts view or Accounts manage.",
+   "related": [
+    "rule:accounting_on",
+    "rule:accounting_start_date",
+    "feature:opening_balance",
+    "screen:balancecheck",
+    "screen:freshness"
+   ],
+   "verified": true,
+   "src": "phase40.sql; phase80.sql; W1-B.md"
+  },
+  "screen:balancecheck": {
+   "title": "Balance check",
+   "does": "Checks that the books agree. Red means the equation, the trial balance, a journal entry or a stock figure is wrong. Day book and other cross-checks show as amber warnings.",
+   "why": "A red line means a figure cannot be trusted.",
+   "default": "Read only. It changes nothing.",
+   "change": "There is no switch. It needs the accounting start date, and without it the page says data is needed.",
+   "who": "The owner and people with Accounts view or Accounts manage.",
+   "related": [
+    "screen:accounts",
+    "rule:allow_test_reset"
+   ],
+   "verified": true,
+   "src": "phase84.sql; integration E.md"
+  },
+  "screen:bankreceipt": {
+   "title": "Bank and cheque receipts",
+   "does": "Takes a customer payment by bank transfer or cheque, with the account it went to and a reference. A cheque is a bank receipt with its cheque number.",
+   "why": "Hotels and offices often pay by bank, and cash or card would be wrong.",
+   "default": "Nothing shows until \"Accept bank transfer and cheque from customers\" is switched on.",
+   "change": "A missing reference can be waived with a written reason. That adds an audit line and a yellow Exceptions row.",
+   "who": "People who can use the POS.",
+   "related": [
+    "rule:receipt_bank_on",
+    "rule:receipt_ref_required",
+    "rule:receipt_ref_from"
+   ],
+   "verified": true,
+   "src": "phase97.sql; W1-F.md"
+  },
+  "screen:exceptions": {
+   "title": "Exceptions",
+   "does": "Lists the lines that need a look: red lines are serious and yellow lines are notes. Every override that needs a reason lands here.",
+   "why": "It shows where a control was bypassed, so nothing is hidden.",
+   "default": "Read only. It does not block anything.",
+   "change": "There is no switch. Each control decides what it writes here.",
+   "who": "Approvers and the owner.",
+   "related": [
+    "feature:exception_reason",
+    "screen:moneycontrols"
+   ],
+   "verified": true,
+   "src": "phase46.sql; phase87.sql; I-1.md section 1 (one list of 18 kinds)"
+  },
+  "screen:freshness": {
+   "title": "Books freshness",
+   "does": "Shows when the last document was posted to the books, what still waits, and if the books are ready to fill by themselves. A button checks what the next run would post and changes nothing.",
+   "why": "The books fill only when something posts documents, so you should see how fresh they are.",
+   "default": "Read only. Scheduled posting is OFF.",
+   "change": "The owner can switch scheduled posting ON or OFF here. The page shows a warning first.",
+   "who": "People with Accounts view or Accounts manage can look. Only the owner switches posting.",
+   "related": [
+    "rule:journal_sched_post_on",
+    "screen:accounts"
+   ],
+   "verified": true,
+   "src": "phase98.sql; W1-G.md"
+  },
+  "screen:ledgerlinks": {
+   "title": "Ledger links",
+   "does": "Shows the master switch that makes approved forms post to the stock ledger, and the switch for each form.",
+   "why": "It is where you decide if paper forms drive the stock.",
+   "default": "The master switch is OFF.",
+   "change": "A warning shows what the switch will lock, before it is saved.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:forms_post_to_ledger",
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase20.sql; W1-G.md"
+  },
+  "screen:moneyaccounts": {
+   "title": "Money accounts",
+   "does": "Lists your cash drawers, mobile wallets and bank accounts. Each one is its own account in the books. You can see a statement, move money, charge a fee and check the real balance.",
+   "why": "Every payment can come from the account you choose, and the books follow it.",
+   "default": "Nothing is drawn until at least one account exists. A payment with no account posts as before.",
+   "change": "Adding an account changes no old figure. An account with a balance, an unposted payment or a repeat transfer cannot be switched off.",
+   "who": "People with the Accounts view grant can see it. The owner and Accounts manage change it.",
+   "related": [
+    "feature:payment_source",
+    "feature:money_transfer",
+    "screen:exceptions"
+   ],
+   "verified": true,
+   "src": "phase87.sql; BUILD-LOG phase 87"
+  },
+  "screen:moneycontrols": {
+   "title": "Money controls",
+   "does": "One page for the cash, supplier and journal controls. It shows each setting and the requests that wait for the approver.",
+   "why": "It is the place to see which controls are on.",
+   "default": "Every control starts OFF or blank, so nothing changes until you set it.",
+   "change": "A held request is decided by the approver chosen under the owner approval setting. The maker never decides.",
+   "who": "People with Accounts view, Accounts manage, cash move or supplier pay can look. The owner changes the settings.",
+   "related": [
+    "rule:owner_money_entry_mode",
+    "rule:supplier_pay_dup_mode",
+    "rule:journal_control_acct_mode",
+    "screen:exceptions"
+   ],
+   "verified": true,
+   "src": "phase94.sql; phase95.sql; W1-E.md"
+  },
+  "screen:monthclose": {
+   "title": "Monthly Close",
+   "does": "Shows a month before you mark it reviewed. It carries salary accrual and the partner profit share. Mark the month reviewed or undo the mark.",
+   "why": "A month should be looked at once before it is left.",
+   "default": "The mark is only a log. It does not lock the month.",
+   "change": "To lock a month, set \"Books closed until\" separately.",
+   "who": "The owner and people with Accounts manage.",
+   "related": [
+    "rule:payroll_accrual_on",
+    "rule:partner_settlement_post_on",
+    "rule:period_closed_until"
+   ],
+   "verified": true,
+   "src": "phase82.sql; phase86.sql (m7); C.md"
+  },
+  "screen:openparties": {
+   "title": "Opening dues and payables",
+   "does": "Type what customers owed you and what you owed suppliers on day one, one by one or by paste. It also shows where the party lists and the books differ.",
+   "why": "Old dues can then be collected and counted in credit limits.",
+   "default": "Nothing changes until \"Count opening dues in customer balances\" is switched on.",
+   "change": "You can type or paste only before the opening batch is posted. After that, use an adjustment with a reason.",
+   "who": "People with Accounts manage for all places type and adjust. People with Accounts view can look. A branch accountant is refused.",
+   "related": [
+    "rule:open_parties_link",
+    "rule:open_parties_freeze",
+    "rule:open_parties_adjust_mode",
+    "feature:opening_balance"
+   ],
+   "verified": true,
+   "src": "W1-A.md sections 0, 3, 4, 5"
+  },
+  "screen:otherincome": {
+   "title": "Other income",
+   "does": "Records money that is not a sale: scrap, old oil, rent received, supplier discount. It posts to the Other income account.",
+   "why": "This money would otherwise have no place in the books.",
+   "default": "The screen refuses entries until \"Other income entry\" is switched on.",
+   "change": "A recorded entry can be voided. Entries dated before the \"from\" date are refused.",
+   "who": "The owner, and people with the cash move grant or Accounts view or manage.",
+   "related": [
+    "rule:other_income_on",
+    "rule:other_income_from"
+   ],
+   "verified": true,
+   "src": "phase96.sql; W1-F.md"
+  },
+  "screen:paths": {
+   "title": "Path switches",
+   "does": "For jobs that can be done two ways, the app screen or the paper form, you choose which one is the main record. The other becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The app screen (path a) is the main record, as set for each job.",
+   "change": "Nothing is deleted, and the other path keeps a locked shadow copy. A refused screen says path_locked.",
+   "who": "Only the owner.",
+   "related": [
+    "switch:path:payroll",
+    "switch:path:stock_issue",
+    "switch:path:stock_transfer",
+    "switch:path:stock_count",
+    "switch:path:production",
+    "switch:path:expense",
+    "switch:path:owner_money",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql; paths.js; W1-G.md"
+  },
+  "screen:periodlock": {
+   "title": "Period lock",
+   "does": "Shows if the books are closed and up to what date. The owner can open an override window with a reason. It also lists held late sales and the back-date limits.",
+   "why": "A closed month should stay closed unless someone has a reason.",
+   "default": "Nothing changes by itself. The lock date is the one typed in \"Books closed until\". Every new rule starts OFF or blank.",
+   "change": "Changing a rule here affects new entries only. Past figures never change.",
+   "who": "The owner changes rules and opens windows. People with Accounts manage see the state.",
+   "related": [
+    "rule:period_closed_until",
+    "rule:period_lock_mode",
+    "rule:owner_closed_period_mode",
+    "rule:late_sale_policy"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "screen:profitcheck": {
+   "title": "Profit check",
+   "does": "Compares the management profit with the journal profit and lists the difference by cause. You can leave one loss out of the profit with a reason. It also shows if day book, profit, expense report and journal agree, and holds the dated brand map.",
+   "why": "Branch ranking and partner shares rest on one profit number.",
+   "default": "Read only for most people. All profit settings start OFF, so every profit figure stays as it is today.",
+   "change": "Leaving a loss out needs a reason of 5 letters or more, and it writes an audit line and a yellow Exceptions row. It can be counted again, and no journal entry is written.",
+   "who": "People with Accounts view or Accounts manage can look. Only the owner changes settings and the brand map.",
+   "related": [
+    "rule:profit_one_number_on",
+    "rule:profit_source",
+    "feature:report_parity",
+    "rule:brand_map_dated_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; phase93.sql; W1-D.md"
+  },
+  "screen:returnrules": {
+   "title": "Return and exit rules",
+   "does": "Sets the rules for sale returns and for people who leave. For returns: the return window, the receipt need, which goods go back on the shelf, and what to do with expired goods.",
+   "why": "A returned sweet or cake should not go back on sale by mistake.",
+   "default": "Every rule starts OFF or blank, so returns work as today.",
+   "change": "A class rule can start on a later day. A rule that starts later is not used today.",
+   "who": "The owner sets the rules. People with the return override grant can pass a rule with a reason.",
+   "related": [
+    "rule:return_window_hours",
+    "rule:return_needs_receipt",
+    "rule:return_expired_restock",
+    "grant:return_override",
+    "rule:exit_revoke_mode"
+   ],
+   "verified": true,
+   "src": "phase90.sql; phase91.sql; W1-C.md"
+  },
+  "screen:shortages": {
+   "title": "Cash short and transit short",
+   "does": "Lists cash short or over cases from the daily count and goods that arrived short between places. A decider approves, claims from the carrier, recovers or writes off. Each step posts a balanced entry.",
+   "why": "A shortage should have an owner and a reason, not just disappear.",
+   "default": "Cases are listed. Nothing is posted to the books until \"Post an approved cash short/over to the books\" is ON.",
+   "change": "There is no switch on the page. Backfill of old cases is not automatic.",
+   "who": "People with Accounts view can look. The decider is set by the \"Who decides\" setting.",
+   "related": [
+    "rule:cash_short_post_on",
+    "rule:short_decider",
+    "rule:transit_short_bearer"
+   ],
+   "verified": true,
+   "src": "phase81.sql; integration B.md"
+  },
+  "screen:wallets": {
+   "title": "Mobile wallets",
+   "does": "A register for each wallet: bKash, Nagad, Rocket and Upay. You can add fees, move money, and count the wallet from the phone.",
+   "why": "It lets you match each wallet with what the phone really shows.",
+   "default": "The wallet register works alone. Nothing moves to its own wallet account until the wallet split switch is ON.",
+   "change": "The phone total is typed first, and the book figure comes back after it is saved. A difference needs a reason once.",
+   "who": "The owner, people with the 10-3 form right and people with Accounts view.",
+   "related": [
+    "rule:d_wallet_split_on",
+    "rule:d_wallet_fee_treatment",
+    "rule:d_wallet_negative_mode"
+   ],
+   "verified": true,
+   "src": "phase83.sql; D.md; phase86.sql"
+  },
+  "switch:path:expense": {
+   "title": "Path switch: expense",
+   "does": "Chooses which way counts for this job: the day-book quick expense or the 10-2 expense voucher. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "Quick entries get a 10-2 shadow copy at day end, confirmed with one click.",
+   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:owner_money": {
+   "title": "Path switch: owner money",
+   "does": "Chooses which way counts for this job: partner capital or the cash move for an owner top-up or draw. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "Partner capital is the main record. The cash move gets the shadow copy.",
+   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:payroll": {
+   "title": "Path switch: payroll",
+   "does": "Chooses which way counts for this job: app payroll runs or the 02-2 monthly salary sheet. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "Both are open. Once app payroll starts for a month, 02-2 is locked and kept as a shadow copy.",
+   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:production": {
+   "title": "Path switch: production",
+   "does": "Chooses which way counts for this job: the recipe production run or the 05-1 factory daily sheet. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The run is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:stock_count": {
+   "title": "Path switch: stock count",
+   "does": "Chooses which way counts for this job: the stock screen count or the 04-3 count sheet. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The screen is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:stock_issue": {
+   "title": "Path switch: stock issue",
+   "does": "Chooses which way counts for this job: the stock screen issue or the 04-2 issue slip. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The screen is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:stock_transfer": {
+   "title": "Path switch: stock transfer",
+   "does": "Chooses which way counts for this job: the stock screen transfer or the 03-1 transfer challan. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The screen is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  }
+ }
+}
