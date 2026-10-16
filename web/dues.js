@@ -56,7 +56,7 @@ async function openCustomer(id) {
   D.cur = c;
   const r = await sb.rpc('customer_ledger', { p_customer: id }); if (r.error) return fail(r.error);
   const canPay = S.ctx.is_owner || (S.ctx.perms.POS && S.ctx.perms.POS.enter);
-  D.st = B.pay.create(() => Number(c.balance)); if (B.pay.receipt) B.pay.receipt(D.st, 'customer_collection');   // W1-F: bank / cheque rows only when receipt_bank_on is ON D.cid = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();     // one id per sheet: a double tap cannot collect twice
+  D.st = B.pay.create(() => Number(c.balance)); if (B.pay.receipt) B.pay.receipt(D.st, 'customer_collection'); D.cid = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();     // one id per sheet: a double tap cannot collect twice. W1-F: bank / cheque rows only when receipt_bank_on is ON
   const locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? B.ENV.locs : B.ENV.locs.filter((l) => S.ctx.locations.includes(l.id));
   openSheet(`<h2>${esc(c.name)} ${c.type === 'wholesale' ? '◆' : ''}</h2><div class="muted">${esc(c.mobile)}</div>
     <div class="row between" style="margin:8px 0"><span>${esc(T('balance'))}</span><b class="mnum">${money(c.balance)}</b></div>
