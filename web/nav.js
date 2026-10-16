@@ -614,7 +614,8 @@ async function home() {
   const ownBtn = ownerBoardOk() ? `<button class="hbig ownbig" data-act="go" data-v="owner" data-owner="1">${ico('control', 'sliders', 34)}<span class="sb-t"><b>${esc(T('omode'))}</b><small>${esc(T('omode_d'))}</small></span></button>` : '';
   const posBtn = sellBtn || ownBtn ? `<div class="hbigrow">${sellBtn}${ownBtn}</div>` : '';
   if (V2) setTimeout(() => loadOldest(), 0);
-  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
+  if (own || GF.accounts_view || GF.accounts_manage) setTimeout(() => { const el = $('#hv_fresh'); if (el && B.freshness) B.freshness.mount(el); }, 0);   // W1-G: the "last posted at" strip (silent when the server has no phase 98)
+  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${own || GF.accounts_view || GF.accounts_manage ? '<div id="hv_fresh"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
     ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>'}

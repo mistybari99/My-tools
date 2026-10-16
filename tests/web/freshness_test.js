@@ -28,8 +28,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     const ctx = await br.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|code: P0001/.test(m.text())) errors.push('console: ' + m.text()); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA }));
-    // the integrator adds this one registry line to web/ia.js (docs/integration/W1-G.md); the test injects the same line
-    await p.route('**/ia.js', async (r) => { const res = await r.fetch(); const body = (await res.text()).replace("  rec('restoredrill',", "  rec('freshness', 'acc', ['Books freshness', 'Books freshness', 'Books freshness'], { icon: 'check', ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true, kw: ['books freshness', 'last posted', 'scheduled posting', 'journal'] }),\n  rec('restoredrill',"); await r.fulfill({ response: res, body }); });
+    // the registry line is in web/ia.js (phase 99 integration)
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.route((u) => u.pathname === '/', async (r) => { const res = await r.fetch(); const body = ((h) => (/freshness\.js/.test(h) ? h : h.replace('</body>', '<script src="freshness.js"></script></body>')))(await res.text()); await r.fulfill({ response: res, body }); });
     const data = C.mk(base, {});

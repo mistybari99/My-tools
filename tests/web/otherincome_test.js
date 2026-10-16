@@ -22,7 +22,6 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (f !== undefined) return { data: JSON.parse(JSON.stringify(f)), error: null };
   return { data: null, error: { message: 'no mock for ' + fn, code: 'P0001' } };
  }; return c; }; })();`;
-const REG = "  rec('otherincome', 'acc', ['Other income', 'Other income', 'Other income'], { icon: 'money', ok: (c) => c.own || c.GF.cash_move === true || c.GF.accounts_view === true || c.GF.accounts_manage === true, kw: ['other income', 'scrap', 'old oil', 'rent received'] }),\n  rec('bankreceipt', 'cust', ['Bank & cheque receipts', 'Bank & cheque receipts', 'Bank & cheque receipts'], { icon: 'money', ok: pos, kw: ['bank receipt', 'cheque', 'bank transfer'] }),\n  rec('restoredrill',";
 const ACC = (id, code, name, type) => ({ id, code, name_en: name, name_bn: name, type, normal_side: type === 'asset' || type === 'expense' ? 'debit' : 'credit', is_group: false, is_system: true, active: true, sort: id });
 const COA = [ACC(1, '1110', 'Cash in hand', 'asset'), ACC(2, '5300', 'Rent', 'expense'), ACC(3, '5400', 'Utilities', 'expense'), ACC(4, '5700', 'Transport', 'expense'), ACC(5, '4900', 'Other income', 'income'), ACC(6, '4910', 'Purchase discounts received', 'income')];
 const HEADS = [{ code: 'scrap_sale', label_en: 'Scrap and packaging sale', active: true, key: 'oi_scrap_sale', own_account: false, account_code: '4900', account_name: 'Other income' },
@@ -56,7 +55,6 @@ const FN = {
     const ctx = await br.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|code: P0001/.test(m.text())) errors.push('console: ' + m.text()); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA }));
-    await p.route('**/ia.js', async (r) => { const res = await r.fetch(); const body = (await res.text()).replace("  rec('restoredrill',", REG); await r.fulfill({ response: res, body }); });
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.route((u) => u.pathname === '/', async (r) => { const res = await r.fetch(); const body = ((h) => (/otherincome\.js/.test(h) ? h : h.replace('</body>', '<script src="moneysrc.js"></script><script src="otherincome.js"></script></body>')))(await res.text()); await r.fulfill({ response: res, body }); });
     const data = C.mk(base, {});

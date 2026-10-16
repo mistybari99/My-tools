@@ -13,7 +13,7 @@ const base = C.baseData(SP), PORT = 8589, srv = require('http').createServer((q,
   fs.readFile(f, (e, b) => {
     if (e) { r.writeHead(404); return r.end(); }
     const x = require('path').extname(f); let body = b;
-    if (u === '/' || u === '/index.html') body = Buffer.from(String(b).replace('<script src="moneyaccounts.js"></script>', '<script src="moneyaccounts.js"></script><script src="periodlock.js"></script>'));
+    if (u === '/' || u === '/index.html') body = Buffer.from(String(b).includes('src="periodlock.js"') ? String(b) : String(b).replace('<script src="moneyaccounts.js"></script>', '<script src="moneyaccounts.js"></script><script src="periodlock.js"></script>'));
     r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[x] || 'application/octet-stream' }); r.end(body);
   });
 }).listen(PORT);

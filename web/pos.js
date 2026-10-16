@@ -28,6 +28,7 @@ const X = {
   amount: L('টাকার পরিমাণ', 'Amount', 'Amount'), what: L('কী বিক্রি (ঐচ্ছিক)', 'What was sold (optional)', 'কী বিক্রি (ঐচ্ছিক)'), all: L('সব', 'All', 'All'), freq: L('বেশি বিক্রি', 'Frequent', 'Frequent'),
   scan: L('বারকোড স্ক্যান', 'Scan barcode', 'Barcode স্ক্যান'), search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), qty: L('পরিমাণ', 'Quantity', 'Quantity'), add: L('কার্টে দিন', 'Add to cart', 'Add to Cart'),
   receipt: L('রসিদ', 'Receipt', 'Receipt'), done: L('সেল হয়েছে', 'Sale done', 'Sale হয়েছে'), queued: L('নেট নেই — সেল জমা আছে, নেট এলে পাঠানো হবে', 'No network — sale saved, will be sent when online', 'Net নেই — Sale জমা আছে, Online হলে যাবে'),
+  held: L('মালিকের জন্য ধরা আছে — এখনও রসিদ নেই', 'Held for the owner — no receipt yet', 'মালিকের জন্য Held — এখনও receipt নেই'),   // W1-B: a late offline sale parked by late_sale_policy = park
   pending: L('পাঠানো বাকি', 'waiting to send', 'পাঠানো বাকি'), void: L('বাতিল', 'Void', 'Void'), voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), voidwhy: L('বাতিলের কারণ (লিখতেই হবে)', 'Reason for voiding (required)', 'Void এর কারণ (লিখতেই হবে)'),
   day: L('আজকের মোট', "Today's total", 'Today মোট'), count: L('টি সেল', 'sales', 'sales'), nodata: L('এখনও কোনো সেল নেই', 'No sales yet', 'এখনও কোনো sale নেই'),
   back: L('ফিরুন', 'Back', 'Back'), close: L('বন্ধ', 'Close', 'Close'), lines: L('আইটেম', 'Items', 'Items'), by: L('বিক্রেতা', 'Sold by', 'Sold by'),
@@ -213,7 +214,7 @@ function otherSheet() {
 // ---------- cart / pay ----------
 function cartSheet() {
   const dm = dmodes(); P.dk = dm.a ? 'amount' : dm.p ? 'percent' : null;
-  P.st = B.pay.create(netTotal, updDue);
+  P.st = B.pay.create(netTotal, updDue); if (B.pay.receipt) B.pay.receipt(P.st, 'pos_split_payment');   // W1-F: bank / cheque rows only when receipt_bank_on is ON
   openSheet(`<h2>${esc(T('cart'))}</h2><div id="cart_lines" class="stack"></div>
     <div class="row wrap" style="margin:8px 0"><button class="tog ${P.type === 'retail' ? 'on' : ''}" data-act="pos_type" data-v="retail">${esc(T('retail'))}</button><button class="tog ${P.type === 'wholesale' ? 'on' : ''}" data-act="pos_type" data-v="wholesale">${esc(T('wholesale'))}</button></div>
     ${dm.a || dm.p ? `<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${dm.a && dm.p ? `<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${esc(T('discL'))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${esc(T('discL'))} %">%</button></div>` : ''}</div>
@@ -334,6 +335,7 @@ async function submitSale(p, change) {
       if (/^LEGACY: /.test(error.message || '')) return toast(error.message.slice(8));
       return fail(error);
     }
+    if (data && data.parked) { closeSheet(); resetCart(); toast(T('held')); return afterSale(); }   // W1-B (phase89): answer {parked:true, held_id}: the sale is held for the owner and counts as sent (no retry, no receipt)
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);

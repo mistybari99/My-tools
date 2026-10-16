@@ -65,6 +65,7 @@ async function open(saleId) {
       <div><label for="sr_reason">${esc(T('reason'))}</label><select id="sr_reason"><option value="">—</option>${optHTML(reasons, '')}</select></div>
       <div><label for="sr_note">${esc(T('note'))}</label><input id="sr_note" autocomplete="off"></div>
       <div class="card stack" id="sr_sum"></div>
+      <div class="stack" id="sr_rr"></div>
       <div id="sr_mw" hidden><label for="sr_mode">${esc(T('mode'))}</label><select id="sr_mode"><option value="">—</option>${['cash', 'mobile', 'card'].map((m) => `<option value="${m}">${esc(T(m))}</option>`).join('')}</select>
         <div id="sr_ww" hidden style="margin-top:6px"><label for="sr_wallet">${esc(T('wallet'))}</label><input id="sr_wallet" autocomplete="off"></div><div style="margin-top:6px"><label for="sr_ref">${esc(T('ref'))}</label><input id="sr_ref" autocomplete="off"></div>${B.moneySrc ? B.moneySrc.slot('sr', 'customer_refund') : ''}</div></div>`
     : lock && d.status === 'done' ? `<div class="s2-lockrow">${LOCK}<span>${esc(T('doReturn'))} · ${esc(T('noperm'))}</span></div>` : ''}
@@ -90,7 +91,24 @@ function recalc() {
   box.innerHTML = `<div class="row between"><span>${esc(T('value'))}</span><b>${esc(money(c.amt))}</b></div>${c.credit > 0 ? `<div class="row between"><span>${esc(T('fromDue'))}</span><b>${esc(money(c.credit))}</b></div>` : ''}
     <div class="row between"><span>${esc(T('handBack'))}</span><b class="mnum">${esc(money(c.refund))}</b></div>${C.d.customer_id && !C.d.due_first ? `<div class="hint">${esc(T('dueFirstOff'))}</div>` : ''}`;
   const mw = $('#sr_mw'); if (mw) mw.hidden = !(c.refund > 0);
+  rrSchedule();
 }
+// W1-C (phase91): the return picker (put back on the shelf or write off per item, receipt number, override reason). It draws only when this database has _w1c_return_preview
+// and returnrules.js is loaded; otherwise the form above is exactly the old one and the plain sale_return is called.
+let rrTimer = null;
+const retLines = () => { const out = []; ((C.d && C.d.lines) || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (el && el.value.trim() && nnum(el.value) > 0) out.push({ item_id: l.item_id, qty: nnum(el.value) }); }); return out; };
+function rrSchedule() { if (!B.returnRules || C.rrOff) return; clearTimeout(rrTimer); rrTimer = setTimeout(rrDraw, 350); }
+async function rrDraw() {
+  const box = $('#sr_rr'); if (!box || !C.d) return;
+  const lines = retLines(); if (!lines.length) { box.innerHTML = ''; return; }
+  try {
+    const pv = await B.returnRules.preview(C.d.sale_id, lines, null, null), names = {};
+    (C.d.lines || []).forEach((l) => { names[l.item_id] = l.name || ''; });
+    if ($('#sr_rr')) $('#sr_rr').innerHTML = B.returnRules.pickerHTML(pv, names);
+  } catch (e) { if (missingFn(e.raw || e)) C.rrOff = true; if ($('#sr_rr')) $('#sr_rr').innerHTML = ''; }
+}
+// the return rules answer with codes (return_window_exceeded ...): say them in words, keep every other error as it was (the emergency request offer still reads 'not allowed')
+const rrErr = (r) => { const e = r && r.error; if (e && B.returnRules && /return_(window_exceeded|receipt_required|restock_not_allowed|expired_restock|override_not_allowed|bad_restock_qty|written_off)/.test(e.message || '')) return { ...r, error: { ...e, message: B.returnRules.errorText(e) } }; return r; };
 async function goReturn(btn) {
   if (C.busy || !C.d) return; const c = calc();
   if (!c || c.bad) return toast(T('badQty')); if (!c.any) return toast(T('needQty'));
@@ -99,8 +117,10 @@ async function goReturn(btn) {
   const wallet = (($('#sr_wallet') || {}).value || '').trim(); if (mode === 'mobile' && !wallet && !(B.moneySrc && B.moneySrc.get('sr'))) return toast(T('needWallet'));
   const lines = []; (C.d.lines || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (el && el.value.trim()) lines.push({ item_id: l.item_id, qty: nnum(el.value) }); });
   const d = C.d;
-  await U.submit(btn, () => sb.rpc('sale_return', { p_client: C.client, p_sale: d.sale_id, p_lines: lines, p_reason: reason, p_note: (($('#sr_note') || {}).value || '').trim() || null,
-    p_refund_mode: c.refund > 0 ? mode : null, p_wallet: (B.moneySrc ? B.moneySrc.tag('sr', wallet || null) : wallet) || null, p_ref: (($('#sr_ref') || {}).value || '').trim() || null }),
+  const rr = B.returnRules && !C.rrOff && $('#sr_rr') && $('#sr_rr').children.length ? B.returnRules.collect($('#sr_rr')) : null;   // restock quantities, receipt number, override reason
+  const args = { p_client: C.client, p_sale: d.sale_id, p_lines: lines, p_reason: reason, p_note: (($('#sr_note') || {}).value || '').trim() || null,
+    p_refund_mode: c.refund > 0 ? mode : null, p_wallet: (B.moneySrc ? B.moneySrc.tag('sr', wallet || null) : wallet) || null, p_ref: (($('#sr_ref') || {}).value || '').trim() || null };
+  await U.submit(btn, async () => rrErr(rr ? await sb.rpc('_w1c_sale_return', { ...args, ...rr }) : await sb.rpc('sale_return', args)),
     () => { toast(T('done')); if ($('#sr_list')) listView(); }, { grant: 'sale_return', loc: d.location_id, context: { sale: d.sale_id } });
 }
 
@@ -114,7 +134,7 @@ Object.assign(H, {
   sr_void: (a) => { U.sheetStart('srvoid'); const id = a.dataset.v;
     openSheet(`<h2>${esc(T('voidRet'))}</h2><div><label for="vn_note">${esc(T('voidWhy'))}</label><input id="vn_note" autocomplete="off"></div><div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="sr_voidgo" data-v="${esc(id)}">${esc(T('voidRet'))}</button></div>`); },
   sr_voidgo: async (a) => { const n = (($('#vn_note') || {}).value || '').trim(); if (!n) return toast(T('voidWhy')); const d = C.d;
-    await U.submit(a, () => sb.rpc('void_sale_return', { p_id: a.dataset.v, p_note: n }), () => { toast(T('voidDone')); if ($('#sr_list')) listView(); }, { grant: 'sale_return', loc: d ? d.location_id : null, context: { return: a.dataset.v } }); },
+    await U.submit(a, async () => rrErr(await sb.rpc('void_sale_return', { p_id: a.dataset.v, p_note: n })), () => { toast(T('voidDone')); if ($('#sr_list')) listView(); }, { grant: 'sale_return', loc: d ? d.location_id : null, context: { return: a.dataset.v } }); },
 });
 document.addEventListener('input', (e) => { if (e.target.dataset && e.target.dataset.rq !== undefined) recalc(); });
 document.addEventListener('change', (e) => {

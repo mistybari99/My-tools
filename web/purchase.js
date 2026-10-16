@@ -395,7 +395,7 @@ async function doPaySupplier(btn) {
   try {
     const r = await sb.rpc('pay_supplier', { p_supplier: PY.cur.supplier_id, p_loc: loc, p_payments: list, p_client: PY.client, p_note: (($('#py_note') || {}).value || '').trim() || null });
     if (r.error) { errToast(r.error, { grant: 'supplier_pay', loc, context: { supplier: PY.cur.supplier_id } }); return; }
-    PY.client = rid(); closeSheet(); toast(r.data && r.data.dup ? T('dup') : T('paidOk') + (r.data && r.data.balance !== undefined ? ' · ' + T('balance') + ' ' + money(r.data.balance) : '')); payables();
+    PY.client = rid(); closeSheet(); toast(r.data && r.data.pending ? B.lab(B.L('অনুমোদনের অপেক্ষায়', 'Waiting for the approver', 'Approver-এর অপেক্ষায়')) : r.data && r.data.dup ? T('dup') : T('paidOk') + (r.data && r.data.balance !== undefined ? ' · ' + T('balance') + ' ' + money(r.data.balance) : '')); payables();
   } catch (e) { fail(e); } finally { PY.busy = false; btn.disabled = false; }
 }
 

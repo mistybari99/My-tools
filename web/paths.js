@@ -50,6 +50,7 @@ function drawSw() {
 }
 async function setSw(dom, patch) {
   const d = D.sw.find((x) => x.domain === dom), c = Object.assign({}, d.cfg, patch);
+  if (patch.primary && window.BOS.freshness && !(await window.BOS.freshness.confirmSwitch('path:' + dom, patch.primary))) return;   // bos98 (W1-G)
   const r = await sb.rpc('path_switch_set', { p_domain: dom, p_loc: 0, p_a_open: c.a_open !== false, p_b_open: c.b_open !== false, p_primary: c.primary, p_note: null });
   if (r.error) return fail(r.error);
   toast(T('saved')); await loadSw(); drawSw();

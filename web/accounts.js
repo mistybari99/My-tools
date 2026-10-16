@@ -513,7 +513,8 @@ async function autopost() {
 }
 async function view() {
   if (B.loadStatic) await B.loadStatic();
-  shell(T('title'), `<div id="ac_body"><p class="muted">${esc(T('loading'))}</p></div>`, true);
+  shell(T('title'), `<div id="ac_fresh"></div><div id="ac_body"><p class="muted">${esc(T('loading'))}</p></div>`, true);
+  if (B.freshness) B.freshness.mount($('#ac_fresh'));   // W1-G: the "last posted at" strip (silent when the server has no phase 98)
   const t0 = today();
   try {
     D.st = await rpc('acct_status');
@@ -577,7 +578,7 @@ async function jSubmit(dry) {
     if (t.diff !== 0) return toast(lab(ERR.unbalanced) + ' (' + fm(t.d) + ' / ' + fm(t.c) + ')');
     const r = await rpc('acct_journal_post', { p_date: D.jdate, p_loc: D.jloc ? Number(D.jloc) : null, p_memo: D.jmemo, p_lines: lines, p_client: dry ? null : D.client, p_photo: D.jphoto || null, p_dry: !!dry });
     if (dry) { $('#ac_jout').textContent = T('dryOk') + ` (${fm(r.total_debit)} = ${fm(r.total_credit)})`; return; }
-    toast(T('saved')); D.client = rid(); D.lines = []; D.jmemo = ''; D.jphoto = ''; D.tab = 'journal'; D.st = await rpc('acct_status'); await draw();
+    toast(r && r.pending ? B.lab(B.L('অনুমোদনের অপেক্ষায়', 'Waiting for the approver', 'Approver-এর অপেক্ষায়')) : T('saved')); D.client = rid(); D.lines = []; D.jmemo = '';   // W1-E: a manual journal on a control account can wait for the approver D.jphoto = ''; D.tab = 'journal'; D.st = await rpc('acct_status'); await draw();
   } catch (e) { toast(eText(e)); }
 }
 async function obSubmit(dry) {

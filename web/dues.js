@@ -18,6 +18,7 @@ const X = {
   none: L('কারও বাকি নেই ✓', 'Nobody owes anything ✓', 'কারও Due নেই ✓'), since: L('দিন আগে থেকে', 'days since', 'দিন আগে থেকে'), wholesale: L('পাইকারি', 'Wholesale', 'Wholesale'),
   ledger: L('হিসাব খাতা', 'Ledger', 'Ledger'), collect: L('বাকি আদায়', 'Collect payment', 'Due আদায়'), balance: L('এখন বাকি', 'Balance now', 'এখন Due'), limit: L('বাকির সীমা (৳)', 'Credit limit (৳)', 'Credit limit (৳)'),
   save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), collected: L('আদায় হয়েছে', 'Collected', 'আদায় হয়েছে'), noteph: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
+  opening: L('পুরনো বাকি', 'Opening due', 'Opening due'),   // W1-A: the first ledger row when the opening due is linked
   sale: L('বিক্রি', 'Sale', 'Sale'), paid: L('পরিশোধ', 'Paid', 'Paid'), coll: L('আদায়', 'Collection', 'আদায়'), back: L('ফিরুন', 'Back', 'Back'), close: L('বন্ধ', 'Close', 'Close'),
   voidwhy: L('বাতিলের কারণ লিখুন', 'Reason for reversing', 'Reverse এর কারণ লিখুন'), advance: L('আগাম', 'in credit', 'আগাম'),
   confirm: L('আদায় নিশ্চিত', 'Confirm collection', 'আদায় Confirm'), nolimit: L('(লেখা নেই)', '(not set)', '(লেখা নেই)'), noloc: L('কোনো লোকেশন নেই', 'No location', 'কোনো Location নেই'),
@@ -55,7 +56,7 @@ async function openCustomer(id) {
   D.cur = c;
   const r = await sb.rpc('customer_ledger', { p_customer: id }); if (r.error) return fail(r.error);
   const canPay = S.ctx.is_owner || (S.ctx.perms.POS && S.ctx.perms.POS.enter);
-  D.st = B.pay.create(() => Number(c.balance)); D.cid = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();     // one id per sheet: a double tap cannot collect twice
+  D.st = B.pay.create(() => Number(c.balance)); if (B.pay.receipt) B.pay.receipt(D.st, 'customer_collection');   // W1-F: bank / cheque rows only when receipt_bank_on is ON D.cid = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();     // one id per sheet: a double tap cannot collect twice
   const locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? B.ENV.locs : B.ENV.locs.filter((l) => S.ctx.locations.includes(l.id));
   openSheet(`<h2>${esc(c.name)} ${c.type === 'wholesale' ? '◆' : ''}</h2><div class="muted">${esc(c.mobile)}</div>
     <div class="row between" style="margin:8px 0"><span>${esc(T('balance'))}</span><b class="mnum">${money(c.balance)}</b></div>
@@ -63,7 +64,7 @@ async function openCustomer(id) {
     ${canPay && Number(c.balance) > 0 ? `<h3 style="margin-top:12px">${esc(T('collect'))}</h3>${locs.length > 1 ? `<select id="du_loc">${locs.map((l) => `<option value="${l.id}" ${l.id === D.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>` : ''}<div id="du_pay">${B.pay.html(D.st)}</div><div><label>${esc(T('noteph'))}</label><input id="du_note"></div>
       <button class="primary full" style="margin-top:10px" data-act="du_collect">${esc(T('confirm'))}</button>` : ''}
     <h3 style="margin-top:14px">${esc(T('ledger'))}</h3>
-    <div class="stack">${(r.data || []).slice().reverse().map((e) => `<div class="row between perm"><span>${esc(hhmm(e.at))}<br><span class="muted" style="font-size:.8rem">${esc(e.kind === 'sale' ? T('sale') + ' ' + e.ref : e.kind === 'collection' ? T('coll') : T('paid'))}${e.kind !== 'sale' && e.ref ? ' · ' + esc(e.ref) : ''}</span></span>
+    <div class="stack">${(r.data || []).slice().reverse().map((e) => `<div class="row between perm"><span>${esc(hhmm(e.at))}<br><span class="muted" style="font-size:.8rem">${esc(e.kind === 'sale' ? T('sale') + ' ' + e.ref : e.kind === 'collection' ? T('coll') : e.kind === 'opening' ? T('opening') : T('paid'))}${e.kind !== 'sale' && e.ref ? ' · ' + esc(e.ref) : ''}</span></span>
       <span style="text-align:right">${Number(e.debit) ? `<b>+${money(e.debit)}</b>` : `<b style="color:var(--ok)">−${money(e.credit)}</b>`}<br><span class="muted" style="font-size:.8rem">${money(e.balance)}</span>${e.kind === 'collection' && e.pid && (S.ctx.is_owner || (S.ctx.perms.POS && S.ctx.perms.POS.approve)) ? `<br><button class="mini" data-act="du_void" data-v="${e.pid}" aria-label="void">✕</button>` : ''}</span></div>`).join('')}</div>
     <button class="full" style="margin-top:10px" data-act="closesheet">${esc(T('close'))}</button>`);
 }

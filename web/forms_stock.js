@@ -564,6 +564,7 @@ Object.assign(A.H, {
   lk_set: async (a) => {
     if (!isOwner()) return;
     const [k, v] = a.dataset.v.split(':'), on = v === '1';
+    if (k === 'master' && on && window.BOS.freshness && !(await window.BOS.freshness.confirmSwitch('forms_post_to_ledger', true))) return;   // bos98 (W1-G): say what the switch will lock, before it is saved
     const r = k === 'master' ? await sb.rpc('set_rule', { p_key: 'forms_post_to_ledger', p_value: on }) : await sb.rpc('forms_ledger_cfg_set', { p_form: k, p_on: on });
     if (r.error) return fail(r.error); toast(T('saved')); return viewLinks();
   },

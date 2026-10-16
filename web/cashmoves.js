@@ -89,7 +89,7 @@ async function call(dry) {
     p_ref: (B.moneySrc ? B.moneySrc.tag('cm', $('#cm_ref').value.trim()) : $('#cm_ref').value.trim()) || null, p_note: $('#cm_note').value.trim() || null, p_client: dry ? null : D.client, p_dry: !!dry });
   if (r.error) return toast(eText(r.error));
   if (dry) { $('#cm_out').textContent = T('dry') + ' → ' + ((r.data && r.data.daybook) || ''); return; }
-  D.client = rid(); toast(T('saved')); await show();
+  D.client = rid(); toast(r.data && r.data.pending ? B.lab(B.L('অনুমোদনের অপেক্ষায়', 'Waiting for the approver', 'Approver-এর অপেক্ষায়')) : T('saved')); await show();   // W1-E: an owner draw / top-up by a non-owner waits for the approver (answer {pending:true,request_id})
 }
 async function show() {
   const el = $('#cm_body'); if (!el) return;

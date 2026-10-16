@@ -59,7 +59,7 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
     data.tables.rules = (data.tables.rules || []).filter((x) => !RULES.some((r) => r.key === x.key)).concat(JSON.parse(JSON.stringify(RULES)));
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__M0=${JSON.stringify(o.m || {})};window.__P0=${JSON.stringify(o.p || {})};${o.owner === false ? 'window.__OWNER=false;' : ''}try{localStorage.setItem('bos_lang','${lang || 'en'}')}catch(e){}`);
     await p.goto('http://localhost:8392/' + hash); await p.waitForTimeout(1200);
-    await p.addScriptTag({ content: fs.readFileSync(path.join(WEB, 'profitcheck.js'), 'utf8') });      // the integrator adds the real script tag
+    if (!(await p.evaluate(() => !!(window.BOS_PAGES || {}).profitcheck))) await p.addScriptTag({ content: fs.readFileSync(path.join(WEB, 'profitcheck.js'), 'utf8') });      // the real script tag is in index.html since phase 99
     await p.evaluate(() => { location.hash = '#/x'; }); await p.waitForTimeout(100);
     await p.evaluate(() => { location.hash = '#/profitcheck'; }); await p.waitForTimeout(900);
     return p;
