@@ -90,6 +90,7 @@ select tt.chk('T1 c_post_pending posts no payroll accrual without the hooks', :'
 do $h$ declare d text;
 begin
   d := pg_get_functiondef('public._acct_docs(date)'::regprocedure);
+  if position('_c_docs' in d) > 0 then return; end if;  -- phase85 already installed the hooks
   d := replace(d, 'public.is_shadow(''payroll_runs'', p.run_id::text)', 'public._c_run_skip(p.run_id)');
   d := replace(d, 'public._acct_paykey(p.mode), ''c'', p.amount', 'public._c_salary_paykey(p.mode), ''c'', p.amount');
   d := regexp_replace(d, 'end \$function\$\s*$', E'  return query select * from public._c_docs(p_start);\nend $function$');

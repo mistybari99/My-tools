@@ -94,6 +94,9 @@ insert into exceptions (entry_id,form_code,location_id,entry_date,flag_code,leve
 select tt.chk('G4 one open case per count; other flags make none', (select count(*) from shortage_cash_cases)=5 and (select count(*) from shortage_cash_cases where status='open')=5);
 select tt.chk('G4 amount signed: short -200, over +50', (select amount from shortage_cash_cases where entry_id=:'e1')=-200 and (select amount from shortage_cash_cases where entry_id=:'e2')=50
   and (select case_date from shortage_cash_cases where entry_id=:'e2')=tt.today()-1);
+-- bos85: an exception with no entry (POS style) must still be saved and must make no case
+insert into exceptions (form_code,location_id,entry_date,flag_code,level,amount,text) values ('14-1',1,tt.today(),'cash_short_over','yellow',-5,'{}');
+select tt.chk('G4 a cash_short_over exception without an entry is saved and makes no case (never blocks the insert)', (select count(*) from exceptions where entry_id is null and flag_code='cash_short_over' and amount=-5)=1 and (select count(*) from shortage_cash_cases)=5);
 select id as c1 from shortage_cash_cases where entry_id=:'e1' \gset
 select id as c2 from shortage_cash_cases where entry_id=:'e2' \gset
 select id as c3 from shortage_cash_cases where entry_id=:'e3' \gset

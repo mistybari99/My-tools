@@ -52,9 +52,14 @@ select tt.chk('T0 anon cannot execute any phase83 API; helpers closed to browser
 select tt.chk('T0 browsers cannot write the tables directly', not has_table_privilege('authenticated','d_wallet_fees','insert') and not has_table_privilege('authenticated','d_wallets','update'));
 
 \echo == T1 simulate the integrator hook (TEST DATABASE ONLY): _acct_docs = base + _d_acct_docs
-alter function public._acct_docs(date) rename to _acct_docs_base_t;
-create or replace function public._acct_docs(p_start date) returns table(source_type text, source_id text, entry_date date, location_id integer, memo text, subtype text, live boolean, void_date date, flags text, waiting text, lines jsonb)
-language sql stable security definer set search_path = public as $$ select * from public._acct_docs_base_t(p_start) union all select * from public._d_acct_docs(p_start) $$;
+-- (since phase85 the real hook is in _acct_docs; the simulation below runs only when the hook is NOT there yet)
+do $h$ begin
+  if position('_d_acct_docs' in pg_get_functiondef('public._acct_docs(date)'::regprocedure)) = 0 then
+    alter function public._acct_docs(date) rename to _acct_docs_base_t;
+    execute $q$create or replace function public._acct_docs(p_start date) returns table(source_type text, source_id text, entry_date date, location_id integer, memo text, subtype text, live boolean, void_date date, flags text, waiting text, lines jsonb)
+      language sql stable security definer set search_path = public as $f$ select * from public._acct_docs_base_t(p_start) union all select * from public._d_acct_docs(p_start) $f$$q$;
+  end if;
+end $h$;
 select set_config('request.jwt.claim.sub', :'o', false);
 set role authenticated;
 select tt.as(:'o');

@@ -167,7 +167,7 @@ end $$;
 -- ---------- G4: a case is made for every cash_short_over exception ----------
 create or replace function public._b_cash_case_trg() returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if new.flag_code = 'cash_short_over' and coalesce(new.amount, 0) <> 0 then
+  if new.flag_code = 'cash_short_over' and coalesce(new.amount, 0) <> 0 and new.entry_id is not null and new.location_id is not null then  -- bos85: an exception without an entry or a place makes no case (it must never block the exception insert; phase46 test)
     insert into public.shortage_cash_cases (entry_id, form_code, location_id, case_date, amount)
       values (new.entry_id, new.form_code, new.location_id, new.entry_date, new.amount)
       on conflict (entry_id) do update set amount = excluded.amount, case_date = excluded.case_date, location_id = excluded.location_id
