@@ -50,6 +50,7 @@ function form() {
     <div><label for="cm_loc">${esc(T('loc'))}</label><select id="cm_loc">${locs.map((l) => `<option value="${l.id}" ${l.id === D.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></div>
     <div><label for="cm_kind">${esc(T('kind'))}</label><select id="cm_kind">${KINDS.map(([k, l]) => `<option value="${k}">${esc(lab(l))}</option>`).join('')}</select></div>
     <div id="cm_modew"><label for="cm_mode">${esc(T('mode'))}</label><select id="cm_mode"><option value="cash">${esc(T('cash'))}</option><option value="bank">${esc(T('bank'))}</option><option value="mobile">${esc(T('mobile'))}</option></select></div>
+    ${B.moneySrc ? B.moneySrc.slot('cm', 'owner_topup', { locSel: '#cm_loc' }) : ''}
     <div><label for="cm_amt">${esc(T('amount'))}</label><input id="cm_amt" inputmode="decimal" autocomplete="off"></div>
     <div><label for="cm_date">${esc(T('date'))}</label><input id="cm_date" type="date" value="${today()}"></div>
     <div id="cm_custw" hidden><label for="cm_cust">${esc(T('cust'))}</label><input id="cm_cust" inputmode="tel" autocomplete="off"></div>
@@ -69,6 +70,8 @@ function sync() {
   const k = ($('#cm_kind') || {}).value, def = KINDS.find((x) => x[0] === k);
   const mw = $('#cm_modew'), cw = $('#cm_custw');
   if (mw) mw.hidden = !(def && def[2]);
+  if (B.moneySrc) B.moneySrc.setEvent('cm', ({ owner_topup: 'owner_topup', owner_draw: 'owner_draw', cust_advance: 'customer_advance', cust_advance_refund: 'customer_advance', hub_receipt: 'cash_handover' })[k] || 'owner_topup');
+  const sl = $('#ms_cm'); if (sl) sl.hidden = !['owner_topup', 'owner_draw', 'cust_advance', 'cust_advance_refund', 'hub_receipt'].includes(k);
   if (cw) cw.hidden = !String(k).startsWith('cust_advance');
 }
 async function custId() {
@@ -83,7 +86,7 @@ async function call(dry) {
   if (kind.startsWith('cust_advance')) { cid = await custId(); if (!cid) return toast(T('needCust')); }
   const def = KINDS.find((x) => x[0] === kind);
   const r = await sb.rpc('cash_move_add', { p_loc: D.loc, p_kind: kind, p_amount: amt, p_date: $('#cm_date').value || null, p_mode: def[2] ? $('#cm_mode').value : null, p_customer: cid,
-    p_ref: $('#cm_ref').value.trim() || null, p_note: $('#cm_note').value.trim() || null, p_client: dry ? null : D.client, p_dry: !!dry });
+    p_ref: (B.moneySrc ? B.moneySrc.tag('cm', $('#cm_ref').value.trim()) : $('#cm_ref').value.trim()) || null, p_note: $('#cm_note').value.trim() || null, p_client: dry ? null : D.client, p_dry: !!dry });
   if (r.error) return toast(eText(r.error));
   if (dry) { $('#cm_out').textContent = T('dry') + ' → ' + ((r.data && r.data.daybook) || ''); return; }
   D.client = rid(); toast(T('saved')); await show();

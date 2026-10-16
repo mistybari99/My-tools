@@ -86,6 +86,7 @@ function drawQx() {
     <div class="row wrap"><select id="qx_head">${HEADS.map((h) => `<option value="${h[0]}">${esc(lab({ bn: h[1], mix: h[1], en: h[2] }))}</option>`).join('')}</select>
       <input id="qx_to" placeholder="${esc(T('to2'))}" maxlength="120"><input id="qx_amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="${esc(T('amt'))}" style="max-width:8rem">
       <select id="qx_mode"><option value="cash">cash</option><option value="bank">bank</option><option value="mobile">mobile</option></select>
+      ${B.moneySrc ? B.moneySrc.slot('qx', 'quick_expense', { locSel: '#qx_loc' }) : ''}
       <label class="row"><input type="checkbox" id="qx_rc"> ${esc(T('rcpt'))}</label><button type="button" class="btn primary" data-act="qx_add">${esc(T('add'))}</button></div></div>
     <div class="card stack"><div class="row between"><b>${esc(T('total'))}: ৳ ${esc(String(d.total))}</b><span class="chip ${d.owed ? 'warn' : ''}">${esc(T('owed'))}: ${d.owed}</span></div>
       ${(d.rows || []).map((r) => `<div class="row between"${r.status === 'void' ? ' style="opacity:.5;text-decoration:line-through"' : ''}><span>${esc(r.head)} · ${esc(r.paid_to || '')} · ${esc(r.mode)}${r.receipt ? ' 🧾' : ''}</span><b>৳ ${esc(String(r.amount))}</b>
@@ -96,7 +97,7 @@ const refreshQx = async () => { await loadQx(); drawQx(); };
 Object.assign(H, {
   qx_add: async () => {
     const amt = Number($('#qx_amt').value); if (!(amt > 0)) return toast(T('amt'));
-    const r = await sb.rpc('quick_expense_add', { p_loc: D.q.loc, p_date: D.q.day, p_head: $('#qx_head').value, p_to: $('#qx_to').value, p_amount: amt, p_mode: $('#qx_mode').value, p_receipt: $('#qx_rc').checked, p_note: null, p_client: crypto.randomUUID() });
+    const r = await sb.rpc('quick_expense_add', { p_loc: D.q.loc, p_date: D.q.day, p_head: $('#qx_head').value, p_to: $('#qx_to').value, p_amount: amt, p_mode: $('#qx_mode').value, p_receipt: $('#qx_rc').checked, p_note: B.moneySrc ? B.moneySrc.tag('qx', null) : null, p_client: crypto.randomUUID() });
     if (r.error) return fail(r.error); toast(T('saved')); await refreshQx();
   },
   qx_void: async (a) => { const why = window.prompt(T('why')); if (!why) return; const r = await sb.rpc('quick_expense_void', { p_id: a.dataset.id, p_note: why }); if (r.error) return fail(r.error); await refreshQx(); },

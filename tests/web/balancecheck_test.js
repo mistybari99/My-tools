@@ -41,7 +41,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     equation: { assets: 8000, liabilities: 0, equity: 10000, earnings: -2000, liabilities_equity_earnings: 8000, difference: 0, ok: true },
     trial_balance: { total_debit: 12000, total_credit: 12000, difference: 0, ok: true },
     journal: { broken: 0, rows: [], truncated: false, ok: true }, stock_identity: { broken: 0, rows: [], truncated: false, ok: true, as_of: 'now' },
-    cross_checks: { daybook_vs_journal: { ran: true, kinds_differing: 0, diff: 0, ok: true }, inventory_vs_gl: { ran: true, diff: 0, ok: true }, unposted_sources: { ran: true, pending: 0, errors: 0, ok: true } } };
+    cross_checks: { daybook_vs_journal: { ran: true, kinds_differing: 0, diff: 0, ok: true }, money_accounts: { ran: true, ok: true, red: false, amber: false, money_accounts_total: 100, ledger_total: 100, difference: 0 }, inventory_vs_gl: { ran: true, diff: 0, ok: true }, unposted_sources: { ran: true, pending: 0, errors: 0, ok: true } } };
   const RED = JSON.parse(JSON.stringify(GREEN)); RED.status = 'red'; RED.reds = ['equation', 'trial_balance', 'journal', 'stock_identity'];
   RED.equation.difference = 100; RED.equation.ok = false; RED.trial_balance.difference = 100; RED.trial_balance.ok = false;
   RED.journal = { broken: 1, ok: false, truncated: false, rows: [{ entry_id: 3, date: '2026-10-16', source_type: 'manual', source_id: 'test_unbalanced_1', debit: 7000, credit: 6900, diff: 100, lines: 2 }] };
@@ -54,6 +54,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(/Balance check/.test(await p.locator('h1').textContent()), 'title (English)');
   ok(await p.locator('#bc_banner[data-status=green]').count() === 1 && /All good/.test(t), 'green banner');
   ok(/Assets/.test(t) && /8,000/.test(t) && /10,000/.test(t), 'equation figures shown');
+  ok(await p.locator('.bc-xc[data-k=money_accounts]').count() === 1 && /Money accounts total = mapped ledger accounts/.test(t), 'phase87: the money accounts item is on the page');
   ok(await p.locator('#bc_reset').count() === 0, 'no reset card while the server flag is OFF');
   ok((await calls(p, '_e_balance_check')).length === 1 && (await calls(p, '_e_balance_check'))[0].p_loc === null, 'one read-only call, all places');
   ok((await calls(p, '_e_test_reset')).length === 0, 'the reset is never called on load');

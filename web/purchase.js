@@ -96,7 +96,7 @@ const lockPage = (title, back) => shell(title, `<div class="lockcard">${LOCK}<sp
     return h.replace('<button type="button" class="tog ', `<button type="button" class="tog" data-act="pay_add" data-m="bank">＋ ${esc(T('addBank'))}</button><button type="button" class="tog `);
   };
 })();
-const newPay = (getTotal) => { const st = B.pay.create(getTotal); st.rows = []; st.bank = true; return st; };       // purchases start "all on credit"
+const newPay = (getTotal) => { const st = B.pay.create(getTotal); st.rows = []; st.bank = true; st.moneyEvent = 'purchase_payment'; if (B.moneySrc) B.moneySrc.prefetch('purchase_payment', null); return st; };       // purchases start "all on credit"
 
 // ================= bills list =================
 async function listView() {
@@ -371,7 +371,7 @@ async function ledger(i, fromCredit) {
   const rows = lr.data || [], open = ob.error ? [] : (ob.data || []);
   const canVoid = {}; for (const l of [...new Set(rows.filter((e) => e.kind === 'payment' || e.kind === 'refund').map((e) => e.location_id))]) canVoid[l] = await grant('purchase_void', l);
   const bal = Number(x.balance), mode = npMode();
-  PY.st = B.pay.create(() => bal); PY.st.rows = [{ mode: 'cash', amount: '', wallet: '', ref: '', given: '', auto: false }]; PY.st.bank = true;
+  PY.st = B.pay.create(() => bal); PY.st.rows = [{ mode: 'cash', amount: '', wallet: '', ref: '', given: '', auto: false }]; PY.st.bank = true; PY.st.moneyEvent = 'supplier_payment'; if (B.moneySrc) await B.moneySrc.prefetch('supplier_payment', null);
   if (B.pay.loadWallets) B.pay.loadWallets();
   const KL = { opening: 'opening', bill: 'kBill', return: 'kReturn', payment: 'kPayment', paid: 'kPaid', refund: 'kRefund' };
   openSheet(`<h2>${esc(x.name)}</h2><div class="muted">${esc(x.mobile || '')}</div>
@@ -407,6 +407,7 @@ function refundSheet(sup, credit) {
     ${locs2()}
     <div><label for="rf_amt">${esc(T('refundAmt'))}</label><input id="rf_amt" inputmode="decimal" autocomplete="off"><div class="hint">${esc(T('refundMax'))}</div></div>
     <div><label for="rf_mode">${esc(T('mode_'))}</label><select id="rf_mode">${['cash', 'mobile', 'card', 'bank'].map((m) => `<option value="${m}">${esc(modeL(m))}</option>`).join('')}</select></div>
+    ${B.moneySrc ? B.moneySrc.slot('rf', 'supplier_refund', { locSel: '#py_loc2' }) : ''}
     <div id="rf_w" hidden><label for="rf_wallet">${esc(T('wallet'))}</label><input id="rf_wallet" autocomplete="off"></div>
     <div><label for="rf_ref">${esc(T('refundRef'))}</label><input id="rf_ref" autocomplete="off"></div>
     ${reasons.length ? `<div><label for="rf_reason">${esc(T('reasonOpt'))}</label><select id="rf_reason"><option value="">—</option>${optHTML(reasons, '')}</select></div>` : ''}
@@ -418,9 +419,9 @@ async function doRefund(btn) {
   const amt = nnum(($('#rf_amt') || {}).value), credit = Number(btn.dataset.credit);
   if (!(amt > 0) || !(amt <= credit + 0.00001)) return toast(T('refundMax'));
   const mode = ($('#rf_mode') || {}).value, wallet = (($('#rf_wallet') || {}).value || '').trim();
-  if (mode === 'mobile' && !wallet) return toast(T('walletNeeded'));
+  if (mode === 'mobile' && !wallet && !(B.moneySrc && B.moneySrc.get('rf'))) return toast(T('walletNeeded'));
   const loc = Number(($('#py_loc2') || {}).value) || defLoc(), sup = PY.cur;
-  await U.submit(btn, () => sb.rpc('supplier_refund', { p_supplier: sup.supplier_id, p_loc: loc, p_amount: r2(amt), p_mode: mode, p_wallet: wallet || null, p_ref: (($('#rf_ref') || {}).value || '').trim() || null,
+  await U.submit(btn, () => sb.rpc('supplier_refund', { p_supplier: sup.supplier_id, p_loc: loc, p_amount: r2(amt), p_mode: mode, p_wallet: (B.moneySrc ? B.moneySrc.tag('rf', wallet || null) : wallet) || null, p_ref: (($('#rf_ref') || {}).value || '').trim() || null,
     p_reason: (($('#rf_reason') || {}).value) || null, p_note: (($('#rf_note') || {}).value || '').trim() || null, p_client: PY.rclient }),
     () => { PY.rclient = rid(); toast(T('refundOk')); payables(); }, { grant: 'supplier_pay', loc, context: { supplier: sup.supplier_id } });
 }

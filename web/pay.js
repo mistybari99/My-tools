@@ -40,13 +40,13 @@ const pay = {
   paid: (st) => r2(st.rows.reduce((s, r) => s + r2(nnum(r.amount)), 0)),
   due: (st) => r2(st.getTotal() - pay.paid(st)),
   syncAuto(st) { if (st.rows.length === 1 && st.rows[0].auto) st.rows[0].amount = String(r2(st.getTotal())); },
-  list(st) { return st.rows.filter((r) => r2(nnum(r.amount)) > 0).map((r) => ({ mode: r.mode, amount: r2(nnum(r.amount)), wallet: r.mode === 'mobile' ? r.wallet : undefined, ref: r.mode === 'mobile' && r.ref ? r.ref : undefined,
+  list(st) { return st.rows.filter((r) => r2(nnum(r.amount)) > 0).map((r) => ({ mode: r.mode, amount: r2(nnum(r.amount)), wallet: (B.moneySrc ? B.moneySrc.taggedWallet(r.macc, r.mode === 'mobile' ? r.wallet : '') : (r.mode === 'mobile' ? r.wallet : '')) || undefined, ref: r.mode === 'mobile' && r.ref ? r.ref : undefined,
     tendered: r.mode === 'cash' && nnum(r.given) > 0 ? r2(nnum(r.given)) : undefined })); },
   // returns an error key (string) or null
   check(st) {
     const tot = st.getTotal();
     if (pay.paid(st) > tot + 0.001) return 'overpaid';
-    for (const r of st.rows) { if (nnum(r.amount) > 0 && r.mode === 'mobile' && !r.wallet) return 'wallet_needed'; }
+    for (const r of st.rows) { if (nnum(r.amount) > 0 && r.mode === 'mobile' && !r.wallet && !r.macc) return 'wallet_needed'; }
     return null;
   },
   html(st) {
@@ -57,7 +57,8 @@ const pay = {
         <button type="button" class="mini" data-act="pay_del" data-i="${i}" aria-label="x">✕</button></div>
       <div class="row"><div style="flex:1"><label>${esc(T('amount'))} (৳)</label><input data-pay="${i}.amount" inputmode="decimal" value="${esc(r.amount)}"></div>
         ${r.mode === 'cash' && single ? `<div style="flex:1"><label>${esc(T('given'))} (৳)</label><input data-pay="${i}.given" inputmode="decimal" value="${esc(r.given)}"></div>` : ''}</div>
-      ${r.mode === 'mobile' ? `<div class="row"><div style="flex:1"><label>${esc(T('wallet'))}</label><select data-pay="${i}.wallet"><option value="">${esc(T('pickWallet'))}</option>${w.map(([c, l]) => `<option value="${esc(c)}" ${r.wallet === c ? 'selected' : ''}>${esc(lab(l))}</option>`).join('')}</select></div>
+      ${st.moneyEvent && B.moneySrc ? B.moneySrc.rowSelect(st.moneyEvent, i, r.macc, r) : ''}
+      ${r.mode === 'mobile' && !r.macc ? `<div class="row"><div style="flex:1"><label>${esc(T('wallet'))}</label><select data-pay="${i}.wallet"><option value="">${esc(T('pickWallet'))}</option>${w.map(([c, l]) => `<option value="${esc(c)}" ${r.wallet === c ? 'selected' : ''}>${esc(lab(l))}</option>`).join('')}</select></div>
         <div style="flex:1"><label>${esc(T('ref'))}</label><input data-pay="${i}.ref" value="${esc(r.ref)}"></div></div>` : ''}</div>`).join('');
     return `<div id="pay_box">${rows}<div class="row wrap" style="margin:8px 0">${MODES.map(([m, l]) => `<button type="button" class="tog" data-act="pay_add" data-m="${m}">＋ ${esc(lab(l))}</button>`).join('')}
         <button type="button" class="tog ${st.rows.length === 0 ? 'on' : ''}" data-act="pay_credit">${esc(T('onCredit'))}</button></div>

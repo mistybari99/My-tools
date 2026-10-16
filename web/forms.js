@@ -33,6 +33,7 @@ B.forms['10-2'] = {
         CH('receipt', L('রসিদ সংযুক্ত', 'Receipt attached'), YN, { req: true }), M('amount', L('টাকা', 'Amount'), { req: true })], { min: 3 }),
       CALC('total', L('মোট', 'Total'), 'money', { big: true })] },
     { title: L('সীমা ও রসিদ', 'Limit & receipts'), fields: [
+      SEL('money_account_id', L('Payment source', 'Payment source'), () => (B.moneySrc ? B.moneySrc.formOpts('expense_10_2')() : []), { wide: true, show: () => !!(B.moneySrc && B.moneySrc.hasAccounts('expense_10_2')) }),
       PHOTO('receipt_photos', L('রসিদ / ভাউচারের ছবি', 'Receipt / voucher photos')),
       CALC('limit_text', L('সীমা যাচাই', 'Limit check'), 'text'),
       ST('approved_by', L('সীমার উপরে হলে অনুমোদনকারী', 'Approved by (when over the limit)'), { show: (x) => x.v.over_limit, req: (x) => x.v.over_limit }),

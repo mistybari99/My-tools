@@ -222,6 +222,7 @@ function lineSheet(i) {
 function paySheet(i) {
   const one = i != null ? P.lines[i] : null;
   openSheet(`<h3>${esc(T('pay'))}${one ? ': ' + esc(nameOf(one)) : ''}</h3><div class="stack"><div><label for="py_m">${esc(T('mode'))}</label><select id="py_m"><option value="cash">${esc(T('cash'))}</option><option value="bank">${esc(T('bank'))}</option><option value="mobile">${esc(T('mobile'))}</option></select></div>
+    ${B.moneySrc ? B.moneySrc.slot('py', 'salary_payment', { loc: P.loc }) : ''}
     <div><label for="py_d">${esc(T('date'))}</label><input id="py_d" type="date" value="${today()}" max="${today()}"></div>${one ? `<div><label for="py_a">${esc(T('amount'))}</label><input id="py_a" inputmode="decimal" value="${esc(Number(one.net) - Number(one.paid_amount))}"></div>` : ''}
     <div><label for="py_r">${esc(T('ref'))}</label><input id="py_r" autocomplete="off"></div><div><label for="py_n">${esc(T('note'))}</label><input id="py_n" autocomplete="off"></div>
     <button class="primary full" data-act="py_go" data-i="${i == null ? '' : i}">${esc(T('pay'))}</button></div>`);
@@ -262,15 +263,16 @@ Object.assign(H, {
   py_go: async (a) => { const i = a.dataset.i === '' ? null : Number(a.dataset.i); const one = i == null ? null : P.lines[i];
     const amt = one ? nnum(val('py_a')) : null; if (one && !(amt > 0)) return toast(lab(ERR.bad_amount));
     const due = one ? Number(one.net) - Number(one.paid_amount) : null;
-    const d = await rpc('payroll_pay', { p_run: P.run.id, p_lines: one ? [one.id] : null, p_mode: val('py_m'), p_date: val('py_d') || today(), p_ref: val('py_r') || null, p_note: val('py_n') || null, p_client: P.payClient, p_amount: one && amt !== due ? amt : null }, 'saved');
+    const d = await rpc('payroll_pay', { p_run: P.run.id, p_lines: one ? [one.id] : null, p_mode: val('py_m'), p_date: val('py_d') || today(), p_ref: (B.moneySrc ? B.moneySrc.tag('py', val('py_r') || null) : val('py_r')) || null, p_note: val('py_n') || null, p_client: P.payClient, p_amount: one && amt !== due ? amt : null }, 'saved');
     if (d) { closeSheet(); draw(); } },
   adv_new: async () => { if (!P.emps.length) await loadEmps(); openSheet(`<h3>${esc(T('addAdv'))}</h3><div class="stack"><div><label for="av_e">${esc(T('who'))}</label><select id="av_e">${P.emps.filter((e) => ['active', 'on_leave'].includes(e.status)).map((e) => `<option value="${esc(e.id)}">${esc(empName(e))} ${esc(e.employee_no || '')}</option>`).join('')}</select></div>
       <div><label for="av_d">${esc(T('date'))}</label><input id="av_d" type="date" value="${today()}" max="${today()}"></div><div><label for="av_a">${esc(T('amount'))}</label><input id="av_a" inputmode="decimal" autocomplete="off"></div>
       <div><label for="av_i">${esc(T('inst'))}</label><input id="av_i" inputmode="decimal" autocomplete="off"></div><div><label for="av_f">${esc(T('recFrom'))}</label><input id="av_f" type="month" value="${today().slice(0, 7)}"></div>
       <div><label for="av_m">${esc(T('mode'))}</label><select id="av_m"><option value="cash">${esc(T('cash'))}</option><option value="bank">${esc(T('bank'))}</option><option value="mobile">${esc(T('mobile'))}</option><option value="none">${esc(T('modeNone'))}</option></select></div>
+      ${B.moneySrc ? B.moneySrc.slot('av', 'salary_advance', { loc: P.loc }) : ''}
       <div><label for="av_n">${esc(T('note'))}</label><input id="av_n" autocomplete="off"></div><button class="primary full" data-act="av_save">${esc(T('save'))}</button></div>`); P.advClient = rid(); },
   av_save: async () => { const amt = nnum(val('av_a')); if (!(amt > 0)) return toast(lab(ERR.bad_amount)); const ins = val('av_i') ? nnum(val('av_i')) : null;
-    const d = await rpc('staff_advance_add', { p_emp: val('av_e'), p_date: val('av_d'), p_amount: amt, p_instalment: ins, p_mode: val('av_m'), p_recover_from: (val('av_f') || today().slice(0, 7)) + '-01', p_note: val('av_n') || null, p_client: P.advClient }, 'saved');
+    const d = await rpc('staff_advance_add', { p_emp: val('av_e'), p_date: val('av_d'), p_amount: amt, p_instalment: ins, p_mode: val('av_m'), p_recover_from: (val('av_f') || today().slice(0, 7)) + '-01', p_note: (B.moneySrc && val('av_m') !== 'none' ? B.moneySrc.tag('av', val('av_n') || null) : val('av_n')) || null, p_client: P.advClient }, 'saved');
     if (d) { closeSheet(); draw(); } },
   adv_void: async (a) => { const n = ask(); if (!n) return; const d = await rpc('staff_advance_void', { p_id: Number(a.dataset.v), p_reason: n }, 'saved'); if (d) draw(); },
   fb_save: async () => { if (!val('fb_n')) return toast(lab(ERR.name_required)); const d = await rpc('payroll_bonus_event_save', { p_month: m01(), p_name: val('fb_n'), p_loc: S.ctx.is_owner ? null : P.loc, p_active: true }, 'saved'); if (d) draw(); },

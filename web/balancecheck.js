@@ -104,7 +104,8 @@ function xcHTML(r) {
   return `<div class="card stack" id="bc_xc"><b>${esc(T('xc'))}</b>
     ${line('daybook_vs_journal', T('dvj'), (x) => ` · ${T('kinds')}: ${x.kinds_differing}`)}
     ${line('inventory_vs_gl', T('ivg'), (x) => ` · ${T('diff')}: ${num(x.diff)}`)}
-    ${line('unposted_sources', T('unp'), (x) => ` · ${T('pend')}: ${x.pending} · ${T('errs')}: ${x.errors}`)}</div>`;
+    ${line('unposted_sources', T('unp'), (x) => ` · ${T('pend')}: ${x.pending} · ${T('errs')}: ${x.errors}`)}
+    ${line('money_accounts', 'Money accounts total = mapped ledger accounts', (x) => ` · ${num(x.money_accounts_total)} / ${num(x.ledger_total)} · ${T('diff')}: ${num(x.difference)}${x.red ? ' · RED' : ''}`)}</div>`;
 }
 function resetHTML() {
   const s = D.st; if (!s || !s.owner || !s.flag) return '';

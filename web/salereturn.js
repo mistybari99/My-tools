@@ -66,7 +66,7 @@ async function open(saleId) {
       <div><label for="sr_note">${esc(T('note'))}</label><input id="sr_note" autocomplete="off"></div>
       <div class="card stack" id="sr_sum"></div>
       <div id="sr_mw" hidden><label for="sr_mode">${esc(T('mode'))}</label><select id="sr_mode"><option value="">—</option>${['cash', 'mobile', 'card'].map((m) => `<option value="${m}">${esc(T(m))}</option>`).join('')}</select>
-        <div id="sr_ww" hidden style="margin-top:6px"><label for="sr_wallet">${esc(T('wallet'))}</label><input id="sr_wallet" autocomplete="off"></div><div style="margin-top:6px"><label for="sr_ref">${esc(T('ref'))}</label><input id="sr_ref" autocomplete="off"></div></div></div>`
+        <div id="sr_ww" hidden style="margin-top:6px"><label for="sr_wallet">${esc(T('wallet'))}</label><input id="sr_wallet" autocomplete="off"></div><div style="margin-top:6px"><label for="sr_ref">${esc(T('ref'))}</label><input id="sr_ref" autocomplete="off"></div>${B.moneySrc ? B.moneySrc.slot('sr', 'customer_refund') : ''}</div></div>`
     : lock && d.status === 'done' ? `<div class="s2-lockrow">${LOCK}<span>${esc(T('doReturn'))} · ${esc(T('noperm'))}</span></div>` : ''}
     <h3 style="margin-top:14px">${esc(T('history'))}</h3><div>${(d.returns || []).map((x) => `<div class="s2-led"><div>${esc(money(x.amount))} ${x.status === 'void' ? `<span class="chip bad">${esc(T('voided'))}</span>` : ''}<div class="sub">${esc(dt(x.at))}${x.staff ? ' · ' + esc(x.staff) : ''} · ${esc(rLabel(x.reason))}${x.note ? ' · ' + esc(x.note) : ''}</div>
       <div class="sub">${Number(x.credit) ? esc(T('fromDue')) + ' ' + esc(money(x.credit)) : ''}${Number(x.refund) ? ' ' + esc(T('handBack')) + ' ' + esc(money(x.refund)) + (x.refund_mode ? ' (' + esc(T(x.refund_mode)) + ')' : '') : ''}</div></div>
@@ -96,11 +96,11 @@ async function goReturn(btn) {
   if (!c || c.bad) return toast(T('badQty')); if (!c.any) return toast(T('needQty'));
   const reason = ($('#sr_reason') || {}).value; if (!reason) return toast(T('needReason'));
   const mode = ($('#sr_mode') || {}).value || null; if (c.refund > 0 && !mode) return toast(T('needMode'));
-  const wallet = (($('#sr_wallet') || {}).value || '').trim(); if (mode === 'mobile' && !wallet) return toast(T('needWallet'));
+  const wallet = (($('#sr_wallet') || {}).value || '').trim(); if (mode === 'mobile' && !wallet && !(B.moneySrc && B.moneySrc.get('sr'))) return toast(T('needWallet'));
   const lines = []; (C.d.lines || []).forEach((l, i) => { const el = $(`[data-rq="${i}"]`); if (el && el.value.trim()) lines.push({ item_id: l.item_id, qty: nnum(el.value) }); });
   const d = C.d;
   await U.submit(btn, () => sb.rpc('sale_return', { p_client: C.client, p_sale: d.sale_id, p_lines: lines, p_reason: reason, p_note: (($('#sr_note') || {}).value || '').trim() || null,
-    p_refund_mode: c.refund > 0 ? mode : null, p_wallet: wallet || null, p_ref: (($('#sr_ref') || {}).value || '').trim() || null }),
+    p_refund_mode: c.refund > 0 ? mode : null, p_wallet: (B.moneySrc ? B.moneySrc.tag('sr', wallet || null) : wallet) || null, p_ref: (($('#sr_ref') || {}).value || '').trim() || null }),
     () => { toast(T('done')); if ($('#sr_list')) listView(); }, { grant: 'sale_return', loc: d.location_id, context: { sale: d.sale_id } });
 }
 

@@ -452,18 +452,18 @@ Object.assign(H, {
     <p class="muted">${esc(t3('বাকি', 'Remaining'))}: ${money(num(l.amount) - num(l.paid_amount))}</p>
     ${fld('pp_amt', t3('অঙ্ক', 'Amount'), inp('pp_amt', r2(num(l.amount) - num(l.paid_amount)), 'inputmode="decimal"'))}
     ${fld('pp_mode', t3('কীভাবে', 'How'), `<select id="pp_mode">${['cash', 'bank', 'mobile'].map((k) => opt(k, lb(MODES, k), '')).join('')}</select>`)}
-    ${fld('pp_date', t3('তারিখ', 'Date'), inp('pp_date', today(), 'type="date"'))}${fld('pp_ref', t3('রেফারেন্স', 'Reference'), inp('pp_ref', ''))}
+    ${B.moneySrc ? B.moneySrc.slot('pp', 'partner_payout') : ''}${fld('pp_date', t3('তারিখ', 'Date'), inp('pp_date', today(), 'type="date"'))}${fld('pp_ref', t3('রেফারেন্স', 'Reference'), inp('pp_ref', ''))}
     <button class="full primary" data-act="pt_paysave" data-v="${l.id}">${esc(lab(X.save))}</button></div>`); },
   pt_paysave: async (a) => { const amt = nnum($('#pp_amt').value); if (!(amt > 0)) return toast(eText('bad_amount'));
-    const r = await rpc('partner_settlement_pay', { p_line: Number(a.dataset.v), p_amount: amt, p_mode: $('#pp_mode').value, p_date: $('#pp_date').value, p_ref: $('#pp_ref').value || null, p_client: (D.cpay = D.cpay || rid()) }); if (!r) return; D.cpay = null; closeSheet(); toast(lab(X.saved)); await refresh(); },
+    const r = await rpc('partner_settlement_pay', { p_line: Number(a.dataset.v), p_amount: amt, p_mode: $('#pp_mode').value, p_date: $('#pp_date').value, p_ref: (B.moneySrc ? B.moneySrc.tag('pp', $('#pp_ref').value || null) : $('#pp_ref').value) || null, p_client: (D.cpay = D.cpay || rid()) }); if (!r) return; D.cpay = null; closeSheet(); toast(lab(X.saved)); await refresh(); },
   pt_capnew: () => { const aps = deedParties(D.capd || (D.deeds.find((d) => d.status === 'active') || {}).id); openSheet(`<h2>${esc(t3('পুঁজির লেনদেন', 'Capital entry'))}</h2><div class="stack">
     ${fld('ck_p', t3('পক্ষ', 'Party'), `<select id="ck_p">${aps.map((x) => opt(x.party_id, pname(x.party_id) + ' (' + lb(ROLES, x.role) + ')', '')).join('')}</select>`)}
     ${fld('ck_k', t3('কী ধরনের', 'Kind'), `<select id="ck_k">${Object.keys(CKIND).map((k) => opt(k, lb(CKIND, k), '')).join('')}</select>`)}
     ${fld('ck_a', t3('অঙ্ক', 'Amount'), inp('ck_a', '', 'inputmode="decimal"'))}${fld('ck_d', t3('তারিখ', 'Date'), inp('ck_d', today(), 'type="date"'))}
-    ${fld('ck_m', t3('কীভাবে', 'How'), `<select id="ck_m">${Object.keys(MODES).map((k) => opt(k, lb(MODES, k), '')).join('')}</select>`)}${fld('ck_n', t3('বিবরণ', 'Description'), inp('ck_n', ''))}${fld('ck_r', t3('রেফারেন্স', 'Reference'), inp('ck_r', ''))}
+    ${fld('ck_m', t3('কীভাবে', 'How'), `<select id="ck_m">${Object.keys(MODES).map((k) => opt(k, lb(MODES, k), '')).join('')}</select>`)}${B.moneySrc ? B.moneySrc.slot('ck', 'partner_capital') : ''}${fld('ck_n', t3('বিবরণ', 'Description'), inp('ck_n', ''))}${fld('ck_r', t3('রেফারেন্স', 'Reference'), inp('ck_r', ''))}
     <button class="full primary" data-act="pt_capsave">${esc(lab(X.save))}</button></div>`); },
   pt_capsave: async () => { const amt = nnum($('#ck_a').value); if (!(amt > 0)) return toast(eText('bad_amount'));
-    const r = await rpc('partner_capital_add', { p_agr: Number(D.capd || (D.deeds.find((d) => d.status === 'active') || {}).id), p_party: Number($('#ck_p').value), p_kind: $('#ck_k').value, p_amount: amt, p_date: $('#ck_d').value, p_mode: $('#ck_m').value, p_desc: $('#ck_n').value || null, p_ref: $('#ck_r').value || null, p_client: (D.ccap = D.ccap || rid()) });
+    const r = await rpc('partner_capital_add', { p_agr: Number(D.capd || (D.deeds.find((d) => d.status === 'active') || {}).id), p_party: Number($('#ck_p').value), p_kind: $('#ck_k').value, p_amount: amt, p_date: $('#ck_d').value, p_mode: $('#ck_m').value, p_desc: $('#ck_n').value || null, p_ref: (B.moneySrc ? B.moneySrc.tag('ck', $('#ck_r').value || null) : $('#ck_r').value) || null, p_client: (D.ccap = D.ccap || rid()) });
     if (!r) return; D.ccap = null; closeSheet(); toast(lab(X.saved)); await refresh(); },
   pt_capvoid: async (a) => { const n = window.prompt(lab(X.why)); if (!n) return; const r = await rpc('partner_capital_void', { p_id: Number(a.dataset.v), p_reason: n }); if (r) await refresh(); },
   pt_stmt: (a) => { D.tab = 'stmt'; D.stmt = null; D.stmtArgs = { party: Number(a.dataset.v) }; paint(); },
