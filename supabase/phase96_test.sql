@@ -80,8 +80,8 @@ select tt.chk('T1 9 new accounts: right type, normal side, parent group; owner-e
   and (select p.code from coa_accounts c join coa_accounts p on p.id=c.parent_id where c.code='4920')='4000');
 select tt.chk('T1 VAT and withholding payable are inactive placeholders; the other 7 are active', (select count(*) from coa_accounts where code in ('2800','2810') and not active)=2
   and (select count(*) from coa_accounts where code in ('1250','2700','4910','5880','5890','4920','5895') and active)=7);
-select tt.chk('T1 every key is mapped (13) and the head key oi_supplier_discount books to the purchase discount account',
-  (select count(*) from acct_mappings m join w1f_seed_state s on s.key=m.key)=13 and (select a.code from acct_mappings m join coa_accounts a on a.id=m.account_id where m.key='oi_supplier_discount')='4910');
+select tt.chk('T1 11 keys are mapped (the 2 inactive placeholders get their key when switched on, so every mapping points to a live account) and the head key oi_supplier_discount books to the purchase discount account',
+  (select count(*) from acct_mappings m join w1f_seed_state s on s.key=m.key)=11 and not exists (select 1 from acct_mappings m join coa_accounts a on a.id=m.account_id where not a.active or a.is_group) and (select a.code from acct_mappings m join coa_accounts a on a.id=m.account_id where m.key='oi_supplier_discount')='4910');
 select tt.chk('T1 one audit_log line per seeded key (13)', (select count(*) from audit_log where action='w1f_seed')=13);
 select tt.chk('T1 a second seed run changes nothing', _w1f_seed_run()=0);
 select tt.chk('T1 expense heads: rent utilities marketing are in the list but RETIRED (the 10-2 form does not offer them); the 7 old heads are active',
@@ -136,7 +136,8 @@ select tt.chk('T2 with a reason an unused account is deactivated', :'da1'::boole
 select (_w1f_seed_edit('staff_deposit',null,null,true) ->> 'changed')::boolean as da2 \gset
 select tt.chk('T2 and reactivated', :'da2'::boolean and (select active from coa_accounts where code='2700'));
 select (_w1f_seed_edit('vat_payable',null,null,true) ->> 'changed')::boolean as va1 \gset
-select tt.chk('T2 the VAT placeholder can be switched on by the owner when the adviser decides', :'va1'::boolean and (select active from coa_accounts where code='2800'));
+select tt.chk('T2 the VAT placeholder can be switched on by the owner when the adviser decides, and only then does it get its key vat_payable', :'va1'::boolean and (select active from coa_accounts where code='2800')
+  and (select a.code from acct_mappings m join coa_accounts a on a.id=m.account_id where m.key='vat_payable')='2800');
 select (_w1f_seed_edit('vat_payable',null,null,false,'test_back_to_placeholder') ->> 'changed')::boolean as va2 \gset
 select tt.chk('T2 and back to a placeholder', :'va2'::boolean and not (select active from coa_accounts where code='2800'));
 select tt.err('T2 re-pointing a key that already has an account needs a reason', $q$select _w1f_seed_map('rounding','5895')$q$, 'reason_required');

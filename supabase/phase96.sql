@@ -137,7 +137,7 @@ begin
         insert into public.coa_accounts (code, name_bn, name_en, type, normal_side, parent_id, is_group, is_system, active, sort)
           values (r.code, r.name_bn, r.name_en, r.type, case when r.type in ('asset', 'expense') then 'debit' else 'credit' end, par.id, false, false, not r.placeholder, 600 + r.ord)
           returning * into a;
-        insert into public.acct_mappings (key, account_id, label_bn, label_en) values (r.key, a.id, r.name_en, r.purpose);
+        if not r.placeholder then insert into public.acct_mappings (key, account_id, label_bn, label_en) values (r.key, a.id, r.name_en, r.purpose); end if;   -- a placeholder is mapped when the owner switches it on
         st := 'created'; nid := a.id;
       end if;
     end if;
@@ -175,9 +175,9 @@ create or replace function public._w1f_seed_report() returns jsonb language plpg
 begin
   if not public._w1f_view_ok() then raise exception 'not allowed'; end if;
   return coalesce((select jsonb_agg(jsonb_build_object('key', s.key, 'proposed_code', s.code, 'purpose', s.purpose, 'status', s.status, 'placeholder', s.placeholder, 'note', s.note,
-      'type', s.type, 'mapped', m.account_id is not null, 'account_id', c.id, 'code', c.code, 'name_en', c.name_en, 'name_bn', c.name_bn, 'active', c.active,
+      'type', s.type, 'mapped', m.account_id is not null, 'has_account', c.id is not null, 'account_id', c.id, 'code', c.code, 'name_en', c.name_en, 'name_bn', c.name_bn, 'active', c.active,
       'has_lines', c.id is not null and exists (select 1 from public.journal_lines l where l.account_id = c.id)) order by s.ord)
-    from public.w1f_seed_state s left join public.acct_mappings m on m.key = s.key left join public.coa_accounts c on c.id = m.account_id), '[]'::jsonb);
+    from public.w1f_seed_state s left join public.acct_mappings m on m.key = s.key left join public.coa_accounts c on c.id = coalesce(m.account_id, s.account_id)), '[]'::jsonb);
 end $$;
 
 -- the owner (or the accounts manager) edits a seeded account: names and active. The chart CODE of an account never changes (phase40 guard, BUILD-RULES: a code is never given to anything else);
@@ -189,7 +189,7 @@ begin
   if not public._w1f_chart_ok() then raise exception 'not allowed'; end if;
   select * into s from public.w1f_seed_state where key = p_key;
   if not found then raise exception 'unknown_key'; end if;
-  select c.* into a from public.acct_mappings m join public.coa_accounts c on c.id = m.account_id where m.key = p_key for update of c;
+  select c.* into a from public.coa_accounts c where c.id = coalesce((select m.account_id from public.acct_mappings m where m.key = p_key), s.account_id) for update;
   if not found then raise exception 'not_mapped'; end if;
   if p_name_en is not null and (length(btrim(p_name_en)) not between 1 and 120) then raise exception 'name_required'; end if;
   if p_name_bn is not null and (length(btrim(p_name_bn)) not between 1 and 120) then raise exception 'name_required'; end if;
@@ -207,6 +207,9 @@ begin
   if p_name_bn is not null and btrim(p_name_bn) is distinct from a.name_bn then changed := changed || jsonb_build_object('name_bn', jsonb_build_array(a.name_bn, btrim(p_name_bn))); end if;
   if changed = '{}'::jsonb then return jsonb_build_object('key', p_key, 'changed', false); end if;
   update public.coa_accounts set name_en = coalesce(nullif(btrim(p_name_en), ''), name_en), name_bn = coalesce(nullif(btrim(p_name_bn), ''), name_bn), active = coalesce(p_active, active) where id = a.id;
+  if p_active is true then   -- a placeholder gets its mapping key the day the owner switches it on
+    insert into public.acct_mappings (key, account_id, label_bn, label_en, updated_by) values (p_key, a.id, s.name_en, s.purpose, auth.uid()) on conflict (key) do nothing;
+  end if;
   perform public._w1f_audit('w1f_seed_edit', 'coa_accounts', a.id::text, jsonb_build_object('key', p_key, 'changes', changed, 'reason', why));
   return jsonb_build_object('key', p_key, 'changed', true, 'account_id', a.id);
 end $$;
