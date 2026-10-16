@@ -159,3 +159,20 @@ Total about 35 days [unverified]. Phase numbers follow release order only if fil
 | Q5 | Price of milk and packing: purchase bill or fixed value? | G3, G10 |
 | Q6 | Which phase may be applied to the live database, and the accounting start date | all |
 | Q7 | Approve deleting or archiving old branches (G14) | G14 |
+
+---
+
+## Owner approval modes (owner request, new item G15)
+
+The owner wants one setting with four modes, switchable at any time to fit the situation:
+
+| Mode | Behaviour |
+|---|---|
+| Approver | Owner's own entries need approval from a named person (for example Management) |
+| Self-approve | Owner approves own entries |
+| Logged | Owner's entries are always shown in the log, with who approved and how |
+| Off | The control is switched off; the owner decides when to turn it on again |
+
+Status: only the `owner_self_approve` switch is confirmed in code (ON by default). The named-approver choice, the always-log display and an off switch are [unverified] and must be checked in code before building.
+
+Rules for the build: every change of this setting is itself written to the audit log with who changed it and when; the setting is owner-only; the log display works in every mode; a test must prove that "Approver" mode blocks owner self-approval and "Self-approve" mode allows it. Owner decision needed: which person or role is the default approver.
