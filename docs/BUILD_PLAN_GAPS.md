@@ -200,10 +200,14 @@ SQL numbers used: phase81 (B), phase82 (C), phase83 (D), phase84 (E), phase85 (i
 | G5 customer advance | posting already existed (phase40/52/79); read-only `cust_advance_check()` and tests added | in phase81_test |
 | G6 transit short | done in SQL (claim, recover, write-off), owner decides the bearer (`transit_short_bearer`, default ask) | in phase81_test |
 | G8 partner profit share | done in SQL, posting **off by default** (`partner_settlement_post_on`); monthly split preview only | in phase82_test |
-| G9 separate wallets, fee expense, 10-3 blind reconcile | done; fee in journal, P&L and day book since phase85 | phase83_test 92 / 0; phase85_test (S3) |
+| G9 separate wallets, fee expense, 10-3 blind reconcile | done; fee in journal, P&L and day book since phase85; the wallet split of the journal is a **switch, off by default** (`d_wallet_split_on`, phase86) | phase83_test 92 / 0; phase85_test (S3) |
 | G10 milk / chhana / packing roles and gate | done; gate **off by default** (`d_recipe_materials_mode`); costing-method wiring (hook H4) NOT done by decision | in phase83_test |
 | G11 balance check | done, read only, screen `#/balancecheck`; banner on `#/accounts` and `#/finance2` NOT done | phase84_test 41 / 0 |
 | G12 salary not in daily profit | `c_daily_profit()` leaves salary out (`salary_in_daily_off`, default on); Monthly Close screen `#/monthclose` | in phase82_test |
 | G13 test reset | guarded function exists but is in its own file `phase84_test_project_only.sql`, **test projects only, not in the live paste order** | in phase84_test |
 
 Known limits found while integrating: (1) toggling `d_wallet_fee_treatment` to `not_posted` and back leaves the journal at 0 for fees that were reversed (the poster never re-posts a reversed source) while P&L and day book show the fee again; do not toggle after real postings. (2) Builder B's trigger on `exceptions` raised when an exception had no entry; fixed in phase81 (found by phase46_test). (3) Re-pasting an older phase that re-creates `_acct_docs`, `_p27_pl` or `_daybook_lines` removes the hooks: paste phase85 again afterwards.
+
+## Build status (phase86, fixes after the independent check)
+
+Paste phase86 after phase85. New rule `d_wallet_split_on` (OFF). Fixed: named-approver bypass (M1), decider differs from maker and the owner cannot hold the approver role (M2), P&L salary unchanged while payroll accrual is off (M3), wallet split behind a switch (M4), supplier payment from a wallet joins the negative check once the wallet has an opening date (m5), owner recovery from a stuck named mode verified (m8), Monthly Close screen now says "Reviewed (not locked)" instead of "Closed" (m7: label change chosen; a real lock via `period_closed_until` is NOT built). Tests: phase86_test 36 / 0. Still open: m6 (named mode narrows only entries and entry change requests), m9, m10, a real period lock, G3 web box, G15 web screen, real phone, live Supabase.
