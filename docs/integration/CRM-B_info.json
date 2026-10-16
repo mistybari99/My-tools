@@ -1,0 +1,207 @@
+{
+  "package": "CRM-B",
+  "title": "Customer consent, privacy and duplicate customers",
+  "note": "Plain English entries for the (i) info sheet. Every setting is OFF or blank by default and keeps today's behaviour. English only for now.",
+  "entries": [
+    {
+      "key": "crm_consent_pos_on",
+      "kind": "setting",
+      "title": "Let counter staff record a customer's yes or no to messages",
+      "what_it_does": "Lets the person at the counter tick 'Agrees to messages? Yes / No / Not asked' under the customer's mobile number while making a sale. Only the ways that need the customer present are allowed: counter tick, phone, paper form, message reply.",
+      "why_it_matters": "A customer's yes is the only thing that lets us message them. The counter is where we meet the customer, so it is the easiest place to ask and write it down.",
+      "default": "OFF. Today only the owner or a customer manager can record consent.",
+      "if_switched": "ON: anyone who can enter POS sales can tick yes or no. They can also say 'do not contact', but only a manager can undo it. OFF again: counter staff lose the tick at once; what was recorded stays.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_quiet_from / crm_quiet_to",
+      "kind": "setting",
+      "title": "Quiet time for messages",
+      "what_it_does": "Two clock times (for example 21:00 and 08:00). Inside this window the message check says 'quiet hours' so the campaign screen can hold messages back.",
+      "why_it_matters": "Customers do not like messages late at night or very early.",
+      "default": "Blank. No quiet time.",
+      "if_switched": "With both times filled in, messages are marked 'quiet hours' inside the window. A window that runs past midnight is fine. A badly written time is ignored. Nothing is sent or blocked by this setting alone.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_pii_guard_on",
+      "kind": "setting",
+      "title": "Show customer phone and address only to people who are allowed",
+      "what_it_does": "Hides customers' phone numbers, WhatsApp numbers and addresses in the CRM customer list, the customer sheet, the duplicate list and the consent register. The owner and people given 'See customers' full phone and address' still see everything.",
+      "why_it_matters": "Every sales person can read every customer's number today. A customer list that leaves with a departing employee is a real loss.",
+      "default": "OFF. Everyone who can see customers sees numbers exactly as today.",
+      "if_switched": "ON: other staff see a masked number such as 017******78 and no address. Opening a full number needs a reason (if that setting is on) and is written to the access log. OFF again: numbers are shown as before. Honest limit: a person with POS access can still read the customers table directly through the system; this switch does not close that.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_mask_style",
+      "kind": "setting",
+      "title": "How a hidden phone number looks",
+      "what_it_does": "Chooses what a hidden number shows: the first three and last two digits (017******78) or only the last four digits.",
+      "why_it_matters": "Staff still need to tell two customers apart without seeing the whole number.",
+      "default": "First three and last two digits.",
+      "if_switched": "Only changes the look of hidden numbers, and only while the privacy switch is ON.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_unmask_reason_required",
+      "kind": "setting",
+      "title": "Ask for a reason before showing a full phone number",
+      "what_it_does": "When someone other than the owner opens a hidden number, they must write a short reason (at least 3 characters). The reason goes in the access log.",
+      "why_it_matters": "A reason makes people think twice and gives the owner something to check later.",
+      "default": "ON, but it only matters while the privacy switch is ON.",
+      "if_switched": "OFF: staff can open a hidden number without a reason; the look is still written to the access log.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_reveal_for_call",
+      "kind": "setting",
+      "title": "Let counter staff ask for one number at a time to call",
+      "what_it_does": "Gives a masked person a Call button that opens one customer's full number to dial it. It always needs a reason (if that setting is on) and is always logged. It never shows the address.",
+      "why_it_matters": "Staff sometimes have to phone a customer about an order. This lets them do it without being able to copy the whole list.",
+      "default": "OFF. A masked person cannot open a number.",
+      "if_switched": "ON: masked staff can open one number at a time to call. OFF: only the owner and people with the 'see full phone' right can.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_export_on",
+      "kind": "setting",
+      "title": "Allow the customer list to be exported",
+      "what_it_does": "Allows the owner and people given 'Export the customer list' to download customers as a CSV file, with a reason, a row cap and a log line.",
+      "why_it_matters": "A customer file can be copied and taken away. Every export is written down with who, when, how many and why.",
+      "default": "OFF. There is no customer export.",
+      "if_switched": "ON: export works, but only after the 'most customers one export may contain' number is set. If the privacy switch is ON and the person cannot see full numbers, the file has hidden numbers too. OFF again: export stops at once.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_export_max_rows",
+      "kind": "setting",
+      "title": "Most customers one export may contain",
+      "what_it_does": "A number. One export never has more customers than this.",
+      "why_it_matters": "A limit stops one click from taking the whole customer book.",
+      "default": "Blank. Export stays blocked even when switched on.",
+      "if_switched": "Type a number to allow export. Blank again: export is blocked.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_print_needs_export",
+      "kind": "setting",
+      "title": "Printing a customer list needs the export right",
+      "what_it_does": "Ties printing a customer list to the same right as exporting it.",
+      "why_it_matters": "A printed list is as portable as a file.",
+      "default": "OFF. Anyone who sees the list can print it. Each print is written to the log.",
+      "if_switched": "ON: only the owner and people given 'Export the customer list' can print customer lists. The screen enforces it; the system cannot stop a browser print by itself, so the log is the control.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_dup_check_on",
+      "kind": "setting",
+      "title": "Look for duplicate customers and allow linking them as one person",
+      "what_it_does": "Builds the 'possible duplicates' list (same phone number, same name) and lets people with the right link two customers as the same person.",
+      "why_it_matters": "The same person under two numbers splits their history, points and tier. Messages could go to both numbers.",
+      "default": "OFF. No list and no linking. Saving a customer still stops on an identical mobile number, as today.",
+      "if_switched": "ON: the list appears and linking works. A link never moves sales, payments, dues or the books. OFF again: no new links; existing links stay and can be undone.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_dup_similar_names_on",
+      "kind": "setting",
+      "title": "Also list names that differ by one letter",
+      "what_it_does": "Adds pairs whose names are one letter apart (a spelling slip) to the duplicate list, as a weak hint.",
+      "why_it_matters": "People spell names differently, but one letter apart is often two different people, so it is only a hint.",
+      "default": "OFF. Names must be the same after removing spaces, capitals and punctuation.",
+      "if_switched": "ON: more pairs appear, marked 'weak' unless they also share an address or a birthday.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_contact_view",
+      "kind": "right",
+      "title": "See customers' full phone and address",
+      "what_it_does": "Lets a person see full phone numbers and addresses while the privacy switch is ON.",
+      "why_it_matters": "Some people, such as the manager who phones customers, need the whole number.",
+      "default": "Nobody has it until the owner gives it. The owner always sees everything.",
+      "if_switched": "Given: that person sees full numbers, and each time they open the whole list or a profile it is written to the access log. Taken away: they see masked numbers.",
+      "who_can_change": "Only the owner gives or takes this right."
+    },
+    {
+      "key": "crm_export",
+      "kind": "right",
+      "title": "Export the customer list",
+      "what_it_does": "Lets a person export (and, if the setting asks, print) customer lists.",
+      "why_it_matters": "Exports are the easiest way to lose a customer book.",
+      "default": "Nobody has it until the owner gives it. The owner always may.",
+      "if_switched": "Given: the person can export once export is switched on and a row cap is set; each export needs a reason and is logged.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_merge",
+      "kind": "right",
+      "title": "Link two customers as the same person",
+      "what_it_does": "Lets a person link and unlink duplicate customers.",
+      "why_it_matters": "A wrong link would hide a real customer, so it is not open to everyone.",
+      "default": "Nobody has it until the owner gives it. The owner always may.",
+      "if_switched": "Given: the person can link and unlink with a written reason; each link is a yellow row in the Exceptions list.",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "consent_register",
+      "kind": "screen",
+      "title": "Customer consent and privacy",
+      "what_it_does": "Shows who has said yes, who said no, who was never asked and who is do-not-contact, per channel. Tap a customer to record a change.",
+      "why_it_matters": "It is the proof that a customer agreed. A customer never asked gets no message.",
+      "default": "Existing customers all start as 'Not asked'. Nothing is changed for them.",
+      "if_switched": "Recording a no cancels waiting messages at once. A yes after a no needs a written reason.",
+      "who_can_change": "The owner and customer managers. Counter staff only if the owner switches that on."
+    },
+    {
+      "key": "do_not_contact",
+      "kind": "feature",
+      "title": "Do not contact",
+      "what_it_does": "Stops every message to a customer on every channel, even if they said yes before.",
+      "why_it_matters": "Some customers ask not to be contacted at all. This is the strongest stop and nothing overrides it.",
+      "default": "Off for everybody.",
+      "if_switched": "On: waiting messages are cancelled now and new ones are refused. Off again: needs a manager and a written reason.",
+      "who_can_change": "Anyone who may record consent can switch it on; only a manager can switch it off."
+    },
+    {
+      "key": "paper_list_import",
+      "kind": "feature",
+      "title": "Paper list",
+      "what_it_does": "Records many customers' yes (or no) from a paper list of mobile numbers. You check first; nothing is written until you press Apply. The list needs a name.",
+      "why_it_matters": "Many shops already hold signed forms. This brings them in with a record of where they came from.",
+      "default": "Nothing is imported unless someone does it.",
+      "if_switched": "A customer who said no before is never turned back to yes by a list.",
+      "who_can_change": "The owner and customer managers."
+    },
+    {
+      "key": "access_log",
+      "kind": "screen",
+      "title": "Access log",
+      "what_it_does": "Lists who opened a hidden phone number, address or customer list, when, and why.",
+      "why_it_matters": "Lets the owner see if someone is looking where they should not.",
+      "default": "Empty until the privacy switch is ON.",
+      "if_switched": "Entries cannot be edited or deleted.",
+      "who_can_change": "Only the owner can read it. Nobody can change it."
+    },
+    {
+      "key": "possible_duplicates",
+      "kind": "screen",
+      "title": "Duplicate customers",
+      "what_it_does": "Shows pairs that may be the same person, with the reason (same phone, same name, same address, same birthday) and how likely it is. For each pair you can say 'Same person' or 'Not the same'.",
+      "why_it_matters": "One person under two numbers splits their points, tier and history.",
+      "default": "Empty and switched off.",
+      "if_switched": "'Not the same' hides the pair from the list; you can bring it back.",
+      "who_can_change": "Everyone who can see it can look; only people with the 'link two customers' right can decide."
+    },
+    {
+      "key": "soft_link",
+      "kind": "feature",
+      "title": "Same person (link)",
+      "what_it_does": "Marks one customer as the same person as another. Their ids do not change. The customer list can show them as one, and a 'no' or 'do not contact' on one number protects the other number.",
+      "why_it_matters": "Sales, payments and dues are tied to the customer id in the books, so the two customers are never merged into one record.",
+      "default": "No customers are linked.",
+      "if_switched": "Dues, payments and balances stay on each customer. Only spend, orders, last purchase and points are added up for display. Unlinking puts everything back.",
+      "who_can_change": "The owner and people given 'Link two customers as the same person'."
+    }
+  ]
+}
