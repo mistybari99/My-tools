@@ -75,6 +75,9 @@ const X = {
   // opening
   opH: L('শুরুর জের: হিসাব শুরুর তারিখে প্রতিটি হিসাবে কত ছিল তা লিখুন। একবারই দেওয়া যায়। যে অঙ্ক মিলবে না তা "জমা মুনাফা" দিয়ে মেলানো যাবে।', 'Opening balances: enter what each account held on the start date. Done once. Any difference can be put to "Retained earnings".', 'Opening: start date-এ প্রতিটি account-এ কত ছিল। একবারই। পার্থক্য Retained earnings-এ।'),
   opDone: L('শুরুর জের দেওয়া হয়ে গেছে। ভুল হলে জার্নাল বই থেকে উল্টো এন্ট্রি দিয়ে নতুন করে দিন।', 'The opening balances are already entered. To fix a mistake, post a reversing entry from the journal book and enter them again.', 'Opening দেওয়া আছে। ভুল হলে Journal book থেকে উল্টো entry দিয়ে আবার দিন।'),
+  obHead: L('সম্পূর্ণ শুরুর জের (মজুত, জায়গা অনুযায়ী ক্যাশ, ওয়ালেট, বাকি, মূলধন) — একসাথে একটি এন্ট্রি', 'Full opening (stock, cash per place, wallets, dues, capital) - one entry', 'Full opening (stock, place-wise cash, wallet, due, capital) - একটি entry'),
+  obHint: L('JSON দিন: stock, cash, customer_dues, supplier_dues, capital, other। ডেবিট = ক্রেডিট না হলে কিছুই সেভ হয় না।', 'Paste JSON: stock, cash, customer_dues, supplier_dues, capital, other. Nothing is saved unless debit equals credit.', 'JSON দিন: stock, cash, customer_dues, supplier_dues, capital, other। Dr = Cr না হলে save হবে না।'),
+  obBad: L('JSON ঠিক নয়', 'The JSON is not valid', 'JSON ঠিক নয়'),
   plug: L('অমিল অঙ্ক "জমা মুনাফা" দিয়ে মেলান', 'Put any difference to "Retained earnings"', 'অমিল অঙ্ক Retained earnings-এ'),
   addParty: L('+ পক্ষ অনুযায়ী', '+ By party', '+ Party অনুযায়ী'), amount: L('অঙ্ক', 'Amount', 'Amount'),
   // parties
@@ -426,7 +429,9 @@ async function tOpening() {
   };
   return `<div class="card stack"><div class="ac-note">${esc(T('opH'))}</div><div>${esc(T('start'))}: <b>${esc(D.st.start)}</b></div>${rows.map(line).join('')}
     <div id="ac_optot" role="status"></div><label class="row"><input type="checkbox" id="ac_plug" ${D.op.plug ? 'checked' : ''}> ${esc(T('plug'))}</label>
-    <div class="row"><button class="full" data-act="ac_opdry">${esc(T('check'))}</button><button class="full primary" data-act="ac_opsave">${esc(T('save'))}</button></div><div id="ac_opout" class="muted"></div></div>`;
+    <div class="row"><button class="full" data-act="ac_opdry">${esc(T('check'))}</button><button class="full primary" data-act="ac_opsave">${esc(T('save'))}</button></div><div id="ac_opout" class="muted"></div>
+    <details><summary>${esc(T('obHead'))}</summary><div class="ac-note">${esc(T('obHint'))}</div><label for="ac_obj">JSON</label><textarea id="ac_obj" rows="8" autocomplete="off" spellcheck="false"></textarea>
+    <div class="row"><button class="full" data-act="ac_obdry">${esc(T('check'))}</button><button class="full primary" data-act="ac_obsave">${esc(T('save'))}</button></div><div id="ac_obout" class="muted"></div></details></div>`;
 }
 async function opLines() {
   const out = [];
@@ -575,6 +580,14 @@ async function jSubmit(dry) {
     toast(T('saved')); D.client = rid(); D.lines = []; D.jmemo = ''; D.jphoto = ''; D.tab = 'journal'; D.st = await rpc('acct_status'); await draw();
   } catch (e) { toast(eText(e)); }
 }
+async function obSubmit(dry) {
+  let j; try { j = JSON.parse(($('#ac_obj') || {}).value || ''); } catch (e) { return toast(T('obBad')); }
+  try {
+    const r = await rpc('opening_balance_post', { p_json: j, p_client: dry ? null : D.client, p_dry: !!dry, p_plug: false });
+    if (dry) { $('#ac_obout').textContent = T('dryOk') + ` (${fm(r.total_debit)} / ${fm(r.total_credit)}${r.balanced ? '' : ' · ' + T('diff') + ' ' + fm(r.difference)})`; return; }
+    toast(T('saved')); D.client = rid(); D.st = await rpc('acct_status'); await draw();
+  } catch (e) { toast(eText(e)); }
+}
 async function opSubmit(dry) {
   try {
     const lines = await opLines(); if (!lines.length) return toast(T('none'));
@@ -592,6 +605,7 @@ Object.assign(H, {
   ac_rev: async (a) => { const n = window.prompt(T('why')); if (!n || n.trim().length < 3) return;
     try { await rpc('acct_journal_reverse', { p_id: Number(a.dataset.v), p_note: n.trim(), p_client: rid() }); toast(T('reversed')); D.st = await rpc('acct_status'); await draw(); } catch (e) { toast(eText(e)); } },
   ac_addline: () => { D.lines.push(newLine()); const el = $('#ac_lines'); if (el) el.innerHTML = D.lines.map(lineHtml).join(''); showTotals(); },
+  ac_obdry: () => obSubmit(true), ac_obsave: () => obSubmit(false),
   ac_jdry: () => jSubmit(true), ac_jsave: () => jSubmit(false),
   ac_opparty: (a) => { const id = a.dataset.v; const e = D.op.rows[id] = D.op.rows[id] || {}; e.parts = e.parts || []; e.parts.push({ pid: '', mob: '', amt: '' }); draw(); },
   ac_opdry: () => opSubmit(true), ac_opsave: () => opSubmit(false),

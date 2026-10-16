@@ -15,7 +15,7 @@ const MAPS = [{ key: 'pay_cash', account_id: 2, label_bn: 'নগদ টাক�
 const MOCK = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const A = window.__ACC;
  c.rpc = async (fn, args) => {
   (window.__ACALLS = window.__ACALLS || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);
-  if (!/^acct_|^set_rule$|^inventory_vs_gl$/.test(fn)) return rpc(fn, args);
+  if (!/^acct_|^set_rule$|^inventory_vs_gl$|^opening_balance_post$/.test(fn)) return rpc(fn, args);
   const err = (m) => ({ data: null, error: { message: m, code: 'P0001' } });
   if (A.fail && A.fail[fn]) { const m = A.fail[fn]; if (!A.keep) delete A.fail[fn]; return err(m); }
   if (fn === 'acct_status') return { data: A.status, error: null };
@@ -41,6 +41,9 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
     const diff = Math.round((d - k) * 100) / 100; if (diff !== 0 && !args.p_plug) return err('unbalanced: debit ' + d + ' credit ' + k);
     if (args.p_dry) return { data: { dry: true, total_debit: Math.max(d, k), total_credit: Math.max(d, k), plug: diff }, error: null };
     A.status.opening = true; return { data: { id: 5, plug: diff }, error: null }; }
+  if (fn === 'opening_balance_post') { const t = JSON.stringify(args.p_json || {}); const bal = /"amount":100\\b/.test(t) && /"amount":100\\b.*"amount":100\\b/.test(t);
+    if (args.p_dry) return { data: { dry: true, total_debit: 100, total_credit: bal ? 100 : 60, difference: bal ? 0 : 40, balanced: bal }, error: null };
+    if (!bal) return err('unbalanced: debit 100 credit 60'); A.status.opening = true; return { data: { id: 6 }, error: null }; }
   if (fn === 'acct_account_save') { if (args.p_id === null && args.p_code === '1110') return err('code_taken'); return { data: { id: 99, code: args.p_code }, error: null }; }
   if (fn === 'acct_mapping_set') return { data: { key: args.p_key }, error: null };
   if (fn === 'acct_journal_reverse') return { data: { id: 88 }, error: null };
@@ -186,6 +189,10 @@ function acc(o = {}) {
   ok(/Difference 400\.00/.test(await p.textContent('#ac_optot')), 'opening totals shown');
   await p.click('[data-act=ac_opdry]'); await wait(p, 400); c = await calls(p, 'acct_opening');
   ok(c.length === 1 && c[0].p_dry === true && c[0].p_plug === true && c[0].p_lines.length === 2, 'opening dry sent with the balancing switch'); ok(/Difference 400\.00/.test(await p.textContent('#ac_opout')), 'plug shown');
+  await p.click('details summary'); await p.fill('#ac_obj', '{"cash":[{"mode":"cash","amount":100}],"capital":[{"kind":"owner","amount":60}]}'); await p.click('[data-act=ac_obdry]'); await wait(p, 300);
+  c = await calls(p, 'opening_balance_post'); ok(c.length === 1 && c[0].p_dry === true && c[0].p_plug === false && /Difference 40\.00/.test(await p.textContent('#ac_obout')), 'full opening preview shows the difference');
+  await p.click('[data-act=ac_obsave]'); await wait(p, 400); c = await calls(p, 'opening_balance_post'); ok(c.length === 2 && c[1].p_dry === false && !!c[1].p_client, 'full opening unbalanced is sent to the server (which refuses)'); ok(/unbalanced|debit/i.test(await p.locator('#toast').textContent()), 'refusal is shown');
+  await p.evaluate(() => { document.querySelector('#ac_obj').closest('details').open = true; }); await p.fill('#ac_obj', 'not json'); await p.click('[data-act=ac_obsave]'); await wait(p, 200); c = await calls(p, 'opening_balance_post'); ok(c.length === 2, 'invalid JSON is not sent');
   await p.click('[data-act=ac_opsave]'); await wait(p, 500); c = await calls(p, 'acct_opening'); ok(c.length === 2 && c[1].p_dry === false && c[1].p_client, 'opening saved');
   ok(/already entered/.test(await text(p)), 'opening done text');
   await noOverflow(p, 'opening');
