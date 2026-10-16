@@ -47,7 +47,7 @@ select (:'pm'::date + interval '1 month' - interval '1 day')::date as pme \gset
 
 \echo == T0 shape, safe defaults, patches in place, internals closed
 select tt.chk('T0 phase87 present, 14 event settings, none has a default, override allowed, source not required, no money account exists',
-  to_regprocedure('public._p87_present()') is not null and (select count(*) from money_event_settings)=14
+  to_regprocedure('public._p87_present()') is not null and (select count(*) from money_event_settings where event_type in ('salary_payment','salary_advance','expense_10_2','quick_expense','supplier_payment','purchase_payment','owner_topup','owner_draw','partner_capital','partner_payout','customer_refund','supplier_refund','customer_advance','cash_handover'))=14   -- phase99: phases 96 and 97 add other_income, customer_collection and pos_split_payment, so the 14 original events are checked by name, not the total
   and not exists (select 1 from money_event_settings where default_account_id is not null or not allow_override or require_source) and not exists (select 1 from money_accounts));
 select tt.chk('T0 the patches are in place (marker bos87) in the 10 shared functions',
   (select count(*) from (values ('public._acct_docs(date)'),('public._c_docs(date)'),('public._daybook_lines(int[],int[],date,date)'),('public._daybook_lines12(int[],date,date)'),('public._daybook_lines23(int[],date,date)'),

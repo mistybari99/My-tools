@@ -38,14 +38,14 @@ set role authenticated; select tt.as(:'o');
 select list_def_set('expense_heads','{"add_rule":"open"}') is not null as ok \gset
 select tt.chk('T1 owner sets rule', (select add_rule from list_defs where list_code='expense_heads')='open');
 select tt.as(:'s');
-select option_add('expense_heads','নতুন ভাড়া','Rent van') ->> 'status' as st, (option_add('expense_heads','গাড়ির ভাড়া','Car rent van') ->> 'status') as st2 \gset
+select option_add('expense_heads','নতুন ভ্যান ফি','Van fee') ->> 'status' as st, (option_add('expense_heads','গাড়ির ভ্যান ফি','Car van fee') ->> 'status') as st2 \gset
 select tt.chk('T1 staff adds at once under open (first add; second is similar)', :'st'='added' and :'st2'='similar');
-select tt.chk('T1 value_code is slug of English name, created_by set', exists (select 1 from option_lists where list_code='expense_heads' and value_code='rent_van' and created_by=:'s'::uuid and created_at is not null));
-select option_add('expense_heads','নতুন ভাড়া','Rent van') ->> 'status' as st3 \gset
-select tt.chk('T1 same name again -> exists, nothing added', :'st3'='exists' and (select count(*) from option_lists where list_code='expense_heads' and label_en='Rent van')=1);
-select option_add('expense_heads','  RENT  VAN ',null) ->> 'status' as st4 \gset
+select tt.chk('T1 value_code is slug of English name, created_by set', exists (select 1 from option_lists where list_code='expense_heads' and value_code='van_fee' and created_by=:'s'::uuid and created_at is not null));
+select option_add('expense_heads','নতুন ভ্যান ফি','Van fee') ->> 'status' as st3 \gset
+select tt.chk('T1 same name again -> exists, nothing added', :'st3'='exists' and (select count(*) from option_lists where list_code='expense_heads' and label_en='Van fee')=1);
+select option_add('expense_heads','  VAN  FEE ',null) ->> 'status' as st4 \gset
 select tt.chk('T1 normalised duplicate (case/space) -> exists', :'st4'='exists');
-select option_add('expense_heads','গাড়ির ভাড়া ২','Car rent van 2', null, '{}', true) ->> 'status' as st5 \gset
+select option_add('expense_heads','গাড়ির ভ্যান ফি ২','Car van fee 2', null, '{}', true) ->> 'status' as st5 \gset
 select tt.chk('T1 similar can be added anyway with force', :'st5'='added');
 select tt.chk('T1 similar list says which', (option_similar('expense_heads','Transports',null,null)->0->>'value_code')='transport');
 select tt.err('T1 empty name refused', $$select option_add('expense_heads','  ')$$, 'name_required');
@@ -62,7 +62,7 @@ select tt.err('T2 staff cannot write requests directly', $$insert into option_re
 select tt.err('T2 staff cannot write other queue directly', $$update list_other_entries set status='added'$$, 'permission denied');
 select tt.err('T2 nobody deletes (staff)', $$delete from option_lists$$, 'permission denied');
 reset role; select tt.err('T2 even the table owner cannot delete', 'delete from list_defs', 'nothing is deleted');
-select tt.err('T2 value_code immutable', $$update option_lists set value_code='zz' where value_code='rent_van'$$, 'code is immutable');
+select tt.err('T2 value_code immutable', $$update option_lists set value_code='zz' where value_code='van_fee'$$, 'code is immutable');
 
 \echo == T3 rule APPROVAL: request, person uses Other meanwhile; maker <> approver
 set role authenticated; select tt.as(:'o');

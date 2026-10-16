@@ -58,15 +58,29 @@ ALL = [NOTIFY, BACKUP_ENV, BACKUP_FIND, BACKUP_CP_LATEST, BACKUP_CP_DAY, BACKUP_
 
 
 def apply(root, hook):
+    """Applies one hook to a scratch copy. After the Wave 1 integration (phase 99) the repository already carries the new text: then there is nothing to do."""
     rel, old, new = hook
     p = os.path.join(root, rel)
     with open(p, encoding='utf-8') as f:
         s = f.read()
+    if s.count(new) >= 1 and old != new and new in s and s.count(old) == s.count(new):
+        return   # already integrated (the old text is the first part of the new text)
     n = s.count(old)
     if n != 1:
         raise AssertionError(f'{rel}: patch site found {n} times (must be exactly 1): {old[:60]!r}')
     with open(p, 'w', encoding='utf-8') as f:
         f.write(s.replace(old, new))
+
+
+def unapply(root, hook):
+    """Takes one hook back out of a scratch copy (the original text), so the "before the patch" tests still see the original files after the integration."""
+    rel, old, new = hook
+    p = os.path.join(root, rel)
+    with open(p, encoding='utf-8') as f:
+        s = f.read()
+    if new in s:
+        with open(p, 'w', encoding='utf-8') as f:
+            f.write(s.replace(new, old))
 
 
 class Hooks(unittest.TestCase):
@@ -79,14 +93,17 @@ class Hooks(unittest.TestCase):
                 self.assertIn(ln.strip(), note, f'{rel}: the note must print this line exactly: {ln.strip()[:80]}')
 
     def test_patch_sites_exist_exactly_once(self):
+        # before the integration the old text is there once; after it the new text is there once (the old text is its first part)
         for rel, old, new in ALL:
             with open(os.path.join(ROOT, rel), encoding='utf-8') as f:
-                self.assertEqual(f.read().count(old), 1, rel + ': ' + old[:50])
+                txt = f.read()
+            self.assertTrue(txt.count(new) == 1 or txt.count(old) == 1, rel + ': ' + old[:50])
 
     # ---------- notify workflow hook ----------
     def scratch_tools(self, d):
         t = os.path.join(d, 'tools')
         shutil.copytree(HERE, t, ignore=shutil.ignore_patterns('__pycache__', 'edge', 'kb_playbooks'))
+        unapply(d, NOTIFY)   # start from the original file whether or not the repository already carries the hook
         apply(d, NOTIFY)
         return t
 
@@ -152,6 +169,8 @@ class Hooks(unittest.TestCase):
     def patched_workflow(self, d, patches):
         os.makedirs(os.path.join(d, '.github', 'workflows'))
         shutil.copy(os.path.join(ROOT, '.github', 'workflows', 'backup.yml'), os.path.join(d, '.github', 'workflows', 'backup.yml'))
+        for h in (BACKUP_ENV, BACKUP_FIND, BACKUP_CP_LATEST, BACKUP_CP_DAY, BACKUP_RCLONE):
+            unapply(d, h)   # the original workflow, whether or not the repository already carries the hooks
         for p in patches:
             apply(d, p)
         with open(os.path.join(d, '.github', 'workflows', 'backup.yml'), encoding='utf-8') as f:
@@ -233,6 +252,8 @@ class Hooks(unittest.TestCase):
             shutil.copytree(os.path.join(ROOT, 'web'), os.path.join(d, 'web'))
             os.makedirs(os.path.join(d, 'tests'))
             shutil.copytree(os.path.join(ROOT, 'tests', 'web'), os.path.join(d, 'tests', 'web'), ignore=shutil.ignore_patterns('*.png'))
+            unapply(d, FORMS)
+            unapply(d, PATHS)
             apply(d, FORMS)
             apply(d, PATHS)
             for t in ('forms_links_test.js',):
