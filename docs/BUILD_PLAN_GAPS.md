@@ -242,3 +242,25 @@ Tests (local Postgres 16, port 5553; live Supabase untouched)
 | tests/web/moneyaccounts_test.js | 0 assert failures, no console errors |
 
 Open: owner to try the screen with real accounts on a TEST project; a picker on the POS sale screen; cheque handling and payment attachments if wanted; the Opening tab JSON box names the `money` section in its hint but has no ready-made template (`money_opening_json()` gives the list).
+
+## Wave 1 (U-01 to U-12): money and control, phases 88 to 99 (UNIFIED_BUILD_PLAN section 4.3; integrated in phase99)
+All twelve items are built, merged and tested; nothing is switched on by default (every setting keeps today's behaviour). Test counts are from the integrated tree (local Postgres 16, port 5570).
+
+| Item | What | Phase / web | Status | Tests |
+|---|---|---|---|---|
+| U-01 | Opening dues and payables linked to the customer and supplier sub-ledgers | 88 / openparties | done, OFF (`open_parties_link`), hooks by phase99 | phase88_test 146; openparties_test 0 failures; before/after 19 snapshots equal |
+| U-02 | Period integrity: pure-date lock, owner override with reason, back-date window, late offline sale policy | 89 / periodlock | done, defaults = today, hooks by phase99 | phase89_test 182; periodlock_test 40; before/after 12 equal |
+| U-03 | Staff exit revokes login, grants and device tokens | 90 / returnrules (Staff exit) | done, OFF (`exit_revoke_mode`), hook by phase99 | phase90_test 71; before/after (W1-C) 12 equal |
+| U-04 | Sale return control: restock choice, window, receipt, automatic write-off | 91 / returnrules, salereturn picker | done, no class rule by default, hooks by phase99 | phase91_test 70; returnrules_test 44; wave1_wiring picker tests |
+| U-05 | One profit number | 92 / profitcheck | done, OFF (`profit_one_number_on`) | phase92_test 75; before/after (W1-D) 21 equal |
+| U-06 | Report parity and dated brand map | 93 / profitcheck | done, OFF | phase93_test 55; profitcheck_test 0 failures |
+| U-07 | Cash and payment controls (owner money, bank slip, duplicate payment, vendor, pay account) | 94 / moneycontrols | done, defaults = today, hooks by phase99 | phase94_test 119; moneycontrols_test 0 failures; before/after 12 equal, all 15 settings ON moves nothing historic |
+| U-08 | Journal, chart and mapping controls | 95 / moneycontrols | done, OFF | phase95_test 84 |
+| U-09 | Chart and mapping completeness, expense heads, other income | 96 / otherincome | done, OFF (`other_income_on`), hooks by phase99 | phase96_test 127; otherincome_test 86 |
+| U-10 | Customer receipt channels: bank and cheque | 97 / otherincome (bank receipts), pay.js | done, OFF (`receipt_bank_on`), hooks by phase99 | phase97_test 79; before/after 19 equal |
+| U-11 | Journal freshness, scheduled posting, switch-coupling warning | 98 / freshness, notify_digest | done, scheduled posting OFF (`journal_sched_post_on`), warning text ON (`switch_coupling_warning` = warn, blocks nothing) | phase98_test 110; freshness_test 0 failures; before/after 12 equal |
+| U-12 | Data protection: backup encryption, retention, seed copy tools, restore drill | 98 / tools | done, encryption OFF (`backup_encrypt_on`, no passphrase secret yet) | test_backup_crypto 28; test_data_protection 19; test_w1g_hooks 8; test_restore_drill 11 |
+| I-1 | Integration: all hooks, one Exceptions list, web wiring | 99 | done | phase99_test 54; phase99_before_after.sh 33 snapshots equal + 33 wave-2 reports equal; wave1_wiring_test 30 |
+
+Open decisions for the owner: OD-5/OD-7 (owner in a closed period, late offline sales), OD-8 (when and from which date to switch the one profit number ON), OD-15 (cost column in the seed file, history), backup passphrase holder and retention period, scheduler (GitHub notify job or pg_cron), the seed names of heads and accounts (OD-16). Not done: the Opening tab JSON template from `w1a_open_json()`, aging of opening dues (U-22), a test-project reset that knows the Wave 1 tables.
+

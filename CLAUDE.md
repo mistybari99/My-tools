@@ -15,4 +15,5 @@
 ## Build discipline
 - Follow `docs/BUILD-RULES.md`. New SQL goes in a new phase file; do not edit old phase files. SQL must be safe to paste twice.
 - Every journal entry must balance (Dr = Cr). New behaviour is OFF or safe by default.
+- Every owner decision is a setting with a safe default; new behaviour starts only when the owner switches it on or from its effective-from date.
 - Register new screens only through `web/ia.js` (see `docs/IA_RULES.md`).
