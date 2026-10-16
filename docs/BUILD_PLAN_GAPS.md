@@ -211,3 +211,34 @@ Known limits found while integrating: (1) toggling `d_wallet_fee_treatment` to `
 ## Build status (phase86, fixes after the independent check)
 
 Paste phase86 after phase85. New rule `d_wallet_split_on` (OFF). Fixed: named-approver bypass (M1), decider differs from maker and the owner cannot hold the approver role (M2), P&L salary unchanged while payroll accrual is off (M3), wallet split behind a switch (M4), supplier payment from a wallet joins the negative check once the wallet has an opening date (m5), owner recovery from a stuck named mode verified (m8), Monthly Close screen now says "Reviewed (not locked)" instead of "Closed" (m7: label change chosen; a real lock via `period_closed_until` is NOT built). Tests: phase86_test 36 / 0. Still open: m6 (named mode narrows only entries and entry change requests), m9, m10, a real period lock, G3 web box, G15 web screen, real phone, live Supabase.
+
+
+## G16 Money accounts: the payment source is chosen per payment (owner decision, final)  (phase87)
+
+The owner may pay salary or anything else from hand cash, mobile banking (bKash, Nagad, Rocket or any other) or any bank account, differently each time. Nothing in the books fixes the source. Everything is a setting; the chain (journal, per-account balance, statements, reports, reconciliation) follows the account chosen. Q1 (salary from cash, bKash or bank) is therefore answered: not fixed. `salary_pay_source` (phase82) remains only as the fallback for a payment that names no account.
+
+| Item | Status | Where |
+|---|---|---|
+| Registry: cash drawer per place, wallet per provider and number, bank per bank / branch / number; own chart account each (or an existing leaf); add, rename, switch off, never delete | done | `money_accounts`, `money_account_add / update / set_active`, screen `#/moneyaccounts` |
+| Opening balance of an account through the existing opening path | done (section `money` of `opening_balance_post`); after an opening exists a new account is funded by top-up or transfer | phase80 function patched |
+| Payment source on 14 event types with default / allow override / require source per type | done in SQL and on the payment screens (not on POS sales, not asked) | `money_event_settings`, `BOS.moneySrc` |
+| Journal line hits exactly the chosen account; old rows and rows with no account post as before | done | `_acct_docs`, `_c_docs` patched (`_m_patch`) |
+| Transfers (cash to bank, bank to wallet, wallet cash-out) as one balanced entry with optional fee; recurring transfers; charges and interest | done | `money_transfer_add / void`, `money_charge_add / void`, `money_recurring_*` |
+| Statement per account (opening, in, out, closing, date range, CSV), period summary, negative balance policy per account (warn default), blind real balance as an exception | done | `money_statement(_csv)`, `money_summary`, `money_check_*` |
+| P&L and balance sheet with a line per account; day book shows the account; salary report shows the source; Balance Check item | done | `money_statements`, day book patches, `money_salary_sources`, `_m_balance_check` |
+| One-off owner exceptions (negative block, source required, other source / place, closed period, approver) with reason, Exceptions list, audit_log | done | `money_exception_grant`, `money_exceptions_list` |
+| Approver not fixed: role or named people or per entry, audited; phase86 protections kept | done in SQL and in the Approvers tab | `owner_approval_mode_set2`, `entry_approver_set`, `entries_approver_guard87` |
+| d_wallet_split_on | stays a switch for the legacy phase83 register only; money-account wallets do not depend on it | tested ON and OFF |
+| Cheque handling, attachments on payments, recurring expenses / salary, POS sale picker | NOT built (reasons in BUILD-LOG) | |
+
+Tests (local Postgres 16, port 5553; live Supabase untouched)
+
+| Suite | Result |
+|---|---|
+| phase87_test.sql (fresh DB through 86 + 87) | 208 pass / 0 fail |
+| phase87.sql pasted twice | no error; second paste patches nothing |
+| tests/sql/phase87_before_after.sh | 12 snapshots identical before / after the paste; posting after the paste posts 0; second wave on a twin DB identical |
+| Older SQL suites (every `phase*_test.sql`, DB through 86 versus DB through 87) | identical fail sets: phase 8 (1), 14 (2), 15 (1), 19 (1), 21 (17), 23 (1), 47 (2), 72 (1), 82 (3 by design after 85); on a full DB phase 16 (7), 18 (1) and 84 (12, needs `phase84_test_project_only`) also fail with and without phase87; 10 and 42 pass on a full DB. Same sets with and without phase87. |
+| tests/web/moneyaccounts_test.js | 0 assert failures, no console errors |
+
+Open: owner to try the screen with real accounts on a TEST project; a picker on the POS sale screen; cheque handling and payment attachments if wanted; the Opening tab JSON box names the `money` section in its hint but has no ready-made template (`money_opening_json()` gives the list).
