@@ -176,3 +176,14 @@ The owner wants one setting with four modes, switchable at any time to fit the s
 Status: only the `owner_self_approve` switch is confirmed in code (ON by default). The named-approver choice, the always-log display and an off switch are [unverified] and must be checked in code before building.
 
 Rules for the build: every change of this setting is itself written to the audit log with who changed it and when; the setting is owner-only; the log display works in every mode; a test must prove that "Approver" mode blocks owner self-approval and "Self-approve" mode allows it. Owner decision needed: which person or role is the default approver.
+
+
+## Build status (R1 + G15, phase80)
+
+| Gap | Status | Tests |
+|---|---|---|
+| G2 readiness (`acct_readiness`) | not built (opening path only) | none |
+| G3 opening balance | done in SQL (`opening_balance_post`, stock + cash + wallet + dues + payables + capital in one balanced entry); web is a JSON box in the Opening tab, so partly | phase80_test 42 pass / 0 fail; accounts_test 0 failures |
+| G7 owner and partner capital in opening | done (capital section 3100 / 3200) | in phase80_test |
+| G15 owner approval modes | done in SQL (four modes, audit, log); named mode enforced on entries and entry change requests only; no web screen yet, so partly | in phase80_test |
+Open: default approver role is blank (owner decision); wallet split waits for G9.
