@@ -68,7 +68,7 @@ const EXTRA82 = `(function(){ const real = window.supabase.createClient; window.
   await p.click('[data-act=mc_post]'); await wait(p); ok((await calls(p, 'c_post_pending')).length === 1, 'post pending calls the server');
   await p.click('[data-act=mc_close]'); await wait(p, 500);
   c = await calls(p, 'c_month_close'); ok(c.length === 1 && c[0].p_month === prevM && c[0].p_note === 'test note', 'close sends month and note');
-  t = await text(p); ok(/Closed/.test(t) && !(await p.$('[data-act=mc_close]')), 'closed state shown, close button gone');
+  t = await text(p); ok(/Reviewed \(not locked\)/.test(t) && !/Closed/.test(t) && !(await p.$('[data-act=mc_close]')), 'reviewed state shown (not called closed), button gone');
   await p.click('[data-act=mc_reopen]'); await wait(p, 500);
   c = await calls(p, 'c_month_reopen'); ok(c.length === 1 && c[0].p_reason === 'test note', 'reopen sends the reason'); t = await text(p); ok(/Open/.test(t) && await p.$('[data-act=mc_close]'), 'open again');
 
