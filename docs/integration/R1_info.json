@@ -1,0 +1,104 @@
+{
+ "version": 1,
+ "entries": {
+  "feature:pay_requests": {
+   "title": "Pay requests (salary and advance)",
+   "does": "A staff member writes a request in the app: amount, reason and the date he needs it. One person decides. He shows the staff member received, approved with a pay date, a different date, rejected with a reason, or paid.",
+   "why": "Nobody has to come in person and tell a story to ask for money. Every request leaves a trace with dates.",
+   "default": "Off. Nothing changes until the owner switches it on.",
+   "change": "Setting pay_requests_on. The person who decides is set on the Pay request settings page: the owner, a role, or one named person. It can be changed at any time. The owner can always decide.",
+   "who": "Any staff member linked to an employee record sends. The chosen person decides. The person who asks never decides or pays his own request.",
+   "related": ["screen:payrequest", "screen:payapprovals", "screen:payreqsettings", "feature:pay_request_required"],
+   "verified": false,
+   "src": "phase120.sql (pay_request_submit, pay_request_decide); docs/integration/R1.md"
+  },
+  "feature:pay_request_required": {
+   "title": "No pay without a request (verbal request policy)",
+   "does": "When ON, an advance or a salary payment to a staff member is refused unless an approved request, due today or earlier, backs it. The old screens still work: they are accepted when a matching request exists.",
+   "why": "Money moves only after a written, approved request, not after a talk.",
+   "default": "Off. Payments work exactly as before.",
+   "change": "Setting pay_requests_required, with pay_requests_required_kinds (both, advance or salary). A paper-register advance (mode none, no money moves) is not covered.",
+   "who": "The owner switches it on. It applies to everyone who pays.",
+   "related": ["feature:pay_request_exception", "feature:pay_requests"],
+   "verified": false,
+   "src": "phase120.sql (trigger a0_r1_gate_bi)"
+  },
+  "feature:pay_request_exception": {
+   "title": "Pay without a request, with a reason",
+   "does": "One payment, within 30 minutes, for one person and up to one amount, after the payer writes why. It is written to the Exceptions list as r1_unbacked_payment.",
+   "why": "A real emergency must not be blocked, but it must not be silent.",
+   "default": "The payer may do it with a reason, but only while the policy above is ON.",
+   "change": "Setting pay_request_exception_mode: reason, owner (only the owner) or never.",
+   "who": "Decided by the setting. The owner's one-off override of the money controls (event r1_pay_advance, r1_pay_salary, r1_pay_supplier) also works.",
+   "related": ["feature:exception_reason", "screen:exceptions"],
+   "verified": false,
+   "src": "phase120.sql (pay_request_exception_open)"
+  },
+  "feature:pay_request_limits": {
+   "title": "Request limits",
+   "does": "Caps the number of requests one staff member may send in a month, and the total advance he may hold: open advances, open advance requests and the new one together.",
+   "why": "Stops repeated small requests and advances that grow past what the owner accepts.",
+   "default": "Blank. No limit.",
+   "change": "Settings pay_request_max_per_month and pay_request_advance_ceiling. A cancelled request is not counted.",
+   "who": "The owner sets them. The server refuses a request that passes a limit.",
+   "related": ["feature:pay_requests"],
+   "verified": false,
+   "src": "phase120.sql (pay_request_submit)"
+  },
+  "feature:party_requests": {
+   "title": "Supplier payment requests",
+   "does": "Purchase, store or any staff member (or the supplier side, entered for them) writes a request to pay a supplier: amount, which bill or due, date needed. The same approver flow decides. The payment is then made through the normal supplier payment, from the money account chosen at that moment.",
+   "why": "A supplier asking at the counter becomes a written request with a decision and a date.",
+   "default": "Off.",
+   "change": "Settings party_requests_on and party_requests_required (no supplier payment without an approved request), and the approver for supplier requests: the same person as for staff requests, the owner, a role or one named person.",
+   "who": "Any staff with a place can send. The chosen person decides. A payment made together with a purchase bill is not covered.",
+   "related": ["screen:partyrequest", "screen:payables", "feature:pay_requests"],
+   "verified": false,
+   "src": "phase120.sql (pay_request_submit kind supplier, trigger on supplier_payments)"
+  },
+  "screen:payrequest": {
+   "title": "Ask for salary or advance",
+   "does": "Send a request and see the status and dates of your requests. You can cancel one that is not paid.",
+   "why": "One place for asking and for knowing the answer.",
+   "default": "Shows a notice while the switch is off.",
+   "change": "Setting pay_requests_on.",
+   "who": "Staff linked to an employee record. A payroll manager can enter one for a colleague.",
+   "related": ["feature:pay_requests"],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:partyrequest": {
+   "title": "Ask to pay a supplier",
+   "does": "Write a request to pay a supplier and follow its status.",
+   "why": "Supplier payments start from a written request.",
+   "default": "Shows a notice while the switch is off.",
+   "change": "Setting party_requests_on.",
+   "who": "Any staff with a place.",
+   "related": ["feature:party_requests"],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:payapprovals": {
+   "title": "Pay requests to decide",
+   "does": "Waiting, due today, later and all. Approve on the date asked or on another date, reject with a reason, or pay from the list.",
+   "why": "The person responsible sees everything he must decide or pay today in one place.",
+   "default": "Empty until requests are switched on.",
+   "change": "The approver is set on the Pay request settings page.",
+   "who": "The chosen approver and the owner.",
+   "related": ["feature:pay_requests"],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:payreqsettings": {
+   "title": "Pay request settings",
+   "does": "Switch requests on, choose who decides, switch the policy on, set the exception rule and the limits.",
+   "why": "Every owner decision is a setting that can change at any time.",
+   "default": "Everything off or blank.",
+   "change": "Each change is written to the change log.",
+   "who": "The owner.",
+   "related": ["feature:pay_requests", "feature:pay_request_required", "feature:pay_request_limits"],
+   "verified": false,
+   "src": "web/payrequests.js"
+  }
+ }
+}
