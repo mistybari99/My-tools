@@ -187,3 +187,23 @@ Rules for the build: every change of this setting is itself written to the audit
 | G7 owner and partner capital in opening | done (capital section 3100 / 3200) | in phase80_test |
 | G15 owner approval modes | done in SQL (four modes, audit, log); named mode enforced on entries and entry change requests only; no web screen yet, so partly | in phase80_test |
 Open: default approver role is blank (owner decision); wallet split waits for G9.
+
+
+## Build status (R2 to R4 integrated, phase81 to phase85)
+
+SQL numbers used: phase81 (B), phase82 (C), phase83 (D), phase84 (E), phase85 (integration of the shared-function hooks). Live Supabase was never touched; all numbers are from a local Postgres 16 with every phase pasted in order.
+
+| Gap | Status | Tests (local) |
+|---|---|---|
+| G1 salary as monthly accrual | done in SQL, **off by default** (`payroll_accrual_on`, `payroll_accrual_from` blank); hooks live since phase85; salary counted once, accrual off and on | phase82_test 101 / 0 (hooks simulated, DB through 84); phase85_test 37 / 0 (real hooks) |
+| G4 cash short / over | done in SQL, posting **off by default** (`cash_short_post_on`); screen `#/shortages` | phase81_test 110 / 0; shortages_test |
+| G5 customer advance | posting already existed (phase40/52/79); read-only `cust_advance_check()` and tests added | in phase81_test |
+| G6 transit short | done in SQL (claim, recover, write-off), owner decides the bearer (`transit_short_bearer`, default ask) | in phase81_test |
+| G8 partner profit share | done in SQL, posting **off by default** (`partner_settlement_post_on`); monthly split preview only | in phase82_test |
+| G9 separate wallets, fee expense, 10-3 blind reconcile | done; fee in journal, P&L and day book since phase85 | phase83_test 92 / 0; phase85_test (S3) |
+| G10 milk / chhana / packing roles and gate | done; gate **off by default** (`d_recipe_materials_mode`); costing-method wiring (hook H4) NOT done by decision | in phase83_test |
+| G11 balance check | done, read only, screen `#/balancecheck`; banner on `#/accounts` and `#/finance2` NOT done | phase84_test 41 / 0 |
+| G12 salary not in daily profit | `c_daily_profit()` leaves salary out (`salary_in_daily_off`, default on); Monthly Close screen `#/monthclose` | in phase82_test |
+| G13 test reset | guarded function exists but is in its own file `phase84_test_project_only.sql`, **test projects only, not in the live paste order** | in phase84_test |
+
+Known limits found while integrating: (1) toggling `d_wallet_fee_treatment` to `not_posted` and back leaves the journal at 0 for fees that were reversed (the poster never re-posts a reversed source) while P&L and day book show the fee again; do not toggle after real postings. (2) Builder B's trigger on `exceptions` raised when an exception had no entry; fixed in phase81 (found by phase46_test). (3) Re-pasting an older phase that re-creates `_acct_docs`, `_p27_pl` or `_daybook_lines` removes the hooks: paste phase85 again afterwards.

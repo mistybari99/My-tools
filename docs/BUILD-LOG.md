@@ -417,3 +417,15 @@ Tests
 - phase80_test.sql: 42 pass / 0 fail on a fresh DB (phase8..phase79 + phase80); phase80.sql pasted twice with no error. Same-DB before/after: phase15 113/1 (the 1 failure exists without phase80), 16 167/0, 17 147/0, 40 119/0, 52 33/0, 79 77/0 with and without phase80. accounts_test.js: errors none, 0 assert failures.
 Not confirmed
 - Local Postgres 16 only; live Supabase untouched. Web box takes JSON (no form for rows); no web screen for the approval mode yet; named mode narrows only entries and entry change requests (other request tables such as lists, releases, item changes still use the self-approve switch only). Wallet is still one account (1130, G9 later). The list of every older suite was not re-run, only the ones above.
+
+### R2-R4 integration: phase81 to phase85 (integrator)
+Merged: builder B (phase81, G4 G5 G6, web/shortages.js), C (phase82, G1 G8 G12 Monthly Close, web/monthclose.js), D (phase83, G9 G10, web/wallets.js), E (phase84, G11 G13, web/balancecheck.js). No merge conflicts (files disjoint).
+Changed
+- `supabase/phase85.sql` (new, paste LAST, paste-twice safe, tag bos85): `_acct_docs` (phase79 body) + calls to `_b_docs`, `_c_docs`, `_d_acct_docs` + C's `_c_run_skip` (3 places) and `_c_salary_paykey`; `_p27_pl` (phase72 body) + wallet fee rows and salary = 02-2 sheets that are not a shadow + approved/paid app payroll runs (`c_salary_by_month`), so a salary is counted once; `_daybook_lines` (phase50 body) + wallet fee rows. Nothing is switched on: payroll accrual, cash short posting, partner posting, material gate keep their safe defaults.
+- `supabase/phase84.sql` now holds only the READ-ONLY balance check. The guarded reset (`_e_test_reset`, rule `allow_test_reset`, reset log, table lists) moved to `supabase/phase84_test_project_only.sql`: **TEST PROJECTS ONLY, never in the live paste order**. Its clear list also names the tables of phases 80 to 83.
+- `phase81.sql`: the exceptions trigger no longer fails for an exception without entry or place (it blocked the insert; phase46_test caught it).
+- Test files: phase82_test and phase83_test skip their hook simulation when the real hook is installed.
+- Web: four `rec()` lines in `web/ia.js` (shortages, wallets, monthclose [home acc slot 11], balancecheck), four script tags in `web/index.html`, day-book label for `wallet_fee`. `.gitignore`: `.claude/worktrees/`.
+Order for the live project: ... 79, 80, 81, 82, 83, 84, 85. Test projects may also paste phase84_test_project_only.
+Tests: see the final table in docs/BUILD_PLAN_GAPS.md status and the integrator report: phase85_test 37 pass / 0 fail; phase80 42, 81 110, 82 101 (on a DB through 84; on a DB with phase85 three asserts that expect the hooks to be absent fail by design), 83 92, 84 41, all 0 fail. Older suites equal the pre-merge baseline (phase 8, 10, 14, 15, 19, 21, 22, 23, 42, 47, 72 known fails unchanged).
+Not confirmed: live Supabase, a real phone, hook H4 (costing method wiring), banner on accounts / finance2, `last_purchase` costing, transit lines in the day book.
