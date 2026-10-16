@@ -75,7 +75,8 @@ select acct_post_pending(false) ->> 'posted' as pp0 \gset
 select tt.chk('S1 run0 approved', :'ap0'='approved');
 select tt.chk('S1 accrual OFF: run0 is cash basis, no accrual entry, nothing in 2200', _c_run_basis(:'run0')='cash' and tt.n('payroll_accrual')=0 and tt.nd('2200')=0);
 select tt.chk('S1 journal: salary expense 5200 = 23000 exactly once (old payroll_payment source), cash -23000', tt.nd('5200')=23000 and tt.ndt('payroll_payment','5200')=23000 and tt.ndt('payroll_payment','1110')=-23000);
-select tt.chk('S1 P&L salary of month PM2 place 1 = 23000 (the app run is counted)', (select o_sal from _p27_pl(:'pm2'::date, :'pm2e'::date, array[1]))=23000);
+-- phase86 (fix M3): with the accrual setting OFF the P&L salary is only the 02-2 sheets (as before phase85), so the run is not added; phase85 alone adds it (23000)
+select tt.chk('S1 P&L salary of month PM2 place 1 = 23000 (the app run is counted) [with phase86 and accrual OFF: 0, no sheet yet]', coalesce((select o_sal from _p27_pl(:'pm2'::date, :'pm2e'::date, array[1])),0)=case when (to_regprocedure('public._p86_present()') is not null) then 0 else 23000 end);
 -- a 02-2 sheet that is NOT linked to a run is a separate salary of 4000 and is counted; a 02-2 sheet linked as the SHADOW of run0 (9000) is not.
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
  ('02-2',1,9501,:'pm2'::date,'approved',format('{"pay":[{"due":4000}],"month":"%s"}',:'pm2')::jsonb,'[]',:'o','st'),
@@ -84,8 +85,8 @@ select id as f1 from entries where form_code='02-2' and serial=9501 \gset
 select id as f2 from entries where form_code='02-2' and serial=9502 \gset
 select (select o_sal from _p27_pl(:'pm2'::date, :'pm2e'::date, array[1])) as sal_before_link \gset
 select shadow_link_add('payroll', 1, 'payroll_runs', :'run0', 'entries', :'f2', 'test shadow') is not null as lk \gset
-select tt.chk('S1 before the link both sheets and the run are counted: 23000 + 4000 + 9000 = 36000', :'sal_before_link'::numeric=36000);
-select tt.chk('S1 after the link the shadow sheet is NOT counted again: 23000 + 4000 = 27000', (select o_sal from _p27_pl(:'pm2'::date, :'pm2e'::date, array[1]))=27000);
+select tt.chk('S1 before the link both sheets and the run are counted: 23000 + 4000 + 9000 = 36000 [with phase86 and accrual OFF: sheets only 13000]', :'sal_before_link'::numeric=case when (to_regprocedure('public._p86_present()') is not null) then 13000 else 36000 end);
+select tt.chk('S1 after the link the shadow sheet is NOT counted again: 23000 + 4000 = 27000 [with phase86 and accrual OFF: 13000, unchanged]', (select o_sal from _p27_pl(:'pm2'::date, :'pm2e'::date, array[1]))=case when (to_regprocedure('public._p86_present()') is not null) then 13000 else 27000 end);
 
 \echo == S2 salary counted ONCE with the accrual setting ON (month PM, accrual from PM)
 select set_rule('payroll_accrual_on','true'::jsonb) is null as r1 \gset
@@ -113,9 +114,9 @@ select payroll_pay(:'run1'::bigint, array[:'l1b'::bigint], 'cash', tt.today(), '
 select acct_post_pending(false) ->> 'posted' as pp3 \gset
 select tt.chk('S2 the last 5000: Dr 2200 -> accrued salaries back to 0; salary expense still 46000; payroll_payment source untouched',
   tt.nd('2200')=0 and tt.nd('5200')=46000 and tt.ndt('payroll_payment','5200')=23000 and tt.n('payroll_pay_accr')=3);
-select tt.chk('S2 P&L salary of month PM place 1 = 23000 (run1 once; no sheet in that month)', (select o_sal from _p27_pl(:'pm'::date, :'pme'::date, array[1]))=23000);
+select tt.chk('S2 P&L salary of month PM place 1 = 23000 (run1 once; no sheet in that month)', coalesce((select o_sal from _p27_pl(:'pm'::date, :'pme'::date, array[1])),0)=case when (to_regprocedure('public._p86_present()') is not null) then 0 else 23000 end);  -- phase86: accrual is OFF here, no sheet in PM => 0
 select tt.chk('S2 P&L salary over both months = 27000 + 23000 = 50000 and the journal 5200 = 46000 (the 4000 sheet has no journal source: known, Dr = 46000 + 4000 only in the P&L)',
-  (select sum(o_sal) from _p27_pl(:'pm2'::date, :'pme'::date, array[1]))=50000);
+  (select sum(o_sal) from _p27_pl(:'pm2'::date, :'pme'::date, array[1]))=case when (to_regprocedure('public._p86_present()') is not null) then 13000 else 50000 end);
 select acct_post_pending(false) ->> 'posted' as pp4 \gset
 select tt.chk('S2 posting again posts nothing (no double posting), every entry balances', :'pp4'::int=0 and tt.unbalanced()=0);
 select set_rule('payroll_accrual_from', null) is null as r4 \gset
@@ -123,6 +124,8 @@ select set_rule('payroll_accrual_from', null) is null as r4 \gset
 \echo == S3 mobile wallet fee: journal, P&L expense, day book (hooks H1 H2 H3)
 select d_wallet_opening_set((select id from d_wallets where code='bkash'), 500, :'pm2'::date) ->> 'opening' as wo \gset
 select coalesce(sum(o_exp),0) as exp0 from _p27_pl(date_trunc('month', tt.today())::date, tt.today(), array[1]) \gset
+-- phase86: the wallet split is a switch (default OFF); this block tests the split, so it is switched on here
+select case when exists (select 1 from rules where key='d_wallet_split_on') then set_rule('d_wallet_split_on','true'::jsonb)::text end as spl \gset
 select (d_wallet_fee_add((select id from d_wallets where code='bkash'), 1, tt.today(), 15, 'cash_out', 'test_ref_85', null, gen_random_uuid())->>'id') is not null as fee \gset
 select acct_post_pending(false) ->> 'posted' as pp5 \gset
 select tt.chk('S3 journal: wallet fee Dr 5815 15, Cr the bKash wallet account 15', tt.ndt('d_wallet_fee','5815')=15 and tt.ndt('d_wallet_fee','1131')=-15);

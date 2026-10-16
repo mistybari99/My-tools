@@ -65,6 +65,8 @@ set role authenticated;
 select tt.as(:'o');
 select set_rule('accounting_on', 'true'::jsonb) is null as r1 \gset
 select acct_set_start(tt.today()-5)->>'start' as sd \gset
+-- phase86: the wallet split is a switch (default OFF); this suite tests the split, so it is switched on here when the switch exists
+select case when exists (select 1 from rules where key='d_wallet_split_on') then set_rule('d_wallet_split_on','true'::jsonb)::text end as spl \gset
 
 \echo == T2 sales into wallets (test numbers): bkash 1000, 'Nagad' label 500, rocket 300, unknown text 200 ; supplier pays 100 from bkash
 reset role;
