@@ -60,40 +60,7 @@ select v.key, 'crm', v.kind, v.dv, v.unit, null, v.mn, v.mx, v.lab, v.lab, v.lab
  ) as v(key, kind, dv, unit, mn, mx, lab, hint, srt)
 on conflict (key) do nothing;
 
--- the guard of phase316 learns the switch-on rule (re-created: it is this package's own function)
-create or replace function public._crmf_rules_guard() returns trigger language plpgsql set search_path = public as $$
-declare v text; d date; a public.coa_accounts; was boolean; now_ boolean;
-begin
-  if new.key in ('crm_points_expiry_from', 'crm_voucher_liability_from') then
-    v := nullif(btrim(coalesce(new.value, new.default_value) #>> '{}'), '');
-    if v is not null then
-      if v !~ '^\d{4}-\d{2}-\d{2}$' then raise exception 'bad_value'; end if;
-      begin d := v::date; exception when others then raise exception 'bad_value'; end;
-      if d < date '2000-01-01' or d > date '2100-01-01' then raise exception 'bad_value'; end if;
-    end if;
-  end if;
-  if new.key in ('crm_voucher_liability_account', 'crm_voucher_expense_account') then
-    v := nullif(btrim(coalesce(new.value, new.default_value) #>> '{}'), '');
-    if v is not null then
-      select * into a from public.coa_accounts where code = v;
-      if not found or a.is_group or not a.active then raise exception 'bad_account'; end if;
-      if new.key = 'crm_voucher_liability_account' and a.type <> 'liability' then raise exception 'bad_account_type'; end if;
-      if new.key = 'crm_voucher_expense_account' and a.type <> 'expense' then raise exception 'bad_account_type'; end if;
-    end if;
-  end if;
-  if new.key = 'crm_voucher_liability_on' then
-    now_ := coalesce((coalesce(new.value, new.default_value) #>> '{}')::boolean, false);
-    was := case when tg_op = 'UPDATE' then coalesce((coalesce(old.value, old.default_value) #>> '{}')::boolean, false) else false end;
-    if now_ and not was then
-      v := public.rule_txt('crm_voucher_liability_from');
-      if v is null then raise exception 'liability_from_needed'; end if;
-      if v::date < (now() at time zone 'Asia/Dhaka')::date then raise exception 'liability_from_in_the_past'; end if;
-      if public.rule_txt('crm_voucher_liability_account') is null or public.rule_txt('crm_voucher_expense_account') is null then raise exception 'liability_accounts_needed'; end if;
-      if not public.rule_on('accounting_on') or public._acct_start() is null then raise exception 'accounting_not_on'; end if;
-    end if;
-  end if;
-  return new;
-end $$;
+-- (the settings guard _crmf_rules_guard, with the liability switch-on rules, lives in phase316, so re-pasting an earlier phase can never remove a rule)
 
 -- ---------- tables ----------
 create table if not exists public.crmf_coupons (

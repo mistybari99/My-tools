@@ -17,7 +17,7 @@
 --   crm_points_expiry_months (blank)  crm_points_expiry_from (blank)  crm_points_expiry_warn_days (blank)
 --   crm_burn_max_percent (blank)  crm_burn_max_points (blank)  crm_burn_step_points (blank)  crm_points_adjust_alert_over (blank)
 -- GRANT: crm_loyalty_manage (apply expiry, rule override, referral decisions). The owner always may. `customer_manage` keeps its meaning (tier, credit limit, gifts, points).
--- RULE TEXT FIX: expiry is FIFO-free. The rule on screen is: points earned on or before the cut date, minus every point spent or expired since (oldest points are
+-- EXPIRY RULE (no first-in-first-out tracking). The rule on screen is: points earned on or before the cut date, minus every point spent or expired since (oldest points are
 --   assumed spent first, which is the kinder reading), never more than the balance. A second Apply the same day finds nothing.
 -- Hooks for the POS (points burn at the till) are in docs/integration/CRM-F.md.
 -- ============================================================
@@ -108,9 +108,10 @@ select v.key, 'crm', v.kind, v.dv, v.unit, null, v.mn, v.mx, v.lab, v.lab, v.lab
  ) as v(key, kind, dv, unit, mn, mx, lab, hint, srt)
 on conflict (key) do nothing;
 
--- text settings are checked when they are written, so a bad date or account can never sit in a setting waiting to fail later
+-- text settings are checked when they are written, so a bad date or account can never sit in a setting waiting to fail later;
+-- the voucher liability switch also needs its date, both accounts and accounting before it can go ON
 create or replace function public._crmf_rules_guard() returns trigger language plpgsql set search_path = public as $$
-declare v text; d date; a public.coa_accounts; vals jsonb;
+declare v text; d date; a public.coa_accounts; was boolean; now_ boolean;
 begin
   if new.key in ('crm_points_expiry_from', 'crm_voucher_liability_from') then
     v := nullif(btrim(coalesce(new.value, new.default_value) #>> '{}'), '');
@@ -129,8 +130,20 @@ begin
       if new.key = 'crm_voucher_expense_account' and a.type <> 'expense' then raise exception 'bad_account_type'; end if;
     end if;
   end if;
+  if new.key = 'crm_voucher_liability_on' then
+    now_ := coalesce((coalesce(new.value, new.default_value) #>> '{}')::boolean, false);
+    was := case when tg_op = 'UPDATE' then coalesce((coalesce(old.value, old.default_value) #>> '{}')::boolean, false) else false end;
+    if now_ and not was then
+      v := public.rule_txt('crm_voucher_liability_from');
+      if v is null then raise exception 'liability_from_needed'; end if;
+      if v::date < (now() at time zone 'Asia/Dhaka')::date then raise exception 'liability_from_in_the_past'; end if;
+      if public.rule_txt('crm_voucher_liability_account') is null or public.rule_txt('crm_voucher_expense_account') is null then raise exception 'liability_accounts_needed'; end if;
+      if not public.rule_on('accounting_on') or public._acct_start() is null then raise exception 'accounting_not_on'; end if;
+    end if;
+  end if;
   return new;
 end $$;
+
 revoke all on function public._crmf_rules_guard() from public, anon, authenticated;
 drop trigger if exists crmf_rules_guard on public.rules;
 create trigger crmf_rules_guard before insert or update on public.rules for each row when (new.key like 'crm\_%') execute function public._crmf_rules_guard();
