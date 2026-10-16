@@ -14,7 +14,7 @@ Tags used in this file:
 - **[assumption]**: a business expectation the demo tests. The software may or may not do it.
 - **[gap]**: the software cannot produce this yet.
 
-Sources read for this guide: `docs/SUPABASE_READONLY_AUDIT.md`, `docs/DEMO_STAFF_ROSTER.md`, `docs/REAL_LIFE_DAILY_WORKFLOW_GUIDE.md`, `docs/REAL_LIFE_STORY_GUIDE.md`, `docs/DEMO_FULL_WORKFLOW_AND_LEDGER.md`, `web/ia.js` (screen registry), and the `web/` screen and form files named below.
+Sources read for this guide: `docs/SUPABASE_READONLY_AUDIT.md`, `docs/demo/DEMO_STAFF_ROSTER.md`, `docs/demo/REAL_LIFE_DAILY_WORKFLOW_GUIDE.md`, `docs/demo/REAL_LIFE_STORY_GUIDE.md`, `docs/demo/DEMO_FULL_WORKFLOW_AND_LEDGER.md`, `web/ia.js` (screen registry), and the `web/` screen and form files named below.
 
 ---
 

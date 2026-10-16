@@ -172,7 +172,7 @@ Read each row as: **Enter at** (location) · **Entered by** (role) · **Approved
 
 ## 5. One complete demo day (full roster, all 7 places)
 
-Assumption: every grant below is already given to the named demo person (permissions treated as granted). Run this only in a **test project or test accounts**, never on the live database. Names come from `docs/DEMO_STAFF_ROSTER.md`.
+Assumption: every grant below is already given to the named demo person (permissions treated as granted). Run this only in a **test project or test accounts**, never on the live database. Names come from `docs/demo/DEMO_STAFF_ROSTER.md`.
 
 **Pre-day setup (owner Karim, before 07:00)**
 - Create the 17 test accounts and assign each role and place from the roster.
@@ -259,7 +259,7 @@ Assumption: every grant below is already given to the named demo person (permiss
 | Switches | `forms_post_to_ledger` OFF, `blind_count_on` OFF, `owner_self_approve` ON, `period_closed_until` empty, `stock_negative_mode` = warn, `em_enabled` ON, `tools_stock_on` OFF |
 | Items | 1,369 items, 57 cost rows |
 
-**Consequence for the demo:** run section 5 in order only after (a) the staff in `docs/DEMO_STAFF_ROSTER.md` are created in a *test* project or as test accounts, (b) opening stock is entered for the godown, (c) the owner decides on the three switches above.
+**Consequence for the demo:** run section 5 in order only after (a) the staff in `docs/demo/DEMO_STAFF_ROSTER.md` are created in a *test* project or as test accounts, (b) opening stock is entered for the godown, (c) the owner decides on the three switches above.
 
 ---
 

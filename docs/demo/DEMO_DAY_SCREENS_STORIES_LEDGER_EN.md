@@ -32,7 +32,7 @@ Found while checking code for this document. These must be fixed in `DEMO_FULL_W
 
 ---
 
-## 2. Places and people (from `docs/DEMO_STAFF_ROSTER.md`, live roles)
+## 2. Places and people (from `docs/demo/DEMO_STAFF_ROSTER.md`, live roles)
 
 | Place code | Use | Demo person (role) |
 |---|---|---|
@@ -488,7 +488,7 @@ Verification not done: the stories were checked by reading code, not by running 
 
 ## 10. Source files read
 
-- `docs/DEMO_FULL_WORKFLOW_AND_LEDGER.md`, `docs/DEMO_STAFF_ROSTER.md`, `docs/SUPABASE_READONLY_AUDIT.md`, `docs/REAL_LIFE_STORY_GUIDE.md`, `docs/REAL_LIFE_DAILY_WORKFLOW_GUIDE.md`
+- `docs/demo/DEMO_FULL_WORKFLOW_AND_LEDGER.md`, `docs/demo/DEMO_STAFF_ROSTER.md`, `docs/SUPABASE_READONLY_AUDIT.md`, `docs/demo/REAL_LIFE_STORY_GUIDE.md`, `docs/demo/REAL_LIFE_DAILY_WORKFLOW_GUIDE.md`
 - `web/ia.js` (90 routes), `web/stock2.js`, `web/pos.js`, `web/cashmoves.js`, `web/purchase.js`, `web/daybook.js`, `web/forms.js`, `web/forms_cash.js`, `web/forms_sales.js`, `web/forms_stock.js`, `web/forms_factory.js`, `web/forms_staff.js`, `web/entry.js` (grep-level)
 - `supabase/phase10.sql` (stock RPCs, seeds), `phase12.sql` (wastage request), `phase74.sql` (production), `phase17.sql` (decide_entry), `phase18.sql` (count), `ALL_NEW3.sql`, `ALL_NEW10.sql` (switch comments)
 - Live (read-only): `roles.allow_self_approve`, `rule_grants` for stock and wastage grants.
