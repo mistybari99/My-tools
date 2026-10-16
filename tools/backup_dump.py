@@ -12,7 +12,13 @@ How it works (Python 3 standard library only):
      the run and warns when the last good backup is too old.
 Exit code 0 only when everything is complete. Secrets come from the environment only: SUPABASE_URL, SUPABASE_ANON_KEY, BOT_EMAIL, BOT_PASSWORD. Nothing secret is printed.
 
-Usage:  python3 tools/backup_dump.py [--out out] [--page 2000] [--tables a,b] [--no-log] [--destination github]
+Encryption (item U-12, phase98 rule backup_encrypt_on, default OFF): --encrypt auto|on|off (default auto = follow the rule; an old database without phase98 means off).
+When ON the files are written ONLY in encrypted form (<table>.ndjson.gz.enc, format BOSENC1, tools/backup_crypto.py), no plain copy is left in --out, and
+manifest.json gets an "encryption" block (no secret in it). The passphrase comes from the environment variable BACKUP_PASSPHRASE (and optionally BACKUP_KDF_SALT).
+ON without a usable passphrase makes the run FAIL (and be logged as failed); it never falls back to plain files. To restore: tools/backup_crypto.py decrypt, then the
+normal restore_drill.py / restore_backup.py. See docs/integration/W1-G.md.
+
+Usage:  python3 tools/backup_dump.py [--out out] [--page 2000] [--tables a,b] [--no-log] [--destination github] [--encrypt auto|on|off]
 """
 import argparse
 import datetime
@@ -24,6 +30,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import backup_crypto as bc  # noqa: E402
 import ops_common as oc  # noqa: E402
 
 BIG_FILE_BYTES = 90 * 1024 * 1024        # GitHub refuses single files above 100 MB: warn early
@@ -33,8 +40,8 @@ def now_iso():
     return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def write_gz(path, lines):
-    """Deterministic gzip (mtime 0, no file name) of the given text lines. Returns (rows, bytes, sha256-of-the-file)."""
+def gz_bytes(lines):
+    """Deterministic gzip (mtime 0, no file name) of the given text lines, in memory. Returns (rows, data)."""
     buf = io.BytesIO()
     with gzip.GzipFile(filename='', mode='wb', fileobj=buf, mtime=0, compresslevel=9) as z:
         n = 0
@@ -42,10 +49,46 @@ def write_gz(path, lines):
             z.write(ln.encode('utf-8'))
             z.write(b'\n')
             n += 1
-    data = buf.getvalue()
+    return n, buf.getvalue()
+
+
+def write_gz(path, lines):
+    """Deterministic gzip (mtime 0, no file name) of the given text lines. Returns (rows, bytes, sha256-of-the-file)."""
+    n, data = gz_bytes(lines)
     with open(path, 'wb') as f:
         f.write(data)
     return n, len(data), hashlib.sha256(data).hexdigest()
+
+
+def write_enc(path, lines, keys, label):
+    """Same gzip, encrypted (BOSENC1, deterministic: unchanged content = identical bytes). Only the encrypted file is written. Returns (rows, plain_gz_bytes,
+    sha256-of-the-plain-gz, encrypted_bytes, sha256-of-the-encrypted-file)."""
+    n, data = gz_bytes(lines)
+    blob = bc.encrypt_bytes(keys, label, data)
+    with open(path, 'wb') as f:
+        f.write(blob)
+    return n, len(data), hashlib.sha256(data).hexdigest(), len(blob), hashlib.sha256(blob).hexdigest()
+
+
+def resolve_encryption(api, mode, env=None):
+    """Returns the Keys to encrypt with, or None for a plain backup. mode: 'on' | 'off' | 'auto' (follow the server rule backup_encrypt_on; no phase98 = off).
+    Raises when encryption is wanted but the passphrase is missing or too short (never a silent plain backup)."""
+    mode = (mode or 'auto').lower()
+    if mode == 'off':
+        return None
+    if mode == 'auto':
+        try:
+            st = api.rpc('_w1g_backup_settings')
+            want = bool(isinstance(st, dict) and st.get('encrypt_on'))
+        except Exception as e:  # an older database (no phase98) or no permission: keep today's behaviour
+            oc.log('encryption setting not readable (', type(e).__name__, '): plain backup, as before')
+            want = False
+        if not want:
+            return None
+    try:
+        return bc.keys_from_env(env)
+    except bc.CryptoError as e:
+        raise RuntimeError('encryption is switched on but cannot be used: ' + str(e) + ' (set the secret BACKUP_PASSPHRASE, or switch backup_encrypt_on OFF)')
 
 
 def dump_table(api, table, page):
@@ -66,11 +109,12 @@ def dump_table(api, table, page):
         seen.add(cursor)
 
 
-def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', clock=now_iso):
+def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', clock=now_iso, encrypt='auto', env=None):
     """Returns the manifest dict. Raises on any failure (after trying to record the failure with backup_log)."""
     started = clock()
     os.makedirs(out_dir, exist_ok=True)
     try:
+        keys = resolve_encryption(api, encrypt, env)
         m0 = api.rpc('backup_manifest')
         names = [t['name'] for t in m0['tables']]
         start_rows = {t['name']: int(t['rows']) for t in m0['tables']}
@@ -81,13 +125,22 @@ def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', 
             names = list(only)
         # remove files of tables that no longer exist, so the folder is an exact picture of this run
         for f in ([] if only else os.listdir(out_dir)):
-            if f.endswith('.ndjson.gz') and f[:-len('.ndjson.gz')] not in names:
+            base = f[:-len('.enc')] if f.endswith('.ndjson.gz.enc') else f
+            if base.endswith('.ndjson.gz') and base[:-len('.ndjson.gz')] not in names:
                 os.remove(os.path.join(out_dir, f))
         files, warnings, total_rows, total_bytes = {}, [], 0, 0
         for t in names:
-            path = os.path.join(out_dir, t + '.ndjson.gz')
-            n, size, sha = write_gz(path, dump_table(api, t, page))
-            files[t] = {'file': t + '.ndjson.gz', 'rows': n, 'bytes': size, 'sha256': sha}
+            plain_name = t + '.ndjson.gz'
+            for stale in (plain_name, plain_name + '.enc'):      # the folder is an exact picture of this run: no plain copy next to an encrypted one, and the other way round
+                if os.path.exists(os.path.join(out_dir, stale)):
+                    os.remove(os.path.join(out_dir, stale))
+            if keys is None:
+                n, size, sha = write_gz(os.path.join(out_dir, plain_name), dump_table(api, t, page))
+                files[t] = {'file': plain_name, 'rows': n, 'bytes': size, 'sha256': sha}
+            else:
+                n, size, sha, esize, esha = write_enc(os.path.join(out_dir, plain_name + '.enc'), dump_table(api, t, page), keys, plain_name)
+                files[t] = {'file': plain_name + '.enc', 'rows': n, 'bytes': size, 'sha256': sha, 'enc_bytes': esize, 'enc_sha256': esha, 'encrypted': True}
+                size = esize                                       # the size on disk decides the git warning
             total_rows += n
             total_bytes += size
             if size > BIG_FILE_BYTES:
@@ -111,11 +164,13 @@ def run(api, out_dir, page=2000, only=None, log_run=True, destination='github', 
             'tables': {t: {**files[t], 'rows_at_start': start_rows[t], 'rows_at_end': end_rows.get(t)} for t in names},
             'warnings': warnings,
         }
+        if keys is not None:
+            manifest['encryption'] = keys.describe()
         with open(os.path.join(out_dir, 'manifest.json'), 'w', encoding='utf-8') as f:
             json.dump(manifest, f, ensure_ascii=False, indent=1, sort_keys=True)
             f.write('\n')
         if log_run:
-            api.rpc('backup_log', {'p_status': 'ok', 'p_detail': {'warnings': warnings, 'schema_fingerprint': m0.get('fingerprint')},
+            api.rpc('backup_log', {'p_status': 'ok', 'p_detail': {'warnings': warnings, 'schema_fingerprint': m0.get('fingerprint'), 'encrypted': keys is not None},
                                    'p_tables': len(names), 'p_rows': total_rows, 'p_bytes': total_bytes, 'p_destination': destination})
         return manifest
     except Exception as e:
@@ -134,14 +189,15 @@ def main(argv=None, api=None):
     ap.add_argument('--tables', default='', help='comma list (for a partial test run)')
     ap.add_argument('--no-log', action='store_true', help='do not call backup_log')
     ap.add_argument('--destination', default='github')
+    ap.add_argument('--encrypt', choices=['auto', 'on', 'off'], default='auto', help='auto = follow the rule backup_encrypt_on (default OFF); on = always (needs BACKUP_PASSPHRASE)')
     a = ap.parse_args(argv)
     try:
         if api is None:
             api = oc.Api(oc.env('SUPABASE_URL', required=True), oc.env('SUPABASE_ANON_KEY', required=True))
             api.login(oc.env('BOT_EMAIL', required=True), oc.env('BOT_PASSWORD', required=True))
         only = [t for t in a.tables.split(',') if t.strip()] or None
-        m = run(api, a.out, page=max(1, min(a.page, 5000)), only=only, log_run=not a.no_log, destination=a.destination)
-        oc.log(f"backup OK: {m['table_count']} tables, {m['rows']} rows, {m['bytes']} bytes")
+        m = run(api, a.out, page=max(1, min(a.page, 5000)), only=only, log_run=not a.no_log, destination=a.destination, encrypt=a.encrypt)
+        oc.log(f"backup OK: {m['table_count']} tables, {m['rows']} rows, {m['bytes']} bytes" + (' (encrypted)' if m.get('encryption') else ''))
         gh = os.environ.get('GITHUB_OUTPUT')
         if gh:
             with open(gh, 'a') as f:
