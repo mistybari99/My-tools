@@ -1,6 +1,6 @@
 -- FRESH DB ONLY. Phase 84 tests: balance check (G11) and guarded test reset (G13). Test data only, no person names. Place 1 only.
---   ORDER="phase8 ... phase79 phase84" bash <copy of tests/sql/build_fresh_db.sh with your paths> e84db
---   psql -h /tmp -p 5549 -U postgres -d e84db -qAt -f supabase/phase84_test.sql | grep -E 'FAIL|RESULT'
+--   ORDER="phase8 ... phase79 phase84 phase84_test_project_only" bash <copy of tests/sql/build_fresh_db.sh with your paths> e84db   (the reset functions are in phase84_test_project_only.sql, test projects only)
+--   psql -h /tmp -p 5549 -U postgres -d e84db -qAt -f supabase/phase84_test.sql | grep -E "FAIL|RESULT"
 -- All numbers are hand-computed (comment above each block).
 \set ON_ERROR_STOP off
 \set o '00000000-0000-0000-0000-0000000000e1'
