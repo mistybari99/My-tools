@@ -202,6 +202,13 @@ def run(api, send, mode='scan', slot='manual', dry=False, app_url='', now=None, 
         sc = api.rpc('notify_scan')
         res['scan_created'] = sc.get('created')
         oc.log(f"scan: {sc.get('created')} new notification(s)")
+        try:   # bos98 (W1-G): scheduled journal posting. The server answers "skipped" while the switch journal_sched_post_on is OFF (default).
+            jp = api.rpc('_w1g_post_scheduled', {'p_dry': False})
+            res['journal'] = {k: jp.get(k) for k in ('posted', 'reversed', 'left', 'skipped')} if isinstance(jp, dict) else None
+            oc.log('journal posting:', res['journal'])
+        except Exception as e:   # the alerts and the digest must never stop because the books could not be posted
+            res['journal'] = {'error': type(e).__name__}
+            oc.log('journal posting failed:', type(e).__name__)
     if not res['email_on']:
         oc.log('e-mail is switched OFF in the Switchboard (notify_email_on): nothing is sent')
         return res
