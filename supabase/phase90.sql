@@ -249,6 +249,12 @@ begin
   select status into v_from from public.employees where id = p_id;
   r := public.employee_status_set(p_id, p_status, p_date, p_reason);
   x := public._w1c_exit_apply(p_id, v_from, p_status, p_date, nullif(left(btrim(coalesce(p_reason, '')), 300), ''));
+  -- integration fix (phase99): with the hook installed the step already ran inside employee_status_set, so the call above answers "done". Report what that step logged in this transaction.
+  if x ->> 'skipped' = 'done' then
+    select jsonb_build_object('action', l.action, 'grants_ended', l.grants_ended, 'lists_ended', l.lists_ended, 'devices_off', l.devices_off) into x
+      from public.w1c_exit_log l where l.employee_id = p_id and l.at = now() order by l.id desc limit 1;
+    x := coalesce(x, jsonb_build_object('action', 'done_by_hook'));
+  end if;
   return r || jsonb_build_object('exit', x);
 end $$;
 revoke all on function public._w1c_employee_status_set(uuid, text, date, text) from public, anon; grant execute on function public._w1c_employee_status_set(uuid, text, date, text) to authenticated;

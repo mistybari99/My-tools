@@ -39,6 +39,9 @@ begin
    where c.conrelid = 'public.money_exceptions'::regclass and c.contype = 'c' and pg_get_constraintdef(c.oid) like '%negative_warn%';
   if con is null then raise exception 'phase94: money_exceptions kind check not found'; end if;
   select array_agg(m[1]) into cur from regexp_matches(def, '''([a-z_0-9]+)''', 'g') m;
+  -- the form '{a,b}'::text[] (what phase89 writes when it runs first): integration fix, both forms are read
+  if cur is null then cur := string_to_array(substring(def from '\{([^}]*)\}'), ','); end if;
+  if cur is null or cardinality(cur) = 0 then raise exception 'phase94: money_exceptions kind check has an unknown shape'; end if;
   allk := cur;
   foreach k in array p_kinds loop if not (k = any (allk)) then allk := allk || k; end if; end loop;
   if allk = cur then return; end if;
