@@ -465,6 +465,7 @@ function sync(live) {
   if (drawerOpen) { sig = ''; renderDrawer(); }
   else sig = '';
   syncBnav();
+  if (B.announce && B.announce.tick) B.announce.tick();   // R2-A: the headline bar under the header (nothing at all while announce_on is OFF or nothing is addressed to this person)
 }
 
 // ---------- favourites: pin / unpin / order / label / hide - all from the ⋮ menus (no star buttons anywhere) ----------
@@ -615,7 +616,9 @@ async function home() {
   const posBtn = sellBtn || ownBtn ? `<div class="hbigrow">${sellBtn}${ownBtn}</div>` : '';
   if (V2) setTimeout(() => loadOldest(), 0);
   if (own || GF.accounts_view || GF.accounts_manage) setTimeout(() => { const el = $('#hv_fresh'); if (el && B.freshness) B.freshness.mount(el); }, 0);   // W1-G: the "last posted at" strip (silent when the server has no phase 98)
-  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${own || GF.accounts_view || GF.accounts_manage ? '<div id="hv_fresh"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
+  const r2t = !!(B.rule && B.rule('todo_on', false) === true);   // R2-B: the small to-do card (only while todo_on is ON, and only drawn when the person has something open)
+  if (r2t) setTimeout(() => { const el = $('#hv_todo'); if (el && B.todo) B.todo.mount(el); }, 0);
+  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${r2t ? '<div id="hv_todo"></div>' : ''}${own || GF.accounts_view || GF.accounts_manage ? '<div id="hv_fresh"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
     ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>'}
