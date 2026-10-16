@@ -170,36 +170,59 @@ Read each row as: **Enter at** (location) · **Entered by** (role) · **Approved
 
 ---
 
-## 5. One complete demo day (intended setup)
+## 5. One complete demo day (full roster, all 7 places)
 
-Demo names: Owner Karim · Management Salma · Showroom manager Rahim (`main`) · Showroom manager Ayesha (`mishti_bari`) · Salesperson Nasrin (`main`) · Storekeeper Jamal (`godown`) · Factory in-charge Selim (`main`, sweet factory) · Purchasing Hasan (head office) · Cash controller Fatema (hub) · Party coordinator Ruma (`main`) · HR Anwar (head office) · Carrier Sohel.
+Assumption: every grant below is already given to the named demo person (permissions treated as granted). Run this only in a **test project or test accounts**, never on the live database. Names come from `docs/DEMO_STAFF_ROSTER.md`.
+
+**Pre-day setup (owner Karim, before 07:00)**
+- Create the 17 test accounts and assign each role and place from the roster.
+- Keep switches as they are today: `forms_post_to_ledger` OFF, `blind_count_on` OFF, `owner_self_approve` ON.
+- Enter opening stock per place (`Stock: Opening`), because `stock_ledger` is empty. Example: godown sweet A 30 kg, sugar 60 kg, flour 50 kg; main sweet A 0; cake_factory cake B 0; branch2 sweet A 5 kg.
 
 | Time | Place | Who | Action (screen / form) | Result |
 |---|---|---|---|---|
-| 07:30 | `godown` | Jamal | Stock: check In transit list (empty). Storekeeper opens stock-in list. | Nothing in transit. |
-| 08:00 | `godown` | Jamal | Receives 40 kg sugar from supplier against purchase bill (Purchasing entered it at head office the day before). Writes 04-1 GRN with counted qty and quality "accept". | Stock IN 40 kg at `godown` by purchase bill. 04-1 has no extra stock effect (switch OFF). |
-| 08:30 | `godown` → `main` | Jamal, Selim | 04-2 Material Issue Slip: 20 kg sugar to factory. Then Stock: Issue 20 kg from `godown`. | Stock OUT at `godown`, 20 kg. Selim signs for receipt on paper. |
-| 09:00 | `main` (factory) | Selim | Starts production: Recipes and production, recipe "sweet A", 2 batches. Enters actual yield 9.6 kg. | Ingredients OUT per recipe. Finished goods IN as batch with expiry. Yield variance 4% recorded. |
-| 09:20 | `main` | Selim | Fills 05-1 Factory Daily Sheet (output, fridge temperature). Submits. | Management approves later. No stock from the paper. |
-| 10:00 | `main` | Selim (sends), Rahim (receives) | Stock: Transfer 5 kg finished sweet from the factory to the showroom. Rahim opens In transit and receives 5 kg. | Stock OUT and IN. Both sides are `main` in the seed, so the owner must confirm whether factory and showroom need separate place rows (open item in section 6). |
-| 10:30 | `main` | Rahim | Opens 14-1 Daily Showroom Sheet: opening float, receipts. Counts cash by note. | Drawer expected shown after count. |
-| 11:00 | `main` | Nasrin | POS sale: 1.5 kg sweet A, cash 900, rest on bKash. | Stock OUT at `main`. Cash and wallet recorded. |
-| 11:30 | `main` | Nasrin | POS sale: 2 kg, due. Customer mobile entered (required for due). | Customer balance up. Stock OUT. |
-| 12:00 | `main` | Ruma | 20-1 Customer order: 5 kg sweet, advance 1000 for a delivery on Friday. | Record only. No stock until the sale. |
-| 13:00 | `main` | Nasrin | Dues collection from yesterday's customer, cash 600. | Customer balance down. Shows in 14-1. |
-| 14:00 | `mishti_bari` | Ayesha | Receives transfer from `godown` sent yesterday. Opens In transit, types received qty 10 kg (sent 10). | Stock IN 10 kg. |
-| 15:00 | `mishti_bari` | Ayesha | Receives a second transfer, types 9 kg (sent 10). | Stock IN 9 kg. Yellow `transit_short` for 1 kg, for owner to decide. |
-| 16:00 | hub | Fatema, Sohel | 10-1 Cash Handover: Rahim counts 25,000 cash, Sohel carries, Fatema counts 24,800. | Hub difference 200 is red. Reason needed. Management or owner decides. |
-| 16:30 | hub | Fatema | 10-3 Digital Payment Register: bKash total vs phone. | Match or yellow flag. |
-| 17:00 | `main` | Rahim | 10-2 Expense: tea and small repair, 350, with receipt. Quick expense added to day book. | Counted once in the day book. |
-| 18:00 | `main` | Salma | Approves 14-1 (cash difference explained, under tolerance). Approves 10-2. | Status approved. No stock. |
-| 18:30 | `godown` | Hasan (counter), Anwar (witness) | 04-3 Stock Count Sheet for 5 items. Storekeeper Jamal does not count his own stock. Hasan counts, Anwar checks and signs as witness. | Counter must not be the storekeeper (red flag if so). Witness must differ from counter (enforced). Variance beyond tolerance is a yellow exception. |
-| 19:00 | head office | Hasan | 06-1 Requisition for next week's flour. 06-2 CS with 2 quotes. | No stock. Owner decides large orders. |
-| 19:30 | head office | Anwar | 02-1 Attendance register for the day. | Record. |
-| 20:00 | all | Karim | Opens Exceptions list: 1 transit short, 1 hub difference, 1 count variance (if any). Releases or resolves. | Each resolved with a note. |
-| 20:30 | `main` | Rahim | Day close: 14-1 is approved, no red flags left. | Day closed for that place. Next day's sheet starts. |
+| 07:00 | godown | Jamal | Stock: In transit list | Empty |
+| 07:30 | godown | Hasan (purchasing, head office) | Purchase bill: 40 kg sugar, posted at godown (entered the day before) | Stock IN 40 kg sugar at godown |
+| 08:00 | godown | Jamal | 04-1 GRN for the sugar: counted 40, quality accept | No extra stock effect (switch OFF) |
+| 08:30 | godown → main | Jamal, Selim | 04-2 issue slip 20 kg sugar; then Stock: Issue 20 kg | Stock OUT godown 20 kg; Selim signs |
+| 08:45 | godown → cake_factory | Jamal, Mitu | 04-2 issue 15 kg flour; Stock: Issue | Stock OUT godown; Mitu receives |
+| 09:00 | main | Selim | Recipes and production: "sweet A", 2 batches, actual yield 9.6 kg | Ingredients OUT; finished goods IN as batch with expiry; 4% yield variance |
+| 09:20 | main | Selim | 05-1 Factory Daily Sheet, submit | Waits for Salma; no stock from paper |
+| 09:40 | cake_factory | Mitu | Recipes and production: "cake B", 1 batch, yield 6 kg | Stock IN 6 kg cake B at cake_factory |
+| 10:00 | godown | Jamal | Stock: Transfer 10 kg sweet A → mishti_bari (in transit) | Stock OUT godown; row in transit |
+| 10:15 | branch2 | Shirin | Stock: Transfer 5 kg sweet A from main, receive 5 kg | Stock IN branch2 |
+| 10:30 | main | Rahim | 14-1 Daily Showroom Sheet: opening float, count cash by note | Drawer expected shown after count |
+| 11:00 | main | Nasrin | POS sale 1.5 kg sweet A; cash 900, rest bKash | Stock OUT main; cash and wallet recorded |
+| 11:20 | branch2 | Tania | POS sale 2 kg sweet A, cash | Stock OUT branch2 |
+| 11:30 | main | Nasrin | POS sale 2 kg on due; mobile entered | Customer balance up; stock OUT |
+| 12:00 | main | Ruma | 20-1 Customer order 5 kg, advance 1000, delivery Friday | Record only; no stock |
+| 12:30 | cake_factory → al_cakes | Mitu, Lipi | Stock: Transfer 3 kg cake B; Lipi receives 3 kg | Stock OUT cake_factory; IN al_cakes |
+| 12:45 | main | intake_bot (system) | Online order into 20-6, online orders only | Record; Ruma links to a sale later |
+| 13:00 | al_cakes | Lipi | POS sale 1 kg cake B, cash; 14-1 opening float | Stock OUT al_cakes; drawer shown |
+| 13:15 | main | Nasrin | Dues collection 600 from yesterday's customer | Balance down; shows in 14-1 |
+| 13:45 | godown | Jamal | Transfer 10 kg sweet A → mishti_bari (second one) | Stock OUT godown |
+| 14:00 | mishti_bari | Ayesha | Receives first 10 kg transfer, types 10 | Stock IN 10 kg |
+| 15:00 | mishti_bari | Ayesha | Receives the 13:45 transfer, types 9 (sent 10) | Stock IN 9 kg; yellow transit_short 1 kg |
+| 15:30 | branch2 | Shirin | 14-1 day sheet; 20-3 return register for one return | Record; refund typed with register no. |
+| 16:00 | main (hub) | Rahim → Sohel → Fatema | 10-1 Cash handover: Rahim counts 25,000, Sohel carries, Fatema counts 24,800 | Diff 200 red; reason needed |
+| 16:20 | main (hub) | Fatema | 10-3 Digital payment register: bKash total vs phone | Match or yellow flag |
+| 16:30 | main (hub) | Fatema | 10-4 Cash position vs hub limits; 10-5 receivable and advance check | Records; cross-check with ledger |
+| 17:00 | main | Rahim | 10-2 Expense 350 (tea and small repair, receipt); quick expense | Counted once in day book |
+| 17:30 | al_cakes | Lipi | 11-1 Shift handover register | Record |
+| 18:00 | main | Salma | Approves 14-1 (Rahim), 10-2, 05-1 (Selim) | Status approved; no stock |
+| 18:20 | branch2 | Shirin, Salma | Approves 14-1 for branch2 and 20-2 discount slip if any | Approved |
+| 18:30 | godown | Hasan (counter), Anwar (witness) | 04-3 Stock count, 5 items. Jamal does not count his own stock | Variance beyond tolerance = yellow exception; witness ≠ counter |
+| 18:45 | godown | Jamal | Tries to count own stock (test row) | Form refuses; counter must not be storekeeper |
+| 19:00 | head office | Hasan | 06-1 Requisition: flour for next week; 06-2 comparative statement, 2 quotes | No stock or cash |
+| 19:20 | main | Selim → Nazia | Recipe change "sweet A" v2 sent to recipe approver | Nazia approves; maker ≠ approver |
+| 19:30 | head office | Anwar | 02-1 Attendance register for all staff for the day | Record |
+| 20:00 | all | Karim | Exceptions list: transit short, hub diff, count variance. Release or resolve each with a note | Each closed with note |
+| 20:20 | main, branch2, al_cakes, mishti_bari, cake_factory, godown | each showroom or factory manager (Rahim, Shirin, Lipi, Ayesha, Mitu, Jamal) | Day close: 14-1 approved, no red flags left | Day closed per place |
+| 20:40 | all | Karim | Read-only check: day book vs journal (`daybook_vs_journal`) and duplicate suspects (`dup_suspects`) | Reports only; no change |
 
-**Note on the demo:** the day above is written as the intended setup. Items marked `[Unverified]` in section 3 were not confirmed in code. Run the demo in a test place first (see section 6).
+**Roster coverage check:** all 17 names appear in this table (Karim, Salma, Rahim, Ayesha, Shirin, Lipi, Nasrin, Tania, Jamal, Selim, Mitu, Hasan, Fatema, Ruma, Anwar, Sohel, Nazia). All active places appear: main, branch2, mishti_bari, al_cakes, cake_factory, godown. `mishti_factory` is paused and does not appear.
+
+**Note on the demo:** items marked `[Unverified]` in section 3 were not confirmed in code. Run the demo in a test project first (see section 6).
 
 ---
 
@@ -237,3 +260,9 @@ Demo names: Owner Karim · Management Salma · Showroom manager Rahim (`main`) �
 | Items | 1,369 items, 57 cost rows |
 
 **Consequence for the demo:** run section 5 in order only after (a) the staff in `docs/DEMO_STAFF_ROSTER.md` are created in a *test* project or as test accounts, (b) opening stock is entered for the godown, (c) the owner decides on the three switches above.
+
+---
+
+## 8. Permission assumption
+
+Every role-to-place grant in section 5 is treated as granted to the named fictitious person. No live grant has been made. Before any real use, the owner must create the accounts and grants, and run the pre-day setup in a test project.
