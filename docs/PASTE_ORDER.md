@@ -14,10 +14,11 @@ This is the owner's step list for the merged build (all packages built so far). 
    - `supabase/phase84b_test_project_only_wave1.sql` (and any file whose name starts with `phase84b_`)
    - any `*_test.sql` file, `phase14_import*`, `phase30_controls*`, `ALL_NEW*` (only for a brand-new empty project, see SETUP.md)
 5. A file that stops with a red error: stop there, copy the message, do not paste the next file. Every file is safe to paste again after the cause is fixed.
+6. **Restore test and idle projects.** Once, before you rely on the backup, restore the latest backup into a spare (test) project and open the app on it; a backup that was never restored is not proved. Two things stop quietly when nobody uses them: a Supabase free-tier project is paused automatically after 7 days without activity (open the app or the dashboard at least once a week, or use a paid plan), and a GitHub Actions scheduled workflow (nightly backup, notifications) is disabled by GitHub after 60 days without any repository activity (push a small commit or re-enable it under Actions). Check both after a long holiday.
 
 ## 1. What is already in your live project
 
-Phases 8 to 87 (the base). If you pasted Wave 1 (88 to 99) already, skip those rows. Your project's history decides where you start; pasting a phase that is already in is harmless (every file is safe to paste twice).
+Phases 8 to 87 (the base). If you pasted Wave 1 (88 to 99) already, skip those rows. Your project's history decides where you start; pasting a phase that is already in causes no error and no data change, but an OLD phase (3 to 98) also puts back the older text of functions that later phases patched. Read section 5 before you paste any file that is already in; for phases 88 and later (and 120 on) a second paste changes nothing (proved, function text identical).
 
 ## 2. The paste list (numeric order = `tests/sql/ORDER.txt`)
 

@@ -266,7 +266,7 @@ Object.assign(H, {
 });
 
 function csv(columns, rows) {
-  const q = (v) => { const s = v === null || v === undefined ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const q = (v) => { let s = v === null || v === undefined ? '' : String(v); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   return [columns.join(',')].concat(rows.map((r) => r.map(q).join(','))).join('\n');
 }
 async function doExport(args) {

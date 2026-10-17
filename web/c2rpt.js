@@ -56,7 +56,7 @@ function tableHTML(t) {
     ${t.total ? `<tfoot><tr>${t.cols.map((c, i) => `<td class="${/money|int|num|pct|min/.test(c.f || '') ? 'n' : ''}"><b>${i === 0 ? esc(t.total.label || 'Total') : t.total.vals && t.total.vals[c.k] !== undefined ? cell(c, { [c.k]: t.total.vals[c.k] }) : ''}</b></td>`).join('')}</tr></tfoot>` : ''}</table></div>
     ${t.rows.length > rows.length ? `<p class="muted">${esc('Showing the first ' + rows.length + ' of ' + t.rows.length + ' rows; the CSV has all of them.')}</p>` : ''}</div>`;
 }
-const csvEsc = (v) => { const s = String(v === null || v === undefined ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+const csvEsc = (v) => { let s = String(v === null || v === undefined ? '' : v); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
 function csvText(t) { return [t.cols.map((c) => csvEsc(c.h)).join(',')].concat(t.rows.map((r) => t.cols.map((c) => csvEsc(rawCell(c, r))).join(','))).join('\r\n'); }
 function csvDownload(name, text) {
   try { const blob = new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '.csv'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); window.__c2csv = { name, text }; }

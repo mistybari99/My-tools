@@ -17,7 +17,7 @@ import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-TEST_ONLY = ['supabase/phase84_test_project_only.sql', 'supabase/phase84b_test_project_only_wave1.sql']
+TEST_ONLY = ['supabase/phase84_test_project_only.sql', 'supabase/phase84b_test_project_only_wave1.sql', 'supabase/phase84c_test_project_only_wave2.sql']
 
 
 def read(rel):
