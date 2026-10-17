@@ -1,0 +1,161 @@
+{
+  "package": "CRM-C",
+  "title": "Customer lists, customer scores and customer value",
+  "language": "English only (the owner adds Bangla later)",
+  "note": "One entry per setting or feature, in plain words for the (i) info sheet. 'default' is what you get after pasting the SQL, which is how the shop works today.",
+  "entries": [
+    {
+      "key": "crm_segments_on",
+      "label": "Customer lists: allow saving and freezing lists",
+      "what_it_does": "Lets people with the right save a list of customers (for example 'not seen for 60 days') and freeze a copy of it.",
+      "why_it_matters": "A saved list gives your team the same group of customers every time, so a festival call or message goes to the right people and not to everybody.",
+      "default": "OFF",
+      "what_changes_if_switched": "OFF: you can still build a list and see how many customers it holds, but you cannot save it. ON: people with the right can save, change, retire and freeze lists. Nothing is sent to any customer either way.",
+      "who_can_change": "Only the owner (Settings). Saving a list needs the right 'Save customer lists and refresh customer scores'."
+    },
+    {
+      "key": "crm_rfm_recent_days",
+      "label": "Customer score: recent means bought within this many days",
+      "what_it_does": "Decides who counts as a recent customer when customers are given labels such as Champion or At risk.",
+      "why_it_matters": "A sweet shop and a cake shop do not buy at the same pace. You choose what 'recent' means for your business.",
+      "default": "Blank (the standard labels are used)",
+      "what_changes_if_switched": "Blank: the standard labels are used, the same as the old Customer value report (Champion = 3 or more orders and seen within 30 days). When this and the next two numbers are all set, your own labels are used at once, with no rebuild.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_rfm_frequency_min",
+      "label": "Customer score: frequent means at least this many orders in 12 months",
+      "what_it_does": "Decides who counts as a frequent customer.",
+      "why_it_matters": "Frequent buyers are your regulars. Knowing who they are lets you thank them and notice when they go quiet.",
+      "default": "Blank (the standard labels are used)",
+      "what_changes_if_switched": "Set together with the other two numbers, it switches the labels to your own cut-offs. Blank brings the standard labels back. No customer data is changed.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_rfm_spend_min",
+      "label": "Customer score: big spender means at least this much spent in 12 months",
+      "what_it_does": "Decides who counts as a big spender. Money is counted after returns.",
+      "why_it_matters": "A few customers bring a large part of the money. This number tells the screens who they are.",
+      "default": "Blank (the standard labels are used)",
+      "what_changes_if_switched": "Set together with the other two numbers, it switches the labels to your own cut-offs. Blank brings the standard labels back. Accounting figures are never changed.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_winback_days",
+      "label": "Lapsed customer: not seen for this many days",
+      "what_it_does": "Sets how many days without a visit makes a customer 'lapsed'. The lapsed list and the Customer value overview use it.",
+      "why_it_matters": "These are the customers a phone call or a small offer can bring back, and bringing back an old customer is cheaper than finding a new one.",
+      "default": "Blank (the lapsed list asks for the number of days each time)",
+      "what_changes_if_switched": "A number becomes the default for the lapsed list and fills the 'lapsed' tile. A customer who has never bought is never counted as lapsed.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_metrics_batch",
+      "label": "Most customers scored in one run",
+      "what_it_does": "Limits how many customers are worked out each time someone presses 'Refresh scores'.",
+      "why_it_matters": "Keeps one press from making the system slow. A big shop just presses again; the oldest scores are done first.",
+      "default": "2000 (a technical size, not a business limit)",
+      "what_changes_if_switched": "A smaller number means more presses to finish; a bigger one means each press takes longer. Nothing else changes.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_metrics_schedule_on",
+      "label": "Refresh customer scores by itself",
+      "what_it_does": "Lets the regular 30-minute background job refresh the scores, so nobody has to press the button.",
+      "why_it_matters": "Scores stay fresh for the festival rush without remembering to refresh them.",
+      "default": "OFF (scores are refreshed only when someone presses the button)",
+      "what_changes_if_switched": "ON, with the hours below set: the background job refreshes scores, never more often than the hours you chose, and never more than the batch size per run. ON with the hours blank does nothing. It needs the optional hook in the notification job to be installed.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_metrics_schedule_hours",
+      "label": "Refresh customer scores by itself: at most once every this many hours",
+      "what_it_does": "Sets the quiet time between two automatic refreshes.",
+      "why_it_matters": "Stops the job from doing the same work again and again.",
+      "default": "Blank (the automatic refresh does nothing even if switched ON)",
+      "what_changes_if_switched": "A number lets the automatic refresh run once per that many hours, continuing at once if a big shop is not finished.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_segment_max_members",
+      "label": "Largest list that can be frozen",
+      "what_it_does": "Stops a list from being frozen if it holds more customers than this number.",
+      "why_it_matters": "A rule that is too wide (almost everybody) would make a list nobody should message. The system tells you the size and asks you to narrow the rules.",
+      "default": "5000 (a technical safety size)",
+      "what_changes_if_switched": "A bigger number lets bigger lists be frozen. A list over the number can still be counted and looked at.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "crm_seg_export_on",
+      "label": "Customer lists: allow export",
+      "what_it_does": "Lets people with the Export right download a list as a spreadsheet file.",
+      "why_it_matters": "A downloaded list leaves the system. Keeping this off by default protects your customers' phone numbers.",
+      "default": "OFF (no export)",
+      "what_changes_if_switched": "ON, with the largest export size set: a person with the Export right can download a list after writing a reason. Phone numbers are hidden unless the person may see full numbers. Every export is written to a log that nobody can edit.",
+      "who_can_change": "Only the owner (Settings). Exporting needs the right 'Export customer lists'."
+    },
+    {
+      "key": "crm_seg_export_max_rows",
+      "label": "Customer lists: most customers one export may hold",
+      "what_it_does": "Sets the largest export. A bigger list is refused, never cut short silently.",
+      "why_it_matters": "Limits how much customer data can leave in one go.",
+      "default": "Blank (export stays blocked even if switched ON)",
+      "what_changes_if_switched": "A number allows exports up to that size.",
+      "who_can_change": "Only the owner (Settings)."
+    },
+    {
+      "key": "feature_customer_lists",
+      "label": "Customer lists screen",
+      "what_it_does": "Build a list of customers from a few plain rules: not seen for N days, high spenders, birthday soon, one-time buyers, at risk, not yet agreed to messages, by outlet, by tier, bought an item. You see how many customers it holds before you save anything.",
+      "why_it_matters": "It turns 'who should we call or message for this festival?' into a clear list, and shows the size first so nobody messages the whole customer book by mistake.",
+      "default": "The screen is visible only to the owner and to people given a CRM right; saving is off.",
+      "what_changes_if_switched": "Looking and counting change nothing in your data. Saving and freezing are controlled by the switch above. Nothing is sent from this screen.",
+      "who_can_change": "The owner decides who gets the rights 'See customer lists, scores and notes', 'Save customer lists and refresh customer scores' and 'Export customer lists'."
+    },
+    {
+      "key": "feature_safe_rules",
+      "label": "Safe rule builder",
+      "what_it_does": "Only a fixed set of questions can be asked about customers, with a fixed set of comparisons. Anything else is refused.",
+      "why_it_matters": "Nobody can type a command that reads or changes other data. A mistake or an attack through this screen cannot reach your books.",
+      "default": "Always on (not a switch)",
+      "what_changes_if_switched": "Not applicable.",
+      "who_can_change": "Nobody; it is part of the system."
+    },
+    {
+      "key": "feature_customer_value",
+      "label": "Customer value screen",
+      "what_it_does": "Shows how many customers come back (repeat-purchase rate), the average and middle lifetime value, who is a Champion or At risk, who has not been seen for a while, the biggest customers, and who owes money.",
+      "why_it_matters": "It shows whether the shop is building loyal customers and where regular customers are slipping away, before the money is lost.",
+      "default": "Visible to the owner and to people given a CRM right. Reading only.",
+      "what_changes_if_switched": "Nothing in your data changes. Lifetime value here is what the customer really spent after returns; it is not a forecast.",
+      "who_can_change": "The owner decides who gets the right to see it."
+    },
+    {
+      "key": "feature_refresh_scores",
+      "label": "Refresh scores",
+      "what_it_does": "Works out each customer's last visit, orders, spending, amount owed, points, usual outlet and top three items from the sales you already have, and keeps the result so screens are fast.",
+      "why_it_matters": "Lists and labels use these numbers. Without a refresh a new customer, or yesterday's sale, would not be counted yet.",
+      "default": "Runs only when someone presses the button (or when the owner switches the automatic refresh on)",
+      "what_changes_if_switched": "It only copies figures; it never changes a sale, a payment, a return or the books. If more customers need a score than the batch size, press again.",
+      "who_can_change": "Anyone with the right 'Save customer lists and refresh customer scores', the customer manager, or the owner can press it."
+    },
+    {
+      "key": "feature_customer_profit",
+      "label": "Customer profit view",
+      "what_it_does": "Shows, for a period of up to 400 days, how much each customer bought, what it cost you, and the profit, using the same cost figures as the profit reports.",
+      "why_it_matters": "A customer who buys a lot at a big discount may earn you little. This shows who really makes money.",
+      "default": "Visible only to people who may already see cost",
+      "what_changes_if_switched": "Reading only. Sales whose cost is not known are shown apart and marked 'some cost unknown'; they are never guessed.",
+      "who_can_change": "The owner, through the existing right to see cost."
+    },
+    {
+      "key": "feature_privacy",
+      "label": "Phone numbers in customer lists",
+      "what_it_does": "When the privacy guard is on, people without the right 'See full phone numbers and addresses in customer lists' see a hidden number such as 017******78.",
+      "why_it_matters": "A list of phone numbers is valuable. Hiding them from people who do not need them protects your customers and your business.",
+      "default": "Follows the privacy guard; if the privacy package is not installed, numbers show as they do today",
+      "what_changes_if_switched": "Turning the guard on hides numbers in these lists and exports for people without the right. The full number never travels to a hidden screen.",
+      "who_can_change": "The owner."
+    }
+  ]
+}
