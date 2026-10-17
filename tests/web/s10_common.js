@@ -1,6 +1,6 @@
 // Shared mock for stock2_test.js / purchase_test.js: in-page RPC stand-ins for the phase10 API (the Supabase stub returns null for unknown RPCs).
 const fs = require('fs'), path = require('path'), http = require('http');
-const ROOT = '/home/user/My-tools/web';
+const ROOT = process.env.BOS_WEB || '/home/user/My-tools/web';
 function baseData(SP) {
   const src = fs.readFileSync(SP + '/smoke.js', 'utf8');
   return new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);
@@ -71,6 +71,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'stock_opening' || fn === 'stock_wastage' || fn === 'stock_issue' || fn === 'stock_production_in' || fn === 'stock_transfer' || fn === 'stock_expire_batch' || fn === 'stock_receive_transfer' || fn === 'stock_cancel_transfer') return { data: { ledger_id: 99, id: 'x', qty: 1 }, error: null };
   if (fn === 'stock_count_adjust') return { data: { ledger_id: 98, delta: -1.5, qty: 2 }, error: null };
   if (fn === 'stock_reconcile') return { data: clone(M.recon), error: null };
+  if (fn === 'stock_reconcile_fix') return { data: { fixed: (M.recon || []).length }, error: null };
   if (fn === 'purchase_list') { let r = M.list.filter((x) => (!args.p_supplier || x.supplier_id === args.p_supplier) && (!args.p_status || x.status === args.p_status) && (!args.p_from || x.bill_date >= args.p_from) && (!args.p_to || x.bill_date <= args.p_to)); return { data: clone(r), error: null }; }
   if (fn === 'purchase_get') { const l = M.list.find((x) => x.id === args.p_id) || M.list[0]; const d = M.detail && M.detail[args.p_id]; return { data: Object.assign({}, l, { subtotal: l.total + l.discount, note: null, void_note: null, reason_code: null, ref_bill_id: null, lines: [{ line_no: 1, item_id: 'i0', description: null, qty: 4, unit: 'kg', unit_cost: 250, amount: 1000 }, { line_no: 2, item_id: null, description: 'Gas cylinder', qty: 1, unit: null, unit_cost: 0, amount: 0 }], payments: [{ id: 5, mode: 'cash', wallet: null, ref: null, amount: 400, paid_at: '2026-10-08T05:00:00Z', voided: false }] }, d || {}), error: null }; }
   if (fn === 'save_purchase') return { data: { id: 'b9', status: 'draft', total: 525, lines: 2 }, error: null };
