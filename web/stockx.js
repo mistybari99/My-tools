@@ -32,7 +32,7 @@ const X = {
   pass: L('পাস', 'Pass', 'Pass'), hold: L('আটক', 'Hold', 'Hold'), reject: L('বাতিল', 'Reject', 'Reject'), note: L('নোট', 'Note', 'Note'), hist: L('ইতিহাস', 'History', 'History'),
   qcOff: L('কোয়ালিটি আটক এখন শুধু রেকর্ড — কিছু আটকায় না (মালিক সেটিংসে চালু করতে পারেন)।', 'Quality hold is a record only for now — nothing is blocked (the owner can switch it on in Settings).', 'Quality hold এখন শুধু record — কিছু আটকায় না (owner Settings এ on করতে পারেন)।'),
   qcOn: L('কোয়ালিটি আটক চালু: আটক/বাতিল GRN-এ নতুন ব্যাচ হবে না।', 'Quality block is ON: a held / rejected GRN cannot get new batches.', 'Quality block ON: held/rejected GRN এ নতুন batch হবে না।'),
-  pick: L('বেছে নিন…', 'Choose…', 'বেছে নিন…'), bad: L('সংখ্যা ঠিক নেই', 'Check the numbers', 'সংখ্যা ঠিক নেই'),
+  pick: L('বেছে নিন…', 'Choose…', 'বেছে নিন…'), mixed: L('ভিন্ন একক: যোগ করা হয়নি', 'Different units: not added up', 'ভিন্ন unit: যোগ করা হয়নি'), mixNote: L('পুরনো ডেটাবেস: ভিন্ন এককের পরিমাণ যোগ হয়ে যেতে পারে (phase 420 চালান)', 'Old database: quantities of different units may be added together (paste phase 420)', 'Old database: ভিন্ন unit যোগ হতে পারে (phase 420 চালান)'), bad: L('সংখ্যা ঠিক নেই', 'Check the numbers', 'সংখ্যা ঠিক নেই'),
 };
 const T = (k) => lab(X[k]);
 const ERR = {
@@ -45,9 +45,12 @@ const ERR = {
   unit_unknown: L('একক চেনা যায়নি', 'Unit not recognised', 'Unit চেনা যায়নি'), bad_qty: L('পরিমাণ ঠিক নেই', 'Quantity is wrong', 'Quantity ঠিক নেই'),
 };
 const failx = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? toast(lab(ERR[k])) : fail(e); };
-const D = { tab: 're', loc: null, locs: [], days: 30, exDays: 7, from: null, to: null, qcKind: 'grn' };
+const D = { tab: 're', loc: null, locs: [], days: 30, exDays: 7, from: null, to: null, qcKind: 'grn', csv: null, csvOk: false };
+const ruleDays = () => { try { const v = Number(B.rule('report_expiry_soon_days', null)); if (Number.isFinite(v) && v >= 0) return v; const w = Number(B.rule('expiry_warn_days', null)); return Number.isFinite(w) && w >= 0 ? w : null; } catch (e) { return null; } };
 const locSel = (id) => `<label>${esc(T('place'))} <select id="${id}"><option value="">${esc(T('all'))}</option>${D.locs.map((l) => `<option value="${l.id}" ${String(D.loc) === String(l.id) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></label>`;
-const out = (h) => { const el = $('#sx_out'); if (el) el.innerHTML = h; };
+const KIT = () => B.repkit;
+const out = (h) => { const el = $('#sx_out'); if (!el) return; const k = KIT(), c = D.csv; el.innerHTML = h + (k && c ? `<div class="rp-foot">${k.csvBtn(D.csvOk, c.key)}</div>` : ''); };
+const setCsv = (key, head, rows, flt) => { const k = KIT(); if (!k) return; const cols = head.map((h, i) => ({ key: 'c' + i, label_bn: h, label_en: h, type: 'text' })); D.csv = { key }; k.last[key] = { cols, rows: rows.map((r) => { const o = {}; r.forEach((v, i) => { o['c' + i] = v; }); return o; }), flt }; };
 const tbl = (head, rows) => rows.length ? `<div style="overflow-x:auto"><table class="tbl" style="font-size:.8rem;width:100%"><thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>` : `<p class="muted">${esc(T('none'))}</p>`;
 const loc = () => (D.loc ? Number(D.loc) : null);
 
@@ -66,18 +69,25 @@ function draw() {
   run().catch(failx);
 }
 async function run() {
+  D.csv = null; try { D.csvOk = KIT() ? await KIT().canExport() : false; } catch (e) { D.csvOk = false; }
   if (D.tab === 're') {
     const r = await sb.rpc('reorder_report', { p_loc: loc(), p_days: D.days }); if (r.error) throw r.error;
+    setCsv('stockx_reorder', [T('item'), T('onhand'), T('min'), T('avg'), T('left'), T('lead'), T('sug')], (r.data || []).map((x) => [x.code + ' ' + (x.name_en || x.name_bn), x.on_hand, x.min_stock, x.avg_daily, x.days_left, x.lead_days, x.suggest_qty]), { loc: loc(), days: D.days });
     out(tbl([T('item'), T('onhand'), T('min'), T('avg'), T('left'), T('lead'), T('sug')], (r.data || []).map((x) =>
       `<tr><td>${esc(x.code)} · ${esc(lab({ bn: x.name_bn, mix: x.name_bn, en: x.name_en || x.name_bn }))}<div class="chip ${x.why === 'cover' ? '' : 'warn'}">${esc(T('w_' + x.why))}</div></td><td>${q4(x.on_hand)} ${esc(x.base_unit || '')}</td><td>${q4(x.min_stock)}</td><td>${q4(x.avg_daily)}</td><td>${q4(x.days_left)}</td><td>${q4(x.lead_days)}</td><td><b>${q4(x.suggest_qty)}</b></td></tr>`)));
   } else if (D.tab === 'ex') {
     const r = await sb.rpc('near_expiry_report', { p_loc: loc(), p_days: D.exDays }); if (r.error) throw r.error;
+    setCsv('stockx_expiry', [T('item'), T('batch'), T('exp'), T('qty')], (r.data || []).map((x) => [x.code + ' ' + (x.name_en || x.name_bn), x.batch_no || '', String(x.expires_at).slice(0, 10), x.qty_remaining]), { loc: loc(), days: D.exDays });
     out(tbl([T('item'), T('batch'), T('exp'), T('qty'), ''], (r.data || []).map((x) =>
       `<tr><td>${esc(x.code)} · ${esc(lab({ bn: x.name_bn, mix: x.name_bn, en: x.name_en || x.name_bn }))}</td><td>${esc(x.batch_no || '—')}${x.qc_blocked ? `<div class="chip warn">${esc(T('blocked'))}</div>` : ''}</td><td>${esc(String(x.expires_at).slice(0, 10))}${x.expired ? `<div class="chip warn">${esc(T('expired'))}</div>` : ` · ${q4(x.days_left)}d`}</td><td>${q4(x.qty_remaining)}</td><td><button type="button" class="mini" data-act="sx_fefo" data-i="${esc(x.item_id)}" data-l="${x.location_id}">${esc(T('fefo'))}</button></td></tr>`)));
   } else if (D.tab === 'wa') {
-    const r = await sb.rpc('wastage_by_reason', { p_loc: loc(), p_from: D.from, p_to: D.to }); if (r.error) throw r.error;
-    out(tbl([T('reason'), T('entries'), T('items'), T('qty')], (r.data || []).map((x) =>
-      `<tr><td>${esc(lab({ bn: x.label_bn, mix: x.label_mix || x.label_bn, en: x.label_en || x.label_bn }))}</td><td>${x.entries}</td><td>${x.items}</td><td>${q4(x.qty)}</td></tr>`)));
+    let r = await sb.rpc('wastage_by_reason2', { p_loc: loc(), p_from: D.from, p_to: D.to }), two = true;
+    if (r.error && /could not find|does not exist|schema cache/i.test(r.error.message || '')) { r = await sb.rpc('wastage_by_reason', { p_loc: loc(), p_from: D.from, p_to: D.to }); two = false; }
+    if (r.error) throw r.error;
+    const qtyOf = (x) => (two ? (x.units || []).map((u) => `${q4(u.qty)} ${esc(u.unit)}`).join(' + ') : q4(x.qty));
+    setCsv('stockx_wastage', [T('reason'), T('entries'), T('items'), T('qty')], (r.data || []).map((x) => [x.label_en || x.label_bn, x.entries, x.items, two ? (x.units || []).map((u) => u.qty + ' ' + u.unit).join(' + ') : x.qty]), { loc: loc(), from: D.from, to: D.to });
+    out(`${two ? '' : `<div class="notice warn">${esc(T('mixNote'))}</div>`}` + tbl([T('reason'), T('entries'), T('items'), T('qty')], (r.data || []).map((x) =>
+      `<tr><td>${esc(lab({ bn: x.label_bn, mix: x.label_mix || x.label_bn, en: x.label_en || x.label_bn }))}</td><td>${x.entries}</td><td>${x.items}</td><td>${qtyOf(x)}${two && x.mixed_units ? `<div class="chip warn">${esc(T('mixed'))}</div>` : ''}</td></tr>`)));
   } else {
     const [r, sw] = await Promise.all([sb.rpc('qc_list', { p_loc: loc(), p_from: null, p_to: null, p_status: null }), sb.rpc('qc_gate', { p_source_type: 'grn', p_source_id: '00000000-0000-0000-0000-000000000000' })]);
     if (r.error) throw r.error;
@@ -155,7 +165,7 @@ Object.assign(H, {
 function collect() {
   const l = $('#sx_loc'); if (l) D.loc = l.value || null;
   const d = $('#sx_days'); if (d) D.days = Math.min(365, Math.max(1, Math.round(nnum(d.value)) || 30));
-  const e = $('#sx_exd'); if (e) D.exDays = Math.min(365, Math.max(0, Math.round(nnum(e.value)) || 0));
+  const e = $('#sx_exd'); if (e) D.exTouched = true; if (e) D.exDays = Math.min(365, Math.max(0, Math.round(nnum(e.value)) || 0));
   const f = $('#sx_from'), t = $('#sx_to'); if (f) D.from = f.value || null; if (t) D.to = t.value || null;
 }
 document.addEventListener('change', (e) => { const k = e.target && e.target.dataset && e.target.dataset.sx; if (k === 'srcpick') H.sx_srcpick(e.target); if (k === 'qkind') H.sx_qkind(e.target); });
@@ -163,6 +173,7 @@ document.addEventListener('change', (e) => { const k = e.target && e.target.data
 async function view() {
   if (B.loadStatic) await B.loadStatic();
   try { D.locs = B.liveLocs ? B.liveLocs(B.ENV.locs) : []; } catch (e) { D.locs = []; }
+  { const rd = ruleDays(); if (rd !== null && !D.exTouched) D.exDays = rd; }
   D.from = D.from || new Date(Date.now() + 6 * 3600e3 - 30 * 864e5).toISOString().slice(0, 10); D.to = D.to || today();
   frame();
 }

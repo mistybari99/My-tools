@@ -59,7 +59,7 @@ const X = {
   e_filter: L('ফিল্টারের মান ঠিক নেই', 'A filter value is not valid', 'Filter-এর value ঠিক নেই'),
   e_slow: L('অনেক তথ্য — ফিল্টার ছোট করে আবার চেষ্টা করুন', 'Too much data — narrow the filters and retry', 'অনেক data — Filter ছোট করে আবার চেষ্টা করুন'),
   e_off: L('ইন্টারনেট নেই — রিপোর্ট দেখতে অনলাইন লাগবে', 'You are offline — reports need a connection', 'Internet নেই — Report দেখতে online লাগবে'),
-  retry: L('আবার চেষ্টা', 'Retry', 'Retry'),
+  retry: L('আবার চেষ্টা', 'Retry', 'Retry'), notcap: L('লেখা হয়নি', 'not captured', 'not captured'),
 };
 const T = (k) => lab(X[k]);
 const dimLabel = (d) => lab({ bn: d.label_bn, en: d.label_en || d.label_bn, mix: d.label_bn });
@@ -258,7 +258,7 @@ const RAW_INT = new Set(['fiscal_year', 'hour', 'dow', 'receipt']);
 function fmtVal(c, row, money_ = false) {
   let v = row[c.key];
   if (c.en && S.lang === 'en' && row[c.en] !== null && row[c.en] !== undefined && row[c.en] !== '') v = row[c.en];
-  if (v === null || v === undefined || v === '') return '—';
+  if (v === null || v === undefined || v === '') return row && Array.isArray(row._nc) && row._nc.includes(c.key) ? T('notcap') : '—';
   switch (c.type) {
     case 'money': return money_ ? money(v) : fmt(Math.round(Number(v) * 100) / 100);
     case 'pct': return Number(v).toFixed(1) + '%';
@@ -312,7 +312,8 @@ function drawRes(errTxt) {
     tbl = `<div class="scrollx rp-tw"><table class="rp-t" id="rp_tbl"><thead><tr>${cols.map((c) => `<th class="${c.role === 'measure' || ['money', 'int', 'num', 'pct'].includes(c.type) && c.role !== 'dim' ? 'n' : ''}"><button class="rp-th" data-act="rp_sortcol" data-k="${esc(c.key)}" aria-label="${esc(T('sort') + ': ' + colLabel(c))}">${esc(colLabel(c))}${sk === c.key ? `<i>${sd === 'desc' ? '↓' : '↑'}</i>` : ''}</button></th>`).join('')}</tr></thead>
       <tbody>${(V.rows || []).map((row, i) => {
         const pr = cmp ? pmap.get(sigOf(all, row)) : null;
-        return `<tr ${drillable ? `class="tap" data-act="rp_drill" data-i="${i}"` : ''}>${cols.map((c, ci) => {
+        const go = !drillable && typeof row.drill === 'string' && row.drill.startsWith('#/');
+        return `<tr ${drillable ? `class="tap" data-act="rp_drill" data-i="${i}"` : go ? `class="tap" data-act="rp_rowgo" data-i="${i}"` : ''}>${cols.map((c, ci) => {
           const num = c.role !== 'dim' && ['money', 'int', 'num', 'pct'].includes(c.type);
           const dl = cmp && c.role === 'measure' && (c.type === 'money' || c.type === 'int' || c.type === 'num') ? deltaHTML(c.key, row[c.key], pr ? pr[c.key] : 0) : '';
           return `<${ci === 0 ? 'th scope="row"' : 'td'} class="${num ? 'n' : ''}">${esc(fmtVal(c, row))}${dl}</${ci === 0 ? 'th' : 'td'}>`; }).join('')}</tr>`; }).join('')}</tbody>
@@ -322,7 +323,8 @@ function drawRes(errTxt) {
   const pg = res.page || {}, shown = (V.rows || []).length;
   const more = res.has_more ? `<button class="full" data-act="rp_more" ${V.loading ? 'disabled' : ''}>${esc(T('more'))} · ${shown} ${esc(T('of'))} ${esc(String(Math.min(pg.groups || shown, pg.cap || 500)))}</button>` : '';
   const exp = (ok, act, label) => (ok ? `<button data-act="${act}">${esc(label)}</button>` : noperm() === 'lock' ? `<button disabled aria-label="${esc(label + ' · ' + T('exp_lock'))}">${LOCK.replace('<svg', '<svg width="16" height="16"')} ${esc(label)}</button>` : '');
-  box.innerHTML = `${noteH}${stats}${empty ? `<div class="notice warn mk warn">${esc(T('empty'))}</div>` : ''}${tbl}${more}
+  const subH = (res.subtotals || []).map((sc) => `<div class="hsec">${esc(lab({ bn: sc.title_bn, en: sc.title_en || sc.title_bn, mix: sc.title_bn }))}</div><div class="scrollx rp-tw"><table class="rp-t"><thead><tr>${(sc.columns || []).map((c) => `<th class="${c.type === 'text' ? '' : 'n'}">${esc(colLabel(c))}</th>`).join('')}</tr></thead><tbody>${(sc.rows || []).map((rw) => `<tr>${(sc.columns || []).map((c, ci) => { const v = c.key === 'name' && S.lang === 'en' && rw.name_en ? rw.name_en : rw[c.key]; return `<${ci === 0 ? 'th scope="row"' : 'td'} class="${c.type === 'text' ? '' : 'n'}">${esc(v === null || v === undefined ? '—' : c.type === 'money' ? fmt(Math.round(Number(v) * 100) / 100) : c.type === 'text' ? String(v) : fmt(v))}</${ci === 0 ? 'th' : 'td'}>`; }).join('')}</tr>`).join('')}</tbody></table></div>`).join('');
+  box.innerHTML = `${noteH}${stats}${empty ? `<div class="notice warn mk warn">${esc(T('empty'))}</div>` : ''}${tbl}${more}${subH}
     ${!empty ? `<div class="rp-foot">${exp(V.exp, 'rp_csv', T('csv'))}${exp(V.exp, 'rp_print', T('print'))}</div>` : ''}`;
 }
 
@@ -451,6 +453,7 @@ Object.assign(A.H, {
   rp_retry: () => run(false),
   rp_sortcol: (a) => { const k = a.dataset.k; V.sort = V.sort === k ? '-' + k : V.sort === '-' + k ? null : k; persist(); drawTop(); run(false); },
   rp_drill: (a) => drill(Number(a.dataset.i)),
+  rp_rowgo: (a) => { const r = (V.rows || [])[Number(a.dataset.i)]; if (r && typeof r.drill === 'string' && r.drill.startsWith('#/')) location.hash = r.drill; },
   rp_back: () => { const s = V.stack.pop(); if (!s) return; V.f = s.f; V.group = s.group; V.group2 = s.group2; V.sort = s.sort; persist(); drawTop(); run(false); },
   rp_cols: colsSheet,
   rp_coltog: (a) => { const k = a.dataset.k; if (V.hidden.has(k)) V.hidden.delete(k); else V.hidden.add(k); a.classList.toggle('on', !V.hidden.has(k)); a.setAttribute('aria-pressed', !V.hidden.has(k)); persist(); drawTop(); drawRes(); },

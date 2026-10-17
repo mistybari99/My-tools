@@ -446,7 +446,7 @@ grant execute on function public.stock_reconcile_fix(text) to authenticated;
 -- ---------- 8. export audit line for the new report pages ----------
 create or replace function public._r4_export_keys() returns text[]
 language sql immutable set search_path = public as $$
-  select array['stock_ledger','stock_recon','batch_stock','fg_ageing','unsold_by_batch','fg_distribution','expired_damaged_unsold'];
+  select array['stock_ledger','stock_recon','batch_stock','fg_ageing','unsold_by_batch','fg_distribution','expired_damaged_unsold','batch_trace','stockx_reorder','stockx_expiry','stockx_wastage'];
 $$;
 create or replace function public.log_report_export4(p_key text, p_kind text, p_filters jsonb, p_rows int) returns void
 language plpgsql security definer set search_path = public as $$

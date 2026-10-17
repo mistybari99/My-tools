@@ -15,6 +15,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'reorder_report') return { data: [{ item_id: 'i0', code: 'R-1', name_bn: 'ময়দা', name_en: 'Flour', location_id: 1, base_unit: 'kg', on_hand: 20, min_stock: 50, avg_daily: 3, days_left: 6.7, lead_days: 3, suggest_qty: 30, why: 'below_min' }, { item_id: 'i1', code: 'R-2', name_bn: 'চিনি', name_en: 'Sugar', location_id: 1, base_unit: 'kg', on_hand: 9, min_stock: null, avg_daily: 2, days_left: 4.5, lead_days: 3, suggest_qty: 11, why: 'cover' }], error: null };
   if (fn === 'near_expiry_report') return { data: [{ batch_id: 1, batch_no: 'LOT-A', item_id: 'i0', code: 'R-1', name_bn: 'ময়দা', name_en: 'Flour', location_id: 1, expires_at: '2026-10-15T17:59:00Z', qty_remaining: 23, days_left: 2.1, expired: false, qc_blocked: true }], error: null };
   if (fn === 'fefo_hint') return { data: [{ rank: 1, batch_id: 1, batch_no: 'LOT-A', expires_at: '2026-10-15T17:59:00Z', qty_remaining: 23, expired: false, qc_blocked: true }], error: null };
+  if (fn === 'wastage_by_reason2') return { data: [{ reason_code: 'spillage', label_bn: 'ছিটকে', label_mix: 'ছিটকে', label_en: 'Spillage', entries: 2, items: 2, qty: 3, unit: 'kg', mixed_units: false, units: [{ unit: 'kg', qty: 3, entries: 2 }] }], error: null };
   if (fn === 'wastage_by_reason') return { data: [{ reason_code: 'spillage', label_bn: 'ছিটকে', label_mix: 'ছিটকে', label_en: 'Spillage', entries: 2, items: 2, qty: 3 }], error: null };
   if (fn === 'qc_gate') return { data: { status: null, switch_on: X.qcOn, blocked: false }, error: null };
   if (fn === 'qc_list') return { data: clone(X.qc), error: null };
@@ -66,8 +67,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('.sheet [data-act=sx_bsave]'); await wait(p, 400); ok(/already exists/.test(await toastTxt(p)), 'friendly error for duplicate batch no');
   // wastage
   await p.evaluate(() => document.querySelector('.sheet-x') && document.querySelector('.sheet-x').click()); await wait(p, 150);
-  await p.click('[data-act=sx_tab][data-v=wa]'); await wait(p, 400); t = await p.textContent('#sx_out'); ok(/Spillage/.test(t) && (await p.locator('#sx_out tbody tr td:nth-child(4)').textContent()).trim() === '3', 'wastage by reason'); await noOverflow(p, 'wastage');
-  c = await calls(p, 'wastage_by_reason'); ok(c.length && /^\d{4}-\d\d-\d\d$/.test(c[0].p_from), 'date range sent');
+  await p.click('[data-act=sx_tab][data-v=wa]'); await wait(p, 400); t = await p.textContent('#sx_out'); ok(/Spillage/.test(t) && (await p.locator('#sx_out tbody tr td:nth-child(4)').textContent()).trim() === '3 kg', 'wastage by reason (per unit)'); await noOverflow(p, 'wastage');
+  c = await calls(p, 'wastage_by_reason2'); ok(c.length && /^\d{4}-\d\d-\d\d$/.test(c[0].p_from), 'date range sent');
   // qc
   await p.click('[data-act=sx_tab][data-v=qc]'); await wait(p, 400); t = await p.textContent('#sx_out');
   ok(/Hold/.test(t) && /smells off/.test(t) && /nothing is blocked/i.test(t), 'QC list with record-only note (switch off)');
