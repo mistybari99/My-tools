@@ -1,0 +1,86 @@
+{
+  "package": "CRM-A",
+  "note": "Plain-English entries for the (i) info sheet. English only. Keys match the setting or grant key.",
+  "entries": [
+    {
+      "key": "crm_on",
+      "kind": "setting",
+      "title": "Customer profile extras",
+      "what_it_does": "Lets staff add more to a customer's profile: a preferred language and outlet, extra delivery points, family birthdays and anniversaries, tags, notes, a customer type and credit days.",
+      "why_it_matters": "Shop staff can recognise a customer, remember their dates and deliver to the right place. Nothing is typed twice and the main customer form stays as it is.",
+      "default": "OFF. The customer screens work exactly as they do today and nothing can be added.",
+      "if_switched": "ON: the extra fields can be filled. They never change a sale, a payment or any accounting figure. Switching it OFF again keeps everything that was entered; it only stops new entries.",
+      "who_can_change": "Only the owner, in the settings (Switchboard)."
+    },
+    {
+      "key": "crm_second_phone_on",
+      "kind": "setting",
+      "title": "Extra phone numbers",
+      "what_it_does": "Lets a customer have more than one phone number (home, work, a family member). The cashier can find the customer by any of them.",
+      "why_it_matters": "A customer who calls from another phone is not entered a second time, so their history, points and dues stay in one place.",
+      "default": "OFF. Only the main mobile and the WhatsApp number are used.",
+      "if_switched": "ON: extra numbers can be added. A number that already belongs to another customer is accepted but flagged as a possible duplicate; a sale is never blocked. Online orders and messages are matched to a customer only by numbers that belong to that customer alone.",
+      "who_can_change": "Only the owner. Needs 'Customer profile extras' to be ON as well."
+    },
+    {
+      "key": "crm_mask_phone",
+      "kind": "setting",
+      "title": "Hide customer phone numbers and addresses",
+      "what_it_does": "Shows a number as 017******78 and hides the address from people who do not have the right to see them.",
+      "why_it_matters": "Today every person who can open the customer list can read every customer's number and address. Hiding them protects customers if a staff phone is lost or a person leaves.",
+      "default": "OFF. Everyone who can see customers sees full numbers, as today.",
+      "if_switched": "ON: the owner, people given 'See full customer phone and address', and people who already see mobile numbers in reports still see everything. Everyone else sees hidden numbers and can ask to show one number with a written reason, which is recorded. The Call and WhatsApp buttons are not shown on a hidden number. Note: some older screens still read customers directly and are not covered until they are switched over (see the integration note).",
+      "who_can_change": "Only the owner."
+    },
+    {
+      "key": "crm_view",
+      "kind": "grant",
+      "title": "See customer notes, messages and the full timeline",
+      "what_it_does": "Lets a person read and write notes on a customer, see the messages sent to them and their enquiries, and see who has a birthday or anniversary coming.",
+      "why_it_matters": "Notes and messages can be private. Only people who need them should read them.",
+      "default": "Nobody has it until the owner gives it. The owner always can.",
+      "if_switched": "Given: the person sees the Notes tab and the message and enquiry lines in the timeline. Taken away: they disappear at once; the notes themselves are kept.",
+      "who_can_change": "The owner (roles and people grid)."
+    },
+    {
+      "key": "crm_contact_view",
+      "kind": "grant",
+      "title": "See full customer phone and address",
+      "what_it_does": "Lets a person see full phone numbers and addresses even when hiding is ON.",
+      "why_it_matters": "Delivery and accounts staff may need the real number while counter staff do not.",
+      "default": "Nobody has it until the owner gives it. The owner always can, and so can anyone who already sees mobile numbers in reports.",
+      "if_switched": "Given: the person sees full numbers. It has no effect while hiding is OFF.",
+      "who_can_change": "The owner (roles and people grid)."
+    },
+    {
+      "key": "customer_type_and_credit_days",
+      "kind": "field",
+      "title": "Customer type and credit days",
+      "what_it_does": "Marks a customer as retail, wholesale, party, corporate, online or staff (from the editable list), and records how many days they are normally given to pay.",
+      "why_it_matters": "Staff know at a glance how to treat the customer. Credit days are a note for now: they do not block a sale and do not change the credit limit.",
+      "default": "Empty for every customer.",
+      "if_switched": "Setting a value changes only the profile. The retail / wholesale choice used at the till is not changed by it.",
+      "who_can_change": "The owner or a person with the customer manager right."
+    },
+    {
+      "key": "main_phone_change",
+      "kind": "action",
+      "title": "Make an extra number the main number",
+      "what_it_does": "Swaps the main phone number of a customer with one of their extra numbers. The old main number stays on the profile as an extra number.",
+      "why_it_matters": "The main number is how the till finds the customer. A wrong change could split a customer in two, so it is controlled and recorded.",
+      "default": "Not available until 'Customer profile extras' is ON.",
+      "if_switched": "Needs a written reason of at least 3 characters and writes one line to the change log. A number that is already the main number of another customer is refused.",
+      "who_can_change": "The owner or a person with the customer manager right."
+    },
+    {
+      "key": "notes_are_kept",
+      "kind": "field",
+      "title": "Notes cannot be edited or deleted",
+      "what_it_does": "A note keeps its text, its author and its time. A wrong note is retired with a reason; it disappears from the list but stays in the record.",
+      "why_it_matters": "A fair history of what was said to a customer. Nothing is silently changed.",
+      "default": "Applies as soon as notes are used.",
+      "if_switched": "Not a setting. Retiring needs a reason of at least 3 characters, by the author or the owner.",
+      "who_can_change": "Fixed rule."
+    }
+  ]
+}
