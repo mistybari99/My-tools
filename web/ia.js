@@ -101,12 +101,13 @@ const IA = [
   rec('outbox', 'appr', ['ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা (Not sent yet)'], { icon: 'doc', cnt: 'obx', tone: 'warn', kw: ['outbox', 'offline', 'unsent', 'queue', 'জমা', 'পাঠানো হয়নি', 'অফলাইন'] }),
   // Reports & analytics
   rec('reports', 'reports', ['রিপোর্ট', 'Reports', 'Report'], { icon: 'doc', mob: 3, mod: 3, home: { biz: 7, acc: 6 }, kw: ['report', 'sales report', 'stock report', 'export', 'csv', 'রিপোর্ট', 'প্রতিবেদন', 'এক্সপোর্ট'] }),
-  rec('biz', 'reports', 't:biz', { ok: (c) => c.own || c.P('POS', 'approve'), mod: 4.5, home: { acc: 5 }, kw: ['profit', 'loss', 'p&l', 'analysis', 'margin', 'লাভ', 'ক্ষতি', 'বিশ্লেষণ', 'ব্যবসা'] }),
-  rec('profitcheck', 'reports', ['Profit check', 'Profit check', 'Profit check'], { icon: 'biz', ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true,
+  rec('reports/map', 'reports', ['রিপোর্ট মানচিত্র', 'Reports map', 'Report map'], { icon: 'doc', kw: ['reports map', 'report list', 'master list', 'which reports', 'report status', 'রিপোর্ট মানচিত্র', 'রিপোর্টের তালিকা', 'অবস্থা', 'কোন রিপোর্ট'] }),
+  rec('biz', 'reports', 't:biz', { ok: (c) => c.own || c.P('POS', 'approve'), mod: 4.5, home: { acc: 5 }, also: ['acc'], kw: ['profit', 'loss', 'p&l', 'analysis', 'margin', 'লাভ', 'ক্ষতি', 'বিশ্লেষণ', 'ব্যবসা'] }),
+  rec('profitcheck', 'acc', ['Profit check', 'Profit check', 'Profit check'], { icon: 'biz', also: ['reports'], ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true,
     kw: ['profit', 'one profit number', 'loss', 'wastage', 'shortage', 'partner profit', 'reconcile', 'journal profit', 'brand', 'parity', 'expense report', 'salary'],
     verbs: ['compare profit', 'leave a loss out of profit', 'change brand'], aliases: ['profit check'] }),
-  rec('brandpnl', 'reports', ['ব্র্যান্ড অনুযায়ী লাভ-ক্ষতি', 'Brand profit & loss', 'Brand Profit-Loss'], { icon: 'biz', ok: (c) => c.own || c.P('POS', 'approve'), kw: ['brand', 'profit', 'ব্র্যান্ড', 'লাভ'] }),
-  rec('discounts', 'reports', ['ডিসকাউন্ট রিপোর্ট', 'Discounts report', 'Discount report'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve'), also: ['sale'], kw: ['discount', 'offer', 'ডিসকাউন্ট', 'ছাড়'] }),
+  rec('brandpnl', 'dash', ['ব্র্যান্ড অনুযায়ী লাভ-ক্ষতি', 'Brand profit & loss', 'Brand Profit-Loss'], { icon: 'biz', also: ['reports'], ok: (c) => c.own || c.P('POS', 'approve'), kw: ['brand', 'profit', 'ব্র্যান্ড', 'লাভ'] }),
+  rec('discounts', 'sale', ['ডিসকাউন্ট রিপোর্ট', 'Discounts report', 'Discount report'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve'), also: ['reports'], kw: ['discount', 'offer', 'ডিসকাউন্ট', 'ছাড়'] }),
   rec('report', 'reports', ['রিপোর্ট', 'Reports', 'Report'], { icon: 'doc', drawer: false, status: 'hidden', alias: 'reports' }),
   // Staff, roles, permissions
   rec('staff', 'people', 't:staff', { ok: owner, cnt: 'stf', tone: 'info', mod: 13, kw: ['staff', 'employee', 'user', 'approve user', 'স্টাফ', 'কর্মী', 'ব্যবহারকারী'] }),
@@ -120,7 +121,7 @@ const IA = [
   // Administration & settings
   rec('control', 'settings', ['কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'], { icon: 'control', ok: (c) => c.ctlOk(), cnt: 'ctl', tone: 'info', kw: ['control', 'admin', 'কন্ট্রোল', 'নিয়ন্ত্রণ'] }),
   rec('rulehub', 'settings', 't:rulehub', { ok: owner, mod: 14, kw: ['rules', 'switch', 'grants', 'নিয়ম', 'অপশন', 'অনুমতি'] }),
-  rec('owner', 'settings', ['মালিকের বোর্ড', 'Owner mode board', 'Owner mode board'], { icon: 'control', ok: owner, kw: ['owner', 'board', 'must check', 'daily check', 'morning', 'মালিক', 'বোর্ড', 'প্রতিদিন', 'দেখুন'] }),
+  rec('owner', 'dash', ['মালিকের বোর্ড', 'Owner mode board', 'Owner mode board'], { icon: 'control', also: ['settings'], ok: owner, kw: ['owner', 'board', 'must check', 'daily check', 'morning', 'মালিক', 'বোর্ড', 'প্রতিদিন', 'দেখুন'] }),
   rec('switchboard', 'settings', ['সুইচবোর্ড (সব চালু/বন্ধ)', 'Switchboard (all on/off)', 'Switchboard (সব on/off)'], { icon: 'settings', ok: owner, kw: ['switch', 'on off', 'toggle', 'blind', 'pin', 'flag', 'সুইচ', 'চালু', 'বন্ধ', 'অন', 'অফ', 'সেটিংস'] }),
   rec('parallel', 'settings', ['পাশাপাশি মাস: তুলনা ও পাস/ফেল', 'Parallel month: compare & pass/fail', 'Parallel মাস: compare ও pass/fail'], { icon: 'doc', ok: (c) => c.own || c.GF.rollout_manage === true, parent: 'rollout', kw: ['parallel', 'compare', 'pass', 'fail', 'paper', 'পাশাপাশি', 'তুলনা', 'পাস', 'ফেল'] }),
   rec('printbooks', 'settings', ['ছাপা ও বই', 'Print & books', 'Print ও books'], { icon: 'print', ok: (c) => c.own || c.GF.head_management === true || c.GF.print_books === true, kw: ['print', 'book', 'serial', 'paper', 'ছাপা', 'বই', 'সিরিয়াল'] }),
