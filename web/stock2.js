@@ -22,7 +22,9 @@ const X = {
   all: L('সব', 'All', 'All'), allLoc: L('সব জায়গা', 'All locations', 'সব Location'), category: L('ক্যাটাগরি', 'Category', 'Category'), location: L('জায়গা', 'Location', 'Location'),
   belowMin: L('শুধু ন্যূনতমের নিচে', 'Only below minimum', 'শুধু Minimum-এর নিচে'), showZero: L('শূন্য মজুতও দেখান', 'Show zero stock too', 'Zero stock-ও দেখান'),
   nItems: L('টি পণ্য', 'items', 'items'), nBelow: L('ন্যূনতমের নিচে', 'Below minimum', 'Minimum-এর নিচে'), totalValue: L('মজুতের মূল্য', 'Stock value', 'Stock-এর value'),
-  avg: L('গড় দাম', 'avg cost', 'avg cost'), chipOut: L('শেষ', 'Out', 'Out'), chipLow: L('ন্যূনতমের নিচে', 'Below min', 'Min-এর নিচে'), min: L('ন্যূনতম', 'min', 'min'),
+  avg: L('গড় দাম', 'avg cost', 'avg cost'), chipOut: L('শেষ', 'Out', 'Out'), chipNeg: L('ঋণাত্মক', 'Negative', 'ঋণাত্মক'),
+  fixTitle: L('ক্যাশ ঠিক করা নিশ্চিত করুন', 'Confirm the cache repair', 'Cache ঠিক করা নিশ্চিত করুন'), fixHint: L('এটি ক্যাশ ব্যালান্স খাতা থেকে নতুন করে লিখবে এবং অডিট লগে লেখা হবে। নিশ্চিত করতে FIX লিখুন।', 'This rewrites the cached balance from the ledger and is written to the audit log. Type FIX to confirm.', 'এটি cache balance ledger থেকে নতুন করে লিখবে, audit log-এ লেখা হবে। Confirm করতে FIX লিখুন।'),
+  fixWord: L('FIX লিখুন', 'Type FIX', 'FIX লিখুন'), chipLow: L('ন্যূনতমের নিচে', 'Below min', 'Min-এর নিচে'), min: L('ন্যূনতম', 'min', 'min'),
   none: L('কোনো স্টক নেই', 'No stock to show', 'কোনো stock নেই'), noneHint: L('শুধু "স্টক ট্র্যাক" করা পণ্য এখানে আসে। পণ্যের অ্যাডভান্স অপশনে চালু করুন।', 'Only items marked "track stock" appear here. Turn it on in the product advance options.', 'শুধু "Stock track" করা product এখানে আসে। Product-এর Advance Option-এ চালু করুন।'),
   more: L('আরও দেখুন', 'Show more', 'আরও দেখুন'), actions: L('স্টকের কাজ', 'Stock actions', 'Stock-এর কাজ'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
   a_open: L('প্রারম্ভিক স্টক বসান', 'Opening balance', 'Opening balance'), a_waste: L('নষ্ট মাল বাদ দিন', 'Write off wastage', 'Wastage write-off'), a_count: L('গণনা অনুযায়ী ঠিক করুন', 'Adjust to a count', 'Count অনুযায়ী ঠিক'),
@@ -284,11 +286,11 @@ function paintRows(list) {
   const box = $('#s2_list'); if (!box) return;
   const showLoc = D.loc === null || D.loc === undefined;
   const html = list.slice(0, D.shown).map((r) => {
-    const i = D.rows.indexOf(r), out = Number(r.qty) <= 0, bar = out ? 'bad' : r.below_min ? 'warn' : '';
+    const i = D.rows.indexOf(r), neg = Number(r.qty) < 0, out = Number(r.qty) <= 0, bar = out ? 'bad' : r.below_min ? 'warn' : '';
     return `<div class="card item s2-row mk ${bar}" data-act="s2_item" data-i="${i}" role="button" tabindex="0"><div><div class="nm">${esc(nm(r))}</div>
       <div class="sub">${esc(r.code)}${r.category ? ' · ' + esc(catLabel(r.category)) : ''}${showLoc ? ' · ' + esc(locName(r.location_id)) : ''}${r.min_stock !== null && r.min_stock !== undefined ? ' · ' + esc(T('min')) + ' ' + q4(r.min_stock) : ''}</div>
       <div class="sub">${esc(unitLine(r.item_id, r.base_unit))}</div>
-      ${out ? `<span class="chip bad">${esc(T('chipOut'))}</span>` : r.below_min ? `<span class="chip warn">${esc(T('chipLow'))}</span>` : ''}</div>
+      ${neg ? `<span class="chip bad">${esc(T('chipNeg'))}</span>` : out ? `<span class="chip bad">${esc(T('chipOut'))}</span>` : r.below_min ? `<span class="chip warn">${esc(T('chipLow'))}</span>` : ''}</div>
       <div class="pr"><button type="button" class="mini s2-dots" data-act="s2_rowmenu" data-i="${i}" aria-label="${esc(T('more2'))}">⋮</button><b>${q4(r.qty)} ${esc(unitLabel(r.base_unit))}</b>${r.avg_cost !== null && r.avg_cost !== undefined ? `<small>${esc(T('avg'))} ${esc(money(r.avg_cost))}</small>` : ''}${r.value !== null && r.value !== undefined ? `<small>${esc(money(r.value))}</small>` : ''}</div></div>`;
   }).join('');
   box.innerHTML = (html || `<div class="card center"><p class="muted">${esc(T('none'))}</p><p class="muted" style="font-size:.85rem">${esc(T('noneHint'))}</p></div>`)
@@ -551,7 +553,10 @@ Object.assign(H, {
   s2_wa_cancel: async (a) => { const x = D.wa[Number(a.dataset.i)]; if (!x) return;
     await submit(a, () => sb.rpc('wastage_cancel', { p_id: x.id }), () => { toast(T('waDone')); loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); }, { context: { request: x.id } }); },
   s2_recon: reconSheet,
-  s2_fix: async () => { const r = await sb.rpc('stock_reconcile', { p_fix: true }); if (r.error) return errToast(r.error); closeSheet(); toast(T('saved')); afterWrite(); },
+  s2_fix: () => { openSheet(`<h2>${esc(T('fixTitle'))}</h2><div class="notice warn">${esc(T('fixHint'))}</div><div><label for="s2_fixw">${esc(T('fixWord'))}</label><input id="s2_fixw" autocomplete="off"></div>
+      <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="s2_fix_go">${esc(T('reconFix'))}</button></div>`); },
+  s2_fix_go: async () => { const w = (($('#s2_fixw') || {}).value || '').trim(); if (w !== 'FIX') return toast(T('fixWord'));
+    const r = await sb.rpc('stock_reconcile_fix', { p_confirm: w }); if (r.error) return errToast(r.error); closeSheet(); toast(T('saved')); afterWrite(); },
 });
 
 // exception flag codes -> readable titles (3 modes). Shown by the exceptions page next to the server text.

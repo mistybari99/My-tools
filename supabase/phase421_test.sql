@@ -33,7 +33,7 @@ reset role; select tt.as(:'o'); set role authenticated;
 \echo == T2 #66 count variance: sheets and app counts, with value
 reset role;
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
- ('04-3',1,9601,current_date,'approved',jsonb_build_object('counted_by','test_store','rows',jsonb_build_array(jsonb_build_object('item','test_fg_sweet','count',7.5,'book',8,'reason','test sheet reason'),jsonb_build_object('item','test_rs_tea','count',36,'book',36))),'[]',:'o','test_store');
+ ('04-3',1,9601,tt.today(),'approved',jsonb_build_object('counted_by','test_store','rows',jsonb_build_array(jsonb_build_object('item','test_fg_sweet','count',7.5,'book',8,'reason','test sheet reason'),jsonb_build_object('item','test_rs_tea','count',36,'book',36))),'[]',:'o','test_store');
 set role authenticated; select tt.as(:'o');
 select tt.chk('T2 the paper sheet rows are still there: sweet counted 7.5 vs book 8 (net -0.5), tea counted 36 = book (counted, no difference)', (select (r->>'counts')::int=1 and (r->>'off_n')::int=1 and (r->>'net_var')::numeric=-0.5 from jsonb_array_elements(tt.run('k2_count_variance','{"preset":"this_month"}'::jsonb)->'rows') r where r->>'source'='sheet 04-3' and r->>'item_code'='test_fg_sweet')
   and (select (r->>'counts')::int=1 and (r->>'off_n')::int=0 from jsonb_array_elements(tt.run('k2_count_variance','{"preset":"this_month"}'::jsonb)->'rows') r where r->>'source'='sheet 04-3' and r->>'item_code'='test_rs_tea'));

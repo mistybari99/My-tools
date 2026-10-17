@@ -90,7 +90,7 @@ select tt.chk('T5 notices name the forms that were not captured', (select count(
 select tt.chk('T5 totals leave the uncaptured legs out (no 0 total for grns)', not (tt.run('p4_supplier_score','{"preset":"this_month"}'::jsonb)->'totals' ? 'grns'));
 reset role;
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
- ('04-1',7,9501,current_date,'approved','{"supplier":"test_sup_one","lines":[{"item":"test_raw_flour","memo":10,"counted":9,"quality":"return"},{"item":"test_raw_sugar","memo":5,"counted":5,"quality":"ok"}]}'::jsonb,'[]',:'o','test_store');
+ ('04-1',7,9501,tt.today(),'approved','{"supplier":"test_sup_one","lines":[{"item":"test_raw_flour","memo":10,"counted":9,"quality":"return"},{"item":"test_raw_sugar","memo":5,"counted":5,"quality":"ok"}]}'::jsonb,'[]',:'o','test_store');
 set role authenticated; select tt.as(:'o');
 select qc_record('grn',:'pb1'::uuid,'reject','[]'::jsonb,'test bad lot') is not null as q1 \gset
 select tt.chk('T5 once a GRN sheet and a QC check exist the legs show numbers: grns 1, lines 2, short 1, rejected 1, qc 1 / bad 1 (100 %)', (select (r->>'grns')::int=1 and (r->>'lines')::int=2 and (r->>'short_lines')::int=1 and (r->>'rejected')::int=1 and (r->>'qc_n')::int=1 and (r->>'qc_bad')::int=1 and (r->>'qc_bad_pct')::numeric=100 and r->>'not_captured'='06-4, 06-3'
@@ -106,10 +106,10 @@ select tt.chk('T6 no age bucket default is invented: with report_aging_buckets e
 select tt.chk('T6 supplier_credit_gaps lists the supplier for the payables screen', (select count(*) from jsonb_array_elements(supplier_credit_gaps()) g where g->>'name'='test_sup_nocredit')=1);
 
 \echo == T7 wastage by reason: no sum across units
-select tt.chk('T7 the old report added kg and pieces into one number (expired 1.5 kg + 1 pc = 2.5)', (select qty from wastage_by_reason(null, current_date-1, current_date+1) where reason_code='expired')=2.5);
-select tt.chk('T7 the new one has no single quantity for a mixed reason and lists one quantity per unit', (select r->'qty'='null'::jsonb and (r->>'mixed_units')::boolean and jsonb_array_length(r->'units')=2 from jsonb_array_elements(wastage_by_reason2(null, current_date-1, current_date+1)) r where r->>'reason_code'='expired'));
-select tt.chk('T7 a reason with one unit keeps its quantity and unit (broken 0.5 kg)', (select (r->>'qty')::numeric=0.5 and r->>'unit'='kg' and not (r->>'mixed_units')::boolean from jsonb_array_elements(wastage_by_reason2(null, current_date-1, current_date+1)) r where r->>'reason_code'='broken'));
-select tt.chk('T7 entries and items are the same as the old report', (select (r->>'entries')::int from jsonb_array_elements(wastage_by_reason2(null, current_date-1, current_date+1)) r where r->>'reason_code'='expired') = (select entries from wastage_by_reason(null, current_date-1, current_date+1) where reason_code='expired'));
+select tt.chk('T7 the old report added kg and pieces into one number (expired 1.5 kg + 1 pc = 2.5)', (select qty from wastage_by_reason(null, tt.today()-1, tt.today()+1) where reason_code='expired')=2.5);
+select tt.chk('T7 the new one has no single quantity for a mixed reason and lists one quantity per unit', (select r->'qty'='null'::jsonb and (r->>'mixed_units')::boolean and jsonb_array_length(r->'units')=2 from jsonb_array_elements(wastage_by_reason2(null, tt.today()-1, tt.today()+1)) r where r->>'reason_code'='expired'));
+select tt.chk('T7 a reason with one unit keeps its quantity and unit (broken 0.5 kg)', (select (r->>'qty')::numeric=0.5 and r->>'unit'='kg' and not (r->>'mixed_units')::boolean from jsonb_array_elements(wastage_by_reason2(null, tt.today()-1, tt.today()+1)) r where r->>'reason_code'='broken'));
+select tt.chk('T7 entries and items are the same as the old report', (select (r->>'entries')::int from jsonb_array_elements(wastage_by_reason2(null, tt.today()-1, tt.today()+1)) r where r->>'reason_code'='expired') = (select entries from wastage_by_reason(null, tt.today()-1, tt.today()+1) where reason_code='expired'));
 select tt.err('T7 bad range refused', $q$select wastage_by_reason2(null,'2020-01-01','2026-12-31')$q$, 'bad_range');
 
 \echo == T8 stock_reconcile fix: owner only, typed confirmation, audit line

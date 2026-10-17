@@ -19,6 +19,7 @@ exception when others then perform tt.chk(p_name, sqlerrm like '%' || p_msg || '
 create or replace function tt.as(p_sub text) returns void language plpgsql as $$
 begin perform set_config('request.jwt.claim.sub', p_sub, false); end $$;
 create or replace function tt.run(p_key text, p_flt jsonb default '{}', p_grp text default null) returns jsonb language sql as $$ select public.report_run2(p_key, p_flt, p_grp, null, 1) $$;
+create or replace function tt.today() returns date language sql stable as $$ select (now() at time zone 'Asia/Dhaka')::date $$;
 create or replace function tt.core(p_key text, p_flt jsonb default '{}') returns jsonb language sql security definer as $$ select public.report_run2_core(p_key, p_flt, null, null, 1) $$;
 create or replace function tt.n(p_sql text) returns numeric language plpgsql security definer as $$ declare v numeric; begin execute p_sql into v; return v; end $$;
 create or replace function tt.t(p_sql text) returns text language plpgsql security definer as $$ declare v text; begin execute p_sql into v; return v; end $$;
@@ -62,15 +63,15 @@ select stock_opening(:'i_sa',7,10,null,null,'test opening, cost not known') is n
 select stock_opening(:'i_te',1,40,12,null,'test opening') is not null as o5 \gset
 -- (pb3 below stays a draft)
 -- 2. PURCHASES at the store: one posted bill (flour 60 @42, sugar 20 @61, sugar 5 for a second supplier), a draft, one voided, one purchase return
-select save_purchase(null,null,:'su1',7,'T-B1',current_date-6,format('[{"item_id":"%s","qty":60,"unit":"kg","unit_cost":42},{"item_id":"%s","qty":20,"unit":"kg","unit_cost":61}]',:'i_fl',:'i_su')::jsonb) ->> 'id' as pb1 \gset
+select save_purchase(null,null,:'su1',7,'T-B1',tt.today()-6,format('[{"item_id":"%s","qty":60,"unit":"kg","unit_cost":42},{"item_id":"%s","qty":20,"unit":"kg","unit_cost":61}]',:'i_fl',:'i_su')::jsonb) ->> 'id' as pb1 \gset
 select post_purchase(:'pb1'::uuid) is not null as p1 \gset
-select save_purchase(null,null,:'su2',7,'T-B2',current_date-5,format('[{"item_id":"%s","qty":5,"unit":"kg","unit_cost":60}]',:'i_su')::jsonb) ->> 'id' as pb2 \gset
+select save_purchase(null,null,:'su2',7,'T-B2',tt.today()-5,format('[{"item_id":"%s","qty":5,"unit":"kg","unit_cost":60}]',:'i_su')::jsonb) ->> 'id' as pb2 \gset
 select post_purchase(:'pb2'::uuid) is not null as p2 \gset
-select save_purchase(null,null,:'su1',7,'T-B3',current_date-4,format('[{"item_id":"%s","qty":999,"unit":"kg","unit_cost":1}]',:'i_fl')::jsonb) ->> 'id' as pb3 \gset
-select save_purchase(null,null,:'su1',7,'T-B4',current_date-4,format('[{"item_id":"%s","qty":888,"unit":"kg","unit_cost":1}]',:'i_fl')::jsonb) ->> 'id' as pb4 \gset
+select save_purchase(null,null,:'su1',7,'T-B3',tt.today()-4,format('[{"item_id":"%s","qty":999,"unit":"kg","unit_cost":1}]',:'i_fl')::jsonb) ->> 'id' as pb3 \gset
+select save_purchase(null,null,:'su1',7,'T-B4',tt.today()-4,format('[{"item_id":"%s","qty":888,"unit":"kg","unit_cost":1}]',:'i_fl')::jsonb) ->> 'id' as pb4 \gset
 select post_purchase(:'pb4'::uuid) is not null as p4 \gset
 select void_purchase(:'pb4'::uuid, 'test void') is not null as v4 \gset
-select save_purchase(null,null,:'su1',7,'T-R1',current_date-3,format('[{"item_id":"%s","qty":2,"unit":"kg","unit_cost":42}]',:'i_fl')::jsonb,0,null,null,'return',:'pb1'::uuid,'damaged') ->> 'id' as pr1 \gset
+select save_purchase(null,null,:'su1',7,'T-R1',tt.today()-3,format('[{"item_id":"%s","qty":2,"unit":"kg","unit_cost":42}]',:'i_fl')::jsonb,0,null,null,'return',:'pb1'::uuid,'damaged') ->> 'id' as pr1 \gset
 select post_purchase(:'pr1'::uuid) is not null as pr1p \gset
 -- 3. TRANSFER of raw material store -> factory (received in full): flour 80, sugar 40, box 100
 select stock_transfer(7,6,:'i_fl',80) ->> 'id' as t1 \gset
@@ -96,13 +97,13 @@ select stock_cancel_transfer(:'t8'::uuid, 'test cancel') is not null as t8c \gse
 reset role;
 -- 6. SALES at outlet 1 (the sale trigger moves the stock): sweet 12 kg + tea 4; a second sale of sweet 3 kg that is then VOIDED; cakes 9 pc when only 8 are there (goes -1, oversold)
 insert into sales (client_id,location_id,receipt,sale_date,sold_at,lines,subtotal,discount,total,pay_mode,created_by,paid,status) values
- (gen_random_uuid(),1,990001,current_date,now(),format('[{"item_id":"%s","qty":12,"price":300,"amount":3600,"unit":"kg","name":"test_sweet"},{"item_id":"%s","qty":4,"price":20,"amount":80,"unit":"pc","name":"test_tea"}]',:'i_sw',:'i_te')::jsonb,3680,0,3680,'cash',:'s',3680,'done');
+ (gen_random_uuid(),1,990001,tt.today(),now(),format('[{"item_id":"%s","qty":12,"price":300,"amount":3600,"unit":"kg","name":"test_sweet"},{"item_id":"%s","qty":4,"price":20,"amount":80,"unit":"pc","name":"test_tea"}]',:'i_sw',:'i_te')::jsonb,3680,0,3680,'cash',:'s',3680,'done');
 select id as sale1 from sales where receipt=990001 \gset
 insert into sales (client_id,location_id,receipt,sale_date,sold_at,lines,subtotal,discount,total,pay_mode,created_by,paid,status) values
- (gen_random_uuid(),1,990002,current_date,now(),format('[{"item_id":"%s","qty":3,"price":300,"amount":900,"unit":"kg","name":"test_sweet"}]',:'i_sw')::jsonb,900,0,900,'cash',:'s',900,'done');
+ (gen_random_uuid(),1,990002,tt.today(),now(),format('[{"item_id":"%s","qty":3,"price":300,"amount":900,"unit":"kg","name":"test_sweet"}]',:'i_sw')::jsonb,900,0,900,'cash',:'s',900,'done');
 select id as sale2 from sales where receipt=990002 \gset
 insert into sales (client_id,location_id,receipt,sale_date,sold_at,lines,subtotal,discount,total,pay_mode,created_by,paid,status) values
- (gen_random_uuid(),1,990003,current_date,now(),format('[{"item_id":"%s","qty":9,"price":500,"amount":4500,"unit":"pc","name":"test_cake"}]',:'i_ck')::jsonb,4500,0,4500,'cash',:'s',4500,'done');
+ (gen_random_uuid(),1,990003,tt.today(),now(),format('[{"item_id":"%s","qty":9,"price":500,"amount":4500,"unit":"pc","name":"test_cake"}]',:'i_ck')::jsonb,4500,0,4500,'cash',:'s',4500,'done');
 update sales set status='void' where id=:'sale2'::uuid;
 set role authenticated; select tt.as(:'o');
 -- 7. REFUND of 2 kg sweet from the first sale, reason damaged

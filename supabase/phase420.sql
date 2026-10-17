@@ -96,7 +96,7 @@ $$;
 create or replace function public._r4_levels_agg(p_locs int[], p_cat text[], p_ty text[], p_cost boolean) returns jsonb
 language sql stable security definer set search_path = public as $$
   with x as (
-    select b.item_id, b.location_id, b.qty, b.avg_cost, coalesce(l.name_bn, '') as lbn, coalesce(l.name_en, l.name_bn, '') as len, coalesce(l.kind, '(not set)') as kind,
+    select b.item_id, b.location_id, b.qty, b.avg_cost, it.min_stock, coalesce(l.name_bn, '') as lbn, coalesce(l.name_en, l.name_bn, '') as len, coalesce(l.kind, '(not set)') as kind,
            coalesce(t.label_bn, it.item_type) as tbn, coalesce(t.label_en, t.label_bn, it.item_type) as ten, it.item_type
       from public.stock_balance b join public.items it on it.id = b.item_id join public.locations l on l.id = b.location_id left join public.item_types t on t.code = it.item_type
      where b.location_id = any (p_locs) and it.is_active and (p_cat is null or it.category = any (p_cat)) and (p_ty is null or it.item_type = any (p_ty))),
@@ -117,6 +117,7 @@ language sql stable security definer set search_path = public as $$
     'type', coalesce((select jsonb_agg(jsonb_build_object('name', a.bn, 'name_en', a.en, 'lines', a.lines, 'negative_lines', a.negative_lines, 'uncosted_lines', case when p_cost then a.uncosted_lines end,
         'value', case when p_cost then coalesce(a.value, 0) end) order by a.bn) from a where a.g = 'type'), '[]'::jsonb),
     'lines', (select count(*) from x), 'negative_lines', (select count(*) from x where qty < 0), 'uncosted_lines', (select count(*) from x where qty <> 0 and avg_cost is null),
+    'low_lines', (select count(*) from x where qty >= 0 and min_stock is not null and qty <= min_stock), 'no_min_lines', (select count(*) from x where qty >= 0 and min_stock is null),
     'value', case when p_cost then (select coalesce(sum(round(qty * avg_cost, 2)) filter (where avg_cost is not null), 0) from x) end);
 $$;
 revoke all on function public._r4_levels_agg(int[], text[], text[], boolean) from public, anon, authenticated;
@@ -126,12 +127,14 @@ language plpgsql stable security definer set search_path = public as $$
 declare agg jsonb; cost_ok boolean := public.rpt_cost_ok(); res jsonb := p_res; col jsonb; cols jsonb := '[]'::jsonb; sec jsonb := '[]'::jsonb; mcols jsonb;
 begin
   agg := public._r4_levels_agg(public._r2_locs(p_flt), public.rpt_arr_text(p_flt -> 'categories'), public._r4_types(p_flt), cost_ok);
+  res := jsonb_set(res, '{totals}', coalesce(res -> 'totals', '{}'::jsonb) || jsonb_build_object('lines', agg -> 'lines', 'low_lines', agg -> 'low_lines', 'no_min_lines', agg -> 'no_min_lines', 'negative_lines', agg -> 'negative_lines'));
   if not cost_ok then
     for col in select * from jsonb_array_elements(res -> 'columns') loop
       if col ->> 'key' not in ('avg_cost', 'value', 'cost_note') then cols := cols || jsonb_build_array(col); end if;
     end loop;
     res := jsonb_set(res, '{columns}', cols);
     res := jsonb_set(res, '{totals}', coalesce(res -> 'totals', '{}'::jsonb) - 'value');
+    res := jsonb_set(res, '{rows}', coalesce((select jsonb_agg(r - 'avg_cost' - 'value' - 'cost_note' - '_nc') from jsonb_array_elements(res -> 'rows') r), '[]'::jsonb));
     res := public._r4_addnote(res, jsonb_build_object('code', 'cost_hidden'));
   else
     res := jsonb_set(res, '{totals}', coalesce(res -> 'totals', '{}'::jsonb) || jsonb_build_object('value', agg -> 'value'));
@@ -182,12 +185,14 @@ language sql stable security definer set search_path = public as $$
         left join public.stock_balance sb on sb.item_id = b.item_id and sb.location_id = b.location_id cross join t
      where b.qty_remaining > 0 and b.expires_at is null and b.location_id = any (locs) and (t.cat is null or it.category = any (t.cat))
      group by it.id, it.code, it.name_bn, it.name_en, l.id, l.name_bn, l.name_en, it.unit, sb.avg_cost, t.cost)
-  select jsonb_build_object('item_code', d.code, 'item_name', d.name_bn, 'item_name_en', d.name_en, 'location_bn', d.lbn, 'location_en', d.len, 'made_on', d.made_on, 'expires_on', d.exp_on,
+  select jsonb_build_object('item_code', d.code, 'item_name', d.name_bn, 'item_name_en', d.name_en, 'location_id', d.loc_id, 'location_bn', d.lbn, 'location_en', d.len, 'made_on', d.made_on, 'expires_on', d.exp_on,
+      'n_dated', 1, 'n_expired', case when d.exp_on < d.today then 1 else 0 end,
       'days_left', d.exp_on - d.today, 'qty', d.qty, 'unit', d.unit, 'batches', 1, 'state', case when d.exp_on < d.today then 'expired' else 'soon' end,
       'value', case when d.cost and d.avg_cost is not null then round(d.qty * d.avg_cost, 2) end, 'drill', format('#/batchrep/batches?item=%s&loc=%s', d.item_id, d.loc_id))
     from dated d
   union all
-  select jsonb_build_object('item_code', n.code, 'item_name', n.name_bn, 'item_name_en', n.name_en, 'location_bn', n.lbn, 'location_en', n.len, 'made_on', n.made_on, 'expires_on', null,
+  select jsonb_build_object('item_code', n.code, 'item_name', n.name_bn, 'item_name_en', n.name_en, 'location_id', n.loc_id, 'location_bn', n.lbn, 'location_en', n.len, 'made_on', n.made_on, 'expires_on', null,
+      'n_dated', 0, 'n_expired', 0,
       'days_left', null, 'qty', n.qty, 'unit', n.unit, 'batches', n.batches, 'state', 'no_expiry',
       'value', case when n.cost and n.avg_cost is not null then round(n.qty * n.avg_cost, 2) end, '_nc', '["expires_on","days_left"]'::jsonb,
       'drill', format('#/batchrep/batches?item=%s&loc=%s', n.item_id, n.loc_id))
@@ -215,9 +220,12 @@ begin
     res := public._r4_addnote(res, public._r4_note('data_needed', nb || ' batch(es) of ' || ni || ' item(s) hold stock with NO expiry date captured. They are listed as "no expiry" rows; they are not "safe". Expiry is captured only when the item has a shelf-life rule (Settings > shelf life) or the batch is entered with an expiry.',
       nb || 'টি ব্যাচে (' || ni || 'টি আইটেম) স্টক আছে কিন্তু মেয়াদ লেখা নেই। এগুলো "মেয়াদ নেই" সারিতে দেখানো হয়েছে; এগুলো নিরাপদ নয়। আইটেমের শেলফ-লাইফ নিয়ম থাকলে বা ব্যাচে মেয়াদ দিলে তবেই মেয়াদ লেখা হয়।', 'shelf_life_rules / expires_at'));
   end if;
+  res := jsonb_set(res, '{totals}', (coalesce(res -> 'totals', '{}'::jsonb) - 'n_dated' - 'n_expired') || jsonb_build_object('batches', coalesce((res #>> '{totals,n_dated}')::numeric::int, 0), 'expired_batches', coalesce((res #>> '{totals,n_expired}')::numeric::int, 0)));
   if not cost_ok then
     for col in select * from jsonb_array_elements(res -> 'columns') loop if col ->> 'key' <> 'value' then cols := cols || jsonb_build_array(col); end if; end loop;
     res := jsonb_set(res, '{columns}', cols);
+    res := jsonb_set(res, '{totals}', coalesce(res -> 'totals', '{}'::jsonb) - 'value');
+    res := jsonb_set(res, '{rows}', coalesce((select jsonb_agg(r - 'value') from jsonb_array_elements(res -> 'rows') r), '[]'::jsonb));
     res := public._r4_addnote(res, jsonb_build_object('code', 'cost_hidden'));
   end if;
   return res;
@@ -226,7 +234,7 @@ end $$;
 insert into public.report_defs3 (key, code, grp, name_bn, name_en, name_mix, cols, tot, sort_key, sort_dir, allow, nodate, cost, owner_only, sort) values
  ('expiry_soon', 'S3', 'stock', 'মেয়াদ শেষ / শিগগির শেষ', 'Expired and expiring soon', 'Expiry শেষ / শিগগির শেষ',
   '[["item_code","কোড","Code","text"],["item_name","আইটেম","Item","text"],["item_name_en","Item (EN)","Item (EN)","text"],["location_bn","লোকেশন","Location","text"],["location_en","Location (EN)","Location (EN)","text"],["made_on","তৈরি","Made","date"],["expires_on","মেয়াদ শেষ","Expires","date"],["days_left","বাকি দিন","Days left","int"],["qty","পরিমাণ (বাকি)","Qty left","num"],["unit","একক","Unit","text"],["batches","ব্যাচ","Batches","int"],["state","অবস্থা","State","text"],["value","আনুমানিক মূল্য","Approx. value","money"]]'::jsonb,
-  array['qty'], 'days_left', 'asc', array['locations','brands','categories'], true, false, false, 4202)
+  array['n_dated','n_expired','value'], 'days_left', 'asc', array['locations','brands','categories'], true, false, false, 4202)
 on conflict (key) do update set code = excluded.code, grp = excluded.grp, name_bn = excluded.name_bn, name_en = excluded.name_en, name_mix = excluded.name_mix, cols = excluded.cols, tot = excluded.tot,
   sort_key = excluded.sort_key, sort_dir = excluded.sort_dir, allow = excluded.allow, nodate = excluded.nodate, cost = excluded.cost, owner_only = excluded.owner_only, sort = excluded.sort, is_active = true;
 
