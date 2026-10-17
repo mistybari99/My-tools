@@ -1,0 +1,171 @@
+{
+  "package": "CRM-H",
+  "about": "Plain-English entries for the (i) info sheet of each setting and right added by phases 328 and 329. English only.",
+  "entries": [
+    {
+      "key": "crm_complaints_on",
+      "label": "Record customer complaints and track them to a result",
+      "what_it_does": "Lets staff log a complaint with the outlet, item, severity and owner, and move it through open, in progress, resolved and closed. Every step is kept in a history that cannot be edited.",
+      "why_it_matters": "Today a complaint is only a line on the paper register (form 20-3). With this on, the owner can see which outlet and which item keep producing complaints and which ones nobody has answered.",
+      "default": "OFF. Nothing changes and nobody can log a complaint here.",
+      "if_switched": "ON: the Feedback and complaints screen accepts complaints. A complaint never posts any money; a refund is still made on the sale return screen and then linked. OFF again: new complaints are refused, old ones stay and can still be read.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_sla_hours_low",
+      "label": "Target hours to resolve a LOW severity complaint",
+      "what_it_does": "Sets how many hours staff have to resolve a low complaint. The clock starts the moment the complaint is logged. After that time the complaint shows OVERDUE and appears in the overdue list.",
+      "why_it_matters": "Gives small complaints a deadline only if the owner wants one. Leave blank to keep low severity complaints without a clock.",
+      "default": "Blank. No clock runs for this severity.",
+      "if_switched": "A complaint logged from now on gets a due time. Complaints already logged keep the clock they were given, unless someone changes their severity (then the clock is worked out again from the time it was logged). Nothing is sent to a customer and no money moves.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_sla_hours_medium",
+      "label": "Target hours to resolve a MEDIUM severity complaint",
+      "what_it_does": "Sets how many hours staff have to resolve a medium complaint. The clock starts the moment the complaint is logged. After that time the complaint shows OVERDUE and appears in the overdue list.",
+      "why_it_matters": "Stops ordinary complaints from being forgotten. The owner decides the hours; the system never invents a target.",
+      "default": "Blank. No clock runs for this severity.",
+      "if_switched": "A complaint logged from now on gets a due time. Complaints already logged keep the clock they were given, unless someone changes their severity (then the clock is worked out again from the time it was logged). Nothing is sent to a customer and no money moves.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_sla_hours_high",
+      "label": "Target hours to resolve a HIGH severity complaint",
+      "what_it_does": "Sets how many hours staff have to resolve a high complaint. The clock starts the moment the complaint is logged. After that time the complaint shows OVERDUE and appears in the overdue list.",
+      "why_it_matters": "Serious complaints should be answered fast. A short target makes a late answer visible the same day.",
+      "default": "Blank. No clock runs for this severity.",
+      "if_switched": "A complaint logged from now on gets a due time. Complaints already logged keep the clock they were given, unless someone changes their severity (then the clock is worked out again from the time it was logged). Nothing is sent to a customer and no money moves.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_sla_hours_critical",
+      "label": "Target hours to resolve a CRITICAL severity complaint",
+      "what_it_does": "Sets how many hours staff have to resolve a critical complaint. The clock starts the moment the complaint is logged. After that time the complaint shows OVERDUE and appears in the overdue list.",
+      "why_it_matters": "For the worst cases, such as a customer who fell ill. A very short target puts the complaint at the top of the list quickly.",
+      "default": "Blank. No clock runs for this severity.",
+      "if_switched": "A complaint logged from now on gets a due time. Complaints already logged keep the clock they were given, unless someone changes their severity (then the clock is worked out again from the time it was logged). Nothing is sent to a customer and no money moves.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_fs_exception_on",
+      "label": "Put a food-safety complaint on the Exceptions list",
+      "what_it_does": "When a complaint is marked food safety, one red line is added to the Exceptions list so the owner sees it without opening the complaints screen.",
+      "why_it_matters": "A customer falling ill after eating is the most costly kind of complaint. It should never wait in a list nobody opens.",
+      "default": "ON, but it only matters once complaints are switched on.",
+      "if_switched": "OFF: the complaint is still marked food safety and still shows a warning chip, but no line is added to the Exceptions list. Lines already added stay.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_fs_categories",
+      "label": "Complaint categories that always count as food safety",
+      "what_it_does": "A comma list of category codes. A complaint in one of these categories is marked food safety even if the staff member forgot to tick the box.",
+      "why_it_matters": "A cashier under pressure may forget the tick box. The category already tells the story.",
+      "default": "sick (the same fell-ill cause that form 20-3 already flags).",
+      "if_switched": "Add more codes, for example sick,smell, to treat more categories as food safety. Set it to blank to let only the tick box decide. Complaints already logged are not changed.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_fs_severity",
+      "label": "Lowest severity given to a food-safety complaint",
+      "what_it_does": "keep leaves the severity as chosen by the person. high or critical raises a food-safety complaint to at least that severity when it is logged.",
+      "why_it_matters": "Raising the severity gives the complaint the shorter clock automatically.",
+      "default": "keep. The person's choice stands.",
+      "if_switched": "New food-safety complaints get at least the chosen severity and therefore its target hours. Complaints already logged are not changed.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_breach_exception_on",
+      "label": "Put an overdue complaint on the Exceptions list",
+      "what_it_does": "When the overdue check runs, each complaint that has newly passed its target time gets a yellow line on the Exceptions list (red for food safety).",
+      "why_it_matters": "The owner sees late complaints without hunting for them.",
+      "default": "ON, but it only matters once complaints are on and at least one target time is set.",
+      "if_switched": "OFF: an overdue complaint is still marked overdue on the complaint itself, but no line is added to the Exceptions list.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_repeat_days",
+      "label": "Repeat complaint check: look back this many days",
+      "what_it_does": "When set, a new complaint is marked REPEAT if the same customer (and, by default, the same item) already complained within this many days.",
+      "why_it_matters": "The same customer complaining about the same item again usually means the first answer did not work or a batch is bad.",
+      "default": "Blank. No repeat check.",
+      "if_switched": "New complaints are checked from now on and may be marked repeat. Old complaints are not re-marked, but they are counted as earlier ones. The repeat customers list becomes available.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_repeat_min",
+      "label": "Repeat complaint check: complaints needed (this one included)",
+      "what_it_does": "How many complaints, counting the new one, make a repeat. 2 means the second complaint is marked.",
+      "why_it_matters": "A higher number avoids marking a customer who only complained twice by accident.",
+      "default": "2. It has no effect until the look-back days are set.",
+      "if_switched": "Changes which new complaints are marked. Marks already made stay.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_repeat_scope",
+      "label": "Repeat complaint check: same customer and item, or same customer only",
+      "what_it_does": "customer_item looks for the same customer complaining about the same item. customer looks for any earlier complaint by the same customer.",
+      "why_it_matters": "The first finds a problem with one product. The second finds an unhappy customer.",
+      "default": "customer_item. It has no effect until the look-back days are set.",
+      "if_switched": "Changes which new complaints are marked. Marks already made stay.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_feedback_on",
+      "label": "Record customer ratings (1 to 5 stars) for a sale or order",
+      "what_it_does": "Lets staff record a star rating and a short comment for a sale or an online order. Only one rating is allowed for each sale or order.",
+      "why_it_matters": "Shows which outlets and items please customers, and which ratings need a phone call.",
+      "default": "OFF. Nothing changes.",
+      "if_switched": "ON: the Ratings tab accepts ratings. A rating never changes a sale or posts money. OFF again: new ratings are refused; old ones stay.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_feedback_low_max",
+      "label": "A rating at or below this many stars needs a follow-up call",
+      "what_it_does": "Puts every rating at or below this number on the Calls needed list until someone records the call. A manager can also turn the rating into a complaint.",
+      "why_it_matters": "An unhappy customer who is called quickly often stays a customer.",
+      "default": "Blank. No rating needs a call.",
+      "if_switched": "New ratings at or below the number are put on the list. Ratings already recorded are not changed.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_feedback_window_days",
+      "label": "Accept a rating only for a sale made in the last this many days",
+      "what_it_does": "Refuses a rating for a sale or order older than this number of days.",
+      "why_it_matters": "A rating long after the sale says little about today's service.",
+      "default": "Blank. A sale of any age can be rated.",
+      "if_switched": "Older sales can no longer be rated. Ratings already recorded stay.",
+      "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
+    },
+    {
+      "key": "crm_complaint_log",
+      "kind": "grant",
+      "label": "Log a customer complaint or rating",
+      "what_it_does": "Lets a person log a complaint or a rating at the outlets given to them. Staff who already may enter sales at an outlet can do this without the grant.",
+      "why_it_matters": "The person at the counter hears the complaint first.",
+      "default": "Given to nobody. The owner always has it.",
+      "if_switched": "The person can log at their own outlets only. They see only what they logged themselves or what is assigned to them, with the phone number hidden.",
+      "who_can_change": "Only the owner, on the user rights page."
+    },
+    {
+      "key": "crm_complaint_manage",
+      "kind": "grant",
+      "label": "Assign, resolve and close customer complaints",
+      "what_it_does": "Lets a person assign an owner, add notes and calls, change severity, resolve, close, close without a result, reopen, link a finished return, and run the overdue check, at their own outlets.",
+      "why_it_matters": "Closing a complaint should be a decision by a responsible person, not by whoever logged it. No approver is fixed in the system; the owner gives this right to any role or any named person.",
+      "default": "Given to nobody. The owner always has it.",
+      "if_switched": "The person sees the full phone number and every complaint at their own outlets.",
+      "who_can_change": "Only the owner, on the user rights page."
+    },
+    {
+      "key": "crm_feedback_view",
+      "kind": "grant",
+      "label": "See customer complaint and rating lists and reports",
+      "what_it_does": "Lets a person read the complaint list, the rating list, the repeat customers list and the report for their own outlets. It lets them change nothing.",
+      "why_it_matters": "A buyer or an area head may need the numbers without being able to close complaints.",
+      "default": "Given to nobody. The owner always has it.",
+      "if_switched": "The person sees the lists and reports for their own outlets with the phone number hidden.",
+      "who_can_change": "Only the owner, on the user rights page."
+    }
+  ]
+}
