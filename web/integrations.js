@@ -40,7 +40,8 @@ const num = (v) => (Number.isFinite(Number(v)) ? Number(v).toLocaleString('en-US
 /* ---------- pure helpers (tested) ---------- */
 const stateTxt = (s) => (X['s_' + s] ? T('s_' + s) : String(s || ''));
 const stateTone = (s) => ({ matched: 'ok', open: '', refunded: '', closed_unpaid: '', missing_payment: 'warn', voided_payment: 'warn', amount_mismatch: 'bad' }[s] || '');
-const csvFile = (r) => ({ name: String((r && r.filename) || 'export.csv').replace(/[^A-Za-z0-9_.\-]/g, '_').replace(/\.{2,}/g, '.'), text: '﻿' + String((r && r.csv) || '') });
+const guardCsv = (t) => String(t).replace(/(^|,|\n)("?)([=+\-@\t\r])(?!\d*(\.\d+)?(,|\n|"|$))/g, "$1$2'$3");   // spreadsheet formula guard: a cell starting with = + - @ tab CR gets a leading apostrophe (plain numbers are left alone)
+const csvFile = (r) => ({ name: String((r && r.filename) || 'export.csv').replace(/[^A-Za-z0-9_.\-]/g, '_').replace(/\.{2,}/g, '.'), text: '﻿' + guardCsv((r && r.csv) || '') });
 function download(name, text) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' })); a.download = name;
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);

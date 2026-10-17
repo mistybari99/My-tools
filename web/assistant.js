@@ -636,7 +636,7 @@ function addUser(text) { const log = $('#asst_log'); if (!log) return; log.inser
 function addCard(c) { const log = $('#asst_log'); if (log) { log.insertAdjacentHTML('beforeend', cardHtml(c)); const el = log.lastElementChild; if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); } return c; }
 
 // ---------- export / print ----------
-function csvOf(c) { const cols = c.table.columns; const q = (v) => { const s = v === null || v === undefined ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function csvOf(c) { const cols = c.table.columns; const q = (v) => { let s = v === null || v === undefined ? '' : String(v); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   return [cols.map((x) => q(isEn() ? x.label_en : x.label_bn)).join(',')].concat((c.table.all || c.table.rows).map((r) => cols.map((x) => q(r[x.key])).join(','))).join('\n'); }
 async function exportCard(c) {
   if (!c || !c.table) return A.toast && A.toast(T('nothingToExport'));

@@ -525,7 +525,7 @@ async function backupAll() {
 }
 async function backupItems() {
   try { const rows = await fetchAll('items'); const cols = ['code', 'name_bn', 'name_en', 'name_mix', 'category', 'unit', 'sell_price', 'cost_price', 'is_active'];
-    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const q = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return '"' + s.replace(/"/g, '""') + '"'; };
     download(`bos-items-${today()}.csv`, '﻿' + [cols.join(','), ...rows.map((r) => cols.map((c) => q(r[c])).join(','))].join('\n'), 'text/csv'); toast(t('done'));
   } catch (e) { fail(e); }
 }

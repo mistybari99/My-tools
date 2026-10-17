@@ -17,6 +17,7 @@ const rid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'x
 const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d)).replace(/,/g, '').trim();
 const nnum = (v) => { const s = norm(v); if (s === '') return NaN; const n = Number(s); return Number.isFinite(n) ? n : NaN; };
 const fm = (n) => { const v = Number(n); if (!Number.isFinite(v)) return '-'; return (v < 0 ? '-' : '') + Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+const guardCsv = (t) => String(t).replace(/(^|,|\n)("?)([=+\-@\t\r])(?!\d*(\.\d+)?(,|\n|"|$))/g, "$1$2'$3");   // spreadsheet formula guard: a cell starting with = + - @ tab CR gets a leading apostrophe (plain numbers are left alone)
 const val = (id) => (($('#' + id) || {}).value || '').trim();
 const monthStart = () => today().slice(0, 8) + '01';
 const locs = () => {
@@ -235,7 +236,7 @@ Object.assign(H, {
   ma_stshow: act(async () => { D.sel = val('st_acc'); D.from = val('st_from'); D.to = val('st_to'); D.st = await call('money_statement', { p_account: Number(D.sel), p_from: D.from || null, p_to: D.to || null, p_loc: null, p_limit: 2000 }); draw(); }),
   ma_stcsv: act(async () => {
     D.sel = val('st_acc'); const t = await call('money_statement_csv', { p_account: Number(D.sel), p_from: val('st_from') || null, p_to: val('st_to') || null, p_loc: null });
-    const blob = new Blob([t], { type: 'text/csv;charset=utf-8' }), u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = 'statement-' + D.sel + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+    const blob = new Blob([guardCsv(t)], { type: 'text/csv;charset=utf-8' }), u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = 'statement-' + D.sel + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
   }),
   ma_smshow: act(async () => { D.from = val('sm_from'); D.to = val('sm_to'); D.sm = await call('money_summary', { p_from: D.from || null, p_to: D.to || null, p_loc: null }); draw(); }),
   ma_ckgo: act(async () => {

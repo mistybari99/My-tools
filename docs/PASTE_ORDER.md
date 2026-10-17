@@ -51,6 +51,7 @@ Phases 8 to 87 (the base). If you pasted Wave 1 (88 to 99) already, skip those r
 | 25 | `phase458` ... `phase468` | RPT-C3 | campaigns and marketing spend (optional posting of form 18-1), audit reports, forecasts |
 | 26 | `phase470` ... `phase476` | RPT-HUB | Business Memory: day replay, timeline of a thing, compare, spend finder, record trail (all read-only) |
 | 27 | `phase477` | integrator | **re-patch all** + glue (see section 5) + one Exceptions-kinds merge |
+| 28 | `phase478` | integrator | closes the ~13 small helper functions (`_..._present`, `_w1*_`) to the signed-out role (anon); signed-in people, the owner paths, `_i2_state()` and phase 477 keep working. Paste **last**, after 477 |
 
 Numbers 114 to 132 are reserved in `docs/UNIFIED_BUILD_PLAN.md` 4.4 for Wave 2; R1 (120) and R2 (130 to 132) took numbers inside that range. Nothing else in this build uses 100 to 119 or 121 to 129, so there is no clash; if a later Wave 2 package wants 120 it must be renumbered. RPT-HUB was built as 450 to 456, which clashed with RPT-C2 (445 to 457); it is now **470 to 476** (files, tests, texts all renamed). `phase414` and `phase417` to `phase419` do not exist on purpose (RPT-B4 left them unused).
 
@@ -74,7 +75,7 @@ The app is the `web/` folder (static files). As in `docs/HANDOVER_3.md`:
 Old phase files (3 to 98) re-create functions and so remove the hooks other phases put into them. The rule:
 
 1. Paste **every file from that phase up to `phase98`, in order** (a hook patches the exact text a chain of phases left, so one old file alone can break the chain; this is how the Wave 1 hooks have always worked).
-2. Then paste `phase99`, and every later file you use, or simply paste `phase477` (it calls `public._i2_apply_all()`).
+2. Then paste `phase99`, and every later file you use, or simply paste `phase477` (it calls `public._i2_apply_all()`). Then paste `phase478` again: a re-pasted old phase makes its helper functions open to anon again, and 478 closes them (safe to paste twice).
 3. `select public._i2_apply_all();` puts back every exact-text hook (Wave 1: 37, W1-FIX: 4, RPT-B1: 13, RPT-B3: 1, CRM-B: 2, CRM-C: 1, RPT-C1: 7, glue: 1) and says how many it had to patch. It is safe to run any time; the second call patches nothing.
 4. **Functions that a package re-creates as a whole** (not patched) are not restored by step 3. `select * from public._i2_state() where not present;` lists them with the phase to paste again: `phase420` (report_run2, report_catalog2, stock_reconcile, p4), `phase421` (k2), `phase432` (qc), `phase434` (rate trend), `phase441` (compliance). Pasting those files again is safe.
 5. Check again: `select * from public._i2_state() where not present;` returns no rows.
@@ -229,6 +230,7 @@ Four settings are ON by default but do nothing until their module is on: `shift_
 | Default state = today | `PORT=5570 BASE=base87 bash tests/sql/integ_before_after.sh` | 33 existing reports identical before/after (pasted once, twice, and after a second wave of records); only `l1_pnl` / `l3_shop_pnl` gain the key `profit_complete` and words in `gaps`, no figure changes |
 | Many settings ON at once | `psql ... -f tests/sql/integ_test.sql` | 39 checks: every journal entry balances, Balance Check green, all report engines run, the packages share data correctly |
 | Re-patch | `supabase/phase477_test.sql` | 33 checks |
+| Helpers closed to anon | `supabase/phase478_test.sql` | 13 checks |
 | Web | `python3 tests/web/run_all.py` | 97 suites, all clean: exit code 0, no FAIL line, no page error (read every log, not only the exit code) |
 
 ## 8. What is NOT covered or untested

@@ -272,6 +272,7 @@ async function viewBen() {
 }
 
 /* ============ #/biexport ============ */
+const guardCsv = (t) => String(t).replace(/(^|,|\n)("?)([=+\-@\t\r])(?!\d*(\.\d+)?(,|\n|"|$))/g, "$1$2'$3");   // spreadsheet formula guard: a cell starting with = + - @ tab CR gets a leading apostrophe (plain numbers are left alone)
 const EX = { ds: 'sales', from: null, to: null, loc: null, fmt: 'csv', limit: '', res: null, log: [] };
 const DS = ['sales', 'sale_lines', 'purchases', 'stock_ledger', 'journal'];
 function drawExport() {
@@ -297,7 +298,7 @@ Object.assign(H, {
   },
   ex_dl: () => {
     const r = EX.res; if (!r) return;
-    const body = r.format === 'csv' ? '﻿' + r.csv : JSON.stringify(r.rows, null, 1);
+    const body = r.format === 'csv' ? '﻿' + guardCsv(r.csv) : JSON.stringify(r.rows, null, 1);
     const url = URL.createObjectURL(new Blob([body], { type: r.format === 'csv' ? 'text/csv;charset=utf-8' : 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = `${r.dataset}_${EX.from}_${EX.to}.${r.format}`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
   },

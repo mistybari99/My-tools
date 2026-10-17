@@ -231,7 +231,7 @@ function paySheet(i) {
 function csvOut(lines) {
   const cols = ['employee_no', 'name', 'location_id', 'days_in_month', 'paid_days', 'absent_days', 'late_count', 'ot_minutes', 'basic_amount', 'allowance_total', 'ot_amount', 'gross', 'absent_deduction', 'late_deduction', 'unpaid_deduction',
     'not_employed_deduction', 'structure_deduction_total', 'advance_recovery', 'deductions', 'net', 'payment_status', 'paid_amount'];
-  const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const q = (v) => { let s = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const text = '﻿' + cols.join(',') + '\n' + lines.map((l) => cols.map((c) => q(l[c])).join(',')).join('\n') + '\n';
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = `payroll_${P.month}_${P.loc == null ? 'all' : P.loc}.csv`;
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);

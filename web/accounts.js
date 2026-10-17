@@ -176,7 +176,7 @@ function download(name, text) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' })); a.download = name;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
-const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+const q = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return '"' + s.replace(/"/g, '""') + '"'; };
 function noData() { return `<div class="card"><p><b>${esc(T('need'))}</b></p><p>${esc(T('needH'))}</p>${isOwner() ? startForm() : ''}</div>`; }
 function startForm() {
   return `<div class="stack"><label for="ac_start">${esc(T('start'))}</label><input id="ac_start" type="date" value="${esc((D.st && D.st.start) || today())}"><button class="primary full" data-act="ac_setstart">${esc(T('setStart'))}</button></div>`;
