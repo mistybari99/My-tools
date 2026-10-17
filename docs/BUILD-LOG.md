@@ -574,3 +574,9 @@ Not confirmed
 Merge of all finished packages onto one branch; see docs/integration/INTEGRATION.md for merge order, conflicts, renumbering, glue (phase 477), handler renames, test results and what is not covered. Owner paste list: docs/PASTE_ORDER.md.
 - Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
 - Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.
+
+## X3 (social and marketing workspace, publisher, chat-order parser), branch x3-social
+
+* Added: supabase/phase500.sql (+ phase500_test.sql, pasted twice clean on a throwaway database), tools/social_publish.py (+ tests/py/test_social_publish.py), web/order_parser.js (+ tests/web/order_parser_test.js), .github/workflows/social.yml (manual), docs/integration/X3.md, docs/integration/X3_info.json (merged into web/data/info.json), tests/sql/ORDER.txt (phase500 appended).
+* Checked: SQL 62 checks, Python 15, parser 81; check_info_coverage OK, check_no_demo_leak OK, phase477 and report registry checks OK.
+* Not checked: any screen, any live provider, the existing reports before and after (defaults parity), the meta-webhook path. See docs/integration/X3.md section 2 and 5.

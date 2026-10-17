@@ -1908,6 +1908,26 @@
    "verified": true,
    "src": "phase132.sql (shift_manage, _r2c_ok); phase132_test.sql T2 and T3"
   },
+  "grant:social_approve": {
+   "title": "Approve social posts",
+   "does": "Lets a person approve a post that someone else wrote, after looking at the preview.",
+   "why": "Every public post needs a second person to say yes.",
+   "default": "Nobody (except the owner).",
+   "change": "The approver can approve, send back or cancel posts. The person who wrote a post can never approve it.",
+   "who": "Only the owner (Settings, people rights).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "grant:social_manage": {
+   "title": "Write and submit social posts",
+   "does": "Lets a person write a post, add its pictures and send it for approval.",
+   "why": "Only the people who write posts should have this.",
+   "default": "Nobody (except the owner).",
+   "change": "The person can prepare posts; they cannot approve their own.",
+   "who": "Only the owner (Settings, people rights).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
   "grant:stockout_log": {
    "title": "Log a stockout (unmet demand)",
    "does": "Lets a person write down that a customer wanted an item and it was not there.",
@@ -4321,6 +4341,106 @@
    ],
    "verified": true,
    "src": "phase81.sql; B.md"
+  },
+  "rule:social_max_per_day": {
+   "title": "Most posts per day",
+   "does": "The largest number of posts and customer messages that may be planned or sent in one Dhaka day.",
+   "why": "Stops a flood of posts that annoys followers and can get the page restricted.",
+   "default": "Blank. No post can be scheduled or published until a number is typed.",
+   "change": "A new schedule that would go over the number is refused with a day-limit message.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_max_per_hour": {
+   "title": "Most posts per hour",
+   "does": "The largest number of posts and customer messages in one clock hour.",
+   "why": "Spreads posts out so the page does not look like spam.",
+   "default": "Blank. No post can be scheduled or published until a number is typed.",
+   "change": "A schedule that would go over the number in its hour is refused.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_media_image_mb": {
+   "title": "Largest picture size (MB)",
+   "does": "The biggest JPEG or PNG picture that may be attached to a post.",
+   "why": "Large files are slow to upload and may be refused by the provider.",
+   "default": "5 MB. This is a proposed starting value, to be confirmed by the owner.",
+   "change": "Bigger pictures are refused when they are added.",
+   "who": "Only the owner (Settings).",
+   "verified": false,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_media_video_mb": {
+   "title": "Largest video size (MB)",
+   "does": "The biggest MP4 video that may be attached to a post.",
+   "why": "Video uploads are slow on a weak connection.",
+   "default": "50 MB. This is a proposed starting value, to be confirmed by the owner.",
+   "change": "Bigger videos are refused when they are added.",
+   "who": "Only the owner (Settings).",
+   "verified": false,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_on": {
+   "title": "Social and marketing workspace is on",
+   "does": "Turns on the content calendar, content items, the approval queue and the publishing screens. Nothing is posted by this switch alone.",
+   "why": "Keeps the social work in one place with an approval step before anything goes public.",
+   "default": "Off. No content can be written and no approval can be made.",
+   "change": "On: people with the write or approve right can prepare and approve content. Publishing still needs its own switch.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_publish_on": {
+   "title": "Publish approved posts automatically",
+   "does": "Lets the publisher send approved posts to the connected pages and accounts at their scheduled time.",
+   "why": "A post goes out on time without someone pressing a button, but only after a person approved it.",
+   "default": "Off. The publisher sends nothing.",
+   "change": "On: the publisher (run by GitHub Actions with the secrets you set) posts due items, within the limits and outside quiet hours. Off: due items wait.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_quiet_from": {
+   "title": "Quiet hours start (Dhaka time)",
+   "does": "The start of a window when no post and no customer message goes out. Written as HH:MM.",
+   "why": "Nobody wants a message at midnight.",
+   "default": "Blank. No quiet hours.",
+   "change": "Scheduling inside the window is refused; the publisher waits until it is over.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_quiet_to": {
+   "title": "Quiet hours end (Dhaka time)",
+   "does": "The end of the quiet window. Written as HH:MM. An end earlier than the start means the window crosses midnight.",
+   "why": "Together with the start it defines when the page stays silent.",
+   "default": "Blank. No quiet hours.",
+   "change": "As for the start: both must be written for the window to apply.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_retry_max": {
+   "title": "Most tries for one post",
+   "does": "How many times the publisher tries a post that failed before it is marked failed.",
+   "why": "A short problem with the provider heals itself; a long one must be seen by a person.",
+   "default": "5 tries. The waits grow: 2, 4, 8 and 16 minutes.",
+   "change": "A failed post after its last try shows in the queue as failed and can be scheduled again by the approver.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_stop_all": {
+   "title": "Stop all publishing (emergency)",
+   "does": "Stops every post and every customer message at once. Queued items wait; nothing is deleted.",
+   "why": "A wrong post or a provider problem can be stopped in one step.",
+   "default": "Off.",
+   "change": "On: the publisher sends nothing and new schedules are refused until it is switched off again. Off: the waiting queue continues.",
+   "who": "Only the owner, and it needs a reason.",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
   },
   "rule:start_date_lock_after_opening": {
    "title": "Do not move the accounting start date after the opening is posted",
