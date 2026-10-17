@@ -28,6 +28,10 @@ const X = {
   billNo: L('সাপ্লায়ারের বিল নম্বর', "Supplier's bill no.", 'Supplier-এর bill no.'), date: L('বিলের তারিখ', 'Bill date', 'Bill date'), supPh: L('সাপ্লায়ারের নাম লিখুন বা বাছুন', 'Type or choose a supplier', 'Supplier-এর নাম লিখুন বা বাছুন'),
   lines: L('মালের লাইন', 'Lines', 'Lines'), nLines: L('লাইন', 'lines', 'lines'), addLine: L('লাইন যোগ', 'Add line', 'Line যোগ'), item: L('পণ্য', 'Item', 'Item'), itemph: L('কোড বা নাম (ঐচ্ছিক)', 'Code or name (optional)', 'Code বা নাম (ঐচ্ছিক)'),
   desc: L('অথবা লিখে বিবরণ (গ্যাস, ভাড়া…)', 'Or a free-text description (gas, transport…)', 'অথবা description (gas, transport…)'), qty: L('পরিমাণ', 'Qty', 'Qty'), unit: L('একক', 'Unit', 'Unit'), itemUnit: L('(পণ্যের)', '(item)', '(item-এর)'),
+  lotNo: L('সাপ্লায়ারের লট / ব্যাচ নম্বর', 'Supplier lot / batch no', 'Supplier lot / batch no'), lotExp: L('লটের মেয়াদ', 'Lot expiry date', 'Lot expiry'),
+  lotHint: L('ঐচ্ছিক। এক লাইনে এক লট; দুই লট হলে দুই লাইন করুন। কাগজের ফর্মের কোড: মালিক দেবেন।', 'Optional. One lot per line; for two lots use two lines. Paper form code: to be given by owner.', 'Optional। এক line এ এক lot; দুই lot হলে দুই line। Paper form code: owner দেবেন।'),
+  lotNeed: L('এই লাইনে সাপ্লায়ারের লট নম্বর লাগবে (মালিকের নিয়ম)', 'This line needs the supplier lot number (owner setting)', 'এই line এ supplier lot no লাগবে (owner setting)'), expNeed: L('এই লাইনে লটের মেয়াদ লাগবে (মালিকের নিয়ম)', 'This line needs the lot expiry date (owner setting)', 'এই line এ lot expiry লাগবে (owner setting)'),
+  lotsTitle: L('সাপ্লায়ারের লট', 'Supplier lots', 'Supplier lots'), lotStaged: L('লট লেখা আছে কিন্তু স্টকে ব্যাচ হয়নি', 'Lot written but no stock batch made yet', 'Lot লেখা আছে কিন্তু batch হয়নি'), lotApply: L('এখনই ব্যাচ বানান', 'Make the batches now', 'এখনই batch বানান'), lotNoStock: L('স্টকে মাল নেই বলে ব্যাচ হয়নি', 'No batch: the stock was no longer there', 'Stock নেই তাই batch হয়নি'), lotNone: L('এই বিলে কোনো লট লেখা হয়নি', 'No lot was written on this bill', 'এই bill এ কোনো lot লেখা হয়নি'), lotBatch: L('ব্যাচ', 'Batch', 'Batch'),
   ucost: L('একক দাম ৳', 'Unit cost ৳', 'Unit cost ৳'), amount: L('টাকা', 'Amount', 'Amount'), note: L('নোট', 'Note', 'Note'), photo: L('বিলের ছবি', 'Bill photo', 'Bill-এর photo'), addPhoto: L('ছবি তুলুন / বাছুন', 'Take / choose photo', 'Photo তুলুন / বাছুন'),
   upl: L('ছবি আপলোড হচ্ছে…', 'Uploading photo…', 'Photo upload হচ্ছে…'), reason: L('ফেরতের কারণ', 'Return reason', 'Return-এর reason'), againstBill: L('কোন বিলের বিপরীতে (ঐচ্ছিক)', 'Against bill (optional)', 'কোন bill-এর বিপরীতে (ঐচ্ছিক)'),
   payNow: L('এখনই পেমেন্ট', 'Pay now', 'Pay now'), payHint: L('কিছু না দিলে পুরো টাকা সাপ্লায়ারের পাওনা থাকবে', 'If you pay nothing the whole amount stays owed to the supplier', 'কিছু না দিলে পুরো amount supplier-এর payable থাকবে'),
@@ -142,9 +146,10 @@ async function editor(o) {
   let b = null;
   if (o.id) { const r = await sb.rpc('purchase_get', { p_id: o.id }); if (r.error) { if (/not allowed/.test(r.error.message || '')) return lockPage(T('title'), 'purchase'); return errToast(r.error); } b = r.data; if (b.status !== 'draft') { location.hash = '#/purchase/' + o.id; return; } }
   const kind = b ? b.kind : o.kind;
+  let stagedLots = []; if (b && b.kind === 'bill') { try { const lr = await sb.rpc('receipt_lots_get', { p_bill: b.id }); if (lr && !lr.error) stagedLots = (lr.data || []).filter((x) => x.status === 'staged'); } catch (e) { stagedLots = []; } }
   F = { id: b ? b.id : null, client: b ? null : rid(), kind, loc: b ? b.location_id : defLoc(), supplier: b ? b.supplier_id : '', supName: b ? ((supById(b.supplier_id) || {}).name || b.supplier_name || '') : '', billNo: b ? b.bill_no || '' : '', date: b ? b.bill_date : today(),
     discount: b ? String(b.discount || '') : '', note: b ? b.note || '' : '', photo: b ? b.photo || null : null, reason: b ? b.reason_code || '' : '', ref: b ? b.ref_bill_id || '' : (o.ref || ''), busy: false, refBills: [],
-    lines: b ? (b.lines || []).map((l) => { const it = ITEMS_ALL.find((i) => i.id === l.item_id); return { item_id: l.item_id || null, item: it ? U.itemText(it) : '', desc: l.description || '', qty: String(l.qty), unit: l.unit || '', cost: String(l.unit_cost) }; }) : [{ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }] };
+    lines: b ? (b.lines || []).map((l) => { const it = ITEMS_ALL.find((i) => i.id === l.item_id); const lt = stagedLots.find((x, ix) => x.line_no === (b.lines || []).indexOf(l) + 1); return { item_id: l.item_id || null, item: it ? U.itemText(it) : '', desc: l.description || '', qty: String(l.qty), unit: l.unit || '', cost: String(l.unit_cost), lot: lt ? lt.lot_no || '' : '', lotexp: lt && lt.expiry ? String(lt.expiry).slice(0, 10) : '' }; }) : [{ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }] };
   F.canPay = kind === 'bill' && await grant('supplier_pay', F.loc);
   F.pay = newPay(() => totals().total);
   await loadConvP();
@@ -162,6 +167,8 @@ function lineHTML(l, i) {
     <div class="row"><div style="flex:1"><label>${esc(T('qty'))}</label><input data-ln="${i}.qty" inputmode="decimal" value="${esc(l.qty)}"></div>
       <div style="flex:1"><label>${esc(T('unit'))}</label><select data-ln="${i}.unit"><option value="">${esc(it ? unitLabel(it.unit) || T('itemUnit') : T('itemUnit'))}</option>${optHTML(lists('units').map((r) => [r.value_code, lab(rowL(r))]), l.unit)}</select></div>
       <div style="flex:1"><label>${esc(T('ucost'))}</label><input data-ln="${i}.cost" inputmode="decimal" value="${esc(l.cost)}"></div></div>
+    ${it && F.kind === 'bill' && it.tracked && it.item_type !== 'asset' ? `<div class="row"><div style="flex:1"><label>${esc(T('lotNo'))}${B.rule('receipt_lot_required', false) === true ? ' *' : ''}</label><input data-ln="${i}.lot" maxlength="40" autocomplete="off" value="${esc(l.lot || '')}"></div>
+      <div style="flex:1"><label>${esc(T('lotExp'))}${B.rule('receipt_expiry_required', false) === true ? ' *' : ''}</label><input data-ln="${i}.lotexp" type="date" value="${esc(l.lotexp || '')}"></div></div><div class="hint">${esc(T('lotHint'))}</div>` : ''}
     <div class="row between"><span class="muted">${esc(T('amount'))}</span><b data-amt="${i}">${nnum(l.qty) > 0 && nnum(l.cost) >= 0 ? esc(money(r2(nnum(l.qty) * nnum(l.cost)))) : '—'}</b></div>
     <div class="hint s2-pv" data-pv="${i}" aria-live="polite"></div></div></div>`;
 }
@@ -253,16 +260,23 @@ function payload() {
   syncFixed();
   if (!F.supplier) { toast(T('needSup')); return null; } if (!F.date) { toast(T('needDate')); return null; }
   if (F.kind === 'return' && !F.reason) { toast(T('needReason')); return null; }
-  const lines = [];
+  const lines = [], lotsOut = [];
   for (const l of F.lines) {
     const it = l.item_id ? ITEMS_ALL.find((x) => x.id === l.item_id) : null, hasAny = l.item_id || l.desc.trim() || l.qty || l.cost; if (!hasAny) continue;
     const q = nnum(l.qty), c = nnum(l.cost);
     if (!(q > 0) || !(c >= 0)) { toast(T('badLine')); return null; }
     if (!it && !l.desc.trim()) { toast(T('needLine')); return null; }
     const o = { qty: q, unit_cost: c }; if (it) o.item_id = it.id; else o.description = l.desc.trim(); if (l.unit) o.unit = l.unit; lines.push(o);
+    if (F.kind === 'bill' && it && it.tracked && it.item_type !== 'asset') {          // RPT-B3: the supplier lot and expiry of this stock line (optional unless the owner switched them on)
+      const lot = (l.lot || '').trim(), lx = l.lotexp || '';
+      if (B.rule('receipt_lot_required', false) === true && !lot) { toast(T('lotNeed') + ' · ' + it.code); return null; }
+      if (B.rule('receipt_expiry_required', false) === true && !lx) { toast(T('expNeed') + ' · ' + it.code); return null; }
+      if (lot || lx) lotsOut.push({ line_no: lines.length, lot_no: lot || null, expiry: lx || null });
+    }
   }
   if (!lines.length) { toast(T('needLine')); return null; }
   const tt = totals(); if (tt.disc > tt.sub) { toast(T('badDisc')); return null; }
+  F._lots = lotsOut;
   return lines;
 }
 async function saveDraft(post) {
@@ -271,6 +285,12 @@ async function saveDraft(post) {
     p_kind: F.kind, p_ref_bill: F.kind === 'return' ? (F.ref || null) : null, p_reason: F.kind === 'return' ? F.reason : null });
   if (r.error) { errToast(r.error, { grant: F.kind === 'return' ? 'purchase_return' : 'purchase_entry', loc: F.loc, context: { action: 'save_purchase' } }); return null; }
   F.id = r.data.id; F.client = null;            // later saves are updates of this draft by id (a client id would just return the old draft)
+  if (F.kind === 'bill') {                      // RPT-B3: stage the lots (an empty list clears old ones); a database without phase 430 simply has no such function
+    try {
+      const lr = await sb.rpc('receipt_lots_stage', { p_bill: F.id, p_lots: F._lots || [] });
+      if (lr && lr.error && !/PGRST202|Could not find|does not exist/i.test(String(lr.error.code || '') + ' ' + (lr.error.message || ''))) { toast((lr.error.message || '').replace(/^.*?:\s*/, '')); return null; }
+    } catch (e) { /* lots are optional */ }
+  }
   return r.data;
 }
 async function doSave(btn) {
@@ -288,6 +308,7 @@ async function doPost(btn) {
 async function postBill(id, list, kind, loc) {
   const r = await sb.rpc('post_purchase', { p_id: id, p_payments: list.length ? list : null });
   if (r.error) { errToast(r.error, { grant: list.length && /not allowed/.test(r.error.message || '') && kind === 'bill' ? 'supplier_pay' : kind === 'return' ? 'purchase_return' : 'purchase_entry', loc, context: { action: 'post_purchase', bill: id } }); return false; }
+  if (kind === 'bill') { try { await sb.rpc('receipt_lots_apply', { p_bill: id }); } catch (e) { /* phase 430 not installed, or nothing staged */ } }      // RPT-B3: makes the stock batches of the lots (idempotent; the server hook may already have)
   toast(r.data && r.data.dup ? T('dup') : T('posted_ok')); closeSheet(); const target = '#/purchase/' + id, same = location.hash === target; location.hash = target; if (same) detail(id); return true;
 }
 
@@ -300,6 +321,7 @@ async function detail(id) {
   const r = await sb.rpc('purchase_get', { p_id: id });
   if (r.error) { if (/not allowed/.test(r.error.message || '')) return lockPage(T('title'), 'purchase'); errToast(r.error); return; }
   const b = r.data; CUR = b;
+  let lots = []; if (b.kind === 'bill') { try { const lr = await sb.rpc('receipt_lots_get', { p_bill: b.id }); if (lr && !lr.error) lots = lr.data || []; } catch (e) { lots = []; } }
   const [gv, gr, ge, gp] = await Promise.all([grant('purchase_void', b.location_id), grant('purchase_return', b.location_id), grant('purchase_entry', b.location_id), grant('supplier_pay', b.location_id)]);
   const mode = npMode(), ret = b.kind === 'return';
   const act = (ok, a, label, cls, extra = '') => ok ? `<button class="${cls || ''}" data-act="${a}" ${extra}>${esc(label)}</button>` : mode === 'lock' ? `<button disabled>${LOCK.replace('<svg', '<svg width="16" height="16"')} ${esc(label)}</button>` : '';
@@ -316,6 +338,9 @@ async function detail(id) {
       ${Number(b.discount) ? `<div class="row between"><span>${esc(T('discount'))}</span><b>− ${esc(money(b.discount))}</b></div>` : ''}
       <div class="row between"><span>${esc(T('total'))}</span><b class="mnum">${esc(money(b.total))}</b></div>
       ${b.status === 'posted' && !ret ? `<div class="row between"><span>${esc(T('paid'))}</span><b>${esc(money(b.paid))}</b></div><div class="row between"><span>${esc(T('due'))}</span><b class="${Number(b.due) > 0 ? 'amt-bad' : ''}">${esc(money(b.due))}</b></div>` : ''}</div>
+    ${lots.length ? `<div class="card" data-lots="1"><h3>${esc(T('lotsTitle'))}</h3>${lots.map((x) => { const li = (b.lines || [])[x.line_no - 1], it2 = li && ITEMS_ALL && li.item_id ? ITEMS_ALL.find((y) => y.id === li.item_id) : null;
+        return `<div class="s2-led"><div>${esc(it2 ? nm(it2) : '#' + x.line_no)}<div class="sub">${x.lot_no ? esc(x.lot_no) : esc(lab(L('লট নম্বর লেখা নেই', 'lot number: data not captured', 'lot no লেখা নেই')))} · ${x.expiry ? esc(String(x.expiry).slice(0, 10)) : esc(lab(L('মেয়াদ লেখা নেই', 'expiry: data not captured', 'expiry লেখা নেই')))}${x.status === 'applied' ? ' · ' + esc(T('lotBatch')) + ' #' + esc(x.batch_id) : x.status === 'no_stock' ? ' · ' + esc(T('lotNoStock')) : ' · ' + esc(T('lotStaged'))}</div></div><div class="q">${x.qty_base ? U.q4(x.qty_base) : ''}</div></div>`; }).join('')}
+      ${b.status === 'posted' && lots.some((x) => x.status === 'staged') ? `<button class="full" data-act="pu_lotapply" data-v="${esc(b.id)}">${esc(T('lotApply'))}</button>` : ''}</div>` : (b.status === 'posted' && b.kind === 'bill' ? `<div class="muted">${esc(T('lotNone'))}</div>` : '')}
     ${(b.payments || []).length ? `<div class="card"><h3>${esc(T('paid'))}</h3>${b.payments.map((p) => `<div class="s2-led"><div>${esc(modeL(p.mode))}${p.wallet ? ' · ' + esc(p.wallet) : ''}${p.voided ? ` <span class="chip bad">${esc(T('void_'))}</span>` : ''}<div class="sub">${esc(dt(p.paid_at))}${p.ref ? ' · ' + esc(p.ref) : ''}</div></div><div class="q">${esc(money(p.amount))}</div></div>`).join('')}</div>` : ''}
     ${b.photo ? `<div class="card"><img id="pd_img" alt="" style="width:100%;border-radius:12px"></div>` : ''}
     <div class="s2-bar" style="flex-wrap:wrap">${bar.join('')}</div>`, 'purchase');
@@ -497,6 +522,7 @@ Object.assign(H, {
   py_pay: doPaySupplier,
   py_void: (a) => { U.sheetStart('pvoid'); const pid = Number(a.dataset.v);
     openSheet(`<h2>${esc(T('voidPay'))}</h2><div><label for="vn_note">${esc(T('voidWhy'))}</label><input id="vn_note" autocomplete="off"></div><div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="py_voidgo" data-v="${pid}">${esc(T('voidPay'))}</button></div>`); },
+  pu_lotapply: async (a) => { const r = await sb.rpc('receipt_lots_apply', { p_bill: a.dataset.v }); if (r.error) return errToast(r.error); toast(T('saved')); detail(a.dataset.v); },
   py_voidgo: async (a) => { const note = (($('#vn_note') || {}).value || '').trim(); if (!note) return toast(T('needNote')); const pid = Number(a.dataset.v);
     await U.submit(a, () => sb.rpc('void_supplier_payment', { p_id: pid, p_note: note }), () => { toast(T('payVoided')); payables(); }, { grant: 'purchase_void', loc: PY.loc === undefined ? null : PY.loc, context: { payment: pid } }); },
 });

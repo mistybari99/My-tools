@@ -46,7 +46,7 @@ create table if not exists public.recall_cases (
 create table if not exists public.recall_batches (
   id bigserial primary key,
   case_id uuid not null references public.recall_cases(id),
-  batch_id bigint not null references public.stock_batches(id),
+  batch_id bigint not null,                                    -- (no FK on purpose, like grn_batch_links: a truncate of the stock tables must still hit the ledger trigger first)
   added_by uuid, added_at timestamptz not null default now(), note text check (note is null or length(note) <= 300),
   action_status text not null default 'to_do' check (action_status in ('to_do', 'removed_from_shelf', 'returned_to_supplier', 'written_off', 'not_found', 'nothing_left')),
   action_by uuid, action_at timestamptz, action_note text check (action_note is null or length(action_note) <= 300),
