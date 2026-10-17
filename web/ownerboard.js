@@ -152,6 +152,13 @@ const KINDS = {
     const d = await rpc('balance_sheet'); if (!d || typeof d !== 'object') throw new Miss('empty');
     const a = N(d.assets), le = N(d.liabilities) + N(d.equity), diff = d.diff !== undefined ? N(d.diff) : d.difference !== undefined ? N(d.difference) : a - le, okb = Math.abs(diff) < 0.5;
     return { value: okb ? '✓' : money(Math.abs(diff)), num: Math.abs(diff), tone: okb ? 'ok' : 'bad', sub: okb ? lab(L('মিলেছে', 'Balanced', 'Balanced')) : lab(L('অমিল', 'Out of balance', 'Out of balance')), route: 'biz' }; } },
+  // RPT-B4 (phase 411): this month's sales target against what the outlets have achieved. No target set = the tile says so; a source that is not installed or not allowed hides it (Miss).
+  target_vs: { g: 'sales', num: true, l: L('এই মাসের লক্ষ্য বনাম অর্জন (শাখা অনুযায়ী)', 'This month: target vs achievement per outlet', 'এই মাসের target vs achievement'), route: 'targets', async load() {
+    const d = await rpc('rb4_target_tile'); if (!d || typeof d !== 'object') throw new Miss('empty');
+    if (!d.total) return { value: '—', tone: 'info', sub: lab(L('বিক্রির লক্ষ্য ঠিক করা নেই', 'Sales target not set', 'Sales target ঠিক নেই')), route: 'targets' };
+    const t = d.total, behind = (d.rows || []).filter((r) => r.status === 'behind' || r.status === 'closed_missed'), nmL = (r) => (S.lang === 'en' ? r.location_en || r.location : r.location || r.location_en);
+    return { value: t.achievement_pct === null || t.achievement_pct === undefined ? '—' : t.achievement_pct + '%', num: N(t.achievement_pct), tone: behind.length ? 'warn' : 'ok',
+      sub: `${money(t.achieved)} / ${money(t.target)} · ${lab(L('এ পর্যন্ত হওয়ার কথা', 'pace', 'pace'))} ${t.pace_pct === null || t.pace_pct === undefined ? '–' : t.pace_pct + '%'}${behind.length ? ' · ' + lab(L('পিছিয়ে', 'behind', 'behind')) + ': ' + behind.map(nmL).join(', ') : ''}`, route: 'targets' }; } },
   report: { g: 'custom', l: L('রিপোর্ট শর্টকাট', 'Report shortcut', 'Report shortcut'), route: 'reports', cfg: 'report', async load(env, cfg) {
     if (!cfg.report) return { value: '—', tone: 'info', sub: T('pick'), route: 'reports' };
     const cat = await reportCatalog(), def = cat.find((r) => r.key === cfg.report); if (!def) throw new Miss('report');
