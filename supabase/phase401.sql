@@ -84,6 +84,8 @@ begin
         'text_en', 'The profit shown does not include: ' || txt_en || '. They are in the stock ledger / cash cases but the setting "One profit number: count losses in the profit" is off (or that loss is switched off). The gaps column marks the rows.',
         'text_bn', 'দেখানো লাভে এগুলো ধরা নেই: ' || txt_bn || '। স্টক-হিসাব/ক্যাশ কেসে আছে, কিন্তু "One profit number: count losses in the profit" নিয়মটি বন্ধ (বা সেই ক্ষতির সুইচ বন্ধ)। gaps কলামে সারিগুলো চিহ্নিত।'));
     end if;
+  elsif p_key in ('y1_daily_sellout', 'y2_festival_compare', 'y3_customer_items') and to_regprocedure('public._rptb1_y_notes(text,date,date,integer[],jsonb)') is not null then
+    out_ := out_ || public._rptb1_y_notes(p_key, d1, d2, locs, flt);      -- phase 403: the three added reports
   end if;
   return out_;
 end $$;

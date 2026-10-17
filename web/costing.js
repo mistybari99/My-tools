@@ -39,7 +39,12 @@ const X = {
   poolNote: L('শো-রুম ও অ্যাডমিন খরচ এখানে নয় — সেগুলো শাখার লাভ-ক্ষতিতে যায়', 'Showroom and admin cost are not here — they go to the branch P&L', 'Showroom ও admin cost এখানে নয় — branch P&L-এ'),
   actual: L('বাস্তব', 'Actual', 'Actual'), absorbed: L('পণ্যে ধরা', 'Absorbed', 'Absorbed'), unabs: L('অনাবশোষিত ওভারহেড', 'Unabsorbed overhead', 'অনাবশোষিত ওভারহেড'), noActual: L('বাস্তব খরচ ঢোকানো নেই', 'no actual entered', 'actual ঢোকানো নেই'),
   total: L('মোট', 'Total', 'Total'), runsHead: L('উৎপাদনের খরচ', 'Production costs', 'Production cost'), mat: L('কাঁচামাল', 'Material', 'Material'), std: L('স্ট্যান্ডার্ড', 'Standard', 'Standard'), act: L('আসল', 'Actual', 'Actual'), out: L('উৎপাদন', 'Output', 'Output'),
-  voided: L('বাতিল', 'Void', 'Void'), badNum: L('সংখ্যা ঠিক নয়', 'Number is not valid', 'Number ঠিক নয়'), sqlMissing: L('এই অংশের ডেটাবেস এখনও চালু হয়নি (phase74)', 'The database part is not installed yet (phase74)', 'Database অংশ চালু হয়নি (phase74)'),
+  voided: L('বাতিল', 'Void', 'Void'),
+  ncConv: L('খরচ ধরা হয়নি — এই জায়গার পদ্ধতি বন্ধ (জায়গা অনুযায়ী পদ্ধতি ট্যাবে বাছুন)', 'Not costed — the method of this place is off (choose it on the Method per place tab)', 'খরচ ধরা হয়নি — এই place-এর method বন্ধ (Method per place tab-এ বাছুন)'),
+  ncAct: L('ধরা হয়নি — আসল উৎপাদনের পরিমাণ লেখা হয়নি (উৎপাদন পোস্টে "আসল ফলন" ঘর দরকার)', 'Not captured — the actual quantity made was not typed (the "actual yield" field of production posting is needed)', 'ধরা হয়নি — আসল production-এর পরিমাণ লেখা হয়নি (production post-এ "actual yield" ঘর দরকার)'),
+  matOnly: L('একক খরচ = শুধু কাঁচামাল', 'Unit cost = material only', 'Unit cost = শুধু material'), csvB: L('CSV', 'CSV', 'CSV'), csvDone: L('ফাইল তৈরি', 'File ready', 'File তৈরি'),
+  hCode: L('কোড', 'Code', 'Code'), hDate: L('তারিখ', 'Date', 'Date'), hStatus: L('অবস্থা', 'Status', 'Status'), hConv: L('রূপান্তর খরচ', 'Conversion cost', 'Conversion cost'), hUnit: L('একক খরচ', 'Unit cost', 'Unit cost'), hYs: L('স্ট্যান্ডার্ড ফলন', 'Standard yield', 'Standard yield'), hYa: L('আসল ফলন', 'Actual yield', 'Actual yield'), hYv: L('ফলনের পার্থক্য %', 'Yield difference %', 'Yield পার্থক্য %'), hNc: L('ধরা হয়নি', 'not captured', 'ধরা হয়নি / not captured'),
+ badNum: L('সংখ্যা ঠিক নয়', 'Number is not valid', 'Number ঠিক নয়'), sqlMissing: L('এই অংশের ডেটাবেস এখনও চালু হয়নি (phase74)', 'The database part is not installed yet (phase74)', 'Database অংশ চালু হয়নি (phase74)'),
 };
 const T = (k) => lab(X[k]);
 const TYPE_LBL = (t) => lab({ bn: t.label_bn, mix: t.label_bn, en: t.label_en || t.label_bn });
@@ -140,8 +145,8 @@ function paneRuns() {
   const r = D.runs;
   return `<div class="card stack">${locSel('cs_loc_u')}<div class="row wrap"><label>${esc(T('from'))} <input type="date" id="cs_from" value="${esc(D.from)}"></label><label>${esc(T('to'))} <input type="date" id="cs_to" value="${esc(D.to)}"></label></div><button type="button" class="btn primary full" data-act="cs_runs">${esc(T('show'))}</button></div>` +
     (r ? (r.length ? r.map((x) => `<div class="card stack"${x.status === 'void' ? ' style="opacity:.55"' : ''}><div class="row between wrap"><b>${esc(x.code)} · ${esc(String(x.made_at).slice(0, 10))}${x.status === 'void' ? ' (' + esc(T('voided')) + ')' : ''}</b><span class="muted">${esc(T('out'))}: ${q(x.output)}</span></div>
-      <div>${esc(T('mat'))}: ${money(x.material_cost)} · ${esc(T('conv'))}: ${money(x.conversion_cost)}${x.conversion_complete === false ? ` <span class="chip warn">${esc(T('incomplete'))}</span>` : ''}</div>
-      <div>${esc(T('unit'))}: <b>${money(x.unit_cost)}</b> · ${esc(T('std'))}: ${money(x.std_cost)} · ${esc(T('act'))}: ${money(x.actual_cost)}</div></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`) : '');
+      <div>${esc(T('mat'))}: ${money(x.material_cost)} · ${esc(T('conv'))}: ${x.conversion_status === 'not_captured' ? `<span class="chip warn" data-nc="conv">${esc(T('ncConv'))}</span>` : money(x.conversion_cost)}${x.conversion_complete === false ? ` <span class="chip warn">${esc(T('incomplete'))}</span>` : ''}</div>
+      <div>${esc(T('unit'))}: <b>${money(x.unit_cost)}</b>${x.unit_cost_basis === 'material_only' ? ` <small class="muted">(${esc(T('matOnly'))})</small>` : ''} · ${esc(T('std'))}: ${money(x.std_cost)} · ${esc(T('act'))}: ${x.actual_status === 'not_captured' ? `<span class="chip warn" data-nc="act">${esc(T('ncAct'))}</span>` : money(x.actual_cost)}</div></div>`).join('') + `<button type="button" class="btn full" data-act="cs_runs_csv">${esc(T('csvB'))}</button>` : `<p class="muted">${esc(T('none'))}</p>`) : '');
 }
 
 /* ---------- handlers ---------- */
@@ -171,6 +176,16 @@ Object.assign(H, {
     if (r.error) return errMsg(r.error); toast(T('saved')); await refresh();
   },
   cs_true: async () => { const r = await sb.rpc('overhead_trueup', { p_loc: D.loc, p_month: D.month + '-01' }); if (r.error) return errMsg(r.error); D.out = r.data; draw(); },
+  cs_runs_csv: () => {
+    const r = D.runs || []; if (!r.length) return;
+    const cell = (v) => { if (v === null || v === undefined) return ''; let t = String(v); if (/^[=+@\t\r]/.test(t)) t = "'" + t; return /[",\r\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+    const nc = T('hNc'), head = [T('hCode'), T('hDate'), T('hStatus'), T('out'), T('mat'), T('hConv'), T('hUnit'), T('std'), T('act'), T('hYs'), T('hYa'), T('hYv')];
+    const rows = r.map((x) => [x.code, String(x.made_at).slice(0, 10), x.status, x.output, x.material_cost, x.conversion_status === 'not_captured' ? nc : x.conversion_cost, x.unit_cost, x.std_cost,
+      x.actual_status === 'not_captured' ? nc : x.actual_cost, x.yield_std, x.yield_actual === null || x.yield_actual === undefined ? nc : x.yield_actual, x.yield_var_pct]);
+    const txt = '\ufeff' + [head, ...rows].map((l) => l.map(cell).join(',')).join('\r\n') + '\r\n';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })); a.download = `production-costs-${D.from}_${D.to}.csv`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); toast(T('csvDone'));
+  },
   cs_runs: async () => { D.from = $('#cs_from').value || D.from; D.to = $('#cs_to').value || D.to; const r = await sb.rpc('production_run_costs', { p_loc: D.loc, p_from: D.from, p_to: D.to }); if (r.error) return errMsg(r.error); D.runs = r.data || []; draw(); },
 });
 document.addEventListener('change', async (e) => {

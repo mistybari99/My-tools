@@ -90,7 +90,7 @@ select case when to_regprocedure('public._rptb1_p401_present()') is not null the
 -- 2c. report_run3: the notes under f3 / l1 / l3.
 select case when to_regprocedure('public._rptb1_p401_present()') is not null then public._rptb1_patch('public.report_run3(text,jsonb,text,text,integer)'::regprocedure, 'bos401', array[
   $a$if jsonb_array_length(rows_) = 0 or ng = 0 then$a$,
-  $a$if ng > 0 then notes := notes || public._rptb1_r3_notes(p_key, d1, d2, eff, flt); end if;   -- bos401: "not captured" and "left out of the profit" notes
+  $a$notes := notes || public._rptb1_r3_notes(p_key, d1, d2, eff, flt);   -- bos401: "not captured" and "left out of the profit" notes (also when the list is empty)
   if jsonb_array_length(rows_) = 0 or ng = 0 then$a$]) end;
 
 -- 2d. production_run_costs (costing Runs tab): no 0 for a conversion cost that was never costed, no "actual" that is only the standard.
