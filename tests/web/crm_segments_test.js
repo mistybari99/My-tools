@@ -99,7 +99,7 @@ const FN = { crmc_me: ME, crmc_metrics_status: STATUS, crmc_field_catalog: CAT, 
   await p.click('[data-act=cs_count][data-v="1"]'); await wait(p, 400);
   ok(/test_list_lapsed: 3 customers/.test(await toastText(p)), 'count now: ' + await toastText(p));
   ok((await calls(p, 'crmc_preview')).some((c) => c.p_segment === 1 && c.p_rule === null), 'count of a saved list asks by id');
-  await p.click('[data-act=cs_open][data-v="2"]'); await wait(p, 500);
+  await p.click('[data-act=crs_open][data-v="2"]'); await wait(p, 500);
   let c1 = await calls(p, 'crmc_members');
   ok(c1.length === 1 && c1[0].p_segment === 2 && c1[0].p_rule === null && c1[0].p_offset === 0 && c1[0].p_limit === 50, 'open a saved list: ' + JSON.stringify(c1));
   t = await text(p);
@@ -109,7 +109,7 @@ const FN = { crmc_me: ME, crmc_metrics_status: STATUS, crmc_field_catalog: CAT, 
 
   // ---- New list builder
   p = await page('#/crmlists', { crmc_members: PAGE2 });
-  await p.click('[data-act=cs_tab][data-v=build]'); await wait(p, 200);
+  await p.click('[data-act=crs_tab][data-v=build]'); await wait(p, 200);
   ok(await p.locator('#cs_presets button').count() === 10, 'ten presets');
   await p.click('[data-act=cs_preset][data-v=notseen]'); await wait(p, 300);
   ok(await p.locator('.cs-cond').count() === 2 && await p.locator('#cs_0_field').inputValue() === 'days_since_last' && await p.locator('#cs_0_op').inputValue() === 'gt' && await p.locator('#cs_0_v').inputValue() === '60', 'preset: not seen, taking the owner days (60) as the starting number');
@@ -163,11 +163,11 @@ const FN = { crmc_me: ME, crmc_metrics_status: STATUS, crmc_field_catalog: CAT, 
   await p.fill('#cs_name', 'test_new'); await p.fill('#cs_note', 'for a call'); await p.click('[data-act=cs_save]'); await wait(p, 600);
   const sv = await calls(p, 'crmc_segment_save');
   ok(sv.length === 1 && sv[0].p_name === 'test_new' && sv[0].p_id === null && /^[0-9a-f-]{36}$/.test(sv[0].p_client) && sv[0].p_note === 'for a call' && sv[0].p_rule.conditions[0].field === 'source', 'save call with a client id: ' + JSON.stringify(sv));
-  p = await page('#/crmlists'); await p.click('[data-act=cs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
+  p = await page('#/crmlists'); await p.click('[data-act=crs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
   await p.click('#cs_result [data-act=cs_freezesheet]'); await wait(p, 300); await p.fill('#cs_fname', 'test_frozen_new'); await p.click('[data-act=cs_freeze]'); await wait(p, 500);
   const fz = await calls(p, 'crmc_segment_freeze'); ok(fz.length === 1 && fz[0].p_name === 'test_frozen_new' && fz[0].p_segment === null && fz[0].p_rule.conditions[0].value === 1, 'freeze call: ' + JSON.stringify(fz));
   // retire and export of saved lists
-  await p.click('[data-act=cs_tab][data-v=lists]'); await wait(p, 200);
+  await p.click('[data-act=crs_tab][data-v=lists]'); await wait(p, 200);
   await p.locator('.cs-seg').nth(0).locator('details summary').click(); await p.click('[data-act=cs_retire][data-v="1"]'); await wait(p, 500);
   const rt = await calls(p, 'crmc_segment_retire'); ok(rt.length === 1 && rt[0].p_id === 1 && rt[0].p_active === false && rt[0].p_reason === 'test reason', 'retire sends the reason');
   await p.locator('.cs-seg').nth(0).locator('details summary').click(); await p.click('[data-act=cs_exportsaved][data-v="1"]'); await wait(p, 600);
@@ -176,16 +176,16 @@ const FN = { crmc_me: ME, crmc_metrics_status: STATUS, crmc_field_catalog: CAT, 
 
   // ---- refusals in plain English, switched-off saving, no permission
   p = await page('#/crmlists', {}, { err: { crmc_preview: 'bad_rule:bad_value', crmc_segment_save: 'segments_off', crmc_segment_freeze: 'over_cap:6000' } });
-  await p.click('[data-act=cs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
+  await p.click('[data-act=crs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
   ok(/A value is missing or not allowed/.test(await toastText(p)), 'bad rule in English: ' + await toastText(p));
   p = await page('#/crmlists', {}, { err: { crmc_segment_freeze: 'over_cap:6000' } });
-  await p.click('[data-act=cs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
+  await p.click('[data-act=crs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
   await p.click('#cs_result [data-act=cs_freezesheet]'); await p.fill('#cs_fname', 'test_x'); await p.click('[data-act=cs_freeze]'); await wait(p, 400);
   ok(/6000 customers, more than the largest list that can be frozen/.test(await toastText(p)), 'over cap in English: ' + await toastText(p));
   p = await page('#/crmlists', { crmc_me: Object.assign({}, ME, { segments_on: false, export_on: false, export: false, run: false, owner: false }) });
   t = await text(p);
   ok(await p.locator('#cs_off').count() === 1 && /Saving lists is switched off/.test(t) && await p.locator('#cs_head [data-act=cs_refresh]').count() === 0, 'saving off notice, no refresh button without the right');
-  await p.click('[data-act=cs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
+  await p.click('[data-act=crs_tab][data-v=build]'); await p.click('[data-act=cs_preset][data-v=onetime]'); await p.click('#cs_preview'); await wait(p, 400);
   ok(await p.locator('#cs_result [data-act=cs_savesheet]').isDisabled() && await p.locator('#cs_result [data-act=cs_freezesheet]').isDisabled() && await p.locator('#cs_result [data-act=cs_exportnew]').count() === 0, 'save and freeze disabled, no export button while off');
   p = await page('#/crmlists', { crmc_me: { view: false, edit: false, run: false, export: false, contact: false, cost: false, owner: false } });
   ok(await p.locator('#cs_noperm').count() === 1 && await p.locator('#cs_head').count() === 0, 'no permission: nothing but a sentence');

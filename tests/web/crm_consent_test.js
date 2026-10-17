@@ -287,7 +287,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok((await calls(p, 'customer_directory')).length >= 1 && await p.locator('.cu-row').count() === 2, 'server without phase304: the hooked list falls back to customer_directory and still works');
   HOOKED = false;
   p = await open('#/customers', { o: { missing: true, list: DIR } });
-  ok(await p.locator('.cu-row').count() === 2 && (await calls(p, '_crmb_customer_list')).length === 0, 'the real (unhooked) customers.js is unchanged: it never calls the new functions');
+  ok(await p.locator('.cu-row').count() === 2 && (await calls(p, '_crmb_customer_list')).length >= 1, 'INTEGRATION: the real customers.js carries the hook (it asks for the new list, falls back when the server lacks it)');
 
   // ---- 11. POS strip (API) and the hooked pos.js
   HOOKED = true;
@@ -314,7 +314,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open('#/pos', { o: { pol: POL({ consent_pos_on: true }) } });
   await p.click(`.pos-item[data-v="${pcItem.id}"]`); await wait(p, 200); await p.click('[data-act=pos_cart]'); await wait(p, 300);
   await p.click('[data-act=pos_cust_show]'); await wait(p, 200); await p.fill('#cu_mobile', '01700000001'); await wait(p, 900);
-  ok(await p.locator('#crmc_pos').count() === 0, 'unhooked pos.js: no strip (today)');
+  ok(await p.locator('#crmc_pos').count() === 1, 'INTEGRATION: the real pos.js carries the hook (the strip appears with the switch ON)');
 
   // ---- 12. print gate
   p = await open('#/crmconsent', { o: { pol: POL({ can_print: false }) } });

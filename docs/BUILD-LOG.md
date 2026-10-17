@@ -557,3 +557,20 @@ What changed (details and exact hook texts: `docs/integration/RPT-C3.md`; info s
 Tests (local throwaway Postgres 16, port 5710, `bash tests/sql/rptc3_run.sh`; live Supabase never touched): phase458 53, 459 39, 460 36, 461 42, 462 32, 463 31, 464 31, 465 42, 466 20, 467 35, 468 27 = 388 checks, 0 fail. Web: `tests/web/rptc3_test.js` 88 assertions (360 px, Bangla mode, CSV only after the export log, drill-down, till hooks), 0 failures, no console errors; ia, nav, nav2, control, favsync, settings2, wave1_wiring, wave1_comment_guard, pos2, pos_units, allforms, daybook, reports, customers re-run against this branch: 0 failures.
 Not confirmed
 - Live Supabase, a real phone, an accountant's view of the 18-1 posting entries, the CRM-F merge (its tables are not in this branch; the coupon report was tested with stand-in tables), run order against the other report packages (phases 440-457 are not in this branch).
+
+## Packages merged by the integration (summary entries; details in each package note under docs/integration/)
+
+- W1-FIX (phases 140-143): Wave 1 check fixes; 4 hooks in phase 143; own suites 84 pass.
+- INFO-1: the (i) info sign (web/infohint.js, web/data/info.json, `data-info`), coverage checker tools/check_info_coverage.py.
+- R1 (120): pay requests (advance/bill payment approval); OFF by default; exceptions kind r1_unbacked_payment added via phase 477.
+- R2 (130-132): announcements, to-do, shifts; own suites 247 pass.
+- CRM-A (300-302): customer 360, consent, duplicates, lists. CRM-B (303-306): privacy guard, masking, reveal log, export gate. CRM-C (307-308): data sharing hooks. CRM-F (316-319): loyalty, coupons, vouchers, referrals. CRM-G (323-326): leads, tasks, quotes. CRM-H (327-329): feedback and complaints.
+- RPT-B2, B3, B4 (404-436): purchase, stock and production reports; B3 yield_report and B4 yield screen: one screen, the other links to it.
+- RPT-C1 (440-444): profit and one-number reports. RPT-C2 (445-457): orders and customers. RPT-C3 (458-468): marketing, audit, planning.
+- RPT-HUB (470-476, renumbered from 450-456): reports hub and ask-a-question.
+
+## INTEGRATION (phase 477, merged branch)
+
+Merge of all finished packages onto one branch; see docs/integration/INTEGRATION.md for merge order, conflicts, renumbering, glue (phase 477), handler renames, test results and what is not covered. Owner paste list: docs/PASTE_ORDER.md.
+- Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
+- Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.

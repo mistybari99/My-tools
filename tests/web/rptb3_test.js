@@ -118,10 +118,10 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(/Purchase returns/.test(t) && /Damaged/.test(t) && /8.51%/.test(t), 'returns tab'); ok(await p.locator('[data-act=pr_go][data-v="#/purchase/r1"]').count() === 1, 'a return opens its bill (drill-down)');
   ok(/Open the report/.test(await txt(p)), 'price trend link');
   for (const [tab, pat] of [['price', /without an agreed price/], ['rej', /50%/], ['sup', /declared suppliers: data not captured/], ['del', /promised date/]]) {
-    await p.click(`[data-act=pr_tab][data-v=${tab}]`); await wait(p, 500); t = await txt(p, '#pr_out'); ok(pat.test(t), 'tab ' + tab + ' shows ' + pat); await noOverflow(p, tab);
+    await p.click(`[data-act=pur_tab][data-v=${tab}]`); await wait(p, 500); t = await txt(p, '#pr_out'); ok(pat.test(t), 'tab ' + tab + ' shows ' + pat); await noOverflow(p, tab);
   }
-  ok(/data not captured: quantity/.test(await (async () => { await p.click('[data-act=pr_tab][data-v=rej]'); await wait(p, 400); return txt(p, '#pr_out'); })()), 'rejection tab: quantity rate not 0 when no quantity was typed');
-  const pcsv = await csvOf(p, '#pr_out [data-act=pr_csv]'); ok(/test_supplier_a/.test(pcsv), 'CSV of the rejection tab'); await p.close();
+  ok(/data not captured: quantity/.test(await (async () => { await p.click('[data-act=pur_tab][data-v=rej]'); await wait(p, 400); return txt(p, '#pr_out'); })()), 'rejection tab: quantity rate not 0 when no quantity was typed');
+  const pcsv = await csvOf(p, '#pr_out [data-act=pur_csv]'); ok(/test_supplier_a/.test(pcsv), 'CSV of the rejection tab'); await p.close();
   p = await open({ w: { hideCost: true } }, '#/purchrep'); await wait(p, 500); ok(/may not see money figures/.test(await txt(p, '#pr_out')) && !/ ৳ 200/.test(await txt(p, '#pr_out')), 'without the cost right the money is hidden and said so'); await p.close();
   p = await open({ lang: 'bn' }, '#/purchrep'); await wait(p, 500); ok(/ক্রয় ফেরত/.test(await txt(p, '#pr_out')), 'Bangla'); await noOverflow(p, 'purchrep bn'); await p.close();
 

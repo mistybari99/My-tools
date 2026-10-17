@@ -99,9 +99,9 @@ const RULES = [['crm_points_expiry_months', null, null], ['crm_points_expiry_fro
   let p = await open('#/crmcoupons');
   let t = await text(p);
   ok(/Coupons & vouchers/.test(await p.locator('h1').textContent()), 'coupons title');
-  ok(await p.locator('#cp_tabs .tog').count() === 3, 'three tabs');
-  ok(await p.locator('#cp_off').count() === 1 && /switched OFF/.test(t), 'coupons-off notice while the switch is OFF');
-  ok(await p.locator('#cp_blank').count() === 1, 'a blank maximum shows the Set-this-first note');
+  ok(await p.locator('#cpn_tabs .tog').count() === 3, 'three tabs');
+  ok(await p.locator('#cpn_off').count() === 1 && /switched OFF/.test(t), 'coupons-off notice while the switch is OFF');
+  ok(await p.locator('#cpn_blank').count() === 1, 'a blank maximum shows the Set-this-first note');
   ok(await p.locator('.cp-row').count() === 3, 'three coupons listed');
   ok(/TEST10/.test(t) && /10%/.test(t) && /2 uses/.test(t) && /3 left/.test(t), 'percent coupon with uses and uses left');
   ok(/Expired/.test(t), 'an old coupon is labelled expired');
@@ -109,40 +109,40 @@ const RULES = [['crm_points_expiry_months', null, null], ['crm_points_expiry_fro
   await noOverflow(p, 'coupon list');
   await p.screenshot({ path: SHOTS + '/crmf_coupons.png', fullPage: true });
   // new coupon
-  await p.click('[data-act=cp_new]'); await wait(p);
+  await p.click('[data-act=cpn_new]'); await wait(p);
   ok(await p.locator('#cf_code').count() === 1 && await p.locator('#cf_more').count() === 1, 'new coupon form: essentials first, more options folded');
   await p.fill('#cf_code', 'new1'); await p.fill('#cf_name', 'test new'); await p.selectOption('#cf_kind', 'percent'); await p.fill('#cf_value', '12'); await p.fill('#cf_to', '2099-12-31');
   await p.click('#cf_more summary'); await p.fill('#cf_min', '500'); await p.fill('#cf_max', '3'); await p.check('.cf_loc >> nth=0'); await p.fill('#cf_cats', 'cat_a, cat_b');
-  await p.click('[data-act=cp_savego]'); await wait(p, 500);
+  await p.click('[data-act=cpn_savego]'); await wait(p, 500);
   let c = await calls(p, 'crmf_coupon_save');
   ok(c.length === 1 && c[0].p_id === null && c[0].p.code === 'NEW1' && c[0].p.kind === 'percent' && c[0].p.value === 12 && c[0].p.min_bill === 500 && c[0].p.max_uses === 3 && c[0].p.valid_to === '2099-12-31', 'save arguments: code in capitals, kind, value, minimum, uses, dates');
   ok(c[0].p.scope && c[0].p.scope.locations.length === 1 && c[0].p.scope.categories.join() === 'cat_a,cat_b', 'scope: one place and two categories');
   ok(/^[0-9a-f-]{36}$/.test(c[0].p_client || ''), 'a client id is sent (a repeat cannot create a second coupon)');
   ok(c[0].p.post_liability === false, 'liability is not marked unless asked');
   // server refusal text
-  await p.click('[data-act=cp_new]'); await wait(p);
+  await p.click('[data-act=cpn_new]'); await wait(p);
   await p.fill('#cf_code', 'bad1'); await p.fill('#cf_name', 'x'); await p.fill('#cf_value', '12'); await p.fill('#cf_to', '2099-12-31');
   await setErr(p, 'crmf_coupon_save', 'max_percent_not_set');
-  await p.click('[data-act=cp_savego]'); await wait(p, 400);
+  await p.click('[data-act=cpn_savego]'); await wait(p, 400);
   ok(/largest percent/.test(await toastText(p)), 'plain English for a blank maximum');
   await p.click('[data-act=closesheet]'); await wait(p);
   // edit a used coupon: money terms are not sent
-  await p.click('.cp-row[data-code=TEST10] [data-act=cp_edit]'); await wait(p);
-  await p.fill('#cf_name', 'test ten renamed'); await p.click('[data-act=cp_savego]'); await wait(p, 500);
+  await p.click('.cp-row[data-code=TEST10] [data-act=cpn_edit]'); await wait(p);
+  await p.fill('#cf_name', 'test ten renamed'); await p.click('[data-act=cpn_savego]'); await wait(p, 500);
   c = await calls(p, 'crmf_coupon_save'); const last = c[c.length - 1];
   ok(last.p_id === 'cp-1' && last.p.name === 'test ten renamed' && !('value' in last.p) && !('min_bill' in last.p) && !('max_discount' in last.p) && !('kind' in last.p) && !('scope' in last.p), 'a used coupon: only the free fields are sent');
   // retire
-  await p.click('.cp-row[data-code=TEST10] [data-act=cp_active]'); await wait(p, 400);
+  await p.click('.cp-row[data-code=TEST10] [data-act=cpn_active]'); await wait(p, 400);
   c = await calls(p, 'crmf_coupon_save');
   ok(c[c.length - 1].p_id === 'cp-1' && c[c.length - 1].p.active === false, 'retire sends active=false');
   // uses tab
-  await p.click('[data-act=cp_tab][data-v=uses]'); await wait(p, 400);
+  await p.click('[data-act=cpn_tab][data-v=uses]'); await wait(p, 400);
   t = await text(p);
   ok(/Redemption log/.test(t) && /Different from the coupon/.test(t) && /Accepted with a reason/.test(t) && /void/.test(t), 'uses tab: mismatch, override and void marked');
-  await p.selectOption('#cp_f', 'cp-1'); await wait(p, 400);
+  await p.selectOption('#cpn_f', 'cp-1'); await wait(p, 400);
   c = await calls(p, 'crmf_coupon_uses_list'); ok(c[c.length - 1].p_coupon === 'cp-1', 'the filter asks the server for one coupon');
   // liability tab
-  await p.click('[data-act=cp_tab][data-v=liab]'); await wait(p, 400);
+  await p.click('[data-act=cpn_tab][data-v=liab]'); await wait(p, 400);
   t = await text(p);
   ok(await p.locator('#lb_off').count() === 1 && /Nothing is booked/.test(t), 'liability OFF notice');
   await p.click('[data-act=lb_sync]'); await wait(p, 400);

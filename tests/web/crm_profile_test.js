@@ -54,7 +54,7 @@ const DIR = [{ id: 'c1', mobile: '01711111111', name: 'test_dir_one', type: 'ret
 const EXTRA_SRC = (K) => `(function(){ const K = ${JSON.stringify(K)}; const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc;
  const R = window.__CR = window.__CR || {}; R.calls = R.calls || []; R.o = R.o || {};
  c.rpc = async (fn, args) => {
-  if (!/^(crma_|customer_directory$|customer_profile$|find_customer$|customer_pos_info$)/.test(fn)) return rpc(fn, args);
+  if (!/^(crma_|_crmb_customer_list$|customer_directory$|customer_profile$|find_customer$|customer_pos_info$)/.test(fn)) return rpc(fn, args);
   R.calls.push([fn, JSON.parse(JSON.stringify(args || {}))]);
   const O = R.o;
   if (O.err && O.err[fn]) return { data: null, error: { message: O.err[fn], code: 'P0001' } };

@@ -66,7 +66,7 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   let p = await open({}, '#/reports/hub');
   ok(/Business Memory/.test(await text(p)) && await p.locator('#rh_q').count() === 1, 'hub opens with the question box');
   ok(await p.locator('.rh-tool').count() === 5, 'five tools');
-  ok(await p.locator('.rh-sec-h').count() === 8, 'seven audited sections + the not-audited group are listed (got ' + await p.locator('.rh-sec-h').count() + ')');
+  ok(await p.locator('.rh-sec-h').count() === 14, 'INTEGRATION: all 14 sections of the registry are listed (got ' + await p.locator('.rh-sec-h').count() + ')');
   ok(/5\. Stock/.test(await p.textContent('#rh_cat')), 'section 5 name is shown');
   await noOverflow(p, 'hub home');
   await p.click('.rh-sec-h[data-v=s02]'); await p.waitForTimeout(200);
@@ -83,9 +83,9 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   ok(/Nothing matches/.test(await p.textContent('#rh_cat')), 'empty search says so');
   await p.fill('#rh_cq', ''); await p.waitForTimeout(150);
   await p.selectOption('#rh_ft', 'unavailable'); await p.waitForTimeout(200);
-  ok(await p.locator('.rh-rep').count() === 15, 'status filter: 15 unavailable (got ' + await p.locator('.rh-rep').count() + ')');
+  ok(await p.locator('.rh-rep').count() === 1, 'INTEGRATION: status filter: 1 unavailable report in the registry (got ' + await p.locator('.rh-rep').count() + ')');
   await p.selectOption('#rh_ft', ''); await p.selectOption('#rh_fs', 'x'); await p.waitForTimeout(200);
-  ok(/not audited/i.test(await p.textContent('#rh_cat')), 'section filter: the not-audited group');
+  ok(await p.locator('.rh-rep').count() === 0, 'INTEGRATION: section filter: the not-audited group is empty, every report is in a section');
   await p.selectOption('#rh_fs', ''); await p.selectOption('#rh_fa', 'purchase'); await p.waitForTimeout(200);
   ok(await p.locator('.rh-rep').count() === 15, 'area filter purchasing = 15 reports');
   await p.selectOption('#rh_fa', '');

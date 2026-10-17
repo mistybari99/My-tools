@@ -59,11 +59,12 @@ function MOCK(KEYS) {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; let n = 0, bad = 0;
   const ok = (c, m) => { n++; if (!c) { bad++; console.log('FAIL: ' + m); } };
-  async function open(hash, lang) {
+  async function open(hash, lang, withRegistry) {
     const ctx = await br.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2, acceptDownloads: true }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); }); p.on('dialog', (d) => d.accept());
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + '\n(' + MOCK.toString() + ')(' + JSON.stringify(KEYS) + ');' }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
+    if (!withRegistry) await p.route('**/data/report_registry.json', (r) => r.abort());      // INTEGRATION: the old checks below are about the static map; the registry sync has its own check at the end
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','${lang || 'en'}')}catch(e){}
       window.__BL=[];const _c=URL.createObjectURL.bind(URL);URL.createObjectURL=(b)=>{ if(b&&b.text){ b.text().then(t=>window.__BL.push(t)); } return _c(b); };`);
     await p.goto('http://localhost:8641/' + hash); await p.waitForTimeout(1200); return p;
@@ -151,6 +152,16 @@ function MOCK(KEYS) {
   await p.evaluate(() => window.BOS.reportsMap.extend([{ id: 5, title: ['বিভাগ ৫', 'Purchasing', 'Purchasing'], reports: [{ n: 56, name: ['ক্রয় রিপোর্ট', 'Purchases by supplier', 'Purchases by supplier'], status: 'implemented', route: 'report/purchases_by_supplier', group: 'purch' }] }]));
   await p.goto('http://localhost:8641/#/reports'); await wait(p, 500); await p.goto('http://localhost:8641/#/reports/map'); await wait(p, 700);
   ok(await p.locator('details.rm-sec[data-sec="5"]').count() === 1 && await p.locator('section.rm-sec.pend').count() === 9, 'extend() turns section 5 from a placeholder into a listed section');
+  await p.close();
+
+  // INTEGRATION: with web/data/report_registry.json (RPT-HUB) the map shows all 193 reports in 14 sections and follows the registry statuses
+  p = await open('#/reports/map', 'en', true);
+  ok(await p.locator('details.rm-sec').count() === 15 && await p.locator('section.rm-sec.pend').count() === 0, 'with the registry: 14 sections + the extra one are listed, none is a placeholder');
+  const nreg = await p.evaluate(() => window.BOS.reportsMap.sections().filter((s) => !s.extra).reduce((n, s) => n + s.reports.length, 0));
+  ok(nreg === 193, 'with the registry: all 193 reports are on the map (' + nreg + ')');
+  const r7 = await p.evaluate(() => { const r = window.BOS.reportsMap.sections()[0].reports.find((x) => x.n === 7); return r && [r.status, r.route]; });
+  ok(r7 && r7[0] === 'implemented' && r7[1] === 'prodreports', 'report 7 follows the registry: built by RPT-B4, opens Production reports');
+  ok(await p.locator('.rm-hublink [data-v="reports/hub"]').count() === 1, 'the map links to Business Memory');
   await p.close();
 
   // the hub (#/reports) still works and links to the map

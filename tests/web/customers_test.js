@@ -17,6 +17,7 @@ const EXTRA43 = `(function(){ const real = window.supabase.createClient; window.
  c.rpc = async (fn, args) => {
   (window.__AC43 = window.__AC43 || []).push([fn, clone(args || {})]);
   if (/^(customer_|gift|tier_|set_rule|find_customer)/.test(fn) && W.err[fn]) { const m = W.err[fn]; delete W.err[fn]; return { data: null, error: { message: m, code: 'P0001' } }; }
+  if (/^_crmb_customer_/.test(fn)) return { data: null, error: { message: 'Could not find the function public.' + fn, code: 'PGRST202' } };      // INTEGRATION: CRM-B reads are not on this stand-in server; the screen falls back to the old functions
   if (fn === 'customer_directory') return { data: clone(D), error: null };
   if (fn === 'customer_profile') { const x = D.find((u) => u.id === args.p_customer) || D[0];
     return { data: { customer: { id: x.id, mobile: x.mobile, name: x.name, type: x.type, active: x.active, tier_id: x.tier_id, tier_locked: x.tier_locked, birthday: x.birthday, anniversary: null, address: x.address, whatsapp: null, note: 'likes tea', source: 'walk-in', credit_limit: x.credit_limit, customer_since: x.customer_since },
