@@ -1,0 +1,127 @@
+{
+ "package": "RPT-B3",
+ "title": "Reports: traceability, quality extras, purchasing - info sheet entries",
+ "language": "English",
+ "entries": [
+  {
+   "key": "receipt_lot_required",
+   "kind": "setting",
+   "title": "Supplier lot number required on a purchase bill",
+   "what_it_does": "Makes the supplier's lot or batch number compulsory on every stock line before a purchase bill can be posted.",
+   "why_it_matters": "Without a lot number a bad delivery cannot be traced to the products and outlets it reached.",
+   "default": "OFF. The lot is optional.",
+   "what_changes_if_switched": "A bill with a stock line and no lot number is refused at posting. Needs the server hook; the screen asks either way.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "receipt_expiry_required",
+   "kind": "setting",
+   "title": "Lot expiry date required",
+   "what_it_does": "Also requires the expiry date printed on the supplier's lot.",
+   "why_it_matters": "Expiry lists are silent about stock with no expiry.",
+   "default": "OFF.",
+   "what_changes_if_switched": "A stock line without an expiry date is refused at posting (together with the lot switch).",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "trace",
+   "kind": "feature",
+   "title": "Trace a batch",
+   "what_it_does": "Follows a batch from the supplier lot through production, transfers and sales to the outlets and named customers, and back.",
+   "why_it_matters": "Answers 'where did this lot go' in minutes.",
+   "default": "Always available to who may read stock or quality reports.",
+   "what_changes_if_switched": "Nothing changes. It only reads. Stock with no batch is printed as the unbatched quantity.",
+   "who_can_change": "Anyone with the stock or quality report right."
+  },
+  {
+   "key": "recall",
+   "kind": "feature",
+   "title": "Recall case",
+   "what_it_does": "Records a recall: the batches under recall, what was done with each, and prints the affected-stock report.",
+   "why_it_matters": "A recall needs one list of everything affected, and a record that it was handled.",
+   "default": "No case exists until someone opens one.",
+   "what_changes_if_switched": "Opening a case writes a red line in Exceptions. Holding, returning or writing off is done with the existing screens.",
+   "who_can_change": "The owner or the recall_manage right."
+  },
+  {
+   "key": "quality_checks",
+   "kind": "feature",
+   "title": "Quality check with item, quantity, supplier",
+   "what_it_does": "A quality check can name the item, the quantity checked or rejected and the supplier.",
+   "why_it_matters": "Needed for the supplier rejection rate.",
+   "default": "Optional. Old checks stay blank and say 'data not captured'.",
+   "what_changes_if_switched": "Filters by item and supplier appear on the list.",
+   "who_can_change": "Who holds qc_record."
+  },
+  {
+   "key": "transfer_damage",
+   "kind": "feature",
+   "title": "Damaged quantity on transfer receive",
+   "what_it_does": "The receiver can write how much of what arrived is damaged and why.",
+   "why_it_matters": "Separates damage from a short count.",
+   "default": "Optional. Blank is 'not captured', never 0.",
+   "what_changes_if_switched": "A yellow line appears in Exceptions. Stock is not changed: write damaged goods off with the wastage screen.",
+   "who_can_change": "Who may receive transfers."
+  },
+  {
+   "key": "stockout",
+   "kind": "feature",
+   "title": "Stockout log",
+   "what_it_does": "A simple shop entry: date, place, item, note, optional estimate of missed quantity.",
+   "why_it_matters": "Shows what customers asked for and the shop did not have.",
+   "default": "Available to the grant stockout_log.",
+   "what_changes_if_switched": "Nothing changes in stock or money. A blank estimate is never added as 0.",
+   "who_can_change": "The owner or the stockout_log right."
+  },
+  {
+   "key": "shelf_life_missing",
+   "kind": "feature",
+   "title": "Shelf life not set notice",
+   "what_it_does": "Lists made products that have no shelf-life rule.",
+   "why_it_matters": "Their batches get no expiry, so expiry lists say nothing about them.",
+   "default": "Shown automatically.",
+   "what_changes_if_switched": "Set the rule in Settings > Shelf life.",
+   "who_can_change": "Who sees stock screens."
+  },
+  {
+   "key": "actual_yield",
+   "kind": "feature",
+   "title": "Actual yield at production",
+   "what_it_does": "An optional box in the production sheet for the real quantity made.",
+   "why_it_matters": "The report can then compare real and standard yield.",
+   "default": "Blank: the standard yield goes into stock and the run says 'actual yield not captured'.",
+   "what_changes_if_switched": "A typed value is what goes into stock for that run (existing production rule).",
+   "who_can_change": "Who may post production."
+  },
+  {
+   "key": "agreed_prices",
+   "kind": "feature",
+   "title": "Agreed price per item and supplier",
+   "what_it_does": "The price agreed with a supplier, from a date; a new price closes the old one.",
+   "why_it_matters": "Lets the price variance report show what was paid above the agreement.",
+   "default": "Blank. Lines with no agreed price are counted as 'not captured'.",
+   "what_changes_if_switched": "Nothing is posted or changed; it is a comparison.",
+   "who_can_change": "The owner or supplier_terms_manage."
+  },
+  {
+   "key": "item_suppliers",
+   "kind": "feature",
+   "title": "Preferred and alternative suppliers",
+   "what_it_does": "Which suppliers may supply an item, preferred or alternative.",
+   "why_it_matters": "Shows items that depend on one supplier.",
+   "default": "Blank. Items without a declared supplier are flagged 'not captured'.",
+   "what_changes_if_switched": "Only the dependency report changes.",
+   "who_can_change": "The owner or supplier_terms_manage."
+  },
+  {
+   "key": "purchasing_reports",
+   "kind": "feature",
+   "title": "Purchasing reports",
+   "what_it_does": "Returns and adjustments, price variance, rejection rate, supplier dependency, delivery performance.",
+   "why_it_matters": "One place to judge suppliers.",
+   "default": "Always available to who may read purchase reports.",
+   "what_changes_if_switched": "Read only. Money shown only with the cost right.",
+   "who_can_change": "Anyone with the purchase report right."
+  }
+ ]
+}

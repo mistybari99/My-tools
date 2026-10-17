@@ -255,6 +255,8 @@ async function openProduction(pre) {
     <div><label for="pr_b">${esc(T('batches'))}</label><input id="pr_b" inputmode="decimal" value="${esc(PS.batches)}"></div>
     <div><label for="pr_made">${esc(T('madeAt'))}</label><input id="pr_made" type="datetime-local" value="${now}"></div>
     <div><label for="pr_note">${esc(T('note'))}</label><input id="pr_note" autocomplete="off"></div>
+    <div><label for="pr_ay">${esc(lab(L('আসল ফলন (ঐচ্ছিক — না জানলে খালি রাখুন)', 'Actual yield (optional - leave empty if not measured)', 'আসল ফলন (optional — না জানলে খালি)')))}</label><input id="pr_ay" inputmode="decimal" autocomplete="off"><div class="muted" style="font-size:.8rem">${esc(lab(L('খালি রাখলে স্ট্যান্ডার্ড ফলনই স্টকে ওঠে এবং "আসল ফলন লেখা হয়নি" থাকে। কাগজের ফর্মের কোড: মালিক দেবেন।', 'Empty = the standard yield goes into stock and the run says "actual yield not captured". Paper form code: to be given by owner.', 'খালি থাকলে standard yield stock এ যায়, "actual yield লেখা হয়নি" থাকে। Paper form code: owner দেবেন।')))}</div></div>
+    <div id="pr_shelf"></div>
     <div id="pr_pv"><p class="muted">${esc(T('nothing'))}</p></div></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" id="pr_go" data-act="rc_post">${esc(T('post'))}</button></div>`);
   runPreview();
@@ -267,6 +269,10 @@ async function runPreview() {
   if (!PS.recipe || !(b > 0)) { box.innerHTML = `<p class="muted">${esc(T('nothing'))}</p>`; PS.pv = null; return; }
   const r = await sb.rpc('production_preview', { p_loc: PS.loc, p_recipe: PS.recipe, p_batches: b });
   if (!$('#pr_pv')) return;
+  try {                                   // RPT-B3: tell the maker when this product has no shelf-life rule (its batch would get no expiry)
+    const sm = await sb.rpc('shelf_life_missing', { p_loc: PS.loc }), rec = (D.recipes || []).find((x) => x.id === PS.recipe), its = (sm && !sm.error && sm.data && sm.data.items) || [], sh = $('#pr_shelf');
+    if (sh) sh.innerHTML = its.length && (!rec || its.some((x) => x.item_id === rec.item_id)) ? `<div class="notice warn" data-shelf-missing="1">${esc(lab(L('এই পণ্যের মেয়াদের নিয়ম বসানো নেই — ব্যাচে মেয়াদ থাকবে না', 'Shelf life is NOT set for this product - the batch will get no expiry', 'এই product এর shelf life set নেই — batch এ expiry থাকবে না')))} <button type="button" class="mini" data-act="go" data-v="settings2/shelf">${esc(lab(L('নিয়ম বসান', 'Set it', 'Set করুন')))}</button></div>` : '';
+  } catch (e) { /* phase 433 not installed */ }
   if (r.error) { box.innerHTML = `<div class="notice bad">${esc(String(r.error.message || '').slice(0, 120))}</div>`; PS.pv = null; return; }
   const pv = PS.pv = r.data || {}, rows = pv.lines || [];
   box.innerHTML = `<h3 style="margin:6px 0">${esc(T('preview'))}</h3><table class="rc-tbl"><tr><th>${esc(T('ing'))}</th><th class="n">${esc(T('need'))}</th><th class="n">${esc(T('have'))}</th></tr>
@@ -283,7 +289,11 @@ async function postProduction(btn) {
   const m = ($('#pr_made') || {}).value, note = (($('#pr_note') || {}).value || '').trim() || null;
   PS.busy = true; if (btn) btn.disabled = true;
   try {
-    const r = await sb.rpc('production_post', { p_loc: PS.loc, p_recipe: PS.recipe, p_batches: b, p_client: PS.client, p_made_at: m ? m + ':00+06:00' : null, p_note: note });
+    const ayRaw = String(($('#pr_ay') || {}).value || '').trim(), ay = ayRaw === '' ? null : nnum(ayRaw);
+    if (ay !== null && !(ay > 0)) { PS.busy = false; if (btn) btn.disabled = false; return toast(T('nothing')); }
+    const args = { p_loc: PS.loc, p_recipe: PS.recipe, p_batches: b, p_client: PS.client, p_made_at: m ? m + ':00+06:00' : null, p_note: note };
+    if (ay !== null) args.p_actual_yield = ay;                          // blank = the 6-argument call exactly as before
+    const r = await sb.rpc('production_post', args);
     if (r.error) return errMsg(r.error, { grant: 'stock_production', loc: PS.loc, context: { recipe: PS.recipe } });
     closeSheet(); toast(r.data && r.data.dup ? lab(X.saved) : T('done')); PS = null;
     await load(); if ($('#rc_main')) { if (D.tab === 'make') drawMake(); }

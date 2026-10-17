@@ -44,6 +44,8 @@ const X = {
   expOffHint: L('শুধু শেলফ-লাইফের নিয়ম থাকা পণ্যের ব্যাচে মেয়াদ বসে। নিয়ম ছাড়া পণ্যে মেয়াদের সুবিধা বন্ধ।', 'Only batches of items that have a shelf-life rule get an expiry. Items without a rule have expiry switched off.', 'Shelf-life rule থাকা item-এর batch-এ expiry বসে। Rule ছাড়া item-এ expiry বন্ধ।'),
   writeOff: L('বাদ দিন', 'Write off', 'Write off'), batchQty: L('ব্যাচে বাকি', 'In batch', 'Batch-এ বাকি'),
   trEmpty: L('পথে কোনো মাল নেই', 'Nothing in transit', 'Transit-এ কোনো মাল নেই'), receive: L('গ্রহণ', 'Receive', 'Receive'), cancelX: L('ফিরিয়ে নিন', 'Take back', 'Take back'),
+  dmgQty: L('এর মধ্যে ক্ষতিগ্রস্ত (ঐচ্ছিক — না দেখলে খালি রাখুন)', 'Of which damaged (optional - leave empty if not checked)', 'এর মধ্যে damaged (optional — না দেখলে খালি)'), dmgReason: L('ক্ষতির কারণ', 'Damage reason', 'ক্ষতির কারণ'),
+  dmgNote: L('ক্ষতিগ্রস্ত মাল স্টকে গোনা থাকে; নষ্ট ধরতে "নষ্ট মাল বাদ" ব্যবহার করুন। কাগজের ফর্মের কোড: মালিক দেবেন।', 'Damaged goods stay counted in stock; write them off with "Write off wastage". Paper form code: to be given by owner.', 'Damaged মাল stock এ গোনা থাকে; write-off "Wastage" থেকে। Paper form code: owner দেবেন।'), needDmgReason: L('ক্ষতির কারণ বাছুন', 'Choose the damage reason', 'ক্ষতির কারণ বাছুন'), dmgOver: L('ক্ষতিগ্রস্ত পরিমাণ গ্রহণের চেয়ে বেশি হতে পারে না', 'Damaged cannot be more than received', 'Damaged received এর চেয়ে বেশি হবে না'),
   recvQty: L('কত পেলেন (বেস এককে)', 'Quantity received (base unit)', 'কত পেলেন (base unit)'), sent: L('পাঠানো', 'Sent', 'Sent'), shortBy: L('কম পড়েছে — মালিককে জানানো হবে', 'Short — the owner will be told', 'কম — Owner-কে জানানো হবে'),
   confirmCancel: L('পাঠানো বাতিল করে মাল ফিরিয়ে নেবেন?', 'Cancel the transfer and take the goods back?', 'Transfer cancel করে মাল ফিরিয়ে নেবেন?'),
   recon: L('খাতা মেলান', 'Reconcile', 'Ledger মেলান'), reconOk: L('সব মিলেছে ✓', 'Everything matches ✓', 'সব মিলেছে ✓'), reconBad: L('মিলছে না', 'Mismatch', 'মিলছে না'),
@@ -499,12 +501,15 @@ function recvSheet(x) {
   sheetStart('recv'); const it = (ITEMS || []).find((y) => y.id === x.item_id), u = unitLabel(baseOf(it));
   openSheet(`<h2>${esc(T('receive'))} · ${esc(nm(x))}</h2><p class="muted">${esc(T('sent'))}: ${q4(x.qty)} ${esc(u)} · ${esc(locName(x.from_location_id))} → ${esc(locName(x.to_location_id))}</p><div class="stack">
     <div><label for="r_qty">${esc(T('recvQty'))}</label><input id="r_qty" inputmode="decimal" value="${esc(String(x.qty))}" data-sent="${esc(String(x.qty))}"></div><div class="notice warn" id="r_short" hidden>${esc(T('shortBy'))}</div>
+    <div><label for="r_dmg">${esc(T('dmgQty'))}</label><input id="r_dmg" inputmode="decimal" autocomplete="off"></div>
+    <div id="r_dmg_w" hidden><label for="r_dmg_r">${esc(T('dmgReason'))}</label><select id="r_dmg_r"><option value="">—</option>${optHTML(lists('transfer_damage_reasons').map((r) => [r.value_code, lab(rowL(r))]), '')}</select></div><div class="muted" style="font-size:.8rem">${esc(T('dmgNote'))}</div>
     <div><label for="a_note">${esc(T('note'))}</label><input id="a_note" autocomplete="off"></div></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="s2_go_recv" data-i="${D.tr.indexOf(x)}">${esc(T('receive'))}</button></div>`);
 }
 document.addEventListener('input', (e) => {
   if (e.target.id === 's2_q') { D.q = e.target.value; D.shown = 50; paintRows(rowsFor()); }
   if (e.target.id === 'r_qty') { const v = nnum(e.target.value), s = Number(e.target.dataset.sent); const w = $('#r_short'); if (w) w.hidden = !(v >= 0 && v < s); }
+  if (e.target.id === 'r_dmg') { const v = nnum(e.target.value), w = $('#r_dmg_w'); if (w) w.hidden = !(v > 0); }
 });
 document.addEventListener('change', (e) => { if (e.target.id === 's2_loc') { D.loc = e.target.value === '' ? null : Number(e.target.value); refreshActs().then(draw); } });
 
@@ -534,7 +539,10 @@ Object.assign(H, {
     await submit(a, () => sb.rpc('stock_expire_batch', { p_batch: x.batch_id, p_reason: ($('#a_reason') || {}).value || 'expired', p_note: reasonNote(noteVal()), p_photo: SH.photo }), () => { toast(T('saved')); afterWrite(); }, { grant: 'wastage_write_off', loc: x.location_id, context: { batch: x.batch_id } }); },
   s2_xrecv: (a) => { const x = D.tr[Number(a.dataset.i)]; if (x) recvSheet(x); },
   s2_go_recv: async (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; const v = nnum(($('#r_qty') || {}).value); if (!(v >= 0)) return toast(T('needQty'));
-    await submit(a, () => sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal() }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.to_location_id, context: { transfer: x.id } }); },
+    const draw_ = norm(($('#r_dmg') || {}).value), dq = draw_ === '' ? null : nnum(draw_), dr = ($('#r_dmg_r') || {}).value || '';      // RPT-B3: damaged quantity is optional; blank = not captured (the 3-argument call, exactly as before)
+    if (dq !== null && !(dq >= 0)) return toast(T('needQty')); if (dq !== null && dq > v) return toast(T('dmgOver')); if (dq > 0 && !dr) return toast(T('needDmgReason'));
+    await submit(a, () => (dq === null ? sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal() })
+      : sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal(), p_damaged_qty: dq, p_damaged_reason: dq > 0 ? dr : null })), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.to_location_id, context: { transfer: x.id } }); },
   s2_xcancel: (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; sheetStart('xcancel');
     openSheet(`<h2>${esc(T('cancelX'))} · ${esc(nm(x))}</h2><div class="notice warn">${esc(T('confirmCancel'))}</div><div><label for="a_note">${esc(T('note'))}</label><input id="a_note" autocomplete="off"></div>
       <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="s2_go_xcancel" data-i="${a.dataset.i}">${esc(T('cancelX'))}</button></div>`); },
