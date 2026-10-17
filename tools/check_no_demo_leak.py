@@ -6,9 +6,12 @@ Checks (read-only, writes nothing):
      a demo file name, or a demo staff name (Karim, Salma, Rahim, ...).
   2. web/data/kb.json (the knowledge base shipped to the browser) must not contain them either.
   3. tools/build_kb.py must not read docs/demo or glob docs/*.md broadly.
-Test fixtures in tests/ and *_test.sql may use ordinary first names; they are not shipped.
+  6. Test files (tests/, *_test.sql, *_test.js, test_*.py) are scanned for the same roster names, in any letter case ("karim02" counts).
+     Test files that already carried such names when this check was added are frozen in tools/demo_leak_test_baseline.json (file -> count of hits,
+     never the names themselves): the count may go DOWN but never up, and any other test file must have none. New fixtures use neutral test_* names.
+     To refresh the baseline after removing names:  python3 tools/check_no_demo_leak.py --write-baseline   (refuses to raise a count or add a file).
 """
-import os, re, sys
+import json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEMO_FILES = ['DEMO_DAY_SCREENS_STORIES_LEDGER_EN', 'DEMO_FULL_WORKFLOW_AND_LEDGER', 'DEMO_STAFF_ROSTER', 'FINAL_DEMO_BUSINESS_GUIDE',
               'IMAGINED_FUTURE_SYSTEM_DEMO', 'REAL_LIFE_DAILY_WORKFLOW_GUIDE', 'REAL_LIFE_STORY_GUIDE']
@@ -51,7 +54,37 @@ for d, dirs, files in os.walk(os.path.join(ROOT, 'docs')):
         t = open(os.path.join(d, f), encoding='utf-8', errors='ignore').read()
         if len({n for n in NAMES if re.search(r'\b' + n + r'\b', t)}) >= 5:
             bad.append((os.path.relpath(os.path.join(d, f), ROOT), 0, '5 or more demo staff names in one document'))
+# 6. test files: the roster names are frozen at the baseline (ratchet), nothing new may carry them
+TEST_PAT = re.compile(r'(?<![A-Za-z])(?:' + '|'.join(NAMES) + r')(?![A-Za-z])', re.I)
+BASELINE = os.path.join(ROOT, 'tools', 'demo_leak_test_baseline.json')
+def test_hits():
+    out = {}
+    for d, dirs, files in os.walk(ROOT):
+        dirs[:] = [x for x in dirs if x not in SKIP_DIRS]
+        for f in files:
+            if not f.endswith(('.js', '.json', '.sql', '.py', '.html', '.css', '.csv', '.yml', '.yaml', '.ts', '.md', '.sh')): continue
+            p = os.path.join(d, f); rel = os.path.relpath(p, ROOT).replace(os.sep, '/')
+            if not is_test(rel) or rel.endswith('check_no_demo_leak.py'): continue
+            try: txt = open(p, encoding='utf-8', errors='ignore').read()
+            except OSError: continue
+            n = len(TEST_PAT.findall(txt))
+            if n: out[rel] = n
+    return out
+try: base = json.load(open(BASELINE, encoding='utf-8'))
+except (OSError, ValueError): base = {}
+hits = test_hits()
+if '--write-baseline' in sys.argv:
+    new = {k: v for k, v in hits.items() if k in base and v <= base[k]}
+    refused = [k for k, v in hits.items() if k not in base or v > base[k]]
+    if refused:
+        for k in refused: print('REFUSED  %s has %d roster name hit(s), more than the baseline allows' % (k, hits[k]))
+        sys.exit(1)
+    json.dump(dict(sorted(new.items())), open(BASELINE, 'w', encoding='utf-8'), indent=1); open(BASELINE, 'a').write('\n')
+    print('baseline written: %d file(s), %d hit(s)' % (len(new), sum(new.values()))); sys.exit(0)
+for rel, n in sorted(hits.items()):
+    if rel not in base: bad.append((rel, 0, 'test file uses a roster staff name (%d hit(s)); use neutral test_* names' % n))
+    elif n > base[rel]: bad.append((rel, 0, 'more roster staff names than the frozen baseline (%d > %d); use neutral test_* names' % (n, base[rel])))
 if bad:
     for r, n, w in bad[:50]: print('LEAK  %s:%s  %s' % (r, n, w))
     print('FAIL: %d reference(s) to demo material in app code' % len(bad)); sys.exit(1)
-print('OK: no demo file name, demo staff name or docs/demo reference in app code, kb.json or build_kb.py')
+print('OK: no demo file name, demo staff name or docs/demo reference in app code, kb.json or build_kb.py; test files carry no new roster names')
