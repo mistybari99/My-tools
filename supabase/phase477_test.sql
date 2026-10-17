@@ -11,7 +11,7 @@ create or replace function tt.sig() returns text language sql as $$
 select tt.chk('T0 phase 477 objects exist', to_regprocedure('public._i2_apply_all()') is not null and to_regprocedure('public._i2_state()') is not null and to_regprocedure('public._i2_exc_kinds_apply()') is not null);
 select tt.chk('T0 every 477 function is closed to browsers (anon and authenticated)', not exists (select 1 from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname like '\_i2\_%' and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))));
 select tt.chk('T0 the paste applied everything: no expected hook is missing', not exists (select 1 from public._i2_state() where not present));
-select tt.chk('T0 the state lists all five packages that patch (B1, B3, CRM-B, CRM-C, C1) and the glue', (select count(distinct pkg) from public._i2_state() where how = 'patch') = 6);
+select tt.chk('T0 the state lists all five packages that patch (B1, B3, CRM-B, CRM-C, C1) and the two glue groups (f3, CRM-A mask)', (select count(distinct pkg) from public._i2_state() where how = 'patch') = 7);
 select tt.chk('T0 state: 13 B1 + 1 B3 + 2 CRM-B + 1 CRM-C + 7 C1 + 1 glue patches (a function with two markers counts twice)', (select count(*) from public._i2_state() where how = 'patch') >= 25);
 
 \echo == T1 paste twice: the second call patches nothing
@@ -149,5 +149,17 @@ select tt.chk('T5 a corrected record replaces the older one (history kept): 5 + 
 select stock_post(:'i_rm'::uuid, 1, -1, 'issue_out', 'production', :'run1', null, null, now(), 'test extra issue', null, 'full') is not null as w_x1 \gset
 select tt.e3('f3_raw_vs_recipe') as fe \gset
 select tt.chk('T5 a record wins over a stock movement of the same run and ingredient (still 12, not 13)', (select (r ->> 'actual')::numeric = 12 from tt.rows(:'fe'::jsonb) r limit 1));
+
+\echo == T6 glue: one privacy switch is enough (CRM-B guard also masks the CRM-A screens)
+select tt.as(:'o');
+select set_rule('crm_pii_guard_on','false') is null as g0 \gset
+select set_rule('crm_mask_phone','false') is null as m0 \gset
+select tt.chk('T6 both OFF: CRM-A hides nothing', not _crma_mask_on() and _crma_show_phone());
+select set_rule('crm_pii_guard_on','true') is null as g1 \gset
+select tt.chk('T6 the CRM-B guard ON: the CRM-A mask is on too (the owner still sees the number)', _crma_mask_on() and _crma_show_phone());
+select set_rule('crm_pii_guard_on','false') is null as g2 \gset
+select set_rule('crm_mask_phone','true') is null as m1 \gset
+select tt.chk('T6 the CRM-A switch alone still masks', _crma_mask_on());
+select set_rule('crm_mask_phone','false') is null as m2 \gset
 
 select 'RESULT ' || count(*) filter (where ok) || ' passed, ' || count(*) filter (where not ok) || ' FAILED' from tt.res;

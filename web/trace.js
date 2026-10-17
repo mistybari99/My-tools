@@ -191,10 +191,10 @@ async function recallList() {
   const r = await sb.rpc('recall_list', { p_status: null });
   if (r.error) { shell(T('rtitle'), B.ui.state('error', eText(r.error)), true); return; }
   D.cases = r.data || []; D.canRecall = await canRecall();
-  const card = (c) => `<div class="card tap" data-act="rc_open" data-v="${esc(c.id)}" style="cursor:pointer"><div class="row between"><b>${esc(T('caseNo'))} ${esc(c.case_no)} · ${esc(c.title)}</b><span class="chip ${c.status === 'open' ? 'warn' : ''}">${esc(ownTxt(c.status))}</span></div>
+  const card = (c) => `<div class="card tap" data-act="trc_open" data-v="${esc(c.id)}" style="cursor:pointer"><div class="row between"><b>${esc(T('caseNo'))} ${esc(c.case_no)} · ${esc(c.title)}</b><span class="chip ${c.status === 'open' ? 'warn' : ''}">${esc(ownTxt(c.status))}</span></div>
     <div class="muted">${esc(d10(c.opened_at))} · ${c.batches_n} ${esc(T('batch'))}${c.to_do_n ? ' · ' + c.to_do_n + ' ' + esc(T('stillToDo')) : ''}</div><div>${esc(c.reason)}</div></div>`;
   const open = D.cases.filter((c) => c.status === 'open'), closed = D.cases.filter((c) => c.status !== 'open');
-  shell(T('rtitle'), `<div class="stack">${D.canRecall ? `<button class="primary full" data-act="rc_new">${esc(T('newCase'))}</button>` : ''}
+  shell(T('rtitle'), `<div class="stack">${D.canRecall ? `<button class="primary full" data-act="trc_new">${esc(T('newCase'))}</button>` : ''}
     <h3>${esc(T('openCases'))}</h3>${open.map(card).join('') || B.ui.state('empty', T('none'))}<h3>${esc(T('closedCases'))}</h3>${closed.map(card).join('') || B.ui.state('empty', T('none'))}</div>`, true);
 }
 function newCaseSheet(batchId) {
@@ -220,7 +220,7 @@ async function caseView(id) {
   shell(`${T('caseNo')} ${c.case_no}`, `<div class="stack"><div class="card"><div class="row between"><b>${esc(c.title)}</b><span class="chip ${open ? 'warn' : ''}">${esc(ownTxt(c.status))}</span></div>
       <div>${esc(c.reason)}</div>${c.hazard ? `<div class="muted">${esc(c.hazard)}</div>` : ''}<div class="muted">${esc(d10(c.opened_at))} · ${esc(c.opened_staff || '')}</div>${c.close_note ? `<div class="muted">${esc(c.close_note)}</div>` : ''}</div>
     <p class="muted">${esc(T('howTo'))}</p>
-    <h3>${esc(T('batches'))}</h3>${ent}${open && D.canRecall ? `<button class="full" data-act="rc_add">${esc(T('addBatch'))}</button>` : ''}
+    <h3>${esc(T('batches'))}</h3>${ent}${open && D.canRecall ? `<button class="full" data-act="trc_add">${esc(T('addBatch'))}</button>` : ''}
     <h2>${esc(T('affected'))}</h2>${fwdHTML(d.forward)}
     ${unl.length ? `<div class="notice warn"><b>${esc(T('unlot'))}</b>${unl.map((u) => `<div>${esc(u.supplier)} · ${esc(T('oBill'))} ${esc(u.bill_no || '—')} ${esc(d10(u.bill_date))} · ${esc(u.code)} · ${q4(u.qty)}</div>`).join('')}</div>` : ''}
     <div class="row"><button data-act="rc_csv">${esc(T('csv'))}</button>${open && D.canRecall ? `<button class="danger" data-act="rc_close">${esc(T('closeCase'))}</button>` : ''}</div>
@@ -256,8 +256,8 @@ Object.assign(H, {
   tr_csv: traceCSV,
   tr_sale: (a) => saleSheet(Number(a.dataset.i)),
   tr_recall: (a) => { location.hash = '#/recall/new/' + a.dataset.v; },
-  rc_open: (a) => { location.hash = '#/recall/' + a.dataset.v; },
-  rc_new: () => newCaseSheet(null),
+  trc_open: (a) => { location.hash = '#/recall/' + a.dataset.v; },
+  trc_new: () => newCaseSheet(null),
   rc_create: () => {
     const t = ($('#rc_t') || {}).value || '', r = ($('#rc_r') || {}).value || '', h = ($('#rc_h') || {}).value || '';
     if (t.trim().length < 3) return toast(lab(ERR.bad_title)); if (r.trim().length < 3) return toast(lab(ERR.reason_required));
@@ -265,7 +265,7 @@ Object.assign(H, {
   },
   rc_mark: (a) => markSheet(Number(a.dataset.i)),
   rc_markgo: () => { const c = D.caseData.case; return act(sb.rpc('recall_batch_mark', { p_case: c.id, p_batch: D.markBatch, p_status: ($('#rc_st') || {}).value, p_note: (($('#rc_n') || {}).value || '').trim() || null }), () => caseView(c.id)); },
-  rc_add: () => addSheet().catch(fail),
+  trc_add: () => addSheet().catch(fail),
   rc_addgo: () => { const v = ($('#rc_pick') || {}).value; if (!v) return toast(T('pickBatch')); const c = D.caseData.case; return act(sb.rpc('recall_add_batch', { p_case: c.id, p_batch: Number(v), p_note: null }), () => caseView(c.id)); },
   rc_close: () => openSheet(`<h2>${esc(T('closeCase'))}</h2><div class="stack"><div><label for="rc_cn">${esc(T('note'))}</label><input id="rc_cn" maxlength="500" autocomplete="off"></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="danger full" data-act="rc_closego">${esc(T('closeCase'))}</button></div></div>`),

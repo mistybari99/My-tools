@@ -58,18 +58,18 @@ const tabs = [
       const b = await sb.rpc('production_line_list', { p_loc: D.loc ? Number(D.loc) : null, p_with_retired: true }); if (b.error) throw b.error;
       D.lines = b.data || []; return { ratings: a.data || [], lines: D.lines };
     },
-    top: (d, D) => (D.canEdit ? `<div class="row wrap"><button type="button" class="primary" data-act="cp_newline">${esc(lab(L_.addLine))}</button><button type="button" class="primary" data-act="cp_newrate">${esc(lab(L_.addRating))}</button></div><p class="muted">${esc(lab(R.X.paperCode))}</p>` : `<p class="muted">${esc(lab(L_.ownerOnly))}</p>`),
+    top: (d, D) => (D.canEdit ? `<div class="row wrap"><button type="button" class="primary" data-act="cap_newline">${esc(lab(L_.addLine))}</button><button type="button" class="primary" data-act="cap_newrate">${esc(lab(L_.addRating))}</button></div><p class="muted">${esc(lab(R.X.paperCode))}</p>` : `<p class="muted">${esc(lab(L_.ownerOnly))}</p>`),
     blocks: [
       { title: L_.lines, rows: (d) => d.lines, status: { true: L_.active, false: L_.retired }, warn: (r) => !r.active,
-        detail: (r) => (r.can_edit && r.active ? `<div class="row wrap"><button type="button" class="mini" data-act="cp_editline" data-id="${r.id}">${esc(lab(L_.rename))}</button><button type="button" class="mini" data-act="cp_retline" data-id="${r.id}">${esc(lab(L_.retire))}</button></div>` : ''),
+        detail: (r) => (r.can_edit && r.active ? `<div class="row wrap"><button type="button" class="mini" data-act="cap_editline" data-id="${r.id}">${esc(lab(L_.rename))}</button><button type="button" class="mini" data-act="cap_retline" data-id="${r.id}">${esc(lab(L_.retire))}</button></div>` : ''),
         cols: [{ l: L_.line, get: (r) => lineOwn(r), w: 't' }, { l: L_.status, get: (r) => String(r.active), f: 'status', w: 'c' }, placeS, { l: L_.note, get: (r) => r.retired_note }] },
       { title: L_.ratings, rows: (d) => d.ratings, status: { active: L_.active, retired: L_.retired }, warn: (r) => r.status !== 'active',
-        detail: (r) => (r.can_edit && r.status === 'active' ? `<button type="button" class="mini" data-act="cp_retrate" data-id="${r.id}">${esc(lab(L_.retire))}</button>` : ''),
+        detail: (r) => (r.can_edit && r.status === 'active' ? `<button type="button" class="mini" data-act="cap_retrate" data-id="${r.id}">${esc(lab(L_.retire))}</button>` : ''),
         cols: [{ l: L_.place, get: (r) => R.locName(r) + ' · ' + (r.line_id ? lineName(r) : lab(L_.whole)), w: 't' }, { l: L_.status, get: (r) => r.status, f: 'status', w: 'c' }, { l: L_.bpd, get: (r) => r.batches_per_day, f: 'q4' }, { l: L_.dpw, get: (r) => r.days_per_week, f: 'q4' },
           { l: L_.effFrom, get: (r) => r.effective_from, f: 'date' }, { l: L_.note, get: (r) => r.note || r.retired_note }] }] },
 ];
 
-R.page({ route: 'capacity', act: 'cp', title: L_.title, tabs, range: 'days30',
+R.page({ route: 'capacity', act: 'cap', title: L_.title, tabs, range: 'days30',
   init: async (D) => {
     D.canEdit = !!S.ctx.is_owner;
     if (!D.canEdit && B.s2 && B.s2.grant) { try { D.canEdit = !!(await B.s2.grant('capacity_manage', null)); } catch (e) { D.canEdit = false; } }
@@ -77,39 +77,39 @@ R.page({ route: 'capacity', act: 'cp', title: L_.title, tabs, range: 'days30',
   handlers: (D, api) => {
     const act = async (p, ok) => { if (D.busy) return; D.busy = true; try { const r = await p; if (r.error) return toast(R.errText(r.error)); closeSheet(); toast(lab(L_.saveMsg)); await ok(r.data || {}); } catch (e) { fail(e); } finally { D.busy = false; } };
     const lineSheet = (ln) => openSheet(`<h2>${esc(lab(ln ? L_.rename : L_.addLine))}</h2><div class="stack"><p class="muted">${esc(lab(R.X.paperCode))}</p>
-      ${ln ? '' : `<div><label for="cp_l_loc">${esc(lab(L_.place))}</label>${R.placeSel(D, 'cp_l_loc', D.loc, false)}</div>`}
-      <div><label for="cp_l_bn">${esc(lab(L_.nameBn))}</label><input id="cp_l_bn" maxlength="80" autocomplete="off" value="${esc(ln ? ln.name_bn : '')}"></div>
-      <div><label for="cp_l_en">${esc(lab(L_.nameEn))}</label><input id="cp_l_en" maxlength="80" autocomplete="off" value="${esc(ln ? ln.name_en || '' : '')}"></div>
-      <div class="row"><button class="full" data-act="closesheet">${esc(lab(R.X.cancel))}</button><button class="primary full" data-act="cp_linesave" data-id="${ln ? ln.id : ''}">${esc(lab(R.X.save))}</button></div></div>`);
-    const reasonSheet = (kind, id) => { D.reason = { kind, id }; openSheet(`<h2>${esc(lab(L_.retire))}</h2><div class="stack"><div><label for="cp_why">${esc(lab(R.X.why))}</label><input id="cp_why" maxlength="300" autocomplete="off"></div><div class="row"><button class="full" data-act="closesheet">${esc(lab(R.X.cancel))}</button><button class="danger full" data-act="cp_rgo">${esc(lab(L_.retire))}</button></div></div>`); };
+      ${ln ? '' : `<div><label for="cap_l_loc">${esc(lab(L_.place))}</label>${R.placeSel(D, 'cap_l_loc', D.loc, false)}</div>`}
+      <div><label for="cap_l_bn">${esc(lab(L_.nameBn))}</label><input id="cap_l_bn" maxlength="80" autocomplete="off" value="${esc(ln ? ln.name_bn : '')}"></div>
+      <div><label for="cap_l_en">${esc(lab(L_.nameEn))}</label><input id="cap_l_en" maxlength="80" autocomplete="off" value="${esc(ln ? ln.name_en || '' : '')}"></div>
+      <div class="row"><button class="full" data-act="closesheet">${esc(lab(R.X.cancel))}</button><button class="primary full" data-act="cap_linesave" data-id="${ln ? ln.id : ''}">${esc(lab(R.X.save))}</button></div></div>`);
+    const reasonSheet = (kind, id) => { D.reason = { kind, id }; openSheet(`<h2>${esc(lab(L_.retire))}</h2><div class="stack"><div><label for="cap_why">${esc(lab(R.X.why))}</label><input id="cap_why" maxlength="300" autocomplete="off"></div><div class="row"><button class="full" data-act="closesheet">${esc(lab(R.X.cancel))}</button><button class="danger full" data-act="cap_rgo">${esc(lab(L_.retire))}</button></div></div>`); };
     const setData = () => (D.data.set || {});
     return {
-      cp_newline: () => lineSheet(null),
-      cp_editline: (a) => { const ln = (setData().lines || []).find((x) => String(x.id) === a.dataset.id); closeSheet(); if (ln) setTimeout(() => lineSheet(ln), 0); },
-      cp_linesave: (a) => {
-        const id = a.dataset.id ? Number(a.dataset.id) : null, bn = (($('#cp_l_bn') || {}).value || '').trim(), en = (($('#cp_l_en') || {}).value || '').trim(), loc = id ? null : Number(($('#cp_l_loc') || {}).value);
+      cap_newline: () => lineSheet(null),
+      cap_editline: (a) => { const ln = (setData().lines || []).find((x) => String(x.id) === a.dataset.id); closeSheet(); if (ln) setTimeout(() => lineSheet(ln), 0); },
+      cap_linesave: (a) => {
+        const id = a.dataset.id ? Number(a.dataset.id) : null, bn = (($('#cap_l_bn') || {}).value || '').trim(), en = (($('#cap_l_en') || {}).value || '').trim(), loc = id ? null : Number(($('#cap_l_loc') || {}).value);
         if (!bn) return toast(lab(R.ERR.bad_name)); if (!id && !loc) return toast(lab(L_.place) + '?');
         return act(sb.rpc('production_line_set', { p_id: id, p_loc: loc, p_name_bn: bn, p_name_en: en || null, p_active: true, p_note: null }), () => api.run());
       },
-      cp_retline: (a) => { closeSheet(); setTimeout(() => reasonSheet('line', a.dataset.id), 0); },
-      cp_newrate: () => {
+      cap_retline: (a) => { closeSheet(); setTimeout(() => reasonSheet('line', a.dataset.id), 0); },
+      cap_newrate: () => {
         const lines = (setData().lines || []).filter((l) => l.active);
         openSheet(`<h2>${esc(lab(L_.addRating))}</h2><div class="stack"><p class="muted">${esc(lab(R.X.paperCode))}</p>
-          <div><label for="cp_r_loc">${esc(lab(L_.place))}</label>${R.placeSel(D, 'cp_r_loc', D.loc, false)}</div>
-          <div><label for="cp_r_line">${esc(lab(L_.line))}</label><select id="cp_r_line"><option value="">${esc(lab(L_.whole2))}</option>${lines.map((l) => `<option value="${l.id}" data-loc="${l.location_id}">${esc(R.locName(l) + ' · ' + lineOwn(l))}</option>`).join('')}</select></div>
-          <div class="row"><div style="flex:1"><label for="cp_r_bpd">${esc(lab(L_.bpd))}</label><input id="cp_r_bpd" inputmode="decimal" autocomplete="off"></div><div style="flex:1"><label for="cp_r_dpw">${esc(lab(L_.dpw))}</label><input id="cp_r_dpw" inputmode="decimal" autocomplete="off"></div></div>
-          <div><label for="cp_r_from">${esc(lab(L_.from))}</label><input id="cp_r_from" type="date" value="${esc(R.today())}"></div>
-          <div><label for="cp_r_note">${esc(lab(L_.note))}</label><input id="cp_r_note" maxlength="300" autocomplete="off"></div>
-          <div class="row"><button class="full" data-act="closesheet">${esc(lab(R.X.cancel))}</button><button class="primary full" data-act="cp_ratesave">${esc(lab(R.X.save))}</button></div></div>`);
+          <div><label for="cap_r_loc">${esc(lab(L_.place))}</label>${R.placeSel(D, 'cap_r_loc', D.loc, false)}</div>
+          <div><label for="cap_r_line">${esc(lab(L_.line))}</label><select id="cap_r_line"><option value="">${esc(lab(L_.whole2))}</option>${lines.map((l) => `<option value="${l.id}" data-loc="${l.location_id}">${esc(R.locName(l) + ' · ' + lineOwn(l))}</option>`).join('')}</select></div>
+          <div class="row"><div style="flex:1"><label for="cap_r_bpd">${esc(lab(L_.bpd))}</label><input id="cap_r_bpd" inputmode="decimal" autocomplete="off"></div><div style="flex:1"><label for="cap_r_dpw">${esc(lab(L_.dpw))}</label><input id="cap_r_dpw" inputmode="decimal" autocomplete="off"></div></div>
+          <div><label for="cap_r_from">${esc(lab(L_.from))}</label><input id="cap_r_from" type="date" value="${esc(R.today())}"></div>
+          <div><label for="cap_r_note">${esc(lab(L_.note))}</label><input id="cap_r_note" maxlength="300" autocomplete="off"></div>
+          <div class="row"><button class="full" data-act="closesheet">${esc(lab(R.X.cancel))}</button><button class="primary full" data-act="cap_ratesave">${esc(lab(R.X.save))}</button></div></div>`);
       },
-      cp_ratesave: () => {
-        const loc = Number(($('#cp_r_loc') || {}).value), line = ($('#cp_r_line') || {}).value, bpd = R.nnum(($('#cp_r_bpd') || {}).value), dpw = R.nnum(($('#cp_r_dpw') || {}).value), from = ($('#cp_r_from') || {}).value;
+      cap_ratesave: () => {
+        const loc = Number(($('#cap_r_loc') || {}).value), line = ($('#cap_r_line') || {}).value, bpd = R.nnum(($('#cap_r_bpd') || {}).value), dpw = R.nnum(($('#cap_r_dpw') || {}).value), from = ($('#cap_r_from') || {}).value;
         if (!loc) return toast(lab(L_.place) + '?'); if (!(bpd > 0)) return toast(lab(R.ERR.bad_capacity)); if (!(dpw > 0 && dpw <= 7)) return toast(lab(R.ERR.bad_days)); if (!from) return toast(lab(R.ERR.bad_date));
-        return act(sb.rpc('capacity_rating_set', { p_loc: loc, p_line: line ? Number(line) : null, p_batches_per_day: bpd, p_days_per_week: dpw, p_from: from, p_note: (($('#cp_r_note') || {}).value || '').trim() || null }), () => api.run());
+        return act(sb.rpc('capacity_rating_set', { p_loc: loc, p_line: line ? Number(line) : null, p_batches_per_day: bpd, p_days_per_week: dpw, p_from: from, p_note: (($('#cap_r_note') || {}).value || '').trim() || null }), () => api.run());
       },
-      cp_retrate: (a) => { closeSheet(); setTimeout(() => reasonSheet('rating', a.dataset.id), 0); },
-      cp_rgo: () => {
-        const n = (($('#cp_why') || {}).value || '').trim(); if (n.length < 3) return toast(lab(R.ERR.note_required)); const s = D.reason;
+      cap_retrate: (a) => { closeSheet(); setTimeout(() => reasonSheet('rating', a.dataset.id), 0); },
+      cap_rgo: () => {
+        const n = (($('#cap_why') || {}).value || '').trim(); if (n.length < 3) return toast(lab(R.ERR.note_required)); const s = D.reason;
         if (s.kind === 'rating') return act(sb.rpc('capacity_rating_retire', { p_id: Number(s.id), p_note: n }), () => api.run());
         return act(sb.rpc('production_line_set', { p_id: Number(s.id), p_loc: null, p_name_bn: ((setData().lines || []).find((x) => String(x.id) === String(s.id)) || {}).name_bn, p_name_en: ((setData().lines || []).find((x) => String(x.id) === String(s.id)) || {}).name_en || null, p_active: false, p_note: n }), () => api.run());
       },

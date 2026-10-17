@@ -238,6 +238,16 @@ begin
   g as ($a$]);
     if v then n := n + 1; end if;
   end if;
+  -- (bos477c) ONE privacy switch is enough: CRM-A hides phone numbers on its screens when crm_mask_phone is ON, CRM-B when crm_pii_guard_on is ON. Either switch now masks both (otherwise the owner
+  -- who switched on the CRM-B guard would still see full numbers on the Customer 360 page). Both OFF = nothing hidden, as before.
+  if to_regprocedure('public._crma_mask_on()') is not null then
+    v := public._i2_patch(to_regprocedure('public._crma_mask_on()'), 'bos477c', array[$a$select public.rule_on('crm_mask_phone');$a$, $a$select public.rule_on('crm_mask_phone') or public.rule_on('crm_pii_guard_on'); /* bos477c */$a$]);
+    if v then n := n + 1; end if;
+  end if;
+  if to_regprocedure('public._crma_show_phone()') is not null then
+    v := public._i2_patch(to_regprocedure('public._crma_show_phone()'), 'bos477c', array[$a$select not public.rule_on('crm_mask_phone') or public._crma_contact_ok();$a$, $a$select not (public.rule_on('crm_mask_phone') or public.rule_on('crm_pii_guard_on')) /* bos477c */ or public._crma_contact_ok();$a$]);
+    if v then n := n + 1; end if;
+  end if;
   -- (bos477b) re-pasting phase 60 brings the old 4-argument qc_list back next to the 6-argument one of phase 432 (a call by name becomes ambiguous): drop it again, as phase 432 does
   if to_regprocedure('public.qc_list(integer,date,date,text,uuid,uuid)') is not null and to_regprocedure('public.qc_list(integer,date,date,text)') is not null then
     drop function public.qc_list(integer, date, date, text); n := n + 1;
@@ -274,6 +284,8 @@ create or replace function public._i2_expect() returns table(pkg text, fn text, 
     ('RPT-C1', 'public.report_run2_core(text,jsonb,text,text,integer)', 'bos441a', 'patch'),
     ('RPT-C1', 'public.report_run2_core(text,jsonb,text,text,integer)', 'bos441b', 'patch'),
     ('INTEGRATION', 'public._r3q_f3_raw_vs_recipe(date,date,integer[],jsonb)', 'bos477', 'patch'),
+    ('CRM-A', 'public._crma_mask_on()', 'bos477c', 'patch'),
+    ('CRM-A', 'public._crma_show_phone()', 'bos477c', 'patch'),
     ('RPT-B2', 'public.report_run2(text,jsonb,text,text,integer)', 'bos420', 'repaste phase420'),
     ('RPT-B2', 'public.stock_reconcile(boolean)', 'bos420', 'repaste phase420'),
     ('RPT-B2', 'public._r3q_p4_supplier_score(date,date,integer[],jsonb)', 'bos420', 'repaste phase420'),
@@ -292,7 +304,7 @@ begin
    where to_regprocedure(e.fn) is not null
      and exists (select 1 from pg_proc q where q.pronamespace = 'public'::regnamespace and q.proname = case e.pkg
            when 'RPT-B1' then '_rptb1_patch' when 'RPT-B3' then '_rb3_lot_gate' when 'CRM-B' then '_crmb_patch' when 'CRM-C' then '_crmc_patch'
-           when 'RPT-C1' then '_c1_patch' when 'RPT-B2' then '_r4_lockdown' when 'INTEGRATION' then '_rptb1_patch' end)
+           when 'RPT-C1' then '_c1_patch' when 'RPT-B2' then '_r4_lockdown' when 'INTEGRATION' then '_rptb1_patch' when 'CRM-A' then '_crma_mask_on' end)
      and (e.pkg <> 'INTEGRATION' or to_regclass('public.production_issue_actual') is not null)
    order by e.pkg, e.fn, e.marker;
 end $$;

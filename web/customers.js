@@ -165,7 +165,7 @@ function formSheet(c) {
     <div><label for="cf_note">${esc(T('notes'))}</label><input id="cf_note" value="${esc(e.note || '')}"></div>
     ${D.mgr ? `<div><label for="cf_limit">${esc(T('limit'))}</label><input id="cf_limit" inputmode="decimal" value="${e.credit_limit === null || e.credit_limit === undefined ? '' : esc(e.credit_limit)}"></div>
       <label class="row"><input type="checkbox" id="cf_lock" ${e.tier_locked ? 'checked' : ''}> ${esc(T('lock'))}</label>` : ''}
-    ${edit && B.crm && B.crm.openEdit ? `<button type="button" class="full" data-act="crm_more" data-v="${esc(e.id)}">More profile details</button>` : ''}
+    ${edit && B.crm && B.crm.openEdit && B.rule('crm_on', false) === true ? `<button type="button" class="full" data-act="crm_more" data-v="${esc(e.id)}">More profile details</button>` : ''}
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="cu_save">${esc(T('save'))}</button></div></div>`);
   setTimeout(() => { const f = $(edit ? '#cf_name' : '#cf_mobile'); if (f) f.focus(); }, 60);
 }
@@ -204,7 +204,7 @@ function menuSheet(id) {
 
 // ---------- profile ----------
 async function openProfile(id) {
-  if (B.crm && B.crm.open360) return B.crm.open360(id);
+  if (B.crm && B.crm.open360 && B.rule('crm_on', false) === true) return B.crm.open360(id);      // CRM-A (integration: only while the owner has switched crm_on ON; at the default the old profile sheet opens)
   const r = await (B.crmConsent ? B.crmConsent.profile(id) : sb.rpc('customer_profile', { p_customer: id })); if (r.error) return toast(eText(r.error));
   const d = r.data || {}, c = d.customer || {}; D.cur = { id, c, d };
   const t = tier(c.tier_id);

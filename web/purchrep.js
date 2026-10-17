@@ -92,7 +92,7 @@ function frame() {
   const locOpts = D.locs.map((l) => `<option value="${l.id}" ${String(D.loc) === String(l.id) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('');
   const supOpts = D.sups.map((s) => `<option value="${esc(s.id)}" ${D.sup === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
   shell(T('title'), `<div class="stack"><div class="card"><b>${esc(T('trend'))}</b> <button class="mini" data-act="pr_go" data-v="#/report/p2_rate_trend">${esc(T('openTrend'))}</button></div>
-    <div class="row wrap">${TABS.map((t) => `<button type="button" class="btn ${D.tab === t[0] ? 'primary' : ''}" data-act="pr_tab" data-v="${t[0]}">${esc(T(t[1]))}</button>`).join('')}</div>
+    <div class="row wrap">${TABS.map((t) => `<button type="button" class="btn ${D.tab === t[0] ? 'primary' : ''}" data-act="pur_tab" data-v="${t[0]}">${esc(T(t[1]))}</button>`).join('')}</div>
     <div class="row"><div style="flex:1"><label for="pr_from">${esc(T('from'))}</label><input id="pr_from" type="date" value="${esc(D.from)}"></div><div style="flex:1"><label for="pr_to">${esc(T('to'))}</label><input id="pr_to" type="date" value="${esc(D.to)}"></div></div>
     <div class="row"><div style="flex:1"><label for="pr_loc">${esc(T('place'))}</label><select id="pr_loc"><option value="">${esc(T('all'))}</option>${locOpts}</select></div>
       <div style="flex:1"><label for="pr_sup">${esc(T('supplier'))}</label><select id="pr_sup"><option value="">${esc(T('all'))}</option>${supOpts}</select></div></div>
@@ -101,7 +101,7 @@ function frame() {
 }
 const filt = () => ({ p_from: D.from, p_to: D.to, p_loc: D.loc ? Number(D.loc) : null });
 const out = (h) => { const el = $('#pr_out'); if (el) el.innerHTML = h; };
-const footer = (key, label) => `<div class="row"><button data-act="pr_csv" data-k="${key}" data-n="${label}">${esc(T('csv'))}</button></div>`;
+const footer = (key, label) => `<div class="row"><button data-act="pur_csv" data-k="${key}" data-n="${label}">${esc(T('csv'))}</button></div>`;
 const supN = (id) => { const s = D.sups.find((x) => x.id === id); return s ? s.name : id; };
 
 async function run() {
@@ -258,10 +258,10 @@ async function reasonSheet(kind, id) {
 const act = async (p, ok) => { if (D.busy) return; D.busy = true; try { const r = await p; if (r.error) return toast(eText(r.error)); closeSheet(); toast(T('saved')); await ok(r.data || {}); } catch (e) { fail(e); } finally { D.busy = false; } };
 
 Object.assign(H, {
-  pr_tab: (a) => { D.tab = a.dataset.v; frame(); },
+  pur_tab: (a) => { D.tab = a.dataset.v; frame(); },
   pr_show: () => { D.from = ($('#pr_from') || {}).value || D.from; D.to = ($('#pr_to') || {}).value || D.to; D.loc = ($('#pr_loc') || {}).value || ''; D.sup = ($('#pr_sup') || {}).value || ''; run(); },
   pr_go: (a) => { location.hash = a.dataset.v; },
-  pr_csv: (a) => exportCSV(a.dataset.k, a.dataset.n + `-${D.from}_${D.to}`, csvRows(a.dataset.k)),
+  pur_csv: (a) => exportCSV(a.dataset.k, a.dataset.n + `-${D.from}_${D.to}`, csvRows(a.dataset.k)),
   pr_pnew: priceSheet,
   pr_pgo: () => {
     const it = itemFrom(($('#pp_item') || {}).value), sup = ($('#pp_sup') || {}).value, price = nnum(($('#pp_price') || {}).value);

@@ -57,12 +57,12 @@ const locs = () => {
   return all.map((l) => ({ id: l.id, name: A.nm ? A.nm(l) : l.name_en || l.name_bn || l.code || String(l.id) }));
 };
 const TABS = [['list', 't_list'], ['uses', 't_uses'], ['liab', 't_liab']];
-const tabsBar = () => `<div class="row wrap" id="cp_tabs" style="gap:.3rem">${TABS.map(([k, l]) => `<button type="button" class="tog ${CP.tab === k ? 'on' : ''}" data-act="cp_tab" data-v="${k}">${esc(T(l))}</button>`).join('')}</div>`;
+const tabsBar = () => `<div class="row wrap" id="cpn_tabs" style="gap:.3rem">${TABS.map(([k, l]) => `<button type="button" class="tog ${CP.tab === k ? 'on' : ''}" data-act="cpn_tab" data-v="${k}">${esc(T(l))}</button>`).join('')}</div>`;
 const state = (c) => (!c.active ? 'retired' : (c.valid_to < today() ? 'expired' : 'active'));
 
 function listHTML() {
-  const off = CP.status && CP.status.voucher && !CP.status.voucher.on ? `<div class="notice" id="cp_off">${esc(T('offNote'))}</div>` : '';
-  const blank = CP.status && CP.status.voucher && (CP.status.voucher.max_percent == null || CP.status.voucher.max_amount == null) ? `<div class="notice" id="cp_blank">${esc(T('blankMax'))}</div>` : '';
+  const off = CP.status && CP.status.voucher && !CP.status.voucher.on ? `<div class="notice" id="cpn_off">${esc(T('offNote'))}</div>` : '';
+  const blank = CP.status && CP.status.voucher && (CP.status.voucher.max_percent == null || CP.status.voucher.max_amount == null) ? `<div class="notice" id="cpn_blank">${esc(T('blankMax'))}</div>` : '';
   const rows = CP.list.map((c) => {
     const st = state(c); const val_ = c.kind === 'percent' ? Number(c.value) + '%' : fm(c.value);
     const left = c.max_uses == null ? '' : ` · ${Math.max(Number(c.max_uses) - Number(c.uses), 0)} ${esc(T('left'))}`;
@@ -70,18 +70,18 @@ function listHTML() {
       <div>${esc(c.name)}</div>
       <div class="muted">${esc(c.valid_from)} → ${esc(c.valid_to)} · ${Number(c.uses)} ${esc(T('uses'))}${left}${c.min_bill != null ? ' · min ' + fm(c.min_bill) : ''}</div>
       <div class="row wrap" style="gap:.3rem">${chip(T(st === 'active' ? 'active' : st), st === 'active' ? 'ok' : '')}${c.customer_id ? chip(T('personal')) : ''}${(c.scope || []).length ? chip(T('scope')) : ''}${c.post_liability ? chip(T('t_liab')) : ''}</div>
-      <div class="row"><button type="button" class="mini" data-act="cp_edit" data-v="${esc(c.code)}">${esc(T('edit'))}</button>
-      <button type="button" class="mini" data-act="cp_active" data-v="${esc(c.code)}">${esc(c.active ? T('retire') : T('reopen'))}</button>
-      <button type="button" class="mini" data-act="cp_log" data-v="${esc(c.code)}">${esc(T('t_uses'))}</button></div></div>`;
+      <div class="row"><button type="button" class="mini" data-act="cpn_edit" data-v="${esc(c.code)}">${esc(T('edit'))}</button>
+      <button type="button" class="mini" data-act="cpn_active" data-v="${esc(c.code)}">${esc(c.active ? T('retire') : T('reopen'))}</button>
+      <button type="button" class="mini" data-act="cpn_log" data-v="${esc(c.code)}">${esc(T('t_uses'))}</button></div></div>`;
   }).join('');
-  return `<p class="muted">${esc(T('hint'))}</p>${off}${blank}<div class="row"><button type="button" class="full primary" data-act="cp_new">+ ${esc(T('newc'))}</button></div>${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
+  return `<p class="muted">${esc(T('hint'))}</p>${off}${blank}<div class="row"><button type="button" class="full primary" data-act="cpn_new">+ ${esc(T('newc'))}</button></div>${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
 }
 function usesHTML() {
   const opts = `<option value="">${esc(T('all'))}</option>` + CP.list.map((c) => `<option value="${esc(c.id)}" ${CP.filter === c.id ? 'selected' : ''}>${esc(c.code)}</option>`).join('');
   const rows = CP.uses.map((u) => `<div class="card ${u.sale_status === 'void' ? 'muted' : ''}"><div class="row between"><b>${esc(u.code)}</b><b>${fm(u.discount_given)}</b></div>
     <div class="muted">${esc(T('receipt'))} ${esc(u.receipt)} · ${esc(String(u.sale_date))}${u.customer_name ? ' · ' + esc(u.customer_name) : ''}${u.sale_status === 'void' ? ' · void' : ''}</div>
     <div class="row wrap" style="gap:.3rem">${u.mismatch ? chip(T('mismatch') + ' (' + T('expected') + ' ' + fm(u.discount_expected) + ')') : ''}${u.override_reason ? chip(T('override')) : ''}</div></div>`).join('');
-  return `<h3>${esc(T('logTitle'))}</h3>${fld('cp_f', T('filter'), `<select id="cp_f">${opts}</select>`)}${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
+  return `<h3>${esc(T('logTitle'))}</h3>${fld('cpn_f', T('filter'), `<select id="cpn_f">${opts}</select>`)}${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
 }
 function liabHTML() {
   const r = CP.liab; if (!r) return `<p class="muted">${esc(T('none'))}</p>`;
@@ -90,7 +90,7 @@ function liabHTML() {
     <div class="row"><button type="button" class="full" data-act="lb_sync">${esc(T('sync'))}</button><button type="button" class="full" data-act="lb_wind">${esc(T('wind'))}</button></div>${rows || `<p class="muted">${esc(T('none'))}</p>`}`;
 }
 function draw() {
-  const el = $('#cp_body'); if (!el) return;
+  const el = $('#cpn_body'); if (!el) return;
   el.innerHTML = tabsBar() + (CP.tab === 'list' ? listHTML() : CP.tab === 'uses' ? usesHTML() : liabHTML());
 }
 async function load(tab) {
@@ -106,7 +106,7 @@ function formSheet(c) {
   const isNew = !c; const sc = (c && c.scope) || [];
   const chk = (id) => sc.some((s) => s.kind === 'location' && String(s.ref) === String(id)) ? 'checked' : '';
   const cats = sc.filter((s) => s.kind === 'category').map((s) => s.ref).join(', ');
-  openSheet(`<h3>${esc(isNew ? T('newc') : c.code)}</h3><div class="stack" id="cp_form">
+  openSheet(`<h3>${esc(isNew ? T('newc') : c.code)}</h3><div class="stack" id="cpn_form">
     ${isNew ? fld('cf_code', T('code2'), inp('cf_code', '', 'maxlength="20" style="text-transform:uppercase"')) : ''}
     ${fld('cf_name', T('name'), inp('cf_name', c ? c.name : '', 'maxlength="80"'))}
     ${fld('cf_kind', T('kind'), `<select id="cf_kind" ${isNew ? '' : 'disabled'}><option value="percent" ${c && c.kind === 'percent' ? 'selected' : ''}>${esc(T('percent'))}</option><option value="amount" ${c && c.kind === 'amount' ? 'selected' : ''}>${esc(T('amount'))}</option></select>`)}
@@ -122,7 +122,7 @@ function formSheet(c) {
       <label class="row"><input type="checkbox" id="cf_liab" ${c && c.post_liability ? 'checked' : ''} ${isNew ? '' : 'disabled'}> ${esc(T('liab'))}</label>
       ${S.ctx && S.ctx.is_owner ? fld('cf_over', T('over'), inp('cf_over', '', 'maxlength="300"')) : ''}
     </div></details>
-    <div class="row"><button type="button" class="full" data-act="closesheet">${esc(T('cancel'))}</button><button type="button" class="full primary" data-act="cp_savego" data-v="${esc(c ? c.id : '')}">${esc(T('save'))}</button></div></div>`);
+    <div class="row"><button type="button" class="full" data-act="closesheet">${esc(T('cancel'))}</button><button type="button" class="full primary" data-act="cpn_savego" data-v="${esc(c ? c.id : '')}">${esc(T('save'))}</button></div></div>`);
 }
 async function itemIds(codes) {
   if (!codes.length) return [];
@@ -132,12 +132,12 @@ async function itemIds(codes) {
   return codes.map((c) => m[c]);
 }
 Object.assign(H, {
-  cp_tab: act(async (a) => { await load(a.dataset.v); }),
-  cp_new: () => formSheet(null),
-  cp_edit: (a) => formSheet(CP.list.find((x) => x.code === a.dataset.v)),
-  cp_active: act(async (a) => { const c = CP.list.find((x) => x.code === a.dataset.v); if (!c) return; await call('crmf_coupon_save', { p_id: c.id, p: { active: !c.active }, p_client: null, p_override: null }); toast(T('saved')); CP.list = []; await load('list'); }),
-  cp_log: act(async (a) => { const c = CP.list.find((x) => x.code === a.dataset.v); CP.filter = c ? c.id : ''; await load('uses'); }),
-  cp_savego: act(async (a) => {
+  cpn_tab: act(async (a) => { await load(a.dataset.v); }),
+  cpn_new: () => formSheet(null),
+  cpn_edit: (a) => formSheet(CP.list.find((x) => x.code === a.dataset.v)),
+  cpn_active: act(async (a) => { const c = CP.list.find((x) => x.code === a.dataset.v); if (!c) return; await call('crmf_coupon_save', { p_id: c.id, p: { active: !c.active }, p_client: null, p_override: null }); toast(T('saved')); CP.list = []; await load('list'); }),
+  cpn_log: act(async (a) => { const c = CP.list.find((x) => x.code === a.dataset.v); CP.filter = c ? c.id : ''; await load('uses'); }),
+  cpn_savego: act(async (a) => {
     const id = a.dataset.v || null; const p = {};
     const num = (k, s, nm) => { const v = nnum(val(s)); if (Number.isNaN(v)) throw new Error(ERR.bad_number); if (v !== null) p[k] = v; else if (id) p[k] = null; };
     if (!id) { p.code = val('cf_code').toUpperCase(); p.kind = val('cf_kind'); }
@@ -162,11 +162,11 @@ Object.assign(H, {
   lb_wind: () => openSheet(`<h3>${esc(T('wind'))}</h3><div class="stack">${fld('wd_why', T('reason'), inp('wd_why', '', 'maxlength="300"'))}<div class="row"><button type="button" class="full" data-act="closesheet">${esc(T('cancel'))}</button><button type="button" class="full primary" data-act="lb_windgo">${esc(T('windGo'))}</button></div></div>`),
   lb_windgo: act(async () => { const w = val('wd_why'); if (w.length < 3) return toast(ERR.reason_required); await call('crmf_voucher_liability_wind_down', { p_reason: w }); closeSheet(); toast(T('done')); await load('liab'); }),
 });
-document.addEventListener('change', (e) => { const t = e.target; if (t && t.id === 'cp_f') { CP.filter = t.value; load('uses').catch((er) => toast(er.message)); } });
+document.addEventListener('change', (e) => { const t = e.target; if (t && t.id === 'cpn_f') { CP.filter = t.value; load('uses').catch((er) => toast(er.message)); } });
 
 async function viewCoupons() {
   if (B.loadStatic) await B.loadStatic();
-  shell(T('title'), '<div id="cp_body"><p class="muted">…</p></div>', true);
+  shell(T('title'), '<div id="cpn_body"><p class="muted">…</p></div>', true);
   try { await load(CP.tab); } catch (e) { fail(e); }
 }
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { crmcoupons: viewCoupons });
@@ -178,7 +178,7 @@ window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { crmcoupons: viewCoupo
 const CF = { status: null, at: 0, pending: null };
 async function cfStatus() {
   if (CF.status && Date.now() - CF.at < 60000) return CF.status;
-  try { CF.status = await call('crmf_status', {}); } catch (e) { CF.status = { voucher: { on: false } }; }
+  try { CF.status = (await call('crmf_status', {})) || { voucher: { on: false } }; } catch (e) { CF.status = { voucher: { on: false } }; }
   CF.at = Date.now(); return CF.status;
 }
 const REASON = {

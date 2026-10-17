@@ -117,14 +117,14 @@ function headHTML() {
     ${s.never_scored ? `<div class="notice" id="cs_unscored">${esc(String(s.never_scored))} customers have no score yet. Rules about orders, spending or visits skip them until you press Refresh scores.</div>` : ''}</div>`;
 }
 function tabsBar() {
-  return `<div class="row wrap" id="cs_tabs" style="gap:.3rem">${[['lists', 'Saved lists'], ['build', 'New list']].map(([k, l]) => `<button type="button" class="tog ${D.tab === k ? 'on' : ''}" data-act="cs_tab" data-v="${k}">${esc(l)}</button>`).join('')}</div>`;
+  return `<div class="row wrap" id="cs_tabs" style="gap:.3rem">${[['lists', 'Saved lists'], ['build', 'New list']].map(([k, l]) => `<button type="button" class="tog ${D.tab === k ? 'on' : ''}" data-act="crs_tab" data-v="${k}">${esc(l)}</button>`).join('')}</div>`;
 }
 function listsHTML() {
   const me = D.me || {};
   const off = me.edit && !me.segments_on ? `<div class="notice" id="cs_off">Saving lists is switched off. You can still build a list and see how many customers it holds. The owner switches saving on in Settings.</div>` : '';
   const rows = (D.segs || []).map((s) => `<div class="card cs-seg" data-id="${esc(s.id)}"><div class="row between"><b>${esc(s.name)}</b>${chip(s.kind === 'list' ? 'Frozen' : 'Live', s.kind === 'list' ? 'ok' : '')}</div>
       <div class="muted">${s.kind === 'list' ? esc(String(s.member_count)) + ' customers, frozen ' + esc(dt(s.frozen_at)) : 'Last count ' + esc(String(s.last_count ?? '-')) + ' · ' + esc(dt(s.last_count_at))}${s.note ? ' · ' + esc(s.note) : ''}</div>
-      <div class="row wrap"><button class="primary" data-act="cs_open" data-v="${esc(s.id)}">Show customers</button><button data-act="cs_count" data-v="${esc(s.id)}">Count now</button>
+      <div class="row wrap"><button class="primary" data-act="crs_open" data-v="${esc(s.id)}">Show customers</button><button data-act="cs_count" data-v="${esc(s.id)}">Count now</button>
         <details><summary>More</summary><div class="row wrap">
           ${me.edit && me.segments_on && s.kind === 'dynamic' ? `<button data-act="cs_freezesaved" data-v="${esc(s.id)}">Freeze as list</button><button data-act="cs_edit" data-v="${esc(s.id)}">Change rules</button>` : ''}
           ${me.export && me.export_on ? `<button data-act="cs_exportsaved" data-v="${esc(s.id)}">Export</button>` : ''}
@@ -196,7 +196,7 @@ const segArgs = () => ({ p_rule: toRule() });
 function askText(q) { const r = window.prompt(q); return r === null ? null : r.trim(); }
 
 Object.assign(H, {
-  cs_tab: (a) => { readConds(); D.tab = a.dataset.v; draw(); },
+  crs_tab: (a) => { readConds(); D.tab = a.dataset.v; draw(); },
   cs_refresh: act(async () => {
     let r = await call('crmc_metrics_refresh', { p_dry: false, p_limit: null });
     toast('Scored ' + r.processed + (r.remaining ? ', ' + r.remaining + ' left: press again' : ', all up to date'));
@@ -220,7 +220,7 @@ Object.assign(H, {
   }),
   cs_members: act(async () => { const r = toRule(); await showPage({ p_rule: r }, 'Customers in this list', 0); }),
   cs_pg: act(async (a) => { await showPage(D.page.args, D.page.title, Number(a.dataset.v)); }),
-  cs_open: act(async (a) => { const s = D.segs.find((x) => String(x.id) === a.dataset.v); await showPage({ p_segment: s.id }, s.name, 0); }),
+  crs_open: act(async (a) => { const s = D.segs.find((x) => String(x.id) === a.dataset.v); await showPage({ p_segment: s.id }, s.name, 0); }),
   cs_count: act(async (a) => { const s = D.segs.find((x) => String(x.id) === a.dataset.v); const pv = await call('crmc_preview', { p_rule: null, p_segment: s.id }); toast(s.name + ': ' + pv.count + ' customers'); }),
   cs_edit: (a) => {
     const s = D.segs.find((x) => String(x.id) === a.dataset.v); D.editing = s.id;
