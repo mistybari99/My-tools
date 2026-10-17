@@ -1,5 +1,5 @@
 -- Phase 416 (bos416) - RPT-B4 / R9b: FACTORY VS RETAIL (#7) AND THE AUDIT LINE FOR THE CSV OF EVERY NEW REPORT OF THIS PACKAGE.
--- Paste after phase415 (and after 406-413 for the export keys to be useful; the report itself needs 404 and 415 only). Paste-twice safe. Read only. No earlier phase file is edited.
+-- Paste after phase415 (and after 406-413 for the export keys to be useful; the report itself needs 404, 409, 410 and 415; the guard below says so). Paste-twice safe. Read only. No earlier phase file is edited.
 --
 --   rb4_factory_vs_retail(from, to)   three blocks side by side, per place the reader may see:
 --     factory   what each factory place produced (runs, output per item, the cost booked on the runs) and what it sent to the shops;
