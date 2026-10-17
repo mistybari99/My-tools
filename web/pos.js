@@ -219,6 +219,7 @@ function cartSheet() {
     <div class="row wrap" style="margin:8px 0"><button class="tog ${P.type === 'retail' ? 'on' : ''}" data-act="pos_type" data-v="retail">${esc(T('retail'))}</button><button class="tog ${P.type === 'wholesale' ? 'on' : ''}" data-act="pos_type" data-v="wholesale">${esc(T('wholesale'))}</button></div>
     ${dm.a || dm.p ? `<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${dm.a && dm.p ? `<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${esc(T('discL'))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${esc(T('discL'))} %">%</button></div>` : ''}</div>
     <div class="muted" id="cart_disc_calc" style="font-size:.9rem;min-height:1.4em"></div>` : ''}
+    ${B.mkt && B.mkt.posBox ? B.mkt.posBox() : ''}
     <div class="row between" style="margin:10px 0"><span>${esc(T('total'))}</span><b style="font-size:1.4rem" id="cart_total"></b></div>
     <div id="cart_pay"></div><div id="cart_cust"></div>
     <div style="margin-top:8px"><label>${esc(T('note'))}</label><input id="cart_note"></div>
@@ -328,7 +329,7 @@ async function submitSale(p, change) {
   try {
     const { data, error } = await send(p);
     if (error) {
-      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); return afterSale(); }
+      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); if (B.mkt && B.mkt.queued) B.mkt.queued(p.p_client); return afterSale(); }   // RPT-C3: remember the campaign tag of a queued sale
       if (btn) btn.disabled = false;
       const m = T2(error);
       if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: g === 'discount_over_limit' ? { amount: p.p_discount, total: p._total } : g === 'credit_over_limit' ? { amount: Math.max(0, Math.round((p._total - p._paid) * 100) / 100), total: p._total } : { total: p._total }, message: m }); return toast(m); }
@@ -339,6 +340,7 @@ async function submitSale(p, change) {
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
+    if (B.mkt && B.mkt.afterSale) B.mkt.afterSale(data.id);   // RPT-C3: optional campaign / offer code tag (silent when campaigns.js is not loaded)
     afterSale();
   } finally { P.busy = false; }
 }

@@ -107,6 +107,15 @@ const IA = [
   rec('brandpnl', 'reports', ['ব্র্যান্ড অনুযায়ী লাভ-ক্ষতি', 'Brand profit & loss', 'Brand Profit-Loss'], { icon: 'biz', ok: (c) => c.own || c.P('POS', 'approve'), kw: ['brand', 'profit', 'ব্র্যান্ড', 'লাভ'] }),
   rec('discounts', 'reports', ['ডিসকাউন্ট রিপোর্ট', 'Discounts report', 'Discount report'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve'), also: ['sale'], kw: ['discount', 'offer', 'ডিসকাউন্ট', 'ছাড়'] }),
   rec('report', 'reports', ['রিপোর্ট', 'Reports', 'Report'], { icon: 'doc', drawer: false, status: 'hidden', alias: 'reports' }),
+  // RPT-C3: marketing, audit and planning reports (reports stay open to the existing report grants; the server decides)
+  rec('campaigns', 'reports', ['মার্কেটিং ক্যাম্পেইন ও রিপোর্ট', 'Marketing campaigns & reports', 'Marketing campaign ও report'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true || c.GF.report_marketing === true, also: ['acc'],
+    kw: ['campaign', 'marketing', 'spend', 'roi', 'cac', 'acquisition', 'promotion', 'offer', 'coupon', '18-1', 'ক্যাম্পেইন', 'মার্কেটিং', 'প্রচার', 'অফার'], verbs: ['see marketing spend by campaign', 'post marketing spend to the books'] }),
+  rec('couponuse', 'reports', ['কুপন ও অফারের ব্যবহার', 'Coupon & offer usage', 'Coupon ও offer usage'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true || c.GF.report_marketing === true, drawer: false, parent: 'campaigns',
+    kw: ['coupon', 'voucher', 'offer code', 'কুপন', 'অফার কোড'] }),
+  rec('auditreports', 'appr', ['অডিট ও নিয়ন্ত্রণ রিপোর্ট', 'Audit & control reports', 'Audit ও control report'], { icon: 'check', ok: (c) => c.own || c.anyApprove() || c.GF.view_reports === true || c.GF.report_control === true, also: ['item'],
+    kw: ['audit log', 'void', 'reversal', 'correction', 'approval delay', 'override', 'activity', 'missing cost', 'অডিট', 'বাতিল', 'সংশোধন', 'অনুমোদন'], verbs: ['read the audit log', 'see all voids'] }),
+  rec('forecast', 'reports', ['পরিকল্পনা ও পূর্বাভাস', 'Planning & forecasts', 'Planning ও forecast'], { icon: 'biz', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true || c.GF.report_sales === true || c.GF.report_stock === true || c.GF.report_cash === true, also: ['factory', 'purch', 'stock'],
+    kw: ['forecast', 'demand', 'festival', 'scenario', 'what if', 'production requirement', 'cash calendar', 'expiry risk', 'পূর্বাভাস', 'চাহিদা', 'উৎসব', 'পরিকল্পনা'], verbs: ['forecast sales', 'plan production', 'see expected cash'] }),
   // Staff, roles, permissions
   rec('staff', 'people', 't:staff', { ok: owner, cnt: 'stf', tone: 'info', mod: 13, kw: ['staff', 'employee', 'user', 'approve user', 'স্টাফ', 'কর্মী', 'ব্যবহারকারী'] }),
   rec('matrix', 'people', 't:matrix', { ok: owner, kw: ['role', 'permission', 'access', 'ভূমিকা', 'অনুমতি', 'রোল'] }),
@@ -165,7 +174,7 @@ const IA = [
 // 3D icon key per screen (icons3d.js). The old r.icon stays for the Classic theme; i3 is used by the Premium themes. Unknown routes fall back to icon, then doc.
 const I3 = { items: 'bag', 'items/new': 'plus', lists: 'list', 'settings2/units': 'scale', itemimport: 'download', itemmap: 'link', bulkitems: 'bag', itemtypes: 'tag', stock: 'box', assets: 'tool', purchase: 'cart', 'purchase/new': 'plus',
   'purchase/return': 'swap', payables: 'money', recipes: 'chef', pos: 'pos', salereturn: 'swap', dues: 'dues', invoice: 'print', daybook: 'book', cashmoves: 'money', parallel: 'swap', flow: 'check', delegation: 'users', accounts: 'book', employees: 'users', 'employees/new': 'plus', deeds: 'doc', attendance: 'check', leave: 'calendar', payroll: 'money', customers: 'users', tiers: 'star', notifications: 'bell', partners: 'money', assistant: 'info', printbooks: 'print', switchboard: 'settings', ledgerlinks: 'link', exceptions: 'warn', pending: 'stamp', itemreq: 'swap', releases: 'unlock',
-  emergency: 'alert', changes: 'edit', numaudit: 'hash', outbox: 'upload', reports: 'chart', biz: 'pie', brandpnl: 'pie', discounts: 'tag', staff: 'users', matrix: 'matrix', salary: 'money', locations: 'pin', locset: 'pinset', locsheet: 'pinset',
+  emergency: 'alert', changes: 'edit', numaudit: 'hash', outbox: 'upload', reports: 'chart', biz: 'pie', brandpnl: 'pie', discounts: 'tag', campaigns: 'chart', couponuse: 'tag', auditreports: 'history', forecast: 'pie', staff: 'users', matrix: 'matrix', salary: 'money', locations: 'pin', locset: 'pinset', locsheet: 'pinset',
   rollout: 'sliders', control: 'sliders', rulehub: 'shield', owner: 'sliders', rules: 'rules', settings: 'gear', settings2: 'sliders', logs: 'history', backup: 'download', home: 'home' };
 IA.forEach((r) => { r.i3 = I3[r.route] || (r.route.startsWith('settings2/') ? 'gear' : r.icon); });
 const byRoute = new Map(IA.map((r) => [r.route, r]));
