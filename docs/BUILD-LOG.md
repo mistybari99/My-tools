@@ -574,3 +574,13 @@ Not confirmed
 Merge of all finished packages onto one branch; see docs/integration/INTEGRATION.md for merge order, conflicts, renumbering, glue (phase 477), handler renames, test results and what is not covered. Owner paste list: docs/PASTE_ORDER.md.
 - Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
 - Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.
+
+## X4 AI helpers (phases 510-511, branch x4-agents)
+
+What changed: SQL phases 510 (provider registry without key column, monthly budgets, redaction rules, 10 agents all OFF, forbidden action and grant guards, untrusted-input rule, append-only `ai_calls`, owner RPCs) and 511 (verified knowledge with second-owner verification, suggestions with accept/reject/correct and no self-decision, outcomes, evaluation cases and runs, scorecard, usage with owner-typed prices only). JS core `web/ai_core.js` (redaction, schema subset, tool whitelist, untrusted rule, one-round tool limit, gate before provider call, BM25 with authoritative flag). Edge source `tools/edge/ai-proxy.ts` (not deployed). `tools/ai_kb_check.py` + `docs/ai_kb/entries.json` (two PROPOSED entries; nothing verified by the builder). CI `ai-kb.yml` OFF unless repository variable AI_KB_REBUILD is 'true'. Docs: docs/AI_DEPLOY.md, docs/integration/X4.md. (i) entries for the 4 switches merged into web/data/info.json. kb.json rebuilt.
+
+Tests run: phase510_test.sql 51/51, phase511_test.sql 34/34 on a throwaway Postgres (port 5830), each file pasted twice without error. tests/web/ai_core_test.js 87/87 (includes 36 injection cases, mock provider only). check_no_demo_leak OK, build_kb --check OK, check_info_coverage OK, build_phase477 --check OK, ai_kb_check OK.
+
+Not built yet: AI screens (agent picker, feedback thumbs, proposal inbox, usage/scorecard pages), ia.js registration, speech input, prompt library and redaction editor UI, rate limits per user beyond the existing assistant hour limit, provider adapter run against a live provider, X1 adapter (action_proposals), eval runner against providers. Not run: existing browser suites (kb.json changed).
+
+Owner checks: paste phase510 then phase511 (after phase478) on the TEST project first; confirm ai_on is OFF and ai_agents shows 10 disabled agents; nothing is deployed.

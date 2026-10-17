@@ -1993,6 +1993,38 @@
    "verified": true,
    "src": "phase40.sql; phase89.sql"
   },
+  "rule:ai_default_provider": {
+   "title": "Default AI provider",
+   "does": "Chooses which provider the helpers use when an agent does not name one. local_rules runs on the phone for free. The other choices are paid providers and need a key, a model and a monthly budget first.",
+   "why": "A paid provider can spend money every month. Keeping local_rules as the default means no spending happens by accident.",
+   "default": "local_rules (on the phone, free).",
+   "change": "A paid provider is used only when it is enabled, has a model and a budget, and the data level it needs is allowed for it. The AI log shows each call.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_on": {
+   "title": "AI helpers are on (after a provider is linked)",
+   "does": "Lets the AI helpers run. Nothing runs while this is off, and no provider is called and no money is spent.",
+   "why": "This is the main on/off for every AI helper. It is safe to leave off until a provider and a monthly budget are set.",
+   "default": "Off. No AI call is made and nothing is spent.",
+   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews. Nothing is changed by the AI itself.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_pause_all": {
+   "title": "Pause all AI now (emergency stop)",
+   "does": "Stops every AI agent and every provider at once. No new suggestion or proposal is made while it is on.",
+   "why": "If an answer looks wrong or a cost looks too high, one switch stops everything at once.",
+   "default": "Off.",
+   "change": "On: every AI call is refused and the reason 'paused' is written in the AI log. Existing suggestions and their decisions are kept.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_speech_on": {
+   "title": "Voice questions (browser speech-to-text)",
+   "does": "Shows a microphone button in the assistant. The phone's own speech recognition turns the voice into text, which is then shown for the person to check before it is asked.",
+   "why": "Helps people who prefer speaking, including in Bangla. The text is still checked and redacted like typed text.",
+   "default": "Off. No microphone button is shown.",
+   "change": "On: the microphone button appears in the assistant. The question is still answered by the same rules and permissions as typed text.",
+   "who": "Only the owner, in Settings."
+  },
   "rule:allow_test_reset": {
    "title": "Allow test data reset",
    "does": "When ON, the owner can delete all test data by typing a fixed phrase. The switch turns itself OFF after one reset and a log line is written.",
