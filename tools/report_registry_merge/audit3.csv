@@ -1,0 +1,90 @@
+no,name_en,name_bn,question_en,question_bn,section,status,route,source,area,note
+105,Daily Cash Book,Daily Cash Book,Daily Cash Book,Daily Cash Book,8,implemented,daybook,`day_book` p23:390 (+`_daybook_lines` p13:99); `money_statement` p87:933,cash,"P: drafts and voids excluded, refunds in; card shown as bank"
+106,Day Book / Transaction Register,Day Book / Transaction Register,Day Book / Transaction Register,Day Book / Transaction Register,8,implemented,daybook,`acct_journal_book` p40:896; `day_book`,cash,Y: reversal rows flagged
+107,Daily Cash Flow,Daily Cash Flow,Daily Cash Flow,Daily Cash Flow,8,implemented,daybook,`_r3q_w1_cash_flow` p25:246,cash,P: internal transfers and salary excluded by design
+108,Cashier Day Close,Cashier Day Close,Cashier Day Close,Cashier Day Close,8,implemented,report/pos_day_close,rpt_def p9:517; blind count p18,cash,Y: voids shown apart
+109,Cash Shortage/Excess,Cash Shortage/Excess,Cash Shortage/Excess,Cash Shortage/Excess,8,implemented,shortages,"`cash_short_list` p81:195, `cash_short_decide`; p21:351",cash,P: report ignores case status (F14)
+110,Cash Handover vs Physical Count,Cash Handover vs Physical Count,Cash Handover vs Physical Count,Cash Handover vs Physical Count,8,implemented,report/w2_handover_vs_hub,p25:259,cash,Y
+111,Payment Method Reconciliation,Payment Method Reconciliation,Payment Method Reconciliation,Payment Method Reconciliation,8,implemented,wallets,rpt_def p9; `d_wallet_recon_report` p83:517,cash,Y: voided excluded
+112,Bank Reconciliation,Bank Reconciliation,Bank Reconciliation,Bank Reconciliation,8,unverified,finance2,"`bank_stmt_import` p53:248, `bank_recon_*` p53:308-437",cash,Y: reversals visible as book lines
+113,Mobile Financial Service and Card Settlement Recon,Mobile Financial Service and Card Settlement Recon,Mobile Financial Service and Card Settlement Recon,Mobile Financial Service and Card Settlement Recon,8,incomplete,wallets,`d_wallet_*` p83; p9,cash,"P: card treated as bank, no settlement batch"
+114,Expense Register,Expense Register,Expense Register,Expense Register,8,incomplete,quickexp,`expense_by_head` p21; `quick_expense_day` p50:194,cash,"N: three totals 790/1,210/920 (F3)"
+115,Expenses by Category/Head,Expenses by Category/Head,Expenses by Category/Head,Expenses by Category/Head,8,incomplete,report/expense_by_head,"p21 (dims head, location, day)",cash,N: skips quick expenses (F3)
+116,Expense Trend and Period Comparison,Expense Trend and Period Comparison,Expense Trend and Period Comparison,Expense Trend and Period Comparison,8,implemented,report/e2_expense_trend,p25:175,cash,Y (P&L basis; differs from 115)
+117,"Petty Cash, Imprest, Missing Receipts","Petty Cash, Imprest, Missing Receipts","Petty Cash, Imprest, Missing Receipts","Petty Cash, Imprest, Missing Receipts",8,implemented,report/e3_weak_control,p25:189; `quick_expense_close_day` p50:208,cash,Y
+118,Accounts Receivable and Customer Dues,Accounts Receivable and Customer Dues,Accounts Receivable and Customer Dues,Accounts Receivable and Customer Dues,8,implemented,dues,"`customer_dues` p12:539, report SQL p9:766, `acct_party_ledger` p40:935, `acct_reconcile` p40:959",cash,P: voids excluded; opening dues not linked (F13)
+119,Accounts Payable and Supplier Dues,Accounts Payable and Supplier Dues,Accounts Payable and Supplier Dues,Accounts Payable and Supplier Dues,8,implemented,payables,"`supplier_dues` p10:1240, `payables_summary` p10:1289, `supplier_ledger`",cash,Y
+120,Receivable and Payable Ageing,Receivable and Payable Ageing,Receivable and Payable Ageing,Receivable and Payable Ageing,8,implemented,report/receivable_aging,rule `report_aging_buckets`,cash,Y
+121,P&L by Month and Outlet,P&L by Month and Outlet,P&L by Month and Outlet,P&L by Month and Outlet,8,incomplete,accounts,"`_p27_pl` p27:17, `_r3q_l1_pnl` p27:73; `acct_income_statement` p40:821",cash,"P: returns netted; wastage and bill opex excluded; nulls shown as 0 (F1,F2)"
+122,Consolidated P&L,Consolidated P&L,Consolidated P&L,Consolidated P&L,8,implemented,accounts,`acct_income_statement` p40:821; `money_statements` p87:1086,cash,"Y: reversals net, entries balanced"
+123,Balance Sheet,Balance Sheet,Balance Sheet,Balance Sheet,8,implemented,accounts,`acct_balance_sheet` p40:843,cash,Y
+124,Cash Flow Statement,Cash Flow Statement,Cash Flow Statement,Cash Flow Statement,8,incomplete,accounts,`acct_cash_flow` p40:915,cash,"P: opening journal as inflow, transfers gross (F12)"
+125,Cost Coverage and Break-even,Cost Coverage and Break-even,Cost Coverage and Break-even,Cost Coverage and Break-even,8,incomplete,biz,`_r3q_l5_breakeven` p27:179,cash,P: totals 0 when fixed cost blank (F1)
+126,Working Capital Summary,Working Capital Summary,Working Capital Summary,Working Capital Summary,8,unavailable,,-,cash,-
+127,"Loan, Interest, Repayment Schedule (if applicable)","Loan, Interest, Repayment Schedule (if applicable)","Loan, Interest, Repayment Schedule (if applicable)","Loan, Interest, Repayment Schedule (if applicable)",8,unavailable,,`partner_capital_balances` p44:714; p87:793,cash,-
+128,Tax/VAT Reconciliation (if applicable),Tax/VAT Reconciliation (if applicable),Tax/VAT Reconciliation (if applicable),Tax/VAT Reconciliation (if applicable),8,incomplete,finance2,`vat_report` p53:556,cash,Y: returns reduce VAT
+129,Owner's Financial Summary vs System,Owner's Financial Summary vs System,Owner's Financial Summary vs System,Owner's Financial Summary vs System,8,implemented,profitcheck,p27:146; `profit_recon` p92:314; `report_parity` p93:218,cash,P: management basis (F2)
+130,Best Customers,Best Customers,Best Customers,Best Customers,9,implemented,customers,rpt_def p9,customer,Y: done sales only
+131,New vs Repeat,New vs Repeat,New vs Repeat,New vs Repeat,9,implemented,report/d5_lapsed,p25:46,customer,Y
+132,Lapsed Customers,Lapsed Customers,Lapsed Customers,Lapsed Customers,9,implemented,report/d5_lapsed,p25:46,customer,P: 180 days hard-coded (F9)
+133,Customer Purchase History,Customer Purchase History,Customer Purchase History,Customer Purchase History,9,implemented,report/receipt_register,`customer_profile` p43:753,customer,Y
+134,Segmentation/RFM,Segmentation/RFM,Segmentation/RFM,Segmentation/RFM,9,incomplete,report/m1_rfm,p25:61,customer,Y
+135,Customer Outstanding Dues,Customer Outstanding Dues,Customer Outstanding Dues,Customer Outstanding Dues,9,implemented,,p9:766,customer,-
+136,Customer Receivable Ageing,Customer Receivable Ageing,Customer Receivable Ageing,Customer Receivable Ageing,9,implemented,,p9:779,customer,-
+137,Credit-limit Utilization,Credit-limit Utilization,Credit-limit Utilization,Credit-limit Utilization,9,implemented,report/credit_limit_use,p9:814,customer,Y
+138,Customer Credit Risk and Overdue,Customer Credit Risk and Overdue,Customer Credit Risk and Overdue,Customer Credit Risk and Overdue,9,incomplete,,p9:779,customer,-
+139,Customer Lifetime Value,Customer Lifetime Value,Customer Lifetime Value,Customer Lifetime Value,9,incomplete,,`customer_profile`,customer,Y
+140,Customer Complaints and Return History,Customer Complaints and Return History,Customer Complaints and Return History,Customer Complaints and Return History,9,incomplete,salereturn,p26:458; `sale_returns_summary` p23:206,customer,Y
+141,Birthday Cake / Special Order Customer History,Birthday Cake / Special Order Customer History,Birthday Cake / Special Order Customer History,Birthday Cake / Special Order Customer History,9,incomplete,,`gifts_due`,customer,-
+142,Attendance Summary,Attendance Summary,Attendance Summary,Attendance Summary,10,incomplete,attendance,"`attendance_board` p42:616, `attendance_month` p42:642; p21:368",staff,"N: hub reads paper only, returns [] (F5)"
+143,Monthly Staff Indicators,Monthly Staff Indicators,Monthly Staff Indicators,Monthly Staff Indicators,10,implemented,report/x5_staff_trend,p25:121,staff,Y
+144,Staff Cost vs Sales,Staff Cost vs Sales,Staff Cost vs Sales,Staff Cost vs Sales,10,incomplete,report/t4_staff_cost_ratio,p27:234 (`_p27_pl`),staff,"P: salary basis legacy 7,000 vs run 8,000 (F5)"
+145,Payroll and Salary Register,Payroll and Salary Register,Payroll and Salary Register,Payroll and Salary Register,10,implemented,payroll,`payroll_*` p42:1273-1507,staff,"Y: void run, payment void"
+146,Staff Advances and Deductions,Staff Advances and Deductions,Staff Advances and Deductions,Staff Advances and Deductions,10,implemented,payroll,`staff_advance_add/void` p42; p27:198,staff,"Y (A: 1,000 in BS 1220 and day book)"
+147,Overtime and Attendance Variance,Overtime and Attendance Variance,Overtime and Attendance Variance,Overtime and Attendance Variance,10,incomplete,,`attendance_ot_approve` p42:604,staff,-
+148,Sales per Staff / Labour Hour,Sales per Staff / Labour Hour,Sales per Staff / Labour Hour,Sales per Staff / Labour Hour,10,unavailable,biz,`biz_staff` p4:102,staff,-
+149,Production Output per Worker / Labour Hour,Production Output per Worker / Labour Hour,Production Output per Worker / Labour Hour,Production Output per Worker / Labour Hour,10,unavailable,,-,staff,-
+150,Cashier-wise Cash Variance,Cashier-wise Cash Variance,Cashier-wise Cash Variance,Cashier-wise Cash Variance,10,incomplete,report/cash_short_over,p21:351,staff,P
+151,Staff Transaction Exception Report,Staff Transaction Exception Report,Staff Transaction Exception Report,Staff Transaction Exception Report,10,implemented,biz,p25:121; `biz_staff`,staff,Y
+152,Staff Access and Permission Audit,Staff Access and Permission Audit,Staff Access and Permission Audit,Staff Access and Permission Audit,10,implemented,delegation,`grant_separation_report` p78:391; login_attempts p11:94,staff,-
+153,Customer Order Register,Customer Order Register,Customer Order Register,Customer Order Register,11,incomplete,onlineorders,`online_orders_list` p61:251; p25:20,orders,N: S10 empty though 3 orders (F6)
+154,Pending/Confirmed/Completed Orders,Pending/Confirmed/Completed Orders,Pending/Confirmed/Completed Orders,Pending/Confirmed/Completed Orders,11,implemented,onlineorders,`online_order_status` p61:174,orders,Y: trail kept
+155,Custom Cake / Birthday Order Register,Custom Cake / Birthday Order Register,Custom Cake / Birthday Order Register,Custom Cake / Birthday Order Register,11,incomplete,,p25:20 (no type split),orders,-
+156,Advance Payments and Outstanding Order Balances,Advance Payments and Outstanding Order Balances,Advance Payments and Outstanding Order Balances,Advance Payments and Outstanding Order Balances,11,incomplete,,p61:251,orders,N: delivered 250 / cancelled 70 shown owed; advance not in books (F6)
+157,Order Cancellation and Refunds,Order Cancellation and Refunds,Order Cancellation and Refunds,Order Cancellation and Refunds,11,incomplete,,`online_order_cancel` p61:189,orders,N
+158,On-time Delivery Performance,On-time Delivery Performance,On-time Delivery Performance,On-time Delivery Performance,11,unavailable,,-,orders,-
+159,Delayed and Undelivered Orders,Delayed and Undelivered Orders,Delayed and Undelivered Orders,Delayed and Undelivered Orders,11,unavailable,,-,orders,-
+160,Order-wise Production and Material Cost,Order-wise Production and Material Cost,Order-wise Production and Material Cost,Order-wise Production and Material Cost,11,unavailable,,-,orders,-
+161,Order Profitability,Order Profitability,Order Profitability,Order Profitability,11,unavailable,,-,orders,-
+162,Delivery Cost and Performance,Delivery Cost and Performance,Delivery Cost and Performance,Delivery Cost and Performance,11,unavailable,,-,orders,-
+163,Order Fulfilment Rate,Order Fulfilment Rate,Order Fulfilment Rate,Order Fulfilment Rate,11,unavailable,,-,orders,-
+164,Marketing Spend by Campaign/Period,Marketing Spend by Campaign/Period,Marketing Spend by Campaign/Period,Marketing Spend by Campaign/Period,12,incomplete,report/e4_marketing_limit,p25:226,marketing,P: not posted to books (F8)
+165,Marketing Spend vs Sales,Marketing Spend vs Sales,Marketing Spend vs Sales,Marketing Spend vs Sales,12,implemented,report/m2_marketing_vs_sales,p26:383,marketing,Y
+166,Campaign Revenue and Contribution Profit,Campaign Revenue and Contribution Profit,Campaign Revenue and Contribution Profit,Campaign Revenue and Contribution Profit,12,unavailable,,-,marketing,-
+167,Discount Campaign Performance,Discount Campaign Performance,Discount Campaign Performance,Discount Campaign Performance,12,incomplete,discounts,rpt_def p9 discounts,marketing,Y
+168,Coupon/Offer Usage,Coupon/Offer Usage,Coupon/Offer Usage,Coupon/Offer Usage,12,incomplete,,-,marketing,Y
+169,Customer Acquisition Cost,Customer Acquisition Cost,Customer Acquisition Cost,Customer Acquisition Cost,12,unavailable,,-,marketing,-
+170,Repeat Purchase after Promotion,Repeat Purchase after Promotion,Repeat Purchase after Promotion,Repeat Purchase after Promotion,12,unavailable,,-,marketing,-
+171,Marketing ROI,Marketing ROI,Marketing ROI,Marketing ROI,12,unavailable,,-,marketing,-
+172,Exception Summary,Exception Summary,Exception Summary,Exception Summary,13,implemented,exceptions,p21 `exceptions_summary`; `w1e_exceptions_list` p94:423; `money_exceptions_list` p87:691,audit,Y
+173,Audit and Correction Log,Audit and Correction Log,Audit and Correction Log,Audit and Correction Log,13,incomplete,logs,p25:90,audit,Y: append-only
+174,Stock Adjustment Approval History,Stock Adjustment Approval History,Stock Adjustment Approval History,Stock Adjustment Approval History,13,incomplete,,p12:193,audit,Y
+175,Discount and Price Override Approvals,Discount and Price Override Approvals,Discount and Price Override Approvals,Discount and Price Override Approvals,13,incomplete,discounts,`discounts_report` p20:437,audit,Y
+176,"Voids, Refunds, Unusual Transactions","Voids, Refunds, Unusual Transactions","Voids, Refunds, Unusual Transactions","Voids, Refunds, Unusual Transactions",13,incomplete,salereturn,p9; p23:206,audit,P
+177,User Activity and Access History,User Activity and Access History,User Activity and Access History,User Activity and Access History,13,incomplete,,-,audit,-
+178,Missing/Incomplete Form Submissions,Missing/Incomplete Form Submissions,Missing/Incomplete Form Submissions,Missing/Incomplete Form Submissions,13,incomplete,report/x4_compliance,p25:100,audit,P (F10)
+179,Duplicate/Out-of-order Receipt and Paper Numbers,Duplicate/Out-of-order Receipt and Paper Numbers,Duplicate/Out-of-order Receipt and Paper Numbers,Duplicate/Out-of-order Receipt and Paper Numbers,13,implemented,numaudit,p25:140; `number_audit` p5:26,audit,Y
+180,Unapproved Transactions and Approval Delays,Unapproved Transactions and Approval Delays,Unapproved Transactions and Approval Delays,Unapproved Transactions and Approval Delays,13,incomplete,pending,p28,audit,Y
+181,Data Integrity and Reconciliation Exceptions,Data Integrity and Reconciliation Exceptions,Data Integrity and Reconciliation Exceptions,Data Integrity and Reconciliation Exceptions,13,implemented,balancecheck,`_e_balance_check` p84:17; `inventory_vs_gl`,audit,Y
+182,"Deleted, Reversed, Corrected Transaction History","Deleted, Reversed, Corrected Transaction History","Deleted, Reversed, Corrected Transaction History","Deleted, Reversed, Corrected Transaction History",13,incomplete,,-,audit,Y: nothing hard-deleted
+183,"Missing Cost, Recipe, Batch or Expiry Data","Missing Cost, Recipe, Batch or Expiry Data","Missing Cost, Recipe, Batch or Expiry Data","Missing Cost, Recipe, Batch or Expiry Data",13,incomplete,,-,audit,-
+184,Daily/Weekly Sales Forecast,Daily/Weekly Sales Forecast,Daily/Weekly Sales Forecast,Daily/Weekly Sales Forecast,14,incomplete,biz,`biz_outlook` p4:150,planning,Y
+185,Item-wise Demand Forecast,Item-wise Demand Forecast,Item-wise Demand Forecast,Item-wise Demand Forecast,14,incomplete,report/item_sales,p60:335,planning,Y
+186,Production Requirement Forecast,Production Requirement Forecast,Production Requirement Forecast,Production Requirement Forecast,14,unavailable,,-,planning,-
+187,Raw Material Purchase Forecast,Raw Material Purchase Forecast,Raw Material Purchase Forecast,Raw Material Purchase Forecast,14,incomplete,report/p6_purchase_budget,p4:150; p60:335; p26:191,planning,Y
+188,Expected Cash Inflow/Outflow,Expected Cash Inflow/Outflow,Expected Cash Inflow/Outflow,Expected Cash Inflow/Outflow,14,unavailable,,-,planning,-
+189,Upcoming Supplier Payment Forecast,Upcoming Supplier Payment Forecast,Upcoming Supplier Payment Forecast,Upcoming Supplier Payment Forecast,14,incomplete,payables,`supplier_dues` p10:1240,planning,Y
+190,Expected Wastage and Expiry Risk,Expected Wastage and Expiry Risk,Expected Wastage and Expiry Risk,Expected Wastage and Expiry Risk,14,incomplete,stockx,`near_expiry_report` p60:283,planning,Y
+191,Outlet Replenishment Recommendations,Outlet Replenishment Recommendations,Outlet Replenishment Recommendations,Outlet Replenishment Recommendations,14,implemented,stockx,`reorder_report` p60:335,planning,Y
+192,Sales and Profit Scenario Analysis,Sales and Profit Scenario Analysis,Sales and Profit Scenario Analysis,Sales and Profit Scenario Analysis,14,unavailable,,-,planning,-
+193,Seasonal and Festival Demand Analysis,Seasonal and Festival Demand Analysis,Seasonal and Festival Demand Analysis,Seasonal and Festival Demand Analysis,14,unavailable,report/sales_trend,p9,planning,Y

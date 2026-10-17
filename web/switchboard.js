@@ -43,7 +43,7 @@ function rowHTML(r) {
   const ctl = r.kind === 'switch'
     ? `<button type="button" class="tog ${isOn(r) ? 'on' : ''}" role="switch" aria-checked="${isOn(r)}" data-act="sw_set" data-k="${esc(r.key)}" data-v="${isOn(r) ? '0' : '1'}">${esc(isOn(r) ? T('on') : T('off'))}</button>`
     : `<select data-sw-choice="${esc(r.key)}" aria-label="${esc(lab(rl(r)))}">${(Array.isArray(r.choices) ? r.choices : []).map((c) => `<option value="${esc(c)}" ${String(cur(r)) === String(c) ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>`;
-  return `<div class="card sw-row" data-key="${esc(r.key)}"><div class="row between"><div style="min-width:0"><b>${esc(lab(rl(r)))}</b>${ch ? ` <span class="chip warn">${esc(T('changed'))}</span>` : ''}
+  return `<div class="card sw-row" data-key="${esc(r.key)}"><div class="row between"><div style="min-width:0"><b>${esc(lab(rl(r)))}</b>${B.info ? B.info('rule:' + r.key) : ''}${ch ? ` <span class="chip warn">${esc(T('changed'))}</span>` : ''}
       <div class="muted" style="font-size:.78rem">${esc(r.key)}</div></div>${ctl}</div>${h ? `<div class="muted" style="font-size:.85rem;margin-top:4px">${esc(lab(h))}</div>` : ''}
       ${ch ? `<div class="row" style="margin-top:6px"><button type="button" class="mini" data-act="sw_reset" data-k="${esc(r.key)}">${esc(T('reset'))}</button></div>` : ''}</div>`;
 }

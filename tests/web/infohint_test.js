@@ -65,8 +65,8 @@ const parseRgb = (s) => (String(s).match(/[\d.]+/g) || []).slice(0, 3).map(Numbe
   const sqlAll = fs.readdirSync(path.join(ROOT, 'supabase')).filter((f) => f.endsWith('.sql') && !f.endsWith('_test.sql')).map((f) => [f, fs.readFileSync(path.join(ROOT, 'supabase', f), 'utf8')]);
   const iaText = fs.readFileSync(path.join(WEB, 'ia.js'), 'utf8');
   const routes = new Set(Array.from(iaText.matchAll(/rec\('([a-z0-9_]+)'/g), (m) => m[1]));
-  const tup = (name, text) => new RegExp("\\(\\s*'" + name + "'\\s*,").test(text);
-  const ruleSql = sqlAll.filter(([, t]) => /insert\s+into\s+(public\.)?rules\b/i.test(t)).map(([, t]) => t);
+  const tup = (name, text) => new RegExp("(\\(\\s*|seed\\(\\s*)'" + name + "'\\s*,").test(text);      // a row tuple ('key', ...) or a seed helper call like _crmb_rule_seed('key', ...)
+  const ruleSql = sqlAll.filter(([, t]) => /insert\s+into\s+(public\.)?rules\b|_rule_seed\(/i.test(t)).map(([, t]) => t);
   const grantSql = sqlAll.filter(([, t]) => /insert\s+into\s+(public\.)?grant_defs\b/i.test(t)).map(([, t]) => t);
   const pathSql = (sqlAll.find(([f]) => f === 'phase48.sql') || [, ''])[1];
   for (const k of keys) {
@@ -86,7 +86,7 @@ const parseRgb = (s) => (String(s).match(/[\d.]+/g) || []).slice(0, 3).map(Numbe
   ok(/test project/i.test((E['rule:allow_test_reset'] || {}).warn || ''), 'test reset carries the test-projects-only warning');
   const out = cp.spawnSync('python3', [path.join(ROOT, 'tools', 'check_no_demo_leak.py')], { cwd: ROOT, encoding: 'utf8' });
   ok(out.status === 0 && /OK/.test(out.stdout), 'check_no_demo_leak.py prints OK');
-  const NAMES = ['Karim', 'Salma', 'Rahim', 'Ayesha', 'Shirin', 'Lipi', 'Nasrin', 'Tania', 'Jamal', 'Selim', 'Mitu', 'Hasan', 'Fatema', 'Ruma', 'Anwar', 'Sohel', 'Nazia'];
+  const NAMES = (fs.readFileSync(path.join(ROOT, 'tools', 'check_no_demo_leak.py'), 'utf8').match(/^NAMES = \[(.*?)\]/m)[1].match(/[A-Za-z]+/g));      // the roster the guard knows (read from it, not repeated in a test file)
   const mine = raw + fs.readFileSync(path.join(WEB, 'infohint.js'), 'utf8');
   ok(!new RegExp('\\b(' + NAMES.join('|') + ')\\b').test(mine) && !/docs\/demo|DEMO_|IMAGINED_/.test(mine), 'no demo name or demo file in info.json or infohint.js');
   const cov = cp.spawnSync('python3', [path.join(ROOT, 'tools', 'check_info_coverage.py')], { cwd: ROOT, encoding: 'utf8' });

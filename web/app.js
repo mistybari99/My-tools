@@ -55,7 +55,7 @@ function shell(title, body, back) {
   const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>`
     : (nav && pg !== 'home' ? `<button data-act="goback" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">');
   const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
-  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
+  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
 }
 function openSheet(html) {

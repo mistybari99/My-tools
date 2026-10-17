@@ -1,4 +1,4 @@
-AUDIT #56-104 DONE, BUT docs/REPORTS_AUDIT_2.md COULD NOT BE WRITTEN. The Write tool refused ("Subagents should return findings as text, not write report files"). I did not work around it. Nothing is committed, the worktree is clean, nothing is pushed. The full matrix is below, so you can save it as docs/REPORTS_AUDIT_2.md yourself.
+# Reports audit 2 (sections 5-7, reports 56-104)
 
 SETUP: local throwaway Postgres 16 on port 5630, built from tests/sql/ORDER.txt with no errors, now stopped and deleted. I ran a dry run with neutral test_* data kept outside the repo: opening stock, 4 purchase bills (one draft, one voided, one purchase return), a batch with expiry, recipe, production run, sales (one voided), a refund, 2 transfers (one short, one in transit), wastage, a count, a sale beyond stock, and paper-form entries (PO, GRN, bill check, count sheet, hygiene and fridge sheet, complaint). I called every report named below as owner. Not checked: a real browser or phone, the CSV/PDF files, or live data. The live stock_ledger has 0 rows.
 

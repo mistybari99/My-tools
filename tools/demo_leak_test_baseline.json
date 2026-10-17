@@ -18,6 +18,7 @@
  "tests/sql/test4.sql": 1,
  "tests/sql/test6.sql": 1,
  "tests/sql/test8.sql": 1,
+ "tests/ui_inventory/baseline.json": 3,
  "tests/web/accounts_test.js": 1,
  "tests/web/assistant_intents.json": 1,
  "tests/web/assistant_test.js": 7,

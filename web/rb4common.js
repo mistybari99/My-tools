@@ -245,6 +245,7 @@ function page(cfg) {
     D.ready = false;
     try { await loadBase(D, cfg.base); if (cfg.init) await cfg.init(D, api); } catch (e) { /* the page still draws; a missing helper list is not fatal */ }
     D.from = D.from || (cfg.range === 'month' ? monthStart(today()) : daysAgo(30)); D.to = D.to || today();
+    { const h = (location.hash.replace(/^#\/?/, '').split('?')[0].split('/')[1] || ''); if (cfg.tabs.some((t) => t.id === h)) D.tab = h; }      // #/prodreports/yield opens that tab (integration: the stock screen links here)
     D.ready = true; frame();
   }
   window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { [cfg.route]: cfg.view ? () => cfg.view(D, api, view) : view });

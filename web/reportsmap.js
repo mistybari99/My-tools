@@ -134,6 +134,34 @@ function extend(list) {
 }
 if (Array.isArray(window.BOS_REPORT_MAP_EXT)) extend(window.BOS_REPORT_MAP_EXT);
 
+// ---------- ONE list of all 193 reports: web/data/report_registry.json (RPT-HUB; built from the audits by tools/build_report_registry.py) ----------
+// Integration: sections 5 to 14 of this map come from it, and the status / route of the reports of sections 1 to 4 follow it (the notes written here stay).
+const AREA_GROUP = { exec: 'dash', sales: 'sale', product: 'acc', production: 'factory', stock: 'stock', quality: 'stock', purchase: 'purch', cash: 'acc', customer: 'cust', staff: 'people', orders: 'sale', marketing: 'reports', audit: 'appr', planning: 'reports', unaudited: 'reports' };
+let synced = false;
+async function syncRegistry() {
+  if (synced) return;
+  try {
+    const r = await fetch('data/report_registry.json'); if (!r.ok) return;
+    const d = await r.json(), reps = d && Array.isArray(d.reports) ? d.reports : [];
+    if (!reps.length) return;
+    const byNo = new Map(reps.map((x) => [x.no, x]));
+    SECTIONS.forEach((sec) => { if (sec.extra) return; (sec.reports || []).forEach((row) => { const g = byNo.get(row.n); if (g && g.status !== 'unaudited') { row.status = g.status; if (g.route) row.route = g.route; } }); });
+    (d.sections || []).forEach((sd) => {
+      if (!sd.range || sd.no < 5) return;
+      const rows = reps.filter((x) => x.section === sd.no && x.status !== 'unaudited').map((x) => {
+        const g = (x.route && B.ia && B.ia.byRoute && B.ia.byRoute(x.route.split('/')[0]) && B.ia.byRoute(x.route.split('/')[0]).group) || AREA_GROUP[x.area] || 'reports';
+        const note = x.note ? [x.note, x.note, x.note] : undefined;
+        return Object.assign({ n: x.no, name: [x.name.bn, x.name.en, x.name.mix || x.name.en], status: x.status, route: x.route || null, group: g }, note ? { note } : {});
+      });
+      if (!rows.length) return;
+      const cur = SECTIONS.find((x) => String(x.id) === String(sd.no));
+      if (cur && cur.reports && cur.reports.length) return;      // a section written by hand in this file or by BOS.reportsMap.extend() wins
+      extend([{ id: sd.no, title: [sd.name.bn, sd.name.en, sd.name.mix || sd.name.en], reports: rows }]);
+    });
+    synced = true;
+  } catch (e) { /* offline or no file: the map shows what it has */ }
+}
+
 // ---------- what the person may open (best effort; the server decides on every call) ----------
 const MAP = { q: '', st: '', allowed: null, pages: null };
 async function loadAllowed() {
@@ -186,8 +214,8 @@ function draw() {
 }
 async function viewMap() {
   shell(T('title'), `<p class="muted">${esc(lab(L('লোড হচ্ছে…', 'Loading…', 'Loading…')))}</p>`, 'reports');
-  await loadAllowed();
-  shell(T('title'), `<p class="muted rm-intro">${esc(T('intro'))}</p>
+  await Promise.all([loadAllowed(), syncRegistry()]);
+  shell(T('title'), `<p class="muted rm-intro">${esc(T('intro'))}</p><p class="rm-hublink"><button type="button" class="mini" data-act="go" data-v="reports/hub">${esc(lab(L('বিজনেস মেমোরি: কী ঘটেছিল', 'Business Memory: what happened', 'Business Memory: কী ঘটেছিল')))} ›</button></p>
     <input id="rm_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(MAP.q)}"><div id="rm_body"></div>`, 'reports');
   draw();
 }

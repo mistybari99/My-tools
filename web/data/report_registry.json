@@ -3,11 +3,10 @@
  "generated_by": "tools/build_report_registry.py",
  "total": 193,
  "status_counts": {
-  "incomplete": 46,
-  "implemented": 42,
-  "unavailable": 15,
-  "unverified": 1,
-  "unaudited": 89
+  "incomplete": 20,
+  "implemented": 170,
+  "unverified": 2,
+  "unavailable": 1
  },
  "note": "Reports 1-104 come from audits 1 and 2 (names are the audits' wording; the owner's master list may word them differently - use --master). Reports 105-193 are unaudited until audit 3 is merged.",
  "areas": {
@@ -17,7 +16,14 @@
   "production": "Production",
   "stock": "Stock",
   "quality": "Quality",
-  "purchase": "Purchasing"
+  "purchase": "Purchasing",
+  "cash": "Cash, bank and finance",
+  "customer": "Customers",
+  "staff": "Staff",
+  "orders": "Orders",
+  "marketing": "Marketing",
+  "audit": "Audit and control",
+  "planning": "Planning"
  },
  "sections": [
   {
@@ -34,9 +40,8 @@
    ],
    "count": 10,
    "status_counts": {
-    "incomplete": 5,
-    "implemented": 2,
-    "unavailable": 2,
+    "incomplete": 4,
+    "implemented": 5,
     "unverified": 1
    }
   },
@@ -54,9 +59,8 @@
    ],
    "count": 18,
    "status_counts": {
-    "implemented": 14,
-    "incomplete": 3,
-    "unavailable": 1
+    "implemented": 15,
+    "incomplete": 3
    }
   },
   {
@@ -73,8 +77,8 @@
    ],
    "count": 11,
    "status_counts": {
-    "implemented": 6,
-    "incomplete": 5
+    "implemented": 7,
+    "incomplete": 4
    }
   },
   {
@@ -91,9 +95,8 @@
    ],
    "count": 16,
    "status_counts": {
-    "unavailable": 6,
-    "implemented": 5,
-    "incomplete": 5
+    "implemented": 15,
+    "incomplete": 1
    }
   },
   {
@@ -110,9 +113,8 @@
    ],
    "count": 20,
    "status_counts": {
-    "implemented": 3,
-    "incomplete": 15,
-    "unavailable": 2
+    "implemented": 19,
+    "incomplete": 1
    }
   },
   {
@@ -129,9 +131,8 @@
    ],
    "count": 14,
    "status_counts": {
-    "implemented": 4,
-    "incomplete": 7,
-    "unavailable": 3
+    "implemented": 13,
+    "incomplete": 1
    }
   },
   {
@@ -148,94 +149,133 @@
    ],
    "count": 15,
    "status_counts": {
-    "implemented": 8,
-    "incomplete": 6,
-    "unavailable": 1
+    "implemented": 15
    }
   },
   {
    "no": 8,
    "id": "s08",
    "name": {
-    "bn": "বিভাগ 8 (এখনও যাচাই হয়নি)",
-    "en": "Section 8 (not audited yet)",
-    "mix": "Section 8 (not audited yet) (বিভাগ 8 (এখনও যাচাই হয়নি))"
+    "bn": "নগদ, ব্যাংক ও আর্থিক",
+    "en": "Cash, banking and financial",
+    "mix": "Cash, banking and financial (নগদ, ব্যাংক ও আর্থিক)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    105,
+    129
+   ],
+   "count": 25,
+   "status_counts": {
+    "implemented": 20,
+    "unverified": 1,
+    "incomplete": 3,
+    "unavailable": 1
+   }
   },
   {
    "no": 9,
    "id": "s09",
    "name": {
-    "bn": "বিভাগ 9 (এখনও যাচাই হয়নি)",
-    "en": "Section 9 (not audited yet)",
-    "mix": "Section 9 (not audited yet) (বিভাগ 9 (এখনও যাচাই হয়নি))"
+    "bn": "গ্রাহক ও বাকি",
+    "en": "Customer and credit",
+    "mix": "Customer and credit (গ্রাহক ও বাকি)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    130,
+    141
+   ],
+   "count": 12,
+   "status_counts": {
+    "implemented": 11,
+    "incomplete": 1
+   }
   },
   {
    "no": 10,
    "id": "s10",
    "name": {
-    "bn": "বিভাগ 10 (এখনও যাচাই হয়নি)",
-    "en": "Section 10 (not audited yet)",
-    "mix": "Section 10 (not audited yet) (বিভাগ 10 (এখনও যাচাই হয়নি))"
+    "bn": "স্টাফ, হাজিরা ও বেতন",
+    "en": "Staff, attendance and payroll",
+    "mix": "Staff, attendance and payroll (স্টাফ, হাজিরা ও বেতন)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    142,
+    152
+   ],
+   "count": 11,
+   "status_counts": {
+    "implemented": 10,
+    "incomplete": 1
+   }
   },
   {
    "no": 11,
    "id": "s11",
    "name": {
-    "bn": "বিভাগ 11 (এখনও যাচাই হয়নি)",
-    "en": "Section 11 (not audited yet)",
-    "mix": "Section 11 (not audited yet) (বিভাগ 11 (এখনও যাচাই হয়নি))"
+    "bn": "অর্ডার, কেক অর্ডার ও ডেলিভারি",
+    "en": "Orders, cake orders and delivery",
+    "mix": "Orders, cake orders and delivery (অর্ডার, কেক অর্ডার ও ডেলিভারি)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    153,
+    163
+   ],
+   "count": 11,
+   "status_counts": {
+    "implemented": 11
+   }
   },
   {
    "no": 12,
    "id": "s12",
    "name": {
-    "bn": "বিভাগ 12 (এখনও যাচাই হয়নি)",
-    "en": "Section 12 (not audited yet)",
-    "mix": "Section 12 (not audited yet) (বিভাগ 12 (এখনও যাচাই হয়নি))"
+    "bn": "মার্কেটিং ও প্রমোশন",
+    "en": "Marketing and promotions",
+    "mix": "Marketing and promotions (মার্কেটিং ও প্রমোশন)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    164,
+    171
+   ],
+   "count": 8,
+   "status_counts": {
+    "implemented": 8
+   }
   },
   {
    "no": 13,
    "id": "s13",
    "name": {
-    "bn": "বিভাগ 13 (এখনও যাচাই হয়নি)",
-    "en": "Section 13 (not audited yet)",
-    "mix": "Section 13 (not audited yet) (বিভাগ 13 (এখনও যাচাই হয়নি))"
+    "bn": "অডিট, কমপ্লায়েন্স ও অভ্যন্তরীণ নিয়ন্ত্রণ",
+    "en": "Audit, compliance and internal control",
+    "mix": "Audit, compliance and internal control (অডিট, কমপ্লায়েন্স ও অভ্যন্তরীণ নিয়ন্ত্রণ)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    172,
+    183
+   ],
+   "count": 12,
+   "status_counts": {
+    "implemented": 11,
+    "incomplete": 1
+   }
   },
   {
    "no": 14,
    "id": "s14",
    "name": {
-    "bn": "বিভাগ 14 (এখনও যাচাই হয়নি)",
-    "en": "Section 14 (not audited yet)",
-    "mix": "Section 14 (not audited yet) (বিভাগ 14 (এখনও যাচাই হয়নি))"
+    "bn": "ব্যবস্থাপনা পরিকল্পনা ও পূর্বাভাস",
+    "en": "Management planning and forecasting",
+    "mix": "Management planning and forecasting (ব্যবস্থাপনা পরিকল্পনা ও পূর্বাভাস)"
    },
-   "range": null,
-   "count": 0,
-   "status_counts": {}
+   "range": [
+    184,
+    193
+   ],
+   "count": 10,
+   "status_counts": {
+    "implemented": 10
+   }
   }
  ],
  "reports": [
@@ -434,9 +474,9 @@
     "en": "How does the factory do against the shops?",
     "mix": "কারখানা ও দোকানের ফল কেমন তুলনায়?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "prodreports",
+   "planned": false,
    "source": "not captured (transfer valuation)",
    "grant": "report_profit or accounts_view",
    "kw": [
@@ -445,7 +485,7 @@
     "কারখানা",
     "খুচরা"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 8,
@@ -489,9 +529,9 @@
     "en": "Did we reach the sales target?",
     "mix": "বিক্রির লক্ষ্যে পৌঁছেছি কি?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "targets",
+   "planned": false,
    "source": "not captured (no targets)",
    "grant": "owner or report_profit / view_reports",
    "kw": [
@@ -499,7 +539,7 @@
     "goal",
     "লক্ষ্য"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 10,
@@ -516,8 +556,8 @@
     "en": "Which numbers are drifting or red?",
     "mix": "কোন সংখ্যাগুলো সরে যাচ্ছে বা লাল?"
    },
-   "status": "incomplete",
-   "route": "owner",
+   "status": "implemented",
+   "route": "targets",
    "planned": false,
    "source": "owner board, exceptions",
    "grant": "owner or report_profit / view_reports",
@@ -529,7 +569,7 @@
     "সতর্ক",
     "লাল"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 11,
@@ -919,16 +959,16 @@
     "en": "Is each outlet on target?",
     "mix": "প্রতিটি শাখা কি লক্ষ্যে আছে?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "targets",
+   "planned": false,
    "source": "not captured (no targets)",
    "grant": "report_sales",
    "kw": [
     "target",
     "লক্ষ্য"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 25,
@@ -1170,8 +1210,8 @@
     "en": "Did production cost more than planned?",
     "mix": "উৎপাদনে পরিকল্পনার চেয়ে বেশি খরচ হলো?"
    },
-   "status": "incomplete",
-   "route": "costing",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "production_runs",
    "grant": "view_cost",
@@ -1181,7 +1221,7 @@
     "actual",
     "পার্থক্য"
    ],
-   "note": "D5: actual yield is never captured, actual cost equals standard"
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 34,
@@ -1359,9 +1399,9 @@
     "en": "Did we make what we planned?",
     "mix": "যা পরিকল্পনা করেছি তা কি বানিয়েছি?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "prodreports",
+   "planned": false,
    "source": "not captured (no plan)",
    "grant": "report_stock",
    "kw": [
@@ -1369,7 +1409,7 @@
     "actual",
     "পরিকল্পনা"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 41,
@@ -1441,8 +1481,8 @@
     "en": "Is real cost above the recipe cost?",
     "mix": "প্রকৃত খরচ কি রেসিপির খরচের চেয়ে বেশি?"
    },
-   "status": "incomplete",
-   "route": "costing",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "production_runs",
    "grant": "view_cost",
@@ -1450,7 +1490,7 @@
     "standard",
     "actual"
    ],
-   "note": "D5, D6"
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 44,
@@ -1467,8 +1507,8 @@
     "en": "Did we use more milk or sugar than the recipe says?",
     "mix": "রেসিপির চেয়ে বেশি দুধ বা চিনি লেগেছে?"
    },
-   "status": "unavailable",
-   "route": "report/f3_raw_vs_recipe",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "not captured (real issue per batch)",
    "grant": "report_stock",
@@ -1478,7 +1518,7 @@
     "variance",
     "কাঁচামাল"
    ],
-   "note": "D4: shows 0.00 percent because actual is the recipe itself"
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 45,
@@ -1495,8 +1535,8 @@
     "en": "Did a batch give the expected yield?",
     "mix": "ব্যাচ কি প্রত্যাশিত ফলন দিল?"
    },
-   "status": "incomplete",
-   "route": "report/f2_yield",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "form 05-4 yield test",
    "grant": "report_stock",
@@ -1504,7 +1544,7 @@
     "yield",
     "ফলন"
    ],
-   "note": "D5: run yield is not captured"
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 46,
@@ -1574,16 +1614,16 @@
     "en": "How productive is the labour?",
     "mix": "শ্রমিকরা কতটা উৎপাদনশীল?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "capacity",
+   "planned": false,
    "source": "not captured (no labour hours)",
    "grant": "report_stock",
    "kw": [
     "labour hour",
     "productivity"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 49,
@@ -1600,8 +1640,8 @@
     "en": "How much was lost while making?",
     "mix": "বানাতে গিয়ে কত নষ্ট হলো?"
    },
-   "status": "incomplete",
-   "route": "report/f2_yield",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "form 05-4",
    "grant": "report_stock",
@@ -1611,7 +1651,7 @@
     "loss",
     "নষ্ট"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 50,
@@ -1629,7 +1669,7 @@
     "mix": "কী নষ্ট হলো আর কেন?"
    },
    "status": "implemented",
-   "route": "report/wastage",
+   "route": "prodreports",
    "planned": false,
    "source": "stock_wastage",
    "grant": "report_stock",
@@ -1639,7 +1679,7 @@
     "অপচয়",
     "নষ্ট"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 51,
@@ -1656,15 +1696,15 @@
     "en": "How much of the capacity is used?",
     "mix": "ক্ষমতার কত অংশ ব্যবহার হচ্ছে?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "capacity",
+   "planned": false,
    "source": "not captured (no rated capacity)",
    "grant": "report_stock",
    "kw": [
     "capacity"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 52,
@@ -1681,16 +1721,16 @@
     "en": "Which orders are waiting to be made?",
     "mix": "কোন অর্ডার বানানোর অপেক্ষায়?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "prodreports",
+   "planned": false,
    "source": "not captured",
    "grant": "report_stock",
    "kw": [
     "order",
     "pending"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 53,
@@ -1707,8 +1747,8 @@
     "en": "Made, sent, received, short: does it add up?",
     "mix": "বানানো, পাঠানো, পাওয়া, কম: হিসাব মেলে?"
    },
-   "status": "incomplete",
-   "route": "report/f1_production",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "production_runs, stock_transfers",
    "grant": "report_stock",
@@ -1717,7 +1757,7 @@
     "reconcile",
     "চালান"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 54,
@@ -1761,15 +1801,15 @@
     "en": "Is the cost gap from price, usage or yield?",
     "mix": "খরচের পার্থক্য কি দাম, ব্যবহার না ফলনের?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "prodreports",
+   "planned": false,
    "source": "not captured (needs actual use and yield)",
    "grant": "view_cost",
    "kw": [
     "variance"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 56,
@@ -1815,7 +1855,7 @@
     "en": "What is the stock worth?",
     "mix": "মজুতের দাম কত?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/stock_balance",
    "planned": false,
    "source": "stock_balance (avg cost)",
@@ -1825,7 +1865,7 @@
     "value",
     "মূল্য"
    ],
-   "note": "drops lines with no cost without saying how many"
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 58,
@@ -1895,7 +1935,7 @@
     "en": "How much raw material is on hand?",
     "mix": "হাতে কাঁচামাল কত?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/stock_balance",
    "planned": false,
    "source": "stock_balance",
@@ -1904,7 +1944,7 @@
     "raw material",
     "কাঁচামাল"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 61,
@@ -1921,7 +1961,7 @@
     "en": "How much finished stock is on hand?",
     "mix": "হাতে তৈরি মাল কত?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/stock_balance",
    "planned": false,
    "source": "stock_balance",
@@ -1930,7 +1970,7 @@
     "finished",
     "তৈরি মাল"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 62,
@@ -1947,7 +1987,7 @@
     "en": "How much packaging is on hand?",
     "mix": "হাতে প্যাকেজিং কত?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/stock_balance",
    "planned": false,
    "source": "stock_balance",
@@ -1958,7 +1998,7 @@
     "প্যাকেজিং",
     "বাক্স"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 63,
@@ -1975,8 +2015,8 @@
     "en": "What moved in and out of an item?",
     "mix": "একটি আইটেমে কী ঢুকল আর বেরোল?"
    },
-   "status": "incomplete",
-   "route": "report/k3_store_ledger",
+   "status": "implemented",
+   "route": "stockrep/ledger",
    "planned": false,
    "source": "stock_ledger",
    "grant": "report_stock",
@@ -1985,7 +2025,7 @@
     "ledger",
     "চলাচল"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 64,
@@ -2002,8 +2042,8 @@
     "en": "What was sent between places?",
     "mix": "জায়গায় জায়গায় কী পাঠানো হলো?"
    },
-   "status": "incomplete",
-   "route": "report/transfers_gap",
+   "status": "implemented",
+   "route": "report/transfers_register",
    "planned": false,
    "source": "stock_transfers",
    "grant": "report_stock",
@@ -2013,7 +2053,7 @@
     "ট্রান্সফার",
     "চালান"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 65,
@@ -2030,8 +2070,8 @@
     "en": "What arrived short or damaged?",
     "mix": "কী কম বা নষ্ট পৌঁছাল?"
    },
-   "status": "incomplete",
-   "route": "shortages",
+   "status": "implemented",
+   "route": "stockx",
    "planned": false,
    "source": "shortage_transit",
    "grant": "report_stock",
@@ -2042,7 +2082,7 @@
     "কম",
     "পথে"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 66,
@@ -2059,7 +2099,7 @@
     "en": "Where did the count differ from the books?",
     "mix": "গণনা কোথায় খাতার সাথে মেলেনি?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/k2_count_variance",
    "planned": false,
    "source": "form 04-3, stock_count_adjust",
@@ -2069,7 +2109,7 @@
     "variance",
     "গণনা"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 67,
@@ -2086,7 +2126,7 @@
     "en": "What is not selling?",
     "mix": "কী বিক্রি হচ্ছে না?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/item_slow",
    "planned": false,
    "source": "sales, stock",
@@ -2096,7 +2136,7 @@
     "dead",
     "ধীর"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 68,
@@ -2113,9 +2153,9 @@
     "en": "How old is what we hold?",
     "mix": "যা আছে তার বয়স কত?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "incomplete",
+   "route": "batchrep/ageing",
+   "planned": false,
    "source": "not captured (no lot date on raw receipts)",
    "grant": "report_stock",
    "kw": [
@@ -2123,7 +2163,7 @@
     "age",
     "বয়স"
    ],
-   "note": ""
+   "note": "Finished-goods ageing is built (RPT-B2, phase 424-425); raw-material ageing waits for supplier lots to be entered on receipts (RPT-B3, phase 430, setting receipt_lot_required)."
   },
   {
    "no": 69,
@@ -2140,7 +2180,7 @@
     "en": "What expires soon?",
     "mix": "কী শিগগির মেয়াদ শেষ হবে?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/expiry_soon",
    "planned": false,
    "source": "stock_batches",
@@ -2150,7 +2190,7 @@
     "expire",
     "মেয়াদ"
    ],
-   "note": "three expiry thresholds exist"
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 70,
@@ -2167,8 +2207,8 @@
     "en": "Which batch should go out first?",
     "mix": "কোন ব্যাচ আগে বেরোবে?"
    },
-   "status": "incomplete",
-   "route": "stockx",
+   "status": "implemented",
+   "route": "batchrep/batches",
    "planned": false,
    "source": "stock_batches",
    "grant": "report_stock",
@@ -2177,7 +2217,7 @@
     "batch",
     "ব্যাচ"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 71,
@@ -2194,8 +2234,8 @@
     "en": "Who adjusted stock and why?",
     "mix": "কে কেন স্টক সমন্বয় করল?"
    },
-   "status": "incomplete",
-   "route": "report/k3_store_ledger",
+   "status": "implemented",
+   "route": "report/stock_adjustments",
    "planned": false,
    "source": "stock_ledger",
    "grant": "report_stock",
@@ -2203,7 +2243,7 @@
     "adjustment",
     "সমন্বয়"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 72,
@@ -2220,8 +2260,8 @@
     "en": "Where is the stock below zero or wrong?",
     "mix": "কোথায় স্টক শূন্যের নিচে বা ভুল?"
    },
-   "status": "incomplete",
-   "route": "report/exceptions_summary",
+   "status": "implemented",
+   "route": "report/stock_integrity",
    "planned": false,
    "source": "stock_balance, exceptions",
    "grant": "report_stock",
@@ -2230,7 +2270,7 @@
     "integrity",
     "ঋণাত্মক"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 73,
@@ -2247,8 +2287,8 @@
     "en": "How fast does stock turn over?",
     "mix": "স্টক কত দ্রুত ঘোরে?"
    },
-   "status": "incomplete",
-   "route": "stockx",
+   "status": "implemented",
+   "route": "report/item_turnover",
    "planned": false,
    "source": "stock_ledger",
    "grant": "report_stock",
@@ -2256,7 +2296,7 @@
     "turnover",
     "আবর্তন"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 74,
@@ -2273,9 +2313,9 @@
     "en": "When did we run out and lose sales?",
     "mix": "কখন স্টক ফুরিয়ে বিক্রি হারালাম?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "stockout",
+   "planned": false,
    "source": "not captured (no stockout log)",
    "grant": "report_stock",
    "kw": [
@@ -2283,7 +2323,7 @@
     "demand",
     "ফুরিয়ে"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 75,
@@ -2300,8 +2340,8 @@
     "en": "Opening plus in minus out equals closing?",
     "mix": "শুরু + ঢোকা - বেরোনো = শেষ?"
    },
-   "status": "incomplete",
-   "route": "report/stock_balance",
+   "status": "implemented",
+   "route": "stockrep/recon",
    "planned": false,
    "source": "stock_ledger, stock_reconcile",
    "grant": "report_stock",
@@ -2309,7 +2349,7 @@
     "reconcile",
     "মিলান"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 76,
@@ -2353,8 +2393,8 @@
     "en": "Is wastage rising against sales?",
     "mix": "বিক্রির তুলনায় অপচয় কি বাড়ছে?"
    },
-   "status": "incomplete",
-   "route": "report/wastage",
+   "status": "implemented",
+   "route": "report/wastage_rate",
    "planned": false,
    "source": "stock_wastage, sales",
    "grant": "report_stock",
@@ -2362,7 +2402,7 @@
     "wastage percent",
     "অপচয় শতাংশ"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 78,
@@ -2379,8 +2419,8 @@
     "en": "How much is lost in making?",
     "mix": "বানাতে কত নষ্ট হয়?"
    },
-   "status": "incomplete",
-   "route": "report/f2_yield",
+   "status": "implemented",
+   "route": "prodreports",
    "planned": false,
    "source": "form 05-4, stock_wastage",
    "grant": "report_stock",
@@ -2388,7 +2428,7 @@
     "yield",
     "production loss"
    ],
-   "note": ""
+   "note": "Built by RPT-B4 (phases 404-416); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 79,
@@ -2405,8 +2445,8 @@
     "en": "How much was thrown away unsold?",
     "mix": "কত অবিক্রিত ফেলে দেওয়া হলো?"
    },
-   "status": "incomplete",
-   "route": "report/wastage",
+   "status": "implemented",
+   "route": "batchrep/expired",
    "planned": false,
    "source": "stock_wastage, returns",
    "grant": "report_stock",
@@ -2415,7 +2455,7 @@
     "expired",
     "অবিক্রিত"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 80,
@@ -2432,16 +2472,16 @@
     "en": "Which batches are left unsold?",
     "mix": "কোন ব্যাচ অবিক্রিত পড়ে আছে?"
    },
-   "status": "incomplete",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "batchrep/unsold",
+   "planned": false,
    "source": "stock_batches",
    "grant": "report_stock",
    "kw": [
     "unsold",
     "batch"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 81,
@@ -2458,16 +2498,16 @@
     "en": "Which items have no shelf life set?",
     "mix": "কোন আইটেমের মেয়াদ ঠিক করা নেই?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "incomplete",
+   "route": "stockx",
+   "planned": false,
    "source": "not captured (shelf_life_rules empty)",
    "grant": "report_stock",
    "kw": [
     "shelf life",
     "মেয়াদ"
    ],
-   "note": ""
+   "note": "RPT-B3 (phase 433) lists the products with no shelf-life rule as a notice on the expiry screen; the rows themselves are entered in Settings, Shelf life."
   },
   {
    "no": 82,
@@ -2484,16 +2524,16 @@
     "en": "Does closing stock match tomorrow's opening?",
     "mix": "দিনশেষ স্টক কি পরদিনের শুরুর সাথে মেলে?"
    },
-   "status": "incomplete",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "report/daily_closing",
+   "planned": false,
    "source": "stock_ledger",
    "grant": "report_stock",
    "kw": [
     "closing",
     "opening"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 83,
@@ -2510,9 +2550,9 @@
     "en": "Where did a batch come from and go to?",
     "mix": "একটি ব্যাচ কোথা থেকে এসে কোথায় গেল?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "trace",
+   "planned": false,
    "source": "not captured (supplier lot)",
    "grant": "report_stock",
    "kw": [
@@ -2520,7 +2560,7 @@
     "lot",
     "ট্রেস"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 84,
@@ -2537,16 +2577,16 @@
     "en": "Which outlet got which batch?",
     "mix": "কোন শাখা কোন ব্যাচ পেল?"
    },
-   "status": "incomplete",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "batchrep/distribution",
+   "planned": false,
    "source": "stock_transfers, ledger",
    "grant": "report_stock",
    "kw": [
     "distribution",
     "বণ্টন"
    ],
-   "note": ""
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 85,
@@ -2563,16 +2603,16 @@
     "en": "Which customers or shops got a bad batch?",
     "mix": "খারাপ ব্যাচ কোন দোকান বা গ্রাহক পেয়েছে?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "recall",
+   "planned": false,
    "source": "not captured (no recall record)",
    "grant": "report_quality",
    "kw": [
     "recall",
     "রিকল"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 86,
@@ -2670,7 +2710,7 @@
     "en": "What was rejected at receipt?",
     "mix": "গ্রহণের সময় কী বাতিল হলো?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "stockx",
    "planned": false,
    "source": "qc_records",
@@ -2681,7 +2721,7 @@
     "reject",
     "মান"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 90,
@@ -2752,7 +2792,7 @@
     "en": "What do we spend on each item?",
     "mix": "প্রতিটি আইটেমে কত খরচ করি?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/p2_rate_trend",
    "planned": false,
    "source": "purchase_lines",
@@ -2761,7 +2801,7 @@
     "item",
     "আইটেম"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 93,
@@ -2805,7 +2845,7 @@
     "en": "Which supplier is reliable?",
     "mix": "কোন সরবরাহকারী নির্ভরযোগ্য?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/p4_supplier_score",
    "planned": false,
    "source": "forms 06-3, 04-1, 06-4",
@@ -2814,7 +2854,7 @@
     "scorecard",
     "reliable"
    ],
-   "note": "prints 0 when the paper forms were not used"
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 95,
@@ -2912,7 +2952,7 @@
     "en": "How much do we owe, since when?",
     "mix": "কত পাওনা, কত দিন ধরে?"
    },
-   "status": "incomplete",
+   "status": "implemented",
    "route": "report/supplier_ageing",
    "planned": false,
    "source": "purchase_bills, supplier_payments",
@@ -2924,7 +2964,7 @@
     "পাওনা",
     "বাকি"
    ],
-   "note": "shows 0.00 overdue when credit days are empty"
+   "note": "Built by RPT-B2 (phases 420-425); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 99,
@@ -2967,8 +3007,8 @@
     "en": "What did we send back?",
     "mix": "কী ফেরত দিয়েছি?"
    },
-   "status": "incomplete",
-   "route": "report/purchases_by_supplier",
+   "status": "implemented",
+   "route": "purchrep",
    "planned": false,
    "source": "purchase_bills (return)",
    "grant": "report_purchase",
@@ -2976,7 +3016,7 @@
     "return",
     "ফেরত"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 101,
@@ -2993,8 +3033,8 @@
     "en": "Did a supplier charge more than agreed?",
     "mix": "সরবরাহকারী কি চুক্তির চেয়ে বেশি নিল?"
    },
-   "status": "incomplete",
-   "route": "report/p2_rate_trend",
+   "status": "implemented",
+   "route": "purchrep",
    "planned": false,
    "source": "not captured (no agreed price)",
    "grant": "report_purchase",
@@ -3002,7 +3042,7 @@
     "variance",
     "agreed"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 102,
@@ -3020,7 +3060,7 @@
     "mix": "কে দেরিতে দেয়?"
    },
    "status": "implemented",
-   "route": "report/p4_supplier_score",
+   "route": "purchrep",
    "planned": false,
    "source": "forms 06-3, 06-4",
    "grant": "report_purchase",
@@ -3028,7 +3068,7 @@
     "delivery",
     "performance"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 103,
@@ -3045,8 +3085,8 @@
     "en": "How much of a supplier's goods is rejected?",
     "mix": "সরবরাহকারীর কত মাল বাতিল হয়?"
    },
-   "status": "incomplete",
-   "route": "report/p4_supplier_score",
+   "status": "implemented",
+   "route": "purchrep",
    "planned": false,
    "source": "qc_records",
    "grant": "report_purchase",
@@ -3054,7 +3094,7 @@
     "rejection",
     "reject"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 104,
@@ -3071,9 +3111,9 @@
     "en": "Who else can supply this item?",
     "mix": "এই আইটেম আর কে দিতে পারে?"
    },
-   "status": "unavailable",
-   "route": null,
-   "planned": true,
+   "status": "implemented",
+   "route": "purchrep",
+   "planned": false,
    "source": "not captured (no item_suppliers)",
    "grant": "report_purchase",
    "kw": [
@@ -3081,2054 +3121,2054 @@
     "preferred",
     "বিকল্প"
    ],
-   "note": ""
+   "note": "Built by RPT-B3 (phases 430-436); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 105,
    "id": "r105",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 105 (এখনও যাচাই হয়নি)",
-    "en": "Report #105 (not audited yet)",
-    "mix": "Report #105 (not audited yet) (রিপোর্ট নং 105 (এখনও যাচাই হয়নি))"
+    "bn": "Daily Cash Book",
+    "en": "Daily Cash Book",
+    "mix": "Daily Cash Book (Daily Cash Book)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Daily Cash Book",
+    "en": "Daily Cash Book",
+    "mix": "Daily Cash Book"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "daybook",
+   "planned": false,
+   "source": "`day_book` p23:390 (+`_daybook_lines` p13:99); `money_statement` p87:933",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: drafts and voids excluded, refunds in; card shown as bank"
   },
   {
    "no": 106,
    "id": "r106",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 106 (এখনও যাচাই হয়নি)",
-    "en": "Report #106 (not audited yet)",
-    "mix": "Report #106 (not audited yet) (রিপোর্ট নং 106 (এখনও যাচাই হয়নি))"
+    "bn": "Day Book / Transaction Register",
+    "en": "Day Book / Transaction Register",
+    "mix": "Day Book / Transaction Register (Day Book / Transaction Register)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Day Book / Transaction Register",
+    "en": "Day Book / Transaction Register",
+    "mix": "Day Book / Transaction Register"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "daybook",
+   "planned": false,
+   "source": "`acct_journal_book` p40:896; `day_book`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: reversal rows flagged"
   },
   {
    "no": 107,
    "id": "r107",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 107 (এখনও যাচাই হয়নি)",
-    "en": "Report #107 (not audited yet)",
-    "mix": "Report #107 (not audited yet) (রিপোর্ট নং 107 (এখনও যাচাই হয়নি))"
+    "bn": "Daily Cash Flow",
+    "en": "Daily Cash Flow",
+    "mix": "Daily Cash Flow (Daily Cash Flow)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Daily Cash Flow",
+    "en": "Daily Cash Flow",
+    "mix": "Daily Cash Flow"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "daybook",
+   "planned": false,
+   "source": "`_r3q_w1_cash_flow` p25:246",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: internal transfers and salary excluded by design"
   },
   {
    "no": 108,
    "id": "r108",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 108 (এখনও যাচাই হয়নি)",
-    "en": "Report #108 (not audited yet)",
-    "mix": "Report #108 (not audited yet) (রিপোর্ট নং 108 (এখনও যাচাই হয়নি))"
+    "bn": "Cashier Day Close",
+    "en": "Cashier Day Close",
+    "mix": "Cashier Day Close (Cashier Day Close)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Cashier Day Close",
+    "en": "Cashier Day Close",
+    "mix": "Cashier Day Close"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/pos_day_close",
+   "planned": false,
+   "source": "rpt_def p9:517; blind count p18",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: voids shown apart"
   },
   {
    "no": 109,
    "id": "r109",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 109 (এখনও যাচাই হয়নি)",
-    "en": "Report #109 (not audited yet)",
-    "mix": "Report #109 (not audited yet) (রিপোর্ট নং 109 (এখনও যাচাই হয়নি))"
+    "bn": "Cash Shortage/Excess",
+    "en": "Cash Shortage/Excess",
+    "mix": "Cash Shortage/Excess (Cash Shortage/Excess)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Cash Shortage/Excess",
+    "en": "Cash Shortage/Excess",
+    "mix": "Cash Shortage/Excess"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "shortages",
+   "planned": false,
+   "source": "`cash_short_list` p81:195, `cash_short_decide`; p21:351",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: report ignores case status (F14)"
   },
   {
    "no": 110,
    "id": "r110",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 110 (এখনও যাচাই হয়নি)",
-    "en": "Report #110 (not audited yet)",
-    "mix": "Report #110 (not audited yet) (রিপোর্ট নং 110 (এখনও যাচাই হয়নি))"
+    "bn": "Cash Handover vs Physical Count",
+    "en": "Cash Handover vs Physical Count",
+    "mix": "Cash Handover vs Physical Count (Cash Handover vs Physical Count)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Cash Handover vs Physical Count",
+    "en": "Cash Handover vs Physical Count",
+    "mix": "Cash Handover vs Physical Count"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/w2_handover_vs_hub",
+   "planned": false,
+   "source": "p25:259",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 111,
    "id": "r111",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 111 (এখনও যাচাই হয়নি)",
-    "en": "Report #111 (not audited yet)",
-    "mix": "Report #111 (not audited yet) (রিপোর্ট নং 111 (এখনও যাচাই হয়নি))"
+    "bn": "Payment Method Reconciliation",
+    "en": "Payment Method Reconciliation",
+    "mix": "Payment Method Reconciliation (Payment Method Reconciliation)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Payment Method Reconciliation",
+    "en": "Payment Method Reconciliation",
+    "mix": "Payment Method Reconciliation"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "wallets",
+   "planned": false,
+   "source": "rpt_def p9; `d_wallet_recon_report` p83:517",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: voided excluded"
   },
   {
    "no": 112,
    "id": "r112",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 112 (এখনও যাচাই হয়নি)",
-    "en": "Report #112 (not audited yet)",
-    "mix": "Report #112 (not audited yet) (রিপোর্ট নং 112 (এখনও যাচাই হয়নি))"
+    "bn": "Bank Reconciliation",
+    "en": "Bank Reconciliation",
+    "mix": "Bank Reconciliation (Bank Reconciliation)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Bank Reconciliation",
+    "en": "Bank Reconciliation",
+    "mix": "Bank Reconciliation"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "unverified",
+   "route": "finance2",
+   "planned": false,
+   "source": "`bank_stmt_import` p53:248, `bank_recon_*` p53:308-437",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: reversals visible as book lines"
   },
   {
    "no": 113,
    "id": "r113",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 113 (এখনও যাচাই হয়নি)",
-    "en": "Report #113 (not audited yet)",
-    "mix": "Report #113 (not audited yet) (রিপোর্ট নং 113 (এখনও যাচাই হয়নি))"
+    "bn": "Mobile Financial Service and Card Settlement Recon",
+    "en": "Mobile Financial Service and Card Settlement Recon",
+    "mix": "Mobile Financial Service and Card Settlement Recon (Mobile Financial Service and Card Settlement Recon)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Mobile Financial Service and Card Settlement Recon",
+    "en": "Mobile Financial Service and Card Settlement Recon",
+    "mix": "Mobile Financial Service and Card Settlement Recon"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "incomplete",
+   "route": "wallets",
+   "planned": false,
+   "source": "`d_wallet_*` p83; p9",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: card treated as bank, no settlement batch"
   },
   {
    "no": 114,
    "id": "r114",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 114 (এখনও যাচাই হয়নি)",
-    "en": "Report #114 (not audited yet)",
-    "mix": "Report #114 (not audited yet) (রিপোর্ট নং 114 (এখনও যাচাই হয়নি))"
+    "bn": "Expense Register",
+    "en": "Expense Register",
+    "mix": "Expense Register (Expense Register)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Expense Register",
+    "en": "Expense Register",
+    "mix": "Expense Register"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "expenseregister",
+   "planned": false,
+   "source": "`expense_by_head` p21; `quick_expense_day` p50:194",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C1 (phases 440-444); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 115,
    "id": "r115",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 115 (এখনও যাচাই হয়নি)",
-    "en": "Report #115 (not audited yet)",
-    "mix": "Report #115 (not audited yet) (রিপোর্ট নং 115 (এখনও যাচাই হয়নি))"
+    "bn": "Expenses by Category/Head",
+    "en": "Expenses by Category/Head",
+    "mix": "Expenses by Category/Head (Expenses by Category/Head)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Expenses by Category/Head",
+    "en": "Expenses by Category/Head",
+    "mix": "Expenses by Category/Head"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "expenseregister",
+   "planned": false,
+   "source": "p21 (dims head, location, day)",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C1 (phases 440-444); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 116,
    "id": "r116",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 116 (এখনও যাচাই হয়নি)",
-    "en": "Report #116 (not audited yet)",
-    "mix": "Report #116 (not audited yet) (রিপোর্ট নং 116 (এখনও যাচাই হয়নি))"
+    "bn": "Expense Trend and Period Comparison",
+    "en": "Expense Trend and Period Comparison",
+    "mix": "Expense Trend and Period Comparison (Expense Trend and Period Comparison)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Expense Trend and Period Comparison",
+    "en": "Expense Trend and Period Comparison",
+    "mix": "Expense Trend and Period Comparison"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/e2_expense_trend",
+   "planned": false,
+   "source": "p25:175",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y (P&L basis; differs from 115)"
   },
   {
    "no": 117,
    "id": "r117",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 117 (এখনও যাচাই হয়নি)",
-    "en": "Report #117 (not audited yet)",
-    "mix": "Report #117 (not audited yet) (রিপোর্ট নং 117 (এখনও যাচাই হয়নি))"
+    "bn": "Petty Cash, Imprest, Missing Receipts",
+    "en": "Petty Cash, Imprest, Missing Receipts",
+    "mix": "Petty Cash, Imprest, Missing Receipts (Petty Cash, Imprest, Missing Receipts)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Petty Cash, Imprest, Missing Receipts",
+    "en": "Petty Cash, Imprest, Missing Receipts",
+    "mix": "Petty Cash, Imprest, Missing Receipts"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/e3_weak_control",
+   "planned": false,
+   "source": "p25:189; `quick_expense_close_day` p50:208",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 118,
    "id": "r118",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 118 (এখনও যাচাই হয়নি)",
-    "en": "Report #118 (not audited yet)",
-    "mix": "Report #118 (not audited yet) (রিপোর্ট নং 118 (এখনও যাচাই হয়নি))"
+    "bn": "Accounts Receivable and Customer Dues",
+    "en": "Accounts Receivable and Customer Dues",
+    "mix": "Accounts Receivable and Customer Dues (Accounts Receivable and Customer Dues)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Accounts Receivable and Customer Dues",
+    "en": "Accounts Receivable and Customer Dues",
+    "mix": "Accounts Receivable and Customer Dues"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "dues",
+   "planned": false,
+   "source": "`customer_dues` p12:539, report SQL p9:766, `acct_party_ledger` p40:935, `acct_reconcile` p40:959",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: voids excluded; opening dues not linked (F13)"
   },
   {
    "no": 119,
    "id": "r119",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 119 (এখনও যাচাই হয়নি)",
-    "en": "Report #119 (not audited yet)",
-    "mix": "Report #119 (not audited yet) (রিপোর্ট নং 119 (এখনও যাচাই হয়নি))"
+    "bn": "Accounts Payable and Supplier Dues",
+    "en": "Accounts Payable and Supplier Dues",
+    "mix": "Accounts Payable and Supplier Dues (Accounts Payable and Supplier Dues)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Accounts Payable and Supplier Dues",
+    "en": "Accounts Payable and Supplier Dues",
+    "mix": "Accounts Payable and Supplier Dues"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "payables",
+   "planned": false,
+   "source": "`supplier_dues` p10:1240, `payables_summary` p10:1289, `supplier_ledger`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 120,
    "id": "r120",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 120 (এখনও যাচাই হয়নি)",
-    "en": "Report #120 (not audited yet)",
-    "mix": "Report #120 (not audited yet) (রিপোর্ট নং 120 (এখনও যাচাই হয়নি))"
+    "bn": "Receivable and Payable Ageing",
+    "en": "Receivable and Payable Ageing",
+    "mix": "Receivable and Payable Ageing (Receivable and Payable Ageing)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Receivable and Payable Ageing",
+    "en": "Receivable and Payable Ageing",
+    "mix": "Receivable and Payable Ageing"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/receivable_aging",
+   "planned": false,
+   "source": "rule `report_aging_buckets`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 121,
    "id": "r121",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 121 (এখনও যাচাই হয়নি)",
-    "en": "Report #121 (not audited yet)",
-    "mix": "Report #121 (not audited yet) (রিপোর্ট নং 121 (এখনও যাচাই হয়নি))"
+    "bn": "P&L by Month and Outlet",
+    "en": "P&L by Month and Outlet",
+    "mix": "P&L by Month and Outlet (P&L by Month and Outlet)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "P&L by Month and Outlet",
+    "en": "P&L by Month and Outlet",
+    "mix": "P&L by Month and Outlet"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "statements",
+   "planned": false,
+   "source": "`_p27_pl` p27:17, `_r3q_l1_pnl` p27:73; `acct_income_statement` p40:821",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C1 (phases 440-444); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 122,
    "id": "r122",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 122 (এখনও যাচাই হয়নি)",
-    "en": "Report #122 (not audited yet)",
-    "mix": "Report #122 (not audited yet) (রিপোর্ট নং 122 (এখনও যাচাই হয়নি))"
+    "bn": "Consolidated P&L",
+    "en": "Consolidated P&L",
+    "mix": "Consolidated P&L (Consolidated P&L)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Consolidated P&L",
+    "en": "Consolidated P&L",
+    "mix": "Consolidated P&L"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "accounts",
+   "planned": false,
+   "source": "`acct_income_statement` p40:821; `money_statements` p87:1086",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: reversals net, entries balanced"
   },
   {
    "no": 123,
    "id": "r123",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 123 (এখনও যাচাই হয়নি)",
-    "en": "Report #123 (not audited yet)",
-    "mix": "Report #123 (not audited yet) (রিপোর্ট নং 123 (এখনও যাচাই হয়নি))"
+    "bn": "Balance Sheet",
+    "en": "Balance Sheet",
+    "mix": "Balance Sheet (Balance Sheet)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Balance Sheet",
+    "en": "Balance Sheet",
+    "mix": "Balance Sheet"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "accounts",
+   "planned": false,
+   "source": "`acct_balance_sheet` p40:843",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 124,
    "id": "r124",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 124 (এখনও যাচাই হয়নি)",
-    "en": "Report #124 (not audited yet)",
-    "mix": "Report #124 (not audited yet) (রিপোর্ট নং 124 (এখনও যাচাই হয়নি))"
+    "bn": "Cash Flow Statement",
+    "en": "Cash Flow Statement",
+    "mix": "Cash Flow Statement (Cash Flow Statement)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Cash Flow Statement",
+    "en": "Cash Flow Statement",
+    "mix": "Cash Flow Statement"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "statements",
+   "planned": false,
+   "source": "`acct_cash_flow` p40:915",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C1 (phases 440-444); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 125,
    "id": "r125",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 125 (এখনও যাচাই হয়নি)",
-    "en": "Report #125 (not audited yet)",
-    "mix": "Report #125 (not audited yet) (রিপোর্ট নং 125 (এখনও যাচাই হয়নি))"
+    "bn": "Cost Coverage and Break-even",
+    "en": "Cost Coverage and Break-even",
+    "mix": "Cost Coverage and Break-even (Cost Coverage and Break-even)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Cost Coverage and Break-even",
+    "en": "Cost Coverage and Break-even",
+    "mix": "Cost Coverage and Break-even"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "incomplete",
+   "route": "biz",
+   "planned": false,
+   "source": "`_r3q_l5_breakeven` p27:179",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: totals 0 when fixed cost blank (F1)"
   },
   {
    "no": 126,
    "id": "r126",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 126 (এখনও যাচাই হয়নি)",
-    "en": "Report #126 (not audited yet)",
-    "mix": "Report #126 (not audited yet) (রিপোর্ট নং 126 (এখনও যাচাই হয়নি))"
+    "bn": "Working Capital Summary",
+    "en": "Working Capital Summary",
+    "mix": "Working Capital Summary (Working Capital Summary)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Working Capital Summary",
+    "en": "Working Capital Summary",
+    "mix": "Working Capital Summary"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "statements",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C1 (phases 440-444); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 127,
    "id": "r127",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 127 (এখনও যাচাই হয়নি)",
-    "en": "Report #127 (not audited yet)",
-    "mix": "Report #127 (not audited yet) (রিপোর্ট নং 127 (এখনও যাচাই হয়নি))"
+    "bn": "Loan, Interest, Repayment Schedule (if applicable)",
+    "en": "Loan, Interest, Repayment Schedule (if applicable)",
+    "mix": "Loan, Interest, Repayment Schedule (if applicable) (Loan, Interest, Repayment Schedule (if applicable))"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Loan, Interest, Repayment Schedule (if applicable)",
+    "en": "Loan, Interest, Repayment Schedule (if applicable)",
+    "mix": "Loan, Interest, Repayment Schedule (if applicable)"
    },
-   "status": "unaudited",
+   "status": "unavailable",
    "route": null,
    "planned": true,
-   "source": "",
+   "source": "`partner_capital_balances` p44:714; p87:793",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "-"
   },
   {
    "no": 128,
    "id": "r128",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 128 (এখনও যাচাই হয়নি)",
-    "en": "Report #128 (not audited yet)",
-    "mix": "Report #128 (not audited yet) (রিপোর্ট নং 128 (এখনও যাচাই হয়নি))"
+    "bn": "Tax/VAT Reconciliation (if applicable)",
+    "en": "Tax/VAT Reconciliation (if applicable)",
+    "mix": "Tax/VAT Reconciliation (if applicable) (Tax/VAT Reconciliation (if applicable))"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Tax/VAT Reconciliation (if applicable)",
+    "en": "Tax/VAT Reconciliation (if applicable)",
+    "mix": "Tax/VAT Reconciliation (if applicable)"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "incomplete",
+   "route": "finance2",
+   "planned": false,
+   "source": "`vat_report` p53:556",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: returns reduce VAT"
   },
   {
    "no": 129,
    "id": "r129",
-   "section": null,
-   "area": "unaudited",
+   "section": 8,
+   "area": "cash",
    "name": {
-    "bn": "রিপোর্ট নং 129 (এখনও যাচাই হয়নি)",
-    "en": "Report #129 (not audited yet)",
-    "mix": "Report #129 (not audited yet) (রিপোর্ট নং 129 (এখনও যাচাই হয়নি))"
+    "bn": "Owner's Financial Summary vs System",
+    "en": "Owner's Financial Summary vs System",
+    "mix": "Owner's Financial Summary vs System (Owner's Financial Summary vs System)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Owner's Financial Summary vs System",
+    "en": "Owner's Financial Summary vs System",
+    "mix": "Owner's Financial Summary vs System"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "profitcheck",
+   "planned": false,
+   "source": "p27:146; `profit_recon` p92:314; `report_parity` p93:218",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: management basis (F2)"
   },
   {
    "no": 130,
    "id": "r130",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 130 (এখনও যাচাই হয়নি)",
-    "en": "Report #130 (not audited yet)",
-    "mix": "Report #130 (not audited yet) (রিপোর্ট নং 130 (এখনও যাচাই হয়নি))"
+    "bn": "Best Customers",
+    "en": "Best Customers",
+    "mix": "Best Customers (Best Customers)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Best Customers",
+    "en": "Best Customers",
+    "mix": "Best Customers"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "customers",
+   "planned": false,
+   "source": "rpt_def p9",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: done sales only"
   },
   {
    "no": 131,
    "id": "r131",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 131 (এখনও যাচাই হয়নি)",
-    "en": "Report #131 (not audited yet)",
-    "mix": "Report #131 (not audited yet) (রিপোর্ট নং 131 (এখনও যাচাই হয়নি))"
+    "bn": "New vs Repeat",
+    "en": "New vs Repeat",
+    "mix": "New vs Repeat (New vs Repeat)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "New vs Repeat",
+    "en": "New vs Repeat",
+    "mix": "New vs Repeat"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/d5_lapsed",
+   "planned": false,
+   "source": "p25:46",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 132,
    "id": "r132",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 132 (এখনও যাচাই হয়নি)",
-    "en": "Report #132 (not audited yet)",
-    "mix": "Report #132 (not audited yet) (রিপোর্ট নং 132 (এখনও যাচাই হয়নি))"
+    "bn": "Lapsed Customers",
+    "en": "Lapsed Customers",
+    "mix": "Lapsed Customers (Lapsed Customers)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Lapsed Customers",
+    "en": "Lapsed Customers",
+    "mix": "Lapsed Customers"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/d5_lapsed",
+   "planned": false,
+   "source": "p25:46",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: 180 days hard-coded (F9)"
   },
   {
    "no": 133,
    "id": "r133",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 133 (এখনও যাচাই হয়নি)",
-    "en": "Report #133 (not audited yet)",
-    "mix": "Report #133 (not audited yet) (রিপোর্ট নং 133 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Purchase History",
+    "en": "Customer Purchase History",
+    "mix": "Customer Purchase History (Customer Purchase History)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Purchase History",
+    "en": "Customer Purchase History",
+    "mix": "Customer Purchase History"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/receipt_register",
+   "planned": false,
+   "source": "`customer_profile` p43:753",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 134,
    "id": "r134",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 134 (এখনও যাচাই হয়নি)",
-    "en": "Report #134 (not audited yet)",
-    "mix": "Report #134 (not audited yet) (রিপোর্ট নং 134 (এখনও যাচাই হয়নি))"
+    "bn": "Segmentation/RFM",
+    "en": "Segmentation/RFM",
+    "mix": "Segmentation/RFM (Segmentation/RFM)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Segmentation/RFM",
+    "en": "Segmentation/RFM",
+    "mix": "Segmentation/RFM"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "incomplete",
+   "route": "report/m1_rfm",
+   "planned": false,
+   "source": "p25:61",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 135,
    "id": "r135",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 135 (এখনও যাচাই হয়নি)",
-    "en": "Report #135 (not audited yet)",
-    "mix": "Report #135 (not audited yet) (রিপোর্ট নং 135 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Outstanding Dues",
+    "en": "Customer Outstanding Dues",
+    "mix": "Customer Outstanding Dues (Customer Outstanding Dues)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Outstanding Dues",
+    "en": "Customer Outstanding Dues",
+    "mix": "Customer Outstanding Dues"
    },
-   "status": "unaudited",
+   "status": "implemented",
    "route": null,
-   "planned": true,
-   "source": "",
+   "planned": false,
+   "source": "p9:766",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "-"
   },
   {
    "no": 136,
    "id": "r136",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 136 (এখনও যাচাই হয়নি)",
-    "en": "Report #136 (not audited yet)",
-    "mix": "Report #136 (not audited yet) (রিপোর্ট নং 136 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Receivable Ageing",
+    "en": "Customer Receivable Ageing",
+    "mix": "Customer Receivable Ageing (Customer Receivable Ageing)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Receivable Ageing",
+    "en": "Customer Receivable Ageing",
+    "mix": "Customer Receivable Ageing"
    },
-   "status": "unaudited",
+   "status": "implemented",
    "route": null,
-   "planned": true,
-   "source": "",
+   "planned": false,
+   "source": "p9:779",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "-"
   },
   {
    "no": 137,
    "id": "r137",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 137 (এখনও যাচাই হয়নি)",
-    "en": "Report #137 (not audited yet)",
-    "mix": "Report #137 (not audited yet) (রিপোর্ট নং 137 (এখনও যাচাই হয়নি))"
+    "bn": "Credit-limit Utilization",
+    "en": "Credit-limit Utilization",
+    "mix": "Credit-limit Utilization (Credit-limit Utilization)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Credit-limit Utilization",
+    "en": "Credit-limit Utilization",
+    "mix": "Credit-limit Utilization"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/credit_limit_use",
+   "planned": false,
+   "source": "p9:814",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 138,
    "id": "r138",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 138 (এখনও যাচাই হয়নি)",
-    "en": "Report #138 (not audited yet)",
-    "mix": "Report #138 (not audited yet) (রিপোর্ট নং 138 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Credit Risk and Overdue",
+    "en": "Customer Credit Risk and Overdue",
+    "mix": "Customer Credit Risk and Overdue (Customer Credit Risk and Overdue)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Credit Risk and Overdue",
+    "en": "Customer Credit Risk and Overdue",
+    "mix": "Customer Credit Risk and Overdue"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "custinsight",
+   "planned": false,
+   "source": "p9:779",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 139,
    "id": "r139",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 139 (এখনও যাচাই হয়নি)",
-    "en": "Report #139 (not audited yet)",
-    "mix": "Report #139 (not audited yet) (রিপোর্ট নং 139 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Lifetime Value",
+    "en": "Customer Lifetime Value",
+    "mix": "Customer Lifetime Value (Customer Lifetime Value)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Lifetime Value",
+    "en": "Customer Lifetime Value",
+    "mix": "Customer Lifetime Value"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "custinsight",
+   "planned": false,
+   "source": "`customer_profile`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 140,
    "id": "r140",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 140 (এখনও যাচাই হয়নি)",
-    "en": "Report #140 (not audited yet)",
-    "mix": "Report #140 (not audited yet) (রিপোর্ট নং 140 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Complaints and Return History",
+    "en": "Customer Complaints and Return History",
+    "mix": "Customer Complaints and Return History (Customer Complaints and Return History)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Complaints and Return History",
+    "en": "Customer Complaints and Return History",
+    "mix": "Customer Complaints and Return History"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "custinsight",
+   "planned": false,
+   "source": "p26:458; `sale_returns_summary` p23:206",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 141,
    "id": "r141",
-   "section": null,
-   "area": "unaudited",
+   "section": 9,
+   "area": "customer",
    "name": {
-    "bn": "রিপোর্ট নং 141 (এখনও যাচাই হয়নি)",
-    "en": "Report #141 (not audited yet)",
-    "mix": "Report #141 (not audited yet) (রিপোর্ট নং 141 (এখনও যাচাই হয়নি))"
+    "bn": "Birthday Cake / Special Order Customer History",
+    "en": "Birthday Cake / Special Order Customer History",
+    "mix": "Birthday Cake / Special Order Customer History (Birthday Cake / Special Order Customer History)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Birthday Cake / Special Order Customer History",
+    "en": "Birthday Cake / Special Order Customer History",
+    "mix": "Birthday Cake / Special Order Customer History"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "custinsight",
+   "planned": false,
+   "source": "`gifts_due`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 142,
    "id": "r142",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 142 (এখনও যাচাই হয়নি)",
-    "en": "Report #142 (not audited yet)",
-    "mix": "Report #142 (not audited yet) (রিপোর্ট নং 142 (এখনও যাচাই হয়নি))"
+    "bn": "Attendance Summary",
+    "en": "Attendance Summary",
+    "mix": "Attendance Summary (Attendance Summary)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Attendance Summary",
+    "en": "Attendance Summary",
+    "mix": "Attendance Summary"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "staffreports",
+   "planned": false,
+   "source": "`attendance_board` p42:616, `attendance_month` p42:642; p21:368",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 143,
    "id": "r143",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 143 (এখনও যাচাই হয়নি)",
-    "en": "Report #143 (not audited yet)",
-    "mix": "Report #143 (not audited yet) (রিপোর্ট নং 143 (এখনও যাচাই হয়নি))"
+    "bn": "Monthly Staff Indicators",
+    "en": "Monthly Staff Indicators",
+    "mix": "Monthly Staff Indicators (Monthly Staff Indicators)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Monthly Staff Indicators",
+    "en": "Monthly Staff Indicators",
+    "mix": "Monthly Staff Indicators"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "report/x5_staff_trend",
+   "planned": false,
+   "source": "p25:121",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 144,
    "id": "r144",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 144 (এখনও যাচাই হয়নি)",
-    "en": "Report #144 (not audited yet)",
-    "mix": "Report #144 (not audited yet) (রিপোর্ট নং 144 (এখনও যাচাই হয়নি))"
+    "bn": "Staff Cost vs Sales",
+    "en": "Staff Cost vs Sales",
+    "mix": "Staff Cost vs Sales (Staff Cost vs Sales)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Staff Cost vs Sales",
+    "en": "Staff Cost vs Sales",
+    "mix": "Staff Cost vs Sales"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "incomplete",
+   "route": "report/t4_staff_cost_ratio",
+   "planned": false,
+   "source": "p27:234 (`_p27_pl`)",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P: salary basis legacy 7,000 vs run 8,000 (F5)"
   },
   {
    "no": 145,
    "id": "r145",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 145 (এখনও যাচাই হয়নি)",
-    "en": "Report #145 (not audited yet)",
-    "mix": "Report #145 (not audited yet) (রিপোর্ট নং 145 (এখনও যাচাই হয়নি))"
+    "bn": "Payroll and Salary Register",
+    "en": "Payroll and Salary Register",
+    "mix": "Payroll and Salary Register (Payroll and Salary Register)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Payroll and Salary Register",
+    "en": "Payroll and Salary Register",
+    "mix": "Payroll and Salary Register"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "payroll",
+   "planned": false,
+   "source": "`payroll_*` p42:1273-1507",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: void run, payment void"
   },
   {
    "no": 146,
    "id": "r146",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 146 (এখনও যাচাই হয়নি)",
-    "en": "Report #146 (not audited yet)",
-    "mix": "Report #146 (not audited yet) (রিপোর্ট নং 146 (এখনও যাচাই হয়নি))"
+    "bn": "Staff Advances and Deductions",
+    "en": "Staff Advances and Deductions",
+    "mix": "Staff Advances and Deductions (Staff Advances and Deductions)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Staff Advances and Deductions",
+    "en": "Staff Advances and Deductions",
+    "mix": "Staff Advances and Deductions"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "payroll",
+   "planned": false,
+   "source": "`staff_advance_add/void` p42; p27:198",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y (A: 1,000 in BS 1220 and day book)"
   },
   {
    "no": 147,
    "id": "r147",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 147 (এখনও যাচাই হয়নি)",
-    "en": "Report #147 (not audited yet)",
-    "mix": "Report #147 (not audited yet) (রিপোর্ট নং 147 (এখনও যাচাই হয়নি))"
+    "bn": "Overtime and Attendance Variance",
+    "en": "Overtime and Attendance Variance",
+    "mix": "Overtime and Attendance Variance (Overtime and Attendance Variance)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Overtime and Attendance Variance",
+    "en": "Overtime and Attendance Variance",
+    "mix": "Overtime and Attendance Variance"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "staffreports",
+   "planned": false,
+   "source": "`attendance_ot_approve` p42:604",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 148,
    "id": "r148",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 148 (এখনও যাচাই হয়নি)",
-    "en": "Report #148 (not audited yet)",
-    "mix": "Report #148 (not audited yet) (রিপোর্ট নং 148 (এখনও যাচাই হয়নি))"
+    "bn": "Sales per Staff / Labour Hour",
+    "en": "Sales per Staff / Labour Hour",
+    "mix": "Sales per Staff / Labour Hour (Sales per Staff / Labour Hour)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Sales per Staff / Labour Hour",
+    "en": "Sales per Staff / Labour Hour",
+    "mix": "Sales per Staff / Labour Hour"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "staffreports",
+   "planned": false,
+   "source": "`biz_staff` p4:102",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 149,
    "id": "r149",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 149 (এখনও যাচাই হয়নি)",
-    "en": "Report #149 (not audited yet)",
-    "mix": "Report #149 (not audited yet) (রিপোর্ট নং 149 (এখনও যাচাই হয়নি))"
+    "bn": "Production Output per Worker / Labour Hour",
+    "en": "Production Output per Worker / Labour Hour",
+    "mix": "Production Output per Worker / Labour Hour (Production Output per Worker / Labour Hour)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Production Output per Worker / Labour Hour",
+    "en": "Production Output per Worker / Labour Hour",
+    "mix": "Production Output per Worker / Labour Hour"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "staffreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 150,
    "id": "r150",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 150 (এখনও যাচাই হয়নি)",
-    "en": "Report #150 (not audited yet)",
-    "mix": "Report #150 (not audited yet) (রিপোর্ট নং 150 (এখনও যাচাই হয়নি))"
+    "bn": "Cashier-wise Cash Variance",
+    "en": "Cashier-wise Cash Variance",
+    "mix": "Cashier-wise Cash Variance (Cashier-wise Cash Variance)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Cashier-wise Cash Variance",
+    "en": "Cashier-wise Cash Variance",
+    "mix": "Cashier-wise Cash Variance"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "staffreports",
+   "planned": false,
+   "source": "p21:351",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 151,
    "id": "r151",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 151 (এখনও যাচাই হয়নি)",
-    "en": "Report #151 (not audited yet)",
-    "mix": "Report #151 (not audited yet) (রিপোর্ট নং 151 (এখনও যাচাই হয়নি))"
+    "bn": "Staff Transaction Exception Report",
+    "en": "Staff Transaction Exception Report",
+    "mix": "Staff Transaction Exception Report (Staff Transaction Exception Report)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Staff Transaction Exception Report",
+    "en": "Staff Transaction Exception Report",
+    "mix": "Staff Transaction Exception Report"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "biz",
+   "planned": false,
+   "source": "p25:121; `biz_staff`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 152,
    "id": "r152",
-   "section": null,
-   "area": "unaudited",
+   "section": 10,
+   "area": "staff",
    "name": {
-    "bn": "রিপোর্ট নং 152 (এখনও যাচাই হয়নি)",
-    "en": "Report #152 (not audited yet)",
-    "mix": "Report #152 (not audited yet) (রিপোর্ট নং 152 (এখনও যাচাই হয়নি))"
+    "bn": "Staff Access and Permission Audit",
+    "en": "Staff Access and Permission Audit",
+    "mix": "Staff Access and Permission Audit (Staff Access and Permission Audit)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Staff Access and Permission Audit",
+    "en": "Staff Access and Permission Audit",
+    "mix": "Staff Access and Permission Audit"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "delegation",
+   "planned": false,
+   "source": "`grant_separation_report` p78:391; login_attempts p11:94",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "-"
   },
   {
    "no": 153,
    "id": "r153",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 153 (এখনও যাচাই হয়নি)",
-    "en": "Report #153 (not audited yet)",
-    "mix": "Report #153 (not audited yet) (রিপোর্ট নং 153 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Order Register",
+    "en": "Customer Order Register",
+    "mix": "Customer Order Register (Customer Order Register)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Order Register",
+    "en": "Customer Order Register",
+    "mix": "Customer Order Register"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "`online_orders_list` p61:251; p25:20",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 154,
    "id": "r154",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 154 (এখনও যাচাই হয়নি)",
-    "en": "Report #154 (not audited yet)",
-    "mix": "Report #154 (not audited yet) (রিপোর্ট নং 154 (এখনও যাচাই হয়নি))"
+    "bn": "Pending/Confirmed/Completed Orders",
+    "en": "Pending/Confirmed/Completed Orders",
+    "mix": "Pending/Confirmed/Completed Orders (Pending/Confirmed/Completed Orders)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Pending/Confirmed/Completed Orders",
+    "en": "Pending/Confirmed/Completed Orders",
+    "mix": "Pending/Confirmed/Completed Orders"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "onlineorders",
+   "planned": false,
+   "source": "`online_order_status` p61:174",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y: trail kept"
   },
   {
    "no": 155,
    "id": "r155",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 155 (এখনও যাচাই হয়নি)",
-    "en": "Report #155 (not audited yet)",
-    "mix": "Report #155 (not audited yet) (রিপোর্ট নং 155 (এখনও যাচাই হয়নি))"
+    "bn": "Custom Cake / Birthday Order Register",
+    "en": "Custom Cake / Birthday Order Register",
+    "mix": "Custom Cake / Birthday Order Register (Custom Cake / Birthday Order Register)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Custom Cake / Birthday Order Register",
+    "en": "Custom Cake / Birthday Order Register",
+    "mix": "Custom Cake / Birthday Order Register"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "p25:20 (no type split)",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 156,
    "id": "r156",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 156 (এখনও যাচাই হয়নি)",
-    "en": "Report #156 (not audited yet)",
-    "mix": "Report #156 (not audited yet) (রিপোর্ট নং 156 (এখনও যাচাই হয়নি))"
+    "bn": "Advance Payments and Outstanding Order Balances",
+    "en": "Advance Payments and Outstanding Order Balances",
+    "mix": "Advance Payments and Outstanding Order Balances (Advance Payments and Outstanding Order Balances)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Advance Payments and Outstanding Order Balances",
+    "en": "Advance Payments and Outstanding Order Balances",
+    "mix": "Advance Payments and Outstanding Order Balances"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "p61:251",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 157,
    "id": "r157",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 157 (এখনও যাচাই হয়নি)",
-    "en": "Report #157 (not audited yet)",
-    "mix": "Report #157 (not audited yet) (রিপোর্ট নং 157 (এখনও যাচাই হয়নি))"
+    "bn": "Order Cancellation and Refunds",
+    "en": "Order Cancellation and Refunds",
+    "mix": "Order Cancellation and Refunds (Order Cancellation and Refunds)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Order Cancellation and Refunds",
+    "en": "Order Cancellation and Refunds",
+    "mix": "Order Cancellation and Refunds"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "`online_order_cancel` p61:189",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 158,
    "id": "r158",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 158 (এখনও যাচাই হয়নি)",
-    "en": "Report #158 (not audited yet)",
-    "mix": "Report #158 (not audited yet) (রিপোর্ট নং 158 (এখনও যাচাই হয়নি))"
+    "bn": "On-time Delivery Performance",
+    "en": "On-time Delivery Performance",
+    "mix": "On-time Delivery Performance (On-time Delivery Performance)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "On-time Delivery Performance",
+    "en": "On-time Delivery Performance",
+    "mix": "On-time Delivery Performance"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 159,
    "id": "r159",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 159 (এখনও যাচাই হয়নি)",
-    "en": "Report #159 (not audited yet)",
-    "mix": "Report #159 (not audited yet) (রিপোর্ট নং 159 (এখনও যাচাই হয়নি))"
+    "bn": "Delayed and Undelivered Orders",
+    "en": "Delayed and Undelivered Orders",
+    "mix": "Delayed and Undelivered Orders (Delayed and Undelivered Orders)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Delayed and Undelivered Orders",
+    "en": "Delayed and Undelivered Orders",
+    "mix": "Delayed and Undelivered Orders"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 160,
    "id": "r160",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 160 (এখনও যাচাই হয়নি)",
-    "en": "Report #160 (not audited yet)",
-    "mix": "Report #160 (not audited yet) (রিপোর্ট নং 160 (এখনও যাচাই হয়নি))"
+    "bn": "Order-wise Production and Material Cost",
+    "en": "Order-wise Production and Material Cost",
+    "mix": "Order-wise Production and Material Cost (Order-wise Production and Material Cost)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Order-wise Production and Material Cost",
+    "en": "Order-wise Production and Material Cost",
+    "mix": "Order-wise Production and Material Cost"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 161,
    "id": "r161",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 161 (এখনও যাচাই হয়নি)",
-    "en": "Report #161 (not audited yet)",
-    "mix": "Report #161 (not audited yet) (রিপোর্ট নং 161 (এখনও যাচাই হয়নি))"
+    "bn": "Order Profitability",
+    "en": "Order Profitability",
+    "mix": "Order Profitability (Order Profitability)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Order Profitability",
+    "en": "Order Profitability",
+    "mix": "Order Profitability"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 162,
    "id": "r162",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 162 (এখনও যাচাই হয়নি)",
-    "en": "Report #162 (not audited yet)",
-    "mix": "Report #162 (not audited yet) (রিপোর্ট নং 162 (এখনও যাচাই হয়নি))"
+    "bn": "Delivery Cost and Performance",
+    "en": "Delivery Cost and Performance",
+    "mix": "Delivery Cost and Performance (Delivery Cost and Performance)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Delivery Cost and Performance",
+    "en": "Delivery Cost and Performance",
+    "mix": "Delivery Cost and Performance"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 163,
    "id": "r163",
-   "section": null,
-   "area": "unaudited",
+   "section": 11,
+   "area": "orders",
    "name": {
-    "bn": "রিপোর্ট নং 163 (এখনও যাচাই হয়নি)",
-    "en": "Report #163 (not audited yet)",
-    "mix": "Report #163 (not audited yet) (রিপোর্ট নং 163 (এখনও যাচাই হয়নি))"
+    "bn": "Order Fulfilment Rate",
+    "en": "Order Fulfilment Rate",
+    "mix": "Order Fulfilment Rate (Order Fulfilment Rate)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Order Fulfilment Rate",
+    "en": "Order Fulfilment Rate",
+    "mix": "Order Fulfilment Rate"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "orderreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C2 (phases 445-457); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 164,
    "id": "r164",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 164 (এখনও যাচাই হয়নি)",
-    "en": "Report #164 (not audited yet)",
-    "mix": "Report #164 (not audited yet) (রিপোর্ট নং 164 (এখনও যাচাই হয়নি))"
+    "bn": "Marketing Spend by Campaign/Period",
+    "en": "Marketing Spend by Campaign/Period",
+    "mix": "Marketing Spend by Campaign/Period (Marketing Spend by Campaign/Period)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Marketing Spend by Campaign/Period",
+    "en": "Marketing Spend by Campaign/Period",
+    "mix": "Marketing Spend by Campaign/Period"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "p25:226",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 165,
    "id": "r165",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 165 (এখনও যাচাই হয়নি)",
-    "en": "Report #165 (not audited yet)",
-    "mix": "Report #165 (not audited yet) (রিপোর্ট নং 165 (এখনও যাচাই হয়নি))"
+    "bn": "Marketing Spend vs Sales",
+    "en": "Marketing Spend vs Sales",
+    "mix": "Marketing Spend vs Sales (Marketing Spend vs Sales)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Marketing Spend vs Sales",
+    "en": "Marketing Spend vs Sales",
+    "mix": "Marketing Spend vs Sales"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "p26:383",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 166,
    "id": "r166",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 166 (এখনও যাচাই হয়নি)",
-    "en": "Report #166 (not audited yet)",
-    "mix": "Report #166 (not audited yet) (রিপোর্ট নং 166 (এখনও যাচাই হয়নি))"
+    "bn": "Campaign Revenue and Contribution Profit",
+    "en": "Campaign Revenue and Contribution Profit",
+    "mix": "Campaign Revenue and Contribution Profit (Campaign Revenue and Contribution Profit)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Campaign Revenue and Contribution Profit",
+    "en": "Campaign Revenue and Contribution Profit",
+    "mix": "Campaign Revenue and Contribution Profit"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 167,
    "id": "r167",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 167 (এখনও যাচাই হয়নি)",
-    "en": "Report #167 (not audited yet)",
-    "mix": "Report #167 (not audited yet) (রিপোর্ট নং 167 (এখনও যাচাই হয়নি))"
+    "bn": "Discount Campaign Performance",
+    "en": "Discount Campaign Performance",
+    "mix": "Discount Campaign Performance (Discount Campaign Performance)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Discount Campaign Performance",
+    "en": "Discount Campaign Performance",
+    "mix": "Discount Campaign Performance"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "rpt_def p9 discounts",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 168,
    "id": "r168",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 168 (এখনও যাচাই হয়নি)",
-    "en": "Report #168 (not audited yet)",
-    "mix": "Report #168 (not audited yet) (রিপোর্ট নং 168 (এখনও যাচাই হয়নি))"
+    "bn": "Coupon/Offer Usage",
+    "en": "Coupon/Offer Usage",
+    "mix": "Coupon/Offer Usage (Coupon/Offer Usage)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Coupon/Offer Usage",
+    "en": "Coupon/Offer Usage",
+    "mix": "Coupon/Offer Usage"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "couponuse",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 169,
    "id": "r169",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 169 (এখনও যাচাই হয়নি)",
-    "en": "Report #169 (not audited yet)",
-    "mix": "Report #169 (not audited yet) (রিপোর্ট নং 169 (এখনও যাচাই হয়নি))"
+    "bn": "Customer Acquisition Cost",
+    "en": "Customer Acquisition Cost",
+    "mix": "Customer Acquisition Cost (Customer Acquisition Cost)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Customer Acquisition Cost",
+    "en": "Customer Acquisition Cost",
+    "mix": "Customer Acquisition Cost"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 170,
    "id": "r170",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 170 (এখনও যাচাই হয়নি)",
-    "en": "Report #170 (not audited yet)",
-    "mix": "Report #170 (not audited yet) (রিপোর্ট নং 170 (এখনও যাচাই হয়নি))"
+    "bn": "Repeat Purchase after Promotion",
+    "en": "Repeat Purchase after Promotion",
+    "mix": "Repeat Purchase after Promotion (Repeat Purchase after Promotion)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Repeat Purchase after Promotion",
+    "en": "Repeat Purchase after Promotion",
+    "mix": "Repeat Purchase after Promotion"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 171,
    "id": "r171",
-   "section": null,
-   "area": "unaudited",
+   "section": 12,
+   "area": "marketing",
    "name": {
-    "bn": "রিপোর্ট নং 171 (এখনও যাচাই হয়নি)",
-    "en": "Report #171 (not audited yet)",
-    "mix": "Report #171 (not audited yet) (রিপোর্ট নং 171 (এখনও যাচাই হয়নি))"
+    "bn": "Marketing ROI",
+    "en": "Marketing ROI",
+    "mix": "Marketing ROI (Marketing ROI)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Marketing ROI",
+    "en": "Marketing ROI",
+    "mix": "Marketing ROI"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "campaigns",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 172,
    "id": "r172",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 172 (এখনও যাচাই হয়নি)",
-    "en": "Report #172 (not audited yet)",
-    "mix": "Report #172 (not audited yet) (রিপোর্ট নং 172 (এখনও যাচাই হয়নি))"
+    "bn": "Exception Summary",
+    "en": "Exception Summary",
+    "mix": "Exception Summary (Exception Summary)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Exception Summary",
+    "en": "Exception Summary",
+    "mix": "Exception Summary"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "exceptions",
+   "planned": false,
+   "source": "p21 `exceptions_summary`; `w1e_exceptions_list` p94:423; `money_exceptions_list` p87:691",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 173,
    "id": "r173",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 173 (এখনও যাচাই হয়নি)",
-    "en": "Report #173 (not audited yet)",
-    "mix": "Report #173 (not audited yet) (রিপোর্ট নং 173 (এখনও যাচাই হয়নি))"
+    "bn": "Audit and Correction Log",
+    "en": "Audit and Correction Log",
+    "mix": "Audit and Correction Log (Audit and Correction Log)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Audit and Correction Log",
+    "en": "Audit and Correction Log",
+    "mix": "Audit and Correction Log"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "p25:90",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 174,
    "id": "r174",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 174 (এখনও যাচাই হয়নি)",
-    "en": "Report #174 (not audited yet)",
-    "mix": "Report #174 (not audited yet) (রিপোর্ট নং 174 (এখনও যাচাই হয়নি))"
+    "bn": "Stock Adjustment Approval History",
+    "en": "Stock Adjustment Approval History",
+    "mix": "Stock Adjustment Approval History (Stock Adjustment Approval History)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Stock Adjustment Approval History",
+    "en": "Stock Adjustment Approval History",
+    "mix": "Stock Adjustment Approval History"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "p12:193",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 175,
    "id": "r175",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 175 (এখনও যাচাই হয়নি)",
-    "en": "Report #175 (not audited yet)",
-    "mix": "Report #175 (not audited yet) (রিপোর্ট নং 175 (এখনও যাচাই হয়নি))"
+    "bn": "Discount and Price Override Approvals",
+    "en": "Discount and Price Override Approvals",
+    "mix": "Discount and Price Override Approvals (Discount and Price Override Approvals)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Discount and Price Override Approvals",
+    "en": "Discount and Price Override Approvals",
+    "mix": "Discount and Price Override Approvals"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "`discounts_report` p20:437",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 176,
    "id": "r176",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 176 (এখনও যাচাই হয়নি)",
-    "en": "Report #176 (not audited yet)",
-    "mix": "Report #176 (not audited yet) (রিপোর্ট নং 176 (এখনও যাচাই হয়নি))"
+    "bn": "Voids, Refunds, Unusual Transactions",
+    "en": "Voids, Refunds, Unusual Transactions",
+    "mix": "Voids, Refunds, Unusual Transactions (Voids, Refunds, Unusual Transactions)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Voids, Refunds, Unusual Transactions",
+    "en": "Voids, Refunds, Unusual Transactions",
+    "mix": "Voids, Refunds, Unusual Transactions"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "p9; p23:206",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 177,
    "id": "r177",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 177 (এখনও যাচাই হয়নি)",
-    "en": "Report #177 (not audited yet)",
-    "mix": "Report #177 (not audited yet) (রিপোর্ট নং 177 (এখনও যাচাই হয়নি))"
+    "bn": "User Activity and Access History",
+    "en": "User Activity and Access History",
+    "mix": "User Activity and Access History (User Activity and Access History)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "User Activity and Access History",
+    "en": "User Activity and Access History",
+    "mix": "User Activity and Access History"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 178,
    "id": "r178",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 178 (এখনও যাচাই হয়নি)",
-    "en": "Report #178 (not audited yet)",
-    "mix": "Report #178 (not audited yet) (রিপোর্ট নং 178 (এখনও যাচাই হয়নি))"
+    "bn": "Missing/Incomplete Form Submissions",
+    "en": "Missing/Incomplete Form Submissions",
+    "mix": "Missing/Incomplete Form Submissions (Missing/Incomplete Form Submissions)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Missing/Incomplete Form Submissions",
+    "en": "Missing/Incomplete Form Submissions",
+    "mix": "Missing/Incomplete Form Submissions"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "incomplete",
+   "route": "report/x4_compliance",
+   "planned": false,
+   "source": "p25:100",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "P (F10)"
   },
   {
    "no": 179,
    "id": "r179",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 179 (এখনও যাচাই হয়নি)",
-    "en": "Report #179 (not audited yet)",
-    "mix": "Report #179 (not audited yet) (রিপোর্ট নং 179 (এখনও যাচাই হয়নি))"
+    "bn": "Duplicate/Out-of-order Receipt and Paper Numbers",
+    "en": "Duplicate/Out-of-order Receipt and Paper Numbers",
+    "mix": "Duplicate/Out-of-order Receipt and Paper Numbers (Duplicate/Out-of-order Receipt and Paper Numbers)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Duplicate/Out-of-order Receipt and Paper Numbers",
+    "en": "Duplicate/Out-of-order Receipt and Paper Numbers",
+    "mix": "Duplicate/Out-of-order Receipt and Paper Numbers"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "numaudit",
+   "planned": false,
+   "source": "p25:140; `number_audit` p5:26",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 180,
    "id": "r180",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 180 (এখনও যাচাই হয়নি)",
-    "en": "Report #180 (not audited yet)",
-    "mix": "Report #180 (not audited yet) (রিপোর্ট নং 180 (এখনও যাচাই হয়নি))"
+    "bn": "Unapproved Transactions and Approval Delays",
+    "en": "Unapproved Transactions and Approval Delays",
+    "mix": "Unapproved Transactions and Approval Delays (Unapproved Transactions and Approval Delays)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Unapproved Transactions and Approval Delays",
+    "en": "Unapproved Transactions and Approval Delays",
+    "mix": "Unapproved Transactions and Approval Delays"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "p28",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 181,
    "id": "r181",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 181 (এখনও যাচাই হয়নি)",
-    "en": "Report #181 (not audited yet)",
-    "mix": "Report #181 (not audited yet) (রিপোর্ট নং 181 (এখনও যাচাই হয়নি))"
+    "bn": "Data Integrity and Reconciliation Exceptions",
+    "en": "Data Integrity and Reconciliation Exceptions",
+    "mix": "Data Integrity and Reconciliation Exceptions (Data Integrity and Reconciliation Exceptions)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Data Integrity and Reconciliation Exceptions",
+    "en": "Data Integrity and Reconciliation Exceptions",
+    "mix": "Data Integrity and Reconciliation Exceptions"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "balancecheck",
+   "planned": false,
+   "source": "`_e_balance_check` p84:17; `inventory_vs_gl`",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 182,
    "id": "r182",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 182 (এখনও যাচাই হয়নি)",
-    "en": "Report #182 (not audited yet)",
-    "mix": "Report #182 (not audited yet) (রিপোর্ট নং 182 (এখনও যাচাই হয়নি))"
+    "bn": "Deleted, Reversed, Corrected Transaction History",
+    "en": "Deleted, Reversed, Corrected Transaction History",
+    "mix": "Deleted, Reversed, Corrected Transaction History (Deleted, Reversed, Corrected Transaction History)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Deleted, Reversed, Corrected Transaction History",
+    "en": "Deleted, Reversed, Corrected Transaction History",
+    "mix": "Deleted, Reversed, Corrected Transaction History"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 183,
    "id": "r183",
-   "section": null,
-   "area": "unaudited",
+   "section": 13,
+   "area": "audit",
    "name": {
-    "bn": "রিপোর্ট নং 183 (এখনও যাচাই হয়নি)",
-    "en": "Report #183 (not audited yet)",
-    "mix": "Report #183 (not audited yet) (রিপোর্ট নং 183 (এখনও যাচাই হয়নি))"
+    "bn": "Missing Cost, Recipe, Batch or Expiry Data",
+    "en": "Missing Cost, Recipe, Batch or Expiry Data",
+    "mix": "Missing Cost, Recipe, Batch or Expiry Data (Missing Cost, Recipe, Batch or Expiry Data)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Missing Cost, Recipe, Batch or Expiry Data",
+    "en": "Missing Cost, Recipe, Batch or Expiry Data",
+    "mix": "Missing Cost, Recipe, Batch or Expiry Data"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "auditreports",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 184,
    "id": "r184",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 184 (এখনও যাচাই হয়নি)",
-    "en": "Report #184 (not audited yet)",
-    "mix": "Report #184 (not audited yet) (রিপোর্ট নং 184 (এখনও যাচাই হয়নি))"
+    "bn": "Daily/Weekly Sales Forecast",
+    "en": "Daily/Weekly Sales Forecast",
+    "mix": "Daily/Weekly Sales Forecast (Daily/Weekly Sales Forecast)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Daily/Weekly Sales Forecast",
+    "en": "Daily/Weekly Sales Forecast",
+    "mix": "Daily/Weekly Sales Forecast"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "`biz_outlook` p4:150",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 185,
    "id": "r185",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 185 (এখনও যাচাই হয়নি)",
-    "en": "Report #185 (not audited yet)",
-    "mix": "Report #185 (not audited yet) (রিপোর্ট নং 185 (এখনও যাচাই হয়নি))"
+    "bn": "Item-wise Demand Forecast",
+    "en": "Item-wise Demand Forecast",
+    "mix": "Item-wise Demand Forecast (Item-wise Demand Forecast)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Item-wise Demand Forecast",
+    "en": "Item-wise Demand Forecast",
+    "mix": "Item-wise Demand Forecast"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "p60:335",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 186,
    "id": "r186",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 186 (এখনও যাচাই হয়নি)",
-    "en": "Report #186 (not audited yet)",
-    "mix": "Report #186 (not audited yet) (রিপোর্ট নং 186 (এখনও যাচাই হয়নি))"
+    "bn": "Production Requirement Forecast",
+    "en": "Production Requirement Forecast",
+    "mix": "Production Requirement Forecast (Production Requirement Forecast)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Production Requirement Forecast",
+    "en": "Production Requirement Forecast",
+    "mix": "Production Requirement Forecast"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 187,
    "id": "r187",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 187 (এখনও যাচাই হয়নি)",
-    "en": "Report #187 (not audited yet)",
-    "mix": "Report #187 (not audited yet) (রিপোর্ট নং 187 (এখনও যাচাই হয়নি))"
+    "bn": "Raw Material Purchase Forecast",
+    "en": "Raw Material Purchase Forecast",
+    "mix": "Raw Material Purchase Forecast (Raw Material Purchase Forecast)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Raw Material Purchase Forecast",
+    "en": "Raw Material Purchase Forecast",
+    "mix": "Raw Material Purchase Forecast"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "p4:150; p60:335; p26:191",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 188,
    "id": "r188",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 188 (এখনও যাচাই হয়নি)",
-    "en": "Report #188 (not audited yet)",
-    "mix": "Report #188 (not audited yet) (রিপোর্ট নং 188 (এখনও যাচাই হয়নি))"
+    "bn": "Expected Cash Inflow/Outflow",
+    "en": "Expected Cash Inflow/Outflow",
+    "mix": "Expected Cash Inflow/Outflow (Expected Cash Inflow/Outflow)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Expected Cash Inflow/Outflow",
+    "en": "Expected Cash Inflow/Outflow",
+    "mix": "Expected Cash Inflow/Outflow"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 189,
    "id": "r189",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 189 (এখনও যাচাই হয়নি)",
-    "en": "Report #189 (not audited yet)",
-    "mix": "Report #189 (not audited yet) (রিপোর্ট নং 189 (এখনও যাচাই হয়নি))"
+    "bn": "Upcoming Supplier Payment Forecast",
+    "en": "Upcoming Supplier Payment Forecast",
+    "mix": "Upcoming Supplier Payment Forecast (Upcoming Supplier Payment Forecast)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Upcoming Supplier Payment Forecast",
+    "en": "Upcoming Supplier Payment Forecast",
+    "mix": "Upcoming Supplier Payment Forecast"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "`supplier_dues` p10:1240",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 190,
    "id": "r190",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 190 (এখনও যাচাই হয়নি)",
-    "en": "Report #190 (not audited yet)",
-    "mix": "Report #190 (not audited yet) (রিপোর্ট নং 190 (এখনও যাচাই হয়নি))"
+    "bn": "Expected Wastage and Expiry Risk",
+    "en": "Expected Wastage and Expiry Risk",
+    "mix": "Expected Wastage and Expiry Risk (Expected Wastage and Expiry Risk)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Expected Wastage and Expiry Risk",
+    "en": "Expected Wastage and Expiry Risk",
+    "mix": "Expected Wastage and Expiry Risk"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "`near_expiry_report` p60:283",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 191,
    "id": "r191",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 191 (এখনও যাচাই হয়নি)",
-    "en": "Report #191 (not audited yet)",
-    "mix": "Report #191 (not audited yet) (রিপোর্ট নং 191 (এখনও যাচাই হয়নি))"
+    "bn": "Outlet Replenishment Recommendations",
+    "en": "Outlet Replenishment Recommendations",
+    "mix": "Outlet Replenishment Recommendations (Outlet Replenishment Recommendations)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Outlet Replenishment Recommendations",
+    "en": "Outlet Replenishment Recommendations",
+    "mix": "Outlet Replenishment Recommendations"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "stockx",
+   "planned": false,
+   "source": "`reorder_report` p60:335",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Y"
   },
   {
    "no": 192,
    "id": "r192",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 192 (এখনও যাচাই হয়নি)",
-    "en": "Report #192 (not audited yet)",
-    "mix": "Report #192 (not audited yet) (রিপোর্ট নং 192 (এখনও যাচাই হয়নি))"
+    "bn": "Sales and Profit Scenario Analysis",
+    "en": "Sales and Profit Scenario Analysis",
+    "mix": "Sales and Profit Scenario Analysis (Sales and Profit Scenario Analysis)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Sales and Profit Scenario Analysis",
+    "en": "Sales and Profit Scenario Analysis",
+    "mix": "Sales and Profit Scenario Analysis"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "-",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   },
   {
    "no": 193,
    "id": "r193",
-   "section": null,
-   "area": "unaudited",
+   "section": 14,
+   "area": "planning",
    "name": {
-    "bn": "রিপোর্ট নং 193 (এখনও যাচাই হয়নি)",
-    "en": "Report #193 (not audited yet)",
-    "mix": "Report #193 (not audited yet) (রিপোর্ট নং 193 (এখনও যাচাই হয়নি))"
+    "bn": "Seasonal and Festival Demand Analysis",
+    "en": "Seasonal and Festival Demand Analysis",
+    "mix": "Seasonal and Festival Demand Analysis (Seasonal and Festival Demand Analysis)"
    },
    "question": {
-    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
-    "en": "The name and question appear when audit 3 is merged.",
-    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+    "bn": "Seasonal and Festival Demand Analysis",
+    "en": "Seasonal and Festival Demand Analysis",
+    "mix": "Seasonal and Festival Demand Analysis"
    },
-   "status": "unaudited",
-   "route": null,
-   "planned": true,
-   "source": "",
+   "status": "implemented",
+   "route": "forecast",
+   "planned": false,
+   "source": "p9",
    "grant": "",
    "kw": [],
-   "note": ""
+   "note": "Built by RPT-C3 (phases 458-468); status set by the integrator after the package suites passed on the merged build."
   }
  ],
  "parser": {

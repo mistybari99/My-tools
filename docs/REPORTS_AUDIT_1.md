@@ -1,7 +1,5 @@
 # Reports audit 1 (sections 1-4)
 
-AUDIT DONE, BUT docs/REPORTS_AUDIT_1.md WAS NOT WRITTEN, AND NOTHING WAS COMMITTED. My Write call for that file was refused by the harness ("Subagents should return findings as text, not write report files"). I did not work around the refusal. The worktree is clean (only the audit scratch work exists, outside the repo). The full audit is below so you can save it as docs/REPORTS_AUDIT_1.md and commit. I did not run check_no_demo_leak.py (no file written); the text uses only neutral test_* wording.
-
 HOW IT WAS CHECKED
 - Read: web/ia.js, reports.js, reports2.js, ownerboard.js, dash.js, biz.js, costing.js, recipes.js, stockx.js, forms_factory.js, plus the SQL of all three report engines and the latest definitions (phase72/79/86/92/93).
 - Ran: a local throwaway Postgres 16 (port 5620, data dir /var/lib/postgresql/audit5620, outside the repo), built from tests/sql/ORDER.txt (phase8 to phase99). It is now stopped. The dry run used neutral test_* data across the whole chain: opening stock, purchase, two production runs (the second with a typed short yield), factory-to-showroom transfer received 1 kg short, 5 sales (retail, discounted, quick, wholesale with price override and credit, one voided), one cash refund return, one wastage. Then I called every relevant report. The scripts are in the session scratchpad, not the repo.

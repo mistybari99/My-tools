@@ -31,14 +31,18 @@ SECTIONS = [
     (4, 'Production', 'উৎপাদন', 40, 55), (5, 'Stock and inventory', 'স্টক ও মজুত', 56, 75), (6, 'Wastage, freshness and quality', 'অপচয়, তাজা অবস্থা ও মান', 76, 89),
     (7, 'Purchasing and suppliers', 'ক্রয় ও সরবরাহকারী', 90, 104),
 ]
-# sections 8-14: names and number ranges are not known until audit 3 lands; the numbers 105-193 are kept as "unaudited"
-for n in range(8, 15):
-    SECTIONS.append((n, 'Section %d (not audited yet)' % n, 'বিভাগ %d (এখনও যাচাই হয়নি)' % n, None, None))
+# sections 8-14 (REPORTS_AUDIT_3): numbers 105-193
+for n, en, bn, a, z in ((8, 'Cash, banking and financial', 'নগদ, ব্যাংক ও আর্থিক', 105, 129), (9, 'Customer and credit', 'গ্রাহক ও বাকি', 130, 141),
+                        (10, 'Staff, attendance and payroll', 'স্টাফ, হাজিরা ও বেতন', 142, 152), (11, 'Orders, cake orders and delivery', 'অর্ডার, কেক অর্ডার ও ডেলিভারি', 153, 163),
+                        (12, 'Marketing and promotions', 'মার্কেটিং ও প্রমোশন', 164, 171), (13, 'Audit, compliance and internal control', 'অডিট, কমপ্লায়েন্স ও অভ্যন্তরীণ নিয়ন্ত্রণ', 172, 183),
+                        (14, 'Management planning and forecasting', 'ব্যবস্থাপনা পরিকল্পনা ও পূর্বাভাস', 184, 193)):
+    SECTIONS.append((n, en, bn, a, z))
 
 GRANTS = {'exec': 'owner or report_profit / view_reports', 'sales': 'report_sales', 'pos': 'report_pos', 'cash': 'report_cash', 'cust': 'report_customers', 'stock': 'report_stock',
           'purch': 'report_purchase', 'exp': 'report_expense', 'profit': 'report_profit or accounts_view', 'cost': 'view_cost', 'quality': 'report_quality', 'ctl': 'report_control',
           'items': 'ITEMS view', 'fin': 'accounts_view', 'ord': 'report_orders', 'staff': 'report_staff'}
-AREAS = {'exec': 'Executive', 'sales': 'Sales', 'product': 'Product profit', 'production': 'Production', 'stock': 'Stock', 'quality': 'Quality', 'purchase': 'Purchasing'}
+AREAS = {'exec': 'Executive', 'sales': 'Sales', 'product': 'Product profit', 'production': 'Production', 'stock': 'Stock', 'quality': 'Quality', 'purchase': 'Purchasing',
+         'cash': 'Cash, bank and finance', 'customer': 'Customers', 'staff': 'Staff', 'orders': 'Orders', 'marketing': 'Marketing', 'audit': 'Audit and control', 'planning': 'Planning'}
 
 # no | area | status | route | name_en | name_bn | question_en | question_bn | source | grant | kw
 # status: I implemented, C incomplete, U unavailable, V unverified.   route: - = planned.   (short codes keep the table readable)

@@ -37,6 +37,7 @@ const X = {
   qcOn: L('কোয়ালিটি আটক চালু: আটক/বাতিল GRN-এ নতুন ব্যাচ হবে না।', 'Quality block is ON: a held / rejected GRN cannot get new batches.', 'Quality block ON: held/rejected GRN এ নতুন batch হবে না।'),
   pick: L('বেছে নিন…', 'Choose…', 'বেছে নিন…'), mixed: L('ভিন্ন একক: যোগ করা হয়নি', 'Different units: not added up', 'ভিন্ন unit: যোগ করা হয়নি'), mixNote: L('পুরনো ডেটাবেস: ভিন্ন এককের পরিমাণ যোগ হয়ে যেতে পারে (phase 420 চালান)', 'Old database: quantities of different units may be added together (paste phase 420)', 'Old database: ভিন্ন unit যোগ হতে পারে (phase 420 চালান)'), bad: L('সংখ্যা ঠিক নেই', 'Check the numbers', 'সংখ্যা ঠিক নেই'),
   tDm: L('পথে নষ্ট', 'Damaged on receipt', 'Damaged on receipt'), tYi: L('ফলন', 'Yield', 'Yield'),
+  yiMoved: L('ফলনের রিপোর্ট এখন উৎপাদন রিপোর্টে', 'The yield report is on the Production reports screen', 'Yield report এখন Production reports এ'), yiMovedSub: L('প্রতিটি রানের আসল ফলন, মালিকের সীমা, কোন তথ্য লেখা হয়নি এবং CSV সেখানে আছে।', 'Actual yield of each run, the owner limit, what is not captured and the CSV are there.', 'প্রতিটি run এর actual yield, owner limit, কোন data লেখা হয়নি, CSV সেখানে।'), yiOpen: L('ফলন রিপোর্ট খুলুন', 'Open the yield report', 'Yield report খুলুন'),
   nc: L('তথ্য লেখা হয়নি', 'data not captured', 'data লেখা হয়নি'), fItem: L('আইটেম', 'item', 'item'), fQty: L('পরিমাণ', 'quantity', 'quantity'), fSupplier: L('সাপ্লায়ার', 'supplier', 'supplier'), fDamaged: L('ক্ষতিগ্রস্ত পরিমাণ', 'damaged quantity', 'damaged quantity'),
   fActual: L('আসল ফলন', 'actual yield', 'actual yield'), fStd: L('স্ট্যান্ডার্ড ফলন', 'standard yield', 'standard yield'),
   shelfMissing: L('এই পণ্যগুলোর মেয়াদের নিয়ম বসানো নেই — তাই এদের ব্যাচে মেয়াদ থাকে না এবং মেয়াদের তালিকা এদের কথা বলে না', 'Shelf life is NOT set for these products — their batches get no expiry, so the expiry lists say nothing about them', 'এই product গুলোর shelf life set নেই — batch এ expiry হয় না, expiry list এদের কথা বলে না'),
@@ -131,14 +132,10 @@ async function run() {
           <td>${x.batch_id ? `<button type="button" class="mini" data-act="go" data-v="trace/${esc(x.batch_id)}">${esc(T('trace'))}</button>` : ''}</td></tr>`))
       + `<div class="row"><button type="button" class="btn" data-act="sx_csv">${esc(T('csv'))}</button></div>`);
   } else {
-    const r = await sb.rpc('yield_report', { p_from: D.from, p_to: D.to, p_loc: loc() }); if (r.error) throw r.error;
-    const d = D.data.yi = r.data || {};
-    out(tbl([T('item'), T('runs'), T('actualN'), T('diffPct')], (d.summary || []).map((x) => `<tr><td>${esc(x.code)} · ${esc(lab({ bn: x.name_bn, mix: x.name_bn, en: x.name_en || x.name_bn }))}</td><td>${x.runs}</td><td>${x.actual_captured}${x.actual_not_captured ? `<div class="muted">${x.actual_not_captured} ${esc(T('nc'))}</div>` : ''}</td>
-        <td>${x.var_pct === null || x.var_pct === undefined ? `<span class="muted">${esc(T('nc'))}: ${esc(T('fActual'))}</span>` : (Number(x.var_pct) > 0 ? '+' : '') + x.var_pct + '%'}</td></tr>`))
-      + tbl([T('item'), T('std'), T('actual'), T('diffPct'), ''], (d.rows || []).map((x) => `<tr><td>${esc(x.code)} · ${esc(lab({ bn: x.name_bn, mix: x.name_bn, en: x.name_en || x.name_bn }))}<div class="muted">${esc(String(x.day))} · ${esc(x.location)}</div></td>
-        <td>${x.yield_std === null || x.yield_std === undefined ? `<span class="muted">${esc(T('nc'))}: ${esc(T('fStd'))}</span>` : q4(x.yield_std)}</td><td>${x.yield_actual === null || x.yield_actual === undefined ? `<span class="muted">${esc(T('nc'))}: ${esc(T('fActual'))}</span>` : q4(x.yield_actual)}</td>
-        <td>${x.var_pct === null || x.var_pct === undefined ? '—' : (Number(x.var_pct) > 0 ? '+' : '') + x.var_pct + '%'}</td><td>${x.batch_id ? `<button type="button" class="mini" data-act="go" data-v="trace/${esc(x.batch_id)}">${esc(T('trace'))}</button>` : ''}</td></tr>`))
-      + `<div class="row"><button type="button" class="btn" data-act="sx_csv">${esc(T('csv'))}</button></div>`);
+    // INTEGRATION: the yield of production runs has ONE screen, Production reports > Yield (RPT-B4: owner limit, "not captured" states, drill-down, CSV).
+    // This tab only leads there; the server function yield_report (phase 433) stays and answers the same question.
+    D.data.yi = null; D.csv = null;
+    out(`<div class="card stack"><b>${esc(T('yiMoved'))}</b><p class="muted" style="margin:0">${esc(T('yiMovedSub'))}</p><button type="button" class="primary full" data-act="go" data-v="prodreports/yield">${esc(T('yiOpen'))} ›</button></div>`);
   }
 }
 

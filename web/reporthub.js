@@ -277,6 +277,7 @@ async function viewHome() {
     <div class="rh-tools">${TOOLS.map(([k, t, s, ic]) => `<button class="rh-tool" data-act="rh_open_tool" data-v="${k}"><span class="ic" aria-hidden="true">${ic}</span><b>${esc(lab(X[t]))}</b><small>${esc(lab(X[s]))}</small></button>`).join('')}</div>
     <div id="rh_mine">${okMine ? mineHTML(reg) : ''}</div>
     <div class="hsec">${esc(T('cat'))}<small>${reg.total}</small></div>
+    <p style="margin:0 0 8px"><button type="button" class="mini" data-act="go" data-v="reports/map">${esc(lab(L('রিপোর্ট মানচিত্র: বিভাগ ও অবস্থা', 'Reports map: sections and status', 'Report map: বিভাগ ও status')))} ›</button></p>
     ${countsHTML(reg)}
     <input id="rh_cq" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(CT.q)}">
     ${filtersHTML(reg)}
