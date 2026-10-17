@@ -220,6 +220,7 @@ function cartSheet() {
     ${dm.a || dm.p ? `<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${dm.a && dm.p ? `<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${esc(T('discL'))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${esc(T('discL'))} %">%</button></div>` : ''}</div>
     <div class="muted" id="cart_disc_calc" style="font-size:.9rem;min-height:1.4em"></div>` : ''}
     ${B.mkt && B.mkt.posBox ? B.mkt.posBox() : ''}
+    ${B.crmf && B.crmf.posBox ? B.crmf.posBox() : ''}
     <div class="row between" style="margin:10px 0"><span>${esc(T('total'))}</span><b style="font-size:1.4rem" id="cart_total"></b></div>
     <div id="cart_pay"></div><div id="cart_cust"></div>
     <div style="margin-top:8px"><label>${esc(T('note'))}</label><input id="cart_note"></div>
@@ -245,7 +246,7 @@ function drawCust() {
   el.innerHTML = `<div class="card" style="margin:8px 0"><b>${esc(T('cust'))}${need ? ' *' : ''}</b>${need ? `<div class="muted" style="font-size:.85rem">${esc(T('custReq'))}</div>` : ''}
     <label>${esc(T('mobile'))}</label><input id="cu_mobile" inputmode="tel" value="${esc(c.mobile)}" placeholder="01XXXXXXXXX">
     ${m && f && f.found ? `<div class="notice ok"><b>${esc(f.name)}</b> · ${esc(T('known'))}${Number(f.balance) > 0 ? ` · ${esc(T('owes'))}: ${money(f.balance)}` : ''}${f.credit_limit !== null && f.credit_limit !== undefined ? ` · ${esc(T('limit'))}: ${money(f.credit_limit)}` : ''}</div>${tierBlock()}`
-      : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}</div>`;
+      : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}${B.crmConsent ? B.crmConsent.posStrip(c.mobile) : ''}</div>`;
   if (keepFocus === 'cu_mobile') { const i = $('#cu_mobile'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
 }
 // phase43: the customer's tier chip + perks, a one-tap "apply the tier discount" button and a gift reminder (all from customer_pos_info; nothing here decides a right)
@@ -265,8 +266,9 @@ function lookup() {
   lookTimer = setTimeout(async () => {
     const r = await sb.rpc('find_customer', { p_mobile: m }); if (r.error) return;
     if (normMobile(P.cust.mobile) !== m) return;
+    let mm = m; if (r.data && !r.data.found && B.crm && B.crm.findAny) { const a = await B.crm.findAny(m); if (a) { r.data = a; mm = a.mobile; P.cust.mobile = a.mobile; } }   // CRM-A: second phone
     P.cust.found = r.data; if (r.data && r.data.found) P.cust.name = r.data.name;
-    P.cust.info = null; if (r.data && r.data.found) { try { const ri = await sb.rpc('customer_pos_info', { p_mobile: m }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === m) P.cust.info = ri.data; } catch (e) { /* database without tiers: no tier line */ } }   // phase43: tier chip, perks, tier discount, gifts due
+    P.cust.info = null; if (r.data && r.data.found) { try { const ri = await sb.rpc('customer_pos_info', { p_mobile: mm }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === mm) P.cust.info = ri.data; } catch (e) { /* database without tiers: no tier line */ } }   // phase43: tier chip, perks, tier discount, gifts due
     drawCust();
   }, 250);
 }
@@ -340,6 +342,8 @@ async function submitSale(p, change) {
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
+    if (B.crmConsent && B.crmConsent.afterSale) B.crmConsent.afterSale(p.p_customer_mobile);   // CRM-B: consent tick
+    if (B.crmf && B.crmf.afterSale) B.crmf.afterSale(data.id);   // CRM-F: record a coupon typed at the till
     if (B.mkt && B.mkt.afterSale) B.mkt.afterSale(data.id);   // RPT-C3: optional campaign / offer code tag (silent when campaigns.js is not loaded)
     afterSale();
   } finally { P.busy = false; }
@@ -501,5 +505,5 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('change', (e) => { if (e.target.id === 'pos_loc') { P.loc = Number(e.target.value); store.set('bos_pos_loc', String(P.loc)); resetCart(); drawPos(); } });
 
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { pos: viewPos });
-B.pos = { flush, normMobile };
+B.pos = { flush, normMobile, ctx: () => ({ loc: P.loc, lines: linesOf(), sub: cartSub(), customerId: (P.cust.info && P.cust.info.id) || null, setDiscount: (v) => { P.dk = 'amount'; const i = $('#cart_disc'); if (i) i.value = String(v); discChanged(); drawDisc(); } }) };   // bosCRMF
 })();

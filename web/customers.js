@@ -103,7 +103,7 @@ async function loadCommon() {
   const t = await sb.from('customer_tiers').select('*').order('rank'); D.tiers = t.data || [];
 }
 async function loadDirectory() {
-  const r = await sb.rpc('customer_directory'); if (r.error) { D.sql = !NOFN.test(r.error.message || ''); D.rows = []; D.err = r.error; return; }
+  const r = await (B.crmConsent ? B.crmConsent.directory() : sb.rpc('customer_directory')); if (r.error) { D.sql = !NOFN.test(r.error.message || ''); D.rows = []; D.err = r.error; return; }
   D.sql = true; D.err = null; D.rows = r.data || [];
 }
 
@@ -165,6 +165,7 @@ function formSheet(c) {
     <div><label for="cf_note">${esc(T('notes'))}</label><input id="cf_note" value="${esc(e.note || '')}"></div>
     ${D.mgr ? `<div><label for="cf_limit">${esc(T('limit'))}</label><input id="cf_limit" inputmode="decimal" value="${e.credit_limit === null || e.credit_limit === undefined ? '' : esc(e.credit_limit)}"></div>
       <label class="row"><input type="checkbox" id="cf_lock" ${e.tier_locked ? 'checked' : ''}> ${esc(T('lock'))}</label>` : ''}
+    ${edit && B.crm && B.crm.openEdit ? `<button type="button" class="full" data-act="crm_more" data-v="${esc(e.id)}">More profile details</button>` : ''}
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="cu_save">${esc(T('save'))}</button></div></div>`);
   setTimeout(() => { const f = $(edit ? '#cf_name' : '#cf_mobile'); if (f) f.focus(); }, 60);
 }
@@ -195,15 +196,16 @@ function menuSheet(id) {
     ${b('cu_open', T('menuOpen'))}${D.canEnter || D.mgr ? b('cu_edit', T('edit')) : ''}
     ${D.mgr ? b('cu_tier', T('menuChangeTier')) : ''}${D.mgr && D.gifts ? b('cu_gift', T('menuGift')) : ''}${D.mgr && D.loyal ? b('cu_pts', T('menuPoints')) : ''}
     <button class="full" data-act="cu_dues">${esc(T('menuDues'))}</button>
-    <a class="full tog" href="tel:${esc(c.mobile)}" style="text-align:center;padding:10px">${esc(T('menuCall'))}</a>
-    <a class="full tog" href="${esc(wa)}" target="_blank" rel="noopener" style="text-align:center;padding:10px">${esc(T('menuWa'))}</a>
-    ${D.mgr ? b('cu_active', c.active ? T('menuOff') : T('menuOn')) : ''}
+    ${B.crmConsent ? B.crmConsent.callHTML(c, T('menuCall')) : `<a class="full tog" href="tel:${esc(c.mobile)}" style="text-align:center;padding:10px">${esc(T('menuCall'))}</a>`}
+    ${c.masked ? '' : `<a class="full tog" href="${esc(wa)}" target="_blank" rel="noopener" style="text-align:center;padding:10px">${esc(T('menuWa'))}</a>`}
+    ${D.mgr ? b('cu_active', c.active ? T('menuOff') : T('menuOn')) : ''}${B.crmConsent ? B.crmConsent.menuHTML(c) : ''}${B.crmDupes ? B.crmDupes.menuHTML(c) : ''}
     <button class="full" data-act="closesheet">${esc(T('close'))}</button></div>`);
 }
 
 // ---------- profile ----------
 async function openProfile(id) {
-  const r = await sb.rpc('customer_profile', { p_customer: id }); if (r.error) return toast(eText(r.error));
+  if (B.crm && B.crm.open360) return B.crm.open360(id);
+  const r = await (B.crmConsent ? B.crmConsent.profile(id) : sb.rpc('customer_profile', { p_customer: id })); if (r.error) return toast(eText(r.error));
   const d = r.data || {}, c = d.customer || {}; D.cur = { id, c, d };
   const t = tier(c.tier_id);
   let due = [];
@@ -283,13 +285,13 @@ Object.assign(H, {
     if (r.error) return toast(eText(r.error)); closeSheet(); toast(T('saved')); },
   cu_pts_ok: async () => { const f = $('#pt_form'); const n = Number(norm(val('#pt_delta')));
     if (!Number.isInteger(n) || n === 0) return toast(lab(ERR.bad_number));
-    const r = await sb.rpc('customer_points_adjust', { p_customer: f.dataset.id, p_delta: n, p_note: val('#pt_note'), p_client: f.dataset.key });
+    const r = await sb.rpc('crmf_points_adjust', { p_customer: f.dataset.id, p_delta: n, p_note: val('#pt_note'), p_client: f.dataset.key });
     if (r.error) return toast(eText(r.error)); closeSheet(); toast(T('saved')); await loadDirectory(); drawPage(); },
   cu_redeem_dry: async () => { const f = $('#rd_form'); const n = Number(norm(val('#rd_n'))); if (!Number.isInteger(n) || n <= 0) return toast(lab(ERR.bad_number));
-    const r = await sb.rpc('customer_points_redeem', { p_customer: f.dataset.id, p_points: n, p_note: null, p_client: null, p_dry: true }); if (r.error) return toast(eText(r.error));
+    const r = await sb.rpc('crmf_points_redeem', { p_customer: f.dataset.id, p_points: n, p_bill: null, p_note: null, p_client: null, p_dry: true, p_override: null }); if (r.error) return toast(eText(r.error));
     $('#rd_out').textContent = `${n} ${T('points')} ${T('worth')} ${money(r.data.value_taka)} · ${T('balance')}: ${r.data.balance} → ${r.data.balance_after}`; },
   cu_redeem_ok: async () => { const f = $('#rd_form'); const n = Number(norm(val('#rd_n'))); if (!Number.isInteger(n) || n <= 0) return toast(lab(ERR.bad_number));
-    const r = await sb.rpc('customer_points_redeem', { p_customer: f.dataset.id, p_points: n, p_note: null, p_client: f.dataset.key, p_dry: false }); if (r.error) return toast(eText(r.error));
+    const r = await sb.rpc('crmf_points_redeem', { p_customer: f.dataset.id, p_points: n, p_bill: null, p_note: null, p_client: f.dataset.key, p_dry: false, p_override: null }); if (r.error) return toast(eText(r.error));
     closeSheet(); toast(`${T('redeemed')}: ${n} = ${money(r.data.value_taka)}`); await loadDirectory(); drawPage(); },
   cu_claim: async (a) => { const cur = D.cur; if (!cur) return;
     const args = a.dataset.g ? { p_customer: cur.id, p_gift: a.dataset.g } : { p_customer: cur.id, p_rule: Number(a.dataset.r), p_occasion: a.dataset.o };

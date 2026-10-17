@@ -209,6 +209,20 @@ def run(api, send, mode='scan', slot='manual', dry=False, app_url='', now=None, 
         except Exception as e:   # the alerts and the digest must never stop because the books could not be posted
             res['journal'] = {'error': type(e).__name__}
             oc.log('journal posting failed:', type(e).__name__)
+        try:   # bos326 (CRM-G): in-app task reminders. The server answers "skipped" while the switch crm_task_reminder_on is OFF (default); a failure never stops the alerts.
+            ts = api.rpc('_crmg_task_scan', {'p_dry': False})
+            res['crm_tasks'] = {k: ts.get(k) for k in ('created', 'people', 'skipped')} if isinstance(ts, dict) else None
+            oc.log('task reminders:', res['crm_tasks'])
+        except Exception as e:   # the alerts and the digest must never stop because a reminder could not be made
+            res['crm_tasks'] = {'error': type(e).__name__}
+            oc.log('task reminders failed:', type(e).__name__)
+        try:   # bos328 (CRM-H): mark complaints that passed their target time. The server answers "skipped" while the switch crm_complaints_on is OFF (default).
+            cs = api.rpc('_crmh_sla_scan', {'p_dry': False})
+            res['complaints'] = {k: cs.get(k) for k in ('marked', 'skipped')} if isinstance(cs, dict) else None
+            oc.log('complaint check:', res['complaints'])
+        except Exception as e:   # the alerts and the digest must never stop because the complaint check failed
+            res['complaints'] = {'error': type(e).__name__}
+            oc.log('complaint check failed:', type(e).__name__)
     if not res['email_on']:
         oc.log('e-mail is switched OFF in the Switchboard (notify_email_on): nothing is sent')
         return res

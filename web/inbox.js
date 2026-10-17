@@ -79,7 +79,7 @@ function drawMsg() {
     <div>${m.masked ? `<span class="muted">${esc(T('masked'))}</span>` : `<div>${esc(m.name || m.handle || '')}</div><div class="muted">${esc(m.text || '')}</div>`}</div>
     <div class="muted" style="font-size:.85rem">${esc(String(m.received_at || '').slice(0, 16).replace('T', ' '))}${m.draft_order_id && m.status !== 'converted' ? ' · ' + esc(T('drafts')) : ''}</div>
     <div class="row wrap">${m.status === 'new' ? `<button type="button" class="mini" data-act="ib_seen" data-id="${esc(String(m.id))}">${esc(T('seen'))}</button>` : ''}
-    ${m.status === 'new' || m.status === 'seen' ? `<button type="button" class="btn primary" data-act="ib_make" data-id="${esc(String(m.id))}">${esc(T('mk'))}</button><button type="button" class="mini" data-act="ib_ignore" data-id="${esc(String(m.id))}">${esc(T('ignore'))}</button>` : ''}
+    ${m.status === 'new' || m.status === 'seen' ? `<button type="button" class="btn primary" data-act="ib_make" data-id="${esc(String(m.id))}">${esc(T('mk'))}</button><button type="button" class="mini" data-act="ib_ignore" data-id="${esc(String(m.id))}">${esc(T('ignore'))}</button><button type="button" class="mini" data-act="ib_track" data-id="${esc(String(m.id))}">Track as enquiry</button>` : ''}
     ${m.status === 'ignored' ? `<button type="button" class="mini" data-act="ib_restore" data-id="${esc(String(m.id))}">${esc(T('restore'))}</button>` : ''}
     ${m.draft_order_id && m.status !== 'converted' ? `<button type="button" class="mini" data-act="ib_verify" data-id="${esc(String(m.draft_order_id))}">${esc(T('verify'))}</button>` : ''}</div></div>`).join('') : `<div class="card"><p class="muted">${esc(T('none'))}</p></div>`);
 }
@@ -156,6 +156,7 @@ Object.assign(H, {
     D.err = ''; D.form = { msg_id: m.id, channel_id: m.channel_id, loc: m.location_id, name: m.name || '', mobile: phoneLike(m.handle), address: '', dmode: 'home', lines: [{ item_id: '', qty: '' }], source: '', pay_mode: '', pay_other: '', pay_ref: '', note: '', client: rid() };
     draw();
   },
+  ib_track: async (a) => { const r = await sb.rpc('inbox_get', { p_id: Number(a.dataset.id) }); if (r.error) return toast(msg(r.error)); const m = r.data; if (m.masked) return toast(T('e_not_allowed')); if (!B.crmLeads) return toast('Enquiry tracking is not installed'); try { await B.crmLeads.track({ id: m.id, location_id: m.location_id, customer_name: m.name, phone: phoneLike(m.handle) }); } catch (e) { toast(e.message); } },   // bos325 (CRM-G): turn a message into an enquiry
   ib_addline: () => { readForm(); D.form.lines.push({ item_id: '', qty: '' }); draw(); },
   ib_back: async () => { D.form = null; draw(); await load('msg'); },
   ib_save: async () => {
