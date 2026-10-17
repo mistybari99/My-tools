@@ -431,4 +431,6 @@ B.forms['20-6'] = {
   },
 };
 B.SETTING_DEFS.forEach((d) => { if (/^mkt_limit_/.test(d.key)) { d.hidden = true; d.label = L('মার্কেটিং খাতের মাসিক সীমা (তালিকা পাতায় দিন)', 'Marketing head monthly limit (set it on the Lists page)'); } });
+// RPT-C2 (#150): a Cashier box in the head of the daily showroom sheet 14-1 (the shift box is already there). Added once; older sheets simply have no cashier. Paper form code: unchanged (the box is a digital entry).
+if (B.forms['14-1'] && B.forms['14-1'].head && !B.forms['14-1'].head.some((f) => f.id === 'cashier')) B.forms['14-1'].head.push(ST('cashier', L('ক্যাশিয়ার (Cashier)', 'Cashier')));
 })();
