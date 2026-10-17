@@ -1,0 +1,62 @@
+{
+ "package": "CRM-F",
+ "note": "Exact-text hooks for the integrator. Each find text appears exactly once in its file. tests/web/crm_loyalty_test.js applies every hook to a scratch copy of the file, parses it, serves the copies and runs the screens and the till flow on them. The real files are not edited by package CRM-F.",
+ "hooks": [
+  {
+   "id": "H1",
+   "file": "web/pos.js",
+   "why": "Lets the coupon box read the cart and fill the normal discount box. Without it the coupon box does nothing (BOS.pos.ctx is missing) and the POS works exactly as today.",
+   "find": "B.pos = { flush, normMobile };",
+   "replace": "B.pos = { flush, normMobile, ctx: () => ({ loc: P.loc, lines: linesOf(), sub: cartSub(), customerId: (P.cust.info && P.cust.info.id) || null, setDiscount: (v) => { P.dk = 'amount'; const i = $('#cart_disc'); if (i) i.value = String(v); discChanged(); drawDisc(); } }) };   // bosCRMF"
+  },
+  {
+   "id": "H2",
+   "file": "web/pos.js",
+   "why": "Draws the coupon box in the cart sheet (only when coupons are ON and the person may sell). Without it there is no coupon box.",
+   "find": "    <div class=\"row between\" style=\"margin:10px 0\"><span>${esc(T('total'))}</span>",
+   "replace": "    ${B.crmf && B.crmf.posBox ? B.crmf.posBox() : ''}\n    <div class=\"row between\" style=\"margin:10px 0\"><span>${esc(T('total'))}</span>"
+  },
+  {
+   "id": "H3",
+   "file": "web/pos.js",
+   "why": "After a sent sale, records the coupon use. A sale that is queued offline does not record the coupon (the server never sees the sale yet).",
+   "find": "    if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);",
+   "replace": "    if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);\n    if (B.crmf && B.crmf.afterSale) B.crmf.afterSale(data.id);   // bosCRMF: record a coupon typed at the till"
+  },
+  {
+   "id": "H4",
+   "file": "web/customers.js",
+   "why": "Manual points change: same arguments, adds the owner alert for a large change. Same permission and reason rules as before.",
+   "find": "await sb.rpc('customer_points_adjust', {",
+   "replace": "await sb.rpc('crmf_points_adjust', {"
+  },
+  {
+   "id": "H5",
+   "file": "web/customers.js",
+   "why": "Points redeem preview: applies the burn rules (blank = same answer as before). This screen has no bill, so a percent cap makes the server answer bill_total_needed; use the till for that.",
+   "find": "sb.rpc('customer_points_redeem', { p_customer: f.dataset.id, p_points: n, p_note: null, p_client: null, p_dry: true })",
+   "replace": "sb.rpc('crmf_points_redeem', { p_customer: f.dataset.id, p_points: n, p_bill: null, p_note: null, p_client: null, p_dry: true, p_override: null })"
+  },
+  {
+   "id": "H6",
+   "file": "web/customers.js",
+   "why": "Points redeem: same as H5, for the real redemption.",
+   "find": "sb.rpc('customer_points_redeem', { p_customer: f.dataset.id, p_points: n, p_note: null, p_client: f.dataset.key, p_dry: false })",
+   "replace": "sb.rpc('crmf_points_redeem', { p_customer: f.dataset.id, p_points: n, p_bill: null, p_note: null, p_client: f.dataset.key, p_dry: false, p_override: null })"
+  },
+  {
+   "id": "H7",
+   "file": "web/index.html",
+   "why": "Loads the two CRM-F screens after customers.js.",
+   "find": "<script src=\"customers.js\"></script>",
+   "replace": "<script src=\"customers.js\"></script><script src=\"crm_loyalty.js\"></script><script src=\"crm_coupons.js\"></script>"
+  },
+  {
+   "id": "H8",
+   "file": "web/ia.js",
+   "why": "Registers the two screens (group cust). Routes: crmloyalty, crmcoupons. The server decides every right; the ok line only hides the entry.",
+   "find": "  rec('tiers', 'cust', [",
+   "replace": "  rec('crmloyalty', 'cust', ['Loyalty extras', 'Loyalty extras', 'Loyalty extras'], { icon: 'users', ok: (c) => c.own || c.GF.customer_manage === true || c.GF.crm_loyalty_manage === true, kw: ['loyalty', 'points', 'expiry', 'expire', 'referral', 'birthday bonus', 'anniversary', 'festival', 'points statement', 'loyalty summary'], verbs: ['expire points', 'see points statement'] }),\n  rec('crmcoupons', 'cust', ['Coupons & vouchers', 'Coupons & vouchers', 'Coupons & vouchers'], { icon: 'settings', ok: (c) => c.own || c.GF.customer_manage === true || c.GF.crm_loyalty_manage === true || c.GF.crm_voucher_issue === true || c.GF.crm_coupon_override === true, kw: ['coupon', 'voucher', 'discount code', 'promo', 'offer', 'redemption', 'liability'], verbs: ['make a coupon', 'check a coupon'] }),\n  rec('tiers', 'cust', ["
+  }
+ ]
+}
