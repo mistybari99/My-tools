@@ -1,0 +1,6212 @@
+{
+ "version": 1,
+ "generated_by": "tools/build_report_registry.py",
+ "total": 193,
+ "status_counts": {
+  "incomplete": 46,
+  "implemented": 42,
+  "unavailable": 15,
+  "unverified": 1,
+  "unaudited": 89
+ },
+ "note": "Reports 1-104 come from audits 1 and 2 (names are the audits' wording; the owner's master list may word them differently - use --master). Reports 105-193 are unaudited until audit 3 is merged.",
+ "areas": {
+  "exec": "Executive",
+  "sales": "Sales",
+  "product": "Product profit",
+  "production": "Production",
+  "stock": "Stock",
+  "quality": "Quality",
+  "purchase": "Purchasing"
+ },
+ "sections": [
+  {
+   "no": 1,
+   "id": "s01",
+   "name": {
+    "bn": "নির্বাহী ও ব্যবস্থাপনা",
+    "en": "Executive and management",
+    "mix": "Executive and management (নির্বাহী ও ব্যবস্থাপনা)"
+   },
+   "range": [
+    1,
+    10
+   ],
+   "count": 10,
+   "status_counts": {
+    "incomplete": 5,
+    "implemented": 2,
+    "unavailable": 2,
+    "unverified": 1
+   }
+  },
+  {
+   "no": 2,
+   "id": "s02",
+   "name": {
+    "bn": "বিক্রি ও POS",
+    "en": "Sales and POS",
+    "mix": "Sales and POS (বিক্রি ও POS)"
+   },
+   "range": [
+    11,
+    28
+   ],
+   "count": 18,
+   "status_counts": {
+    "implemented": 14,
+    "incomplete": 3,
+    "unavailable": 1
+   }
+  },
+  {
+   "no": 3,
+   "id": "s03",
+   "name": {
+    "bn": "পণ্যের লাভজনকতা",
+    "en": "Product profitability",
+    "mix": "Product profitability (পণ্যের লাভজনকতা)"
+   },
+   "range": [
+    29,
+    39
+   ],
+   "count": 11,
+   "status_counts": {
+    "implemented": 6,
+    "incomplete": 5
+   }
+  },
+  {
+   "no": 4,
+   "id": "s04",
+   "name": {
+    "bn": "উৎপাদন",
+    "en": "Production",
+    "mix": "Production (উৎপাদন)"
+   },
+   "range": [
+    40,
+    55
+   ],
+   "count": 16,
+   "status_counts": {
+    "unavailable": 6,
+    "implemented": 5,
+    "incomplete": 5
+   }
+  },
+  {
+   "no": 5,
+   "id": "s05",
+   "name": {
+    "bn": "স্টক ও মজুত",
+    "en": "Stock and inventory",
+    "mix": "Stock and inventory (স্টক ও মজুত)"
+   },
+   "range": [
+    56,
+    75
+   ],
+   "count": 20,
+   "status_counts": {
+    "implemented": 3,
+    "incomplete": 15,
+    "unavailable": 2
+   }
+  },
+  {
+   "no": 6,
+   "id": "s06",
+   "name": {
+    "bn": "অপচয়, তাজা অবস্থা ও মান",
+    "en": "Wastage, freshness and quality",
+    "mix": "Wastage, freshness and quality (অপচয়, তাজা অবস্থা ও মান)"
+   },
+   "range": [
+    76,
+    89
+   ],
+   "count": 14,
+   "status_counts": {
+    "implemented": 4,
+    "incomplete": 7,
+    "unavailable": 3
+   }
+  },
+  {
+   "no": 7,
+   "id": "s07",
+   "name": {
+    "bn": "ক্রয় ও সরবরাহকারী",
+    "en": "Purchasing and suppliers",
+    "mix": "Purchasing and suppliers (ক্রয় ও সরবরাহকারী)"
+   },
+   "range": [
+    90,
+    104
+   ],
+   "count": 15,
+   "status_counts": {
+    "implemented": 8,
+    "incomplete": 6,
+    "unavailable": 1
+   }
+  },
+  {
+   "no": 8,
+   "id": "s08",
+   "name": {
+    "bn": "বিভাগ 8 (এখনও যাচাই হয়নি)",
+    "en": "Section 8 (not audited yet)",
+    "mix": "Section 8 (not audited yet) (বিভাগ 8 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  },
+  {
+   "no": 9,
+   "id": "s09",
+   "name": {
+    "bn": "বিভাগ 9 (এখনও যাচাই হয়নি)",
+    "en": "Section 9 (not audited yet)",
+    "mix": "Section 9 (not audited yet) (বিভাগ 9 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  },
+  {
+   "no": 10,
+   "id": "s10",
+   "name": {
+    "bn": "বিভাগ 10 (এখনও যাচাই হয়নি)",
+    "en": "Section 10 (not audited yet)",
+    "mix": "Section 10 (not audited yet) (বিভাগ 10 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  },
+  {
+   "no": 11,
+   "id": "s11",
+   "name": {
+    "bn": "বিভাগ 11 (এখনও যাচাই হয়নি)",
+    "en": "Section 11 (not audited yet)",
+    "mix": "Section 11 (not audited yet) (বিভাগ 11 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  },
+  {
+   "no": 12,
+   "id": "s12",
+   "name": {
+    "bn": "বিভাগ 12 (এখনও যাচাই হয়নি)",
+    "en": "Section 12 (not audited yet)",
+    "mix": "Section 12 (not audited yet) (বিভাগ 12 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  },
+  {
+   "no": 13,
+   "id": "s13",
+   "name": {
+    "bn": "বিভাগ 13 (এখনও যাচাই হয়নি)",
+    "en": "Section 13 (not audited yet)",
+    "mix": "Section 13 (not audited yet) (বিভাগ 13 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  },
+  {
+   "no": 14,
+   "id": "s14",
+   "name": {
+    "bn": "বিভাগ 14 (এখনও যাচাই হয়নি)",
+    "en": "Section 14 (not audited yet)",
+    "mix": "Section 14 (not audited yet) (বিভাগ 14 (এখনও যাচাই হয়নি))"
+   },
+   "range": null,
+   "count": 0,
+   "status_counts": {}
+  }
+ ],
+ "reports": [
+  {
+   "no": 1,
+   "id": "r001",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "নির্বাহী ড্যাশবোর্ড",
+    "en": "Executive dashboard",
+    "mix": "Executive dashboard (নির্বাহী ড্যাশবোর্ড)"
+   },
+   "question": {
+    "bn": "পুরো ব্যবসা এখন কেমন চলছে?",
+    "en": "How is the whole business doing right now?",
+    "mix": "পুরো ব্যবসা এখন কেমন চলছে?"
+   },
+   "status": "incomplete",
+   "route": "owner",
+   "planned": false,
+   "source": "sales, stock, exceptions (owner board, home)",
+   "grant": "owner or report_profit / view_reports",
+   "kw": [
+    "owner",
+    "board",
+    "overview",
+    "home",
+    "সারসংক্ষেপ",
+    "মালিকের বোর্ড"
+   ],
+   "note": ""
+  },
+  {
+   "no": 2,
+   "id": "r002",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "দৈনিক ব্যবসার সারসংক্ষেপ",
+    "en": "Daily business summary",
+    "mix": "Daily business summary (দৈনিক ব্যবসার সারসংক্ষেপ)"
+   },
+   "question": {
+    "bn": "এক দিনে এক দোকানে কী হলো: বিক্রি, ক্যাশ, কম-বেশি?",
+    "en": "What happened in one shop on one day: sales, cash, short or over?",
+    "mix": "এক দিনে এক দোকানে কী হলো: বিক্রি, ক্যাশ, কম-বেশি?"
+   },
+   "status": "incomplete",
+   "route": "report/pos_day_close",
+   "planned": false,
+   "source": "sales, sale_payments, form 14-1",
+   "grant": "report_pos",
+   "kw": [
+    "day close",
+    "z report",
+    "daily",
+    "দিনশেষ",
+    "দৈনিক",
+    "ক্যাশ মেলানো"
+   ],
+   "note": "D1b: expected drawer cash ignores cash refunds"
+  },
+  {
+   "no": 3,
+   "id": "r003",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "মাসিক ব্যবসার সারসংক্ষেপ",
+    "en": "Monthly business summary",
+    "mix": "Monthly business summary (মাসিক ব্যবসার সারসংক্ষেপ)"
+   },
+   "question": {
+    "bn": "মাসে বিক্রি, খরচ আর লাভ কত ছিল?",
+    "en": "What was the month's sales, cost and profit?",
+    "mix": "মাসে বিক্রি, খরচ আর লাভ কত ছিল?"
+   },
+   "status": "incomplete",
+   "route": "report/l1_pnl",
+   "planned": false,
+   "source": "l1_pnl, month close",
+   "grant": "report_profit or accounts_view",
+   "kw": [
+    "month",
+    "monthly",
+    "p&l",
+    "মাস",
+    "মাসিক",
+    "লাভ"
+   ],
+   "note": "D3: net profit leaves out losses until the profit switch is on"
+  },
+  {
+   "no": 4,
+   "id": "r004",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "বিক্রি, মোট লাভ ও নিট লাভ",
+    "en": "Sales, gross profit and net profit",
+    "mix": "Sales, gross profit and net profit (বিক্রি, মোট লাভ ও নিট লাভ)"
+   },
+   "question": {
+    "bn": "খরচ বাদ দিয়ে আসলে কত থাকল?",
+    "en": "How much did we earn and keep after cost and expenses?",
+    "mix": "খরচ বাদ দিয়ে আসলে কত থাকল?"
+   },
+   "status": "incomplete",
+   "route": "report/l1_pnl",
+   "planned": false,
+   "source": "l1_pnl, l3_shop_pnl, profit check",
+   "grant": "report_profit or accounts_view",
+   "kw": [
+    "profit",
+    "gross",
+    "net",
+    "margin",
+    "লাভ",
+    "মুনাফা",
+    "নিট"
+   ],
+   "note": "D3: net profit leaves out losses until the profit switch is on"
+  },
+  {
+   "no": 5,
+   "id": "r005",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "শাখা তুলনা",
+    "en": "Outlet comparison",
+    "mix": "Outlet comparison (শাখা তুলনা)"
+   },
+   "question": {
+    "bn": "কোন দোকান অন্যদের চেয়ে ভালো করছে?",
+    "en": "Which shop does better than the others?",
+    "mix": "কোন দোকান অন্যদের চেয়ে ভালো করছে?"
+   },
+   "status": "implemented",
+   "route": "report/l3_shop_pnl",
+   "planned": false,
+   "source": "l3_shop_pnl, sales_combined",
+   "grant": "report_profit or accounts_view",
+   "kw": [
+    "outlet",
+    "branch",
+    "shop",
+    "compare",
+    "শাখা",
+    "দোকান",
+    "তুলনা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 6,
+   "id": "r006",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "ব্র্যান্ড তুলনা",
+    "en": "Brand comparison",
+    "mix": "Brand comparison (ব্র্যান্ড তুলনা)"
+   },
+   "question": {
+    "bn": "কোন ব্র্যান্ড বেশি আয় করছে?",
+    "en": "Which brand earns more?",
+    "mix": "কোন ব্র্যান্ড বেশি আয় করছে?"
+   },
+   "status": "implemented",
+   "route": "brandpnl",
+   "planned": false,
+   "source": "brand_pnl, report_brand_map",
+   "grant": "report_profit or accounts_view",
+   "kw": [
+    "brand",
+    "ব্র্যান্ড",
+    "মিষ্টি বাড়ি",
+    "cakiz"
+   ],
+   "note": ""
+  },
+  {
+   "no": 7,
+   "id": "r007",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "কারখানা বনাম খুচরা",
+    "en": "Factory versus retail",
+    "mix": "Factory versus retail (কারখানা বনাম খুচরা)"
+   },
+   "question": {
+    "bn": "কারখানা ও দোকানের ফল কেমন তুলনায়?",
+    "en": "How does the factory do against the shops?",
+    "mix": "কারখানা ও দোকানের ফল কেমন তুলনায়?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (transfer valuation)",
+   "grant": "report_profit or accounts_view",
+   "kw": [
+    "factory",
+    "retail",
+    "কারখানা",
+    "খুচরা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 8,
+   "id": "r008",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "বাজেট বনাম বাস্তব",
+    "en": "Budget versus actual",
+    "mix": "Budget versus actual (বাজেট বনাম বাস্তব)"
+   },
+   "question": {
+    "bn": "আমরা কি বাজেটের মধ্যে আছি?",
+    "en": "Are we within the budget?",
+    "mix": "আমরা কি বাজেটের মধ্যে আছি?"
+   },
+   "status": "unverified",
+   "route": "finance2",
+   "planned": false,
+   "source": "budgets, journal",
+   "grant": "accounts_view",
+   "kw": [
+    "budget",
+    "বাজেট",
+    "plan"
+   ],
+   "note": ""
+  },
+  {
+   "no": 9,
+   "id": "r009",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "লক্ষ্য বনাম অর্জন",
+    "en": "Target versus achievement",
+    "mix": "Target versus achievement (লক্ষ্য বনাম অর্জন)"
+   },
+   "question": {
+    "bn": "বিক্রির লক্ষ্যে পৌঁছেছি কি?",
+    "en": "Did we reach the sales target?",
+    "mix": "বিক্রির লক্ষ্যে পৌঁছেছি কি?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no targets)",
+   "grant": "owner or report_profit / view_reports",
+   "kw": [
+    "target",
+    "goal",
+    "লক্ষ্য"
+   ],
+   "note": ""
+  },
+  {
+   "no": 10,
+   "id": "r010",
+   "section": 1,
+   "area": "exec",
+   "name": {
+    "bn": "KPI-র ধারা ও ব্যতিক্রম সতর্কতা",
+    "en": "KPI trends and exception alerts",
+    "mix": "KPI trends and exception alerts (KPI-র ধারা ও ব্যতিক্রম সতর্কতা)"
+   },
+   "question": {
+    "bn": "কোন সংখ্যাগুলো সরে যাচ্ছে বা লাল?",
+    "en": "Which numbers are drifting or red?",
+    "mix": "কোন সংখ্যাগুলো সরে যাচ্ছে বা লাল?"
+   },
+   "status": "incomplete",
+   "route": "owner",
+   "planned": false,
+   "source": "owner board, exceptions",
+   "grant": "owner or report_profit / view_reports",
+   "kw": [
+    "kpi",
+    "trend",
+    "alert",
+    "red",
+    "সতর্ক",
+    "লাল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 11,
+   "id": "r011",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "বিক্রির সারসংক্ষেপ",
+    "en": "Sales summary",
+    "mix": "Sales summary (বিক্রির সারসংক্ষেপ)"
+   },
+   "question": {
+    "bn": "কত বিক্রি হলো, কয়টি বিলে?",
+    "en": "How much did we sell, in how many bills?",
+    "mix": "কত বিক্রি হলো, কয়টি বিলে?"
+   },
+   "status": "implemented",
+   "route": "report/sales_summary",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "sales",
+    "summary",
+    "total",
+    "বিক্রি",
+    "মোট"
+   ],
+   "note": "D1: engine-1 sales reports ignore returns"
+  },
+  {
+   "no": 12,
+   "id": "r012",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "বিক্রির ধারা ও সময় তুলনা",
+    "en": "Sales trend and period comparison",
+    "mix": "Sales trend and period comparison (বিক্রির ধারা ও সময় তুলনা)"
+   },
+   "question": {
+    "bn": "আগের সময়ের চেয়ে বিক্রি বাড়ছে না কমছে?",
+    "en": "Is selling going up or down compared with before?",
+    "mix": "আগের সময়ের চেয়ে বিক্রি বাড়ছে না কমছে?"
+   },
+   "status": "implemented",
+   "route": "report/sales_trend",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "trend",
+    "compare",
+    "growth",
+    "ধারা",
+    "তুলনা"
+   ],
+   "note": "D1"
+  },
+  {
+   "no": 13,
+   "id": "r013",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "শাখা ও ব্র্যান্ড অনুযায়ী বিক্রি",
+    "en": "Sales by outlet and brand",
+    "mix": "Sales by outlet and brand (শাখা ও ব্র্যান্ড অনুযায়ী বিক্রি)"
+   },
+   "question": {
+    "bn": "কোন শাখা বা ব্র্যান্ড কত বিক্রি করে?",
+    "en": "Which outlet or brand sells what?",
+    "mix": "কোন শাখা বা ব্র্যান্ড কত বিক্রি করে?"
+   },
+   "status": "implemented",
+   "route": "report/sales_combined",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "outlet",
+    "brand",
+    "শাখা",
+    "ব্র্যান্ড"
+   ],
+   "note": "D1"
+  },
+  {
+   "no": 14,
+   "id": "r014",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "আইটেম অনুযায়ী বিক্রি",
+    "en": "Item-wise sales",
+    "mix": "Item-wise sales (আইটেম অনুযায়ী বিক্রি)"
+   },
+   "question": {
+    "bn": "কোন আইটেম কত বিক্রি হচ্ছে?",
+    "en": "Which items sell, how many, for how much?",
+    "mix": "কোন আইটেম কত বিক্রি হচ্ছে?"
+   },
+   "status": "implemented",
+   "route": "report/item_sales",
+   "planned": false,
+   "source": "sales lines",
+   "grant": "report_sales",
+   "kw": [
+    "item",
+    "product",
+    "আইটেম",
+    "পণ্য"
+   ],
+   "note": "D1, D2"
+  },
+  {
+   "no": 15,
+   "id": "r015",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "ক্যাটাগরি অনুযায়ী বিক্রি",
+    "en": "Category-wise sales",
+    "mix": "Category-wise sales (ক্যাটাগরি অনুযায়ী বিক্রি)"
+   },
+   "question": {
+    "bn": "কোন ক্যাটাগরি বিক্রি টানছে?",
+    "en": "Which category carries the sales?",
+    "mix": "কোন ক্যাটাগরি বিক্রি টানছে?"
+   },
+   "status": "implemented",
+   "route": "report/category_sales",
+   "planned": false,
+   "source": "sales lines",
+   "grant": "report_sales",
+   "kw": [
+    "category",
+    "ক্যাটাগরি"
+   ],
+   "note": "D1, D2"
+  },
+  {
+   "no": 16,
+   "id": "r016",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "ঘণ্টা ও বার অনুযায়ী বিক্রি",
+    "en": "Sales by hour and weekday",
+    "mix": "Sales by hour and weekday (ঘণ্টা ও বার অনুযায়ী বিক্রি)"
+   },
+   "question": {
+    "bn": "কোন সময় ও কোন বার ভিড় বেশি?",
+    "en": "When are the busy hours and days?",
+    "mix": "কোন সময় ও কোন বার ভিড় বেশি?"
+   },
+   "status": "implemented",
+   "route": "report/hour_weekday",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "hour",
+    "peak",
+    "weekday",
+    "ঘণ্টা",
+    "ভিড়",
+    "বার"
+   ],
+   "note": "D1"
+  },
+  {
+   "no": 17,
+   "id": "r017",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "খুচরা বনাম পাইকারি",
+    "en": "Retail versus wholesale",
+    "mix": "Retail versus wholesale (খুচরা বনাম পাইকারি)"
+   },
+   "question": {
+    "bn": "পাইকারির অংশ কত বড়?",
+    "en": "How big is the wholesale share?",
+    "mix": "পাইকারির অংশ কত বড়?"
+   },
+   "status": "implemented",
+   "route": "report/retail_wholesale",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "wholesale",
+    "retail",
+    "পাইকারি",
+    "খুচরা"
+   ],
+   "note": "D1"
+  },
+  {
+   "no": 18,
+   "id": "r018",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "রসিদ ও ইনভয়েস তালিকা",
+    "en": "Receipt and invoice register",
+    "mix": "Receipt and invoice register (রসিদ ও ইনভয়েস তালিকা)"
+   },
+   "question": {
+    "bn": "একদিনের সব বিল দেখান।",
+    "en": "Show me every bill of a day.",
+    "mix": "একদিনের সব বিল দেখান।"
+   },
+   "status": "implemented",
+   "route": "report/receipt_register",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "receipt",
+    "invoice",
+    "bill",
+    "register",
+    "রসিদ",
+    "বিল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 19,
+   "id": "r019",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "পেমেন্ট পদ্ধতি রিপোর্ট",
+    "en": "Payment method report",
+    "mix": "Payment method report (পেমেন্ট পদ্ধতি রিপোর্ট)"
+   },
+   "question": {
+    "bn": "নগদ, মোবাইল, কার্ড, বাকিতে কত এলো?",
+    "en": "How much came in by cash, mobile, card, due?",
+    "mix": "নগদ, মোবাইল, কার্ড, বাকিতে কত এলো?"
+   },
+   "status": "implemented",
+   "route": "report/payment_modes",
+   "planned": false,
+   "source": "sale_payments",
+   "grant": "report_cash",
+   "kw": [
+    "payment",
+    "cash",
+    "bkash",
+    "mobile",
+    "card",
+    "পেমেন্ট",
+    "নগদ",
+    "বিকাশ"
+   ],
+   "note": "D1"
+  },
+  {
+   "no": 20,
+   "id": "r020",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "ডিসকাউন্ট ও দাম বদল",
+    "en": "Discounts and price overrides",
+    "mix": "Discounts and price overrides (ডিসকাউন্ট ও দাম বদল)"
+   },
+   "question": {
+    "bn": "কে কত ডিসকাউন্ট দিল?",
+    "en": "Who gave how much discount?",
+    "mix": "কে কত ডিসকাউন্ট দিল?"
+   },
+   "status": "incomplete",
+   "route": "discounts",
+   "planned": false,
+   "source": "sales (discount, override flag)",
+   "grant": "report_pos",
+   "kw": [
+    "discount",
+    "override",
+    "ডিসকাউন্ট",
+    "ছাড়"
+   ],
+   "note": ""
+  },
+  {
+   "no": 21,
+   "id": "r021",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "বাতিল, ফেরত ও রিটার্ন",
+    "en": "Voids, refunds and returns",
+    "mix": "Voids, refunds and returns (বাতিল, ফেরত ও রিটার্ন)"
+   },
+   "question": {
+    "bn": "কয়টি বিক্রি বাতিল বা ফেরত হলো, কেন?",
+    "en": "How many sales were voided or returned, and why?",
+    "mix": "কয়টি বিক্রি বাতিল বা ফেরত হলো, কেন?"
+   },
+   "status": "implemented",
+   "route": "report/voids",
+   "planned": false,
+   "source": "sales, sale_returns",
+   "grant": "report_pos",
+   "kw": [
+    "void",
+    "refund",
+    "return",
+    "বাতিল",
+    "ফেরত"
+   ],
+   "note": ""
+  },
+  {
+   "no": 22,
+   "id": "r022",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "কুইক ও তালিকা-বহির্ভূত বিক্রি",
+    "en": "Quick and unlisted sales",
+    "mix": "Quick and unlisted sales (কুইক ও তালিকা-বহির্ভূত বিক্রি)"
+   },
+   "question": {
+    "bn": "কোন বিক্রিতে আইটেম বা খরচ ছিল না?",
+    "en": "Which sales had no item or cost?",
+    "mix": "কোন বিক্রিতে আইটেম বা খরচ ছিল না?"
+   },
+   "status": "implemented",
+   "route": "report/quick_unlisted",
+   "planned": false,
+   "source": "sales (quick)",
+   "grant": "report_pos",
+   "kw": [
+    "quick",
+    "unlisted",
+    "কুইক"
+   ],
+   "note": ""
+  },
+  {
+   "no": 23,
+   "id": "r023",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "গড় বিল ও বিলপ্রতি আইটেম",
+    "en": "Average bill and items per bill",
+    "mix": "Average bill and items per bill (গড় বিল ও বিলপ্রতি আইটেম)"
+   },
+   "question": {
+    "bn": "গড় বিল কত?",
+    "en": "What is the average bill?",
+    "mix": "গড় বিল কত?"
+   },
+   "status": "incomplete",
+   "route": "report/sales_summary",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "average",
+    "ticket",
+    "avg",
+    "গড়",
+    "বিল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 24,
+   "id": "r024",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "শাখাভিত্তিক বিক্রির লক্ষ্য",
+    "en": "Sales target by outlet",
+    "mix": "Sales target by outlet (শাখাভিত্তিক বিক্রির লক্ষ্য)"
+   },
+   "question": {
+    "bn": "প্রতিটি শাখা কি লক্ষ্যে আছে?",
+    "en": "Is each outlet on target?",
+    "mix": "প্রতিটি শাখা কি লক্ষ্যে আছে?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no targets)",
+   "grant": "report_sales",
+   "kw": [
+    "target",
+    "লক্ষ্য"
+   ],
+   "note": ""
+  },
+  {
+   "no": 25,
+   "id": "r025",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "সেরা, কম ও কমতি পণ্য",
+    "en": "Top, low and declining products",
+    "mix": "Top, low and declining products (সেরা, কম ও কমতি পণ্য)"
+   },
+   "question": {
+    "bn": "কোন পণ্য বাড়ছে, কোনটা কমছে?",
+    "en": "Which products rise, which fall?",
+    "mix": "কোন পণ্য বাড়ছে, কোনটা কমছে?"
+   },
+   "status": "implemented",
+   "route": "report/item_sales",
+   "planned": false,
+   "source": "sales lines",
+   "grant": "report_sales",
+   "kw": [
+    "top",
+    "slow",
+    "declining",
+    "সেরা",
+    "ধীর",
+    "কমছে"
+   ],
+   "note": ""
+  },
+  {
+   "no": 26,
+   "id": "r026",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "বিক্রয়কর্মী ও ক্যাশিয়ার অনুযায়ী বিক্রি",
+    "en": "Sales by salesperson and cashier",
+    "mix": "Sales by salesperson and cashier (বিক্রয়কর্মী ও ক্যাশিয়ার অনুযায়ী বিক্রি)"
+   },
+   "question": {
+    "bn": "কে কত বিক্রি করে?",
+    "en": "Who sells how much?",
+    "mix": "কে কত বিক্রি করে?"
+   },
+   "status": "implemented",
+   "route": "report/x5_staff_trend",
+   "planned": false,
+   "source": "sales",
+   "grant": "report_sales",
+   "kw": [
+    "staff",
+    "cashier",
+    "salesperson",
+    "কর্মী",
+    "ক্যাশিয়ার"
+   ],
+   "note": ""
+  },
+  {
+   "no": 27,
+   "id": "r027",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "বিক্রির মাধ্যম বিশ্লেষণ",
+    "en": "Sales channel analysis",
+    "mix": "Sales channel analysis (বিক্রির মাধ্যম বিশ্লেষণ)"
+   },
+   "question": {
+    "bn": "অর্ডার কোথা থেকে আসে: দোকান, অনলাইন, ফোন?",
+    "en": "Where do orders come from: shop, online, phone?",
+    "mix": "অর্ডার কোথা থেকে আসে: দোকান, অনলাইন, ফোন?"
+   },
+   "status": "incomplete",
+   "route": "report/s10_orders",
+   "planned": false,
+   "source": "paper form 20-1 (free-text channel)",
+   "grant": "report_orders",
+   "kw": [
+    "channel",
+    "online",
+    "order",
+    "অনলাইন",
+    "অর্ডার"
+   ],
+   "note": ""
+  },
+  {
+   "no": 28,
+   "id": "r028",
+   "section": 2,
+   "area": "sales",
+   "name": {
+    "bn": "ফেরত ও রিফান্ডের কারণ",
+    "en": "Return and refund reasons",
+    "mix": "Return and refund reasons (ফেরত ও রিফান্ডের কারণ)"
+   },
+   "question": {
+    "bn": "গ্রাহক কেন জিনিস ফেরত দেয়?",
+    "en": "Why do customers return things?",
+    "mix": "গ্রাহক কেন জিনিস ফেরত দেয়?"
+   },
+   "status": "implemented",
+   "route": "report/q3_complaints",
+   "planned": false,
+   "source": "form 20-3, sale_returns",
+   "grant": "report_quality",
+   "kw": [
+    "complaint",
+    "return reason",
+    "অভিযোগ",
+    "কারণ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 29,
+   "id": "r029",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "আইটেম অনুযায়ী মোট লাভ ও মার্জিন",
+    "en": "Gross profit and margin by item",
+    "mix": "Gross profit and margin by item (আইটেম অনুযায়ী মোট লাভ ও মার্জিন)"
+   },
+   "question": {
+    "bn": "কোন আইটেমে কত মার্জিন?",
+    "en": "Which item earns what margin?",
+    "mix": "কোন আইটেমে কত মার্জিন?"
+   },
+   "status": "implemented",
+   "route": "report/l2_margin",
+   "planned": false,
+   "source": "l2_margin (stock-ledger cost)",
+   "grant": "view_cost",
+   "kw": [
+    "margin",
+    "gp",
+    "gross profit",
+    "মার্জিন",
+    "লাভ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 30,
+   "id": "r030",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "ক্যাটাগরি অনুযায়ী লাভজনকতা",
+    "en": "Profitability by category",
+    "mix": "Profitability by category (ক্যাটাগরি অনুযায়ী লাভজনকতা)"
+   },
+   "question": {
+    "bn": "কোন ক্যাটাগরি লাভ দেয়?",
+    "en": "Which category makes money?",
+    "mix": "কোন ক্যাটাগরি লাভ দেয়?"
+   },
+   "status": "implemented",
+   "route": "report/l2_margin",
+   "planned": false,
+   "source": "l2_margin",
+   "grant": "view_cost",
+   "kw": [
+    "category",
+    "ক্যাটাগরি"
+   ],
+   "note": ""
+  },
+  {
+   "no": 31,
+   "id": "r031",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "শাখা অনুযায়ী লাভজনকতা",
+    "en": "Profitability by outlet",
+    "mix": "Profitability by outlet (শাখা অনুযায়ী লাভজনকতা)"
+   },
+   "question": {
+    "bn": "কোন শাখা লাভ দেয়?",
+    "en": "Which outlet makes money?",
+    "mix": "কোন শাখা লাভ দেয়?"
+   },
+   "status": "implemented",
+   "route": "report/l3_shop_pnl",
+   "planned": false,
+   "source": "l3_shop_pnl",
+   "grant": "report_profit or accounts_view",
+   "kw": [
+    "outlet",
+    "শাখা"
+   ],
+   "note": "D3"
+  },
+  {
+   "no": 32,
+   "id": "r032",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "বিক্রয়মূল্য বনাম বর্তমান খরচ",
+    "en": "Selling price versus current cost",
+    "mix": "Selling price versus current cost (বিক্রয়মূল্য বনাম বর্তমান খরচ)"
+   },
+   "question": {
+    "bn": "আমাদের দাম কি এখনও খরচ তুলে আনে?",
+    "en": "Do our prices still cover cost?",
+    "mix": "আমাদের দাম কি এখনও খরচ তুলে আনে?"
+   },
+   "status": "incomplete",
+   "route": "items",
+   "planned": false,
+   "source": "items, item_costs, recipes",
+   "grant": "view_cost",
+   "kw": [
+    "price",
+    "cost",
+    "দাম",
+    "খরচ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 33,
+   "id": "r033",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "স্ট্যান্ডার্ড বনাম প্রকৃত খরচের পার্থক্য",
+    "en": "Standard versus actual cost variance",
+    "mix": "Standard versus actual cost variance (স্ট্যান্ডার্ড বনাম প্রকৃত খরচের পার্থক্য)"
+   },
+   "question": {
+    "bn": "উৎপাদনে পরিকল্পনার চেয়ে বেশি খরচ হলো?",
+    "en": "Did production cost more than planned?",
+    "mix": "উৎপাদনে পরিকল্পনার চেয়ে বেশি খরচ হলো?"
+   },
+   "status": "incomplete",
+   "route": "costing",
+   "planned": false,
+   "source": "production_runs",
+   "grant": "view_cost",
+   "kw": [
+    "variance",
+    "standard",
+    "actual",
+    "পার্থক্য"
+   ],
+   "note": "D5: actual yield is never captured, actual cost equals standard"
+  },
+  {
+   "no": 34,
+   "id": "r034",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "পণ্যভিত্তিক অবদান-লাভ",
+    "en": "Contribution profit by product",
+    "mix": "Contribution profit by product (পণ্যভিত্তিক অবদান-লাভ)"
+   },
+   "question": {
+    "bn": "সরাসরি খরচ বাদে প্রতিটি পণ্য কত যোগ করে?",
+    "en": "What does each product add after direct cost?",
+    "mix": "সরাসরি খরচ বাদে প্রতিটি পণ্য কত যোগ করে?"
+   },
+   "status": "implemented",
+   "route": "report/l2_margin",
+   "planned": false,
+   "source": "l2_margin",
+   "grant": "view_cost",
+   "kw": [
+    "contribution",
+    "অবদান"
+   ],
+   "note": ""
+  },
+  {
+   "no": 35,
+   "id": "r035",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "পণ্যের লাভজনকতার ক্রম",
+    "en": "Product profitability ranking",
+    "mix": "Product profitability ranking (পণ্যের লাভজনকতার ক্রম)"
+   },
+   "question": {
+    "bn": "লাভ অনুযায়ী পণ্য সাজান।",
+    "en": "Rank products by profit.",
+    "mix": "লাভ অনুযায়ী পণ্য সাজান।"
+   },
+   "status": "implemented",
+   "route": "report/l2_margin",
+   "planned": false,
+   "source": "l2_margin",
+   "grant": "view_cost",
+   "kw": [
+    "rank",
+    "ranking",
+    "ক্রম"
+   ],
+   "note": ""
+  },
+  {
+   "no": 36,
+   "id": "r036",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "দাম বদলের ইতিহাস ও প্রভাব",
+    "en": "Price change history and impact",
+    "mix": "Price change history and impact (দাম বদলের ইতিহাস ও প্রভাব)"
+   },
+   "question": {
+    "bn": "দাম বদলের পর বিক্রিতে কী হলো?",
+    "en": "What happened to sales after a price change?",
+    "mix": "দাম বদলের পর বিক্রিতে কী হলো?"
+   },
+   "status": "incomplete",
+   "route": "items",
+   "planned": false,
+   "source": "item_price_history",
+   "grant": "ITEMS view",
+   "kw": [
+    "price change",
+    "history",
+    "দাম বদল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 37,
+   "id": "r037",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "মুনাফায় ডিসকাউন্টের প্রভাব",
+    "en": "Discount impact on profit",
+    "mix": "Discount impact on profit (মুনাফায় ডিসকাউন্টের প্রভাব)"
+   },
+   "question": {
+    "bn": "ডিসকাউন্ট কত লাভ খেয়ে নিল?",
+    "en": "How much profit did discounts eat?",
+    "mix": "ডিসকাউন্ট কত লাভ খেয়ে নিল?"
+   },
+   "status": "implemented",
+   "route": "report/item_sales",
+   "planned": false,
+   "source": "sales lines",
+   "grant": "view_cost",
+   "kw": [
+    "discount",
+    "impact",
+    "ডিসকাউন্ট"
+   ],
+   "note": "D2"
+  },
+  {
+   "no": 38,
+   "id": "r038",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "কম মার্জিন ও লোকসানের পণ্য",
+    "en": "Low-margin and loss-making products",
+    "mix": "Low-margin and loss-making products (কম মার্জিন ও লোকসানের পণ্য)"
+   },
+   "question": {
+    "bn": "কোন পণ্য নিরাপদ মার্জিনের নিচে বিক্রি হয়?",
+    "en": "Which items sell below a safe margin?",
+    "mix": "কোন পণ্য নিরাপদ মার্জিনের নিচে বিক্রি হয়?"
+   },
+   "status": "incomplete",
+   "route": "report/l2_margin",
+   "planned": false,
+   "source": "l2_margin",
+   "grant": "view_cost",
+   "kw": [
+    "low margin",
+    "loss",
+    "লোকসান",
+    "কম মার্জিন"
+   ],
+   "note": ""
+  },
+  {
+   "no": 39,
+   "id": "r039",
+   "section": 3,
+   "area": "product",
+   "name": {
+    "bn": "পোর্টফোলিও: বেশি বিক্রি বনাম বেশি লাভ",
+    "en": "Portfolio: high sales versus high profit",
+    "mix": "Portfolio: high sales versus high profit (পোর্টফোলিও: বেশি বিক্রি বনাম বেশি লাভ)"
+   },
+   "question": {
+    "bn": "কোন পণ্য বেশি বিক্রি হয় কিন্তু লাভ কম?",
+    "en": "Which items sell much but earn little?",
+    "mix": "কোন পণ্য বেশি বিক্রি হয় কিন্তু লাভ কম?"
+   },
+   "status": "incomplete",
+   "route": "biz",
+   "planned": false,
+   "source": "biz (ABC)",
+   "grant": "view_cost",
+   "kw": [
+    "abc",
+    "portfolio"
+   ],
+   "note": ""
+  },
+  {
+   "no": 40,
+   "id": "r040",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "উৎপাদন পরিকল্পনা বনাম বাস্তব",
+    "en": "Production plan versus actual",
+    "mix": "Production plan versus actual (উৎপাদন পরিকল্পনা বনাম বাস্তব)"
+   },
+   "question": {
+    "bn": "যা পরিকল্পনা করেছি তা কি বানিয়েছি?",
+    "en": "Did we make what we planned?",
+    "mix": "যা পরিকল্পনা করেছি তা কি বানিয়েছি?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no plan)",
+   "grant": "report_stock",
+   "kw": [
+    "plan",
+    "actual",
+    "পরিকল্পনা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 41,
+   "id": "r041",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "ব্যাচ ও উৎপাদন তালিকা",
+    "en": "Batch and production register",
+    "mix": "Batch and production register (ব্যাচ ও উৎপাদন তালিকা)"
+   },
+   "question": {
+    "bn": "কী কখন কে বানাল?",
+    "en": "What was made, when, by whom?",
+    "mix": "কী কখন কে বানাল?"
+   },
+   "status": "implemented",
+   "route": "report/f1_production",
+   "planned": false,
+   "source": "production_runs",
+   "grant": "report_stock",
+   "kw": [
+    "batch",
+    "production",
+    "ব্যাচ",
+    "উৎপাদন"
+   ],
+   "note": ""
+  },
+  {
+   "no": 42,
+   "id": "r042",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "রেসিপি ও BOM খরচ",
+    "en": "Recipe and BOM costing",
+    "mix": "Recipe and BOM costing (রেসিপি ও BOM খরচ)"
+   },
+   "question": {
+    "bn": "এক ব্যাচের খরচ কত?",
+    "en": "What does one batch cost?",
+    "mix": "এক ব্যাচের খরচ কত?"
+   },
+   "status": "implemented",
+   "route": "costing",
+   "planned": false,
+   "source": "recipes, recipe_lines",
+   "grant": "view_cost",
+   "kw": [
+    "recipe",
+    "bom",
+    "রেসিপি"
+   ],
+   "note": ""
+  },
+  {
+   "no": 43,
+   "id": "r043",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "স্ট্যান্ডার্ড বনাম প্রকৃত উৎপাদন খরচ",
+    "en": "Standard versus actual manufacturing cost",
+    "mix": "Standard versus actual manufacturing cost (স্ট্যান্ডার্ড বনাম প্রকৃত উৎপাদন খরচ)"
+   },
+   "question": {
+    "bn": "প্রকৃত খরচ কি রেসিপির খরচের চেয়ে বেশি?",
+    "en": "Is real cost above the recipe cost?",
+    "mix": "প্রকৃত খরচ কি রেসিপির খরচের চেয়ে বেশি?"
+   },
+   "status": "incomplete",
+   "route": "costing",
+   "planned": false,
+   "source": "production_runs",
+   "grant": "view_cost",
+   "kw": [
+    "standard",
+    "actual"
+   ],
+   "note": "D5, D6"
+  },
+  {
+   "no": 44,
+   "id": "r044",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "কাঁচামাল ব্যবহার বনাম রেসিপি",
+    "en": "Raw material use versus recipe",
+    "mix": "Raw material use versus recipe (কাঁচামাল ব্যবহার বনাম রেসিপি)"
+   },
+   "question": {
+    "bn": "রেসিপির চেয়ে বেশি দুধ বা চিনি লেগেছে?",
+    "en": "Did we use more milk or sugar than the recipe says?",
+    "mix": "রেসিপির চেয়ে বেশি দুধ বা চিনি লেগেছে?"
+   },
+   "status": "unavailable",
+   "route": "report/f3_raw_vs_recipe",
+   "planned": false,
+   "source": "not captured (real issue per batch)",
+   "grant": "report_stock",
+   "kw": [
+    "raw",
+    "recipe",
+    "variance",
+    "কাঁচামাল"
+   ],
+   "note": "D4: shows 0.00 percent because actual is the recipe itself"
+  },
+  {
+   "no": 45,
+   "id": "r045",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "ফলন বনাম মান",
+    "en": "Yield versus standard",
+    "mix": "Yield versus standard (ফলন বনাম মান)"
+   },
+   "question": {
+    "bn": "ব্যাচ কি প্রত্যাশিত ফলন দিল?",
+    "en": "Did a batch give the expected yield?",
+    "mix": "ব্যাচ কি প্রত্যাশিত ফলন দিল?"
+   },
+   "status": "incomplete",
+   "route": "report/f2_yield",
+   "planned": false,
+   "source": "form 05-4 yield test",
+   "grant": "report_stock",
+   "kw": [
+    "yield",
+    "ফলন"
+   ],
+   "note": "D5: run yield is not captured"
+  },
+  {
+   "no": 46,
+   "id": "r046",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "ব্যাচভিত্তিক উৎপাদন খরচ",
+    "en": "Batch-wise production cost",
+    "mix": "Batch-wise production cost (ব্যাচভিত্তিক উৎপাদন খরচ)"
+   },
+   "question": {
+    "bn": "প্রতিটি ব্যাচে কত খরচ?",
+    "en": "What did each batch cost?",
+    "mix": "প্রতিটি ব্যাচে কত খরচ?"
+   },
+   "status": "implemented",
+   "route": "costing",
+   "planned": false,
+   "source": "production_runs",
+   "grant": "view_cost",
+   "kw": [
+    "batch cost"
+   ],
+   "note": ""
+  },
+  {
+   "no": 47,
+   "id": "r047",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "শ্রম ও ওভারহেড খরচ",
+    "en": "Labour and overhead cost",
+    "mix": "Labour and overhead cost (শ্রম ও ওভারহেড খরচ)"
+   },
+   "question": {
+    "bn": "এক ব্যাচে শ্রম ও ওভারহেড কত?",
+    "en": "How much labour and overhead goes into a batch?",
+    "mix": "এক ব্যাচে শ্রম ও ওভারহেড কত?"
+   },
+   "status": "incomplete",
+   "route": "costing",
+   "planned": false,
+   "source": "cost components",
+   "grant": "view_cost",
+   "kw": [
+    "labour",
+    "overhead",
+    "শ্রম",
+    "ওভারহেড"
+   ],
+   "note": ""
+  },
+  {
+   "no": 48,
+   "id": "r048",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "শ্রমঘণ্টাপ্রতি উৎপাদন",
+    "en": "Output per labour hour",
+    "mix": "Output per labour hour (শ্রমঘণ্টাপ্রতি উৎপাদন)"
+   },
+   "question": {
+    "bn": "শ্রমিকরা কতটা উৎপাদনশীল?",
+    "en": "How productive is the labour?",
+    "mix": "শ্রমিকরা কতটা উৎপাদনশীল?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no labour hours)",
+   "grant": "report_stock",
+   "kw": [
+    "labour hour",
+    "productivity"
+   ],
+   "note": ""
+  },
+  {
+   "no": 49,
+   "id": "r049",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "বাতিল, পুনঃকাজ ও উৎপাদন ক্ষতি",
+    "en": "Rejection, rework and production loss",
+    "mix": "Rejection, rework and production loss (বাতিল, পুনঃকাজ ও উৎপাদন ক্ষতি)"
+   },
+   "question": {
+    "bn": "বানাতে গিয়ে কত নষ্ট হলো?",
+    "en": "How much was lost while making?",
+    "mix": "বানাতে গিয়ে কত নষ্ট হলো?"
+   },
+   "status": "incomplete",
+   "route": "report/f2_yield",
+   "planned": false,
+   "source": "form 05-4",
+   "grant": "report_stock",
+   "kw": [
+    "reject",
+    "rework",
+    "loss",
+    "নষ্ট"
+   ],
+   "note": ""
+  },
+  {
+   "no": 50,
+   "id": "r050",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "কারণ, পণ্য ও ব্যাচ অনুযায়ী অপচয়",
+    "en": "Wastage by reason, product and batch",
+    "mix": "Wastage by reason, product and batch (কারণ, পণ্য ও ব্যাচ অনুযায়ী অপচয়)"
+   },
+   "question": {
+    "bn": "কী নষ্ট হলো আর কেন?",
+    "en": "What was wasted and why?",
+    "mix": "কী নষ্ট হলো আর কেন?"
+   },
+   "status": "implemented",
+   "route": "report/wastage",
+   "planned": false,
+   "source": "stock_wastage",
+   "grant": "report_stock",
+   "kw": [
+    "wastage",
+    "waste",
+    "অপচয়",
+    "নষ্ট"
+   ],
+   "note": ""
+  },
+  {
+   "no": 51,
+   "id": "r051",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "ক্ষমতা ব্যবহার",
+    "en": "Capacity utilization",
+    "mix": "Capacity utilization (ক্ষমতা ব্যবহার)"
+   },
+   "question": {
+    "bn": "ক্ষমতার কত অংশ ব্যবহার হচ্ছে?",
+    "en": "How much of the capacity is used?",
+    "mix": "ক্ষমতার কত অংশ ব্যবহার হচ্ছে?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no rated capacity)",
+   "grant": "report_stock",
+   "kw": [
+    "capacity"
+   ],
+   "note": ""
+  },
+  {
+   "no": 52,
+   "id": "r052",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "উৎপাদন অর্ডার ও বাকি অর্ডার",
+    "en": "Production orders and pending orders",
+    "mix": "Production orders and pending orders (উৎপাদন অর্ডার ও বাকি অর্ডার)"
+   },
+   "question": {
+    "bn": "কোন অর্ডার বানানোর অপেক্ষায়?",
+    "en": "Which orders are waiting to be made?",
+    "mix": "কোন অর্ডার বানানোর অপেক্ষায়?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured",
+   "grant": "report_stock",
+   "kw": [
+    "order",
+    "pending"
+   ],
+   "note": ""
+  },
+  {
+   "no": 53,
+   "id": "r053",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "উৎপাদন থেকে চালানের মিল",
+    "en": "Production-to-dispatch reconciliation",
+    "mix": "Production-to-dispatch reconciliation (উৎপাদন থেকে চালানের মিল)"
+   },
+   "question": {
+    "bn": "বানানো, পাঠানো, পাওয়া, কম: হিসাব মেলে?",
+    "en": "Made, sent, received, short: does it add up?",
+    "mix": "বানানো, পাঠানো, পাওয়া, কম: হিসাব মেলে?"
+   },
+   "status": "incomplete",
+   "route": "report/f1_production",
+   "planned": false,
+   "source": "production_runs, stock_transfers",
+   "grant": "report_stock",
+   "kw": [
+    "dispatch",
+    "reconcile",
+    "চালান"
+   ],
+   "note": ""
+  },
+  {
+   "no": 54,
+   "id": "r054",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "তৈরি মাল: বানানো, বিক্রি, বাকি",
+    "en": "Finished goods: produced, sold, remaining",
+    "mix": "Finished goods: produced, sold, remaining (তৈরি মাল: বানানো, বিক্রি, বাকি)"
+   },
+   "question": {
+    "bn": "কতটা তৈরি মাল বাকি আছে?",
+    "en": "How much finished stock is left?",
+    "mix": "কতটা তৈরি মাল বাকি আছে?"
+   },
+   "status": "implemented",
+   "route": "report/k3_store_ledger",
+   "planned": false,
+   "source": "stock_ledger",
+   "grant": "report_stock",
+   "kw": [
+    "finished goods",
+    "fg",
+    "তৈরি মাল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 55,
+   "id": "r055",
+   "section": 4,
+   "area": "production",
+   "name": {
+    "bn": "উৎপাদন খরচ পার্থক্য বিশ্লেষণ",
+    "en": "Manufacturing cost variance analysis",
+    "mix": "Manufacturing cost variance analysis (উৎপাদন খরচ পার্থক্য বিশ্লেষণ)"
+   },
+   "question": {
+    "bn": "খরচের পার্থক্য কি দাম, ব্যবহার না ফলনের?",
+    "en": "Is the cost gap from price, usage or yield?",
+    "mix": "খরচের পার্থক্য কি দাম, ব্যবহার না ফলনের?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (needs actual use and yield)",
+   "grant": "view_cost",
+   "kw": [
+    "variance"
+   ],
+   "note": ""
+  },
+  {
+   "no": 56,
+   "id": "r056",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "আইটেম ও জায়গা অনুযায়ী মজুত",
+    "en": "Stock levels by item and place",
+    "mix": "Stock levels by item and place (আইটেম ও জায়গা অনুযায়ী মজুত)"
+   },
+   "question": {
+    "bn": "কোন আইটেম কোথায় কত আছে?",
+    "en": "How much of each item is where?",
+    "mix": "কোন আইটেম কোথায় কত আছে?"
+   },
+   "status": "implemented",
+   "route": "report/stock_balance",
+   "planned": false,
+   "source": "stock_balance",
+   "grant": "report_stock",
+   "kw": [
+    "stock",
+    "balance",
+    "level",
+    "মজুত",
+    "স্টক"
+   ],
+   "note": ""
+  },
+  {
+   "no": 57,
+   "id": "r057",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "মজুতের মূল্য",
+    "en": "Stock value",
+    "mix": "Stock value (মজুতের মূল্য)"
+   },
+   "question": {
+    "bn": "মজুতের দাম কত?",
+    "en": "What is the stock worth?",
+    "mix": "মজুতের দাম কত?"
+   },
+   "status": "incomplete",
+   "route": "report/stock_balance",
+   "planned": false,
+   "source": "stock_balance (avg cost)",
+   "grant": "view_cost",
+   "kw": [
+    "valuation",
+    "value",
+    "মূল্য"
+   ],
+   "note": "drops lines with no cost without saying how many"
+  },
+  {
+   "no": 58,
+   "id": "r058",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "কম মজুতের তালিকা",
+    "en": "Low-stock list",
+    "mix": "Low-stock list (কম মজুতের তালিকা)"
+   },
+   "question": {
+    "bn": "কী ফুরিয়ে আসছে?",
+    "en": "What is running out?",
+    "mix": "কী ফুরিয়ে আসছে?"
+   },
+   "status": "implemented",
+   "route": "report/stock_low",
+   "planned": false,
+   "source": "stock_balance, items.min_stock",
+   "grant": "report_stock",
+   "kw": [
+    "low stock",
+    "minimum",
+    "কম মজুত"
+   ],
+   "note": ""
+  },
+  {
+   "no": 59,
+   "id": "r059",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "আবার অর্ডারের পরামর্শ",
+    "en": "Reorder suggestions",
+    "mix": "Reorder suggestions (আবার অর্ডারের পরামর্শ)"
+   },
+   "question": {
+    "bn": "কী আবার অর্ডার করা উচিত?",
+    "en": "What should we reorder?",
+    "mix": "কী আবার অর্ডার করা উচিত?"
+   },
+   "status": "implemented",
+   "route": "stockx",
+   "planned": false,
+   "source": "reorder_report",
+   "grant": "report_stock",
+   "kw": [
+    "reorder",
+    "অর্ডার"
+   ],
+   "note": ""
+  },
+  {
+   "no": 60,
+   "id": "r060",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "কাঁচামালের মজুত",
+    "en": "Raw material stock",
+    "mix": "Raw material stock (কাঁচামালের মজুত)"
+   },
+   "question": {
+    "bn": "হাতে কাঁচামাল কত?",
+    "en": "How much raw material is on hand?",
+    "mix": "হাতে কাঁচামাল কত?"
+   },
+   "status": "incomplete",
+   "route": "report/stock_balance",
+   "planned": false,
+   "source": "stock_balance",
+   "grant": "report_stock",
+   "kw": [
+    "raw material",
+    "কাঁচামাল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 61,
+   "id": "r061",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "তৈরি মালের মজুত",
+    "en": "Finished goods stock",
+    "mix": "Finished goods stock (তৈরি মালের মজুত)"
+   },
+   "question": {
+    "bn": "হাতে তৈরি মাল কত?",
+    "en": "How much finished stock is on hand?",
+    "mix": "হাতে তৈরি মাল কত?"
+   },
+   "status": "incomplete",
+   "route": "report/stock_balance",
+   "planned": false,
+   "source": "stock_balance",
+   "grant": "report_stock",
+   "kw": [
+    "finished",
+    "তৈরি মাল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 62,
+   "id": "r062",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "প্যাকেজিং মজুত",
+    "en": "Packaging stock",
+    "mix": "Packaging stock (প্যাকেজিং মজুত)"
+   },
+   "question": {
+    "bn": "হাতে প্যাকেজিং কত?",
+    "en": "How much packaging is on hand?",
+    "mix": "হাতে প্যাকেজিং কত?"
+   },
+   "status": "incomplete",
+   "route": "report/stock_balance",
+   "planned": false,
+   "source": "stock_balance",
+   "grant": "report_stock",
+   "kw": [
+    "packaging",
+    "box",
+    "প্যাকেজিং",
+    "বাক্স"
+   ],
+   "note": ""
+  },
+  {
+   "no": 63,
+   "id": "r063",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "মজুত চলাচল: শুরু, ঢোকা, বেরোনো, শেষ",
+    "en": "Stock movement: opening, in, out, closing",
+    "mix": "Stock movement: opening, in, out, closing (মজুত চলাচল: শুরু, ঢোকা, বেরোনো, শেষ)"
+   },
+   "question": {
+    "bn": "একটি আইটেমে কী ঢুকল আর বেরোল?",
+    "en": "What moved in and out of an item?",
+    "mix": "একটি আইটেমে কী ঢুকল আর বেরোল?"
+   },
+   "status": "incomplete",
+   "route": "report/k3_store_ledger",
+   "planned": false,
+   "source": "stock_ledger",
+   "grant": "report_stock",
+   "kw": [
+    "movement",
+    "ledger",
+    "চলাচল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 64,
+   "id": "r064",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "ট্রান্সফার তালিকা",
+    "en": "Transfer register",
+    "mix": "Transfer register (ট্রান্সফার তালিকা)"
+   },
+   "question": {
+    "bn": "জায়গায় জায়গায় কী পাঠানো হলো?",
+    "en": "What was sent between places?",
+    "mix": "জায়গায় জায়গায় কী পাঠানো হলো?"
+   },
+   "status": "incomplete",
+   "route": "report/transfers_gap",
+   "planned": false,
+   "source": "stock_transfers",
+   "grant": "report_stock",
+   "kw": [
+    "transfer",
+    "challan",
+    "ট্রান্সফার",
+    "চালান"
+   ],
+   "note": ""
+  },
+  {
+   "no": 65,
+   "id": "r065",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "ট্রান্সফার গ্রহণে পার্থক্য",
+    "en": "Transfer receipt differences",
+    "mix": "Transfer receipt differences (ট্রান্সফার গ্রহণে পার্থক্য)"
+   },
+   "question": {
+    "bn": "কী কম বা নষ্ট পৌঁছাল?",
+    "en": "What arrived short or damaged?",
+    "mix": "কী কম বা নষ্ট পৌঁছাল?"
+   },
+   "status": "incomplete",
+   "route": "shortages",
+   "planned": false,
+   "source": "shortage_transit",
+   "grant": "report_stock",
+   "kw": [
+    "short",
+    "damaged",
+    "transit",
+    "কম",
+    "পথে"
+   ],
+   "note": ""
+  },
+  {
+   "no": 66,
+   "id": "r066",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "স্টক গণনার পার্থক্য",
+    "en": "Stock count variance",
+    "mix": "Stock count variance (স্টক গণনার পার্থক্য)"
+   },
+   "question": {
+    "bn": "গণনা কোথায় খাতার সাথে মেলেনি?",
+    "en": "Where did the count differ from the books?",
+    "mix": "গণনা কোথায় খাতার সাথে মেলেনি?"
+   },
+   "status": "incomplete",
+   "route": "report/k2_count_variance",
+   "planned": false,
+   "source": "form 04-3, stock_count_adjust",
+   "grant": "report_stock",
+   "kw": [
+    "count",
+    "variance",
+    "গণনা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 67,
+   "id": "r067",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "ধীর ও মৃত স্টক",
+    "en": "Slow and dead stock",
+    "mix": "Slow and dead stock (ধীর ও মৃত স্টক)"
+   },
+   "question": {
+    "bn": "কী বিক্রি হচ্ছে না?",
+    "en": "What is not selling?",
+    "mix": "কী বিক্রি হচ্ছে না?"
+   },
+   "status": "incomplete",
+   "route": "report/item_slow",
+   "planned": false,
+   "source": "sales, stock",
+   "grant": "report_stock",
+   "kw": [
+    "slow",
+    "dead",
+    "ধীর"
+   ],
+   "note": ""
+  },
+  {
+   "no": 68,
+   "id": "r068",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "স্টকের বয়স",
+    "en": "Stock ageing",
+    "mix": "Stock ageing (স্টকের বয়স)"
+   },
+   "question": {
+    "bn": "যা আছে তার বয়স কত?",
+    "en": "How old is what we hold?",
+    "mix": "যা আছে তার বয়স কত?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no lot date on raw receipts)",
+   "grant": "report_stock",
+   "kw": [
+    "ageing",
+    "age",
+    "বয়স"
+   ],
+   "note": ""
+  },
+  {
+   "no": 69,
+   "id": "r069",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "মেয়াদ তালিকা",
+    "en": "Expiry list",
+    "mix": "Expiry list (মেয়াদ তালিকা)"
+   },
+   "question": {
+    "bn": "কী শিগগির মেয়াদ শেষ হবে?",
+    "en": "What expires soon?",
+    "mix": "কী শিগগির মেয়াদ শেষ হবে?"
+   },
+   "status": "incomplete",
+   "route": "report/expiry_soon",
+   "planned": false,
+   "source": "stock_batches",
+   "grant": "report_stock",
+   "kw": [
+    "expiry",
+    "expire",
+    "মেয়াদ"
+   ],
+   "note": "three expiry thresholds exist"
+  },
+  {
+   "no": 70,
+   "id": "r070",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "ব্যাচের বয়স ও FEFO",
+    "en": "Batch ageing and FEFO view",
+    "mix": "Batch ageing and FEFO view (ব্যাচের বয়স ও FEFO)"
+   },
+   "question": {
+    "bn": "কোন ব্যাচ আগে বেরোবে?",
+    "en": "Which batch should go out first?",
+    "mix": "কোন ব্যাচ আগে বেরোবে?"
+   },
+   "status": "incomplete",
+   "route": "stockx",
+   "planned": false,
+   "source": "stock_batches",
+   "grant": "report_stock",
+   "kw": [
+    "fefo",
+    "batch",
+    "ব্যাচ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 71,
+   "id": "r071",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "স্টক সমন্বয়: কে, কেন, কত",
+    "en": "Stock adjustments: who, why, value",
+    "mix": "Stock adjustments: who, why, value (স্টক সমন্বয়: কে, কেন, কত)"
+   },
+   "question": {
+    "bn": "কে কেন স্টক সমন্বয় করল?",
+    "en": "Who adjusted stock and why?",
+    "mix": "কে কেন স্টক সমন্বয় করল?"
+   },
+   "status": "incomplete",
+   "route": "report/k3_store_ledger",
+   "planned": false,
+   "source": "stock_ledger",
+   "grant": "report_stock",
+   "kw": [
+    "adjustment",
+    "সমন্বয়"
+   ],
+   "note": ""
+  },
+  {
+   "no": 72,
+   "id": "r072",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "ঋণাত্মক স্টক ও অসঙ্গতি তালিকা",
+    "en": "Negative stock and integrity list",
+    "mix": "Negative stock and integrity list (ঋণাত্মক স্টক ও অসঙ্গতি তালিকা)"
+   },
+   "question": {
+    "bn": "কোথায় স্টক শূন্যের নিচে বা ভুল?",
+    "en": "Where is the stock below zero or wrong?",
+    "mix": "কোথায় স্টক শূন্যের নিচে বা ভুল?"
+   },
+   "status": "incomplete",
+   "route": "report/exceptions_summary",
+   "planned": false,
+   "source": "stock_balance, exceptions",
+   "grant": "report_stock",
+   "kw": [
+    "negative",
+    "integrity",
+    "ঋণাত্মক"
+   ],
+   "note": ""
+  },
+  {
+   "no": 73,
+   "id": "r073",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "স্টক আবর্তন",
+    "en": "Stock turnover",
+    "mix": "Stock turnover (স্টক আবর্তন)"
+   },
+   "question": {
+    "bn": "স্টক কত দ্রুত ঘোরে?",
+    "en": "How fast does stock turn over?",
+    "mix": "স্টক কত দ্রুত ঘোরে?"
+   },
+   "status": "incomplete",
+   "route": "stockx",
+   "planned": false,
+   "source": "stock_ledger",
+   "grant": "report_stock",
+   "kw": [
+    "turnover",
+    "আবর্তন"
+   ],
+   "note": ""
+  },
+  {
+   "no": 74,
+   "id": "r074",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "স্টক ফুরানো ও অপূর্ণ চাহিদা",
+    "en": "Stockout and unmet demand",
+    "mix": "Stockout and unmet demand (স্টক ফুরানো ও অপূর্ণ চাহিদা)"
+   },
+   "question": {
+    "bn": "কখন স্টক ফুরিয়ে বিক্রি হারালাম?",
+    "en": "When did we run out and lose sales?",
+    "mix": "কখন স্টক ফুরিয়ে বিক্রি হারালাম?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no stockout log)",
+   "grant": "report_stock",
+   "kw": [
+    "stockout",
+    "demand",
+    "ফুরিয়ে"
+   ],
+   "note": ""
+  },
+  {
+   "no": 75,
+   "id": "r075",
+   "section": 5,
+   "area": "stock",
+   "name": {
+    "bn": "সময়কালের স্টক মিলান",
+    "en": "Period stock reconciliation",
+    "mix": "Period stock reconciliation (সময়কালের স্টক মিলান)"
+   },
+   "question": {
+    "bn": "শুরু + ঢোকা - বেরোনো = শেষ?",
+    "en": "Opening plus in minus out equals closing?",
+    "mix": "শুরু + ঢোকা - বেরোনো = শেষ?"
+   },
+   "status": "incomplete",
+   "route": "report/stock_balance",
+   "planned": false,
+   "source": "stock_ledger, stock_reconcile",
+   "grant": "report_stock",
+   "kw": [
+    "reconcile",
+    "মিলান"
+   ],
+   "note": ""
+  },
+  {
+   "no": 76,
+   "id": "r076",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "অপচয় রিপোর্ট",
+    "en": "Wastage report",
+    "mix": "Wastage report (অপচয় রিপোর্ট)"
+   },
+   "question": {
+    "bn": "কত বাদ দেওয়া হলো?",
+    "en": "How much was written off?",
+    "mix": "কত বাদ দেওয়া হলো?"
+   },
+   "status": "implemented",
+   "route": "report/wastage",
+   "planned": false,
+   "source": "stock_wastage",
+   "grant": "report_stock",
+   "kw": [
+    "wastage",
+    "write off",
+    "অপচয়"
+   ],
+   "note": ""
+  },
+  {
+   "no": 77,
+   "id": "r077",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "মজুত বা বিক্রির তুলনায় অপচয়",
+    "en": "Wastage as a share of stock or sales",
+    "mix": "Wastage as a share of stock or sales (মজুত বা বিক্রির তুলনায় অপচয়)"
+   },
+   "question": {
+    "bn": "বিক্রির তুলনায় অপচয় কি বাড়ছে?",
+    "en": "Is wastage rising against sales?",
+    "mix": "বিক্রির তুলনায় অপচয় কি বাড়ছে?"
+   },
+   "status": "incomplete",
+   "route": "report/wastage",
+   "planned": false,
+   "source": "stock_wastage, sales",
+   "grant": "report_stock",
+   "kw": [
+    "wastage percent",
+    "অপচয় শতাংশ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 78,
+   "id": "r078",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "উৎপাদনে অপচয় ও ফলন",
+    "en": "Production wastage and yield",
+    "mix": "Production wastage and yield (উৎপাদনে অপচয় ও ফলন)"
+   },
+   "question": {
+    "bn": "বানাতে কত নষ্ট হয়?",
+    "en": "How much is lost in making?",
+    "mix": "বানাতে কত নষ্ট হয়?"
+   },
+   "status": "incomplete",
+   "route": "report/f2_yield",
+   "planned": false,
+   "source": "form 05-4, stock_wastage",
+   "grant": "report_stock",
+   "kw": [
+    "yield",
+    "production loss"
+   ],
+   "note": ""
+  },
+  {
+   "no": 79,
+   "id": "r079",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "অবিক্রিত ও মেয়াদোত্তীর্ণ মাল",
+    "en": "Unsold and expired goods",
+    "mix": "Unsold and expired goods (অবিক্রিত ও মেয়াদোত্তীর্ণ মাল)"
+   },
+   "question": {
+    "bn": "কত অবিক্রিত ফেলে দেওয়া হলো?",
+    "en": "How much was thrown away unsold?",
+    "mix": "কত অবিক্রিত ফেলে দেওয়া হলো?"
+   },
+   "status": "incomplete",
+   "route": "report/wastage",
+   "planned": false,
+   "source": "stock_wastage, returns",
+   "grant": "report_stock",
+   "kw": [
+    "unsold",
+    "expired",
+    "অবিক্রিত"
+   ],
+   "note": ""
+  },
+  {
+   "no": 80,
+   "id": "r080",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "ব্যাচ অনুযায়ী অবিক্রিত তৈরি মাল",
+    "en": "Unsold finished goods by batch",
+    "mix": "Unsold finished goods by batch (ব্যাচ অনুযায়ী অবিক্রিত তৈরি মাল)"
+   },
+   "question": {
+    "bn": "কোন ব্যাচ অবিক্রিত পড়ে আছে?",
+    "en": "Which batches are left unsold?",
+    "mix": "কোন ব্যাচ অবিক্রিত পড়ে আছে?"
+   },
+   "status": "incomplete",
+   "route": null,
+   "planned": true,
+   "source": "stock_batches",
+   "grant": "report_stock",
+   "kw": [
+    "unsold",
+    "batch"
+   ],
+   "note": ""
+  },
+  {
+   "no": 81,
+   "id": "r081",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "মেয়াদ নির্ধারণের কভারেজ",
+    "en": "Shelf-life setup coverage",
+    "mix": "Shelf-life setup coverage (মেয়াদ নির্ধারণের কভারেজ)"
+   },
+   "question": {
+    "bn": "কোন আইটেমের মেয়াদ ঠিক করা নেই?",
+    "en": "Which items have no shelf life set?",
+    "mix": "কোন আইটেমের মেয়াদ ঠিক করা নেই?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (shelf_life_rules empty)",
+   "grant": "report_stock",
+   "kw": [
+    "shelf life",
+    "মেয়াদ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 82,
+   "id": "r082",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "দিনশেষ স্টক বনাম পরদিন শুরু",
+    "en": "Daily closing stock versus next-day opening",
+    "mix": "Daily closing stock versus next-day opening (দিনশেষ স্টক বনাম পরদিন শুরু)"
+   },
+   "question": {
+    "bn": "দিনশেষ স্টক কি পরদিনের শুরুর সাথে মেলে?",
+    "en": "Does closing stock match tomorrow's opening?",
+    "mix": "দিনশেষ স্টক কি পরদিনের শুরুর সাথে মেলে?"
+   },
+   "status": "incomplete",
+   "route": null,
+   "planned": true,
+   "source": "stock_ledger",
+   "grant": "report_stock",
+   "kw": [
+    "closing",
+    "opening"
+   ],
+   "note": ""
+  },
+  {
+   "no": 83,
+   "id": "r083",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "ব্যাচ ট্রেস: সরবরাহকারীর লট থেকে বিক্রি",
+    "en": "Batch traceability: supplier lot to sale",
+    "mix": "Batch traceability: supplier lot to sale (ব্যাচ ট্রেস: সরবরাহকারীর লট থেকে বিক্রি)"
+   },
+   "question": {
+    "bn": "একটি ব্যাচ কোথা থেকে এসে কোথায় গেল?",
+    "en": "Where did a batch come from and go to?",
+    "mix": "একটি ব্যাচ কোথা থেকে এসে কোথায় গেল?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (supplier lot)",
+   "grant": "report_stock",
+   "kw": [
+    "trace",
+    "lot",
+    "ট্রেস"
+   ],
+   "note": ""
+  },
+  {
+   "no": 84,
+   "id": "r084",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "শাখা ও ব্যাচ অনুযায়ী তৈরি মাল বণ্টন",
+    "en": "Finished goods distribution by outlet and batch",
+    "mix": "Finished goods distribution by outlet and batch (শাখা ও ব্যাচ অনুযায়ী তৈরি মাল বণ্টন)"
+   },
+   "question": {
+    "bn": "কোন শাখা কোন ব্যাচ পেল?",
+    "en": "Which outlet got which batch?",
+    "mix": "কোন শাখা কোন ব্যাচ পেল?"
+   },
+   "status": "incomplete",
+   "route": null,
+   "planned": true,
+   "source": "stock_transfers, ledger",
+   "grant": "report_stock",
+   "kw": [
+    "distribution",
+    "বণ্টন"
+   ],
+   "note": ""
+  },
+  {
+   "no": 85,
+   "id": "r085",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "রিকল রিপোর্ট",
+    "en": "Recall report",
+    "mix": "Recall report (রিকল রিপোর্ট)"
+   },
+   "question": {
+    "bn": "খারাপ ব্যাচ কোন দোকান বা গ্রাহক পেয়েছে?",
+    "en": "Which customers or shops got a bad batch?",
+    "mix": "খারাপ ব্যাচ কোন দোকান বা গ্রাহক পেয়েছে?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no recall record)",
+   "grant": "report_quality",
+   "kw": [
+    "recall",
+    "রিকল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 86,
+   "id": "r086",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "পরিচ্ছন্নতা চেকলিস্ট রিপোর্ট",
+    "en": "Hygiene checklist report",
+    "mix": "Hygiene checklist report (পরিচ্ছন্নতা চেকলিস্ট রিপোর্ট)"
+   },
+   "question": {
+    "bn": "পরিচ্ছন্নতার চেক কি হয়েছে?",
+    "en": "Were the hygiene checks done?",
+    "mix": "পরিচ্ছন্নতার চেক কি হয়েছে?"
+   },
+   "status": "implemented",
+   "route": "report/q2_hygiene",
+   "planned": false,
+   "source": "forms 14-1, 05-1",
+   "grant": "report_quality",
+   "kw": [
+    "hygiene",
+    "clean",
+    "পরিচ্ছন্নতা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 87,
+   "id": "r087",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "ফ্রিজের তাপমাত্রা লগ",
+    "en": "Fridge temperature log",
+    "mix": "Fridge temperature log (ফ্রিজের তাপমাত্রা লগ)"
+   },
+   "question": {
+    "bn": "ফ্রিজ কি সঠিক তাপমাত্রায় ছিল?",
+    "en": "Were the fridges in range?",
+    "mix": "ফ্রিজ কি সঠিক তাপমাত্রায় ছিল?"
+   },
+   "status": "implemented",
+   "route": "report/q1_fridge_temp",
+   "planned": false,
+   "source": "fridge sheet",
+   "grant": "report_quality",
+   "kw": [
+    "fridge",
+    "temperature",
+    "ফ্রিজ",
+    "তাপমাত্রা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 88,
+   "id": "r088",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "গ্রাহকের অভিযোগ",
+    "en": "Customer complaints",
+    "mix": "Customer complaints (গ্রাহকের অভিযোগ)"
+   },
+   "question": {
+    "bn": "গ্রাহক কী নিয়ে অভিযোগ করেছে?",
+    "en": "What did customers complain about?",
+    "mix": "গ্রাহক কী নিয়ে অভিযোগ করেছে?"
+   },
+   "status": "implemented",
+   "route": "report/q3_complaints",
+   "planned": false,
+   "source": "form 20-3",
+   "grant": "report_quality",
+   "kw": [
+    "complaint",
+    "অভিযোগ"
+   ],
+   "note": ""
+  },
+  {
+   "no": 89,
+   "id": "r089",
+   "section": 6,
+   "area": "quality",
+   "name": {
+    "bn": "মান পরিদর্শন ও বাতিল",
+    "en": "Quality inspection and rejection",
+    "mix": "Quality inspection and rejection (মান পরিদর্শন ও বাতিল)"
+   },
+   "question": {
+    "bn": "গ্রহণের সময় কী বাতিল হলো?",
+    "en": "What was rejected at receipt?",
+    "mix": "গ্রহণের সময় কী বাতিল হলো?"
+   },
+   "status": "incomplete",
+   "route": "stockx",
+   "planned": false,
+   "source": "qc_records",
+   "grant": "report_quality",
+   "kw": [
+    "qc",
+    "inspection",
+    "reject",
+    "মান"
+   ],
+   "note": ""
+  },
+  {
+   "no": 90,
+   "id": "r090",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "ক্রয়ের সারসংক্ষেপ",
+    "en": "Purchase summary",
+    "mix": "Purchase summary (ক্রয়ের সারসংক্ষেপ)"
+   },
+   "question": {
+    "bn": "মোট কত কেনা হলো?",
+    "en": "How much did we buy in total?",
+    "mix": "মোট কত কেনা হলো?"
+   },
+   "status": "implemented",
+   "route": "report/purchases_by_supplier",
+   "planned": false,
+   "source": "purchase_bills",
+   "grant": "report_purchase",
+   "kw": [
+    "purchase",
+    "buy",
+    "ক্রয়",
+    "কেনা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 91,
+   "id": "r091",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "সরবরাহকারী অনুযায়ী ক্রয়",
+    "en": "Purchases by supplier",
+    "mix": "Purchases by supplier (সরবরাহকারী অনুযায়ী ক্রয়)"
+   },
+   "question": {
+    "bn": "কার কাছ থেকে কত কিনি?",
+    "en": "Whom do we buy from, how much?",
+    "mix": "কার কাছ থেকে কত কিনি?"
+   },
+   "status": "implemented",
+   "route": "report/purchases_by_supplier",
+   "planned": false,
+   "source": "purchase_bills",
+   "grant": "report_purchase",
+   "kw": [
+    "supplier",
+    "সরবরাহকারী"
+   ],
+   "note": ""
+  },
+  {
+   "no": 92,
+   "id": "r092",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "আইটেম অনুযায়ী ক্রয়মূল্য",
+    "en": "Purchase value by item",
+    "mix": "Purchase value by item (আইটেম অনুযায়ী ক্রয়মূল্য)"
+   },
+   "question": {
+    "bn": "প্রতিটি আইটেমে কত খরচ করি?",
+    "en": "What do we spend on each item?",
+    "mix": "প্রতিটি আইটেমে কত খরচ করি?"
+   },
+   "status": "incomplete",
+   "route": "report/p2_rate_trend",
+   "planned": false,
+   "source": "purchase_lines",
+   "grant": "report_purchase",
+   "kw": [
+    "item",
+    "আইটেম"
+   ],
+   "note": ""
+  },
+  {
+   "no": 93,
+   "id": "r093",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "ক্রয়দামের ধারা",
+    "en": "Purchase price trend",
+    "mix": "Purchase price trend (ক্রয়দামের ধারা)"
+   },
+   "question": {
+    "bn": "কোন কাঁচামাল দামি হলো?",
+    "en": "Which input got dearer?",
+    "mix": "কোন কাঁচামাল দামি হলো?"
+   },
+   "status": "implemented",
+   "route": "report/p2_rate_trend",
+   "planned": false,
+   "source": "purchase_lines",
+   "grant": "report_purchase",
+   "kw": [
+    "price trend",
+    "rate",
+    "দাম"
+   ],
+   "note": ""
+  },
+  {
+   "no": 94,
+   "id": "r094",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "সরবরাহকারীর স্কোরকার্ড",
+    "en": "Supplier scorecard",
+    "mix": "Supplier scorecard (সরবরাহকারীর স্কোরকার্ড)"
+   },
+   "question": {
+    "bn": "কোন সরবরাহকারী নির্ভরযোগ্য?",
+    "en": "Which supplier is reliable?",
+    "mix": "কোন সরবরাহকারী নির্ভরযোগ্য?"
+   },
+   "status": "incomplete",
+   "route": "report/p4_supplier_score",
+   "planned": false,
+   "source": "forms 06-3, 04-1, 06-4",
+   "grant": "report_purchase",
+   "kw": [
+    "scorecard",
+    "reliable"
+   ],
+   "note": "prints 0 when the paper forms were not used"
+  },
+  {
+   "no": 95,
+   "id": "r095",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "ক্রয় অর্ডার ও খোলা PO",
+    "en": "Purchase orders and open POs",
+    "mix": "Purchase orders and open POs (ক্রয় অর্ডার ও খোলা PO)"
+   },
+   "question": {
+    "bn": "কোন PO এখনও খোলা?",
+    "en": "Which POs are still open?",
+    "mix": "কোন PO এখনও খোলা?"
+   },
+   "status": "implemented",
+   "route": "report/p5_po_match",
+   "planned": false,
+   "source": "form 06-3",
+   "grant": "report_purchase",
+   "kw": [
+    "po",
+    "order",
+    "অর্ডার"
+   ],
+   "note": ""
+  },
+  {
+   "no": 96,
+   "id": "r096",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "PO, GRN ও বিল মিল",
+    "en": "PO, GRN and bill match",
+    "mix": "PO, GRN and bill match (PO, GRN ও বিল মিল)"
+   },
+   "question": {
+    "bn": "অর্ডার, গ্রহণ আর বিল কি মেলে?",
+    "en": "Do order, receipt and bill agree?",
+    "mix": "অর্ডার, গ্রহণ আর বিল কি মেলে?"
+   },
+   "status": "implemented",
+   "route": "report/p5_po_match",
+   "planned": false,
+   "source": "forms 06-3, 04-1, 06-4",
+   "grant": "report_purchase",
+   "kw": [
+    "match",
+    "grn",
+    "মিল"
+   ],
+   "note": ""
+  },
+  {
+   "no": 97,
+   "id": "r097",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "PO ডেলিভারির অবস্থা",
+    "en": "PO delivery status",
+    "mix": "PO delivery status (PO ডেলিভারির অবস্থা)"
+   },
+   "question": {
+    "bn": "কোন ডেলিভারি দেরি?",
+    "en": "Which deliveries are late?",
+    "mix": "কোন ডেলিভারি দেরি?"
+   },
+   "status": "implemented",
+   "route": "report/p5_po_match",
+   "planned": false,
+   "source": "form 06-3",
+   "grant": "report_purchase",
+   "kw": [
+    "late",
+    "delivery",
+    "দেরি"
+   ],
+   "note": ""
+  },
+  {
+   "no": 98,
+   "id": "r098",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "সরবরাহকারীর পাওনার বয়স",
+    "en": "Supplier payables ageing",
+    "mix": "Supplier payables ageing (সরবরাহকারীর পাওনার বয়স)"
+   },
+   "question": {
+    "bn": "কত পাওনা, কত দিন ধরে?",
+    "en": "How much do we owe, since when?",
+    "mix": "কত পাওনা, কত দিন ধরে?"
+   },
+   "status": "incomplete",
+   "route": "report/supplier_ageing",
+   "planned": false,
+   "source": "purchase_bills, supplier_payments",
+   "grant": "report_purchase",
+   "kw": [
+    "payable",
+    "ageing",
+    "owe",
+    "পাওনা",
+    "বাকি"
+   ],
+   "note": "shows 0.00 overdue when credit days are empty"
+  },
+  {
+   "no": 99,
+   "id": "r099",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "সরবরাহকারীর খাতা",
+    "en": "Supplier ledger",
+    "mix": "Supplier ledger (সরবরাহকারীর খাতা)"
+   },
+   "question": {
+    "bn": "এক সরবরাহকারীর পুরো হিসাব কী?",
+    "en": "What is the full account with one supplier?",
+    "mix": "এক সরবরাহকারীর পুরো হিসাব কী?"
+   },
+   "status": "implemented",
+   "route": "payables",
+   "planned": false,
+   "source": "supplier_ledger",
+   "grant": "report_purchase",
+   "kw": [
+    "ledger",
+    "খাতা"
+   ],
+   "note": ""
+  },
+  {
+   "no": 100,
+   "id": "r100",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "ক্রয় ফেরত",
+    "en": "Purchase returns",
+    "mix": "Purchase returns (ক্রয় ফেরত)"
+   },
+   "question": {
+    "bn": "কী ফেরত দিয়েছি?",
+    "en": "What did we send back?",
+    "mix": "কী ফেরত দিয়েছি?"
+   },
+   "status": "incomplete",
+   "route": "report/purchases_by_supplier",
+   "planned": false,
+   "source": "purchase_bills (return)",
+   "grant": "report_purchase",
+   "kw": [
+    "return",
+    "ফেরত"
+   ],
+   "note": ""
+  },
+  {
+   "no": 101,
+   "id": "r101",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "চুক্তির দামের সাথে পার্থক্য",
+    "en": "Price variance against the agreed price",
+    "mix": "Price variance against the agreed price (চুক্তির দামের সাথে পার্থক্য)"
+   },
+   "question": {
+    "bn": "সরবরাহকারী কি চুক্তির চেয়ে বেশি নিল?",
+    "en": "Did a supplier charge more than agreed?",
+    "mix": "সরবরাহকারী কি চুক্তির চেয়ে বেশি নিল?"
+   },
+   "status": "incomplete",
+   "route": "report/p2_rate_trend",
+   "planned": false,
+   "source": "not captured (no agreed price)",
+   "grant": "report_purchase",
+   "kw": [
+    "variance",
+    "agreed"
+   ],
+   "note": ""
+  },
+  {
+   "no": 102,
+   "id": "r102",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "সরবরাহকারীর ডেলিভারি কর্মক্ষমতা",
+    "en": "Supplier delivery performance",
+    "mix": "Supplier delivery performance (সরবরাহকারীর ডেলিভারি কর্মক্ষমতা)"
+   },
+   "question": {
+    "bn": "কে দেরিতে দেয়?",
+    "en": "Who delivers late?",
+    "mix": "কে দেরিতে দেয়?"
+   },
+   "status": "implemented",
+   "route": "report/p4_supplier_score",
+   "planned": false,
+   "source": "forms 06-3, 06-4",
+   "grant": "report_purchase",
+   "kw": [
+    "delivery",
+    "performance"
+   ],
+   "note": ""
+  },
+  {
+   "no": 103,
+   "id": "r103",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "সরবরাহকারীর বাতিলের হার",
+    "en": "Supplier rejection rate",
+    "mix": "Supplier rejection rate (সরবরাহকারীর বাতিলের হার)"
+   },
+   "question": {
+    "bn": "সরবরাহকারীর কত মাল বাতিল হয়?",
+    "en": "How much of a supplier's goods is rejected?",
+    "mix": "সরবরাহকারীর কত মাল বাতিল হয়?"
+   },
+   "status": "incomplete",
+   "route": "report/p4_supplier_score",
+   "planned": false,
+   "source": "qc_records",
+   "grant": "report_purchase",
+   "kw": [
+    "rejection",
+    "reject"
+   ],
+   "note": ""
+  },
+  {
+   "no": 104,
+   "id": "r104",
+   "section": 7,
+   "area": "purchase",
+   "name": {
+    "bn": "পছন্দের ও বিকল্প সরবরাহকারী",
+    "en": "Preferred and alternative suppliers",
+    "mix": "Preferred and alternative suppliers (পছন্দের ও বিকল্প সরবরাহকারী)"
+   },
+   "question": {
+    "bn": "এই আইটেম আর কে দিতে পারে?",
+    "en": "Who else can supply this item?",
+    "mix": "এই আইটেম আর কে দিতে পারে?"
+   },
+   "status": "unavailable",
+   "route": null,
+   "planned": true,
+   "source": "not captured (no item_suppliers)",
+   "grant": "report_purchase",
+   "kw": [
+    "alternative",
+    "preferred",
+    "বিকল্প"
+   ],
+   "note": ""
+  },
+  {
+   "no": 105,
+   "id": "r105",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 105 (এখনও যাচাই হয়নি)",
+    "en": "Report #105 (not audited yet)",
+    "mix": "Report #105 (not audited yet) (রিপোর্ট নং 105 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 106,
+   "id": "r106",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 106 (এখনও যাচাই হয়নি)",
+    "en": "Report #106 (not audited yet)",
+    "mix": "Report #106 (not audited yet) (রিপোর্ট নং 106 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 107,
+   "id": "r107",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 107 (এখনও যাচাই হয়নি)",
+    "en": "Report #107 (not audited yet)",
+    "mix": "Report #107 (not audited yet) (রিপোর্ট নং 107 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 108,
+   "id": "r108",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 108 (এখনও যাচাই হয়নি)",
+    "en": "Report #108 (not audited yet)",
+    "mix": "Report #108 (not audited yet) (রিপোর্ট নং 108 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 109,
+   "id": "r109",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 109 (এখনও যাচাই হয়নি)",
+    "en": "Report #109 (not audited yet)",
+    "mix": "Report #109 (not audited yet) (রিপোর্ট নং 109 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 110,
+   "id": "r110",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 110 (এখনও যাচাই হয়নি)",
+    "en": "Report #110 (not audited yet)",
+    "mix": "Report #110 (not audited yet) (রিপোর্ট নং 110 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 111,
+   "id": "r111",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 111 (এখনও যাচাই হয়নি)",
+    "en": "Report #111 (not audited yet)",
+    "mix": "Report #111 (not audited yet) (রিপোর্ট নং 111 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 112,
+   "id": "r112",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 112 (এখনও যাচাই হয়নি)",
+    "en": "Report #112 (not audited yet)",
+    "mix": "Report #112 (not audited yet) (রিপোর্ট নং 112 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 113,
+   "id": "r113",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 113 (এখনও যাচাই হয়নি)",
+    "en": "Report #113 (not audited yet)",
+    "mix": "Report #113 (not audited yet) (রিপোর্ট নং 113 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 114,
+   "id": "r114",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 114 (এখনও যাচাই হয়নি)",
+    "en": "Report #114 (not audited yet)",
+    "mix": "Report #114 (not audited yet) (রিপোর্ট নং 114 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 115,
+   "id": "r115",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 115 (এখনও যাচাই হয়নি)",
+    "en": "Report #115 (not audited yet)",
+    "mix": "Report #115 (not audited yet) (রিপোর্ট নং 115 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 116,
+   "id": "r116",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 116 (এখনও যাচাই হয়নি)",
+    "en": "Report #116 (not audited yet)",
+    "mix": "Report #116 (not audited yet) (রিপোর্ট নং 116 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 117,
+   "id": "r117",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 117 (এখনও যাচাই হয়নি)",
+    "en": "Report #117 (not audited yet)",
+    "mix": "Report #117 (not audited yet) (রিপোর্ট নং 117 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 118,
+   "id": "r118",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 118 (এখনও যাচাই হয়নি)",
+    "en": "Report #118 (not audited yet)",
+    "mix": "Report #118 (not audited yet) (রিপোর্ট নং 118 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 119,
+   "id": "r119",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 119 (এখনও যাচাই হয়নি)",
+    "en": "Report #119 (not audited yet)",
+    "mix": "Report #119 (not audited yet) (রিপোর্ট নং 119 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 120,
+   "id": "r120",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 120 (এখনও যাচাই হয়নি)",
+    "en": "Report #120 (not audited yet)",
+    "mix": "Report #120 (not audited yet) (রিপোর্ট নং 120 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 121,
+   "id": "r121",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 121 (এখনও যাচাই হয়নি)",
+    "en": "Report #121 (not audited yet)",
+    "mix": "Report #121 (not audited yet) (রিপোর্ট নং 121 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 122,
+   "id": "r122",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 122 (এখনও যাচাই হয়নি)",
+    "en": "Report #122 (not audited yet)",
+    "mix": "Report #122 (not audited yet) (রিপোর্ট নং 122 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 123,
+   "id": "r123",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 123 (এখনও যাচাই হয়নি)",
+    "en": "Report #123 (not audited yet)",
+    "mix": "Report #123 (not audited yet) (রিপোর্ট নং 123 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 124,
+   "id": "r124",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 124 (এখনও যাচাই হয়নি)",
+    "en": "Report #124 (not audited yet)",
+    "mix": "Report #124 (not audited yet) (রিপোর্ট নং 124 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 125,
+   "id": "r125",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 125 (এখনও যাচাই হয়নি)",
+    "en": "Report #125 (not audited yet)",
+    "mix": "Report #125 (not audited yet) (রিপোর্ট নং 125 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 126,
+   "id": "r126",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 126 (এখনও যাচাই হয়নি)",
+    "en": "Report #126 (not audited yet)",
+    "mix": "Report #126 (not audited yet) (রিপোর্ট নং 126 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 127,
+   "id": "r127",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 127 (এখনও যাচাই হয়নি)",
+    "en": "Report #127 (not audited yet)",
+    "mix": "Report #127 (not audited yet) (রিপোর্ট নং 127 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 128,
+   "id": "r128",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 128 (এখনও যাচাই হয়নি)",
+    "en": "Report #128 (not audited yet)",
+    "mix": "Report #128 (not audited yet) (রিপোর্ট নং 128 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 129,
+   "id": "r129",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 129 (এখনও যাচাই হয়নি)",
+    "en": "Report #129 (not audited yet)",
+    "mix": "Report #129 (not audited yet) (রিপোর্ট নং 129 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 130,
+   "id": "r130",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 130 (এখনও যাচাই হয়নি)",
+    "en": "Report #130 (not audited yet)",
+    "mix": "Report #130 (not audited yet) (রিপোর্ট নং 130 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 131,
+   "id": "r131",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 131 (এখনও যাচাই হয়নি)",
+    "en": "Report #131 (not audited yet)",
+    "mix": "Report #131 (not audited yet) (রিপোর্ট নং 131 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 132,
+   "id": "r132",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 132 (এখনও যাচাই হয়নি)",
+    "en": "Report #132 (not audited yet)",
+    "mix": "Report #132 (not audited yet) (রিপোর্ট নং 132 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 133,
+   "id": "r133",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 133 (এখনও যাচাই হয়নি)",
+    "en": "Report #133 (not audited yet)",
+    "mix": "Report #133 (not audited yet) (রিপোর্ট নং 133 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 134,
+   "id": "r134",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 134 (এখনও যাচাই হয়নি)",
+    "en": "Report #134 (not audited yet)",
+    "mix": "Report #134 (not audited yet) (রিপোর্ট নং 134 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 135,
+   "id": "r135",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 135 (এখনও যাচাই হয়নি)",
+    "en": "Report #135 (not audited yet)",
+    "mix": "Report #135 (not audited yet) (রিপোর্ট নং 135 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 136,
+   "id": "r136",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 136 (এখনও যাচাই হয়নি)",
+    "en": "Report #136 (not audited yet)",
+    "mix": "Report #136 (not audited yet) (রিপোর্ট নং 136 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 137,
+   "id": "r137",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 137 (এখনও যাচাই হয়নি)",
+    "en": "Report #137 (not audited yet)",
+    "mix": "Report #137 (not audited yet) (রিপোর্ট নং 137 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 138,
+   "id": "r138",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 138 (এখনও যাচাই হয়নি)",
+    "en": "Report #138 (not audited yet)",
+    "mix": "Report #138 (not audited yet) (রিপোর্ট নং 138 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 139,
+   "id": "r139",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 139 (এখনও যাচাই হয়নি)",
+    "en": "Report #139 (not audited yet)",
+    "mix": "Report #139 (not audited yet) (রিপোর্ট নং 139 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 140,
+   "id": "r140",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 140 (এখনও যাচাই হয়নি)",
+    "en": "Report #140 (not audited yet)",
+    "mix": "Report #140 (not audited yet) (রিপোর্ট নং 140 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 141,
+   "id": "r141",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 141 (এখনও যাচাই হয়নি)",
+    "en": "Report #141 (not audited yet)",
+    "mix": "Report #141 (not audited yet) (রিপোর্ট নং 141 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 142,
+   "id": "r142",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 142 (এখনও যাচাই হয়নি)",
+    "en": "Report #142 (not audited yet)",
+    "mix": "Report #142 (not audited yet) (রিপোর্ট নং 142 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 143,
+   "id": "r143",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 143 (এখনও যাচাই হয়নি)",
+    "en": "Report #143 (not audited yet)",
+    "mix": "Report #143 (not audited yet) (রিপোর্ট নং 143 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 144,
+   "id": "r144",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 144 (এখনও যাচাই হয়নি)",
+    "en": "Report #144 (not audited yet)",
+    "mix": "Report #144 (not audited yet) (রিপোর্ট নং 144 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 145,
+   "id": "r145",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 145 (এখনও যাচাই হয়নি)",
+    "en": "Report #145 (not audited yet)",
+    "mix": "Report #145 (not audited yet) (রিপোর্ট নং 145 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 146,
+   "id": "r146",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 146 (এখনও যাচাই হয়নি)",
+    "en": "Report #146 (not audited yet)",
+    "mix": "Report #146 (not audited yet) (রিপোর্ট নং 146 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 147,
+   "id": "r147",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 147 (এখনও যাচাই হয়নি)",
+    "en": "Report #147 (not audited yet)",
+    "mix": "Report #147 (not audited yet) (রিপোর্ট নং 147 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 148,
+   "id": "r148",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 148 (এখনও যাচাই হয়নি)",
+    "en": "Report #148 (not audited yet)",
+    "mix": "Report #148 (not audited yet) (রিপোর্ট নং 148 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 149,
+   "id": "r149",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 149 (এখনও যাচাই হয়নি)",
+    "en": "Report #149 (not audited yet)",
+    "mix": "Report #149 (not audited yet) (রিপোর্ট নং 149 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 150,
+   "id": "r150",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 150 (এখনও যাচাই হয়নি)",
+    "en": "Report #150 (not audited yet)",
+    "mix": "Report #150 (not audited yet) (রিপোর্ট নং 150 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 151,
+   "id": "r151",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 151 (এখনও যাচাই হয়নি)",
+    "en": "Report #151 (not audited yet)",
+    "mix": "Report #151 (not audited yet) (রিপোর্ট নং 151 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 152,
+   "id": "r152",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 152 (এখনও যাচাই হয়নি)",
+    "en": "Report #152 (not audited yet)",
+    "mix": "Report #152 (not audited yet) (রিপোর্ট নং 152 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 153,
+   "id": "r153",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 153 (এখনও যাচাই হয়নি)",
+    "en": "Report #153 (not audited yet)",
+    "mix": "Report #153 (not audited yet) (রিপোর্ট নং 153 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 154,
+   "id": "r154",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 154 (এখনও যাচাই হয়নি)",
+    "en": "Report #154 (not audited yet)",
+    "mix": "Report #154 (not audited yet) (রিপোর্ট নং 154 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 155,
+   "id": "r155",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 155 (এখনও যাচাই হয়নি)",
+    "en": "Report #155 (not audited yet)",
+    "mix": "Report #155 (not audited yet) (রিপোর্ট নং 155 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 156,
+   "id": "r156",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 156 (এখনও যাচাই হয়নি)",
+    "en": "Report #156 (not audited yet)",
+    "mix": "Report #156 (not audited yet) (রিপোর্ট নং 156 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 157,
+   "id": "r157",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 157 (এখনও যাচাই হয়নি)",
+    "en": "Report #157 (not audited yet)",
+    "mix": "Report #157 (not audited yet) (রিপোর্ট নং 157 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 158,
+   "id": "r158",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 158 (এখনও যাচাই হয়নি)",
+    "en": "Report #158 (not audited yet)",
+    "mix": "Report #158 (not audited yet) (রিপোর্ট নং 158 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 159,
+   "id": "r159",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 159 (এখনও যাচাই হয়নি)",
+    "en": "Report #159 (not audited yet)",
+    "mix": "Report #159 (not audited yet) (রিপোর্ট নং 159 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 160,
+   "id": "r160",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 160 (এখনও যাচাই হয়নি)",
+    "en": "Report #160 (not audited yet)",
+    "mix": "Report #160 (not audited yet) (রিপোর্ট নং 160 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 161,
+   "id": "r161",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 161 (এখনও যাচাই হয়নি)",
+    "en": "Report #161 (not audited yet)",
+    "mix": "Report #161 (not audited yet) (রিপোর্ট নং 161 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 162,
+   "id": "r162",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 162 (এখনও যাচাই হয়নি)",
+    "en": "Report #162 (not audited yet)",
+    "mix": "Report #162 (not audited yet) (রিপোর্ট নং 162 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 163,
+   "id": "r163",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 163 (এখনও যাচাই হয়নি)",
+    "en": "Report #163 (not audited yet)",
+    "mix": "Report #163 (not audited yet) (রিপোর্ট নং 163 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 164,
+   "id": "r164",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 164 (এখনও যাচাই হয়নি)",
+    "en": "Report #164 (not audited yet)",
+    "mix": "Report #164 (not audited yet) (রিপোর্ট নং 164 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 165,
+   "id": "r165",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 165 (এখনও যাচাই হয়নি)",
+    "en": "Report #165 (not audited yet)",
+    "mix": "Report #165 (not audited yet) (রিপোর্ট নং 165 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 166,
+   "id": "r166",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 166 (এখনও যাচাই হয়নি)",
+    "en": "Report #166 (not audited yet)",
+    "mix": "Report #166 (not audited yet) (রিপোর্ট নং 166 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 167,
+   "id": "r167",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 167 (এখনও যাচাই হয়নি)",
+    "en": "Report #167 (not audited yet)",
+    "mix": "Report #167 (not audited yet) (রিপোর্ট নং 167 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 168,
+   "id": "r168",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 168 (এখনও যাচাই হয়নি)",
+    "en": "Report #168 (not audited yet)",
+    "mix": "Report #168 (not audited yet) (রিপোর্ট নং 168 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 169,
+   "id": "r169",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 169 (এখনও যাচাই হয়নি)",
+    "en": "Report #169 (not audited yet)",
+    "mix": "Report #169 (not audited yet) (রিপোর্ট নং 169 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 170,
+   "id": "r170",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 170 (এখনও যাচাই হয়নি)",
+    "en": "Report #170 (not audited yet)",
+    "mix": "Report #170 (not audited yet) (রিপোর্ট নং 170 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 171,
+   "id": "r171",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 171 (এখনও যাচাই হয়নি)",
+    "en": "Report #171 (not audited yet)",
+    "mix": "Report #171 (not audited yet) (রিপোর্ট নং 171 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 172,
+   "id": "r172",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 172 (এখনও যাচাই হয়নি)",
+    "en": "Report #172 (not audited yet)",
+    "mix": "Report #172 (not audited yet) (রিপোর্ট নং 172 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 173,
+   "id": "r173",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 173 (এখনও যাচাই হয়নি)",
+    "en": "Report #173 (not audited yet)",
+    "mix": "Report #173 (not audited yet) (রিপোর্ট নং 173 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 174,
+   "id": "r174",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 174 (এখনও যাচাই হয়নি)",
+    "en": "Report #174 (not audited yet)",
+    "mix": "Report #174 (not audited yet) (রিপোর্ট নং 174 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 175,
+   "id": "r175",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 175 (এখনও যাচাই হয়নি)",
+    "en": "Report #175 (not audited yet)",
+    "mix": "Report #175 (not audited yet) (রিপোর্ট নং 175 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 176,
+   "id": "r176",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 176 (এখনও যাচাই হয়নি)",
+    "en": "Report #176 (not audited yet)",
+    "mix": "Report #176 (not audited yet) (রিপোর্ট নং 176 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 177,
+   "id": "r177",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 177 (এখনও যাচাই হয়নি)",
+    "en": "Report #177 (not audited yet)",
+    "mix": "Report #177 (not audited yet) (রিপোর্ট নং 177 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 178,
+   "id": "r178",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 178 (এখনও যাচাই হয়নি)",
+    "en": "Report #178 (not audited yet)",
+    "mix": "Report #178 (not audited yet) (রিপোর্ট নং 178 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 179,
+   "id": "r179",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 179 (এখনও যাচাই হয়নি)",
+    "en": "Report #179 (not audited yet)",
+    "mix": "Report #179 (not audited yet) (রিপোর্ট নং 179 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 180,
+   "id": "r180",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 180 (এখনও যাচাই হয়নি)",
+    "en": "Report #180 (not audited yet)",
+    "mix": "Report #180 (not audited yet) (রিপোর্ট নং 180 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 181,
+   "id": "r181",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 181 (এখনও যাচাই হয়নি)",
+    "en": "Report #181 (not audited yet)",
+    "mix": "Report #181 (not audited yet) (রিপোর্ট নং 181 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 182,
+   "id": "r182",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 182 (এখনও যাচাই হয়নি)",
+    "en": "Report #182 (not audited yet)",
+    "mix": "Report #182 (not audited yet) (রিপোর্ট নং 182 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 183,
+   "id": "r183",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 183 (এখনও যাচাই হয়নি)",
+    "en": "Report #183 (not audited yet)",
+    "mix": "Report #183 (not audited yet) (রিপোর্ট নং 183 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 184,
+   "id": "r184",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 184 (এখনও যাচাই হয়নি)",
+    "en": "Report #184 (not audited yet)",
+    "mix": "Report #184 (not audited yet) (রিপোর্ট নং 184 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 185,
+   "id": "r185",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 185 (এখনও যাচাই হয়নি)",
+    "en": "Report #185 (not audited yet)",
+    "mix": "Report #185 (not audited yet) (রিপোর্ট নং 185 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 186,
+   "id": "r186",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 186 (এখনও যাচাই হয়নি)",
+    "en": "Report #186 (not audited yet)",
+    "mix": "Report #186 (not audited yet) (রিপোর্ট নং 186 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 187,
+   "id": "r187",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 187 (এখনও যাচাই হয়নি)",
+    "en": "Report #187 (not audited yet)",
+    "mix": "Report #187 (not audited yet) (রিপোর্ট নং 187 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 188,
+   "id": "r188",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 188 (এখনও যাচাই হয়নি)",
+    "en": "Report #188 (not audited yet)",
+    "mix": "Report #188 (not audited yet) (রিপোর্ট নং 188 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 189,
+   "id": "r189",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 189 (এখনও যাচাই হয়নি)",
+    "en": "Report #189 (not audited yet)",
+    "mix": "Report #189 (not audited yet) (রিপোর্ট নং 189 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 190,
+   "id": "r190",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 190 (এখনও যাচাই হয়নি)",
+    "en": "Report #190 (not audited yet)",
+    "mix": "Report #190 (not audited yet) (রিপোর্ট নং 190 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 191,
+   "id": "r191",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 191 (এখনও যাচাই হয়নি)",
+    "en": "Report #191 (not audited yet)",
+    "mix": "Report #191 (not audited yet) (রিপোর্ট নং 191 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 192,
+   "id": "r192",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 192 (এখনও যাচাই হয়নি)",
+    "en": "Report #192 (not audited yet)",
+    "mix": "Report #192 (not audited yet) (রিপোর্ট নং 192 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  },
+  {
+   "no": 193,
+   "id": "r193",
+   "section": null,
+   "area": "unaudited",
+   "name": {
+    "bn": "রিপোর্ট নং 193 (এখনও যাচাই হয়নি)",
+    "en": "Report #193 (not audited yet)",
+    "mix": "Report #193 (not audited yet) (রিপোর্ট নং 193 (এখনও যাচাই হয়নি))"
+   },
+   "question": {
+    "bn": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।",
+    "en": "The name and question appear when audit 3 is merged.",
+    "mix": "অডিট ৩ আসার পর এই রিপোর্টের নাম ও প্রশ্ন বসবে।"
+   },
+   "status": "unaudited",
+   "route": null,
+   "planned": true,
+   "source": "",
+   "grant": "",
+   "kw": [],
+   "note": ""
+  }
+ ],
+ "parser": {
+  "heads": [
+   {
+    "key": "staff_meal",
+    "label": {
+     "bn": "স্টাফের খাবার / নাস্তা",
+     "en": "Staff meals / snacks"
+    },
+    "heads": [
+     "staff_meal"
+    ],
+    "sensitive": true,
+    "en": [
+     "meal",
+     "meals",
+     "lunch",
+     "dinner",
+     "snack",
+     "snacks",
+     "tiffin",
+     "food",
+     "tea"
+    ],
+    "bn": [
+     "খাবার",
+     "নাস্তা",
+     "নাশতা",
+     "দুপুরের",
+     "টিফিন",
+     "খানা",
+     "চায়ের"
+    ]
+   },
+   {
+    "key": "electricity",
+    "label": {
+     "bn": "বিদ্যুৎ বিল",
+     "en": "Electricity"
+    },
+    "heads": [
+     "electricity"
+    ],
+    "utility": [
+     "electricity"
+    ],
+    "en": [
+     "electricity",
+     "electric",
+     "electrical",
+     "power bill",
+     "current bill",
+     "pdb",
+     "desco",
+     "dpdc",
+     "reb"
+    ],
+    "bn": [
+     "বিদ্যুৎ",
+     "বিদ্যুত",
+     "কারেন্ট",
+     "ইলেকট্রিক",
+     "বিদ্যুতের"
+    ]
+   },
+   {
+    "key": "gas",
+    "label": {
+     "bn": "গ্যাস বিল",
+     "en": "Gas"
+    },
+    "heads": [
+     "gas"
+    ],
+    "utility": [
+     "gas"
+    ],
+    "en": [
+     "gas",
+     "lpg",
+     "cylinder"
+    ],
+    "bn": [
+     "গ্যাস",
+     "সিলিন্ডার"
+    ]
+   },
+   {
+    "key": "water",
+    "label": {
+     "bn": "পানির বিল",
+     "en": "Water"
+    },
+    "heads": [
+     "water"
+    ],
+    "utility": [
+     "water"
+    ],
+    "en": [
+     "water",
+     "wasa"
+    ],
+    "bn": [
+     "পানি",
+     "ওয়াসা"
+    ]
+   },
+   {
+    "key": "internet",
+    "label": {
+     "bn": "ইন্টারনেট",
+     "en": "Internet"
+    },
+    "heads": [
+     "internet"
+    ],
+    "utility": [
+     "internet"
+    ],
+    "en": [
+     "internet",
+     "wifi",
+     "broadband"
+    ],
+    "bn": [
+     "ইন্টারনেট",
+     "ওয়াইফাই"
+    ]
+   },
+   {
+    "key": "rent",
+    "label": {
+     "bn": "ভাড়া (বাড়ি/দোকান)",
+     "en": "Rent"
+    },
+    "heads": [
+     "rent"
+    ],
+    "utility": [
+     "rent"
+    ],
+    "en": [
+     "rent",
+     "rental",
+     "lease"
+    ],
+    "bn": [
+     "বাড়িভাড়া",
+     "দোকান ভাড়া",
+     "দোকানভাড়া",
+     "ভাড়া"
+    ],
+    "ambiguous_with": "transport"
+   },
+   {
+    "key": "transport",
+    "label": {
+     "bn": "যাতায়াত / পরিবহন",
+     "en": "Transport"
+    },
+    "heads": [
+     "transport"
+    ],
+    "en": [
+     "transport",
+     "rickshaw",
+     "van",
+     "fare",
+     "delivery cost",
+     "carrying",
+     "travel"
+    ],
+    "bn": [
+     "যাতায়াত",
+     "পরিবহন",
+     "রিকশা",
+     "ভ্যান",
+     "গাড়িভাড়া",
+     "ভাড়া"
+    ],
+    "ambiguous_with": "rent"
+   },
+   {
+    "key": "repair",
+    "label": {
+     "bn": "মেরামত",
+     "en": "Repairs"
+    },
+    "heads": [
+     "repair",
+     "machine_repair"
+    ],
+    "utility": [
+     "machine_repair"
+    ],
+    "en": [
+     "repair",
+     "repairs",
+     "maintenance",
+     "fix",
+     "mechanic"
+    ],
+    "bn": [
+     "মেরামত",
+     "রক্ষণাবেক্ষণ",
+     "মিস্ত্রি"
+    ]
+   },
+   {
+    "key": "hospitality",
+    "label": {
+     "bn": "আপ্যায়ন",
+     "en": "Customer hospitality"
+    },
+    "heads": [
+     "hospitality"
+    ],
+    "en": [
+     "hospitality",
+     "guest",
+     "guests",
+     "entertain"
+    ],
+    "bn": [
+     "আপ্যায়ন",
+     "মেহমান",
+     "অতিথি"
+    ]
+   },
+   {
+    "key": "labour",
+    "label": {
+     "bn": "অস্থায়ী শ্রমিকের মজুরি",
+     "en": "Temporary labour wages"
+    },
+    "heads": [
+     "labour"
+    ],
+    "sensitive": true,
+    "en": [
+     "labour",
+     "labor",
+     "daily wage",
+     "temporary worker"
+    ],
+    "bn": [
+     "শ্রমিক",
+     "দৈনিক মজুরি",
+     "মজুরি"
+    ]
+   },
+   {
+    "key": "marketing",
+    "label": {
+     "bn": "মার্কেটিং",
+     "en": "Marketing"
+    },
+    "heads": [
+     "marketing"
+    ],
+    "en": [
+     "marketing",
+     "advertising",
+     "ad",
+     "ads",
+     "boost",
+     "promotion",
+     "banner",
+     "leaflet"
+    ],
+    "bn": [
+     "মার্কেটিং",
+     "বিজ্ঞাপন",
+     "প্রচার",
+     "বুস্ট"
+    ]
+   },
+   {
+    "key": "sourcing",
+    "label": {
+     "bn": "বাইরের সোর্সিং",
+     "en": "Outside-sourced goods"
+    },
+    "heads": [
+     "sourcing"
+    ],
+    "en": [
+     "sourcing",
+     "outside goods",
+     "outsourced"
+    ],
+    "bn": [
+     "সোর্সিং",
+     "বাইরের মাল"
+    ]
+   }
+  ],
+  "kinds": [
+   {
+    "key": "salary",
+    "kinds": [
+     "salary"
+    ],
+    "sensitive": true,
+    "en": [
+     "salary",
+     "salaries",
+     "wage",
+     "wages",
+     "payroll",
+     "pay slip"
+    ],
+    "bn": [
+     "বেতন",
+     "মাইনে",
+     "বেতনের"
+    ]
+   },
+   {
+    "key": "advance",
+    "kinds": [
+     "advance"
+    ],
+    "sensitive": true,
+    "en": [
+     "advance",
+     "advances",
+     "loan to staff"
+    ],
+    "bn": [
+     "অগ্রিম",
+     "অ্যাডভান্স",
+     "এডভান্স"
+    ]
+   },
+   {
+    "key": "purchase",
+    "kinds": [
+     "purchase"
+    ],
+    "en": [
+     "purchase",
+     "purchases",
+     "bought",
+     "buying",
+     "bill from supplier"
+    ],
+    "bn": [
+     "ক্রয়",
+     "কেনা",
+     "কিনেছি",
+     "কিনলাম"
+    ]
+   },
+   {
+    "key": "supplier_payment",
+    "kinds": [
+     "supplier_payment"
+    ],
+    "en": [
+     "paid to supplier",
+     "supplier payment",
+     "payment to supplier"
+    ],
+    "bn": [
+     "সরবরাহকারীকে পরিশোধ",
+     "মহাজনকে দিয়েছি"
+    ]
+   },
+   {
+    "key": "refund",
+    "kinds": [
+     "customer_refund"
+    ],
+    "en": [
+     "refund",
+     "refunds",
+     "refunded"
+    ],
+    "bn": [
+     "রিফান্ড",
+     "ফেরত দিয়েছি"
+    ]
+   },
+   {
+    "key": "expense",
+    "kinds": [
+     "quick_expense",
+     "expense_voucher"
+    ],
+    "en": [
+     "expense",
+     "expenses",
+     "spent",
+     "spend",
+     "spending",
+     "cost"
+    ],
+    "bn": [
+     "খরচ",
+     "ব্যয়",
+     "খরচা"
+    ]
+   }
+  ],
+  "person_words": {
+   "staff": {
+    "en": [
+     "staff",
+     "employee",
+     "worker",
+     "karigor",
+     "cook",
+     "cashier",
+     "salesman",
+     "salesperson"
+    ],
+    "bn": [
+     "কর্মী",
+     "স্টাফ",
+     "কারিগর",
+     "কর্মচারী",
+     "শ্রমিক",
+     "ক্যাশিয়ার"
+    ]
+   },
+   "supplier": {
+    "en": [
+     "supplier",
+     "vendor",
+     "seller"
+    ],
+    "bn": [
+     "সরবরাহকারী",
+     "মহাজন",
+     "সাপ্লায়ার",
+     "বিক্রেতা"
+    ]
+   },
+   "customer": {
+    "en": [
+     "customer",
+     "client",
+     "buyer"
+    ],
+    "bn": [
+     "গ্রাহক",
+     "কাস্টমার",
+     "ক্রেতা"
+    ]
+   }
+  },
+  "place_words": {
+   "factory": {
+    "en": [
+     "factory"
+    ],
+    "bn": [
+     "কারখানা",
+     "ফ্যাক্টরি"
+    ]
+   },
+   "branch": {
+    "en": [
+     "branch",
+     "outlet",
+     "shop",
+     "showroom"
+    ],
+    "bn": [
+     "শাখা",
+     "দোকান",
+     "শোরুম",
+     "আউটলেট"
+    ]
+   },
+   "godown": {
+    "en": [
+     "godown",
+     "store",
+     "warehouse"
+    ],
+    "bn": [
+     "গোডাউন",
+     "গুদাম"
+    ]
+   }
+  },
+  "ordinals": {
+   "en": {
+    "1st": 1,
+    "first": 1,
+    "2nd": 2,
+    "second": 2,
+    "3rd": 3,
+    "third": 3
+   },
+   "bn": {
+    "প্রথম": 1,
+    "দ্বিতীয়": 2,
+    "তৃতীয়": 3
+   }
+  },
+  "num_words": {
+   "en": {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+    "eleven": 11,
+    "twelve": 12,
+    "a": 1,
+    "an": 1
+   },
+   "bn": {
+    "এক": 1,
+    "দুই": 2,
+    "দু": 2,
+    "তিন": 3,
+    "চার": 4,
+    "পাঁচ": 5,
+    "ছয়": 6,
+    "ছ": 6,
+    "সাত": 7,
+    "আট": 8,
+    "নয়": 9,
+    "দশ": 10,
+    "এগারো": 11,
+    "বারো": 12
+   }
+  },
+  "months": {
+   "en": [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december"
+   ],
+   "en_short": [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+    "dec"
+   ],
+   "bn": [
+    "জানুয়ারি",
+    "ফেব্রুয়ারি",
+    "মার্চ",
+    "এপ্রিল",
+    "মে",
+    "জুন",
+    "জুলাই",
+    "আগস্ট",
+    "সেপ্টেম্বর",
+    "অক্টোবর",
+    "নভেম্বর",
+    "ডিসেম্বর"
+   ]
+  },
+  "period_words": {
+   "last": {
+    "en": [
+     "last",
+     "past",
+     "previous",
+     "prev"
+    ],
+    "bn": [
+     "গত",
+     "শেষ",
+     "বিগত"
+    ]
+   },
+   "this": {
+    "en": [
+     "this",
+     "current"
+    ],
+    "bn": [
+     "এই",
+     "চলতি",
+     "এ "
+    ]
+   },
+   "day": {
+    "en": [
+     "day",
+     "days"
+    ],
+    "bn": [
+     "দিন"
+    ]
+   },
+   "week": {
+    "en": [
+     "week",
+     "weeks"
+    ],
+    "bn": [
+     "সপ্তাহ",
+     "হপ্তা"
+    ]
+   },
+   "month": {
+    "en": [
+     "month",
+     "months"
+    ],
+    "bn": [
+     "মাস"
+    ]
+   },
+   "year": {
+    "en": [
+     "year",
+     "years"
+    ],
+    "bn": [
+     "বছর",
+     "বৎসর"
+    ]
+   },
+   "today": {
+    "en": [
+     "today"
+    ],
+    "bn": [
+     "আজ",
+     "আজকে"
+    ]
+   },
+   "yesterday": {
+    "en": [
+     "yesterday"
+    ],
+    "bn": [
+     "গতকাল",
+     "কাল"
+    ]
+   },
+   "fiscal": {
+    "en": [
+     "fiscal",
+     "financial year"
+    ],
+    "bn": [
+     "অর্থবছর",
+     "অর্থ বছর"
+    ]
+   },
+   "since": {
+    "en": [
+     "since",
+     "from"
+    ],
+    "bn": [
+     "থেকে"
+    ]
+   },
+   "ago": {
+    "en": [
+     "ago"
+    ],
+    "bn": [
+     "আগে"
+    ]
+   }
+  },
+  "measures": {
+   "total": {
+    "en": [
+     "how much",
+     "total",
+     "sum",
+     "amount",
+     "paid",
+     "spent",
+     "cost"
+    ],
+    "bn": [
+     "কত",
+     "মোট",
+     "কত টাকা",
+     "দিয়েছি",
+     "খরচ"
+    ]
+   },
+   "count": {
+    "en": [
+     "how many",
+     "how often",
+     "count",
+     "number of",
+     "times"
+    ],
+    "bn": [
+     "কয়টা",
+     "কয়বার",
+     "কতবার",
+     "কতগুলো",
+     "সংখ্যা"
+    ]
+   },
+   "list": {
+    "en": [
+     "list",
+     "show",
+     "details",
+     "every",
+     "all"
+    ],
+    "bn": [
+     "তালিকা",
+     "দেখাও",
+     "দেখান",
+     "সব"
+    ]
+   },
+   "happened": {
+    "en": [
+     "what happened",
+     "replay",
+     "what went on",
+     "story of"
+    ],
+    "bn": [
+     "কী হয়েছিল",
+     "কি হয়েছিল",
+     "কী ঘটেছিল",
+     "কি ঘটেছিল",
+     "কী হলো",
+     "কি হলো"
+    ]
+   },
+   "compare": {
+    "en": [
+     "compare",
+     "versus",
+     "vs",
+     "changed",
+     "difference between",
+     "why did"
+    ],
+    "bn": [
+     "তুলনা",
+     "বনাম",
+     "বদলেছে",
+     "কেন বাড়ল",
+     "কেন কমল",
+     "পার্থক্য"
+    ]
+   }
+  },
+  "stopwords": {
+   "en": [
+    "the",
+    "of",
+    "for",
+    "in",
+    "on",
+    "at",
+    "to",
+    "was",
+    "were",
+    "is",
+    "are",
+    "did",
+    "do",
+    "we",
+    "i",
+    "my",
+    "me",
+    "our",
+    "much",
+    "many",
+    "what",
+    "how",
+    "when",
+    "where",
+    "who",
+    "which",
+    "a",
+    "an",
+    "and",
+    "or",
+    "by",
+    "with",
+    "from",
+    "it",
+    "that",
+    "this",
+    "last",
+    "past",
+    "month",
+    "months",
+    "year",
+    "years",
+    "day",
+    "days",
+    "week",
+    "weeks",
+    "bill",
+    "bills",
+    "paid",
+    "pay",
+    "spend",
+    "spent",
+    "been",
+    "have",
+    "has",
+    "had",
+    "give",
+    "gave",
+    "given",
+    "show",
+    "tell",
+    "please",
+    "total",
+    "amount",
+    "all",
+    "one",
+    "only",
+    "s",
+    "his",
+    "her",
+    "their",
+    "its",
+    "ago",
+    "than",
+    "then",
+    "cost",
+    "costs",
+    "expense",
+    "expenses",
+    "money",
+    "taka",
+    "tk",
+    "member",
+    "members",
+    "person",
+    "people",
+    "someone",
+    "anyone",
+    "any",
+    "each",
+    "every",
+    "per",
+    "branch",
+    "outlet",
+    "shop",
+    "showroom",
+    "factory",
+    "godown",
+    "store",
+    "also",
+    "so",
+    "if",
+    "be",
+    "can",
+    "could",
+    "should",
+    "would",
+    "there",
+    "about",
+    "during",
+    "between",
+    "over",
+    "into"
+   ],
+   "bn": [
+    "কত",
+    "টাকা",
+    "মোট",
+    "গত",
+    "এই",
+    "মাস",
+    "মাসে",
+    "বছর",
+    "বছরে",
+    "দিন",
+    "দিনে",
+    "সপ্তাহ",
+    "কী",
+    "কি",
+    "কেন",
+    "কবে",
+    "কোথায়",
+    "কে",
+    "একজন",
+    "এক",
+    "জন",
+    "আমি",
+    "আমরা",
+    "আমার",
+    "দিয়েছি",
+    "দিলাম",
+    "দেওয়া",
+    "হয়েছে",
+    "হয়েছিল",
+    "ছিল",
+    "বিল",
+    "খরচ",
+    "খরচা",
+    "ব্যয়",
+    "জন্য",
+    "থেকে",
+    "পর্যন্ত",
+    "এর",
+    "ও",
+    "আর",
+    "বা",
+    "যত",
+    "সব",
+    "দেখাও",
+    "দেখান",
+    "বলো",
+    "বলুন",
+    "পরিশোধ",
+    "করেছি",
+    "করেছে",
+    "করা",
+    "টা",
+    "টি",
+    "বিলের",
+    "জনের",
+    "কোন",
+    "কোনো",
+    "কিছু",
+    "মধ্যে",
+    "প্রতি",
+    "আছে",
+    "ছিলো",
+    "হলো",
+    "হয়",
+    "দিয়েছিলাম",
+    "দিয়েছিল",
+    "কর",
+    "শাখার",
+    "দোকানের",
+    "বাবদ",
+    "বিষয়ে",
+    "ব্যাপারে",
+    "নিয়ে",
+    "হিসেবে",
+    "হিসাবে",
+    "শাখায়",
+    "দোকানে",
+    "খরচে",
+    "বিলে"
+   ]
+  }
+ },
+ "intent_hints": [
+  {
+   "en": [
+    "profit",
+    "loss",
+    "p&l"
+   ],
+   "bn": [
+    "লাভ",
+    "ক্ষতি",
+    "মুনাফা"
+   ],
+   "reports": [
+    3,
+    4,
+    5
+   ]
+  },
+  {
+   "en": [
+    "sales",
+    "sold",
+    "revenue"
+   ],
+   "bn": [
+    "বিক্রি",
+    "বিক্রয়"
+   ],
+   "reports": [
+    11,
+    12,
+    14
+   ]
+  },
+  {
+   "en": [
+    "stock",
+    "inventory"
+   ],
+   "bn": [
+    "স্টক",
+    "মজুত"
+   ],
+   "reports": [
+    56,
+    58,
+    63
+   ]
+  },
+  {
+   "en": [
+    "wastage",
+    "waste"
+   ],
+   "bn": [
+    "অপচয়",
+    "নষ্ট"
+   ],
+   "reports": [
+    76,
+    50
+   ]
+  },
+  {
+   "en": [
+    "due",
+    "owe",
+    "payable"
+   ],
+   "bn": [
+    "বাকি",
+    "পাওনা"
+   ],
+   "reports": [
+    98,
+    99
+   ]
+  },
+  {
+   "en": [
+    "discount"
+   ],
+   "bn": [
+    "ডিসকাউন্ট",
+    "ছাড়"
+   ],
+   "reports": [
+    20,
+    37
+   ]
+  },
+  {
+   "en": [
+    "expiry",
+    "expire"
+   ],
+   "bn": [
+    "মেয়াদ"
+   ],
+   "reports": [
+    69
+   ]
+  }
+ ]
+}

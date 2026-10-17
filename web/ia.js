@@ -100,6 +100,7 @@ const IA = [
   rec('outbox', 'appr', ['ফোনে জমা (পাঠানো হয়নি)', 'Not sent yet', 'Phone-এ জমা (Not sent yet)'], { icon: 'doc', cnt: 'obx', tone: 'warn', kw: ['outbox', 'offline', 'unsent', 'queue', 'জমা', 'পাঠানো হয়নি', 'অফলাইন'] }),
   // Reports & analytics
   rec('reports', 'reports', ['রিপোর্ট', 'Reports', 'Report'], { icon: 'doc', mob: 3, mod: 3, home: { biz: 7, acc: 6 }, kw: ['report', 'sales report', 'stock report', 'export', 'csv', 'রিপোর্ট', 'প্রতিবেদন', 'এক্সপোর্ট'] }),
+  rec('reports/hub', 'reports', ['বিজনেস মেমোরি (কী ঘটেছিল)', 'Business Memory (what happened)', 'Business Memory (কী ঘটেছিল)'], { icon: 'doc', also: ['reports'], ok: any, mob: 3, kw: ['what happened', 'replay', 'day replay', 'timeline', 'why did', 'compare', 'spend', 'how much paid', 'electricity', 'meals', 'audit trail', 'who voided', 'কী ঘটেছিল', 'কী হয়েছিল', 'ইতিহাস', 'খরচ খুঁজুন', 'তুলনা', 'বিদ্যুৎ বিল', 'কে বাতিল করেছে'], verbs: ['see what happened', 'find a spend', 'compare two periods'] }),
   rec('biz', 'reports', 't:biz', { ok: (c) => c.own || c.P('POS', 'approve'), mod: 4.5, home: { acc: 5 }, kw: ['profit', 'loss', 'p&l', 'analysis', 'margin', 'লাভ', 'ক্ষতি', 'বিশ্লেষণ', 'ব্যবসা'] }),
   rec('profitcheck', 'reports', ['Profit check', 'Profit check', 'Profit check'], { icon: 'biz', ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true,
     kw: ['profit', 'one profit number', 'loss', 'wastage', 'shortage', 'partner profit', 'reconcile', 'journal profit', 'brand', 'parity', 'expense report', 'salary'],
