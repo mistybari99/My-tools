@@ -260,3 +260,9 @@ Four settings are ON by default but do nothing until their module is on: `shift_
 9. **Loans and VAT** reports are not built (#127, #128).
 10. **CLAUDE.md**: the Database safety line names only `phase84_test_project_only.sql`; consider adding `phase84b_test_project_only_wave1.sql` (W1-FIX suggestion). Not edited by the integrator.
 11. Sample names in `web/i18n.js` and `web/invoice.js` (see section 8).
+
+## 10. X1 foundation (phases 480 and 481)
+
+Paste after phase 478, in this order: `supabase/phase480.sql`, then `supabase/phase481.sql`. Both paste twice clean. Nothing existing is changed (no old function patched); every new behaviour is OFF.
+Owner switches: `automation_on` (OFF) and `automation_pause_until` (empty) in the Switchboard; every connection on the Connect Center (OFF). Details and the list of names: `docs/integration/X1.md`.
+Not in the paste: `supabase/phase480_test.sql`, `supabase/phase481_test.sql` (tests, fresh test databases only).

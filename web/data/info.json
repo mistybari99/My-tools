@@ -21,6 +21,20 @@
    "verified": true,
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
+  "feature:action_queue": {
+   "title": "Approval queue for proposed actions",
+   "does": "An agent or an automated job can propose one action from a short allowed list. The owner approves or rejects it (a rejection needs a reason). Nothing runs by itself: the owner's own session runs the approved action and records the result.",
+   "why": "A proposal is never a silent change. Every step is in the record.",
+   "default": "The list of allowed actions is empty. Nothing can be proposed until the owner allows an action.",
+   "change": "The owner adds an action to the allowed list. Rules, permissions, the audit trail and money can never be on that list.",
+   "who": "The owner decides. The person who proposed cannot decide the same proposal.",
+   "related": [
+    "feature:agent_accounts",
+    "screen:x1health"
+   ],
+   "verified": false,
+   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
+  },
   "feature:actual_yield": {
    "title": "Actual yield at production",
    "does": "An optional box in the production sheet for the real quantity made.",
@@ -30,6 +44,19 @@
    "who": "Who may post production.",
    "verified": true,
    "src": "RPT-B3 (docs/integration/RPT-B3_info.json)"
+  },
+  "feature:agent_accounts": {
+   "title": "Agent accounts (limited sign-in for software)",
+   "does": "A separate sign-in for an automated agent. It can only ask the gate and propose actions for the owner to approve. It can never hold a role or a permission, and it can never change rules, permissions, the audit trail or money.",
+   "why": "An agent can help, but it can never do what only a person may do.",
+   "default": "None exists. The owner creates one only when needed.",
+   "change": "The owner names an account that has no roles and no permissions.",
+   "who": "Only the owner creates one.",
+   "related": [
+    "feature:action_queue"
+   ],
+   "verified": false,
+   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
   },
   "feature:agreed_prices": {
    "title": "Agreed price per item and supplier",
@@ -1677,6 +1704,20 @@
    "verified": true,
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
+  "feature:x1_gate": {
+   "title": "The gate for outside and AI calls",
+   "does": "Every outside call, AI call and automated write asks one gate first. The gate checks, in order: automation ON, not paused, the connection ON and configured, read-only, do-not-contact for the customer, the monthly call cap, the calls per minute, and dry run. The reason for every answer is logged.",
+   "why": "Nothing is sent to a customer who asked not to be contacted, nothing runs over budget, and nothing writes while the owner is only testing.",
+   "default": "Denies everything until automation is ON, the connection is ON and a monthly cap is set.",
+   "change": "The switches and caps on the Connect Center and in the Switchboard.",
+   "who": "Used by the scheduled jobs and by the approved agents. Staff cannot call it.",
+   "related": [
+    "screen:connect",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
+  },
   "grant:announce_post": {
    "title": "Post announcements and instructions",
    "does": "Lets a person or a role post an announcement. A right without a place can post to everyone, a role, a place or one person. A right limited to one place can post only to that place.",
@@ -2034,6 +2075,34 @@
    ],
    "verified": true,
    "src": "phase89.sql"
+  },
+  "rule:automation_on": {
+   "title": "Automation (all) ON",
+   "does": "The one master switch for everything that talks to the outside or runs on a schedule: outside connections, AI calls, scheduled jobs and proposals made by agents. When it is OFF, every call is refused and every scheduled job is recorded as skipped.",
+   "why": "One place stops everything at once if something goes wrong, and nothing starts by surprise.",
+   "default": "Off. Nothing outside the app runs until the owner switches it on.",
+   "change": "Rule automation_on. The pause rule automation_pause_until stops it for a set time without switching it off.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:automation_pause_until",
+    "screen:connect",
+    "screen:x1health"
+   ],
+   "verified": false,
+   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
+  },
+  "rule:automation_pause_until": {
+   "title": "Pause automation until a time",
+   "does": "Stops all automation until the time written here (ISO time, for example 2026-11-01T00:00:00+06:00). A value that cannot be read counts as paused.",
+   "why": "A safe way to stop everything for a few days (for example during a holiday or an incident) without losing the settings.",
+   "default": "Empty = no pause.",
+   "change": "Write the time in the Switchboard rule. Clear it to end the pause.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (_x1_pause_active)"
   },
   "rule:backdate_max_days_cash_move": {
    "title": "Back-date limit: cash move date",
@@ -4553,6 +4622,20 @@
    "verified": true,
    "src": "phase97.sql; W1-F.md"
   },
+  "screen:connect": {
+   "title": "Connect Center",
+   "does": "One place for every outside connection: website and domain, hosting, Facebook Page, Instagram, WhatsApp Business, SMS gateway, e-mail, bKash and Nagad, AI provider, image reading and analytics. It shows the status, the non-secret settings, the names of the server secrets each one needs and where to set them, and a Test connection button.",
+   "why": "When the owner buys a domain or gets a key, he links it here without changing the app.",
+   "default": "Every connection is OFF and not connected.",
+   "change": "Owner: switch a connection on, set its address (https only), rate and monthly call cap, read-only and dry-run. Secret VALUES are never typed here: they are set on the server under the names shown.",
+   "who": "Only the owner can see and change it.",
+   "related": [
+    "screen:x1health",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
+  },
   "screen:exceptions": {
    "title": "Exceptions",
    "does": "Lists the lines that need a look: red lines are serious and yellow lines are notes. Every override that needs a reason lands here.",
@@ -4854,6 +4937,20 @@
    ],
    "verified": true,
    "src": "phase83.sql; D.md; phase86.sql"
+  },
+  "screen:x1health": {
+   "title": "Automation & integration health",
+   "does": "Shows whether automation is on, whether it is paused, each connection and each scheduled job (ok, failed, stale, never run), failed intake items, the last backup, books freshness and proposals waiting for approval.",
+   "why": "One screen tells the owner what is working and what is not. A missing part is shown as missing, never as healthy.",
+   "default": "Owner only. The owner may add the health widget to the owner board.",
+   "change": "Nothing to set. It only reads.",
+   "who": "Only the owner.",
+   "related": [
+    "screen:connect",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase481.sql (x1_health); web/connect.js"
   },
   "switch:path:expense": {
    "title": "Path switch: expense",

@@ -574,3 +574,10 @@ Not confirmed
 Merge of all finished packages onto one branch; see docs/integration/INTEGRATION.md for merge order, conflicts, renumbering, glue (phase 477), handler renames, test results and what is not covered. Owner paste list: docs/PASTE_ORDER.md.
 - Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
 - Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.
+
+## X1 foundation (phases 480 and 481) - local throwaway Postgres only, nothing pushed
+- Built: Connect Center registry (13 connections, all OFF), job runs and heartbeat, one gate x1_gate for every outside or AI call, agent identities with no role and no grant, audit actor columns (new trigger, no old function patched), approval queue with an allowlist, owner health view, public site config, webhook rotation record. Screens #/connect and #/x1health (owner board widget, off by default), workflow automation.yml (dry run by default), tools/x1_job.py, Test-connection edge source (not deployed).
+- Changed: supabase/phase480*.sql, phase481*.sql (new), tests/sql/ORDER.txt (two lines), web/ia.js (two records), web/index.html (one script tag), web/data/info.json (7 entries merged), tests/web/x1_web_test.js (new), tools/x1_job.py + test, docs/integration/X1.md and X1_info.json.
+- Tests: phase480_test 83/0, phase481_test 43/0, phase99 parity with 480+481 all equal (33 snapshots), test_x1_job OK, x1_web_test OK (360px), ia_test 0 failures, check_info_coverage exit 0.
+- Not confirmed: live Supabase, real GitHub Actions run, deployed Test-connection function, real phone, anon read of site_config (owner decision).
+- Manual checks for the owner: link nothing until a domain or key exists; the first live automation run needs automation_on ON and intake_bots set up (see X1.md section 5).
