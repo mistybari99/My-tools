@@ -51,7 +51,7 @@ const EXTRA_W = `(function(){ const real = window.supabase.createClient; window.
     return { each: want.map((w) => ia.filter((r) => r.route === w).length), pages: want.map((w) => !!(window.BOS_PAGES || {})[w]), groups: want.map((w) => (ia.find((r) => r.route === w) || {}).group),
       homeSlots: want.map((w) => !!(ia.find((r) => r.route === w) || {}).home), dup: ia.length - new Set(ia.map((r) => r.route)).size }; });
   ok(reg.each.every((x) => x === 1), 'each new screen is registered exactly once: ' + reg.each); ok(reg.pages.every(Boolean), 'each new screen has its page function (script tag in index.html): ' + reg.pages);
-  ok(JSON.stringify(reg.groups) === JSON.stringify(['acc', 'acc', 'acc', 'acc', 'acc', 'reports', 'settings', 'cust']), 'groups: ' + reg.groups); ok(reg.dup === 0, 'no duplicate route'); ok(reg.homeSlots.every((x) => !x), 'no Home slot is taken by the new screens');
+  ok(JSON.stringify(reg.groups) === JSON.stringify(['acc', 'acc', 'acc', 'acc', 'acc', 'acc', 'settings', 'cust']), 'groups: ' + reg.groups); ok(reg.dup === 0, 'no duplicate route'); ok(reg.homeSlots.every((x) => !x), 'no Home slot is taken by the new screens');
   await p.close();
 
   // ---------- S1 Home strip ----------
