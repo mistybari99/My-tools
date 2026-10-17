@@ -133,7 +133,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('[data-act=sx_tab][data-v=dm]'); await wait(p, 500); t = await txt(p, '#sx_out'); ok(/data not captured: damaged quantity/.test(t) && /1 receipts without a damaged quantity/.test(t) && /Broken/.test(t), 'damaged tab: not captured is said and counted');
   ok(await p.locator('[data-act=go][data-v="trace/12"]').count() === 1, 'damaged row links to the trace');
   const dcsv = await csvOf(p, '#sx_out [data-act=sx_csv]'); ok(/data not captured: damaged quantity/.test(dcsv), 'damaged CSV');
-  await p.click('[data-act=sx_tab][data-v=yi]'); await wait(p, 500); t = await txt(p, '#sx_out'); ok(/data not captured: actual yield/.test(t) && /-10%/.test(t), 'yield tab: actual yield missing is said'); await noOverflow(p, 'stockx yield'); await p.close();
+  await p.click('[data-act=sx_tab][data-v=yi]'); await wait(p, 500); t = await txt(p, '#sx_out'); ok(await p.locator('#sx_out [data-act=go][data-v="prodreports/yield"]').count() === 1, 'INTEGRATION: the yield tab links to the one Yield screen (Production reports); the SQL yield_report stays'); await noOverflow(p, 'stockx yield'); await p.close();
 
   // ---- purchase line lot fields
   p = await open({}, '#/purchase/new'); await wait(p, 600);

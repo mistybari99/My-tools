@@ -64,7 +64,7 @@ function MOCK(KEYS) {
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); }); p.on('dialog', (d) => d.accept());
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + '\n(' + MOCK.toString() + ')(' + JSON.stringify(KEYS) + ');' }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    if (!withRegistry) await p.route('**/data/report_registry.json', (r) => r.abort());      // INTEGRATION: the old checks below are about the static map; the registry sync has its own check at the end
+    if (!withRegistry) await p.route('**/data/report_registry.json', (r) => r.fulfill({ contentType: 'application/json', body: '{}' }));      // INTEGRATION: the old checks below are about the static map; the registry sync has its own check at the end
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','${lang || 'en'}')}catch(e){}
       window.__BL=[];const _c=URL.createObjectURL.bind(URL);URL.createObjectURL=(b)=>{ if(b&&b.text){ b.text().then(t=>window.__BL.push(t)); } return _c(b); };`);
     await p.goto('http://localhost:8641/' + hash); await p.waitForTimeout(1200); return p;

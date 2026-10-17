@@ -28,8 +28,8 @@ const EXTRA43 = `(function(){ const real = window.supabase.createClient; window.
     if (!args.p_id) { const n = { id: 'cn' + D.length, mobile: args.p.mobile, name: args.p.name, type: args.p.type || 'retail', active: true, tier_id: 1, tier_locked: false, birthday: args.p.birthday || null, balance: 0, spend: 0, orders: 0, last_sale: null, points: 0 }; D.push(n); return { data: { id: n.id, mobile: n.mobile, name: n.name, dup: false }, error: null }; }
     const x = D.find((u) => u.id === args.p_id); if (x && 'active' in args.p) x.active = args.p.active; if (x && args.p.name) x.name = args.p.name; return { data: { id: args.p_id, dup: false }, error: null }; }
   if (fn === 'customer_set_tier') { const x = D.find((u) => u.id === args.p_customer); if (x) { x.tier_id = args.p_tier; x.tier_locked = args.p_lock !== false; } return { data: { id: args.p_customer, changed: true }, error: null }; }
-  if (fn === 'customer_points_adjust') { const x = D.find((u) => u.id === args.p_customer); if (x) x.points += args.p_delta; return { data: { dup: false, balance: x ? x.points : 0 }, error: null }; }
-  if (fn === 'customer_points_redeem') { const x = D.find((u) => u.id === args.p_customer); const v = args.p_points * 0.5; if (args.p_dry) return { data: { dry: true, points: args.p_points, value_taka: v, balance: x.points, balance_after: x.points - args.p_points }, error: null }; x.points -= args.p_points; return { data: { dry: false, points: args.p_points, value_taka: v, balance: x.points }, error: null }; }
+  if ((fn === 'customer_points_adjust' || fn === 'crmf_points_adjust')) { const x = D.find((u) => u.id === args.p_customer); if (x) x.points += args.p_delta; return { data: { dup: false, balance: x ? x.points : 0 }, error: null }; }
+  if ((fn === 'customer_points_redeem' || fn === 'crmf_points_redeem')) { const x = D.find((u) => u.id === args.p_customer); const v = args.p_points * 0.5; if (args.p_dry) return { data: { dry: true, points: args.p_points, value_taka: v, balance: x.points, balance_after: x.points - args.p_points }, error: null }; x.points -= args.p_points; return { data: { dry: false, points: args.p_points, value_taka: v, balance: x.points }, error: null }; }
   if (fn === 'gifts_due') return { data: [{ gift_id: 'g1', rule_id: null, occasion: 'manual:1', kind: 'manual', text_bn: 'বই', text_en: 'A book', value_taka: 150, valid_until: '2026-12-01', issued: true }, { gift_id: null, rule_id: 5, occasion: 'birthday:2026', kind: 'birthday', text_bn: 'মিষ্টির বাক্স', text_en: 'Sweet box', value_taka: 300, valid_until: '2026-12-01', issued: false }], error: null };
   if (fn === 'gift_claim') return { data: { dup: false, id: args.p_gift || 'gx' }, error: null };
   if (fn === 'gift_issue') return { data: { dup: false, id: 'gnew' }, error: null };
@@ -113,7 +113,7 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
   await p.click('.cu-row >> nth=0 >> [data-act=cu_menu]'); await wait(p, 200); await p.click('[data-act=cu_gift]'); await wait(p, 200); await p.fill('#gf_en', 'A book'); await p.fill('#gf_val', '150'); await p.click('[data-act=cu_gift_ok]'); await wait(p, 400);
   c = await calls(p, 'gift_issue'); ok(c.length === 1 && c[0].p_text_en === 'A book' && c[0].p_value === 150 && typeof c[0].p_client === 'string', 'gift_issue sent');
   await p.click('.cu-row >> nth=0 >> [data-act=cu_menu]'); await wait(p, 200); await p.click('[data-act=cu_pts]'); await wait(p, 200); await p.fill('#pt_delta', '-10'); await p.fill('#pt_note', 'wrong entry'); await p.click('[data-act=cu_pts_ok]'); await wait(p, 400);
-  c = await calls(p, 'customer_points_adjust'); ok(c.length === 1 && c[0].p_delta === -10 && c[0].p_note === 'wrong entry', 'points adjusted');
+  c = await calls(p, 'crmf_points_adjust'); ok(c.length === 1 && c[0].p_delta === -10 && c[0].p_note === 'wrong entry', 'points adjusted');
   await p.click('.cu-row >> nth=0 >> [data-act=cu_menu]'); await wait(p, 200); await p.click('[data-act=cu_active]'); await wait(p, 400);
   c = await calls(p, 'customer_save'); ok(c.slice(-1)[0].p.active === false, 'switch off sends active=false');
   // ---------- profile, gifts, redeem ----------
@@ -124,7 +124,7 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
   await p.click('[data-act=cu_claim] >> nth=0'); await wait(p, 500); c = await calls(p, 'gift_claim'); ok(c.length === 2 && c[1].p_gift === 'g1', 'an issued gift is claimed by id');
   await p.click('[data-act=cu_redeem]'); await wait(p, 250); await p.fill('#rd_n', '20'); await p.click('[data-act=cu_redeem_dry]'); await wait(p, 300);
   ok(/worth ৳ 10/.test(await p.locator('#rd_out').innerText()), 'redeem preview shows the taka value'); await p.click('[data-act=cu_redeem_ok]'); await wait(p, 400);
-  c = await calls(p, 'customer_points_redeem'); ok(c.length === 2 && c[0].p_dry === true && c[1].p_dry === false && typeof c[1].p_client === 'string', 'redeem: dry run first, then the real one with a key');
+  c = await calls(p, 'crmf_points_redeem'); ok(c.length === 2 && c[0].p_dry === true && c[1].p_dry === false && typeof c[1].p_client === 'string', 'redeem: dry run first, then the real one with a key');
   // loyalty / gifts off: nothing shown
   p = await open('#/customers', { noLoyal: true, noGifts: true }); await p.click('.cu-row >> nth=0'); await wait(p, 400);
   t = await text(p); ok(!/Redeem points/.test(t) && !/Gifts due/.test(t) && (await calls(p, 'gifts_due')).length === 0, 'switches OFF: no points, no gifts, no gift call');

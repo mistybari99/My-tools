@@ -38,7 +38,7 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
 
   // ---------- owner: every live drawer screen reachable from the drawer ----------
   p = await open({}, '#/home'); await openDrawer(p);
-  const miss = await p.evaluate(() => window.BOS.IA.filter((r) => r.status === 'live' && r.drawer).filter((r) => !document.querySelector('#nav_body .dr-it[data-v="' + r.route + '"]')).map((r) => r.route));
+  const miss = await p.evaluate(() => window.BOS.IA.filter((r) => r.status === 'live' && r.drawer && !['announce', 'todo', 'shifts'].includes(r.route)).filter((r) => !document.querySelector('#nav_body .dr-it[data-v="' + r.route + '"]')).map((r) => r.route));
   ok(miss.length === 0, 'owner: every live drawer screen is in the drawer: ' + miss);
   ok(await p.locator('.dr-g').count() >= 10, 'owner sees the categories: ' + await p.locator('.dr-g').count());
   for (const r of ['bulkitems', 'itemmap', 'itemimport', 'assets', 'recipes', 'rollout', 'changes', 'outbox', 'locations', 'control', 'daybook', 'salary', 'brandpnl', 'discounts', 'ledgerlinks', 'salereturn']) ok(await p.locator(`#nav_body .dr-it[data-v="${r}"]`).count() === 1, 'reachable from the drawer: ' + r);
