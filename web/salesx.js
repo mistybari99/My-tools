@@ -71,6 +71,7 @@ async function loadOrders() {
   if (!O.loc) O.loc = (locs()[0] || {}).id;
   const r = await sb.rpc('online_orders_list', { p_loc: O.loc, p_status: O.status || null, p_from: null, p_to: null, p_limit: 100 });
   if (r.error) throw r.error; O.rows = r.data || [];
+  if (B.c2orders) { await B.c2orders.init(); await B.c2orders.attach(O.rows); }      /* RPT-C2: true balance of closed orders, capture fields; silent when the server has no phase 445+ */
 }
 function drawOrders() {
   const el = $('#sx_body'); if (!el) return;
@@ -88,7 +89,8 @@ function orderCard(o) {
   return `<div class="card stack" data-order="${esc(o.id)}"><div class="row between"><b>#${esc(o.order_no)} · ${esc(o.customer_name)}</b>${chips(o.status)}</div>
     <div class="muted" style="font-size:.85rem">${esc(o.channel)} · ${esc(o.customer_mobile)} · ${esc(o.delivery_mode)}${o.delivery_date ? ' · ' + esc(o.delivery_date) : ''}</div>
     <div class="row between"><span>${esc(T('total'))} ${esc(money(Number(o.subtotal) - Number(o.discount) + Number(o.delivery_charge)))}${Number(o.advance) ? ' · ' + esc(T('adv')) + ' ' + esc(money(o.advance)) : ''}</span><b>${esc(T('balance'))} ${esc(money(o.balance))}</b></div>
-    ${acts ? `<div class="row wrap">${acts}</div>` : ''}</div>`;
+    ${o.c2 && (o.status === 'delivered' || o.status === 'cancelled') ? `<div class="muted" style="font-size:.85rem">${esc(o.status === 'delivered' ? 'Still due on the sale' : 'Owes nothing (cancelled)')}: <b>${esc(money(o.c2.balance))}</b>${o.c2.advance_state && o.c2.advance_state !== 'none' ? ' · ' + esc(o.c2.advance_state.replace(/_/g, ' ')) : ''} · the balance above is total minus advance</div>` : ''}
+    ${acts ? `<div class="row wrap">${acts}</div>` : ''}${B.c2orders && B.c2orders.on('detail') ? `<div class="row"><button type="button" class="mini" data-act="sx_c2_detail" data-id="${esc(o.id)}">Details</button></div>` : ''}</div>`;
 }
 async function ensureItems() {
   if (O.items.length) return;
@@ -115,6 +117,7 @@ function orderForm(o) {
       <label>${esc(T('adv'))}<input id="sx_ad" inputmode="decimal" value="${esc(v.advance || 0)}" style="max-width:6rem"></label>
       <label>${esc(T('advm'))}<select id="sx_am">${[['cash', 'cash'], ['mobile', 'mobileP'], ['card', 'card']].map((c) => `<option value="${c[0]}" ${v.advance_mode === c[0] ? 'selected' : ''}>${esc(T(c[1]))}</option>`).join('')}</select></label></div>
     <label>${esc(T('note'))}<input id="sx_nt" maxlength="300" value="${esc(v.note || '')}"></label>
+    ${B.c2orders ? B.c2orders.formHTML() : ''}
     <button type="button" class="btn primary" data-act="sx_save">${esc(T('save'))}</button></div>`;
 }
 async function openForm(id) {
@@ -122,11 +125,13 @@ async function openForm(id) {
   O.edit = null; O.lines = [];
   if (id) { const r = await sb.from('online_orders').select('*').eq('id', id).maybeSingle(); O.edit = r.data; O.lines = ((O.edit && O.edit.lines) || []).map((l) => ({ item_id: l.item_id, qty: l.qty })); }
   if (!O.lines.length && O.items[0]) O.lines = [{ item_id: O.items[0].id, qty: 1 }];
+  if (B.c2orders) { await B.c2orders.init(); await B.c2orders.preload(O.edit); }
   O.client = rid(); openSheet(orderForm(O.edit));
 }
 const refreshLines = () => { const el = $('#sx_lines'); if (el) el.innerHTML = O.lines.map(lineRow).join(''); };
 const refreshOrders = async () => { await loadOrders(); drawOrders(); };
 Object.assign(H, {
+  sx_c2_detail: (a) => { if (B.c2orders) B.c2orders.detail(a.dataset.id); },
   sx_new: () => openForm(null).catch(fail),
   sx_edit: (a) => openForm(a.dataset.id).catch(fail),
   sx_addline: () => { O.lines.push({ item_id: (O.items[0] || {}).id, qty: 1 }); refreshLines(); },
@@ -134,10 +139,11 @@ Object.assign(H, {
   sx_save: async () => {
     const lines = O.lines.map((l) => ({ item_id: l.item_id, qty: num(l.qty) })); if (lines.some((l) => !(l.qty > 0))) return toast(lab(ERR.bad_qty));
     const adv = num($('#sx_ad').value) || 0;
+    const c2x = B.c2orders ? B.c2orders.read() : null; if (c2x && c2x.badWeight) return toast('The cake weight must be above 0');
     const r = await rpc('online_order_save', { p_id: O.edit ? O.edit.id : null, p_client: O.edit ? null : O.client, p_loc: O.edit ? O.edit.location_id : O.loc, p_channel: $('#sx_ch').value, p_name: $('#sx_n').value, p_mobile: $('#sx_m').value,
       p_address: $('#sx_a').value || null, p_lines: lines, p_delivery_mode: $('#sx_dm').value, p_delivery_by: null, p_delivery_date: $('#sx_dd').value || null, p_charge: num($('#sx_c').value) || 0, p_discount: num($('#sx_d').value) || 0,
       p_advance: adv, p_adv_mode: adv > 0 ? $('#sx_am').value : null, p_adv_wallet: null, p_note: $('#sx_nt').value || null });
-    if (!r) return; closeSheet(); toast(T('saved')); await refreshOrders();
+    if (!r) return; if (B.c2orders) await B.c2orders.afterSave(r.id, c2x); closeSheet(); toast(T('saved')); await refreshOrders();
   },
   sx_st_confirmed: async (a) => { if (await rpc('online_order_status', { p_id: a.dataset.id, p_to: 'confirmed', p_note: null })) await refreshOrders(); },
   sx_st_packed: async (a) => { if (await rpc('online_order_status', { p_id: a.dataset.id, p_to: 'packed', p_note: null })) await refreshOrders(); },
@@ -145,22 +151,26 @@ Object.assign(H, {
     const o = O.rows.find((x) => x.id === a.dataset.id);
     openSheet(`<div class="stack"><h3>${esc(T('cancel'))} #${esc(o.order_no)}</h3><label>${esc(T('reason'))}<input id="sx_cr" maxlength="300"></label>
       ${Number(o.advance) > 0 ? `<label>${esc(T('fate'))} (${esc(money(o.advance))})<select id="sx_cf"><option value="refund">${esc(T('refund'))}</option><option value="adjust">${esc(T('adjust'))}</option><option value="income">${esc(T('income'))}</option></select></label>` : ''}
+      ${B.c2orders ? B.c2orders.refundModeHTML(o) : ''}
       <button type="button" class="btn primary" data-act="sx_cancel_go" data-id="${esc(o.id)}">${esc(T('cancel'))}</button></div>`);
   },
   sx_cancel_go: async (a) => {
-    const r = await rpc('online_order_cancel', { p_id: a.dataset.id, p_reason: $('#sx_cr').value, p_advance_fate: $('#sx_cf') ? $('#sx_cf').value : 'none' });
-    if (r) { closeSheet(); await refreshOrders(); }
+    const base = { p_id: a.dataset.id, p_reason: $('#sx_cr').value, p_advance_fate: $('#sx_cf') ? $('#sx_cf').value : 'none' };
+    const r = B.c2orders ? await rpc(B.c2orders.cancelFn(), B.c2orders.cancelArgs(base)) : await rpc('online_order_cancel', base);
+    if (r) { closeSheet(); if (r.refund === 'due') toast('Refund is due: a person who may move money pays it'); else if (r.refund === 'paid') toast('Refund recorded'); await refreshOrders(); }
   },
   sx_deliver: (a) => {
     const o = O.rows.find((x) => x.id === a.dataset.id);
     openSheet(`<div class="stack"><h3>${esc(T('deliver'))} #${esc(o.order_no)}</h3><b>${esc(T('balance'))} ${esc(money(o.balance))}</b>
       <label>${esc(T('collect'))}<input id="sx_pa" inputmode="decimal" value="${esc(o.balance)}"></label>
       <label>${esc(T('payBy'))}<select id="sx_pm"><option value="cash">${esc(T('cash'))}</option><option value="mobile">${esc(T('mobileP'))}</option><option value="card">${esc(T('card'))}</option></select></label>
+      ${B.c2orders ? B.c2orders.costFieldsHTML() : ''}
       <button type="button" class="btn primary" data-act="sx_deliver_go" data-id="${esc(o.id)}">${esc(T('deliver'))}</button></div>`);
   },
   sx_deliver_go: async (a) => {
     const amt = num($('#sx_pa').value) || 0;
-    const r = await rpc('online_order_deliver', { p_id: a.dataset.id, p_payments: amt > 0 ? [{ mode: $('#sx_pm').value, amount: amt }] : [] });
+    const r = await rpc(B.c2orders ? B.c2orders.deliverFn() : 'online_order_deliver', { p_id: a.dataset.id, p_payments: amt > 0 ? [{ mode: $('#sx_pm').value, amount: amt }] : [] });
+    if (r && B.c2orders) await B.c2orders.afterDeliver(a.dataset.id);
     if (r) { closeSheet(); toast(T('done') + (r.receipt ? ' · ' + T('receipt') + ' ' + r.receipt : '')); await refreshOrders(); }
   },
   sx_linksale: async (a) => {

@@ -1,0 +1,367 @@
+{
+  "package": "RPT-C2",
+  "title": "Order and delivery, customer and staff reports (R4, R5, R6)",
+  "note": "Plain-English texts for the (i) info sheet of each setting, capture box and report. Every entry says what it does, why it matters, the default, what changes if it is switched on, and who can change it. English only. Setting keys are the rule keys of supabase/phase445.sql, 447, 448 and 453.",
+  "entries": [
+    {
+      "key": "order_promise_required",
+      "kind": "setting",
+      "label": "A promised time slot is needed before an app order is confirmed",
+      "what_it_does": "Stops an app order from being confirmed until a promised time slot (from and to) is written.",
+      "why_it_matters": "Without a promised time nobody can say whether a delivery was on time.",
+      "default": "Off. Orders are confirmed as today.",
+      "if_switched": "On: confirming an order with no slot is refused with a clear message. Nothing else changes.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "order_late_grace_minutes",
+      "kind": "setting",
+      "label": "Minutes of grace before a delivery counts as late",
+      "what_it_does": "Adds a grace to the end of the promised slot before the on-time report calls a delivery late.",
+      "why_it_matters": "Some owners allow a few minutes; the system does not guess a number for you.",
+      "default": "Blank. Late means after the end of the promised slot, with no grace.",
+      "if_switched": "A number such as 15 makes a delivery up to 15 minutes after the slot still on time. Only the reports change.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "order_advance_post_on",
+      "kind": "setting",
+      "label": "Post an order advance as a customer advance",
+      "what_it_does": "Records the advance taken on an app order in the books the day it is taken (cash, bank or mobile in; account 2300 customer advance). At delivery the advance is applied to the sale.",
+      "why_it_matters": "Today the advance reaches the books only when the order is delivered, and never if the order is cancelled, so the books and the day book miss money that is in the till.",
+      "default": "Off. The advance reaches the books at delivery, as today.",
+      "if_switched": "On: a person with the cash right records the advance; delivery then collects only what is left and applies the advance. Day book, journal and the advance list show it from the first day. Without the cash right the order stays as before and shows 'advance not recorded in the books yet'.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "order_advance_post_from",
+      "kind": "setting",
+      "label": "Post advances only for orders created on or after",
+      "what_it_does": "A start day for advance posting (YYYY-MM-DD).",
+      "why_it_matters": "Protects history: earlier orders are never touched.",
+      "default": "Blank. With the switch on, every open order.",
+      "if_switched": "Orders created before the day are left exactly as they are.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "order_refund_record_on",
+      "kind": "setting",
+      "label": "Record the refund of a cancelled order advance as real money",
+      "what_it_does": "When a cancelled order's advance is to be refunded, makes a refund record. A person who may move money pays it: cash, bank or mobile goes out and the books follow.",
+      "why_it_matters": "Today choosing 'refund' writes nothing, so a refund can be promised and never paid, or paid with no record.",
+      "default": "Off. Choosing refund writes no money record, as today.",
+      "if_switched": "On: every refund has a record (due or paid). If the advance was never recorded, the cash-in and the cash-out both appear on the day it was found, netting to zero.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "credit_default_days",
+      "kind": "setting",
+      "label": "Default credit days for a customer with none of their own",
+      "what_it_does": "Terms used for customers who have no credit days set.",
+      "why_it_matters": "Without terms nothing can be called overdue.",
+      "default": "Blank. A customer with no days of their own has no terms and is not called overdue.",
+      "if_switched": "Their dues are aged against this number in the credit report.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "credit_risk_watch_days",
+      "kind": "setting",
+      "label": "Overdue this many days = watch",
+      "what_it_does": "The days past due at which a customer is marked 'watch'.",
+      "why_it_matters": "The owner decides how much lateness matters.",
+      "default": "Blank. The risk column says 'rule not set'; ages and amounts are still shown.",
+      "if_switched": "Customers at or above the number show as watch (and high risk when the high number is also set).",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "credit_risk_high_days",
+      "kind": "setting",
+      "label": "Overdue this many days = high risk",
+      "what_it_does": "The days past due at which a customer is marked 'high risk'.",
+      "why_it_matters": "Same reason as the watch number.",
+      "default": "Blank. The risk column says 'rule not set'.",
+      "if_switched": "Customers at or above the number show as high risk. Nothing blocks a sale.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "customers.credit_days",
+      "kind": "capture",
+      "label": "Credit days of a customer",
+      "what_it_does": "How many days a customer may take to pay.",
+      "why_it_matters": "A due date is needed to say what is overdue.",
+      "default": "Blank for everyone.",
+      "if_switched": "Set from the customer card in Customer insight. A change of an existing value needs a reason and is written to the audit log.",
+      "who_can_change": "The owner or a person with the customer_manage right (the right that sets the credit limit)."
+    },
+    {
+      "key": "order_delivery_cost_kinds",
+      "kind": "list",
+      "label": "Kinds of delivery cost",
+      "what_it_does": "The list used when a delivery cost is written (rider pay, fuel, platform or courier fee, other).",
+      "why_it_matters": "Costs need a kind so the report can group them.",
+      "default": "Four kinds. 'Other' needs a note.",
+      "if_switched": "The owner adds kinds through Lists.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "cake_spec",
+      "kind": "capture",
+      "label": "Cake specification on an app order",
+      "what_it_does": "Weight, flavour, message, design and a photo reference written on the app order.",
+      "why_it_matters": "Cake orders were only free text. The register, the history per customer and the cost need the facts.",
+      "default": "Optional boxes on the order form. Nothing is required.",
+      "if_switched": "Filled boxes are saved with the order. Paper form code for a printed cake sheet: to be given by owner.",
+      "who_can_change": "Anyone who may enter online orders."
+    },
+    {
+      "key": "promised_slot",
+      "kind": "capture",
+      "label": "Promised time slot on an app order",
+      "what_it_does": "From and to time of the promised delivery on the delivery day.",
+      "why_it_matters": "On-time delivery cannot be measured from a date alone.",
+      "default": "Optional box. Required only if the switch above is on.",
+      "if_switched": "A change needs a reason and keeps the earlier slot in the trail.",
+      "who_can_change": "Anyone who may enter online orders."
+    },
+    {
+      "key": "delivery_cost",
+      "kind": "capture",
+      "label": "Actual delivery cost",
+      "what_it_does": "The cost really paid for delivering one order (rider, fuel, platform fee).",
+      "why_it_matters": "Delivery cost and order profit could not be known; the customer's delivery charge is the only figure the system had.",
+      "default": "Optional box when delivering. Does not post to the books.",
+      "if_switched": "The cost is information for costing. The payment is still entered as an expense as usual, so nothing is counted twice.",
+      "who_can_change": "Anyone who may enter online orders; the cost is shown only with the cost right."
+    },
+    {
+      "key": "cashier_14_1",
+      "kind": "capture",
+      "label": "Cashier on the daily showroom sheet 14-1",
+      "what_it_does": "The person who handled the till for that sheet (the shift box already exists).",
+      "why_it_matters": "Cash short and over could only be tied to the person who wrote the sheet.",
+      "default": "Optional box on form 14-1.",
+      "if_switched": "Cashier-wise variance fills in from new sheets. Older sheets show as 'cashier not written'.",
+      "who_can_change": "Anyone who fills form 14-1."
+    },
+    {
+      "key": "production_crew",
+      "kind": "capture",
+      "label": "Crew and hours on a production run",
+      "what_it_does": "The workers and the hours each worked on one production run, picked from the staff list.",
+      "why_it_matters": "Output per worker hour needs hours; the run had no worker or time.",
+      "default": "Optional box on the production sheet.",
+      "if_switched": "Runs with a crew feed 'Output per labour hour'; runs without are counted apart.",
+      "who_can_change": "Owner or the stock_production right at that place."
+    },
+    {
+      "key": "production_order_link",
+      "kind": "capture",
+      "label": "Order on a production run",
+      "what_it_does": "Links a production run to an app order (with the quantity for that order).",
+      "why_it_matters": "Order-wise production cost needs to know which order a run was for.",
+      "default": "Optional box on the production sheet.",
+      "if_switched": "The run cost is split by quantity across its orders.",
+      "who_can_change": "Owner, the stock_production right at the place, or a person who enters online orders at the order's place."
+    },
+    {
+      "key": "r153",
+      "kind": "report",
+      "label": "Order register (#153)",
+      "what_it_does": "Every order in one list: app orders, paper 20-1 sheets and paper 20-6 ledger lines, each with its source. Never merged.",
+      "why_it_matters": "Before this the paper report showed nothing for app orders and the app list ignored paper.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r155",
+      "kind": "report",
+      "label": "Cake order register (#155)",
+      "what_it_does": "Cake and custom orders with weight, flavour, message and design, beside the paper custom sheets.",
+      "why_it_matters": "Cake facts were only free text.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r156",
+      "kind": "report",
+      "label": "Advance and outstanding balances (#156)",
+      "what_it_does": "Advances held and what is still to collect. A delivered order is not shown as owed unless its sale really has an amount left.",
+      "why_it_matters": "The old list showed delivered orders as owing their advance-reduced total.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r159",
+      "kind": "report",
+      "label": "Delayed and undelivered orders (#159)",
+      "what_it_does": "Open orders whose promised time has passed. Orders with no promised date are counted apart, not judged.",
+      "why_it_matters": "Late orders were found by hand.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r158",
+      "kind": "report",
+      "label": "On-time delivery (#158)",
+      "what_it_does": "Share of delivered app orders that arrived by their promised slot, with the basis (slot or day only).",
+      "why_it_matters": "No promised time existed.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r163",
+      "kind": "report",
+      "label": "Order fulfilment rate (#163)",
+      "what_it_does": "Delivered, cancelled and still open of the orders taken, per source.",
+      "why_it_matters": "Open orders are not counted as failures.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r157",
+      "kind": "report",
+      "label": "Cancellations and refunds (#157)",
+      "what_it_does": "Cancelled orders with the reason and where the advance stands, and the refund records.",
+      "why_it_matters": "A refund could be chosen and never paid.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r162",
+      "kind": "report",
+      "label": "Delivery cost (#162)",
+      "what_it_does": "What the customer paid for delivery against the cost written. Orders with no cost written are counted apart.",
+      "why_it_matters": "Only the customer's charge was known.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r160",
+      "kind": "report",
+      "label": "Order production cost (#160)",
+      "what_it_does": "The share of each linked production run's cost that belongs to an order.",
+      "why_it_matters": "Runs had no order.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r161",
+      "kind": "report",
+      "label": "Order profit (#161)",
+      "what_it_does": "Sale value less goods cost less delivery cost, only where every cost is known.",
+      "why_it_matters": "Never shown as a profit when a cost is missing.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r138",
+      "kind": "report",
+      "label": "Credit risk and overdue (#138)",
+      "what_it_does": "Customers who owe, aged oldest-first by the same rule as the dues list, against their credit days.",
+      "why_it_matters": "Only age buckets existed, with no due date.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r139",
+      "kind": "report",
+      "label": "Customer lifetime value (#139)",
+      "what_it_does": "Orders and revenue over all time (no 365-day cap), returns, first and last sale; margin only where cost is known.",
+      "why_it_matters": "The hub report refuses ranges over 365 days.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r140",
+      "kind": "report",
+      "label": "Returns and complaints per customer (#140)",
+      "what_it_does": "Sale returns and 20-3 complaint sheets matched by phone; sheets that cannot be matched are counted apart.",
+      "why_it_matters": "Complaints had no customer view.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r141",
+      "kind": "report",
+      "label": "Special order history (#141)",
+      "what_it_does": "Cake and custom orders per customer with flavours, birthday and anniversary as entered.",
+      "why_it_matters": "No link from order to customer.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r142",
+      "kind": "report",
+      "label": "Attendance summary for a period (#142)",
+      "what_it_does": "Days by status, late, worked and overtime per person from the app day records; days with no record counted apart.",
+      "why_it_matters": "The hub report read paper only and showed nothing.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r147",
+      "kind": "report",
+      "label": "Overtime and late variance (#147)",
+      "what_it_does": "Worked time against the shift and overtime waiting for approval; only days with a shift are compared.",
+      "why_it_matters": "No scheduled-against-worked view.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r148",
+      "kind": "report",
+      "label": "Sales per labour hour (#148)",
+      "what_it_does": "Sales against labour hours with the punch coverage; a figure appears only where hours exist.",
+      "why_it_matters": "Hours and sales were never joined.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r149",
+      "kind": "report",
+      "label": "Output per labour hour (#149)",
+      "what_it_does": "Finished goods per crew hour over runs with a crew; coverage shown.",
+      "why_it_matters": "Runs had no crew or hours.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "r150",
+      "kind": "report",
+      "label": "Cashier cash variance (#150)",
+      "what_it_does": "Cash short and over by cashier and shift from form 14-1, with the decision on each shortage case.",
+      "why_it_matters": "Variance could only be tied to the sheet writer.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    },
+    {
+      "key": "salary",
+      "kind": "report",
+      "label": "Salary basis notice",
+      "what_it_does": "Which salary figure the staff-cost and profit reports use, beside the 02-2 sheets and the payroll runs. Changes nothing.",
+      "why_it_matters": "The two sources differ and nothing said which one a report used.",
+      "default": "Open to the owner and to holders of the existing report rights; only the places the person may see.",
+      "if_switched": "Reading changes nothing. A missing figure shows as 'not captured', never as 0. Every table has a CSV and, where it makes sense, a drill-down.",
+      "who_can_change": "Nobody changes it; it is a report."
+    }
+  ]
+}

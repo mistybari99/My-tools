@@ -255,9 +255,11 @@ async function openProduction(pre) {
     <div><label for="pr_b">${esc(T('batches'))}</label><input id="pr_b" inputmode="decimal" value="${esc(PS.batches)}"></div>
     <div><label for="pr_made">${esc(T('madeAt'))}</label><input id="pr_made" type="datetime-local" value="${now}"></div>
     <div><label for="pr_note">${esc(T('note'))}</label><input id="pr_note" autocomplete="off"></div>
+    <div id="pr_c2">${B.c2prod ? B.c2prod.fieldsHTML() : ''}</div>
     <div id="pr_pv"><p class="muted">${esc(T('nothing'))}</p></div></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" id="pr_go" data-act="rc_post">${esc(T('post'))}</button></div>`);
   runPreview();
+  if (B.c2prod) B.c2prod.prepare(loc).then(() => { const bx = $('#pr_c2'); if (bx) bx.innerHTML = B.c2prod.fieldsHTML(); }, () => {});      /* RPT-C2: crew / order fields, silent without phases 452 / 457 */
 }
 function schedulePreview() { if (PS) { clearTimeout(PS.timer); PS.timer = setTimeout(runPreview, 250); } }
 async function runPreview() {
@@ -281,10 +283,12 @@ async function postProduction(btn) {
   if (!PS || PS.busy) return; await runPreview();
   const b = nnum(PS.batches); if (!PS.recipe || !(b > 0)) return toast(T('nothing'));
   const m = ($('#pr_made') || {}).value, note = (($('#pr_note') || {}).value || '').trim() || null;
+  const c2x = B.c2prod ? B.c2prod.read() : null; if (c2x && B.c2prod.bad(c2x)) return toast(B.c2prod.bad(c2x));
   PS.busy = true; if (btn) btn.disabled = true;
   try {
     const r = await sb.rpc('production_post', { p_loc: PS.loc, p_recipe: PS.recipe, p_batches: b, p_client: PS.client, p_made_at: m ? m + ':00+06:00' : null, p_note: note });
     if (r.error) return errMsg(r.error, { grant: 'stock_production', loc: PS.loc, context: { recipe: PS.recipe } });
+    if (c2x && r.data && r.data.run_id && !r.data.dup) await B.c2prod.save(r.data.run_id, c2x);
     closeSheet(); toast(r.data && r.data.dup ? lab(X.saved) : T('done')); PS = null;
     await load(); if ($('#rc_main')) { if (D.tab === 'make') drawMake(); }
     if ($('#s2_main') && S2().sheetStart) { /* the stock hub refreshes on its next load */ }
