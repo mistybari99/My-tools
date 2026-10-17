@@ -68,13 +68,34 @@ function draw() {
   const el = $('#cs_body'); if (!el) return;
   const tabs = [['rec', 'tRec'], ['pool', 'tPool'], ['loc', 'tLoc'], ['true', 'tTrue'], ['runs', 'tRuns']];
   el.innerHTML = `<div class="tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${tabs.map((t) => `<button type="button" data-act="cs_tab" data-v="${t[0]}" class="${D.tab === t[0] ? 'on' : ''}" style="min-width:0;flex:1 1 30%">${esc(T(t[1]))}</button>`).join('')}</div><div id="cs_pane">${pane()}</div>`;
+  if (D.tab === 'rec') loadGaps();
 }
 const pane = () => (D.tab === 'rec' ? paneRec() : D.tab === 'pool' ? panePool() : D.tab === 'loc' ? paneLoc() : D.tab === 'true' ? paneTrue() : paneRuns());
 const locSel = (id) => `<label>${esc(T('place'))}<select id="${id}">${locOpts()}</select></label>`;
 
 /* ---------- recipes ---------- */
 function paneRec() {
-  return `<div class="card stack">${locSel('cs_loc_r')}</div>` + (D.recipes.length ? D.recipes.map((r) => `<div class="card row between wrap"><b>${esc(itemName(r.item_id))} · v${r.version}${r.active ? '' : ' (off)'}</b><button type="button" class="btn" data-act="cs_open" data-id="${esc(r.id)}">${esc(T('open'))}</button></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`);
+  return `<div class="card stack">${locSel('cs_loc_r')}</div>` + (D.recipes.length ? D.recipes.map((r) => `<div class="card row between wrap"><b>${esc(itemName(r.item_id))} · v${r.version}${r.active ? '' : ' (off)'}</b><button type="button" class="btn" data-act="cs_open" data-id="${esc(r.id)}">${esc(T('open'))}</button></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`) + `<div id="cs_gaps"></div>`;
+}
+/* RPT-C1: the screen for d_recipe_cost_gaps (phase 83): ingredients and packaging of active recipes that have no cost under the chosen method. Read only; CSV through c1_export_log. English labels only. */
+const GAP = { rows: null, loc: null, err: null };
+const gapT = { title: 'Ingredients and packaging with no cost', intro: 'These materials are used by an active recipe at this place but have no cost under the chosen cost method, so the recipe cost is incomplete (it is shown as incomplete, never as 0).', none: 'Every material of the active recipes has a cost.', recipes: 'recipes', csv: 'CSV', kind: 'Kind', noperm: 'You may not see costs of this place.' };
+async function loadGaps() {
+  const el = $('#cs_gaps'); if (!el || D.tab !== 'rec' || !D.loc) return;
+  let r; try { r = await sb.rpc('d_recipe_cost_gaps', { p_loc: D.loc }); } catch (e) { r = { error: e }; }
+  const box = $('#cs_gaps'); if (!box) return;
+  if (r.error) { GAP.rows = null; box.innerHTML = /not allowed/.test(r.error.message || '') ? `<p class="muted">${esc(gapT.noperm)}</p>` : ''; return; }      // phase 83 not pasted: nothing to show
+  GAP.rows = r.data || []; GAP.loc = D.loc;
+  box.innerHTML = `<div class="card stack"><b>${esc(gapT.title)}</b><p class="muted">${esc(gapT.intro)}</p>${GAP.rows.length ? GAP.rows.map((g) => `<div class="row between wrap"><span>${esc(g.code)} · ${esc(lab({ bn: g.name_bn, mix: g.name_bn, en: g.name_en || g.name_bn }))} <small class="muted">${esc(g.kind)}${(g.roles || []).length ? ' · ' + esc(g.roles.join(', ')) : ''}</small></span><span class="chip warn">${esc(String(g.recipes))} ${esc(gapT.recipes)}</span></div>`).join('') : `<p class="notice ok">${esc(gapT.none)}</p>`}
+    ${GAP.rows.length ? `<button type="button" data-act="cs_gapcsv">${esc(gapT.csv)}</button>` : ''}</div>`;
+}
+async function gapCsv() {
+  const C = B.c1; if (!C || !GAP.rows) return;
+  if (!(await C.exportOk('recipe_cost_gaps', 'csv', { loc: GAP.loc }, GAP.rows.length))) return;
+  const out = [C.csvLine(['code', 'name', 'kind', 'roles', 'active_recipes', 'cost_method'])];
+  GAP.rows.forEach((g) => out.push(C.csvLine([g.code, g.name_en || g.name_bn, g.kind, (g.roles || []).join('; '), g.recipes, g.method])));
+  out.push(''); C.metaLines('Materials with no cost', [['Place', String(GAP.loc)]]).forEach((m) => out.push(C.csvLine(m)));
+  C.download('recipe-cost-gaps.csv', C.csvFile(out)); C.expDone();
 }
 function costBlock(c) {
   const rw = (c.rows || []).map((r) => `<tr><td>${esc(r.row === 'raw' ? T('raw') : r.row === 'packaging' ? T('pack') : T('conv'))}${r.row === 'conversion' && r.mode ? ` <span class="muted">(${esc(r.mode)})</span>` : ''}</td><td style="text-align:right">${money(r.amount)}${r.row === 'conversion' && r.complete === false ? ` <span class="chip warn">${esc(T('incomplete'))}</span>` : ''}</td></tr>`).join('');
@@ -154,6 +175,7 @@ async function refresh() { try { await loadBase(); if (D.tab === 'pool') await l
 Object.assign(H, {
   cs_tab: async (a) => { D.tab = a.dataset.v; try { if (D.tab === 'pool') await loadPools(); } catch (e) { errMsg(e); } draw(); },
   cs_open: (a) => openRecipe(a.dataset.id).catch(errMsg),
+  cs_gapcsv: gapCsv,
   cs_rcnew: () => { D.rc.edit = null; rateForm(null); },
   cs_rcedit: (a) => { const x = (D.rc.rows || []).find((r) => String(r.id) === a.dataset.id); D.rc.edit = x || null; rateForm(x || null); },
   cs_rcret: async (a) => { const r = await sb.rpc('recipe_cost_component_retire', { p_id: Number(a.dataset.id) }); if (r.error) return errMsg(r.error); toast(T('saved')); openRecipe(D.rc.id).catch(errMsg); },

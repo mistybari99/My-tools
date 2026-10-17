@@ -148,9 +148,9 @@ const KINDS = {
   payroll: { g: 'money', num: true, l: L('এই মাসের বেতন দেয় (শিট থেকে)', 'Payroll due this month', 'এই মাসের payroll due'), route: 'salary', async load(env) {
     const d = await rpc('salary_report', { p_loc: null, p_month: env.td.slice(0, 8) + '01' }); if (!d || !d.totals) throw new Miss('empty');
     return { value: money(d.totals.net), num: N(d.totals.net), tone: 'info', sub: `${N(d.totals.people)} ${lab(L('জন', 'people', 'people'))} · ${N(d.sheets)} ${lab(L('শিট', 'sheets', 'sheets'))}`, route: 'salary' }; } },
-  balance_check: { g: 'money', num: true, l: L('হিসাবের ব্যালেন্স শিট মিলছে?', 'Balance sheet check', 'Balance sheet মিলছে?'), route: 'biz', async load() {
-    const d = await rpc('balance_sheet'); if (!d || typeof d !== 'object') throw new Miss('empty');
-    const a = N(d.assets), le = N(d.liabilities) + N(d.equity), diff = d.diff !== undefined ? N(d.diff) : d.difference !== undefined ? N(d.difference) : a - le, okb = Math.abs(diff) < 0.5;
+  balance_check: { g: 'money', num: true, l: L('হিসাবের ব্যালেন্স শিট মিলছে?', 'Balance sheet check', 'Balance sheet মিলছে?'), route: 'biz', async load(env) {
+    const d = await rpc('acct_balance_sheet', { p_as_of: env.td, p_loc: null }); if (!d || typeof d !== 'object' || d.data_needed) throw new Miss('empty');      // RPT-C1: the old call 'balance_sheet' never existed on the server; the books function is acct_balance_sheet
+    const a = N(d.total_assets), le = d.total_liabilities_and_equity !== undefined ? N(d.total_liabilities_and_equity) : N(d.total_liabilities) + N(d.total_equity_and_earnings), diff = d.difference !== undefined ? N(d.difference) : a - le, okb = Math.abs(diff) < 0.5;
     return { value: okb ? '✓' : money(Math.abs(diff)), num: Math.abs(diff), tone: okb ? 'ok' : 'bad', sub: okb ? lab(L('মিলেছে', 'Balanced', 'Balanced')) : lab(L('অমিল', 'Out of balance', 'Out of balance')), route: 'biz' }; } },
   // RPT-B4 (phase 411): this month's sales target against what the outlets have achieved. No target set = the tile says so; a source that is not installed or not allowed hides it (Miss).
   target_vs: { g: 'sales', num: true, l: L('এই মাসের লক্ষ্য বনাম অর্জন (শাখা অনুযায়ী)', 'This month: target vs achievement per outlet', 'এই মাসের target vs achievement'), route: 'targets', async load() {
