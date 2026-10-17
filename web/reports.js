@@ -37,6 +37,7 @@ const X = {
   totalrow: L('মোট', 'Total', 'Total'), back: L('আগের অবস্থায় ফিরুন', 'Back to previous view', 'আগের View-তে ফিরুন'),
   period: L('সময়', 'Period', 'Period'), drillhint: L('সারিতে চাপলে সেই অংশের ফিল্টার বসে', 'Tap a row to filter to it', 'Row-তে চাপলে সেই অংশের Filter বসে'),
   srchint: L('সারিতে চাপলে মূল লেনদেনগুলো দেখা যাবে', 'Tap a row to see the transactions behind it', 'Row-তে চাপলে মূল লেনদেন দেখা যাবে'), srcnone: L('এই সারির মূল লেনদেন পাওয়া যায়নি', 'No source transactions found for this row', 'এই row-র মূল লেনদেন পাওয়া যায়নি'),
+  cmpw: L('এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই তারিখ)', 'Compare with (optional; blank = the same dates last year)', 'Compare with (ঐচ্ছিক; না দিলে গত বছরের একই তারিখ)'),
   nodrill: L('এই সারিতে আর গভীরে যাওয়া যায় না', 'No deeper view for this row', 'এই row-তে আর deeper view নেই'),
   empty: L('তথ্য দরকার: এই সময়/ফিল্টারে কিছু নেই', 'Data needed: nothing matches this period / filters', 'Data দরকার: এই সময়/ফিল্টারে কিছু নেই'),
   need: L('তথ্য দরকার', 'Data needed', 'Data দরকার'), nc: L('ধরা হয়নি', 'Not captured', 'ধরা হয়নি / Not captured'),
@@ -211,6 +212,7 @@ function drawTop() {
     <div class="rp-sel">${isAgg ? `<div><label for="rp_g1">${esc(T('group'))}</label><select id="rp_g1"><option value="" ${V.group === null ? 'selected' : ''}>${esc(T('dflt'))}</option><option value="total" ${V.group === 'total' ? 'selected' : ''}>${esc(T('total'))}</option>${dims.map((x) => optDim(x, V.group)).join('')}</select></div>` : ''}
       <div><label for="rp_s1">${esc(T('sort'))}</label><select id="rp_s1"><option value="">${esc(T('dflt'))}</option>${sortOpts}</select></div>
       ${isAgg && d.kind === 'agg' && eg.length === 1 && V.group !== 'total' ? `<div><label for="rp_g2">${esc(T('then'))}</label><select id="rp_g2"><option value="">${esc(T('none'))}</option>${dims.map((x) => optDim(x, V.group2, eg[0])).join('')}</select></div>` : ''}</div>
+    ${V.key === 'y2_festival_compare' ? `<div class="rp-prev" id="rp_prev"><label for="rp_pf">${esc(T('cmpw'))}</label><div class="row"><input type="date" id="rp_pf" value="${esc(V.f.prev_from || '')}" aria-label="${esc(T('cmpw'))}"><input type="date" id="rp_pt" value="${esc(V.f.prev_to || '')}" aria-label="${esc(T('cmpw'))}"></div></div>` : ''}
     ${isAgg && d.compare ? `<div class="rp-cmp"><button class="tog ${V.compare ? 'on' : ''}" data-act="rp_cmp" aria-pressed="${!!V.compare}">${esc(T('compare'))}</button>
       ${V.compare ? `<div class="seg rp-seg" role="group">${['prev', 'week', 'year'].map((m) => `<button data-act="rp_cm" data-v="${m}" aria-pressed="${V.compare === m}">${esc(T('c_' + m))}</button>`).join('')}</div>` : ''}</div>` : ''}`;
   drawMeta();
@@ -510,6 +512,7 @@ document.addEventListener('change', (e) => {
   const id = e.target.id;
   if (id === 'rp_g1') { V.group = e.target.value === '' ? null : e.target.value; V.group2 = null; V.sort = null; V.stack = []; persist(); drawTop(); run(false); }
   else if (id === 'rp_g2') { V.group2 = e.target.value || null; V.sort = null; persist(); drawTop(); run(false); }
+  else if (id === 'rp_pf' || id === 'rp_pt') { const k = id === 'rp_pf' ? 'prev_from' : 'prev_to'; if (e.target.value) V.f[k] = e.target.value; else delete V.f[k]; V.page = 1; persist(); run(false); }
   else if (id === 'rp_s1') { V.sort = e.target.value || null; persist(); run(false); }
 });
 

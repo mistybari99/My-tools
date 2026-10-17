@@ -51,10 +51,13 @@ select stock_post(:'i_k'::uuid,1,-2,'wastage','wastage','rb1-w-b',null,null,now(
 select stock_post(:'i_k2'::uuid,1,-1,'wastage','wastage','rb1-w-c',null,null,now()) is not null as w19 \gset
 select sale_return(gen_random_uuid(), :'s_kw'::uuid, format('[{"item_id":"%s","qty":1}]',:'i_k')::jsonb, (select value_code from option_lists where list_code='return_reasons' and active order by 1 limit 1), 'test', 'cash') ->> 'id' as r_k \gset
 
--- last year (direct rows: no stock movement)
+-- last year (direct rows: the triggers are off for this insert so no stock moves; the sales facts are loaded by hand)
+set session_replication_role = replica;
 insert into sales (location_id, receipt, sale_date, sold_at, lines, subtotal, discount, total, pay_mode, status, created_by, created_staff, paid)
  select 1, 880000 + n, ((now() at time zone 'Asia/Dhaka')::date - d - interval '1 year')::date, now() - d * interval '1 day' - interval '1 year',
         format('[{"item_id":"%s","qty":%s,"price":%s,"amount":%s}]', it, q, pr, q * pr)::jsonb, q * pr, 0, q * pr, 'cash', 'done', :'o'::uuid, 'test_owner_rb1', q * pr
    from (values (1, 1, :'i_k'::uuid, 20, 60), (2, 1, :'i_k'::uuid, 20, 60), (3, 0, :'i_a'::uuid, 5, 100), (4, 2, :'i_l'::uuid, 7, 25)) v(n, d, it, q, pr);
+reset session_replication_role;
+select count(rpt_fact_load(id)) as n_facts from sales where receipt >= 880000 \gset
 select count(*) as n_ly from sales where receipt >= 880000 \gset
 select :'n_ly' as last_year_sales;
