@@ -574,3 +574,11 @@ Not confirmed
 Merge of all finished packages onto one branch; see docs/integration/INTEGRATION.md for merge order, conflicts, renumbering, glue (phase 477), handler renames, test results and what is not covered. Owner paste list: docs/PASTE_ORDER.md.
 - Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
 - Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.
+
+## XB (order-to-cash, part 1 of 3; branch xb-orders)
+
+- Built (backend only): mobile payment capture, verify, screenshot, statement import and tie-out (phase 540); custom-cake quote, chain, capacity, lead time, cancel via c2_order_cancel, due sheet, customer text (phase 541); riders, zones, delivery states, COD deposits, per-rider reconciliation and cases (phase 542); payment-SMS reader web/xb_paysms.js.
+- Not built: festival playbook, ingredient pre-purchase list, web screens, most of item 5. Details in docs/integration/XB.md section 5.
+- Tests: 102 SQL checks (phase540 36, phase541 37, phase542 29; each pasted twice on a local throwaway Postgres, port 5860), 32 SMS samples. check_no_demo_leak OK.
+- Not confirmed: live Supabase, real bKash / Nagad / Rocket SMS wording, defaults-parity snapshot, journal balance run, Bangla wording of new texts.
+- Manual checks for the owner: read docs/integration/XB.md section 3 and 5 before switching anything on; the three new switches are OFF by default.
