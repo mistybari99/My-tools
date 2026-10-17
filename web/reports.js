@@ -34,7 +34,7 @@ const X = {
   compare: L('আগের সাথে তুলনা', 'Compare', 'Compare (তুলনা)'), c_prev: L('আগের সময়', 'Previous period', 'Previous period'), c_week: L('গত সপ্তাহ', 'Last week', 'Last week'), c_year: L('গত বছর', 'Last year', 'Last year'),
   vs: L('তুলনা', 'vs', 'vs'), new_: L('নতুন', 'new', 'new'),
   more: L('আরও দেখান', 'Show more', 'আরও দেখান'), of: L('/', 'of', '/'), rows: L('সারি', 'rows', 'rows'),
-  totalrow: L('মোট', 'Total', 'Total'), back: L('আগের অবস্থায় ফিরুন', 'Back to previous view', 'আগের View-তে ফিরুন'),
+  nocap: L('সংগ্রহ হয়নি', 'Not captured', 'Not captured'), totalrow: L('মোট', 'Total', 'Total'), back: L('আগের অবস্থায় ফিরুন', 'Back to previous view', 'আগের View-তে ফিরুন'),
   period: L('সময়', 'Period', 'Period'), drillhint: L('সারিতে চাপলে সেই অংশের ফিল্টার বসে', 'Tap a row to filter to it', 'Row-তে চাপলে সেই অংশের Filter বসে'),
   nodrill: L('এই সারিতে আর গভীরে যাওয়া যায় না', 'No deeper view for this row', 'এই row-তে আর deeper view নেই'),
   empty: L('তথ্য দরকার: এই সময়/ফিল্টারে কিছু নেই', 'Data needed: nothing matches this period / filters', 'Data দরকার: এই সময়/ফিল্টারে কিছু নেই'),
@@ -233,7 +233,7 @@ function callRun(page) {
 }
 async function run(append) {
   const tok = ++V.tok; V.loading = true; V.err = null;
-  if (!append) { V.page = 1; V.res = null; V.rows = []; } else V.page += 1;
+  if (!append) { V.page = 1; V.res = null; V.rows = []; V.cn = []; } else V.page += 1;
   drawRes();
   let r; try { r = await callRun(V.page); } catch (e) { r = { error: e }; }
   if (tok !== V.tok) return; V.loading = false;
@@ -242,8 +242,15 @@ async function run(append) {
   V.rows = append ? V.rows.concat(res.rows || []) : (res.rows || []);
   if (append && V.res) { res.compare = V.res.compare; res.totals = res.totals || V.res.totals; }
   V.res = res;
+  if (!append) loadNotes(tok);      /* RPT-C1 hook 1: the basis lines of this report (report_notes, phase 440) */
   if (V.sort && !(res.columns || []).some((c) => c.key === V.sort.replace(/^-/, ''))) V.sort = null;
   drawTop(); drawRes();
+}
+
+// RPT-C1 hook 1 (see docs/integration/RPT-C1.md): never blocks the report; an old database or a report without topics answers []
+function loadNotes(tok) {
+  if (!B.reportnotes || !V.res) return;
+  B.reportnotes.load(V.key, F.clean(V.f), (V.res.columns || []).map((c) => c.key)).then((n) => { if (tok !== V.tok || !n.length) return; V.cn = n; drawRes(); }, () => {});
 }
 
 // ---------- result drawing ----------
@@ -316,13 +323,14 @@ function drawRes(errTxt) {
           const num = c.role !== 'dim' && ['money', 'int', 'num', 'pct'].includes(c.type);
           const dl = cmp && c.role === 'measure' && (c.type === 'money' || c.type === 'int' || c.type === 'num') ? deltaHTML(c.key, row[c.key], pr ? pr[c.key] : 0) : '';
           return `<${ci === 0 ? 'th scope="row"' : 'td'} class="${num ? 'n' : ''}">${esc(fmtVal(c, row))}${dl}</${ci === 0 ? 'th' : 'td'}>`; }).join('')}</tr>`; }).join('')}</tbody>
-      ${tot ? `<tfoot><tr>${cols.map((c, ci) => `<${ci === 0 ? 'th' : 'td'} class="${ci && c.role !== 'dim' ? 'n' : ''}">${ci === 0 ? esc(T('totalrow')) : tot[c.key] !== undefined && tot[c.key] !== null ? esc(fmtVal(c, tot)) : ''}</${ci === 0 ? 'th' : 'td'}>`).join('')}</tr></tfoot>` : ''}</table></div>
+      ${tot ? `<tfoot><tr>${cols.map((c, ci) => `<${ci === 0 ? 'th' : 'td'} class="${ci && c.role !== 'dim' ? 'n' : ''}">${ci === 0 ? esc(T('totalrow')) : tot[c.key] !== undefined && tot[c.key] !== null ? esc(fmtVal(c, tot)) : tot[c.key] === null && c.role !== 'dim' ? `<small class="muted">${esc(T('nocap'))}</small>` : ''}</${ci === 0 ? 'th' : 'td'}>`).join('')}</tr></tfoot>` : ''}</table></div>
       ${drillable ? `<div class="muted rp-hint">${esc(T('drillhint'))}</div>` : ''}`;
   }
   const pg = res.page || {}, shown = (V.rows || []).length;
   const more = res.has_more ? `<button class="full" data-act="rp_more" ${V.loading ? 'disabled' : ''}>${esc(T('more'))} · ${shown} ${esc(T('of'))} ${esc(String(Math.min(pg.groups || shown, pg.cap || 500)))}</button>` : '';
   const exp = (ok, act, label) => (ok ? `<button data-act="${act}">${esc(label)}</button>` : noperm() === 'lock' ? `<button disabled aria-label="${esc(label + ' · ' + T('exp_lock'))}">${LOCK.replace('<svg', '<svg width="16" height="16"')} ${esc(label)}</button>` : '');
-  box.innerHTML = `${noteH}${stats}${empty ? `<div class="notice warn mk warn">${esc(T('empty'))}</div>` : ''}${tbl}${more}
+  const cnH = B.reportnotes && V.cn ? B.reportnotes.html(V.cn) : '';      /* RPT-C1 hook 2 */
+  box.innerHTML = `${noteH}${cnH}${stats}${empty ? `<div class="notice warn mk warn">${esc(T('empty'))}</div>` : ''}${tbl}${more}
     ${!empty ? `<div class="rp-foot">${exp(V.exp, 'rp_csv', T('csv'))}${exp(V.exp, 'rp_print', T('print'))}</div>` : ''}`;
 }
 
@@ -384,8 +392,9 @@ function buildCSV(rows, res) {
   const cols = shownCols(), tot = res.totals;
   const out = [cols.map((c) => csvCell({ type: 'text', key: '_' }, colLabel(c))).join(',')];
   rows.forEach((r) => out.push(cols.map((c) => csvCell(c, (c.en && S.lang === 'en' && r[c.en]) ? r[c.en] : r[c.key])).join(',')));
-  if (tot) out.push(cols.map((c, i) => (i === 0 ? csvCell({ type: 'text', key: '_' }, T('totalrow')) : tot[c.key] !== undefined ? csvCell(c, tot[c.key]) : '')).join(','));
+  if (tot) out.push(cols.map((c, i) => (i === 0 ? csvCell({ type: 'text', key: '_' }, T('totalrow')) : tot[c.key] === null && c.role !== 'dim' ? csvCell({ type: 'text', key: '_' }, 'not captured') : tot[c.key] !== undefined ? csvCell(c, tot[c.key]) : '')).join(','));
   out.push(''); expMeta(res).forEach((m) => out.push(m.map((x) => csvCell({ type: 'text', key: '_' }, x)).join(',')));
+  if (B.reportnotes && V.cn && V.cn.length) { out.push(''); B.reportnotes.csvRows(V.cn).forEach((m) => out.push(m.map((x) => csvCell({ type: 'text', key: '_' }, x)).join(','))); }      // RPT-C1 hook 3: the basis lines travel with the file
   return '﻿' + out.join('\r\n') + '\r\n';
 }
 function download(name, text, type) {
