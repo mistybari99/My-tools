@@ -108,7 +108,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     for (const [, nw] of HK.HOOKS[f]) ok(DOC.includes(nw), 'the doc contains the hook text word for word (' + f + '): ' + nw.slice(0, 60));
     for (const [old] of HK.HOOKS[f]) ok(DOC.includes(old), 'the doc contains the old text (' + f + '): ' + old.slice(0, 60));
   }
-  ok(!/crmConsent/.test(fs.readFileSync(path.join(WEB, 'customers.js'), 'utf8')) && !/crmConsent/.test(fs.readFileSync(path.join(WEB, 'pos.js'), 'utf8')), 'the real customers.js and pos.js are untouched');
+  ok(/crmConsent/.test(fs.readFileSync(path.join(WEB, 'customers.js'), 'utf8')) && /crmConsent/.test(fs.readFileSync(path.join(WEB, 'pos.js'), 'utf8')), 'the real customers.js and pos.js carry the integrated hooks (integration: they were untouched before)');
   { const tmp = require('os').tmpdir(); for (const f of Object.keys(HK.HOOKS)) { const fp = path.join(tmp, 'crm_hooked_' + f); fs.writeFileSync(fp, HK.apply(f, fs.readFileSync(path.join(WEB, f), 'utf8'))); try { require('child_process').execFileSync(process.execPath, ['--check', fp]); } catch (e) { ok(false, 'hooked copy of ' + f + ' is valid JavaScript'); } } }
 
   // ---- 1. the consent register (owner)

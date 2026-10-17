@@ -141,7 +141,7 @@ function reportTab() {
 async function view() {
   if (B.loadStatic) { try { await B.loadStatic(); } catch (e) { /* still opens */ } }
   css(); D.tab = 'my';
-  shell(T('title'), `<div id="r2s_body" data-info="screen:shifts"><p class="muted">…</p></div>`, true);
+  shell(T('title'), `<div id="r2s_body"><p class="muted">…</p></div>`, true);
   await load();
 }
 async function load() {

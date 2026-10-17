@@ -1,6 +1,7 @@
 // The exact hook lines for the integrator-owned screens (docs/integration/CRM-B.md section 3 copies them word for word).
 // crm_consent_test.js applies them to a SCRATCH COPY of web/customers.js and web/pos.js (the real files are not touched), checks every site is found exactly once,
 // checks the doc contains each new text, and runs the hooked screens.
+const U = require('./hooks_util.js');      // INTEGRATION: the hooks are in the real files now; a hook whose new text is already there is skipped
 const HOOKS = {
   'customers.js': [
     ["const r = await sb.rpc('customer_directory'); if (r.error) {",
@@ -25,6 +26,7 @@ const HOOKS = {
 function apply(file, text) {
   let t = text;
   for (const [a, b] of HOOKS[file]) {
+    if (U.integrated(t, a, b)) continue;
     const n = t.split(a).length - 1;
     if (n !== 1) throw new Error('hook site not found exactly once in ' + file + ' (' + n + '): ' + a.slice(0, 70));
     t = t.replace(a, () => b);

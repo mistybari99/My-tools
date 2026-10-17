@@ -1,4 +1,31 @@
 {
   "note": "Intended renames only. Each entry needs a reason. Types: rename, prefix, label, placement. See docs/UI_NO_LOSS_RULE.md.",
-  "aliases": []
+  "aliases": [
+    {
+      "type": "rename",
+      "from": "rpc:customers.js:customer_points_adjust",
+      "to": "rpc:customers.js:crmf_points_adjust",
+      "reason": "CRM-F hook H4 (docs/integration/CRM-F_hooks.json): the customer screen calls crmf_points_adjust, which has the same arguments and the same permission and reason rules, and adds the owner alert for a large change. The old function stays on the server."
+    },
+    {
+      "type": "rename",
+      "from": "rpc:customers.js:customer_points_redeem",
+      "to": "rpc:customers.js:crmf_points_redeem",
+      "reason": "CRM-F hooks H5 and H6: the points redeem preview and the real redemption call crmf_points_redeem, which applies the burn rules (all blank = the same answer as before). The old function stays on the server."
+    },
+    {
+      "type": "rename",
+      "from": "ctl:purchase.js:button:#pl_fb",
+      "to": "ctl:purchase.js:button:pu_filter",
+      "reason": "The first baseline read the payables Filter button through a regular-expression artifact (its id pl_fb with the text of the helper above it). It is the same button: data-act pu_filter, still on the screen, text unchanged."
+    },
+    {
+      "type": "label",
+      "id": "ctl:purchase.js:button:#pl_fb",
+      "lang": "texts",
+      "from": "ok ? `<button class=\" {...} \" data-act=\" {...} \" {...} > {...}",
+      "to": "⎚ L:ফিল্টার|Filter|Filter {...}",
+      "reason": "Same payables Filter button; the first baseline carried the text of the helper line above it (extractor artifact), the button text is unchanged."
+    }
+  ]
 }

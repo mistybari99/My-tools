@@ -342,8 +342,8 @@ async function submitSale(p, change) {
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
-    if (B.crmConsent && B.crmConsent.afterSale) B.crmConsent.afterSale(p.p_customer_mobile);   // CRM-B: consent tick
-    if (B.crmf && B.crmf.afterSale) B.crmf.afterSale(data.id);   // CRM-F: record a coupon typed at the till
+    if (B.crmConsent && B.crmConsent.afterSale) B.crmConsent.afterSale(p.p_customer_mobile);
+    if (B.crmf && B.crmf.afterSale) B.crmf.afterSale(data.id);   // bosCRMF: record a coupon typed at the till
     if (B.mkt && B.mkt.afterSale) B.mkt.afterSale(data.id);   // RPT-C3: optional campaign / offer code tag (silent when campaigns.js is not loaded)
     afterSale();
   } finally { P.busy = false; }

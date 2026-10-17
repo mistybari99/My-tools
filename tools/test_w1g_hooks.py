@@ -147,7 +147,8 @@ class Hooks(unittest.TestCase):
             # switch OFF (default): the server says skipped; the run goes on
             a = self.Api({'ran': False, 'skipped': 'switch_off'})
             res = nd.run(a, lambda *x: None)
-            self.assertEqual([c[0] for c in a.calls], ['notify_config', 'notify_scan', '_w1g_post_scheduled'], 'posting is asked right after the scan')
+            # the CRM-G task reminders and the CRM-H complaint check (integration hooks bos326 / bos328) are asked after the posting, each in its own guarded block
+            self.assertEqual([c[0] for c in a.calls], ['notify_config', 'notify_scan', '_w1g_post_scheduled', '_crmg_task_scan', '_crmh_sla_scan'], 'posting is asked right after the scan')
             self.assertEqual(a.calls[2][1], {'p_dry': False})
             self.assertEqual(res['journal']['skipped'], 'switch_off')
             self.assertEqual(res['scan_created'], 1)

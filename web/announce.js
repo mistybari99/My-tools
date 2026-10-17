@@ -181,7 +181,7 @@ function mineHTML(rows, st) {
 async function view() {
   if (B.loadStatic) { try { await B.loadStatic(); } catch (e) { /* the page still opens */ } }
   css();
-  shell(T('title'), `<div id="r2a_body" data-info="screen:announce"><p class="muted">…</p></div>`, true);
+  shell(T('title'), `<div id="r2a_body"><p class="muted">…</p></div>`, true);
   await load();
 }
 async function load() {

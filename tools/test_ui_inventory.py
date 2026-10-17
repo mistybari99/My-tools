@@ -71,12 +71,21 @@ def drop_line(starts):
     return f
 
 
+def repo_aliases():
+    p = os.path.join(REPO, 'tests', 'ui_inventory', 'aliases.json')
+    return json.load(open(p, encoding='utf-8')).get('aliases', []) if os.path.exists(p) else []
+
+
 def run(root, extra=None, aliases=None, baseline=BASELINE):
     cmd = [sys.executable, CHECK, '--root', root, '--baseline', baseline]
     if aliases:
         cmd += ['--aliases', aliases]
     else:
-        cmd += ['--aliases', os.path.join(root, 'no_aliases.json')]
+        # every case without its own alias file uses the repository's own aliases (the intended renames, each with a reason), so a tree that has such a rename still passes unmodified
+        al = os.path.join(root, 'no_aliases.json')
+        repo_al = os.path.join(REPO, 'tests', 'ui_inventory', 'aliases.json')
+        shutil.copy(repo_al, al) if os.path.exists(repo_al) else open(al, 'w').write('{"aliases": []}')
+        cmd += ['--aliases', al]
     cmd += extra or []
     p = subprocess.run(cmd, capture_output=True, text=True)
     return p.returncode, p.stdout + p.stderr
@@ -172,7 +181,7 @@ def main():
         edit(r, 'web/ia.js', replace_once("rec('bulkitems',", "rec('bulkitems2',"))
         case('route renamed without alias -> fails', 1, r, ['MISSING', 'route:bulkitems'])
         al = os.path.join(tmp, 'aliases_ok.json')
-        json.dump({'aliases': [{'type': 'rename', 'from': 'route:bulkitems', 'to': 'route:bulkitems2', 'reason': 'self-test: intended rename'}]},
+        json.dump({'aliases': repo_aliases() + [{'type': 'rename', 'from': 'route:bulkitems', 'to': 'route:bulkitems2', 'reason': 'self-test: intended rename'}]},
                   open(al, 'w'))
         case('route renamed WITH alias + reason -> passes', 0, r, ['OK: nothing lost'], aliases=al)
         al2 = os.path.join(tmp, 'aliases_noreason.json')
@@ -183,7 +192,7 @@ def main():
         r = make_tree(tmp)
         edit(r, 'web/dues.js', replace_once("save: L('সংরক্ষণ', 'Save', 'Save')", "save: L('সংরক্ষণ', 'Store', 'Store')"))
         al3 = os.path.join(tmp, 'aliases_label.json')
-        json.dump({'aliases': [{'type': 'label', 'id': 'ctl:dues.js:button:du_limit', 'lang': 'texts',
+        json.dump({'aliases': repo_aliases() + [{'type': 'label', 'id': 'ctl:dues.js:button:du_limit', 'lang': 'texts',
                                 'from': 'L:সংরক্ষণ|Save|Save', 'to': 'L:সংরক্ষণ|Store|Store', 'reason': 'self-test: intended label change'},
                                {'type': 'label', 'id': 'ctl:dues.js:button:du_limit', 'lang': 'texts',
                                 'from': 'L:সংরক্ষণ|Save|Save', 'to': 'L:সংরক্ষণ|Store|Store', 'reason': 'duplicate is harmless'}]}, open(al3, 'w'))

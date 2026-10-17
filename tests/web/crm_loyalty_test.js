@@ -18,6 +18,7 @@ const WEB = require('path').join(SP, '..', '..', 'web');
 const PATCHED = {}; const hookProblems = [];
 for (const h of HOOKFILE) {
   const name = h.file.replace(/^web\//, ''); let txt = PATCHED[name] || fs.readFileSync(require('path').join(WEB, name), 'utf8');
+  if (require('./hooks_util.js').integrated(txt, h.find, h.replace)) { PATCHED[name] = txt; continue; }      // INTEGRATION: already in the real file
   const cnt = txt.split(h.find).length - 1;
   if (cnt !== 1) { hookProblems.push(h.id + ': the find text appears ' + cnt + ' times in ' + h.file); continue; }
   PATCHED[name] = txt.replace(h.find, () => h.replace);

@@ -13,15 +13,10 @@ const srv = require('http').createServer((q, r) => { const f = require('path').j
 
 // ---- the exact hook text (the same pairs are written in docs/integration/CRM-A.md) ----
 const HOOKS_CUSTOMERS = [
-  ["const r = await sb.rpc('customer_directory'); if (r.error) {",
-    "let r = await sb.rpc('crma_customer_directory'); if (r.error && /crma_customer_directory/.test(r.error.message || '')) r = await sb.rpc('customer_directory'); if (r.error) {"],
+  /* INTEGRATION: pair 1 (the masked directory) and pairs 4 and 5 (call / WhatsApp links) are superseded by CRM-B's hook (B.crmConsent.directory(), callHTML()); see docs/integration/INTEGRATION.md */
   ['async function openProfile(id) {', "async function openProfile(id) {\n  if (B.crm && B.crm.open360) return B.crm.open360(id);"],
   ['    <div class="row"><button class="full" data-act="closesheet">${esc(T(\'cancel\'))}</button><button class="primary full" data-act="cu_save">${esc(T(\'save\'))}</button></div></div>`);',
     '    ${edit && B.crm && B.crm.openEdit ? `<button type="button" class="full" data-act="crm_more" data-v="${esc(e.id)}">More profile details</button>` : \'\'}\n    <div class="row"><button class="full" data-act="closesheet">${esc(T(\'cancel\'))}</button><button class="primary full" data-act="cu_save">${esc(T(\'save\'))}</button></div></div>`);'],
-  ['    <a class="full tog" href="tel:${esc(c.mobile)}" style="text-align:center;padding:10px">${esc(T(\'menuCall\'))}</a>',
-    '    ${/\\*/.test(c.mobile || \'\') ? \'\' : `<a class="full tog" href="tel:${esc(c.mobile)}" style="text-align:center;padding:10px">${esc(T(\'menuCall\'))}</a>`}'],
-  ['    <a class="full tog" href="${esc(wa)}" target="_blank" rel="noopener" style="text-align:center;padding:10px">${esc(T(\'menuWa\'))}</a>',
-    '    ${/\\*/.test(c.whatsapp || c.mobile || \'\') ? \'\' : `<a class="full tog" href="${esc(wa)}" target="_blank" rel="noopener" style="text-align:center;padding:10px">${esc(T(\'menuWa\'))}</a>`}'],
 ];
 const HOOKS_POS = [
   ['P.cust.found = r.data; if (r.data && r.data.found) P.cust.name = r.data.name;',
@@ -29,7 +24,7 @@ const HOOKS_POS = [
   ["const ri = await sb.rpc('customer_pos_info', { p_mobile: m }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === m)",
     "const ri = await sb.rpc('customer_pos_info', { p_mobile: mm }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === mm)"],
 ];
-function applyHooks(src, pairs) { let s = src; for (const [a, b] of pairs) { const n = s.split(a).length - 1; if (n !== 1) throw new Error('hook site found ' + n + ' times: ' + a.slice(0, 60)); s = s.replace(a, () => b); } return s; }
+function applyHooks(src, pairs) { let s = src; for (const [a, b] of pairs) { if (require('./hooks_util.js').integrated(s, a, b)) continue; const n = s.split(a).length - 1; if (n !== 1) throw new Error('hook site found ' + n + ' times: ' + a.slice(0, 60)); s = s.replace(a, () => b); } return s; }
 
 const ID = '11111111-0000-0000-0000-000000000001';
 const K360 = (o) => Object.assign({
@@ -70,6 +65,7 @@ const EXTRA_SRC = (K) => `(function(){ const K = ${JSON.stringify(K)}; const rea
   if (fn === 'crma_phone_reveal') return { data: { mobile: '01711032001', whatsapp: null, logged: true }, error: null };
   if (fn === 'crma_customer_extras_save') return { data: { id: args.p_id, saved: true }, error: null };
   if (fn === 'crma_phone_add') return { data: { dup: false, id: 9, warning: O.shared ? 'phone_shared' : null }, error: null };
+  if (fn === '_crmb_customer_list') return { data: null, error: { message: 'Could not find the function public._crmb_customer_list', code: 'PGRST202' } };      // INTEGRATION: CRM-B's list is not on this stand-in server: customers.js falls back to customer_directory
   if (fn === 'crma_customer_directory' || fn === 'customer_directory') { if (O.noCrmDir && fn === 'crma_customer_directory') return { data: null, error: { message: 'Could not find the function public.crma_customer_directory', code: 'PGRST202' } }; return { data: K.DIR, error: null }; }
   if (fn === 'customer_profile') return { data: { customer: { id: 'c1', name: 'test_dir_one', mobile: '01711111111' } }, error: null };
   if (fn === 'find_customer') return { data: { found: false, mobile: args.p_mobile }, error: null };
@@ -224,15 +220,15 @@ const EXTRA = EXTRA_SRC({ K360: K360(), STATE: STATE(), TL1, TL2, NOTES, DIR });
 
   mark('9'); // ---- 9. Hooks into customers.js, proved on the patched copy served by this test
   p = await open('#/customers', { hooks: true });
-  ok((await calls(p, 'crma_customer_directory')).length === 1 && (await calls(p, 'customer_directory')).length === 0, 'hook: the list asks for the masked directory');
+  ok((await calls(p, 'crma_customer_directory')).length === 0 && (await calls(p, '_crmb_customer_list')).length === 1, 'integration: the list is read through CRM-B (_crmb_customer_list); CRM-A\'s masked directory function stays on the server');
   ok(await p.locator('#cu_list .cu-row').count() === 1 && /test_dir_one/.test(await text(p)), 'hook: the list still renders');
   await p.click('#cu_list .cu-row'); await wait(p, 400);
   await p.evaluate(() => { const b = document.querySelector('[data-act=cu_open]'); if (b) b.click(); }); await wait(p, 800);
   ok(/#\/crm360\/c1/.test(await p.evaluate(() => location.hash)), 'hook: opening a profile goes to Customer 360');
   p = await open('#/customers', { hooks: true, o: { noCrmDir: true } });
-  ok((await calls(p, 'crma_customer_directory')).length === 1 && (await calls(p, 'customer_directory')).length === 1 && /test_dir_one/.test(await text(p)), 'hook: if the new function is not installed the old directory is used');
+  ok((await calls(p, '_crmb_customer_list')).length === 1 && (await calls(p, 'customer_directory')).length === 1 && /test_dir_one/.test(await text(p)), 'integration: if the CRM-B list is not installed the old directory is used');
   const patched = applyHooks(fs.readFileSync(WEB + '/customers.js', 'utf8'), HOOKS_CUSTOMERS);
-  ok(!/crm_more/.test(fs.readFileSync(WEB + '/customers.js', 'utf8')) && /crm_more/.test(patched), 'web/customers.js in the repository is NOT patched; the copy is');
+  ok(/crm_more/.test(fs.readFileSync(WEB + '/customers.js', 'utf8')) && /crm_more/.test(patched), 'web/customers.js in the repository carries the integrated hooks (integration)');
   const posOk = (() => { try { applyHooks(fs.readFileSync(WEB + '/pos.js', 'utf8'), HOOKS_POS); return true; } catch (e) { return String(e); } })();
   ok(posOk === true, 'hook text for pos.js applies exactly once at each site (text proof only, no browser run): ' + posOk);
 
