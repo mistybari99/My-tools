@@ -137,3 +137,7 @@ Negative tests present (server side, as a salesperson-level login): non-owner ow
 - Real Supabase project, real phone, live data: never touched. The screen is unverified on a phone.
 - `acct_cash_flow`, day book and journal readers were not changed; held requests are not in `cash_moves` / `journal_entries`, so no report counts them until they are approved.
 - Posting date of an approved request is the date the maker entered; a request that is approved after the period was closed is refused by `lock_check` when the approver is not the owner (an owner approver passes `lock_check` as for any entry today; W1-B changes that rule for everybody).
+
+## W1-FIX (phase141): the supplier payment limit can count several days
+
+`supplier_pay_over` is compared with one `pay_supplier` call, so paying in smaller parts avoids it. New setting **`supplier_pay_over_cumulative_days`** (number 0 to 365, default **0** = per call as today). With N more than 0 the limit is compared with this payment plus what the same person already paid to the same supplier in the last N days plus that person's pending requests for that supplier (the owner is never held). Two exact-text lines in `_w1e_pay_gate` (marker `bos141`), see `docs/integration/W1-FIX.md`. The hook H1 of this note is unchanged.

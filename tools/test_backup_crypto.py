@@ -167,6 +167,67 @@ class DumpEncrypted(unittest.TestCase):
                 backup_dump.run(S.api(), out, page=4, encrypt='on', env={'BACKUP_PASSPHRASE': 'short'})
             self.assertEqual(os.listdir(out), [])
 
+    # ---- auto mode is fail-closed: only a MISSING function means "off"; any other error stops the run (finding 3) ----
+    def test_auto_missing_function_pgrst202_is_plain(self):
+        class Api404:
+            def rpc(self, fn, args=None):
+                raise T.oc.ApiError(404, '{"code":"PGRST202","message":"Could not find the function public._w1g_backup_settings"}')
+        self.assertIsNone(backup_dump.resolve_encryption(Api404(), 'auto', env={}))
+
+    def test_auto_connection_error_fails_even_with_the_rule_on(self):
+        class ApiDown:
+            def rpc(self, fn, args=None):
+                raise ConnectionError('connection reset by peer')
+        with self.assertRaises(ConnectionError):
+            backup_dump.resolve_encryption(ApiDown(), 'auto', env=ENV)
+
+    def test_auto_server_error_auth_error_and_odd_answer_fail(self):
+        for status in (0, 401, 403, 500, 502, 503):
+            class ApiBad:
+                def rpc(self, fn, args=None, status=status):
+                    raise T.oc.ApiError(status, 'trouble')
+            with self.assertRaises(RuntimeError, msg=str(status)) as cm:
+                backup_dump.resolve_encryption(ApiBad(), 'auto', env=ENV)
+            self.assertIn('plain copy', str(cm.exception))
+
+        class ApiOdd:
+            def rpc(self, fn, args=None):
+                return None
+        with self.assertRaises(RuntimeError):
+            backup_dump.resolve_encryption(ApiOdd(), 'auto', env=ENV)
+
+    def test_auto_run_fails_with_no_plain_file_and_logs_the_failure(self):
+        with T.FakeServer() as S, tempfile.TemporaryDirectory() as out:
+            S.F.always['_w1g_backup_settings'] = (503, 'service unavailable')
+            with T.Quiet(), self.assertRaises(RuntimeError):
+                backup_dump.run(S.api(retries=0), out, page=4, encrypt='auto', env=ENV)
+            self.assertEqual(os.listdir(out), [], 'no plain file when the setting could not be read')
+            self.assertEqual(S.F.log_rows[-1]['p_status'], 'failed')
+
+    def test_auto_run_with_the_rule_on_and_a_dead_network_stub_fails(self):
+        class Stub:
+            def __init__(self):
+                self.calls = []
+
+            def rpc(self, fn, args=None):
+                self.calls.append(fn)
+                raise ConnectionError('network down')
+        with tempfile.TemporaryDirectory() as out, T.Quiet():
+            st = Stub()
+            with self.assertRaises(ConnectionError):
+                backup_dump.run(st, out, page=4, encrypt='auto', env=ENV, log_run=False)
+            self.assertEqual(st.calls, ['_w1g_backup_settings'], 'stopped at once, nothing dumped')
+            self.assertEqual(os.listdir(out), [])
+
+    def test_main_exit_code_is_1_when_auto_cannot_read_the_setting(self):
+        with T.FakeServer() as S, tempfile.TemporaryDirectory() as out:
+            S.F.always['_w1g_backup_settings'] = (502, 'bad gateway')
+            with T.Quiet() as q:
+                rc = backup_dump.main(['--out', out, '--encrypt', 'auto'], api=S.api(retries=0))
+            self.assertEqual(rc, 1)
+            self.assertIn('BACKUP FAILED', q.text)
+            self.assertEqual(os.listdir(out), [])
+
     def test_main_exit_code_when_on_and_no_key(self):
         with T.FakeServer() as S, tempfile.TemporaryDirectory() as out:
             old = os.environ.pop('BACKUP_PASSPHRASE', None)

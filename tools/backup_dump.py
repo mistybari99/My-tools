@@ -70,8 +70,13 @@ def write_enc(path, lines, keys, label):
     return n, len(data), hashlib.sha256(data).hexdigest(), len(blob), hashlib.sha256(blob).hexdigest()
 
 
+def _function_missing(e):
+    """True only for 'this function does not exist' (PostgREST PGRST202 / HTTP 404): a database older than phase98. Anything else is a real error."""
+    return getattr(e, 'status', None) == 404 or 'PGRST202' in str(e)
+
+
 def resolve_encryption(api, mode, env=None):
-    """Returns the Keys to encrypt with, or None for a plain backup. mode: 'on' | 'off' | 'auto' (follow the server rule backup_encrypt_on; no phase98 = off).
+    """Returns the Keys to encrypt with, or None for a plain backup. mode: 'on' | 'off' | 'auto' (follow the server rule backup_encrypt_on; only a MISSING function (no phase98) means off, any other error stops the run).
     Raises when encryption is wanted but the passphrase is missing or too short (never a silent plain backup)."""
     mode = (mode or 'auto').lower()
     if mode == 'off':
@@ -79,11 +84,16 @@ def resolve_encryption(api, mode, env=None):
     if mode == 'auto':
         try:
             st = api.rpc('_w1g_backup_settings')
-            want = bool(isinstance(st, dict) and st.get('encrypt_on'))
-        except Exception as e:  # an older database (no phase98) or no permission: keep today's behaviour
-            oc.log('encryption setting not readable (', type(e).__name__, '): plain backup, as before')
-            want = False
-        if not want:
+        except oc.ApiError as e:
+            if not _function_missing(e):
+                # network trouble, 5xx, expired login, no permission: we cannot tell whether the owner switched encryption ON.
+                # Failing is safe (the night's backup is retried and the failure is logged); a plain file pushed by mistake is not.
+                raise RuntimeError('cannot read the encryption setting (' + str(e) + '): backup stopped instead of risking a plain copy; fix the cause or set the mode to off/on explicitly') from e
+            oc.log('encryption setting not found on the server (no phase98 yet): plain backup, as before')
+            return None
+        if not isinstance(st, dict):
+            raise RuntimeError('the encryption setting gave an unexpected answer: backup stopped instead of risking a plain copy')
+        if not st.get('encrypt_on'):
             return None
     try:
         return bc.keys_from_env(env)

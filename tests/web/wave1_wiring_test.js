@@ -59,7 +59,7 @@ const EXTRA_W = `(function(){ const real = window.supabase.createClient; window.
   ok(await p.locator('#hv_fresh #fr_strip').count() === 1, 'Home shows the books freshness strip for the owner'); ok((await calls(p, '_w1g_freshness')).length >= 1, 'the strip asked the server once'); await p.close();
   p = await open({}, '#/home'); await wait(p, 400);
   ok(await p.locator('#hv_fresh').count() === 1 && (await p.locator('#hv_fresh').innerHTML()).trim() === '', 'without phase 98 the strip place stays empty'); await p.close();
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={POS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};', m: { grants: [], ctx: { locations: [1], roles: ['salesperson'] } }, w: { fresh: { status: 'fresh' } } }, '#/home'); await wait(p, 400);
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={POS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"test_staff_01",full_name:"test_cashier",status:"active",lang:"en"};', m: { grants: [], ctx: { locations: [1], roles: ['salesperson'] } }, w: { fresh: { status: 'fresh' } } }, '#/home'); await wait(p, 400);
   if (process.env.DBG) log('S1c:', await p.locator('#hv_fresh').count(), JSON.stringify(await calls(p, '_w1g_freshness')));
   ok(await p.locator('#hv_fresh').count() === 0 && (await calls(p, '_w1g_freshness')).length === 0, 'a person without Accounts view gets no strip and no call'); await p.close();
 
@@ -90,7 +90,7 @@ const EXTRA_W = `(function(){ const real = window.supabase.createClient; window.
   }
 
   // ---------- S3 return picker ----------
-  const sales = [{ id: 's1', receipt: 12, sold_at: today + 'T05:00:00Z', total: 1040, status: 'done', customer: 'Rahim', location_id: 1, pay_mode: 'cash', sale_date: today }];
+  const sales = [{ id: 's1', receipt: 12, sold_at: today + 'T05:00:00Z', total: 1040, status: 'done', customer: 'test_customer', location_id: 1, pay_mode: 'cash', sale_date: today }];
   const mk = () => ({ sale_id: 's1', receipt: 12, status: 'done', location_id: 1, customer_id: null, customer: null, factor: 1, due_first: true, balance: null, can_return: true,
     lines: [{ item_id: 'i0', name: 'White sweet', unit: 'kg', sold: 4, returned: 0, left: 4, price: 260 }], returns: [] });
   const fill = async (pg) => { await pg.fill('[data-rq="0"]', '2'); await wait(pg, 900); };
