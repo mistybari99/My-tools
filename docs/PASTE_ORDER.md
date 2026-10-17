@@ -223,12 +223,12 @@ Four settings are ON by default but do nothing until their module is on: `shift_
 | Proof | Command | Result on the merged build |
 |---|---|---|
 | Every phase can be pasted twice | `PORT=5570 bash tests/sql/run_all_sql.sh` (chain in owner order, every phase from 88 on pasted once, then again on a copy) | no error in any second paste |
-| Each package's own SQL suites, alone on a database through phase 99 + its own phases | `docs/integration/INTEGRATION.md` section 6 | see that note for the counts |
+| Each package's own SQL suites, alone on a database through phase 99 + its own phases | `docs/integration/INTEGRATION.md` section 6 | 4259 pass, 0 fail (89 suites) |
 | Old suites 8 to 87 give the same failing lines as before | same runner (base vs final build) | identical, except 3 documented intended changes (RPT-B2: phase21 T5, phase26 K2; phase84 test-project reset, section 8) |
 | Default state = today | `PORT=5570 BASE=base87 bash tests/sql/integ_before_after.sh` | 33 existing reports identical before/after (pasted once, twice, and after a second wave of records); only `l1_pnl` / `l3_shop_pnl` gain the key `profit_complete` and words in `gaps`, no figure changes |
 | Many settings ON at once | `psql ... -f tests/sql/integ_test.sql` | 39 checks: every journal entry balances, Balance Check green, all report engines run, the packages share data correctly |
 | Re-patch | `supabase/phase477_test.sql` | 33 checks |
-| Web | `python3 tests/web/run_all.py` | see INTEGRATION.md section 6 |
+| Web | `python3 tests/web/run_all.py` | 97 suites, all clean: exit code 0, no FAIL line, no page error (read every log, not only the exit code) |
 
 ## 8. What is NOT covered or untested
 

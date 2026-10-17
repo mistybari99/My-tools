@@ -53,8 +53,8 @@ SQL, cumulative database through 477 (`tests/sql/run_all_sql.sh`, 103 suites): 5
 - Combined scenario `tests/sql/integ_test.sql` (about 35 switches ON): 39 of 39; journal balanced, Balance Check green.
 - Parity `tests/sql/integ_before_after.sh`: 33 existing reports identical before and after, once, twice, after the second wave; only `gaps` and `profit_complete` on l1_pnl / l3_shop_pnl are new.
 - `supabase/phase477_test.sql`: 33 of 33.
-- Web: see `docs/PASTE_ORDER.md` section 7 and the final report; run with `python3 tests/web/run_all.py` (copies the tree, because many tests hard-code the main checkout path).
-- `check_no_demo_leak.py` OK; `check_info_coverage.py` exit 0; `check_ui_inventory.py` OK; `build_phase477.py --check`, `build_report_registry.py --check` clean; kb.json rebuilt (861 chunks).
+- Web: 97 suites, 0 with a non-zero exit, no FAIL line and no page error in any log (previously hung settings2, nav2, nav pass). Run with `python3 tests/web/run_all.py` (copies the tree, because many tests hard-code the main checkout path).
+- Python tools/test_*.py and tests/py/test_*.py all OK (test_crmg_hooks 8 of 8). Final-build re-run of integ_test (39 of 39) and parity: identical. `check_no_demo_leak.py` OK; `check_info_coverage.py` exit 0; `check_ui_inventory.py` OK; `build_phase477.py --check`, `build_report_registry.py --check` clean; kb.json rebuilt (861 chunks).
 
 ## 7. Not covered
 
