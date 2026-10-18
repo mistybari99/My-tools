@@ -1,0 +1,56 @@
+# X3: social publisher (tools/social_publish.py). MANUAL ONLY until the owner has linked the accounts (docs/integration/X3.md, section 4).
+# Default = dry run: it logs in as the ops bot and claims nothing. A real run needs send=true AND the repository variable SOCIAL_SEND_ENABLED=1
+# AND the owner's switch social_publish_on in the app. The schedule is not enabled here on purpose.
+name: social
+
+on:
+  workflow_dispatch:
+    inputs:
+      send:
+        description: 'Post due items now (also needs the repository variable SOCIAL_SEND_ENABLED = 1 and the app switch social_publish_on)'
+        type: boolean
+        default: false
+      limit:
+        description: 'Most deliveries to claim in this run (1 to 50)'
+        type: number
+        default: 10
+
+concurrency:
+  group: social
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      NOTIFY_BOT_EMAIL: ${{ secrets.NOTIFY_BOT_EMAIL }}
+      NOTIFY_BOT_PASSWORD: ${{ secrets.NOTIFY_BOT_PASSWORD }}
+      SOCIAL_FB_PAGE_ID: ${{ secrets.SOCIAL_FB_PAGE_ID }}
+      SOCIAL_FB_PAGE_TOKEN: ${{ secrets.SOCIAL_FB_PAGE_TOKEN }}
+      SOCIAL_IG_USER_ID: ${{ secrets.SOCIAL_IG_USER_ID }}
+      SOCIAL_IG_TOKEN: ${{ secrets.SOCIAL_IG_TOKEN }}
+      SOCIAL_WA_PHONE_NUMBER_ID: ${{ secrets.SOCIAL_WA_PHONE_NUMBER_ID }}
+      SOCIAL_WA_TOKEN: ${{ secrets.SOCIAL_WA_TOKEN }}
+      SOCIAL_WA_LANG: ${{ vars.SOCIAL_WA_LANG }}
+      SOCIAL_WEBHOOK_URL: ${{ secrets.SOCIAL_WEBHOOK_URL }}
+      SOCIAL_WEBHOOK_TOKEN: ${{ secrets.SOCIAL_WEBHOOK_TOKEN }}
+      SOCIAL_MEDIA_BASE_URL: ${{ vars.SOCIAL_MEDIA_BASE_URL }}
+      SOCIAL_SEND_ENABLED: ${{ vars.SOCIAL_SEND_ENABLED }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Publish due items (dry run unless send is ticked and the variable is 1)
+        env:
+          SEND: ${{ github.event.inputs.send }}
+          LIMIT: ${{ github.event.inputs.limit }}
+        run: |
+          FLAG=""; if [ "$SEND" = "true" ]; then FLAG="--send"; else FLAG="--dry-run"; fi
+          python3 tools/social_publish.py $FLAG --limit "${LIMIT:-10}"

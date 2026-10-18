@@ -586,3 +586,8 @@ Merge of all finished packages onto one branch; see docs/integration/INTEGRATION
 - Checked here: phases 490 and 491 pasted twice on a copy of the base build (local Postgres 16, port 5810): no error. Site pages at 360 px: 41 of 41. ERP screen: 16 of 16. Build check: 13 of 13. Race: 1 sale of 20 parallel checkouts. Info coverage and strict: exit 0. Demo-leak check: OK. UI inventory: OK.
 - Not confirmed: the full SQL suite (run_all_sql.sh), the full web suite, the GitHub workflow run, a real Supabase storage upload, a real browser against the live project. Not built: accounts and OTP, public coupon check, online payment gateway, captcha provider, loyalty on the site.
 - Manual checks for the owner: paste 490 then 491 on the live project only after review; keep website_on off until a branch, names and one published item are set; place and cancel one test order before sharing the address.
+## X3 (social and marketing workspace, publisher, chat-order parser), branch x3-social
+
+* Added: supabase/phase500.sql (+ phase500_test.sql, pasted twice clean on a throwaway database), tools/social_publish.py (+ tests/py/test_social_publish.py), web/order_parser.js (+ tests/web/order_parser_test.js), .github/workflows/social.yml (manual), docs/integration/X3.md, docs/integration/X3_info.json (merged into web/data/info.json), tests/sql/ORDER.txt (phase500 appended).
+* Checked: SQL 62 checks, Python 15, parser 81; check_info_coverage OK, check_no_demo_leak OK, phase477 and report registry checks OK.
+* Not checked: any screen, any live provider, the existing reports before and after (defaults parity), the meta-webhook path. See docs/integration/X3.md section 2 and 5.
