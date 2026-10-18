@@ -128,12 +128,7 @@ async function grant(code, loc) {
 }
 const costOk = async (loc) => !!(S.ctx.is_owner || (S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view) || await grant('view_cost', loc));
 // photos: stored as a Storage path "<form>/<location>/<id>.jpg" (the bucket policy reads the first two parts); the database keeps only that path (<= 300 chars)
-function shrink(file, max = 1280, q = 0.72) {
-  return new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file);
-    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k) || 1; c.height = Math.round(img.height * k) || 1;
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob((b) => (b ? res(b) : rej(new Error('image'))), 'image/jpeg', q); };
-    img.onerror = () => rej(new Error('image')); img.src = u; });
-}
+function shrink(file, max = 1280, q = 0.72) { return window.BOS.photo.shrink(file, { max: max, q: q }); }   // shared helper: web/photo.js (EXIF, type and size checks)
 const photoForm = (cands) => (S.ctx.is_owner ? cands[0] : (cands.find((c) => S.ctx.perms[c] && S.ctx.perms[c].enter) || cands[0]));
 // cands = storage prefixes in order of preference: the dedicated ones first (STOCK / PURCHASE, grant based, phase12), then the old form codes
 // (kept so a database that has not run phase12 yet keeps working: the first prefix the server accepts wins)

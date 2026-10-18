@@ -17,7 +17,7 @@ const MOCK = `(function(){
     s.getTracks().forEach((t) => { const st = t.stop.bind(t); t.stop = () => { window.__STOPS++; st(); }; }); return s; };
   if (!navigator.mediaDevices) Object.defineProperty(navigator, 'mediaDevices', { value: md, configurable: true });
 })();`;
-const NOCAM = `delete window.BarcodeDetector; window.BarcodeDetector = undefined; try { delete window.BarcodeDetector; } catch (e) {}`;
+const NOCAM = `delete window.BarcodeDetector; window.BarcodeDetector = undefined; try { delete window.BarcodeDetector; } catch (e) {} try { Object.defineProperty(navigator, 'mediaDevices', { value: {}, configurable: true }); } catch (e) {}`;   // X5: no camera API at all -> 'not supported' (with a BarcodeDetector missing but a camera present, the vendored ZXing fallback is used instead)
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8196);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });

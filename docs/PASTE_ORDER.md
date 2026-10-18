@@ -52,6 +52,7 @@ Phases 8 to 87 (the base). If you pasted Wave 1 (88 to 99) already, skip those r
 | 26 | `phase470` ... `phase476` | RPT-HUB | Business Memory: day replay, timeline of a thing, compare, spend finder, record trail (all read-only) |
 | 27 | `phase477` | integrator | **re-patch all** + glue (see section 5) + one Exceptions-kinds merge |
 | 28 | `phase478` | integrator | closes the ~13 small helper functions (`_..._present`, `_w1*_`) to the signed-out role (anon); signed-in people, the owner paths, `_i2_state()` and phase 477 keep working. Paste **last**, after 477 |
+| 29 | `phase520` | X5 | item recognition foundation: duplicate / similar check (`item_similar`, `item_new2` with client id, barcode and exact-name refusal), review record for unclear reads, approved aliases, asset brand / serial / warranty. All recognition switches OFF; blank limits stay blank. Paste once; the app uses it only after the owner switches `item_similar_check_on` ON |
 
 Numbers 114 to 132 are reserved in `docs/UNIFIED_BUILD_PLAN.md` 4.4 for Wave 2; R1 (120) and R2 (130 to 132) took numbers inside that range. Nothing else in this build uses 100 to 119 or 121 to 129, so there is no clash; if a later Wave 2 package wants 120 it must be renumbered. RPT-HUB was built as 450 to 456, which clashed with RPT-C2 (445 to 457); it is now **470 to 476** (files, tests, texts all renamed). `phase414` and `phase417` to `phase419` do not exist on purpose (RPT-B4 left them unused).
 

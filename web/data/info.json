@@ -206,6 +206,19 @@
    "verified": true,
    "src": "RPT-C2 (docs/integration/RPT-C2_info.json)"
   },
+  "feature:camera_recognition": {
+   "title": "Camera and recognition (X5)",
+   "does": "Barcode, label text (on phone), photo matching (on phone, not yet installed), name suggestions, duplicate check and a review record for unclear reads. Every part is a separate switch and is OFF by default.",
+   "why": "Faster item entry with fewer duplicates, and nothing changes until the owner switches a part on.",
+   "default": "All OFF. The item form works as before.",
+   "change": "Each part is switched on or off in Settings. Recognised text or photos only suggest; a person always chooses.",
+   "who": "Owner (switches). Staff with item permission (use).",
+   "related": [
+    "screen:camrec"
+   ],
+   "verified": false,
+   "src": "docs/ANDROID_WRAPPER.md; X5 build (not device-tested)"
+  },
   "feature:campaigns_master": {
    "title": "Campaign list",
    "does": "The master list of marketing campaigns with start, end, budget and channel.",
@@ -3142,6 +3155,20 @@
    "verified": true,
    "src": "phase20.sql; phase48.sql; W1-G.md section 1"
   },
+  "rule:item_similar_check_on": {
+   "title": "Similar-name and barcode check when adding an item",
+   "does": "When ON, adding a new item first checks the name against existing items. An exact same name is refused, and a barcode already in use is refused. A look-alike name is shown and the person presses again to add anyway.",
+   "why": "Stops the same product being entered twice under small spelling differences.",
+   "default": "OFF. Items are added exactly as before.",
+   "change": "Nothing already saved changes. Only new items are checked.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:camrec",
+    "rule:recog_ocr_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql; X5 section"
+  },
   "rule:journal_attach_over": {
    "title": "A manual journal above this total needs an attachment",
    "does": "Above this total in Tk, a manual journal must carry a photo or file reference.",
@@ -4063,6 +4090,131 @@
    "verified": true,
    "src": "phase97.sql"
   },
+  "rule:recog_image_match_on": {
+   "title": "Match a photo to approved item photos (on the phone)",
+   "does": "When ON, a photo is compared with the approved item photos stored on this phone and the nearest items are listed with their distance. Nothing leaves the phone.",
+   "why": "Helps find an item when there is no barcode or readable label.",
+   "default": "OFF. No photo is compared.",
+   "change": "Needs an item photo index on the phone and a distance limit. Until both exist the list stays empty and says why.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_image_threshold",
+    "screen:camrec"
+   ],
+   "warn": "No model is installed in this version: the list stays empty.",
+   "verified": true,
+   "src": "phase520.sql; X5 scan.js"
+  },
+  "rule:recog_image_threshold": {
+   "title": "Photo match distance limit",
+   "does": "Only items whose photo distance is at or below this number are listed. Smaller is stricter. The distance is a number, never a percentage.",
+   "why": "Stops unrelated items from being suggested.",
+   "default": "Blank. Blank = not set: no photo candidates are shown.",
+   "change": "Changing it affects the next photo only.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_image_match_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_langs": {
+   "title": "Languages to read",
+   "does": "The language files to use, written like eng+ben (English and Bangla). Each language is one file downloaded once.",
+   "why": "Bangla labels need the Bangla file; English labels need the English file.",
+   "default": "Blank. Blank blocks label reading.",
+   "change": "A new language downloads its file the next time it is used.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_on",
+    "rule:recog_ocr_wifi_only"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_max_px": {
+   "title": "Label photo longest side in pixels",
+   "does": "The label photo is made smaller to this longest side before reading. Smaller is faster on old phones but reads less small print.",
+   "why": "Old phones run out of memory with large photos.",
+   "default": "Blank. Blank blocks label reading: no size is assumed.",
+   "change": "Changing it affects the next read only.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_on": {
+   "title": "Read label text on the phone (OCR)",
+   "does": "When ON, a label photo is read on this phone by the Tesseract engine. The text is shown for review; nothing is saved from it. The photo never leaves the phone.",
+   "why": "Lets staff find an item from the words on a packet without typing.",
+   "default": "OFF. No label is read.",
+   "change": "The first use downloads the chosen language file once (Wi-Fi only while the Wi-Fi switch is on). Nothing is saved automatically.",
+   "who": "Only the owner (Settings). The camera screen shows whether the phone can run it.",
+   "related": [
+    "rule:recog_ocr_max_px",
+    "rule:recog_ocr_langs",
+    "rule:recog_ocr_wifi_only",
+    "screen:camrec"
+   ],
+   "verified": true,
+   "src": "phase520.sql; X5 scan.js"
+  },
+  "rule:recog_ocr_wifi_only": {
+   "title": "Download language files on Wi-Fi only",
+   "does": "When ON, a language file that is not on the phone is downloaded only on Wi-Fi. A file already on the phone is always used.",
+   "why": "The language files are several megabytes; mobile data is paid for.",
+   "default": "ON.",
+   "change": "Nothing already downloaded is removed.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_langs"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_budget": {
+   "title": "Vision service monthly call cap",
+   "does": "The most calls to the vision service in one month. When reached, no more calls are made until next month.",
+   "why": "Keeps the bill under control.",
+   "default": "Blank. Blank = the service does not run.",
+   "change": "Changing it applies from the next call.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_consent_on": {
+   "title": "Consent to send label photos to the server vision service",
+   "does": "The owner confirms that label photos may be sent to the paid vision service. Without this, no photo is sent.",
+   "why": "Photos can show customers and suppliers; the owner must agree.",
+   "default": "OFF (no consent).",
+   "change": "Turning it off stops all sending at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_on": {
+   "title": "Server vision service (paid, needs consent)",
+   "does": "Would send a label photo to a server vision service for label suggestions. It also needs the consent switch and the monthly cap, and the X1 connection.",
+   "why": "Better reading for hard photos, at a cost.",
+   "default": "OFF. Nothing is sent.",
+   "change": "Not available yet: the X1 connection is not built, so this stays inactive.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_consent_on",
+    "rule:recog_vision_budget"
+   ],
+   "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
+   "verified": true,
+   "src": "phase520.sql; tools/edge/vision-proxy.ts"
+  },
   "rule:report_cash_short_by_case_on": {
    "title": "Cash short/over report follows the shortage case",
    "does": "The cash short and over report leaves out sheets whose shortage case was rejected or voided, and shows how many cases are open, approved, rejected and void.",
@@ -4552,6 +4704,22 @@
    ],
    "verified": true,
    "src": "phase97.sql; W1-F.md"
+  },
+  "screen:camrec": {
+   "title": "Camera & Recognition",
+   "does": "Lists each way the app can read a barcode, label or photo, says whether this phone can run it now and why not, and runs a self-test on each one.",
+   "why": "Shows the truth about this phone before anyone relies on the camera.",
+   "default": "Every recognition option is OFF, so the screen reports them as off.",
+   "change": "The screen only reads; switches are changed in Settings.",
+   "who": "Owner.",
+   "related": [
+    "rule:item_similar_check_on",
+    "rule:recog_ocr_on",
+    "rule:recog_image_match_on",
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "web/scan.js"
   },
   "screen:exceptions": {
    "title": "Exceptions",

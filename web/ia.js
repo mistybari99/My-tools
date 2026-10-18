@@ -222,6 +222,7 @@ const IA = [
   rec('assistant', 'reports', ['প্রশ্ন করুন (সহকারী)', 'Ask (assistant)', 'Ask (সহকারী)'], { icon: 'doc', ok: (c) => c.own || c.GF.assistant_use === true, kw: ['ask', 'assistant', 'question', 'help', 'ai', 'chat', 'how much', 'why', 'প্রশ্ন', 'সহকারী', 'জিজ্ঞেস', 'সাহায্য', 'কত', 'কেন', 'হিসাব'] }),
   rec('rules', 'settings', 't:rules', { ok: owner, kw: ['form rule', 'count first', 'red block', 'ফর্মের নিয়ম'] }),
   rec('settings', 'settings', 't:settings', { ok: owner, kw: ['settings', 'config', 'সেটিংস'] }),
+  rec('camrec', 'settings', ['ক্যামেরা ও স্ক্যান', 'Camera & Recognition', 'Camera & Recognition'], { icon: 'settings', ok: owner, kw: ['camera', 'scan', 'barcode', 'ocr', 'label', 'photo match', 'recognition', 'ক্যামেরা', 'স্ক্যান', 'বারকোড', 'লেখা পড়া', 'ছবি মেলানো'], verbs: ['test scanner', 'check camera'] }),
   rec('settings2', 'settings', ['সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'], { ok: owner, kw: ['fiscal', 'vat', 'barcode', 'tax', 'বছর', 'ভ্যাট', 'সেটিংস'] }),
   rec('logs', 'settings', 't:logs', { ok: owner, kw: ['log', 'audit trail', 'history', 'লগ', 'পরিবর্তন', 'ইতিহাস'] }),
   rec('backup', 'settings', 't:backup', { ok: owner, kw: ['backup', 'download', 'export all', 'ব্যাকআপ', 'ডাউনলোড'] }),
