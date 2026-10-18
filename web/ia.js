@@ -161,6 +161,7 @@ const IA = [
     kw: ['coupon', 'voucher', 'offer code', 'কুপন', 'অফার কোড'] }),
   rec('auditreports', 'appr', ['অডিট ও নিয়ন্ত্রণ রিপোর্ট', 'Audit & control reports', 'Audit ও control report'], { icon: 'check', ok: (c) => c.own || c.anyApprove() || c.GF.view_reports === true || c.GF.report_control === true, also: ['item'],
     kw: ['audit log', 'void', 'reversal', 'correction', 'approval delay', 'override', 'activity', 'missing cost', 'অডিট', 'বাতিল', 'সংশোধন', 'অনুমোদন'], verbs: ['read the audit log', 'see all voids'] }),
+  rec('market', 'reports', ['বাজার ও বৃদ্ধি', 'Market & growth', 'বাজার ও growth'], { icon: 'chart', kw: ['market', 'competitor', 'research', 'opportunity', 'growth', 'price', 'festival', 'বাজার', 'প্রতিযোগী', 'সুযোগ', 'বৃদ্ধি'], verbs: ['add a finding', 'record a competitor price', 'review an opportunity'], ok: (c) => c.own || c.GF.market_view === true || c.GF.market_manage === true, also: ['campaigns'] }),
   rec('forecast', 'reports', ['পরিকল্পনা ও পূর্বাভাস', 'Planning & forecasts', 'Planning ও forecast'], { icon: 'biz', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true || c.GF.report_sales === true || c.GF.report_stock === true || c.GF.report_cash === true, also: ['factory', 'purch', 'stock'],
     kw: ['forecast', 'demand', 'festival', 'scenario', 'what if', 'production requirement', 'cash calendar', 'expiry risk', 'পূর্বাভাস', 'চাহিদা', 'উৎসব', 'পরিকল্পনা'], verbs: ['forecast sales', 'plan production', 'see expected cash'] }),
   // Staff, roles, permissions

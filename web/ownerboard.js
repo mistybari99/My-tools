@@ -131,6 +131,10 @@ const KINDS = {
     return top.length ? { value: top[0].k, tone: 'info', sub: top.map((x) => `${x.k} ×${A.fmt(Math.round(x.q * 100) / 100)}`).join(' · '), route: 'reports' } : { value: '—', tone: 'info', sub: T('nosales'), route: 'reports' }; } },
   parallel: { g: 'appr', num: true, l: L('পাশাপাশি মাসের সিদ্ধান্ত বাকি', 'Parallel-month decisions waiting', 'Parallel মাসের decision বাকি'), route: 'parallel', async load() {
     const n = arr(await rpc('parallel_waiting')).length; return { value: String(n), num: n, tone: n ? 'warn' : 'ok', sub: n ? '' : T('clear'), route: 'parallel' }; } },
+  market_growth: { g: 'sales', num: true, l: L('বাজার ও বৃদ্ধি: খোলা সুযোগ', 'Growth opportunities (open)', 'Growth সুযোগ (খোলা)'), route: 'market', async load() {
+    const s = await rpc('mi_summary'); if (!s || !s.on) throw new Miss('market off');
+    const o = s.opportunities || {}, open = (o.proposed || 0) + (o.saved || 0) + (o.approved || 0) + (o.in_progress || 0);
+    return { value: String(open), num: open, tone: open ? 'info' : 'ok', sub: lab(L('প্রস্তাব', 'proposed', 'proposed')) + ' ' + (o.proposed || 0) + ' · ' + lab(L('চলছে', 'in progress', 'in progress')) + ' ' + (o.in_progress || 0), route: 'market' }; } },
   rollout: { g: 'sys', num: true, l: L('ফর্ম এখনও কাগজে (রোলআউট)', 'Forms still on paper (rollout)', 'Form এখনও কাগজে (rollout)'), route: 'rollout', async load() {
     const rows = arr(await tbl(sb.from('form_rollout').select('mode').limit(2000))), p = rows.filter((x) => x.mode === 'paper').length, pa = rows.filter((x) => x.mode === 'parallel').length;
     return { value: String(p), num: p, tone: p ? 'info' : 'ok', sub: `${lab(L('পাশাপাশি', 'parallel', 'parallel'))} ${pa}`, route: 'rollout' }; } },

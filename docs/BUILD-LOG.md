@@ -628,3 +628,30 @@ Not confirmed (must check on a real phone and the live project):
 
 Not built in this package (honest list): outbox queue with IndexedDB for photo uploads (the shared helper retries but does not queue offline); batch scan for stock counts; label / barcode printing; QR for assets; scan history log; the full product form still saves through item_new (the duplicate check runs on the quick new-item sheet only); review-queue UI (the RPC and table exist); X1 gate (x1-foundation has no commits yet, so the vision path refuses).
 - Manual checks for the owner: switch each recognition option on one at a time (Settings > Camera & Recognition); run the self-test on the phone you use at the counter.
+## X6 - Market intelligence and growth (branch x6-research)
+
+What changed
+- New phases 530 (foundation: 9 settings all OFF or blank, 2 rights owner-only, 15 tables with RLS closed by default, append-only and no-delete guards, adapter catalogue with no network), 531 (workspace functions), 532 (own-data growth, read-only), 533 (research gate OFF, adapter switch, job definitions, AI summariser proposals, price alerts, owner digest).
+- tests/sql/ORDER.txt: phases 530-533 added at the end. tests/sql/x6_head.sql and x6_run.sh are the X6 harness; supabase/phase530_test.sql .. phase533_test.sql are the suites.
+- web/market.js (page #/market, five tabs), web/ia.js (one rec line, group reports), web/index.html (script tag), web/ownerboard.js (widget market_growth: open opportunities, hidden when the workspace is off or the person has no right).
+- docs/integration/X6_info.json merged into web/data/info.json (12 entries: 9 rules, 2 rights, 1 screen). tools/check_info_coverage.py exits 0.
+- docs/PASTE_ORDER.md: row 29.
+
+Checks run (local throwaway Postgres 16, UTF8, port 5850; no live project, no network)
+- Full build with ORDER=all through phase 533: clean.
+- Phases 530-533 each applied twice on the built base: no error (paste-twice).
+- SQL suites: 530 = 17 pass, 531 = 47 pass, 532 = 13 pass, 533 = 30 pass, 0 fail (107 checks: defaults, rights, anon denied, RLS, append-only and no-delete, status machine, own-request block, reasons, tasks, measuring from ERP net, gate, adapters, summariser, alerts, digest).
+- Web: tests/web/x6_market_test.js (360px, all tabs, no page errors) passes. ia_test, nav2_test, control_test, ownerboard_test, nav_test pass (run from copies on free ports; the originals are fixed to ports another session uses).
+- check_no_demo_leak: OK.
+
+Could not confirm
+- Phone and real Supabase: not run. The Bangla strings are written by the builder and need the owner's read.
+- Defaults parity against the existing report snapshots (tests/sql/integ_before_after.sh style): not run. By construction no existing function or rule changed.
+- Report hub registry: not changed. Report 193 (festival demand) is already owned by the RPT-C3 integrator row (implemented, route forecast); the registry is a fixed list of numbers 1-193 owned by the owner's master list, so no new number was added.
+- Not built: the research job runner (X1 job_runs) and the AI summariser agent (X4); both are stubs by name. No provider adapter is linked; rss_feed, sitemap_page and search_api stay offline. Item-not-found log (POS) does not exist in this build, so new-item candidates from unfound searches are not built. Stockout/lost-sales hints are not built beyond the existing stockout log. Customer segment trends reuse the existing RFM report (crmc_rfm_summary) and are not repeated here.
+- Watchlist and digest run only when the scheduled job calls them (X1); until then they are functions only.
+
+Owner links later
+- A research provider: set mi_adapter_set (owner) after the terms and robots check per source; X1 runner calls mi_research_gate before each run.
+- AI summariser: X4 agent 'market-research summariser' calls mi_summary_propose under the user's login; accept/reject through mi_summary_decide.
+- Notifications and digest: X1 schedules mi_alert_notify and mi_growth_digest after the switches are set.
