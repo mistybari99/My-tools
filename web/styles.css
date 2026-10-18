@@ -31,6 +31,9 @@ header.top { position: sticky; top: 0; z-index: 5; margin: 0 -16px 18px; padding
 header.top::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 10px; height: 10px; background: var(--gold-grad); transform: translateX(-50%) rotate(45deg); border: 1px solid var(--bg); }
 header.top .brand { width: 30px; height: 40px; flex: none; }
 header.top h1 { font: 800 1.15rem/1.35 var(--display); margin: 0; flex: 1; min-width: 0; text-wrap: balance; color: var(--ruby); }
+/* A title with an (i) hint (e.g. Announcements) can be one long word: at 360px the header buttons leave no room, so the title drops to its own row instead of overflowing the screen. Wide screens keep one row. */
+header.top:has(h1.ihint-host) { flex-wrap: wrap; }
+header.top h1.ihint-host { flex: 1 1 auto; }
 @media (prefers-color-scheme: dark) { header.top h1 { color: var(--gold-lt); } }
 header.top button { min-height: 44px; min-width: 44px; padding: 0 12px; box-shadow: none; }
 .lang { display: flex; gap: 4px; }
