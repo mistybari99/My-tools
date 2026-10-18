@@ -5677,6 +5677,15 @@
    "verified": true,
    "src": "phase97.sql; W1-F.md"
   },
+  "screen:cakejobs": {
+   "title": "Custom cake jobs and due tomorrow",
+   "does": "Lists custom cakes for a place and date range with their state, and moves each one step forward: confirm, production slip, baked, decorated, ready, delivered. Shows the sheet of cakes due tomorrow with count, weight, flavour, message, design and allergy notes.",
+   "why": "Custom cakes are the largest orders of the week. The list shows what is due and the step each cake is at.",
+   "default": "Visible. Its switch 'Custom cake workflow' defaults OFF; with the switch OFF no cake job can be made or moved.",
+   "change": "A cake moves one step at a time and cannot be skipped. Delivery needs the app order delivered first and, when that switch is on, a photo. Nothing is sent to the customer from this screen.",
+   "who": "The owner, and people who can use point of sale for the place. Price and capacity rules are set in the cake price list and the cake settings.",
+   "verified": false
+  },
   "screen:camrec": {
    "title": "Camera & Recognition",
    "does": "Lists each way the app can read a barcode, label or photo, says whether this phone can run it now and why not, and runs a self-test on each one.",
@@ -5881,6 +5890,15 @@
    "verified": false,
    "src": "web/payrequests.js"
   },
+  "screen:paycapture": {
+   "title": "Mobile payment capture and verify",
+   "does": "Writes a bKash, Nagad or Rocket payment: the Trx-ID, sender number, amount, time and what it is for (an order, an advance or nothing yet). A pasted SMS can be read to fill the boxes; the person checks every value before saving. The server flags the payment ok, over, under or no target, and lists the payments waiting for a second person.",
+   "why": "A Trx-ID can be used only once. Writing it down stops a double use and shows at the end of the day whether the phone and the app agree.",
+   "default": "Visible. Its switch 'Write down bKash, Nagad and Rocket payments' defaults OFF; with the switch OFF nothing can be written.",
+   "change": "Nothing is posted to the books by this screen. A second person verifies each payment; nobody verifies the payment they wrote. A rejected or flagged payment needs a note.",
+   "who": "The owner, and people who can use point of sale for the place. Verifying needs the 'Verify mobile payments' grant, which the server checks.",
+   "verified": false
+  },
   "screen:payreqsettings": {
    "title": "Pay request settings",
    "does": "Switch requests on, choose who decides, switch the policy on, set the exception rule and the limits.",
@@ -5957,6 +5975,15 @@
    ],
    "verified": true,
    "src": "phase90.sql; phase91.sql; W1-C.md"
+  },
+  "screen:riders": {
+   "title": "Riders, delivery status and cash on delivery",
+   "does": "Shows the delivery jobs of a place and moves each one: out for delivery, delivered (with the cash collected), failed (with a reason), try again, or returned to the shop. Assigns an open home or courier order to a rider and a zone. Checks a day's cash collected against the deposits rider by rider, records a deposit, and explains an open difference case.",
+   "why": "Without this the shop does not know which rider has which order or how much cash a rider still holds.",
+   "default": "Visible. Its switch 'Riders and delivery status' defaults OFF; with the switch OFF no rider or delivery can be recorded.",
+   "change": "Checking a day can open one case for a rider whose figures differ; a case is explained, never deleted. No cash is posted and no message is sent to a rider or a customer.",
+   "who": "The owner, and people who can use point of sale for the place. Adding riders and zone fees needs the 'Manage riders and delivery zones' grant.",
+   "verified": false
   },
   "screen:shifts": {
    "title": "Shift schedule screen",
