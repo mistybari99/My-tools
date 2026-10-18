@@ -1,0 +1,39 @@
+{
+  "phases": [
+    {"old": 480, "new": 479, "package": "X1", "file_stem": "x1_foundation_part1"},
+    {"old": 481, "new": 480, "package": "X1", "file_stem": "x1_foundation_part2"},
+    {"old": 490, "new": 481, "package": "X2", "file_stem": "x2_website_part1"},
+    {"old": 491, "new": 482, "package": "X2", "file_stem": "x2_website_part2"},
+    {"old": 500, "new": 483, "package": "X3", "file_stem": "x3_social"},
+    {"old": 510, "new": 484, "package": "X4", "file_stem": "x4_ai_foundation"},
+    {"old": 511, "new": 485, "package": "X4", "file_stem": "x4_ai_knowledge"},
+    {"old": 520, "new": 486, "package": "X5", "file_stem": "x5_item_recognition"},
+    {"old": 530, "new": 487, "package": "X6", "file_stem": "x6_market_foundation"},
+    {"old": 531, "new": 488, "package": "X6", "file_stem": "x6_market_workspace"},
+    {"old": 532, "new": 489, "package": "X6", "file_stem": "x6_growth_intelligence"},
+    {"old": 533, "new": 490, "package": "X6", "file_stem": "x6_research_hook"},
+    {"old": 540, "new": 491, "package": "XB", "file_stem": "xb_payment_capture"},
+    {"old": 541, "new": 492, "package": "XB", "file_stem": "xb_custom_cake"},
+    {"old": 542, "new": 493, "package": "XB", "file_stem": "xb_riders_delivery"},
+    {"old": 550, "new": 494, "package": "XC", "file_stem": "xc_owner_daily_summary"},
+    {"old": 551, "new": 495, "package": "XC", "file_stem": "xc_production_suggestion"},
+    {"old": 552, "new": 496, "package": "XC", "file_stem": "xc_supplier_prices"},
+    {"old": 553, "new": 497, "package": "XC", "file_stem": "xc_unsold_markdown"},
+    {"old": 554, "new": 498, "package": "XC", "file_stem": "xc_staff_coaching"}
+  ],
+  "form_groups": [
+    {"old": "01", "new": "01"},
+    {"old": "02", "new": "02"},
+    {"old": "03", "new": "03"},
+    {"old": "04", "new": "04"},
+    {"old": "05", "new": "05"},
+    {"old": "06", "new": "06"},
+    {"old": "08", "new": "07"},
+    {"old": "10", "new": "08"},
+    {"old": "11", "new": "09"},
+    {"old": "14", "new": "10"},
+    {"old": "18", "new": "11"},
+    {"old": "20", "new": "12"}
+  ],
+  "form_groups_approved": false
+}
