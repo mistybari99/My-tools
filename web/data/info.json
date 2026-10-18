@@ -24,7 +24,7 @@
   "feature:action_queue": {
    "title": "Approval queue for proposed actions",
    "does": "An agent or an automated job can propose one action from a short allowed list. The owner approves or rejects it (a rejection needs a reason). Nothing runs by itself: the owner's own session runs the approved action and records the result.",
-   "why": "A proposal is never a silent change. Every step is in the record.",
+   "why": "A proposal is never a silent change.",
    "default": "The list of allowed actions is empty. Nothing can be proposed until the owner allows an action.",
    "change": "The owner adds an action to the allowed list. Rules, permissions, the audit trail and money can never be on that list.",
    "who": "The owner decides. The person who proposed cannot decide the same proposal.",
@@ -1933,7 +1933,7 @@
   "grant:market_view": {
    "title": "See the market intelligence workspace",
    "does": "Lets a person read the findings, prices, opportunities and growth figures on the Market page.",
-   "why": "Market notes can be sensitive (competitor prices, plans). Only the people who need them should see them.",
+   "why": "Market notes can be sensitive (competitor prices, plans).",
    "default": "Given to nobody. Only the owner has it.",
    "change": "The person sees the Market page and its figures, but can not add or decide anything. Sales figures on the page still follow their places.",
    "who": "Only the owner. Every change is written to the change log.",
@@ -2120,18 +2120,22 @@
   "rule:ai_default_provider": {
    "title": "Default AI provider",
    "does": "Chooses which provider the helpers use when an agent does not name one. local_rules runs on the phone for free. The other choices are paid providers and need a key, a model and a monthly budget first.",
-   "why": "A paid provider can spend money every month. Keeping local_rules as the default means no spending happens by accident.",
+   "why": "A paid provider can spend money every month.",
    "default": "local_rules (on the phone, free).",
    "change": "A paid provider is used only when it is enabled, has a model and a budget, and the data level it needs is allowed for it. The AI log shows each call.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:ai_on": {
    "title": "AI helpers are on (after a provider is linked)",
    "does": "Lets the AI helpers run. Nothing runs while this is off, and no provider is called and no money is spent.",
-   "why": "This is the main on/off for every AI helper. It is safe to leave off until a provider and a monthly budget are set.",
+   "why": "This is the main on/off for every AI helper.",
    "default": "Off. No AI call is made and nothing is spent.",
-   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews. Nothing is changed by the AI itself.",
-   "who": "Only the owner, in Settings."
+   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews.",
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:ai_pause_all": {
    "title": "Pause all AI now (emergency stop)",
@@ -2139,15 +2143,19 @@
    "why": "If an answer looks wrong or a cost looks too high, one switch stops everything at once.",
    "default": "Off.",
    "change": "On: every AI call is refused and the reason 'paused' is written in the AI log. Existing suggestions and their decisions are kept.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:ai_speech_on": {
    "title": "Voice questions (browser speech-to-text)",
    "does": "Shows a microphone button in the assistant. The phone's own speech recognition turns the voice into text, which is then shown for the person to check before it is asked.",
-   "why": "Helps people who prefer speaking, including in Bangla. The text is still checked and redacted like typed text.",
+   "why": "Helps people who prefer speaking, including in Bangla.",
    "default": "Off. No microphone button is shown.",
    "change": "On: the microphone button appears in the assistant. The question is still answered by the same rules and permissions as typed text.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:allow_test_reset": {
    "title": "Allow test data reset",
@@ -3595,9 +3603,9 @@
   "rule:mi_ai_summary_on": {
    "title": "Let the AI summariser propose a summary of chosen findings",
    "does": "Lets the AI assistant write a short proposed summary of findings you selected. The proposal waits for a person to accept or reject it.",
-   "why": "Long sources are slow to read. A draft summary saves time; a person still checks it against the source.",
+   "why": "Long sources are slow to read.",
    "default": "OFF. No AI call is made.",
-   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes. The person who asked can not accept their own proposal.",
+   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes.",
    "who": "Only the owner, in Settings. Every change is written to the change log.",
    "verified": false,
    "src": "X6 (docs/integration/X6_info.json)"
@@ -3625,7 +3633,7 @@
   "rule:mi_elast_min_days": {
    "title": "Minimum trading days at each price before a price-response hint is shown",
    "does": "Sets how many trading days a price must have been charged before we compare how many units sold at that price.",
-   "why": "A price that was charged for one day says nothing. The hint is only a pattern in past data, never a forecast.",
+   "why": "A price that was charged for one day says nothing.",
    "default": "Blank. No price-response hint is shown.",
    "change": "A number lets the Growth page show the past pattern, with the days behind it, when at least two prices meet the minimum. It never changes a price.",
    "who": "Only the owner, in Settings. Every change is written to the change log.",
@@ -3637,7 +3645,7 @@
    "does": "Turns on the Market page: research topics, source registry, findings you type in, competitor prices, opportunities with evidence and decisions, and measuring them from our own sales.",
    "why": "It keeps what we learn about competitors, prices, festivals and customers in one place, with the source and the date, instead of in people's heads.",
    "default": "OFF. The Market page is empty and nothing can be written. Nothing is searched on the internet by this switch.",
-   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever. OFF again: nothing new can be written, old records stay and can be read.",
+   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever.",
    "who": "Only the owner, in Settings (the Rules page). Every change is written to the change log.",
    "verified": false,
    "src": "X6 (docs/integration/X6_info.json)"
@@ -3647,7 +3655,7 @@
    "does": "Sets how many characters of a source may be kept as a direct quote on a finding.",
    "why": "Keeping only short quotes and our own summary respects the source and keeps the record useful.",
    "default": "Blank. Quotes are not stored; write your own summary only.",
-   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message. Existing findings are not changed.",
+   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message.",
    "who": "Only the owner, in Settings. Every change is written to the change log.",
    "verified": false,
    "src": "X6 (docs/integration/X6_info.json)"
@@ -3655,9 +3663,9 @@
   "rule:mi_research_job_on": {
    "title": "Run scheduled research jobs",
    "does": "Lets the job runner (a later package) run the research jobs that are switched on.",
-   "why": "A job is only useful when it runs on its own. This is the master switch for all of them.",
+   "why": "A job is only useful when it runs on its own.",
    "default": "OFF. Job definitions can be stored; none runs.",
-   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above. OFF again: nothing runs.",
+   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above.",
    "who": "Only the owner, in Settings. Every change is written to the change log.",
    "verified": false,
    "src": "X6 (docs/integration/X6_info.json)"
@@ -3665,7 +3673,7 @@
   "rule:mi_scrape_on": {
    "title": "Allow scheduled research to fetch a permitted source",
    "does": "Lets a scheduled research job read a public page from a source, but only when the owner has allowed that source after reading its terms, the robots.txt check passed and a rate limit is typed.",
-   "why": "Reading a permitted page on a schedule saves hours. It is never used to get past a login or a paywall, and it never copies a page in bulk.",
+   "why": "Reading a permitted page on a schedule saves hours.",
    "default": "OFF. No job fetches anything. Even ON, each source stays closed until the owner allows it.",
    "change": "ON: the research gate opens only for sources that meet every condition. OFF again: every job stops at once, whatever the source settings.",
    "who": "Only the owner, in Settings. Every change is written to the change log.",
@@ -5481,10 +5489,12 @@
   "rule:xc_coaching_on": {
    "title": "Staff coaching board (owner only)",
    "does": "Shows the owner, per person, the figures that already exist: bills, discounts, voids, cash shortage cases, production rejects, late days and complaints. No ranking and no score.",
-   "why": "Helps the owner talk to people with the same facts for everyone. Nobody else can see it.",
+   "why": "Helps the owner talk to people with the same facts for everyone.",
    "default": "Off. Nothing is composed, sent or shown.",
-   "change": "On: the owner can open the board for a chosen period. Other roles cannot see it even when it is on. It changes no record.",
-   "who": "Only the owner, in Settings."
+   "change": "On: the owner can open the board for a chosen period. Other roles cannot see it even when it is on.",
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_markdown_pct": {
    "title": "Markdown % for unsold stock",
@@ -5492,7 +5502,9 @@
    "why": "The owner sets the discount, not the software.",
    "default": "Blank. Blank means no discount is suggested and a markdown sale is refused.",
    "change": "A typed percentage (1 to 90) is used for the suggested markdown price and for markdown sales.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_price_alert_on": {
    "title": "Supplier price-rise alert",
@@ -5500,7 +5512,9 @@
    "why": "A rise noticed the day it happens can be negotiated or the menu price changed.",
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: the warning appears once per item and supplier per day. Nothing is changed in the purchase records.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_price_rise_pct": {
    "title": "Rise % that triggers the price alert",
@@ -5508,15 +5522,19 @@
    "why": "Too small and the owner gets noise; too large and small rises are missed.",
    "default": "Blank. Blank means the alert says 'threshold not set' and writes nothing.",
    "change": "A typed percentage (1 to 500) is used by the price alert when its switch is on.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_prod_suggest_on": {
    "title": "Daily production suggestion",
    "does": "Shows a suggested quantity for each item at a place: the average of the same weekday in the last weeks, plus open orders for that day, minus stock on hand. Festival uplift is shown separately.",
-   "why": "Gives the baker a starting figure from real sales. It is arithmetic on past sales, not a forecast.",
+   "why": "Gives the baker a starting figure from real sales.",
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: the planning screen can show the suggestion and the range. Nothing is written to the production plan until the baker confirms.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_prod_weeks": {
    "title": "Weeks of same-weekday history",
@@ -5524,7 +5542,9 @@
    "why": "More weeks steadier, fewer weeks quicker to react.",
    "default": "Blank. Blank means no suggestion is shown and the screen says 'data needed'.",
    "change": "Typed weeks (1 to 12) switch the suggestion on for the switched-on places.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_summary_email_on": {
    "title": "Daily summary by e-mail",
@@ -5532,15 +5552,19 @@
    "why": "E-mail is the record that can be kept and forwarded.",
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: e-mail recipients get the summary. Needs the Gmail secrets set by the technical person (docs/OPS_SETUP.md).",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_summary_on": {
    "title": "Owner daily summary",
    "does": "Builds one summary of the day (sales, cash, wallet receipts, wastage, cakes due tomorrow, and for the owner also dues, approvals and failures) and sends it to the people the owner has entered.",
    "why": "The owner sees the day in one message instead of opening five screens.",
    "default": "Off. Nothing is composed, sent or shown.",
-   "change": "On: the summary goes out at the hours set below, to the recipients who are switched on. Nothing is changed in the books. An outlet recipient gets only that outlet's figures and no cost values.",
-   "who": "Only the owner, in Settings."
+   "change": "On: the summary goes out at the hours set below, to the recipients who are switched on. Nothing is changed in the books.",
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_summary_telegram_on": {
    "title": "Daily summary by Telegram",
@@ -5548,7 +5572,9 @@
    "why": "Telegram reaches a phone quickly.",
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: Telegram recipients get the summary. The bot token is kept as a secret by the technical person; the chat number is typed on the recipient row.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_summary_times": {
    "title": "Summary hours (Dhaka)",
@@ -5556,7 +5582,9 @@
    "why": "Keeps the morning and evening messages where the owner wants them.",
    "default": "21 (evening, today's figures)",
    "change": "The summary goes out only in the hours listed. The technical schedule runs at about 08:10 and 21:10 Dhaka time.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_sync_alert_on": {
    "title": "Every shop synced? alert",
@@ -5564,7 +5592,9 @@
    "why": "A shop that has stopped sending sales is found the same day.",
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: the warning appears once per place per day, if the hours are typed too. Nothing is changed in the books.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_sync_stale_hours": {
    "title": "Hours without a sale before the alert",
@@ -5572,15 +5602,19 @@
    "why": "A quiet shop is not always broken; the owner knows the hours of each shop.",
    "default": "Blank. Blank means the warning says 'threshold not set' and does nothing.",
    "change": "Typed hours (1 to 720) make the sync warning work when its switch is on.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "rule:xc_unsold_on": {
    "title": "Unsold stock and markdown",
    "does": "Lists the units that cannot be sold tomorrow (their expiry is before the end of the next day), lets the person record what happened to each unit (sold at a markdown, staff meal, donation, waste), and shows the wastage share per item.",
-   "why": "Unsold cakes are money. The list makes the decision before the end of the day.",
+   "why": "Unsold cakes are money.",
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: the end-of-day list and the outcome lines are available. An outcome line never moves stock or money; waste is still booked on the wastage screen.",
-   "who": "Only the owner, in Settings."
+   "who": "Only the owner, in Settings.",
+   "verified": false,
+   "src": "X1-XC builder notes (docs/integration/X*.md); not yet checked against the code"
   },
   "screen:accounts": {
    "title": "Accounts and ledger",
@@ -5988,7 +6022,7 @@
   "screen:x1health": {
    "title": "Automation & integration health",
    "does": "Shows whether automation is on, whether it is paused, each connection and each scheduled job (ok, failed, stale, never run), failed intake items, the last backup, books freshness and proposals waiting for approval.",
-   "why": "One screen tells the owner what is working and what is not. A missing part is shown as missing, never as healthy.",
+   "why": "One screen tells the owner what is working and what is not.",
    "default": "Owner only. The owner may add the health widget to the owner board.",
    "change": "Nothing to set. It only reads.",
    "who": "Only the owner.",

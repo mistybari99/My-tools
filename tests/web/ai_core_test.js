@@ -4,7 +4,7 @@
 // retrieval (verified = authoritative), and a prompt-injection suite of 36 cases.
 // Run: node tests/web/ai_core_test.js <repo>/web/ai_core.js     (or from the repo root with no argument)
 const path = require('path');
-const CORE_PATH = process.argv[2] || path.join(__dirname, '..', '..', 'web', 'ai_core.js');
+const CORE_PATH = process.argv[2] ? path.join(process.argv[2], '..', '..', 'web', 'ai_core.js') : path.join(__dirname, '..', '..', 'web', 'ai_core.js');
 const core = require(CORE_PATH);
 
 let pass = 0, fail = 0; const failed = [];
