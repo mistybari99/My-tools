@@ -54,3 +54,8 @@
 - মালিকের ফোন ও Google Drive ফোল্ডার "Islamia BOS backup 2026-10-18": সূচি, GO_LIVE, commit তালিকা।
 - `BACKUP_islamia_bos.zip`: নথি, পরিকল্পনা ও পুরো কথোপকথনের gzip রেকর্ড। মালিকের চ্যাটে পাঠানো হয়েছে।
 - আসল কোড: GitHub `mistybari99/My-tools`।
+
+## ৭. ডিস্ক জায়গা (সেশন চলার সময়)
+- SQL টেস্টের প্রতিটি রান `/tmp/pgNNNN` নামে একটি অস্থায়ী স্থানীয় Postgres বানায় (০.২–১.৬ GB)। রান শেষে সেটি মুছে ফেলুন: `rm -rf /tmp/pg[0-9]* /tmp/pg_c1`।
+- প্রতিটি এজেন্টের নিজস্ব worktree (`.claude/worktrees/*`, প্রতিটি প্রায় ৮৫ MB) কাজ শেষে `git worktree remove --force <path>` দিয়ে মুছুন, তবে আগে নিশ্চিত করুন তাতে uncommitted কাজ নেই এবং ব্রাঞ্চ GitHub-এ push করা।
+- ডিস্ক ৯০%-এর বেশি ভরলে নতুন এজেন্ট বা পূর্ণ টেস্ট চালাবেন না।
