@@ -6033,6 +6033,24 @@
    "verified": false,
    "src": "phase480.sql (x1_health); web/connect.js"
   },
+  "screen:xcsummary": {
+   "title": "Owner summary: recipients and history",
+   "does": "Shows who receives the daily owner summary, lets the owner add a recipient or switch one on or off (a switched-off row is kept, never deleted), and shows the send history.",
+   "why": "The owner decides who gets the summary without asking the technical person.",
+   "default": "Visible in the menu for the owner. The summary switch defaults OFF; no recipient exists until the owner adds one.",
+   "change": "This screen sends nothing. The summary goes out only at the set hours, from the scheduled script, to recipients who are switched on.",
+   "who": "The owner only.",
+   "verified": false
+  },
+  "screen:xcunsold": {
+   "title": "Unsold stock and markdown",
+   "does": "Lists the units whose expiry falls before the end of tomorrow, with the markdown price the server suggests. For each line the person records one decision: sold at a markdown, staff meal, donation or waste. It also lists the decisions already written for the chosen day.",
+   "why": "Unsold cakes are money. The list makes the decision before the end of the day.",
+   "default": "Visible in the menu for the people who may use it. Its own switch 'Unsold stock and markdown' defaults OFF; with the switch OFF the screen says the feature is switched off and records nothing.",
+   "change": "Recording a decision never moves stock or money. Waste is still booked on the stock screen. A markdown sale is taken at the till.",
+   "who": "The owner, and people who can open production or point of sale for the place. The server decides every call.",
+   "verified": false
+  },
   "switch:path:expense": {
    "title": "Path switch: expense",
    "does": "Chooses which way counts for this job: the day-book quick expense or the 10-2 expense voucher. The other way becomes a locked shadow copy.",
