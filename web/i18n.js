@@ -38,6 +38,7 @@ window.BOS_T = {
   hello: { bn: "স্বাগতম", mix: "স্বাগতম", en: "Welcome" },
   home: { bn: "হোম", mix: "Home", en: "Home" },
   back: { bn: "পেছনে", mix: "Back", en: "Back" },
+  mainscr: { bn: "মূল পাতা", mix: "Main", en: "Main" },
   save: { bn: "সংরক্ষণ", mix: "Save", en: "Save" },
   cancel: { bn: "বাতিল", mix: "Cancel", en: "Cancel" },
   saved: { bn: "সংরক্ষিত হয়েছে", mix: "Save হয়েছে", en: "Saved" },

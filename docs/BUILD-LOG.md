@@ -673,3 +673,11 @@ Manual checks run (local throwaway Postgres, port 5870, database built through t
 
 Could not confirm: the live Supabase project, a real Gmail send, a real Telegram chat, any phone or 360px screen (no screen was built), the old SQL suites 8 to 87 with these phases, the web suite.
 Not built: screens, the unsynced badge and outbox viewer, low-stock draft orders, cash-count reminder, shop checklist with photos, temperature reminders, SMS and WhatsApp summary.
+## Design phase: main button and two-state layout (branch claude/supabase-readonly-audit-xo3qkp)
+
+What changed: `web/app.js` shell() shows a "মূল পাতা / Main" button (data-act navmain, existing BOS_NAVSTACK.main) next to the back arrow on every non-Home screen for signed-in users; key `mainscr` in `web/i18n.js`; `.navmain` in `web/styles.css`. `web/switchboard.js` gains a Layout card: selector Default / All optional sections visible, a button that downloads the defaults snapshot as a JSON file (every switch and choice with value and default_value), and a revert to the defaults. Layout rows: todo_on, shift_on, announce_on (module people, default OFF). No new SQL, no new screen, no change to web/ia.js.
+Default = current behaviour: every layout row sits at its default, so nothing changes until the owner picks All. Money, books, attendance and loyalty switches are deliberately not in the layout.
+Tests run: tests/web/run_all.py navstack_test, nav_test, nav2_test, groupab_test, ia_test all exit 0; navstack_test 14 checks OK. tools/check_info_coverage.py and tools/check_ui_inventory.py exit 0; check_no_demo_leak OK.
+Could not confirm: the layout card and the Main button in a real browser on a phone width (no new browser test added); live Supabase set_rule behaviour; Bangla wording of the new texts.
+Not done: a 2-3 step back option (navstack back(n) exists, no UI offered); the layout rows list is a short fixed list and needs the owner's decision.
+Manual check for the owner: open #/switchboard as owner, pick All optional sections, confirm the To-do, Shifts and Announcements screens appear, then pick Default and confirm they go back.
