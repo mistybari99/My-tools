@@ -1,7 +1,7 @@
 /* Islamia BOS · service worker. Goal: the app opens with no internet after the first visit (the POS and the form outbox already work offline once open).
    Rules: only same-origin GET requests are cached; Supabase (API, auth, storage) and anything else is never touched. Network first (so a new version is picked up at once),
    cache as the fallback; navigations fall back to the cached index.html. Bump VERSION to drop the old cache. */
-const VERSION = 'bos-sw-v2';
+const VERSION = 'bos-sw-v3';
 self.addEventListener('install', (e) => { e.waitUntil(self.skipWaiting()); });
 // X5 explicit precache hook: small recognition helpers and the ZXing barcode fallback (336 KB). The OCR files (about 7 MB) are NOT here:
 // they are fetched when the OCR switch is on and then kept by web/scan.js. Add a path here on purpose only.

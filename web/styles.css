@@ -129,6 +129,7 @@ pre.diff { white-space: pre-wrap; word-break: break-word; margin: 4px 0 0; font:
 .rc-g { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; } .rc-g .fld.wide { grid-column: 1 / -1; }
 button.mini { min-height: 36px; min-width: 36px; padding: 0; border-radius: 18px; }
 .navmain { min-height: 36px; padding: 0 10px; font-size: .85rem; white-space: nowrap; }
+.navback { min-height: 36px; padding: 0 8px; font-size: .8rem; white-space: nowrap; }
 .den { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .den label { margin: 0; } .den label span { font-weight: 700; color: var(--ruby); }
 .flags { margin: 10px 0; display: grid; gap: 6px; }

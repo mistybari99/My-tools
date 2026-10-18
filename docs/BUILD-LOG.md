@@ -681,3 +681,10 @@ Tests run: tests/web/run_all.py navstack_test, nav_test, nav2_test, groupab_test
 Could not confirm: the layout card and the Main button in a real browser on a phone width (no new browser test added); live Supabase set_rule behaviour; Bangla wording of the new texts.
 Not done: a 2-3 step back option (navstack back(n) exists, no UI offered); the layout rows list is a short fixed list and needs the owner's decision.
 Manual check for the owner: open #/switchboard as owner, pick All optional sections, confirm the To-do, Shifts and Announcements screens appear, then pick Default and confirm they go back.
+
+## Coordinator pass: back 2/3, paste order, go-live guide (branch claude/supabase-readonly-audit-xo3qkp)
+
+What changed: `web/app.js` shell() shows "2 ধাপ পেছনে / 2 steps back" and "3 ধাপ পেছনে / 3 steps back" buttons (data-act goback with data-n) only when the chain is deep enough (BOS_NAVSTACK.depth()); the existing arrow and Main button are unchanged. `web/i18n.js` gets keys back2, back3; `web/styles.css` gets `.navback`; `web/sw.js` bumped to bos-sw-v3. `docs/PASTE_ORDER.md` rewritten: one line for each of the 184 phase files from phase 8 to 554 (position, file, package, what it does), with the note that 480 to 554 were numbered by parallel builders and that 540 to 542 are missing from tests/sql/ORDER.txt. `docs/GO_LIVE.md` added (owner steps only; no feature turned on).
+Checks run: navstack_test 14 checks OK; tools/check_info_coverage.py OK; tools/check_ui_inventory.py OK; tools/check_no_demo_leak.py OK; tests/py/test_xc_bump_sw.py ALL PASS. Screens listed in docs/integration X1, X5, X6 info files are all registered in web/ia.js; no screen was built.
+Could not confirm: the full web suite result (see the report of this pass); the back 2/3 buttons on a real phone width; the Bangla wording of the new texts.
+Open: X3 social workspace (phase 500), XC screens and XB screens have no web screen (backend only, as their docs say).

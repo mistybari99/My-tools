@@ -56,8 +56,11 @@ function shell(title, body, back) {
     : (nav && pg !== 'home' ? `<button data-act="goback" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">');
   // "main" jumps to the nearest top-level screen of the chain (navstack.js); shown next to the back arrow on every deep screen
   const mainBtn = nav && pg !== 'home' && window.BOS_NAVSTACK ? `<button type="button" class="navmain" data-act="navmain" aria-label="${esc(t('mainscr'))}">${esc(t('mainscr'))}</button>` : '';
+  // back 2 / back 3 steps: shown only when the chain is deep enough (BOS_NAVSTACK.depth() counts the current screen)
+  const depth = nav && pg !== 'home' && window.BOS_NAVSTACK ? window.BOS_NAVSTACK.depth() : 0;
+  const backN = [2, 3].filter((n) => depth > n).map((n) => `<button type="button" class="navback" data-act="goback" data-n="${n}" aria-label="${esc(t('back' + n))}">${esc(t('back' + n))}</button>`).join('');
   const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
-  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}${mainBtn}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
+  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}${mainBtn}${backN}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
 }
 function openSheet(html) {
@@ -545,7 +548,7 @@ const H = {
   dologin: doLogin, doregister: doRegister, logout,
   recheck: async () => { await loadCtx(); route(); },
   closesheet: closeSheet,
-  goback: () => { if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.back(); else if ((window.__navCount || 1) > 1) { window.__navCount -= 2; history.back(); } else go('home'); },
+  goback: (a) => { const n = Math.max(1, Number(a && a.dataset && a.dataset.n) || 1); if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.back(n); else if ((window.__navCount || 1) > 1) { window.__navCount -= 2; history.back(); } else go('home'); },
   navmain: () => { if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.main(); else go('home'); },
   sheettog: (a) => a.classList.toggle('on'),
   itemcat: (a) => { S.itemCat = a.dataset.v; drawItems(); },
