@@ -1,0 +1,111 @@
+{
+ "package": "XC",
+ "title": "Owner summary, production suggestion, price alerts, unsold stock, staff board",
+ "note": "Plain-English info for the settings added by phases 550-554. Every setting starts OFF or blank. No setting is assumed.",
+ "entries": {
+  "rule:xc_summary_on": {
+   "title": "Owner daily summary",
+   "does": "Builds one summary of the day (sales, cash, wallet receipts, wastage, cakes due tomorrow, and for the owner also dues, approvals and failures) and sends it to the people the owner has entered.",
+   "why": "The owner sees the day in one message instead of opening five screens.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the summary goes out at the hours set below, to the recipients who are switched on. Nothing is changed in the books. An outlet recipient gets only that outlet's figures and no cost values.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_email_on": {
+   "title": "Daily summary by e-mail",
+   "does": "Sends the summary by e-mail to recipients whose channel is e-mail.",
+   "why": "E-mail is the record that can be kept and forwarded.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: e-mail recipients get the summary. Needs the Gmail secrets set by the technical person (docs/OPS_SETUP.md).",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_telegram_on": {
+   "title": "Daily summary by Telegram",
+   "does": "Sends the summary to Telegram chats whose channel is Telegram.",
+   "why": "Telegram reaches a phone quickly.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: Telegram recipients get the summary. The bot token is kept as a secret by the technical person; the chat number is typed on the recipient row.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_times": {
+   "title": "Summary hours (Dhaka)",
+   "does": "The hours of the day the summary is due, for example 08 and 21. 08 means yesterday's figures; 21 means today's.",
+   "why": "Keeps the morning and evening messages where the owner wants them.",
+   "default": "21 (evening, today's figures)",
+   "change": "The summary goes out only in the hours listed. The technical schedule runs at about 08:10 and 21:10 Dhaka time.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_sync_alert_on": {
+   "title": "Every shop synced? alert",
+   "does": "Puts a warning in the bell for each place with no recorded sale for longer than the hours set below.",
+   "why": "A shop that has stopped sending sales is found the same day.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the warning appears once per place per day, if the hours are typed too. Nothing is changed in the books.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_sync_stale_hours": {
+   "title": "Hours without a sale before the alert",
+   "does": "How many hours with no recorded sale at a place before the sync warning is shown.",
+   "why": "A quiet shop is not always broken; the owner knows the hours of each shop.",
+   "default": "Blank. Blank means the warning says 'threshold not set' and does nothing.",
+   "change": "Typed hours (1 to 720) make the sync warning work when its switch is on.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_prod_suggest_on": {
+   "title": "Daily production suggestion",
+   "does": "Shows a suggested quantity for each item at a place: the average of the same weekday in the last weeks, plus open orders for that day, minus stock on hand. Festival uplift is shown separately.",
+   "why": "Gives the baker a starting figure from real sales. It is arithmetic on past sales, not a forecast.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the planning screen can show the suggestion and the range. Nothing is written to the production plan until the baker confirms.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_prod_weeks": {
+   "title": "Weeks of same-weekday history",
+   "does": "How many past weeks of the same weekday the suggestion averages over.",
+   "why": "More weeks steadier, fewer weeks quicker to react.",
+   "default": "Blank. Blank means no suggestion is shown and the screen says 'data needed'.",
+   "change": "Typed weeks (1 to 12) switch the suggestion on for the switched-on places.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_price_alert_on": {
+   "title": "Supplier price-rise alert",
+   "does": "Puts a warning in the bell when a supplier's rate for an item goes up by more than the percentage set below, compared with that supplier's previous rate.",
+   "why": "A rise noticed the day it happens can be negotiated or the menu price changed.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the warning appears once per item and supplier per day. Nothing is changed in the purchase records.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_price_rise_pct": {
+   "title": "Rise % that triggers the price alert",
+   "does": "The percentage rise over the previous rate that causes a warning.",
+   "why": "Too small and the owner gets noise; too large and small rises are missed.",
+   "default": "Blank. Blank means the alert says 'threshold not set' and writes nothing.",
+   "change": "A typed percentage (1 to 500) is used by the price alert when its switch is on.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_unsold_on": {
+   "title": "Unsold stock and markdown",
+   "does": "Lists the units that cannot be sold tomorrow (their expiry is before the end of the next day), lets the person record what happened to each unit (sold at a markdown, staff meal, donation, waste), and shows the wastage share per item.",
+   "why": "Unsold cakes are money. The list makes the decision before the end of the day.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the end-of-day list and the outcome lines are available. An outcome line never moves stock or money; waste is still booked on the wastage screen.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_markdown_pct": {
+   "title": "Markdown % for unsold stock",
+   "does": "The discount suggested for units that cannot sell tomorrow, and the discount a markdown sale is recorded at.",
+   "why": "The owner sets the discount, not the software.",
+   "default": "Blank. Blank means no discount is suggested and a markdown sale is refused.",
+   "change": "A typed percentage (1 to 90) is used for the suggested markdown price and for markdown sales.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_coaching_on": {
+   "title": "Staff coaching board (owner only)",
+   "does": "Shows the owner, per person, the figures that already exist: bills, discounts, voids, cash shortage cases, production rejects, late days and complaints. No ranking and no score.",
+   "why": "Helps the owner talk to people with the same facts for everyone. Nobody else can see it.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the owner can open the board for a chosen period. Other roles cannot see it even when it is on. It changes no record.",
+   "who": "Only the owner, in Settings."
+  }
+ }
+}

@@ -574,3 +574,15 @@ Not confirmed
 Merge of all finished packages onto one branch; see docs/integration/INTEGRATION.md for merge order, conflicts, renumbering, glue (phase 477), handler renames, test results and what is not covered. Owner paste list: docs/PASTE_ORDER.md.
 - Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
 - Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.
+
+## XC package (branch xc-ops, local only, not pushed)
+
+What changed: new files only, plus appended rows in `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` (rows 29 to 33), 13 info entries merged into `web/data/info.json`.
+New SQL: `supabase/phase550.sql` to `phase554.sql` (owner summary and sync alert; production suggestion; price board and alert; unsold and markdown; staff board), each with `*_test.sql`; shared test head `tests/sql/xc_head.sql`.
+New tools: `tools/owner_summary.py` (dry run unless `--send`), `tools/bump_sw.py`; workflow `.github/workflows/owner_summary.yml`; tests `tests/py/test_xc_owner_summary.py`, `tests/py/test_xc_bump_sw.py`.
+Docs: `docs/integration/XC.md`, `docs/integration/XC_info.json`.
+
+Manual checks run (local throwaway Postgres, port 5870, database built through the whole owner order): full chain builds; phases 550 to 554 pasted twice with no error; SQL suites 38, 28, 23, 27 and 10 checks all pass on the full chain; Python suites all pass; `check_no_demo_leak` OK; `check_info_coverage` exit 0.
+
+Could not confirm: the live Supabase project, a real Gmail send, a real Telegram chat, any phone or 360px screen (no screen was built), the old SQL suites 8 to 87 with these phases, the web suite.
+Not built: screens, the unsynced badge and outbox viewer, low-stock draft orders, cash-count reminder, shop checklist with photos, temperature reminders, SMS and WhatsApp summary.
