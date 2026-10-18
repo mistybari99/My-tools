@@ -21,20 +21,6 @@
    "verified": true,
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
-  "feature:action_queue": {
-   "title": "Approval queue for proposed actions",
-   "does": "An agent or an automated job can propose one action from a short allowed list. The owner approves or rejects it (a rejection needs a reason). Nothing runs by itself: the owner's own session runs the approved action and records the result.",
-   "why": "A proposal is never a silent change. Every step is in the record.",
-   "default": "The list of allowed actions is empty. Nothing can be proposed until the owner allows an action.",
-   "change": "The owner adds an action to the allowed list. Rules, permissions, the audit trail and money can never be on that list.",
-   "who": "The owner decides. The person who proposed cannot decide the same proposal.",
-   "related": [
-    "feature:agent_accounts",
-    "screen:x1health"
-   ],
-   "verified": false,
-   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
-  },
   "feature:actual_yield": {
    "title": "Actual yield at production",
    "does": "An optional box in the production sheet for the real quantity made.",
@@ -44,19 +30,6 @@
    "who": "Who may post production.",
    "verified": true,
    "src": "RPT-B3 (docs/integration/RPT-B3_info.json)"
-  },
-  "feature:agent_accounts": {
-   "title": "Agent accounts (limited sign-in for software)",
-   "does": "A separate sign-in for an automated agent. It can only ask the gate and propose actions for the owner to approve. It can never hold a role or a permission, and it can never change rules, permissions, the audit trail or money.",
-   "why": "An agent can help, but it can never do what only a person may do.",
-   "default": "None exists. The owner creates one only when needed.",
-   "change": "The owner names an account that has no roles and no permissions.",
-   "who": "Only the owner creates one.",
-   "related": [
-    "feature:action_queue"
-   ],
-   "verified": false,
-   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
   },
   "feature:agreed_prices": {
    "title": "Agreed price per item and supplier",
@@ -232,19 +205,6 @@
    "who": "Anyone who may enter online orders.",
    "verified": true,
    "src": "RPT-C2 (docs/integration/RPT-C2_info.json)"
-  },
-  "feature:camera_recognition": {
-   "title": "Camera and recognition (X5)",
-   "does": "Barcode, label text (on phone), photo matching (on phone, not yet installed), name suggestions, duplicate check and a review record for unclear reads. Every part is a separate switch and is OFF by default.",
-   "why": "Faster item entry with fewer duplicates, and nothing changes until the owner switches a part on.",
-   "default": "All OFF. The item form works as before.",
-   "change": "Each part is switched on or off in Settings. Recognised text or photos only suggest; a person always chooses.",
-   "who": "Owner (switches). Staff with item permission (use).",
-   "related": [
-    "screen:camrec"
-   ],
-   "verified": false,
-   "src": "docs/ANDROID_WRAPPER.md; X5 build (not device-tested)"
   },
   "feature:campaigns_master": {
    "title": "Campaign list",
@@ -1717,20 +1677,6 @@
    "verified": true,
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
-  "feature:x1_gate": {
-   "title": "The gate for outside and AI calls",
-   "does": "Every outside call, AI call and automated write asks one gate first. The gate checks, in order: automation ON, not paused, the connection ON and configured, read-only, do-not-contact for the customer, the monthly call cap, the calls per minute, and dry run. The reason for every answer is logged.",
-   "why": "Nothing is sent to a customer who asked not to be contacted, nothing runs over budget, and nothing writes while the owner is only testing.",
-   "default": "Denies everything until automation is ON, the connection is ON and a monthly cap is set.",
-   "change": "The switches and caps on the Connect Center and in the Switchboard.",
-   "who": "Used by the scheduled jobs and by the approved agents. Staff cannot call it.",
-   "related": [
-    "screen:connect",
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
-  },
   "grant:announce_post": {
    "title": "Post announcements and instructions",
    "does": "Lets a person or a role post an announcement. A right without a place can post to everyone, a role, a place or one person. A right limited to one place can post only to that place.",
@@ -1910,26 +1856,6 @@
    "verified": true,
    "src": "phase89.sql; W1-B.md"
   },
-  "grant:market_manage": {
-   "title": "Add topics, sources, findings, prices and opportunities, and decide them",
-   "does": "Lets a person add research, record opportunities and move them through their statuses (each move needs a reason).",
-   "why": "The person who asks for an opportunity can not approve it themselves, so a decision always has a second person behind it.",
-   "default": "Given to nobody. Only the owner has it.",
-   "change": "The person can add and change research and opportunities, and create tasks from approved work. They can not set scraping permissions, link a provider or schedule jobs.",
-   "who": "Only the owner. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "grant:market_view": {
-   "title": "See the market intelligence workspace",
-   "does": "Lets a person read the findings, prices, opportunities and growth figures on the Market page.",
-   "why": "Market notes can be sensitive (competitor prices, plans). Only the people who need them should see them.",
-   "default": "Given to nobody. Only the owner has it.",
-   "change": "The person sees the Market page and its figures, but can not add or decide anything. Sales figures on the page still follow their places.",
-   "who": "Only the owner. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
   "grant:recall_manage": {
    "title": "Open and run a recall case",
    "does": "Lets a person open a recall case, add batches to it, mark what was done and close it. The affected-stock report shows who holds the batch.",
@@ -1981,26 +1907,6 @@
    ],
    "verified": true,
    "src": "phase132.sql (shift_manage, _r2c_ok); phase132_test.sql T2 and T3"
-  },
-  "grant:social_approve": {
-   "title": "Approve social posts",
-   "does": "Lets a person approve a post that someone else wrote, after looking at the preview.",
-   "why": "Every public post needs a second person to say yes.",
-   "default": "Nobody (except the owner).",
-   "change": "The approver can approve, send back or cancel posts. The person who wrote a post can never approve it.",
-   "who": "Only the owner (Settings, people rights).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "grant:social_manage": {
-   "title": "Write and submit social posts",
-   "does": "Lets a person write a post, add its pictures and send it for approval.",
-   "why": "Only the people who write posts should have this.",
-   "default": "Nobody (except the owner).",
-   "change": "The person can prepare posts; they cannot approve their own.",
-   "who": "Only the owner (Settings, people rights).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
   },
   "grant:stockout_log": {
    "title": "Log a stockout (unmet demand)",
@@ -2087,38 +1993,6 @@
    "verified": true,
    "src": "phase40.sql; phase89.sql"
   },
-  "rule:ai_default_provider": {
-   "title": "Default AI provider",
-   "does": "Chooses which provider the helpers use when an agent does not name one. local_rules runs on the phone for free. The other choices are paid providers and need a key, a model and a monthly budget first.",
-   "why": "A paid provider can spend money every month. Keeping local_rules as the default means no spending happens by accident.",
-   "default": "local_rules (on the phone, free).",
-   "change": "A paid provider is used only when it is enabled, has a model and a budget, and the data level it needs is allowed for it. The AI log shows each call.",
-   "who": "Only the owner, in Settings."
-  },
-  "rule:ai_on": {
-   "title": "AI helpers are on (after a provider is linked)",
-   "does": "Lets the AI helpers run. Nothing runs while this is off, and no provider is called and no money is spent.",
-   "why": "This is the main on/off for every AI helper. It is safe to leave off until a provider and a monthly budget are set.",
-   "default": "Off. No AI call is made and nothing is spent.",
-   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews. Nothing is changed by the AI itself.",
-   "who": "Only the owner, in Settings."
-  },
-  "rule:ai_pause_all": {
-   "title": "Pause all AI now (emergency stop)",
-   "does": "Stops every AI agent and every provider at once. No new suggestion or proposal is made while it is on.",
-   "why": "If an answer looks wrong or a cost looks too high, one switch stops everything at once.",
-   "default": "Off.",
-   "change": "On: every AI call is refused and the reason 'paused' is written in the AI log. Existing suggestions and their decisions are kept.",
-   "who": "Only the owner, in Settings."
-  },
-  "rule:ai_speech_on": {
-   "title": "Voice questions (browser speech-to-text)",
-   "does": "Shows a microphone button in the assistant. The phone's own speech recognition turns the voice into text, which is then shown for the person to check before it is asked.",
-   "why": "Helps people who prefer speaking, including in Bangla. The text is still checked and redacted like typed text.",
-   "default": "Off. No microphone button is shown.",
-   "change": "On: the microphone button appears in the assistant. The question is still answered by the same rules and permissions as typed text.",
-   "who": "Only the owner, in Settings."
-  },
   "rule:allow_test_reset": {
    "title": "Allow test data reset",
    "does": "When ON, the owner can delete all test data by typing a fixed phrase. The switch turns itself OFF after one reset and a log line is written.",
@@ -2160,34 +2034,6 @@
    ],
    "verified": true,
    "src": "phase89.sql"
-  },
-  "rule:automation_on": {
-   "title": "Automation (all) ON",
-   "does": "The one master switch for everything that talks to the outside or runs on a schedule: outside connections, AI calls, scheduled jobs and proposals made by agents. When it is OFF, every call is refused and every scheduled job is recorded as skipped.",
-   "why": "One place stops everything at once if something goes wrong, and nothing starts by surprise.",
-   "default": "Off. Nothing outside the app runs until the owner switches it on.",
-   "change": "Rule automation_on. The pause rule automation_pause_until stops it for a set time without switching it off.",
-   "who": "Only the owner.",
-   "related": [
-    "rule:automation_pause_until",
-    "screen:connect",
-    "screen:x1health"
-   ],
-   "verified": false,
-   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
-  },
-  "rule:automation_pause_until": {
-   "title": "Pause automation until a time",
-   "does": "Stops all automation until the time written here (ISO time, for example 2026-11-01T00:00:00+06:00). A value that cannot be read counts as paused.",
-   "why": "A safe way to stop everything for a few days (for example during a holiday or an incident) without losing the settings.",
-   "default": "Empty = no pause.",
-   "change": "Write the time in the Switchboard rule. Clear it to end the pause.",
-   "who": "Only the owner.",
-   "related": [
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase480.sql (_x1_pause_active)"
   },
   "rule:backdate_max_days_cash_move": {
    "title": "Back-date limit: cash move date",
@@ -3296,20 +3142,6 @@
    "verified": true,
    "src": "phase20.sql; phase48.sql; W1-G.md section 1"
   },
-  "rule:item_similar_check_on": {
-   "title": "Similar-name and barcode check when adding an item",
-   "does": "When ON, adding a new item first checks the name against existing items. An exact same name is refused, and a barcode already in use is refused. A look-alike name is shown and the person presses again to add anyway.",
-   "why": "Stops the same product being entered twice under small spelling differences.",
-   "default": "OFF. Items are added exactly as before.",
-   "change": "Nothing already saved changes. Only new items are checked.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:camrec",
-    "rule:recog_ocr_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql; X5 section"
-  },
   "rule:journal_attach_over": {
    "title": "A manual journal above this total needs an attachment",
    "does": "Above this total in Tk, a manual journal must carry a photo or file reference.",
@@ -3521,96 +3353,6 @@
    "who": "Only the owner (Settings). Posting is run by the accounts manager.",
    "verified": true,
    "src": "RPT-C3 (docs/integration/RPT-C3_info.json)"
-  },
-  "rule:mi_ai_summary_on": {
-   "title": "Let the AI summariser propose a summary of chosen findings",
-   "does": "Lets the AI assistant write a short proposed summary of findings you selected. The proposal waits for a person to accept or reject it.",
-   "why": "Long sources are slow to read. A draft summary saves time; a person still checks it against the source.",
-   "default": "OFF. No AI call is made.",
-   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes. The person who asked can not accept their own proposal.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_alerts_on": {
-   "title": "Put competitor price alerts in the in-app notifications",
-   "does": "Adds one line a day to the owner's notifications when competitor prices moved beyond the threshold.",
-   "why": "The owner sees the alert without opening the Market page.",
-   "default": "OFF. Alerts are only listed on the Market page.",
-   "change": "ON: one in-app line per day with the count of items that moved. It has no customer data.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_digest_on": {
-   "title": "Weekly growth and market digest to the owner (in-app)",
-   "does": "Writes one in-app line for the owner with the top sales movers, open opportunities and the number of price alerts, when the weekly job runs it.",
-   "why": "A short weekly summary keeps the owner on the numbers without a long report.",
-   "default": "OFF. No digest is written.",
-   "change": "ON: the digest is written when the scheduled job (a later package) runs it. It has numbers from our own sales only and is not sent outside the app.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_elast_min_days": {
-   "title": "Minimum trading days at each price before a price-response hint is shown",
-   "does": "Sets how many trading days a price must have been charged before we compare how many units sold at that price.",
-   "why": "A price that was charged for one day says nothing. The hint is only a pattern in past data, never a forecast.",
-   "default": "Blank. No price-response hint is shown.",
-   "change": "A number lets the Growth page show the past pattern, with the days behind it, when at least two prices meet the minimum. It never changes a price.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_on": {
-   "title": "Market intelligence workspace (research, findings, opportunities)",
-   "does": "Turns on the Market page: research topics, source registry, findings you type in, competitor prices, opportunities with evidence and decisions, and measuring them from our own sales.",
-   "why": "It keeps what we learn about competitors, prices, festivals and customers in one place, with the source and the date, instead of in people's heads.",
-   "default": "OFF. The Market page is empty and nothing can be written. Nothing is searched on the internet by this switch.",
-   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever. OFF again: nothing new can be written, old records stay and can be read.",
-   "who": "Only the owner, in Settings (the Rules page). Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_quote_max_chars": {
-   "title": "Longest quoted snippet kept from a source (characters)",
-   "does": "Sets how many characters of a source may be kept as a direct quote on a finding.",
-   "why": "Keeping only short quotes and our own summary respects the source and keeps the record useful.",
-   "default": "Blank. Quotes are not stored; write your own summary only.",
-   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message. Existing findings are not changed.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_research_job_on": {
-   "title": "Run scheduled research jobs",
-   "does": "Lets the job runner (a later package) run the research jobs that are switched on.",
-   "why": "A job is only useful when it runs on its own. This is the master switch for all of them.",
-   "default": "OFF. Job definitions can be stored; none runs.",
-   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above. OFF again: nothing runs.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_scrape_on": {
-   "title": "Allow scheduled research to fetch a permitted source",
-   "does": "Lets a scheduled research job read a public page from a source, but only when the owner has allowed that source after reading its terms, the robots.txt check passed and a rate limit is typed.",
-   "why": "Reading a permitted page on a schedule saves hours. It is never used to get past a login or a paywall, and it never copies a page in bulk.",
-   "default": "OFF. No job fetches anything. Even ON, each source stays closed until the owner allows it.",
-   "change": "ON: the research gate opens only for sources that meet every condition. OFF again: every job stops at once, whatever the source settings.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_watch_threshold_pct": {
-   "title": "Alert when a competitor price moves by more than this %",
-   "does": "Lists each competitor price that moved more than this percentage since its previous observation.",
-   "why": "A big competitor price move is worth a look the same day.",
-   "default": "Blank. No competitor price alert.",
-   "change": "A number lists the moves on the Market page's price tab. Nothing is sent to customers.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
   },
   "rule:mkt_repeat_days": {
    "title": "Repeat purchase window after a promotion (days)",
@@ -4321,131 +4063,6 @@
    "verified": true,
    "src": "phase97.sql"
   },
-  "rule:recog_image_match_on": {
-   "title": "Match a photo to approved item photos (on the phone)",
-   "does": "When ON, a photo is compared with the approved item photos stored on this phone and the nearest items are listed with their distance. Nothing leaves the phone.",
-   "why": "Helps find an item when there is no barcode or readable label.",
-   "default": "OFF. No photo is compared.",
-   "change": "Needs an item photo index on the phone and a distance limit. Until both exist the list stays empty and says why.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_image_threshold",
-    "screen:camrec"
-   ],
-   "warn": "No model is installed in this version: the list stays empty.",
-   "verified": true,
-   "src": "phase520.sql; X5 scan.js"
-  },
-  "rule:recog_image_threshold": {
-   "title": "Photo match distance limit",
-   "does": "Only items whose photo distance is at or below this number are listed. Smaller is stricter. The distance is a number, never a percentage.",
-   "why": "Stops unrelated items from being suggested.",
-   "default": "Blank. Blank = not set: no photo candidates are shown.",
-   "change": "Changing it affects the next photo only.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_image_match_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_ocr_langs": {
-   "title": "Languages to read",
-   "does": "The language files to use, written like eng+ben (English and Bangla). Each language is one file downloaded once.",
-   "why": "Bangla labels need the Bangla file; English labels need the English file.",
-   "default": "Blank. Blank blocks label reading.",
-   "change": "A new language downloads its file the next time it is used.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_ocr_on",
-    "rule:recog_ocr_wifi_only"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_ocr_max_px": {
-   "title": "Label photo longest side in pixels",
-   "does": "The label photo is made smaller to this longest side before reading. Smaller is faster on old phones but reads less small print.",
-   "why": "Old phones run out of memory with large photos.",
-   "default": "Blank. Blank blocks label reading: no size is assumed.",
-   "change": "Changing it affects the next read only.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_ocr_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_ocr_on": {
-   "title": "Read label text on the phone (OCR)",
-   "does": "When ON, a label photo is read on this phone by the Tesseract engine. The text is shown for review; nothing is saved from it. The photo never leaves the phone.",
-   "why": "Lets staff find an item from the words on a packet without typing.",
-   "default": "OFF. No label is read.",
-   "change": "The first use downloads the chosen language file once (Wi-Fi only while the Wi-Fi switch is on). Nothing is saved automatically.",
-   "who": "Only the owner (Settings). The camera screen shows whether the phone can run it.",
-   "related": [
-    "rule:recog_ocr_max_px",
-    "rule:recog_ocr_langs",
-    "rule:recog_ocr_wifi_only",
-    "screen:camrec"
-   ],
-   "verified": true,
-   "src": "phase520.sql; X5 scan.js"
-  },
-  "rule:recog_ocr_wifi_only": {
-   "title": "Download language files on Wi-Fi only",
-   "does": "When ON, a language file that is not on the phone is downloaded only on Wi-Fi. A file already on the phone is always used.",
-   "why": "The language files are several megabytes; mobile data is paid for.",
-   "default": "ON.",
-   "change": "Nothing already downloaded is removed.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_ocr_langs"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_vision_budget": {
-   "title": "Vision service monthly call cap",
-   "does": "The most calls to the vision service in one month. When reached, no more calls are made until next month.",
-   "why": "Keeps the bill under control.",
-   "default": "Blank. Blank = the service does not run.",
-   "change": "Changing it applies from the next call.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_vision_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_vision_consent_on": {
-   "title": "Consent to send label photos to the server vision service",
-   "does": "The owner confirms that label photos may be sent to the paid vision service. Without this, no photo is sent.",
-   "why": "Photos can show customers and suppliers; the owner must agree.",
-   "default": "OFF (no consent).",
-   "change": "Turning it off stops all sending at once.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_vision_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_vision_on": {
-   "title": "Server vision service (paid, needs consent)",
-   "does": "Would send a label photo to a server vision service for label suggestions. It also needs the consent switch and the monthly cap, and the X1 connection.",
-   "why": "Better reading for hard photos, at a cost.",
-   "default": "OFF. Nothing is sent.",
-   "change": "Not available yet: the X1 connection is not built, so this stays inactive.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_vision_consent_on",
-    "rule:recog_vision_budget"
-   ],
-   "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
-   "verified": true,
-   "src": "phase520.sql; tools/edge/vision-proxy.ts"
-  },
   "rule:report_cash_short_by_case_on": {
    "title": "Cash short/over report follows the shortage case",
    "does": "The cash short and over report leaves out sheets whose shortage case was rejected or voided, and shows how many cases are open, approved, rejected and void.",
@@ -4705,106 +4322,6 @@
    "verified": true,
    "src": "phase81.sql; B.md"
   },
-  "rule:social_max_per_day": {
-   "title": "Most posts per day",
-   "does": "The largest number of posts and customer messages that may be planned or sent in one Dhaka day.",
-   "why": "Stops a flood of posts that annoys followers and can get the page restricted.",
-   "default": "Blank. No post can be scheduled or published until a number is typed.",
-   "change": "A new schedule that would go over the number is refused with a day-limit message.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_max_per_hour": {
-   "title": "Most posts per hour",
-   "does": "The largest number of posts and customer messages in one clock hour.",
-   "why": "Spreads posts out so the page does not look like spam.",
-   "default": "Blank. No post can be scheduled or published until a number is typed.",
-   "change": "A schedule that would go over the number in its hour is refused.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_media_image_mb": {
-   "title": "Largest picture size (MB)",
-   "does": "The biggest JPEG or PNG picture that may be attached to a post.",
-   "why": "Large files are slow to upload and may be refused by the provider.",
-   "default": "5 MB. This is a proposed starting value, to be confirmed by the owner.",
-   "change": "Bigger pictures are refused when they are added.",
-   "who": "Only the owner (Settings).",
-   "verified": false,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_media_video_mb": {
-   "title": "Largest video size (MB)",
-   "does": "The biggest MP4 video that may be attached to a post.",
-   "why": "Video uploads are slow on a weak connection.",
-   "default": "50 MB. This is a proposed starting value, to be confirmed by the owner.",
-   "change": "Bigger videos are refused when they are added.",
-   "who": "Only the owner (Settings).",
-   "verified": false,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_on": {
-   "title": "Social and marketing workspace is on",
-   "does": "Turns on the content calendar, content items, the approval queue and the publishing screens. Nothing is posted by this switch alone.",
-   "why": "Keeps the social work in one place with an approval step before anything goes public.",
-   "default": "Off. No content can be written and no approval can be made.",
-   "change": "On: people with the write or approve right can prepare and approve content. Publishing still needs its own switch.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_publish_on": {
-   "title": "Publish approved posts automatically",
-   "does": "Lets the publisher send approved posts to the connected pages and accounts at their scheduled time.",
-   "why": "A post goes out on time without someone pressing a button, but only after a person approved it.",
-   "default": "Off. The publisher sends nothing.",
-   "change": "On: the publisher (run by GitHub Actions with the secrets you set) posts due items, within the limits and outside quiet hours. Off: due items wait.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_quiet_from": {
-   "title": "Quiet hours start (Dhaka time)",
-   "does": "The start of a window when no post and no customer message goes out. Written as HH:MM.",
-   "why": "Nobody wants a message at midnight.",
-   "default": "Blank. No quiet hours.",
-   "change": "Scheduling inside the window is refused; the publisher waits until it is over.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_quiet_to": {
-   "title": "Quiet hours end (Dhaka time)",
-   "does": "The end of the quiet window. Written as HH:MM. An end earlier than the start means the window crosses midnight.",
-   "why": "Together with the start it defines when the page stays silent.",
-   "default": "Blank. No quiet hours.",
-   "change": "As for the start: both must be written for the window to apply.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_retry_max": {
-   "title": "Most tries for one post",
-   "does": "How many times the publisher tries a post that failed before it is marked failed.",
-   "why": "A short problem with the provider heals itself; a long one must be seen by a person.",
-   "default": "5 tries. The waits grow: 2, 4, 8 and 16 minutes.",
-   "change": "A failed post after its last try shows in the queue as failed and can be scheduled again by the approver.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_stop_all": {
-   "title": "Stop all publishing (emergency)",
-   "does": "Stops every post and every customer message at once. Queued items wait; nothing is deleted.",
-   "why": "A wrong post or a provider problem can be stopped in one step.",
-   "default": "Off.",
-   "change": "On: the publisher sends nothing and new schedules are refused until it is switched off again. Off: the waiting queue continues.",
-   "who": "Only the owner, and it needs a reason.",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
   "rule:start_date_lock_after_opening": {
    "title": "Do not move the accounting start date after the opening is posted",
    "does": "When ON, once an opening entry exists the accounting start date cannot be changed. Reverse the opening first.",
@@ -4975,261 +4492,6 @@
    "verified": true,
    "src": "phase140.sql; W1-FIX.md section 2"
   },
-  "rule:website_brand_bn": {
-   "title": "Shop name (Bangla)",
-   "does": "The shop name shown on the public pages in Bangla.",
-   "why": "Customers read the name first.",
-   "default": "Blank: the header shows a generic word.",
-   "change": "The header and footer change at once.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
-  "rule:website_brand_en": {
-   "title": "Shop name (English)",
-   "does": "The shop name shown on the public pages in English.",
-   "why": "English-speaking customers read the name first.",
-   "change": "The English header and footer change at once.",
-  "rule:website_captcha_on": {
-   "title": "Captcha required for web orders",
-   "does": "Requires a captcha pass for web orders; no captcha provider is connected yet.",
-   "why": "Captcha stops automatic order spam, but while it is on and no provider exists the shop refuses orders.",
-   "default": "Off.",
-   "change": "All web checkouts are refused until a provider is added.",
-  "rule:website_custom_cake_on": {
-   "title": "Custom cake request form",
-   "does": "Shows the form where a customer asks for a custom cake with a reference photo.",
-   "why": "A custom cake needs a conversation before it is made.",
-   "change": "Customers can send requests; the owner confirms or declines each one.",
-  "rule:website_cutoff_hour": {
-   "title": "Same-day order cut-off (hour)",
-   "does": "After this hour (Dhaka time) same-day delivery is refused.",
-   "why": "Late orders cannot be made and delivered the same day.",
-   "default": "0: no cut-off.",
-   "change": "Customers see the same-day refusal after this hour.",
-  "rule:website_festival_mode_on": {
-   "title": "Festival pre-order mode",
-   "does": "Lets items show as Pre-order and applies the minimum lead days for festival orders.",
-   "why": "Peak days need orders days ahead.",
-   "default": "Off: items show In stock, Limited or Sold out only.",
-   "change": "Items set to pre-order show Pre-order to customers.",
-  "rule:website_ga_id": {
-   "title": "Google Analytics ID",
-   "does": "Adds Google Analytics only when this ID is set and the visitor accepted cookies.",
-   "why": "Analytics must be chosen by the owner and agreed by the visitor.",
-   "default": "Blank: no analytics code is loaded.",
-   "change": "Visitors who accept cookies are measured from their next visit.",
-  "rule:website_holiday_text_bn": {
-   "title": "Closure banner (Bangla)",
-   "does": "A banner in Bangla on every public page, for a holiday or a notice.",
-   "why": "Customers should know before they order.",
-   "default": "Blank: no banner.",
-   "change": "The banner appears at once.",
-  "rule:website_holiday_text_en": {
-   "title": "Closure banner (English)",
-   "does": "A banner in English on every public page, for a holiday or a notice.",
-   "why": "English-speaking customers should know before they order.",
-   "change": "The English banner appears at once.",
-  "rule:website_lead_days": {
-   "title": "Minimum lead days for an order",
-   "does": "Orders must be placed at least this many days ahead, for every item.",
-   "why": "Cakes and sweets need time to make.",
-   "default": "0: any date from today.",
-   "change": "The earliest delivery date moves for all items.",
-  "rule:website_location_id": {
-   "title": "Branch that receives web orders",
-   "does": "Chooses the branch whose stock and order numbers web orders use. 0 means not chosen.",
-   "why": "A web order is taken from one branch stock, so the wrong branch sends orders to the wrong shelf.",
-   "default": "Blank/0: web orders are refused. Saving a branch affects new orders only.",
-   "change": "New web orders use this branch; existing orders keep theirs.",
-  "rule:website_messenger_url": {
-   "title": "Messenger page link",
-   "does": "Adds a message-us button that opens this Messenger page.",
-   "why": "Some customers prefer Messenger.",
-   "default": "Blank: no Messenger button is shown.",
-   "change": "The button appears on the contact and footer areas. Only an https link is used.",
-  "rule:website_min_order": {
-   "title": "Minimum order (Tk)",
-   "does": "A basket below this amount cannot be ordered online.",
-   "why": "A minimum keeps small online orders from costing more to serve than they bring.",
-   "default": "0: no minimum.",
-   "change": "Baskets below the new amount are refused at checkout.",
-  "rule:website_on": {
-   "title": "Website (online shop) on",
-   "does": "Opens the public shop pages for customers.",
-   "why": "A public order page is the first thing a stranger can use.",
-   "default": "Off: the public pages say the shop is closed and take no orders.",
-   "change": "Customers see published items and can place orders for the chosen branch.",
-   "who": "Only the owner (Settings or Website screen).",
-  "rule:website_pay_cod_on": {
-   "title": "Cash on delivery offered",
-   "does": "Shows the cash-on-delivery option at checkout.",
-   "why": "Many customers pay in cash when the order arrives.",
-   "default": "Off: cash on delivery is not offered.",
-   "change": "The option appears or disappears at checkout.",
-  "rule:website_pay_manual_on": {
-   "title": "bKash / Nagad payment with a Trx ID",
-   "does": "Shows the bKash or Nagad option; the customer types the Trx ID after sending money.",
-   "why": "A typed Trx ID is only a claim until a person checks it in the wallet app.",
-   "default": "Off: the option is not offered.",
-   "change": "Customers can choose it; staff check the payment before confirming.",
-  "rule:website_pay_mobile_number": {
-   "title": "bKash / Nagad number shown to customers",
-   "does": "The number customers send money to for the manual option.",
-   "why": "Customers need the right number to pay.",
-   "default": "Blank: the manual option stays hidden.",
-   "change": "The number appears at checkout.",
-  "rule:website_pixel_id": {
-   "title": "Facebook Pixel ID",
-   "does": "Adds the Facebook Pixel only when this ID is set and the visitor accepted cookies.",
-   "why": "The Pixel reports visits to Facebook, so visitors must agree first.",
-   "default": "Blank: no Pixel code is loaded.",
-   "change": "Visitors who accept cookies are tracked from their next visit.",
-  "rule:website_policy_privacy_bn": {
-   "title": "Privacy policy (Bangla)",
-   "does": "The privacy text shown on the policies page in Bangla.",
-   "why": "Customers give personal details and must know how they are used.",
-   "default": "Blank: the page says coming soon.",
-   "change": "The policies page shows the new text.",
-  "rule:website_policy_privacy_en": {
-   "title": "Privacy policy (English)",
-   "does": "The privacy text shown on the policies page in English.",
-   "why": "English-speaking customers must know how their details are used.",
-   "change": "The English policies page shows the new text.",
-  "rule:website_policy_refund_bn": {
-   "title": "Refund and cancellation (Bangla)",
-   "does": "The refund and cancellation text shown on the policies page in Bangla.",
-   "why": "Customers need to know when a cancellation or refund is possible.",
-  "rule:website_policy_refund_en": {
-   "title": "Refund and cancellation (English)",
-   "does": "The refund and cancellation text shown on the policies page in English.",
-   "why": "English-speaking customers need to know when a cancellation or refund is possible.",
-  "rule:website_policy_terms_bn": {
-   "title": "Terms (Bangla)",
-   "does": "The terms text shown on the policies page in Bangla.",
-   "why": "Customers should know the rules of ordering.",
-  "rule:website_policy_terms_en": {
-   "title": "Terms (English)",
-   "does": "The terms text shown on the policies page in English.",
-   "why": "English-speaking customers should know the rules of ordering.",
-  "rule:website_public_url": {
-   "title": "Public address of the website",
-   "does": "Stores the https address of the shop once a domain or hosting exists.",
-   "why": "The go-live checklist uses it to show whether customers can really reach the shop.",
-   "default": "Blank: the shop is for local testing only.",
-   "change": "The checklist domain line turns OK. Nothing else changes by itself.",
-  "rule:website_rate_max": {
-   "title": "Web orders per device in the time window",
-   "does": "Limits how many web order attempts one device may make in the window below.",
-   "why": "It slows down automatic order spam.",
-   "default": "5 attempts (0 = no limit, not recommended).",
-   "change": "Devices that go over the limit are told to wait.",
-  "rule:website_rate_window_min": {
-   "title": "Web order limit window (minutes)",
-   "does": "The length of time used for the per-device attempt limit.",
-   "why": "The limit needs a time window to mean anything.",
-   "default": "60 minutes.",
-   "change": "A longer window makes the limit stricter.",
-  "rule:website_reserve_minutes": {
-   "title": "Hold time for reserved stock (minutes)",
-   "does": "How long a web order keeps its units before they are released.",
-   "why": "A hold that is never released would block stock forever.",
-   "default": "30 minutes.",
-   "change": "Holds expire sooner or later; expired holds are released.",
-  "rule:website_reserve_on": {
-   "title": "Hold stock at web checkout (hard reservation)",
-   "does": "A web order takes its units out of free stock straight away until it is delivered, cancelled or its hold time ends.",
-   "why": "Without it two customers can buy the last cake; with it the second is told sold out.",
-   "default": "Off: the shop shows availability but holds no stock.",
-   "change": "Checkout is refused as sold out when free stock is not enough.",
-  "rule:website_stock_threshold": {
-   "title": "Stock level that shows Limited",
-   "does": "When free stock is at or below this number, the shop shows Limited instead of In stock.",
-   "why": "It warns customers without showing the exact stock to the public.",
-   "default": "5 units.",
-   "change": "Items move to Limited sooner or later on the web.",
-  "rule:website_whatsapp": {
-   "title": "WhatsApp number for orders",
-   "does": "Adds WhatsApp order and contact buttons with this number.",
-   "why": "Many customers order by WhatsApp.",
-   "default": "Blank: no WhatsApp button is shown.",
-   "change": "The buttons appear on the public pages.",
-  "rule:xc_coaching_on": {
-   "title": "Staff coaching board (owner only)",
-   "does": "Shows the owner, per person, the figures that already exist: bills, discounts, voids, cash shortage cases, production rejects, late days and complaints. No ranking and no score.",
-   "why": "Helps the owner talk to people with the same facts for everyone. Nobody else can see it.",
-   "default": "Off. Nothing is composed, sent or shown.",
-   "change": "On: the owner can open the board for a chosen period. Other roles cannot see it even when it is on. It changes no record.",
-   "who": "Only the owner, in Settings."
-  "rule:xc_markdown_pct": {
-   "title": "Markdown % for unsold stock",
-   "does": "The discount suggested for units that cannot sell tomorrow, and the discount a markdown sale is recorded at.",
-   "why": "The owner sets the discount, not the software.",
-   "default": "Blank. Blank means no discount is suggested and a markdown sale is refused.",
-   "change": "A typed percentage (1 to 90) is used for the suggested markdown price and for markdown sales.",
-  "rule:xc_price_alert_on": {
-   "title": "Supplier price-rise alert",
-   "does": "Puts a warning in the bell when a supplier's rate for an item goes up by more than the percentage set below, compared with that supplier's previous rate.",
-   "why": "A rise noticed the day it happens can be negotiated or the menu price changed.",
-   "change": "On: the warning appears once per item and supplier per day. Nothing is changed in the purchase records.",
-  "rule:xc_price_rise_pct": {
-   "title": "Rise % that triggers the price alert",
-   "does": "The percentage rise over the previous rate that causes a warning.",
-   "why": "Too small and the owner gets noise; too large and small rises are missed.",
-   "default": "Blank. Blank means the alert says 'threshold not set' and writes nothing.",
-   "change": "A typed percentage (1 to 500) is used by the price alert when its switch is on.",
-  "rule:xc_prod_suggest_on": {
-   "title": "Daily production suggestion",
-   "does": "Shows a suggested quantity for each item at a place: the average of the same weekday in the last weeks, plus open orders for that day, minus stock on hand. Festival uplift is shown separately.",
-   "why": "Gives the baker a starting figure from real sales. It is arithmetic on past sales, not a forecast.",
-   "change": "On: the planning screen can show the suggestion and the range. Nothing is written to the production plan until the baker confirms.",
-  "rule:xc_prod_weeks": {
-   "title": "Weeks of same-weekday history",
-   "does": "How many past weeks of the same weekday the suggestion averages over.",
-   "why": "More weeks steadier, fewer weeks quicker to react.",
-   "default": "Blank. Blank means no suggestion is shown and the screen says 'data needed'.",
-   "change": "Typed weeks (1 to 12) switch the suggestion on for the switched-on places.",
-  "rule:xc_summary_email_on": {
-   "title": "Daily summary by e-mail",
-   "does": "Sends the summary by e-mail to recipients whose channel is e-mail.",
-   "why": "E-mail is the record that can be kept and forwarded.",
-   "change": "On: e-mail recipients get the summary. Needs the Gmail secrets set by the technical person (docs/OPS_SETUP.md).",
-  "rule:xc_summary_on": {
-   "title": "Owner daily summary",
-   "does": "Builds one summary of the day (sales, cash, wallet receipts, wastage, cakes due tomorrow, and for the owner also dues, approvals and failures) and sends it to the people the owner has entered.",
-   "why": "The owner sees the day in one message instead of opening five screens.",
-   "change": "On: the summary goes out at the hours set below, to the recipients who are switched on. Nothing is changed in the books. An outlet recipient gets only that outlet's figures and no cost values.",
-  "rule:xc_summary_telegram_on": {
-   "title": "Daily summary by Telegram",
-   "does": "Sends the summary to Telegram chats whose channel is Telegram.",
-   "why": "Telegram reaches a phone quickly.",
-   "change": "On: Telegram recipients get the summary. The bot token is kept as a secret by the technical person; the chat number is typed on the recipient row.",
-  "rule:xc_summary_times": {
-   "title": "Summary hours (Dhaka)",
-   "does": "The hours of the day the summary is due, for example 08 and 21. 08 means yesterday's figures; 21 means today's.",
-   "why": "Keeps the morning and evening messages where the owner wants them.",
-   "default": "21 (evening, today's figures)",
-   "change": "The summary goes out only in the hours listed. The technical schedule runs at about 08:10 and 21:10 Dhaka time.",
-  "rule:xc_sync_alert_on": {
-   "title": "Every shop synced? alert",
-   "does": "Puts a warning in the bell for each place with no recorded sale for longer than the hours set below.",
-   "why": "A shop that has stopped sending sales is found the same day.",
-   "change": "On: the warning appears once per place per day, if the hours are typed too. Nothing is changed in the books.",
-  "rule:xc_sync_stale_hours": {
-   "title": "Hours without a sale before the alert",
-   "does": "How many hours with no recorded sale at a place before the sync warning is shown.",
-   "why": "A quiet shop is not always broken; the owner knows the hours of each shop.",
-   "default": "Blank. Blank means the warning says 'threshold not set' and does nothing.",
-   "change": "Typed hours (1 to 720) make the sync warning work when its switch is on.",
-  "rule:xc_unsold_on": {
-   "title": "Unsold stock and markdown",
-   "does": "Lists the units that cannot be sold tomorrow (their expiry is before the end of the next day), lets the person record what happened to each unit (sold at a markdown, staff meal, donation, waste), and shows the wastage share per item.",
-   "why": "Unsold cakes are money. The list makes the decision before the end of the day.",
-   "change": "On: the end-of-day list and the outcome lines are available. An outcome line never moves stock or money; waste is still booked on the wastage screen.",
-  },
   "screen:accounts": {
    "title": "Accounts and ledger",
    "does": "Shows the books: the journal, trial balance, balance sheet and income statement. The Opening tab posts the first balances. You can post new sales, purchases and expenses to the books here.",
@@ -5291,33 +4553,6 @@
    "verified": true,
    "src": "phase97.sql; W1-F.md"
   },
-  "screen:connect": {
-   "title": "Connect Center",
-   "does": "One place for every outside connection: website and domain, hosting, Facebook Page, Instagram, WhatsApp Business, SMS gateway, e-mail, bKash and Nagad, AI provider, image reading and analytics. It shows the status, the non-secret settings, the names of the server secrets each one needs and where to set them, and a Test connection button.",
-   "why": "When the owner buys a domain or gets a key, he links it here without changing the app.",
-   "default": "Every connection is OFF and not connected.",
-   "change": "Owner: switch a connection on, set its address (https only), rate and monthly call cap, read-only and dry-run. Secret VALUES are never typed here: they are set on the server under the names shown.",
-   "who": "Only the owner can see and change it.",
-   "related": [
-    "screen:x1health",
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
-  "screen:camrec": {
-   "title": "Camera & Recognition",
-   "does": "Lists each way the app can read a barcode, label or photo, says whether this phone can run it now and why not, and runs a self-test on each one.",
-   "why": "Shows the truth about this phone before anyone relies on the camera.",
-   "default": "Every recognition option is OFF, so the screen reports them as off.",
-   "change": "The screen only reads; switches are changed in Settings.",
-   "who": "Owner.",
-    "rule:item_similar_check_on",
-    "rule:recog_ocr_on",
-    "rule:recog_image_match_on",
-    "rule:recog_vision_on"
-   "verified": true,
-   "src": "web/scan.js"
-  },
   "screen:exceptions": {
    "title": "Exceptions",
    "does": "Lists the lines that need a look: red lines are serious and yellow lines are notes. Every override that needs a reason lands here.",
@@ -5359,16 +4594,6 @@
    ],
    "verified": true,
    "src": "phase20.sql; W1-G.md"
-  },
-  "screen:market": {
-   "title": "Market & growth",
-   "does": "One page with five tabs: Overview, Research (topics, sources, findings), Prices (competitor prices and CSV import), Opportunities (evidence, KPI, status, tasks, measuring from sales) and Growth (our item and outlet growth, bought together, festival review).",
-   "why": "It joins what we read about the market with what our own sales show, so a decision can be checked against real numbers.",
-   "default": "Empty until the owner switches on the workspace and gives the rights.",
-   "change": "Every number says what it is based on: the days it covers and the assumptions. A warning reminds that a pattern is not a cause.",
-   "who": "The owner decides who has the rights. The page itself has no setting.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
   },
   "screen:moneyaccounts": {
    "title": "Money accounts",
@@ -5630,20 +4855,6 @@
    "verified": true,
    "src": "phase83.sql; D.md; phase86.sql"
   },
-  "screen:x1health": {
-   "title": "Automation & integration health",
-   "does": "Shows whether automation is on, whether it is paused, each connection and each scheduled job (ok, failed, stale, never run), failed intake items, the last backup, books freshness and proposals waiting for approval.",
-   "why": "One screen tells the owner what is working and what is not. A missing part is shown as missing, never as healthy.",
-   "default": "Owner only. The owner may add the health widget to the owner board.",
-   "change": "Nothing to set. It only reads.",
-   "who": "Only the owner.",
-   "related": [
-    "screen:connect",
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase481.sql (x1_health); web/connect.js"
-  },
   "switch:path:expense": {
    "title": "Path switch: expense",
    "does": "Chooses which way counts for this job: the day-book quick expense or the 10-2 expense voucher. The other way becomes a locked shadow copy.",
@@ -5738,6 +4949,1050 @@
    ],
    "verified": true,
    "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "feature:action_queue": {
+   "title": "Approval queue for proposed actions",
+   "does": "An agent or an automated job can propose one action from a short allowed list. The owner approves or rejects it (a rejection needs a reason). Nothing runs by itself: the owner's own session runs the approved action and records the result.",
+   "why": "A proposal is never a silent change. Every step is in the record.",
+   "default": "The list of allowed actions is empty. Nothing can be proposed until the owner allows an action.",
+   "change": "The owner adds an action to the allowed list. Rules, permissions, the audit trail and money can never be on that list.",
+   "who": "The owner decides. The person who proposed cannot decide the same proposal.",
+   "related": [
+    "feature:agent_accounts",
+    "screen:x1health"
+   ],
+   "verified": false,
+   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
+  },
+  "feature:agent_accounts": {
+   "title": "Agent accounts (limited sign-in for software)",
+   "does": "A separate sign-in for an automated agent. It can only ask the gate and propose actions for the owner to approve. It can never hold a role or a permission, and it can never change rules, permissions, the audit trail or money.",
+   "why": "An agent can help, but it can never do what only a person may do.",
+   "default": "None exists. The owner creates one only when needed.",
+   "change": "The owner names an account that has no roles and no permissions.",
+   "who": "Only the owner creates one.",
+   "related": [
+    "feature:action_queue"
+   ],
+   "verified": false,
+   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
+  },
+  "feature:x1_gate": {
+   "title": "The gate for outside and AI calls",
+   "does": "Every outside call, AI call and automated write asks one gate first. The gate checks, in order: automation ON, not paused, the connection ON and configured, read-only, do-not-contact for the customer, the monthly call cap, the calls per minute, and dry run. The reason for every answer is logged.",
+   "why": "Nothing is sent to a customer who asked not to be contacted, nothing runs over budget, and nothing writes while the owner is only testing.",
+   "default": "Denies everything until automation is ON, the connection is ON and a monthly cap is set.",
+   "change": "The switches and caps on the Connect Center and in the Switchboard.",
+   "who": "Used by the scheduled jobs and by the approved agents. Staff cannot call it.",
+   "related": [
+    "screen:connect",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
+  },
+  "rule:automation_on": {
+   "title": "Automation (all) ON",
+   "does": "The one master switch for everything that talks to the outside or runs on a schedule: outside connections, AI calls, scheduled jobs and proposals made by agents. When it is OFF, every call is refused and every scheduled job is recorded as skipped.",
+   "why": "One place stops everything at once if something goes wrong, and nothing starts by surprise.",
+   "default": "Off. Nothing outside the app runs until the owner switches it on.",
+   "change": "Rule automation_on. The pause rule automation_pause_until stops it for a set time without switching it off.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:automation_pause_until",
+    "screen:connect",
+    "screen:x1health"
+   ],
+   "verified": false,
+   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
+  },
+  "rule:automation_pause_until": {
+   "title": "Pause automation until a time",
+   "does": "Stops all automation until the time written here (ISO time, for example 2026-11-01T00:00:00+06:00). A value that cannot be read counts as paused.",
+   "why": "A safe way to stop everything for a few days (for example during a holiday or an incident) without losing the settings.",
+   "default": "Empty = no pause.",
+   "change": "Write the time in the Switchboard rule. Clear it to end the pause.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (_x1_pause_active)"
+  },
+  "screen:connect": {
+   "title": "Connect Center",
+   "does": "One place for every outside connection: website and domain, hosting, Facebook Page, Instagram, WhatsApp Business, SMS gateway, e-mail, bKash and Nagad, AI provider, image reading and analytics. It shows the status, the non-secret settings, the names of the server secrets each one needs and where to set them, and a Test connection button.",
+   "why": "When the owner buys a domain or gets a key, he links it here without changing the app.",
+   "default": "Every connection is OFF and not connected.",
+   "change": "Owner: switch a connection on, set its address (https only), rate and monthly call cap, read-only and dry-run. Secret VALUES are never typed here: they are set on the server under the names shown.",
+   "who": "Only the owner can see and change it.",
+   "related": [
+    "screen:x1health",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
+  },
+  "screen:x1health": {
+   "title": "Automation & integration health",
+   "does": "Shows whether automation is on, whether it is paused, each connection and each scheduled job (ok, failed, stale, never run), failed intake items, the last backup, books freshness and proposals waiting for approval.",
+   "why": "One screen tells the owner what is working and what is not. A missing part is shown as missing, never as healthy.",
+   "default": "Owner only. The owner may add the health widget to the owner board.",
+   "change": "Nothing to set. It only reads.",
+   "who": "Only the owner.",
+   "related": [
+    "screen:connect",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase481.sql (x1_health); web/connect.js"
+  },
+  "rule:website_brand_bn": {
+   "title": "Shop name (Bangla)",
+   "does": "The shop name shown on the public pages in Bangla.",
+   "why": "Customers read the name first.",
+   "default": "Blank: the header shows a generic word.",
+   "change": "The header and footer change at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_brand_en": {
+   "title": "Shop name (English)",
+   "does": "The shop name shown on the public pages in English.",
+   "why": "English-speaking customers read the name first.",
+   "default": "Blank: the header shows a generic word.",
+   "change": "The English header and footer change at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_captcha_on": {
+   "title": "Captcha required for web orders",
+   "does": "Requires a captcha pass for web orders; no captcha provider is connected yet.",
+   "why": "Captcha stops automatic order spam, but while it is on and no provider exists the shop refuses orders.",
+   "default": "Off.",
+   "change": "All web checkouts are refused until a provider is added.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_custom_cake_on": {
+   "title": "Custom cake request form",
+   "does": "Shows the form where a customer asks for a custom cake with a reference photo.",
+   "why": "A custom cake needs a conversation before it is made.",
+   "default": "Off.",
+   "change": "Customers can send requests; the owner confirms or declines each one.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_cutoff_hour": {
+   "title": "Same-day order cut-off (hour)",
+   "does": "After this hour (Dhaka time) same-day delivery is refused.",
+   "why": "Late orders cannot be made and delivered the same day.",
+   "default": "0: no cut-off.",
+   "change": "Customers see the same-day refusal after this hour.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_festival_mode_on": {
+   "title": "Festival pre-order mode",
+   "does": "Lets items show as Pre-order and applies the minimum lead days for festival orders.",
+   "why": "Peak days need orders days ahead.",
+   "default": "Off: items show In stock, Limited or Sold out only.",
+   "change": "Items set to pre-order show Pre-order to customers.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_ga_id": {
+   "title": "Google Analytics ID",
+   "does": "Adds Google Analytics only when this ID is set and the visitor accepted cookies.",
+   "why": "Analytics must be chosen by the owner and agreed by the visitor.",
+   "default": "Blank: no analytics code is loaded.",
+   "change": "Visitors who accept cookies are measured from their next visit.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_holiday_text_bn": {
+   "title": "Closure banner (Bangla)",
+   "does": "A banner in Bangla on every public page, for a holiday or a notice.",
+   "why": "Customers should know before they order.",
+   "default": "Blank: no banner.",
+   "change": "The banner appears at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_holiday_text_en": {
+   "title": "Closure banner (English)",
+   "does": "A banner in English on every public page, for a holiday or a notice.",
+   "why": "English-speaking customers should know before they order.",
+   "default": "Blank: no banner.",
+   "change": "The English banner appears at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_lead_days": {
+   "title": "Minimum lead days for an order",
+   "does": "Orders must be placed at least this many days ahead, for every item.",
+   "why": "Cakes and sweets need time to make.",
+   "default": "0: any date from today.",
+   "change": "The earliest delivery date moves for all items.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_location_id": {
+   "title": "Branch that receives web orders",
+   "does": "Chooses the branch whose stock and order numbers web orders use. 0 means not chosen.",
+   "why": "A web order is taken from one branch stock, so the wrong branch sends orders to the wrong shelf.",
+   "default": "Blank/0: web orders are refused. Saving a branch affects new orders only.",
+   "change": "New web orders use this branch; existing orders keep theirs.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_messenger_url": {
+   "title": "Messenger page link",
+   "does": "Adds a message-us button that opens this Messenger page.",
+   "why": "Some customers prefer Messenger.",
+   "default": "Blank: no Messenger button is shown.",
+   "change": "The button appears on the contact and footer areas. Only an https link is used.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_min_order": {
+   "title": "Minimum order (Tk)",
+   "does": "A basket below this amount cannot be ordered online.",
+   "why": "A minimum keeps small online orders from costing more to serve than they bring.",
+   "default": "0: no minimum.",
+   "change": "Baskets below the new amount are refused at checkout.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_on": {
+   "title": "Website (online shop) on",
+   "does": "Opens the public shop pages for customers.",
+   "why": "A public order page is the first thing a stranger can use.",
+   "default": "Off: the public pages say the shop is closed and take no orders.",
+   "change": "Customers see published items and can place orders for the chosen branch.",
+   "who": "Only the owner (Settings or Website screen).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_pay_cod_on": {
+   "title": "Cash on delivery offered",
+   "does": "Shows the cash-on-delivery option at checkout.",
+   "why": "Many customers pay in cash when the order arrives.",
+   "default": "Off: cash on delivery is not offered.",
+   "change": "The option appears or disappears at checkout.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_pay_manual_on": {
+   "title": "bKash / Nagad payment with a Trx ID",
+   "does": "Shows the bKash or Nagad option; the customer types the Trx ID after sending money.",
+   "why": "A typed Trx ID is only a claim until a person checks it in the wallet app.",
+   "default": "Off: the option is not offered.",
+   "change": "Customers can choose it; staff check the payment before confirming.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_pay_mobile_number": {
+   "title": "bKash / Nagad number shown to customers",
+   "does": "The number customers send money to for the manual option.",
+   "why": "Customers need the right number to pay.",
+   "default": "Blank: the manual option stays hidden.",
+   "change": "The number appears at checkout.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_pixel_id": {
+   "title": "Facebook Pixel ID",
+   "does": "Adds the Facebook Pixel only when this ID is set and the visitor accepted cookies.",
+   "why": "The Pixel reports visits to Facebook, so visitors must agree first.",
+   "default": "Blank: no Pixel code is loaded.",
+   "change": "Visitors who accept cookies are tracked from their next visit.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_policy_privacy_bn": {
+   "title": "Privacy policy (Bangla)",
+   "does": "The privacy text shown on the policies page in Bangla.",
+   "why": "Customers give personal details and must know how they are used.",
+   "default": "Blank: the page says coming soon.",
+   "change": "The policies page shows the new text.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_policy_privacy_en": {
+   "title": "Privacy policy (English)",
+   "does": "The privacy text shown on the policies page in English.",
+   "why": "English-speaking customers must know how their details are used.",
+   "default": "Blank: the page says coming soon.",
+   "change": "The English policies page shows the new text.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_policy_refund_bn": {
+   "title": "Refund and cancellation (Bangla)",
+   "does": "The refund and cancellation text shown on the policies page in Bangla.",
+   "why": "Customers need to know when a cancellation or refund is possible.",
+   "default": "Blank: the page says coming soon.",
+   "change": "The policies page shows the new text.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_policy_refund_en": {
+   "title": "Refund and cancellation (English)",
+   "does": "The refund and cancellation text shown on the policies page in English.",
+   "why": "English-speaking customers need to know when a cancellation or refund is possible.",
+   "default": "Blank: the page says coming soon.",
+   "change": "The English policies page shows the new text.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_policy_terms_bn": {
+   "title": "Terms (Bangla)",
+   "does": "The terms text shown on the policies page in Bangla.",
+   "why": "Customers should know the rules of ordering.",
+   "default": "Blank: the page says coming soon.",
+   "change": "The policies page shows the new text.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_policy_terms_en": {
+   "title": "Terms (English)",
+   "does": "The terms text shown on the policies page in English.",
+   "why": "English-speaking customers should know the rules of ordering.",
+   "default": "Blank: the page says coming soon.",
+   "change": "The English policies page shows the new text.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_public_url": {
+   "title": "Public address of the website",
+   "does": "Stores the https address of the shop once a domain or hosting exists.",
+   "why": "The go-live checklist uses it to show whether customers can really reach the shop.",
+   "default": "Blank: the shop is for local testing only.",
+   "change": "The checklist domain line turns OK. Nothing else changes by itself.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_rate_max": {
+   "title": "Web orders per device in the time window",
+   "does": "Limits how many web order attempts one device may make in the window below.",
+   "why": "It slows down automatic order spam.",
+   "default": "5 attempts (0 = no limit, not recommended).",
+   "change": "Devices that go over the limit are told to wait.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_rate_window_min": {
+   "title": "Web order limit window (minutes)",
+   "does": "The length of time used for the per-device attempt limit.",
+   "why": "The limit needs a time window to mean anything.",
+   "default": "60 minutes.",
+   "change": "A longer window makes the limit stricter.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_reserve_minutes": {
+   "title": "Hold time for reserved stock (minutes)",
+   "does": "How long a web order keeps its units before they are released.",
+   "why": "A hold that is never released would block stock forever.",
+   "default": "30 minutes.",
+   "change": "Holds expire sooner or later; expired holds are released.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_reserve_on": {
+   "title": "Hold stock at web checkout (hard reservation)",
+   "does": "A web order takes its units out of free stock straight away until it is delivered, cancelled or its hold time ends.",
+   "why": "Without it two customers can buy the last cake; with it the second is told sold out.",
+   "default": "Off: the shop shows availability but holds no stock.",
+   "change": "Checkout is refused as sold out when free stock is not enough.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_stock_threshold": {
+   "title": "Stock level that shows Limited",
+   "does": "When free stock is at or below this number, the shop shows Limited instead of In stock.",
+   "why": "It warns customers without showing the exact stock to the public.",
+   "default": "5 units.",
+   "change": "Items move to Limited sooner or later on the web.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "rule:website_whatsapp": {
+   "title": "WhatsApp number for orders",
+   "does": "Adds WhatsApp order and contact buttons with this number.",
+   "why": "Many customers order by WhatsApp.",
+   "default": "Blank: no WhatsApp button is shown.",
+   "change": "The buttons appear on the public pages.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:website"
+   ],
+   "verified": true,
+   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  },
+  "grant:social_approve": {
+   "title": "Approve social posts",
+   "does": "Lets a person approve a post that someone else wrote, after looking at the preview.",
+   "why": "Every public post needs a second person to say yes.",
+   "default": "Nobody (except the owner).",
+   "change": "The approver can approve, send back or cancel posts. The person who wrote a post can never approve it.",
+   "who": "Only the owner (Settings, people rights).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "grant:social_manage": {
+   "title": "Write and submit social posts",
+   "does": "Lets a person write a post, add its pictures and send it for approval.",
+   "why": "Only the people who write posts should have this.",
+   "default": "Nobody (except the owner).",
+   "change": "The person can prepare posts; they cannot approve their own.",
+   "who": "Only the owner (Settings, people rights).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_max_per_day": {
+   "title": "Most posts per day",
+   "does": "The largest number of posts and customer messages that may be planned or sent in one Dhaka day.",
+   "why": "Stops a flood of posts that annoys followers and can get the page restricted.",
+   "default": "Blank. No post can be scheduled or published until a number is typed.",
+   "change": "A new schedule that would go over the number is refused with a day-limit message.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_max_per_hour": {
+   "title": "Most posts per hour",
+   "does": "The largest number of posts and customer messages in one clock hour.",
+   "why": "Spreads posts out so the page does not look like spam.",
+   "default": "Blank. No post can be scheduled or published until a number is typed.",
+   "change": "A schedule that would go over the number in its hour is refused.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_media_image_mb": {
+   "title": "Largest picture size (MB)",
+   "does": "The biggest JPEG or PNG picture that may be attached to a post.",
+   "why": "Large files are slow to upload and may be refused by the provider.",
+   "default": "5 MB. This is a proposed starting value, to be confirmed by the owner.",
+   "change": "Bigger pictures are refused when they are added.",
+   "who": "Only the owner (Settings).",
+   "verified": false,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_media_video_mb": {
+   "title": "Largest video size (MB)",
+   "does": "The biggest MP4 video that may be attached to a post.",
+   "why": "Video uploads are slow on a weak connection.",
+   "default": "50 MB. This is a proposed starting value, to be confirmed by the owner.",
+   "change": "Bigger videos are refused when they are added.",
+   "who": "Only the owner (Settings).",
+   "verified": false,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_on": {
+   "title": "Social and marketing workspace is on",
+   "does": "Turns on the content calendar, content items, the approval queue and the publishing screens. Nothing is posted by this switch alone.",
+   "why": "Keeps the social work in one place with an approval step before anything goes public.",
+   "default": "Off. No content can be written and no approval can be made.",
+   "change": "On: people with the write or approve right can prepare and approve content. Publishing still needs its own switch.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_publish_on": {
+   "title": "Publish approved posts automatically",
+   "does": "Lets the publisher send approved posts to the connected pages and accounts at their scheduled time.",
+   "why": "A post goes out on time without someone pressing a button, but only after a person approved it.",
+   "default": "Off. The publisher sends nothing.",
+   "change": "On: the publisher (run by GitHub Actions with the secrets you set) posts due items, within the limits and outside quiet hours. Off: due items wait.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_quiet_from": {
+   "title": "Quiet hours start (Dhaka time)",
+   "does": "The start of a window when no post and no customer message goes out. Written as HH:MM.",
+   "why": "Nobody wants a message at midnight.",
+   "default": "Blank. No quiet hours.",
+   "change": "Scheduling inside the window is refused; the publisher waits until it is over.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_quiet_to": {
+   "title": "Quiet hours end (Dhaka time)",
+   "does": "The end of the quiet window. Written as HH:MM. An end earlier than the start means the window crosses midnight.",
+   "why": "Together with the start it defines when the page stays silent.",
+   "default": "Blank. No quiet hours.",
+   "change": "As for the start: both must be written for the window to apply.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_retry_max": {
+   "title": "Most tries for one post",
+   "does": "How many times the publisher tries a post that failed before it is marked failed.",
+   "why": "A short problem with the provider heals itself; a long one must be seen by a person.",
+   "default": "5 tries. The waits grow: 2, 4, 8 and 16 minutes.",
+   "change": "A failed post after its last try shows in the queue as failed and can be scheduled again by the approver.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_stop_all": {
+   "title": "Stop all publishing (emergency)",
+   "does": "Stops every post and every customer message at once. Queued items wait; nothing is deleted.",
+   "why": "A wrong post or a provider problem can be stopped in one step.",
+   "default": "Off.",
+   "change": "On: the publisher sends nothing and new schedules are refused until it is switched off again. Off: the waiting queue continues.",
+   "who": "Only the owner, and it needs a reason.",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:ai_default_provider": {
+   "title": "Default AI provider",
+   "does": "Chooses which provider the helpers use when an agent does not name one. local_rules runs on the phone for free. The other choices are paid providers and need a key, a model and a monthly budget first.",
+   "why": "A paid provider can spend money every month. Keeping local_rules as the default means no spending happens by accident.",
+   "default": "local_rules (on the phone, free).",
+   "change": "A paid provider is used only when it is enabled, has a model and a budget, and the data level it needs is allowed for it. The AI log shows each call.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_on": {
+   "title": "AI helpers are on (after a provider is linked)",
+   "does": "Lets the AI helpers run. Nothing runs while this is off, and no provider is called and no money is spent.",
+   "why": "This is the main on/off for every AI helper. It is safe to leave off until a provider and a monthly budget are set.",
+   "default": "Off. No AI call is made and nothing is spent.",
+   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews. Nothing is changed by the AI itself.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_pause_all": {
+   "title": "Pause all AI now (emergency stop)",
+   "does": "Stops every AI agent and every provider at once. No new suggestion or proposal is made while it is on.",
+   "why": "If an answer looks wrong or a cost looks too high, one switch stops everything at once.",
+   "default": "Off.",
+   "change": "On: every AI call is refused and the reason 'paused' is written in the AI log. Existing suggestions and their decisions are kept.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_speech_on": {
+   "title": "Voice questions (browser speech-to-text)",
+   "does": "Shows a microphone button in the assistant. The phone's own speech recognition turns the voice into text, which is then shown for the person to check before it is asked.",
+   "why": "Helps people who prefer speaking, including in Bangla. The text is still checked and redacted like typed text.",
+   "default": "Off. No microphone button is shown.",
+   "change": "On: the microphone button appears in the assistant. The question is still answered by the same rules and permissions as typed text.",
+   "who": "Only the owner, in Settings."
+  },
+  "feature:camera_recognition": {
+   "title": "Camera and recognition (X5)",
+   "does": "Barcode, label text (on phone), photo matching (on phone, not yet installed), name suggestions, duplicate check and a review record for unclear reads. Every part is a separate switch and is OFF by default.",
+   "why": "Faster item entry with fewer duplicates, and nothing changes until the owner switches a part on.",
+   "default": "All OFF. The item form works as before.",
+   "change": "Each part is switched on or off in Settings. Recognised text or photos only suggest; a person always chooses.",
+   "who": "Owner (switches). Staff with item permission (use).",
+   "related": [
+    "screen:camrec"
+   ],
+   "verified": false,
+   "src": "docs/ANDROID_WRAPPER.md; X5 build (not device-tested)"
+  },
+  "rule:item_similar_check_on": {
+   "title": "Similar-name and barcode check when adding an item",
+   "does": "When ON, adding a new item first checks the name against existing items. An exact same name is refused, and a barcode already in use is refused. A look-alike name is shown and the person presses again to add anyway.",
+   "why": "Stops the same product being entered twice under small spelling differences.",
+   "default": "OFF. Items are added exactly as before.",
+   "change": "Nothing already saved changes. Only new items are checked.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:camrec",
+    "rule:recog_ocr_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql; X5 section"
+  },
+  "rule:recog_image_match_on": {
+   "title": "Match a photo to approved item photos (on the phone)",
+   "does": "When ON, a photo is compared with the approved item photos stored on this phone and the nearest items are listed with their distance. Nothing leaves the phone.",
+   "why": "Helps find an item when there is no barcode or readable label.",
+   "default": "OFF. No photo is compared.",
+   "change": "Needs an item photo index on the phone and a distance limit. Until both exist the list stays empty and says why.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_image_threshold",
+    "screen:camrec"
+   ],
+   "warn": "No model is installed in this version: the list stays empty.",
+   "verified": true,
+   "src": "phase520.sql; X5 scan.js"
+  },
+  "rule:recog_image_threshold": {
+   "title": "Photo match distance limit",
+   "does": "Only items whose photo distance is at or below this number are listed. Smaller is stricter. The distance is a number, never a percentage.",
+   "why": "Stops unrelated items from being suggested.",
+   "default": "Blank. Blank = not set: no photo candidates are shown.",
+   "change": "Changing it affects the next photo only.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_image_match_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_langs": {
+   "title": "Languages to read",
+   "does": "The language files to use, written like eng+ben (English and Bangla). Each language is one file downloaded once.",
+   "why": "Bangla labels need the Bangla file; English labels need the English file.",
+   "default": "Blank. Blank blocks label reading.",
+   "change": "A new language downloads its file the next time it is used.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_on",
+    "rule:recog_ocr_wifi_only"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_max_px": {
+   "title": "Label photo longest side in pixels",
+   "does": "The label photo is made smaller to this longest side before reading. Smaller is faster on old phones but reads less small print.",
+   "why": "Old phones run out of memory with large photos.",
+   "default": "Blank. Blank blocks label reading: no size is assumed.",
+   "change": "Changing it affects the next read only.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_on": {
+   "title": "Read label text on the phone (OCR)",
+   "does": "When ON, a label photo is read on this phone by the Tesseract engine. The text is shown for review; nothing is saved from it. The photo never leaves the phone.",
+   "why": "Lets staff find an item from the words on a packet without typing.",
+   "default": "OFF. No label is read.",
+   "change": "The first use downloads the chosen language file once (Wi-Fi only while the Wi-Fi switch is on). Nothing is saved automatically.",
+   "who": "Only the owner (Settings). The camera screen shows whether the phone can run it.",
+   "related": [
+    "rule:recog_ocr_max_px",
+    "rule:recog_ocr_langs",
+    "rule:recog_ocr_wifi_only",
+    "screen:camrec"
+   ],
+   "verified": true,
+   "src": "phase520.sql; X5 scan.js"
+  },
+  "rule:recog_ocr_wifi_only": {
+   "title": "Download language files on Wi-Fi only",
+   "does": "When ON, a language file that is not on the phone is downloaded only on Wi-Fi. A file already on the phone is always used.",
+   "why": "The language files are several megabytes; mobile data is paid for.",
+   "default": "ON.",
+   "change": "Nothing already downloaded is removed.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_langs"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_budget": {
+   "title": "Vision service monthly call cap",
+   "does": "The most calls to the vision service in one month. When reached, no more calls are made until next month.",
+   "why": "Keeps the bill under control.",
+   "default": "Blank. Blank = the service does not run.",
+   "change": "Changing it applies from the next call.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_consent_on": {
+   "title": "Consent to send label photos to the server vision service",
+   "does": "The owner confirms that label photos may be sent to the paid vision service. Without this, no photo is sent.",
+   "why": "Photos can show customers and suppliers; the owner must agree.",
+   "default": "OFF (no consent).",
+   "change": "Turning it off stops all sending at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_on": {
+   "title": "Server vision service (paid, needs consent)",
+   "does": "Would send a label photo to a server vision service for label suggestions. It also needs the consent switch and the monthly cap, and the X1 connection.",
+   "why": "Better reading for hard photos, at a cost.",
+   "default": "OFF. Nothing is sent.",
+   "change": "Not available yet: the X1 connection is not built, so this stays inactive.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_consent_on",
+    "rule:recog_vision_budget"
+   ],
+   "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
+   "verified": true,
+   "src": "phase520.sql; tools/edge/vision-proxy.ts"
+  },
+  "screen:camrec": {
+   "title": "Camera & Recognition",
+   "does": "Lists each way the app can read a barcode, label or photo, says whether this phone can run it now and why not, and runs a self-test on each one.",
+   "why": "Shows the truth about this phone before anyone relies on the camera.",
+   "default": "Every recognition option is OFF, so the screen reports them as off.",
+   "change": "The screen only reads; switches are changed in Settings.",
+   "who": "Owner.",
+   "related": [
+    "rule:item_similar_check_on",
+    "rule:recog_ocr_on",
+    "rule:recog_image_match_on",
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "web/scan.js"
+  },
+  "grant:market_manage": {
+   "title": "Add topics, sources, findings, prices and opportunities, and decide them",
+   "does": "Lets a person add research, record opportunities and move them through their statuses (each move needs a reason).",
+   "why": "The person who asks for an opportunity can not approve it themselves, so a decision always has a second person behind it.",
+   "default": "Given to nobody. Only the owner has it.",
+   "change": "The person can add and change research and opportunities, and create tasks from approved work. They can not set scraping permissions, link a provider or schedule jobs.",
+   "who": "Only the owner. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "grant:market_view": {
+   "title": "See the market intelligence workspace",
+   "does": "Lets a person read the findings, prices, opportunities and growth figures on the Market page.",
+   "why": "Market notes can be sensitive (competitor prices, plans). Only the people who need them should see them.",
+   "default": "Given to nobody. Only the owner has it.",
+   "change": "The person sees the Market page and its figures, but can not add or decide anything. Sales figures on the page still follow their places.",
+   "who": "Only the owner. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_ai_summary_on": {
+   "title": "Let the AI summariser propose a summary of chosen findings",
+   "does": "Lets the AI assistant write a short proposed summary of findings you selected. The proposal waits for a person to accept or reject it.",
+   "why": "Long sources are slow to read. A draft summary saves time; a person still checks it against the source.",
+   "default": "OFF. No AI call is made.",
+   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes. The person who asked can not accept their own proposal.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_alerts_on": {
+   "title": "Put competitor price alerts in the in-app notifications",
+   "does": "Adds one line a day to the owner's notifications when competitor prices moved beyond the threshold.",
+   "why": "The owner sees the alert without opening the Market page.",
+   "default": "OFF. Alerts are only listed on the Market page.",
+   "change": "ON: one in-app line per day with the count of items that moved. It has no customer data.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_digest_on": {
+   "title": "Weekly growth and market digest to the owner (in-app)",
+   "does": "Writes one in-app line for the owner with the top sales movers, open opportunities and the number of price alerts, when the weekly job runs it.",
+   "why": "A short weekly summary keeps the owner on the numbers without a long report.",
+   "default": "OFF. No digest is written.",
+   "change": "ON: the digest is written when the scheduled job (a later package) runs it. It has numbers from our own sales only and is not sent outside the app.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_elast_min_days": {
+   "title": "Minimum trading days at each price before a price-response hint is shown",
+   "does": "Sets how many trading days a price must have been charged before we compare how many units sold at that price.",
+   "why": "A price that was charged for one day says nothing. The hint is only a pattern in past data, never a forecast.",
+   "default": "Blank. No price-response hint is shown.",
+   "change": "A number lets the Growth page show the past pattern, with the days behind it, when at least two prices meet the minimum. It never changes a price.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_on": {
+   "title": "Market intelligence workspace (research, findings, opportunities)",
+   "does": "Turns on the Market page: research topics, source registry, findings you type in, competitor prices, opportunities with evidence and decisions, and measuring them from our own sales.",
+   "why": "It keeps what we learn about competitors, prices, festivals and customers in one place, with the source and the date, instead of in people's heads.",
+   "default": "OFF. The Market page is empty and nothing can be written. Nothing is searched on the internet by this switch.",
+   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever. OFF again: nothing new can be written, old records stay and can be read.",
+   "who": "Only the owner, in Settings (the Rules page). Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_quote_max_chars": {
+   "title": "Longest quoted snippet kept from a source (characters)",
+   "does": "Sets how many characters of a source may be kept as a direct quote on a finding.",
+   "why": "Keeping only short quotes and our own summary respects the source and keeps the record useful.",
+   "default": "Blank. Quotes are not stored; write your own summary only.",
+   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message. Existing findings are not changed.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_research_job_on": {
+   "title": "Run scheduled research jobs",
+   "does": "Lets the job runner (a later package) run the research jobs that are switched on.",
+   "why": "A job is only useful when it runs on its own. This is the master switch for all of them.",
+   "default": "OFF. Job definitions can be stored; none runs.",
+   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above. OFF again: nothing runs.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_scrape_on": {
+   "title": "Allow scheduled research to fetch a permitted source",
+   "does": "Lets a scheduled research job read a public page from a source, but only when the owner has allowed that source after reading its terms, the robots.txt check passed and a rate limit is typed.",
+   "why": "Reading a permitted page on a schedule saves hours. It is never used to get past a login or a paywall, and it never copies a page in bulk.",
+   "default": "OFF. No job fetches anything. Even ON, each source stays closed until the owner allows it.",
+   "change": "ON: the research gate opens only for sources that meet every condition. OFF again: every job stops at once, whatever the source settings.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_watch_threshold_pct": {
+   "title": "Alert when a competitor price moves by more than this %",
+   "does": "Lists each competitor price that moved more than this percentage since its previous observation.",
+   "why": "A big competitor price move is worth a look the same day.",
+   "default": "Blank. No competitor price alert.",
+   "change": "A number lists the moves on the Market page's price tab. Nothing is sent to customers.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "screen:market": {
+   "title": "Market & growth",
+   "does": "One page with five tabs: Overview, Research (topics, sources, findings), Prices (competitor prices and CSV import), Opportunities (evidence, KPI, status, tasks, measuring from sales) and Growth (our item and outlet growth, bought together, festival review).",
+   "why": "It joins what we read about the market with what our own sales show, so a decision can be checked against real numbers.",
+   "default": "Empty until the owner switches on the workspace and gives the rights.",
+   "change": "Every number says what it is based on: the days it covers and the assumptions. A warning reminds that a pattern is not a cause.",
+   "who": "The owner decides who has the rights. The page itself has no setting.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:xc_coaching_on": {
+   "title": "Staff coaching board (owner only)",
+   "does": "Shows the owner, per person, the figures that already exist: bills, discounts, voids, cash shortage cases, production rejects, late days and complaints. No ranking and no score.",
+   "why": "Helps the owner talk to people with the same facts for everyone. Nobody else can see it.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the owner can open the board for a chosen period. Other roles cannot see it even when it is on. It changes no record.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_markdown_pct": {
+   "title": "Markdown % for unsold stock",
+   "does": "The discount suggested for units that cannot sell tomorrow, and the discount a markdown sale is recorded at.",
+   "why": "The owner sets the discount, not the software.",
+   "default": "Blank. Blank means no discount is suggested and a markdown sale is refused.",
+   "change": "A typed percentage (1 to 90) is used for the suggested markdown price and for markdown sales.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_price_alert_on": {
+   "title": "Supplier price-rise alert",
+   "does": "Puts a warning in the bell when a supplier's rate for an item goes up by more than the percentage set below, compared with that supplier's previous rate.",
+   "why": "A rise noticed the day it happens can be negotiated or the menu price changed.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the warning appears once per item and supplier per day. Nothing is changed in the purchase records.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_price_rise_pct": {
+   "title": "Rise % that triggers the price alert",
+   "does": "The percentage rise over the previous rate that causes a warning.",
+   "why": "Too small and the owner gets noise; too large and small rises are missed.",
+   "default": "Blank. Blank means the alert says 'threshold not set' and writes nothing.",
+   "change": "A typed percentage (1 to 500) is used by the price alert when its switch is on.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_prod_suggest_on": {
+   "title": "Daily production suggestion",
+   "does": "Shows a suggested quantity for each item at a place: the average of the same weekday in the last weeks, plus open orders for that day, minus stock on hand. Festival uplift is shown separately.",
+   "why": "Gives the baker a starting figure from real sales. It is arithmetic on past sales, not a forecast.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the planning screen can show the suggestion and the range. Nothing is written to the production plan until the baker confirms.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_prod_weeks": {
+   "title": "Weeks of same-weekday history",
+   "does": "How many past weeks of the same weekday the suggestion averages over.",
+   "why": "More weeks steadier, fewer weeks quicker to react.",
+   "default": "Blank. Blank means no suggestion is shown and the screen says 'data needed'.",
+   "change": "Typed weeks (1 to 12) switch the suggestion on for the switched-on places.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_email_on": {
+   "title": "Daily summary by e-mail",
+   "does": "Sends the summary by e-mail to recipients whose channel is e-mail.",
+   "why": "E-mail is the record that can be kept and forwarded.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: e-mail recipients get the summary. Needs the Gmail secrets set by the technical person (docs/OPS_SETUP.md).",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_on": {
+   "title": "Owner daily summary",
+   "does": "Builds one summary of the day (sales, cash, wallet receipts, wastage, cakes due tomorrow, and for the owner also dues, approvals and failures) and sends it to the people the owner has entered.",
+   "why": "The owner sees the day in one message instead of opening five screens.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the summary goes out at the hours set below, to the recipients who are switched on. Nothing is changed in the books. An outlet recipient gets only that outlet's figures and no cost values.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_telegram_on": {
+   "title": "Daily summary by Telegram",
+   "does": "Sends the summary to Telegram chats whose channel is Telegram.",
+   "why": "Telegram reaches a phone quickly.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: Telegram recipients get the summary. The bot token is kept as a secret by the technical person; the chat number is typed on the recipient row.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_summary_times": {
+   "title": "Summary hours (Dhaka)",
+   "does": "The hours of the day the summary is due, for example 08 and 21. 08 means yesterday's figures; 21 means today's.",
+   "why": "Keeps the morning and evening messages where the owner wants them.",
+   "default": "21 (evening, today's figures)",
+   "change": "The summary goes out only in the hours listed. The technical schedule runs at about 08:10 and 21:10 Dhaka time.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_sync_alert_on": {
+   "title": "Every shop synced? alert",
+   "does": "Puts a warning in the bell for each place with no recorded sale for longer than the hours set below.",
+   "why": "A shop that has stopped sending sales is found the same day.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the warning appears once per place per day, if the hours are typed too. Nothing is changed in the books.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_sync_stale_hours": {
+   "title": "Hours without a sale before the alert",
+   "does": "How many hours with no recorded sale at a place before the sync warning is shown.",
+   "why": "A quiet shop is not always broken; the owner knows the hours of each shop.",
+   "default": "Blank. Blank means the warning says 'threshold not set' and does nothing.",
+   "change": "Typed hours (1 to 720) make the sync warning work when its switch is on.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:xc_unsold_on": {
+   "title": "Unsold stock and markdown",
+   "does": "Lists the units that cannot be sold tomorrow (their expiry is before the end of the next day), lets the person record what happened to each unit (sold at a markdown, staff meal, donation, waste), and shows the wastage share per item.",
+   "why": "Unsold cakes are money. The list makes the decision before the end of the day.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the end-of-day list and the outcome lines are available. An outcome line never moves stock or money; waste is still booked on the wastage screen.",
+   "who": "Only the owner, in Settings."
   }
  }
 }
