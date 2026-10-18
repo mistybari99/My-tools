@@ -5,7 +5,7 @@
 -- Access: the market_view / market_manage rights OR the sales report right (rpt_access('sales')). Module switch mi_on is NOT needed to read own-data growth.
 
 do $g$ begin
-  if to_regclass('public.sales_fact') is null or to_regprocedure('public._mi_can_view()') is null then raise exception 'phase532 needs phases 531 and 459 first'; end if;
+  if to_regclass('public.sales_fact') is null or to_regprocedure('public._mi_can_view()') is null then raise exception 'phase489 needs phases 488 and 459 first'; end if;
 end $g$;
 
 create or replace function public._mi_growth_ok() returns boolean language sql stable security definer set search_path = public as $$

@@ -42,4 +42,4 @@ select mi_festival_uplift(:'fid'::bigint)::text as fu \gset
 select mt.chk('T6 festival uplift shows the owner % as typed and the comparison window', (:'fu'::jsonb)->>'owner_entered_uplift_pct' = '10.00' and (:'fu'::jsonb)->>'comparison_to' is not null);
 select mt.chk('T6 festival uplift has its coverage and assumptions', (:'fu'::jsonb) ? 'coverage' and (:'fu'::jsonb) ? 'assumptions');
 
-select 'x6 phase532: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;
+select 'x6 phase489: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;

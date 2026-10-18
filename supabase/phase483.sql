@@ -21,7 +21,7 @@ do $g$ begin
   if to_regprocedure('public._crmb_send_allowed(uuid,text,text,timestamptz)') is null or to_regprocedure('public._i62_ops()') is null or to_regprocedure('public._i62_phone(text)') is null
      or to_regprocedure('public.has_grant(text,integer)') is null or to_regclass('public.festival_calendar') is null or to_regclass('public.customers') is null
      or to_regprocedure('public._append_only43()') is null or to_regprocedure('public._client_lock(uuid)') is null then
-    raise exception 'phase500 needs phases 7, 43, 46, 62, 303 and 465 first (build through phase 478)';
+    raise exception 'phase483 needs phases 7, 43, 46, 62, 303 and 465 first (build through phase 478)';
   end if;
 end $g$;
 

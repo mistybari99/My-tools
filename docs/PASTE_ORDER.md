@@ -44,9 +44,13 @@ The parallel-builder files were renumbered in paste order so the sequence contin
 | 553 | 497 |
 | 554 | 498 |
 
-## Phases 491 to 493 (XB): not yet in `tests/sql/ORDER.txt`
+## Phases 491 to 493 (XB): now in `tests/sql/ORDER.txt`
 
-Phases 491, 492 and 493 say "Run AFTER phase 478" in their headers, but they are missing from `tests/sql/ORDER.txt`, so the build scripts never build them. They are listed here at their numeric position (after 490, before 494). Before pasting them in the live project, the owner or a builder should add them to `tests/sql/ORDER.txt` and run the local build once.
+Phases 491, 492 and 493 say "Run AFTER phase 478" in their headers. They are now listed in `tests/sql/ORDER.txt`, after 490 and before 494, so the build scripts build them. They sit at their numeric position (after 490, before 494). Build the local database once before the owner pastes them.
+
+## phase481.sql has no `_test` file
+
+There is no test for 481 of its own: `supabase/phase481_test.sql` does not exist on purpose. The X2 checks for phase481 are in `supabase/phase482_test.sql`, which is run on a fresh copy with 481 and 482 pasted twice.
 
 ## Never paste these
 

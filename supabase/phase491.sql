@@ -20,7 +20,7 @@
 do $guard$ begin
   if to_regclass('public.online_orders') is null or to_regclass('public.d_wallets') is null or to_regclass('public.sales') is null
      or to_regprocedure('public.c2_orders_features()') is null then
-    raise exception 'phase540 needs phase61, phase83, phase6 and phase445 pasted first';
+    raise exception 'phase491 needs phase61, phase83, phase6 and phase445 pasted first';
   end if;
 end $guard$;
 

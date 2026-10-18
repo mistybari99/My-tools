@@ -105,6 +105,6 @@ select tt.chk('K5 anon cannot read the suggestions table', not has_table_privile
 select tt.chk('K5 anon cannot read the knowledge table', not has_table_privilege('anon', 'public.ai_kb_entries', 'select'));
 select tt.chk('K5 anon cannot read the evaluation runs', not has_table_privilege('anon', 'public.ai_eval_runs', 'select'));
 
-\echo == K6 paste twice (this file runs on a database where phase511 was pasted twice)
+\echo == K6 paste twice (this file runs on a database where phase485 was pasted twice)
 select tt.chk('K6 the verified knowledge still has one current text per key', (select count(*) = 1 from public.ai_kb_entries where key = 'test.sales_rule' and status = 'verified'));
 select 'RESULT ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' from tt.res;

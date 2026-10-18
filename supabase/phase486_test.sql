@@ -73,7 +73,7 @@ reset role;
 select tt.as('11111111-1111-1111-1111-111111111111');
 
 \echo == T7 paste twice
-\i supabase/phase520.sql
+\i supabase/phase486.sql
 select tt.chk('T7 second paste: aliases kept', (select count(*) from public.item_aliases) = 1);
 select tt.chk('T7 second paste: rules still OFF', public.rule_on('recog_ocr_on') = false);
 select 'RESULT ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' from tt.res;

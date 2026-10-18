@@ -12,9 +12,9 @@
 -- Costs are not used. Supplier prices are not used. No weather, no trend, no ML.
 
 do $g$ begin
-  if to_regprocedure('public._rb4_prod_view(integer)') is null or to_regprocedure('public._rb4_prod_entry(integer)') is null then raise exception 'phase551 needs phase404'; end if;
-  if to_regclass('public.festival_calendar') is null then raise exception 'phase551 needs phase465 (festival calendar)'; end if;
-  if to_regclass('public.production_orders') is null then raise exception 'phase551 needs phase404 (production orders)'; end if;
+  if to_regprocedure('public._rb4_prod_view(integer)') is null or to_regprocedure('public._rb4_prod_entry(integer)') is null then raise exception 'phase495 needs phase404'; end if;
+  if to_regclass('public.festival_calendar') is null then raise exception 'phase495 needs phase465 (festival calendar)'; end if;
+  if to_regclass('public.production_orders') is null then raise exception 'phase495 needs phase404 (production orders)'; end if;
 end $g$;
 
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_mix, hint_en, sort)

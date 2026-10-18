@@ -13,7 +13,7 @@
 --   rejected and measured are final.
 
 do $g$ begin
-  if to_regprocedure('public._mi_can_manage()') is null or to_regprocedure('public._mi_url_key(text)') is null then raise exception 'phase531 needs phase530 first'; end if;
+  if to_regprocedure('public._mi_can_manage()') is null or to_regprocedure('public._mi_url_key(text)') is null then raise exception 'phase488 needs phase487 first'; end if;
 end $g$;
 
 -- ---------- topics ----------

@@ -25,7 +25,7 @@ do $guard$ begin
   if to_regprocedure('public.xb_pay_capture(uuid,text,text,text,numeric,timestamptz,text,int,text,uuid,uuid,text,text)') is null
      or to_regprocedure('public.c2_order_cancel(uuid,text,text,text)') is null or to_regprocedure('public.notify_enqueue(uuid,uuid,text,text,jsonb,text,text,text)') is null
      or to_regprocedure('public.c2_order_spec_save(uuid,jsonb,text)') is null then
-    raise exception 'phase541 needs phase540, phase445-448 and phase62 pasted first';
+    raise exception 'phase492 needs phase491, phase445-448 and phase62 pasted first';
   end if;
 end $guard$;
 

@@ -8,9 +8,9 @@
 
 do $g$ begin
   if to_regclass('public.attendance_days') is null or to_regclass('public.shortage_cash_cases') is null or to_regclass('public.production_loss') is null then
-    raise exception 'phase554 needs phases 404, 412 (attendance) and the shortage cases';
+    raise exception 'phase498 needs phases 404, 412 (attendance) and the shortage cases';
   end if;
-  if to_regclass('public.crm_complaints') is null then raise exception 'phase554 needs the complaints table (CRM-H)'; end if;
+  if to_regclass('public.crm_complaints') is null then raise exception 'phase498 needs the complaints table (CRM-H)'; end if;
 end $g$;
 
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_mix, hint_en, sort)

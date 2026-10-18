@@ -21,10 +21,10 @@
 do $g$ begin
   if to_regprocedure('public.rule_on(text)') is null or to_regprocedure('public._append_only43()') is null or to_regprocedure('public.no_hard_delete()') is null
      or to_regprocedure('public.log_change()') is null or to_regprocedure('public.is_owner()') is null or to_regprocedure('public.has_grant(text,integer)') is null then
-    raise exception 'phase530 needs phases 10, 43 and the rules / grants base first';
+    raise exception 'phase487 needs phases 10, 43 and the rules / grants base first';
   end if;
   if to_regclass('public.crm_tasks') is null or to_regclass('public.items') is null or to_regclass('public.locations') is null then
-    raise exception 'phase530 needs phase323 (crm_tasks) first';
+    raise exception 'phase487 needs phase323 (crm_tasks) first';
   end if;
 end $g$;
 
@@ -295,7 +295,7 @@ create table if not exists public.mi_summary_decisions (
 -- ---------- seeds: adapters (no network in any row) ----------
 insert into public.mi_adapters (code, kind, label, network_allowed, note) values
  ('mock_offline', 'mock', 'Test adapter (no network, fixed sample data for tests)', false, 'Used only by the test suite. Never fetches anything.'),
- ('rss_feed', 'rss', 'Public RSS feed of a permitted source', false, 'Off until a source is switched on by the owner and the research gate (phase 533) passes.'),
+ ('rss_feed', 'rss', 'Public RSS feed of a permitted source', false, 'Off until a source is switched on by the owner and the research gate (phase 490) passes.'),
  ('sitemap_page', 'sitemap', 'Public sitemap then title/date of pages the terms allow', false, 'Respects robots.txt and the terms flag. No login, no paywall bypass, no bulk copy.'),
  ('search_api', 'search_api', 'Paid search / research API (provider to be linked later)', false, 'Needs the owner to link a provider and a budget. Not linked today.')
 on conflict (code) do nothing;

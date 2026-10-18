@@ -112,4 +112,4 @@ select mt.chk('T11 the viewer sees the measured count', :'ms2' = '1');
 select mt.as(:'nb');
 select mt.err('T11 a person with no right can not read the summary', $$select mi_summary()$$, 'not allowed');
 
-select 'x6 phase531: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;
+select 'x6 phase488: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;

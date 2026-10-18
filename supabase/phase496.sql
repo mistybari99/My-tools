@@ -6,9 +6,9 @@
 -- The recipe preview changes ONE ingredient price on paper and shows the change per batch and per unit. It saves nothing.
 
 do $g$ begin
-  if to_regprocedure('public._p26_rates(date,date,integer[])') is null then raise exception 'phase552 needs phase434 (purchase rates)'; end if;
-  if to_regprocedure('public._recipe_need(uuid,numeric,integer)') is null then raise exception 'phase552 needs phase74 (recipe need)'; end if;
-  if to_regprocedure('public._notif_add(text,text,text,text,text,text,text,text,text,integer)') is null then raise exception 'phase552 needs the notifications helper'; end if;
+  if to_regprocedure('public._p26_rates(date,date,integer[])') is null then raise exception 'phase496 needs phase434 (purchase rates)'; end if;
+  if to_regprocedure('public._recipe_need(uuid,numeric,integer)') is null then raise exception 'phase496 needs phase74 (recipe need)'; end if;
+  if to_regprocedure('public._notif_add(text,text,text,text,text,text,text,text,text,integer)') is null then raise exception 'phase496 needs the notifications helper'; end if;
 end $g$;
 
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_mix, hint_en, sort)

@@ -16,7 +16,7 @@
 -- ============================================================
 do $guard$ begin
   if to_regclass('public.online_orders') is null or to_regclass('public.employees') is null or to_regprocedure('public.xb_cake_create(uuid,uuid,date,time,numeric,text,int,text,text[],text,boolean,boolean,text,text[],numeric)') is null then
-    raise exception 'phase542 needs phase541 (and phase61 / phase41 employees) pasted first';
+    raise exception 'phase493 needs phase492 (and phase61 / phase41 employees) pasted first';
   end if;
 end $guard$;
 

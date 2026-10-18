@@ -109,6 +109,6 @@ select tt.err('T6 a negative token count is refused', $q$select public.ai_log('l
 select tt.err('T7 a provider cannot be deleted', $q$delete from public.ai_providers where code = 'anthropic'$q$, 'nothing is deleted');
 select tt.err('T7 an agent cannot be deleted', $q$delete from public.ai_agents where code = 'erp_guide'$q$, 'nothing is deleted');
 
-\echo == T8 paste twice (run this file on a database where phase510 was pasted twice)
+\echo == T8 paste twice (run this file on a database where phase484 was pasted twice)
 select tt.chk('T8 the switches still exist once', (select count(*) = 1 from public.rules where key = 'ai_on'));
 select 'RESULT ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' from tt.res;

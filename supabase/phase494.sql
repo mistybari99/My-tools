@@ -8,9 +8,9 @@
 -- Access: owner, or the ops bot (ops purpose 'notify'). Recipient addresses are readable only by the owner and the ops bot.
 
 do $g$ begin
-  if to_regprocedure('public.daily_digest(date)') is null then raise exception 'phase550 needs phase46 (daily_digest)'; end if;
-  if to_regprocedure('public._notif_add(text,text,text,text,text,text,text,text,text,integer)') is null then raise exception 'phase550 needs the notifications helper'; end if;
-  if to_regprocedure('public._rb4_prod_view(integer)') is null then raise exception 'phase550 needs phase404'; end if;
+  if to_regprocedure('public.daily_digest(date)') is null then raise exception 'phase494 needs phase46 (daily_digest)'; end if;
+  if to_regprocedure('public._notif_add(text,text,text,text,text,text,text,text,text,integer)') is null then raise exception 'phase494 needs the notifications helper'; end if;
+  if to_regprocedure('public._rb4_prod_view(integer)') is null then raise exception 'phase494 needs phase404'; end if;
 end $g$;
 
 -- ---------- settings (all OFF / blank) ----------

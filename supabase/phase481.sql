@@ -1,3 +1,4 @@
+-- No test file for phase 481: its checks run inside supabase/phase482_test.sql, which pastes 481 and 482 twice (see docs/PASTE_ORDER.md).
 -- ============================================================
 -- Phase 481 (X2 website, part 1) - SETTINGS, CATALOGUE PUBLISHING, PUBLIC READ RPCs.
 -- Run AFTER phase478 (the whole build). Additive + idempotent (paste twice = no error). No existing function or table is changed.

@@ -8,8 +8,8 @@
 -- WASTAGE SHARE = wastage quantity / (quantity sold + wastage quantity), with both shown. A zero denominator gives a blank, never 0.
 
 do $g$ begin
-  if to_regclass('public.stock_batches') is null or to_regclass('public.stock_wastage') is null then raise exception 'phase553 needs the stock phases'; end if;
-  if to_regprocedure('public._rb4_prod_entry(integer)') is null then raise exception 'phase553 needs phase404'; end if;
+  if to_regclass('public.stock_batches') is null or to_regclass('public.stock_wastage') is null then raise exception 'phase497 needs the stock phases'; end if;
+  if to_regprocedure('public._rb4_prod_entry(integer)') is null then raise exception 'phase497 needs phase404'; end if;
 end $g$;
 
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_mix, hint_en, sort)

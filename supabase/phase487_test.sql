@@ -31,5 +31,5 @@ reset role;
 select mt.as(:'o');
 
 select mt.chk('T5 the change log records a new topic', exists (select 1 from audit_log where table_name = 'mi_topics' and record_id = :'tg'));
-select mt.chk('T5 pass count: all phase 530 checks listed above', (select count(*) from mt.res where ok) >= 16);
-select 'x6 phase530: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;
+select mt.chk('T5 pass count: all phase 487 checks listed above', (select count(*) from mt.res where ok) >= 16);
+select 'x6 phase487: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;

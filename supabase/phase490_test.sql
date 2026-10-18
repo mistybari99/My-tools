@@ -89,4 +89,4 @@ select set_rule('mi_on', 'false');
 select mt.err('T8 with the workspace OFF no finding can be added', $$select mi_finding_add('{"source_url":"https://test-off.invalid/a","publisher":"p","summary":"test_off","finding_type":"analysis"}'::jsonb)$$, 'module_off');
 select mt.chk('T8 the gate is closed when the workspace is OFF', (select (mi_research_gate(:'src'::uuid)->>'allowed')::boolean = false));
 
-select 'x6 phase533: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;
+select 'x6 phase490: ' || count(*) filter (where ok) || ' pass, ' || count(*) filter (where not ok) || ' fail' as result from mt.res;

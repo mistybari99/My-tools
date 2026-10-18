@@ -7,7 +7,7 @@
 -- Never bypassed: logins, paywalls, bulk copying (findings keep the owner's own summary; quotes only within mi_quote_max_chars).
 
 do $g$ begin
-  if to_regprocedure('public.mi_finding_add(jsonb, uuid)') is null or to_regclass('public.notifications') is null then raise exception 'phase533 needs phase531 and the notifications base first'; end if;
+  if to_regprocedure('public.mi_finding_add(jsonb, uuid)') is null or to_regclass('public.notifications') is null then raise exception 'phase490 needs phase488 and the notifications base first'; end if;
 end $g$;
 
 create or replace function public.mi_research_gate(p_source uuid, p_adapter text default null) returns jsonb
