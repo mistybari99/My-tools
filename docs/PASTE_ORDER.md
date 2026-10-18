@@ -58,6 +58,13 @@ Phases 8 to 87 (the base). If you pasted Wave 1 (88 to 99) already, skip those r
 | 30 | `phase511` | X4 (AI) | verified knowledge (propose, another owner verifies, publish; only verified is authoritative), suggestions with accept / reject / correct (no self-decision), later outcomes, golden evaluation cases and runs, scorecard and usage (cost only from owner-typed prices). Paste after 510 |
 | 29 | `phase520` | X5 | item recognition foundation: duplicate / similar check (`item_similar`, `item_new2` with client id, barcode and exact-name refusal), review record for unclear reads, approved aliases, asset brand / serial / warranty. All recognition switches OFF; blank limits stay blank. Paste once; the app uses it only after the owner switches `item_similar_check_on` ON |
 | 29 | `phase530` ... `phase533` | X6 Market & growth | Market intelligence workspace (OFF by default): topics, sources (scraping NO), findings with scores, competitor prices and CSV import, opportunities with a reason on every status move, tasks, measuring from ERP sales, growth from own data, research gate (closed), AI summariser proposals only, price alerts, owner digest. Paste after 478. Nothing new switches on by itself. |
+| 29 | `phase550` | XC-1 | owner daily summary (composer, recipients, send log, receipt continuity, every-shop-synced alert). All OFF or blank. Paste after 478 |
+| 30 | `phase551` | XC-2 | daily production suggestion (same-weekday average, range, festival uplift shown separately, open orders, carry-over), the baker's confirmation, accuracy report. OFF |
+| 31 | `phase552` | XC-3 | supplier price board, costliest list, rise alert (blank threshold), recipe-cost preview. OFF |
+| 32 | `phase553` | XC-4 | unsold stock and markdown list, outcome lines (no stock movement), wastage share. OFF; markdown % blank |
+| 33 | `phase554` | XC-5 | owner-only staff coaching board (no ranking). OFF |
+
+Phases 550 to 554 are pasted AFTER 478 (478 is no longer the last file). Each one is safe to paste twice. Scripts: `tools/owner_summary.py` (dry run unless `--send`), `tools/bump_sw.py`. Details: `docs/integration/XC.md`.
 
 Numbers 114 to 132 are reserved in `docs/UNIFIED_BUILD_PLAN.md` 4.4 for Wave 2; R1 (120) and R2 (130 to 132) took numbers inside that range. Nothing else in this build uses 100 to 119 or 121 to 129, so there is no clash; if a later Wave 2 package wants 120 it must be renumbered. RPT-HUB was built as 450 to 456, which clashed with RPT-C2 (445 to 457); it is now **470 to 476** (files, tests, texts all renamed). `phase414` and `phase417` to `phase419` do not exist on purpose (RPT-B4 left them unused).
 

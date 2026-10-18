@@ -662,3 +662,14 @@ Owner links later
 - Tests: 102 SQL checks (phase540 36, phase541 37, phase542 29; each pasted twice on a local throwaway Postgres, port 5860), 32 SMS samples. check_no_demo_leak OK.
 - Not confirmed: live Supabase, real bKash / Nagad / Rocket SMS wording, defaults-parity snapshot, journal balance run, Bangla wording of new texts.
 - Manual checks for the owner: read docs/integration/XB.md section 3 and 5 before switching anything on; the three new switches are OFF by default.
+## XC package (branch xc-ops, local only, not pushed)
+
+What changed: new files only, plus appended rows in `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` (rows 29 to 33), 13 info entries merged into `web/data/info.json`.
+New SQL: `supabase/phase550.sql` to `phase554.sql` (owner summary and sync alert; production suggestion; price board and alert; unsold and markdown; staff board), each with `*_test.sql`; shared test head `tests/sql/xc_head.sql`.
+New tools: `tools/owner_summary.py` (dry run unless `--send`), `tools/bump_sw.py`; workflow `.github/workflows/owner_summary.yml`; tests `tests/py/test_xc_owner_summary.py`, `tests/py/test_xc_bump_sw.py`.
+Docs: `docs/integration/XC.md`, `docs/integration/XC_info.json`.
+
+Manual checks run (local throwaway Postgres, port 5870, database built through the whole owner order): full chain builds; phases 550 to 554 pasted twice with no error; SQL suites 38, 28, 23, 27 and 10 checks all pass on the full chain; Python suites all pass; `check_no_demo_leak` OK; `check_info_coverage` exit 0.
+
+Could not confirm: the live Supabase project, a real Gmail send, a real Telegram chat, any phone or 360px screen (no screen was built), the old SQL suites 8 to 87 with these phases, the web suite.
+Not built: screens, the unsynced badge and outbox viewer, low-stock draft orders, cash-count reminder, shop checklist with photos, temperature reminders, SMS and WhatsApp summary.

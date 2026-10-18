@@ -1,0 +1,65 @@
+# Owner daily summary (XC-1): sends the server-composed summary at 08:10 and 21:10 Asia/Dhaka, to the recipients entered in the app.
+# Nothing is sent unless the owner has switched xc_summary_on (and the channel switch) ON in the app: the scheduled run only asks the server.
+# Manual runs are DRY RUN unless "send" is ticked. Setup (secrets, bot user): docs/OPS_SETUP.md and docs/integration/XC.md.
+# Scheduled workflows run only from the repository DEFAULT branch.
+name: owner-summary
+
+on:
+  schedule:
+    - cron: '10 2 * * *'     # 02:10 UTC = 08:10 Asia/Dhaka -> yesterday's figures (slot 08)
+    - cron: '10 15 * * *'    # 15:10 UTC = 21:10 Asia/Dhaka -> today's figures (slot 21)
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Which summary hour this is'
+        type: choice
+        options: [manual, '08', '21']
+        default: manual
+      send:
+        description: 'Actually send and record (otherwise: dry run, nothing sent)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: owner-summary
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      NOTIFY_BOT_EMAIL: ${{ secrets.NOTIFY_BOT_EMAIL }}
+      NOTIFY_BOT_PASSWORD: ${{ secrets.NOTIFY_BOT_PASSWORD }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      APP_URL: ${{ vars.APP_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Owner summary
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          IN_SLOT: ${{ github.event.inputs.slot }}
+          IN_SEND: ${{ github.event.inputs.send }}
+        run: |
+          SLOT=manual; SEND=""
+          case "$SCHEDULE" in
+            '10 2 * * *')  SLOT=08; SEND="--send" ;;
+            '10 15 * * *') SLOT=21; SEND="--send" ;;
+          esac
+          if [ -z "$SCHEDULE" ]; then
+            [ -n "$IN_SLOT" ] && SLOT="$IN_SLOT"
+            [ "$IN_SEND" = "true" ] && SEND="--send"
+          fi
+          python3 tools/owner_summary.py --slot "$SLOT" $SEND

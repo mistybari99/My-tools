@@ -4992,158 +4992,71 @@
    "title": "Shop name (English)",
    "does": "The shop name shown on the public pages in English.",
    "why": "English-speaking customers read the name first.",
-   "default": "Blank: the header shows a generic word.",
    "change": "The English header and footer change at once.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_captcha_on": {
    "title": "Captcha required for web orders",
    "does": "Requires a captcha pass for web orders; no captcha provider is connected yet.",
    "why": "Captcha stops automatic order spam, but while it is on and no provider exists the shop refuses orders.",
    "default": "Off.",
    "change": "All web checkouts are refused until a provider is added.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_custom_cake_on": {
    "title": "Custom cake request form",
    "does": "Shows the form where a customer asks for a custom cake with a reference photo.",
    "why": "A custom cake needs a conversation before it is made.",
-   "default": "Off.",
    "change": "Customers can send requests; the owner confirms or declines each one.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_cutoff_hour": {
    "title": "Same-day order cut-off (hour)",
    "does": "After this hour (Dhaka time) same-day delivery is refused.",
    "why": "Late orders cannot be made and delivered the same day.",
    "default": "0: no cut-off.",
    "change": "Customers see the same-day refusal after this hour.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_festival_mode_on": {
    "title": "Festival pre-order mode",
    "does": "Lets items show as Pre-order and applies the minimum lead days for festival orders.",
    "why": "Peak days need orders days ahead.",
    "default": "Off: items show In stock, Limited or Sold out only.",
    "change": "Items set to pre-order show Pre-order to customers.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_ga_id": {
    "title": "Google Analytics ID",
    "does": "Adds Google Analytics only when this ID is set and the visitor accepted cookies.",
    "why": "Analytics must be chosen by the owner and agreed by the visitor.",
    "default": "Blank: no analytics code is loaded.",
    "change": "Visitors who accept cookies are measured from their next visit.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_holiday_text_bn": {
    "title": "Closure banner (Bangla)",
    "does": "A banner in Bangla on every public page, for a holiday or a notice.",
    "why": "Customers should know before they order.",
    "default": "Blank: no banner.",
    "change": "The banner appears at once.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_holiday_text_en": {
    "title": "Closure banner (English)",
    "does": "A banner in English on every public page, for a holiday or a notice.",
    "why": "English-speaking customers should know before they order.",
-   "default": "Blank: no banner.",
    "change": "The English banner appears at once.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_lead_days": {
    "title": "Minimum lead days for an order",
    "does": "Orders must be placed at least this many days ahead, for every item.",
    "why": "Cakes and sweets need time to make.",
    "default": "0: any date from today.",
    "change": "The earliest delivery date moves for all items.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_location_id": {
    "title": "Branch that receives web orders",
    "does": "Chooses the branch whose stock and order numbers web orders use. 0 means not chosen.",
    "why": "A web order is taken from one branch stock, so the wrong branch sends orders to the wrong shelf.",
    "default": "Blank/0: web orders are refused. Saving a branch affects new orders only.",
    "change": "New web orders use this branch; existing orders keep theirs.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_messenger_url": {
    "title": "Messenger page link",
    "does": "Adds a message-us button that opens this Messenger page.",
    "why": "Some customers prefer Messenger.",
    "default": "Blank: no Messenger button is shown.",
    "change": "The button appears on the contact and footer areas. Only an https link is used.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_min_order": {
    "title": "Minimum order (Tk)",
    "does": "A basket below this amount cannot be ordered online.",
    "why": "A minimum keeps small online orders from costing more to serve than they bring.",
    "default": "0: no minimum.",
    "change": "Baskets below the new amount are refused at checkout.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_on": {
    "title": "Website (online shop) on",
    "does": "Opens the public shop pages for customers.",
@@ -5151,232 +5064,171 @@
    "default": "Off: the public pages say the shop is closed and take no orders.",
    "change": "Customers see published items and can place orders for the chosen branch.",
    "who": "Only the owner (Settings or Website screen).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_pay_cod_on": {
    "title": "Cash on delivery offered",
    "does": "Shows the cash-on-delivery option at checkout.",
    "why": "Many customers pay in cash when the order arrives.",
    "default": "Off: cash on delivery is not offered.",
    "change": "The option appears or disappears at checkout.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_pay_manual_on": {
    "title": "bKash / Nagad payment with a Trx ID",
    "does": "Shows the bKash or Nagad option; the customer types the Trx ID after sending money.",
    "why": "A typed Trx ID is only a claim until a person checks it in the wallet app.",
    "default": "Off: the option is not offered.",
    "change": "Customers can choose it; staff check the payment before confirming.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_pay_mobile_number": {
    "title": "bKash / Nagad number shown to customers",
    "does": "The number customers send money to for the manual option.",
    "why": "Customers need the right number to pay.",
    "default": "Blank: the manual option stays hidden.",
    "change": "The number appears at checkout.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_pixel_id": {
    "title": "Facebook Pixel ID",
    "does": "Adds the Facebook Pixel only when this ID is set and the visitor accepted cookies.",
    "why": "The Pixel reports visits to Facebook, so visitors must agree first.",
    "default": "Blank: no Pixel code is loaded.",
    "change": "Visitors who accept cookies are tracked from their next visit.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_policy_privacy_bn": {
    "title": "Privacy policy (Bangla)",
    "does": "The privacy text shown on the policies page in Bangla.",
    "why": "Customers give personal details and must know how they are used.",
    "default": "Blank: the page says coming soon.",
    "change": "The policies page shows the new text.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_policy_privacy_en": {
    "title": "Privacy policy (English)",
    "does": "The privacy text shown on the policies page in English.",
    "why": "English-speaking customers must know how their details are used.",
-   "default": "Blank: the page says coming soon.",
    "change": "The English policies page shows the new text.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_policy_refund_bn": {
    "title": "Refund and cancellation (Bangla)",
    "does": "The refund and cancellation text shown on the policies page in Bangla.",
    "why": "Customers need to know when a cancellation or refund is possible.",
-   "default": "Blank: the page says coming soon.",
-   "change": "The policies page shows the new text.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_policy_refund_en": {
    "title": "Refund and cancellation (English)",
    "does": "The refund and cancellation text shown on the policies page in English.",
    "why": "English-speaking customers need to know when a cancellation or refund is possible.",
-   "default": "Blank: the page says coming soon.",
-   "change": "The English policies page shows the new text.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_policy_terms_bn": {
    "title": "Terms (Bangla)",
    "does": "The terms text shown on the policies page in Bangla.",
    "why": "Customers should know the rules of ordering.",
-   "default": "Blank: the page says coming soon.",
-   "change": "The policies page shows the new text.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_policy_terms_en": {
    "title": "Terms (English)",
    "does": "The terms text shown on the policies page in English.",
    "why": "English-speaking customers should know the rules of ordering.",
-   "default": "Blank: the page says coming soon.",
-   "change": "The English policies page shows the new text.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_public_url": {
    "title": "Public address of the website",
    "does": "Stores the https address of the shop once a domain or hosting exists.",
    "why": "The go-live checklist uses it to show whether customers can really reach the shop.",
    "default": "Blank: the shop is for local testing only.",
    "change": "The checklist domain line turns OK. Nothing else changes by itself.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_rate_max": {
    "title": "Web orders per device in the time window",
    "does": "Limits how many web order attempts one device may make in the window below.",
    "why": "It slows down automatic order spam.",
    "default": "5 attempts (0 = no limit, not recommended).",
    "change": "Devices that go over the limit are told to wait.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_rate_window_min": {
    "title": "Web order limit window (minutes)",
    "does": "The length of time used for the per-device attempt limit.",
    "why": "The limit needs a time window to mean anything.",
    "default": "60 minutes.",
    "change": "A longer window makes the limit stricter.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_reserve_minutes": {
    "title": "Hold time for reserved stock (minutes)",
    "does": "How long a web order keeps its units before they are released.",
    "why": "A hold that is never released would block stock forever.",
    "default": "30 minutes.",
    "change": "Holds expire sooner or later; expired holds are released.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_reserve_on": {
    "title": "Hold stock at web checkout (hard reservation)",
    "does": "A web order takes its units out of free stock straight away until it is delivered, cancelled or its hold time ends.",
    "why": "Without it two customers can buy the last cake; with it the second is told sold out.",
    "default": "Off: the shop shows availability but holds no stock.",
    "change": "Checkout is refused as sold out when free stock is not enough.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_stock_threshold": {
    "title": "Stock level that shows Limited",
    "does": "When free stock is at or below this number, the shop shows Limited instead of In stock.",
    "why": "It warns customers without showing the exact stock to the public.",
    "default": "5 units.",
    "change": "Items move to Limited sooner or later on the web.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
-  },
   "rule:website_whatsapp": {
    "title": "WhatsApp number for orders",
    "does": "Adds WhatsApp order and contact buttons with this number.",
    "why": "Many customers order by WhatsApp.",
    "default": "Blank: no WhatsApp button is shown.",
    "change": "The buttons appear on the public pages.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:website"
-   ],
-   "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+  "rule:xc_coaching_on": {
+   "title": "Staff coaching board (owner only)",
+   "does": "Shows the owner, per person, the figures that already exist: bills, discounts, voids, cash shortage cases, production rejects, late days and complaints. No ranking and no score.",
+   "why": "Helps the owner talk to people with the same facts for everyone. Nobody else can see it.",
+   "default": "Off. Nothing is composed, sent or shown.",
+   "change": "On: the owner can open the board for a chosen period. Other roles cannot see it even when it is on. It changes no record.",
+   "who": "Only the owner, in Settings."
+  "rule:xc_markdown_pct": {
+   "title": "Markdown % for unsold stock",
+   "does": "The discount suggested for units that cannot sell tomorrow, and the discount a markdown sale is recorded at.",
+   "why": "The owner sets the discount, not the software.",
+   "default": "Blank. Blank means no discount is suggested and a markdown sale is refused.",
+   "change": "A typed percentage (1 to 90) is used for the suggested markdown price and for markdown sales.",
+  "rule:xc_price_alert_on": {
+   "title": "Supplier price-rise alert",
+   "does": "Puts a warning in the bell when a supplier's rate for an item goes up by more than the percentage set below, compared with that supplier's previous rate.",
+   "why": "A rise noticed the day it happens can be negotiated or the menu price changed.",
+   "change": "On: the warning appears once per item and supplier per day. Nothing is changed in the purchase records.",
+  "rule:xc_price_rise_pct": {
+   "title": "Rise % that triggers the price alert",
+   "does": "The percentage rise over the previous rate that causes a warning.",
+   "why": "Too small and the owner gets noise; too large and small rises are missed.",
+   "default": "Blank. Blank means the alert says 'threshold not set' and writes nothing.",
+   "change": "A typed percentage (1 to 500) is used by the price alert when its switch is on.",
+  "rule:xc_prod_suggest_on": {
+   "title": "Daily production suggestion",
+   "does": "Shows a suggested quantity for each item at a place: the average of the same weekday in the last weeks, plus open orders for that day, minus stock on hand. Festival uplift is shown separately.",
+   "why": "Gives the baker a starting figure from real sales. It is arithmetic on past sales, not a forecast.",
+   "change": "On: the planning screen can show the suggestion and the range. Nothing is written to the production plan until the baker confirms.",
+  "rule:xc_prod_weeks": {
+   "title": "Weeks of same-weekday history",
+   "does": "How many past weeks of the same weekday the suggestion averages over.",
+   "why": "More weeks steadier, fewer weeks quicker to react.",
+   "default": "Blank. Blank means no suggestion is shown and the screen says 'data needed'.",
+   "change": "Typed weeks (1 to 12) switch the suggestion on for the switched-on places.",
+  "rule:xc_summary_email_on": {
+   "title": "Daily summary by e-mail",
+   "does": "Sends the summary by e-mail to recipients whose channel is e-mail.",
+   "why": "E-mail is the record that can be kept and forwarded.",
+   "change": "On: e-mail recipients get the summary. Needs the Gmail secrets set by the technical person (docs/OPS_SETUP.md).",
+  "rule:xc_summary_on": {
+   "title": "Owner daily summary",
+   "does": "Builds one summary of the day (sales, cash, wallet receipts, wastage, cakes due tomorrow, and for the owner also dues, approvals and failures) and sends it to the people the owner has entered.",
+   "why": "The owner sees the day in one message instead of opening five screens.",
+   "change": "On: the summary goes out at the hours set below, to the recipients who are switched on. Nothing is changed in the books. An outlet recipient gets only that outlet's figures and no cost values.",
+  "rule:xc_summary_telegram_on": {
+   "title": "Daily summary by Telegram",
+   "does": "Sends the summary to Telegram chats whose channel is Telegram.",
+   "why": "Telegram reaches a phone quickly.",
+   "change": "On: Telegram recipients get the summary. The bot token is kept as a secret by the technical person; the chat number is typed on the recipient row.",
+  "rule:xc_summary_times": {
+   "title": "Summary hours (Dhaka)",
+   "does": "The hours of the day the summary is due, for example 08 and 21. 08 means yesterday's figures; 21 means today's.",
+   "why": "Keeps the morning and evening messages where the owner wants them.",
+   "default": "21 (evening, today's figures)",
+   "change": "The summary goes out only in the hours listed. The technical schedule runs at about 08:10 and 21:10 Dhaka time.",
+  "rule:xc_sync_alert_on": {
+   "title": "Every shop synced? alert",
+   "does": "Puts a warning in the bell for each place with no recorded sale for longer than the hours set below.",
+   "why": "A shop that has stopped sending sales is found the same day.",
+   "change": "On: the warning appears once per place per day, if the hours are typed too. Nothing is changed in the books.",
+  "rule:xc_sync_stale_hours": {
+   "title": "Hours without a sale before the alert",
+   "does": "How many hours with no recorded sale at a place before the sync warning is shown.",
+   "why": "A quiet shop is not always broken; the owner knows the hours of each shop.",
+   "default": "Blank. Blank means the warning says 'threshold not set' and does nothing.",
+   "change": "Typed hours (1 to 720) make the sync warning work when its switch is on.",
+  "rule:xc_unsold_on": {
+   "title": "Unsold stock and markdown",
+   "does": "Lists the units that cannot be sold tomorrow (their expiry is before the end of the next day), lets the person record what happened to each unit (sold at a markdown, staff meal, donation, waste), and shows the wastage share per item.",
+   "why": "Unsold cakes are money. The list makes the decision before the end of the day.",
+   "change": "On: the end-of-day list and the outcome lines are available. An outcome line never moves stock or money; waste is still booked on the wastage screen.",
   },
   "screen:accounts": {
    "title": "Accounts and ledger",
