@@ -1856,6 +1856,26 @@
    "verified": true,
    "src": "phase89.sql; W1-B.md"
   },
+  "grant:market_manage": {
+   "title": "Add topics, sources, findings, prices and opportunities, and decide them",
+   "does": "Lets a person add research, record opportunities and move them through their statuses (each move needs a reason).",
+   "why": "The person who asks for an opportunity can not approve it themselves, so a decision always has a second person behind it.",
+   "default": "Given to nobody. Only the owner has it.",
+   "change": "The person can add and change research and opportunities, and create tasks from approved work. They can not set scraping permissions, link a provider or schedule jobs.",
+   "who": "Only the owner. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "grant:market_view": {
+   "title": "See the market intelligence workspace",
+   "does": "Lets a person read the findings, prices, opportunities and growth figures on the Market page.",
+   "why": "Market notes can be sensitive (competitor prices, plans). Only the people who need them should see them.",
+   "default": "Given to nobody. Only the owner has it.",
+   "change": "The person sees the Market page and its figures, but can not add or decide anything. Sales figures on the page still follow their places.",
+   "who": "Only the owner. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
   "grant:recall_manage": {
    "title": "Open and run a recall case",
    "does": "Lets a person open a recall case, add batches to it, mark what was done and close it. The affected-stock report shows who holds the batch.",
@@ -3354,6 +3374,96 @@
    "verified": true,
    "src": "RPT-C3 (docs/integration/RPT-C3_info.json)"
   },
+  "rule:mi_ai_summary_on": {
+   "title": "Let the AI summariser propose a summary of chosen findings",
+   "does": "Lets the AI assistant write a short proposed summary of findings you selected. The proposal waits for a person to accept or reject it.",
+   "why": "Long sources are slow to read. A draft summary saves time; a person still checks it against the source.",
+   "default": "OFF. No AI call is made.",
+   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes. The person who asked can not accept their own proposal.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_alerts_on": {
+   "title": "Put competitor price alerts in the in-app notifications",
+   "does": "Adds one line a day to the owner's notifications when competitor prices moved beyond the threshold.",
+   "why": "The owner sees the alert without opening the Market page.",
+   "default": "OFF. Alerts are only listed on the Market page.",
+   "change": "ON: one in-app line per day with the count of items that moved. It has no customer data.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_digest_on": {
+   "title": "Weekly growth and market digest to the owner (in-app)",
+   "does": "Writes one in-app line for the owner with the top sales movers, open opportunities and the number of price alerts, when the weekly job runs it.",
+   "why": "A short weekly summary keeps the owner on the numbers without a long report.",
+   "default": "OFF. No digest is written.",
+   "change": "ON: the digest is written when the scheduled job (a later package) runs it. It has numbers from our own sales only and is not sent outside the app.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_elast_min_days": {
+   "title": "Minimum trading days at each price before a price-response hint is shown",
+   "does": "Sets how many trading days a price must have been charged before we compare how many units sold at that price.",
+   "why": "A price that was charged for one day says nothing. The hint is only a pattern in past data, never a forecast.",
+   "default": "Blank. No price-response hint is shown.",
+   "change": "A number lets the Growth page show the past pattern, with the days behind it, when at least two prices meet the minimum. It never changes a price.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_on": {
+   "title": "Market intelligence workspace (research, findings, opportunities)",
+   "does": "Turns on the Market page: research topics, source registry, findings you type in, competitor prices, opportunities with evidence and decisions, and measuring them from our own sales.",
+   "why": "It keeps what we learn about competitors, prices, festivals and customers in one place, with the source and the date, instead of in people's heads.",
+   "default": "OFF. The Market page is empty and nothing can be written. Nothing is searched on the internet by this switch.",
+   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever. OFF again: nothing new can be written, old records stay and can be read.",
+   "who": "Only the owner, in Settings (the Rules page). Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_quote_max_chars": {
+   "title": "Longest quoted snippet kept from a source (characters)",
+   "does": "Sets how many characters of a source may be kept as a direct quote on a finding.",
+   "why": "Keeping only short quotes and our own summary respects the source and keeps the record useful.",
+   "default": "Blank. Quotes are not stored; write your own summary only.",
+   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message. Existing findings are not changed.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_research_job_on": {
+   "title": "Run scheduled research jobs",
+   "does": "Lets the job runner (a later package) run the research jobs that are switched on.",
+   "why": "A job is only useful when it runs on its own. This is the master switch for all of them.",
+   "default": "OFF. Job definitions can be stored; none runs.",
+   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above. OFF again: nothing runs.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_scrape_on": {
+   "title": "Allow scheduled research to fetch a permitted source",
+   "does": "Lets a scheduled research job read a public page from a source, but only when the owner has allowed that source after reading its terms, the robots.txt check passed and a rate limit is typed.",
+   "why": "Reading a permitted page on a schedule saves hours. It is never used to get past a login or a paywall, and it never copies a page in bulk.",
+   "default": "OFF. No job fetches anything. Even ON, each source stays closed until the owner allows it.",
+   "change": "ON: the research gate opens only for sources that meet every condition. OFF again: every job stops at once, whatever the source settings.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_watch_threshold_pct": {
+   "title": "Alert when a competitor price moves by more than this %",
+   "does": "Lists each competitor price that moved more than this percentage since its previous observation.",
+   "why": "A big competitor price move is worth a look the same day.",
+   "default": "Blank. No competitor price alert.",
+   "change": "A number lists the moves on the Market page's price tab. Nothing is sent to customers.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
   "rule:mkt_repeat_days": {
    "title": "Repeat purchase window after a promotion (days)",
    "does": "How many days after a promotion ended a later bill counts as a repeat purchase.",
@@ -4594,6 +4704,16 @@
    ],
    "verified": true,
    "src": "phase20.sql; W1-G.md"
+  },
+  "screen:market": {
+   "title": "Market & growth",
+   "does": "One page with five tabs: Overview, Research (topics, sources, findings), Prices (competitor prices and CSV import), Opportunities (evidence, KPI, status, tasks, measuring from sales) and Growth (our item and outlet growth, bought together, festival review).",
+   "why": "It joins what we read about the market with what our own sales show, so a decision can be checked against real numbers.",
+   "default": "Empty until the owner switches on the workspace and gives the rights.",
+   "change": "Every number says what it is based on: the days it covers and the assumptions. A warning reminds that a pattern is not a cause.",
+   "who": "The owner decides who has the rights. The page itself has no setting.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
   },
   "screen:moneyaccounts": {
    "title": "Money accounts",
