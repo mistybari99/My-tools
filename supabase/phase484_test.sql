@@ -1,7 +1,7 @@
 -- FRESH DB ONLY. Phase 484 tests (X4 AI foundation): defaults, anon denied, forbidden grants and actions, untrusted-input rule, budget enforcement,
 -- data-level rule, pause switch, agent provider match, append-only call log, actor_type, money estimate from owner prices only.
 --   build a database through phase 484 (ORDER.txt), then from the repository root
---   psql -h /tmp -p <port> -U postgres -d <db> -qAt -f supabase/phase510_test.sql | grep -E 'FAIL|RESULT'
+--   psql -h /tmp -p <port> -U postgres -d <db> -qAt -f supabase/phase484_test.sql | grep -E 'FAIL|RESULT'
 -- Test data only (test_* names). No external call. No data outside the test database is touched.
 \set ON_ERROR_STOP off
 \i tests/sql/rpthub_tt.sql

@@ -1,5 +1,5 @@
 -- Phase 496 (XC-3) - SUPPLIER PRICE INTELLIGENCE: last price, 90-day trend, cheapest supplier, costliest ingredients, rise alerts and a recipe-cost preview.
--- Paste AFTER phase551. Paste-twice safe. Earlier phase files are not edited. It does NOT duplicate the purchase-rate trend report (p2_rate_trend, phase434): it links to it.
+-- Paste AFTER phase495. Paste-twice safe. Earlier phase files are not edited. It does NOT duplicate the purchase-rate trend report (p2_rate_trend, phase434): it links to it.
 -- Prices are costs: readable only by the owner, the cost right (rpt_cost_ok) or the recipe-cost right. Browsers never read the tables directly.
 -- OFF by default: switch xc_price_alert_on (false). The rise threshold xc_price_rise_pct is BLANK by default: with it blank the alert says "threshold not set" and writes nothing.
 -- The alert compares the latest purchase rate of an item from a supplier with the one before it (the same supplier), inside the last 90 days. An alert is an in-app warning only.

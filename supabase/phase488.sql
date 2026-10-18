@@ -1,5 +1,5 @@
 -- Phase 488 (X6) - THE WORKSPACE: topics, sources, findings, competitor prices, offers, product gaps, opportunities (status machine with a reason on every move), tasks and outcome measurement.
--- Paste AFTER phase530. Paste-twice safe. Every write needs rule mi_on = ON and the market_manage right (or the owner). Reads are RLS-gated on market_view.
+-- Paste AFTER phase487. Paste-twice safe. Every write needs rule mi_on = ON and the market_manage right (or the owner). Reads are RLS-gated on market_view.
 -- Scores are computed here and the basis is stored next to them (transparent, not a model):
 --   freshness_score (0-3): age of the PUBLICATION date when the page was retrieved: 30 days or less = 3, up to 180 = 2, up to 365 = 1, older or unknown = 0.
 --   quality_score   (0-6): finding type (sourced_fact 3, source_claim 2, analysis 1, hypothesis 0) + source reliability (A 3, B 2, C 1, D 0; no registered source = 0).

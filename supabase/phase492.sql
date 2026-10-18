@@ -1,6 +1,6 @@
 -- ============================================================
 -- Phase 492 - XB package part 2: custom-cake workflow on top of an app order.
--- Run AFTER phase 540 (and phase 445 / 448 for the order spec and cancel). New file only; no old phase or function is edited.
+-- Run AFTER phase 491 (and phase 445 / 448 for the order spec and cancel). New file only; no old phase or function is edited.
 -- Paste twice = no error, no second row.
 --
 --   * cake_price_rules      owner-editable price table: base per kg, flavour extras and design extras (per kg or flat). Empty table = no quote

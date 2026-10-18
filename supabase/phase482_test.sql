@@ -1,4 +1,4 @@
--- FRESH COPY ONLY. X2 website tests (phases 481 + 482). Build a database through phase 478, then paste 490 and 491 (twice is fine), then:
+-- FRESH COPY ONLY. X2 website tests (phases 481 + 482). Build a database through phase 478, then paste 481 and 482 (twice is fine), then:
 --   psql -h /tmp -p <port> -U postgres -d <db> -qAt -f supabase/phase482_test.sql | grep -E 'FAIL|RESULT'
 -- Test data only: items and names are test_*. Covers: public read RPCs only for anon, no cost/stock leak, idempotent checkout,
 -- server re-pricing, rate limit, validation, hard holds (no oversell, release on cancel and on expiry), tracking, cancel and custom requests,

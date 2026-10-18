@@ -9,7 +9,7 @@
 --   owner               : integration_add / integration_set / site_config_set / agent_account_set / webhook_rotation_record, reads everything here.
 --   ops bot (backup / notify purpose, phase46): job_run_start / job_run_finish / job_heartbeat / integration_test_record, and x1_gate.
 --   agent account (agent_accounts, below): x1_gate only. It can never hold a role or a grant (triggers below).
--- Tags: bos480. Test data only (test_*). Tests: supabase/phase480_test.sql.
+-- Tags: bos480. Test data only (test_*). Tests: supabase/phase479_test.sql.
 
 -- ---------- rules (switches; new behaviour OFF) ----------
 insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values

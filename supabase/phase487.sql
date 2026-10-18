@@ -13,7 +13,7 @@
 --   mi_opp_decisions     every status change, with a MANDATORY reason, kept forever (append-only; pattern of mkt_post_decisions, phase461)
 --   mi_opp_links         implementation tasks (crm_tasks rows) linked to an opportunity (append-only)
 --   mi_opp_outcomes      outcome measurements computed from ERP data (append-only; never typed in by hand)
---   mi_job_defs          scheduled research job definitions (enabled = false; needs the research gate, phase 533)
+--   mi_job_defs          scheduled research job definitions (enabled = false; needs the research gate, phase 490)
 --   mi_adapters          provider adapter catalogue (network_allowed = false for every row; the mock adapter needs no network)
 --   mi_summary_proposals AI summariser output: PROPOSALS only, a person accepts or rejects (append-only status history in mi_summary_decisions)
 -- Build rules applied: every list has Add new (saves a new row) and retire; no hard delete; the change log is written by log_change; new behaviour OFF by default.
@@ -300,7 +300,7 @@ insert into public.mi_adapters (code, kind, label, network_allowed, note) values
  ('search_api', 'search_api', 'Paid search / research API (provider to be linked later)', false, 'Needs the owner to link a provider and a budget. Not linked today.')
 on conflict (code) do nothing;
 
--- ---------- row level security: closed by default; reads only through the rights above; writes only through the functions (phase 531+) ----------
+-- ---------- row level security: closed by default; reads only through the rights above; writes only through the functions (phase 488+) ----------
 do $r$ declare t text; begin
   foreach t in array array['mi_topics', 'mi_sources', 'mi_findings', 'mi_finding_files', 'mi_price_obs', 'mi_offer_log', 'mi_product_gaps', 'mi_opportunities',
                            'mi_opp_decisions', 'mi_opp_links', 'mi_opp_outcomes', 'mi_job_defs', 'mi_adapters', 'mi_summary_proposals', 'mi_summary_decisions'] loop
@@ -336,7 +336,7 @@ create trigger audit_mi_opportunities after insert or update on public.mi_opport
 drop trigger if exists audit_mi_job_defs on public.mi_job_defs;
 create trigger audit_mi_job_defs after insert or update on public.mi_job_defs for each row execute function public.log_change('key');
 
--- writes are never granted directly; the functions in phase 531 / 532 / 533 are the only way in
+-- writes are never granted directly; the functions in phase 488 / 489 / 490 are the only way in
 revoke all on function public._mi_on(), public._mi_can_view(), public._mi_can_manage(), public._mi_today(), public._mi_url_key(text), public._mi_append_only() from public, anon;
 grant execute on function public._mi_can_view(), public._mi_can_manage(), public._mi_on() to authenticated;
 

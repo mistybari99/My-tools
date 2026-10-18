@@ -1,5 +1,5 @@
 -- Phase 490 (X6) - THE SCHEDULED RESEARCH HOOK (OFF), the AI summariser slot (proposal only), competitor price alerts and the weekly owner digest. Paste AFTER phase489. Paste-twice safe.
--- Nothing here fetches anything. The job runner (X1 job_runs, phases 480-489) is NOT in this build: it will call mi_research_gate() before every run and mi_job_mark_run() after it. Until X1 is pasted and the owner switches the job on, no job runs.
+-- Nothing here fetches anything. The job runner (X1 job_runs, phases 479-489) is NOT in this build: it will call mi_research_gate() before every run and mi_job_mark_run() after it. Until X1 is pasted and the owner switches the job on, no job runs.
 -- The research GATE (every condition must hold; the reasons are returned in words):
 --   mi_on and mi_research_job_on and mi_scrape_on are ON; the source is active; the owner has set terms_allow_scraping ON with a terms check date;
 --   robots_ok is true and checked; a rate limit (requests per hour) is typed; the adapter is allowed to use the network (set by the owner, mi_adapter_set).

@@ -1,5 +1,5 @@
 -- Phase 480 (bos481) - X1 FOUNDATION, part 2: approval queue for agent and automation proposals, and the health view.
--- Paste after phase 480. Paste-twice safe. Nothing existing is edited.
+-- Paste after phase 479. Paste-twice safe. Nothing existing is edited.
 -- Rules of the queue:
 --   * A proposal names ONE target RPC from the allowlist action_targets (enabled OFF by default). Rules, grants, audit and finance posting can never be a target (trigger).
 --   * Only the owner decides. The proposer never decides its own proposal. A rejection needs a reason.
@@ -7,7 +7,7 @@
 --     Nothing runs twice: client_id is unique, and a proposal leaves 'approved' once it is executed or failed.
 --   * Expired proposals (expires_at passed) can not be approved.
 -- Health: x1_health() (owner only) reads the registry, job runs, outbox, intake failures, backup and books freshness. A missing source is shown as missing or unverified, never as healthy.
--- Tags: bos481. Test data only (test_*). Tests: supabase/phase481_test.sql.
+-- Tags: bos481. Test data only (test_*). Tests: supabase/phase480_test.sql.
 
 -- ---------- allowlist of proposal targets ----------
 create table if not exists public.action_targets (

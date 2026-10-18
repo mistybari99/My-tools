@@ -4,7 +4,7 @@
 -- Everything is OFF by default: rule ai_on = false, provider local_rules only, every agent disabled.
 --   * No API key is ever stored in a table or a rule. A paid provider keeps its key as a Supabase secret (docs/AI_DEPLOY.md).
 --   * A paid provider cannot run without a monthly budget (tokens or money). Money is estimated ONLY from prices the owner typed; blank price = no money figure.
---   * An agent may only PROPOSE (suggestion rows, phase 511). Untrusted-input agents (customer messages, web pages, photos) get NO proposal actions (table check + trigger).
+--   * An agent may only PROPOSE (suggestion rows, phase 485). Untrusted-input agents (customer messages, web pages, photos) get NO proposal actions (table check + trigger).
 --   * An agent cannot hold a forbidden grant (trigger on ai_agent_grants).
 --   * ai_calls is append-only and carries actor_type ('human' | 'agent' | 'system').
 -- Naming: every object starts with ai_ or _ai_ (no collision with the existing phases).

@@ -6,7 +6,7 @@
 --                   category order, availability mode, allergen / diet tags, lead days, price snapshot for the drift report).
 --                   web_item_images: an image is shown on the web only after the owner approves it (private `photos` bucket stays private).
 --   3. LOCATIONS    web_pickup_points (which outlet can be a pickup point, public hours) and web_zones (delivery zones, charge, minimum order).
---   4. CALENDAR     web_closures (holiday closure days, shown as a banner; orders for a closed day are refused by phase491).
+--   4. CALENDAR     web_closures (holiday closure days, shown as a banner; orders for a closed day are refused by phase482).
 --   5. PUBLIC READ  web_site_config(), web_catalog_v2(), web_quote(); anon may call ONLY these (grants at the end of this file).
 --                   They return published data only: no cost, no supplier, no staff, no exact stock number, no internal codes.
 -- Every behaviour is OFF until the owner switches it on: website_on = false means the public RPCs answer {on:false}.
@@ -173,7 +173,7 @@ create policy web_closures_owner_read on public.web_closures for select to authe
 drop trigger if exists web_closures_no_delete on public.web_closures;
 create trigger web_closures_no_delete before delete on public.web_closures for each row execute function public.no_hard_delete();
 
--- stock holds (hard reservation): written by phase 491 checkout; read here so the catalogue shows the true free quantity.
+-- stock holds (hard reservation): written by phase 482 checkout; read here so the catalogue shows the true free quantity.
 create table if not exists public.web_stock_holds (
   id bigint generated always as identity primary key,
   submission uuid not null, order_id uuid references public.online_orders(id),

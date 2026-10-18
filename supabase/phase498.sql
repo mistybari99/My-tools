@@ -1,5 +1,5 @@
 -- Phase 498 (XC-5) - STAFF COACHING BOARD (OWNER ONLY): per person, the figures that already exist, side by side. No rankings, no scores, no public view.
--- Paste AFTER phase553. Paste-twice safe. Earlier phase files are not edited.
+-- Paste AFTER phase497. Paste-twice safe. Earlier phase files are not edited.
 -- OFF by default: switch xc_coaching_on (false). Only the owner can read it, even when the switch is on.
 -- The figures come from records that already exist: sales (sales, discounts, voids), cash shortage cases, production runs and their losses, attendance days (late minutes),
 -- and complaints. A person with no record for a figure shows a blank, never 0. People are matched to a person's record by their staff id (profiles.staff_id) and by the employee link.

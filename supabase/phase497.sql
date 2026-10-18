@@ -1,5 +1,5 @@
 -- Phase 497 (XC-4) - END-OF-DAY UNSOLD AND MARKDOWN: what cannot sell tomorrow, the outcome of each unsold unit, and wastage share per item and place.
--- Paste AFTER phase552. Paste-twice safe. Earlier phase files are not edited.
+-- Paste AFTER phase496. Paste-twice safe. Earlier phase files are not edited.
 -- OFF by default: switch xc_unsold_on (false). The markdown % xc_markdown_pct is BLANK by default: with it blank no discount is suggested and a sale at a discount is refused ("markdown % not set").
 -- WHAT IS AT RISK: stock batches (stock_batches) with units left whose expiry falls before the end of the next Dhaka day. A batch with NO expiry is counted and named as "no expiry captured" (not treated as safe, not treated as expiring).
 -- OUTCOMES (one line per decision, append-only, void only): sold_discount (sold at the markdown price; value = quantity x sell price x (1 - %)), staff_meal, donation, waste.

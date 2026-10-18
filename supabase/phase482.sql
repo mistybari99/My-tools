@@ -1,6 +1,6 @@
 -- ============================================================
 -- Phase 482 (X2 website, part 2) - CHECKOUT, HARD STOCK HOLDS, TRACKING, CANCEL / CUSTOM CAKE REQUESTS, OWNER ADMIN, DRIFT, GO-LIVE CHECKLIST.
--- Run AFTER phase490. Additive + idempotent (paste twice = no error). No earlier phase file is edited.
+-- Run AFTER phase481. Additive + idempotent (paste twice = no error). No earlier phase file is edited.
 --   1. CHECKOUT      web_checkout_submit(): PUBLIC (anon). Idempotent on a browser-made submission id (same id twice = the same order).
 --                    Rate limited per device hash (rule website_rate_max). Re-prices and re-checks the cart on the server (web_quote).
 --                    Writes ONE online_orders row (channel 'website', status 'new'). Staff then confirm/pack/deliver with the existing screens.
@@ -16,7 +16,7 @@
 --                    after the owner approves its row (web_item_images.approved). The private `photos` bucket is not changed.
 --   6. OWNER ADMIN   web_admin_* functions (owner only): item publishing (single and bulk by category), images, zones, pickup points,
 --                    closures, board, drift report, holds report, web orders, cancel and custom-request decisions, go-live checklist.
---   7. GRANTS        anon: web_checkout_submit, web_order_track, web_order_cancel_request, web_custom_request only (plus phase490 reads).
+--   7. GRANTS        anon: web_checkout_submit, web_order_track, web_order_cancel_request, web_custom_request only (plus phase481 reads).
 --                    Every other new function is closed to anon and public.
 -- ============================================================
 

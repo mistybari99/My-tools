@@ -1,6 +1,6 @@
 -- ============================================================
 -- Phase 493 - XB package part 3: riders, delivery status, delivery zones, COD collected and deposited per rider per day.
--- Run AFTER phase 541. New file only; no old phase or function is edited. Paste twice = no error, no second row.
+-- Run AFTER phase 492. New file only; no old phase or function is edited. Paste twice = no error, no second row.
 --
 --   * riders                 staff or external rider master (name_bn / name_en, kind, optional employee link, phone, place, active). Owner or grant rider_manage.
 --   * delivery_zones        zone fee table (owner or rider_manage). A zone with no fee cannot be assigned (nothing invented).

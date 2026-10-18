@@ -1,5 +1,5 @@
 -- Phase 495 (XC-2) - DAILY PRODUCTION SUGGESTION, THE BAKER'S CONFIRMATION, AND THE ACCURACY REPORT.
--- Paste AFTER phase550. Paste-twice safe. Earlier phase files are not edited.
+-- Paste AFTER phase494. Paste-twice safe. Earlier phase files are not edited.
 -- OFF by default: switch xc_prod_suggest_on (false). Window xc_prod_weeks is BLANK by default: with it blank nothing is suggested ("data needed").
 -- A suggestion is arithmetic on the server, not a forecasting model. It writes NOTHING to production_plans: the baker copies or edits the lines in the production screen.
 --   EXPECTED   = average sold on the same weekday over the last N weeks, using only TRADING days (a day with a bill) that are not festival days.
