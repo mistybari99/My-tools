@@ -655,3 +655,10 @@ Owner links later
 - A research provider: set mi_adapter_set (owner) after the terms and robots check per source; X1 runner calls mi_research_gate before each run.
 - AI summariser: X4 agent 'market-research summariser' calls mi_summary_propose under the user's login; accept/reject through mi_summary_decide.
 - Notifications and digest: X1 schedules mi_alert_notify and mi_growth_digest after the switches are set.
+## XB (order-to-cash, part 1 of 3; branch xb-orders)
+
+- Built (backend only): mobile payment capture, verify, screenshot, statement import and tie-out (phase 540); custom-cake quote, chain, capacity, lead time, cancel via c2_order_cancel, due sheet, customer text (phase 541); riders, zones, delivery states, COD deposits, per-rider reconciliation and cases (phase 542); payment-SMS reader web/xb_paysms.js.
+- Not built: festival playbook, ingredient pre-purchase list, web screens, most of item 5. Details in docs/integration/XB.md section 5.
+- Tests: 102 SQL checks (phase540 36, phase541 37, phase542 29; each pasted twice on a local throwaway Postgres, port 5860), 32 SMS samples. check_no_demo_leak OK.
+- Not confirmed: live Supabase, real bKash / Nagad / Rocket SMS wording, defaults-parity snapshot, journal balance run, Bangla wording of new texts.
+- Manual checks for the owner: read docs/integration/XB.md section 3 and 5 before switching anything on; the three new switches are OFF by default.

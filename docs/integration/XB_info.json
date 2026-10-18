@@ -1,0 +1,107 @@
+{
+  "package": "XB",
+  "title": "Order-to-cash: mobile payments, custom cakes, riders and COD (XB part 1-3)",
+  "note": "Plain-English texts for the (i) info sheet of each setting of phases 540-542. Every entry says what it does, why it matters, the default, what changes if it is switched on, and who can change it. English only. Setting keys are the rule keys of supabase/phase540.sql, 541.sql and 542.sql.",
+  "entries": [
+    {
+      "key": "pay_capture_on",
+      "kind": "setting",
+      "label": "Write down bKash, Nagad and Rocket payments",
+      "what_it_does": "Lets the counter write a mobile payment: the Trx-ID, sender number, amount and time, against an order, a sale or an advance.",
+      "why_it_matters": "A Trx-ID is paid once. Writing it down stops the same payment being used twice, and shows at the end of the day whether the phone and the app agree.",
+      "default": "Off. Nothing can be written; the screens say the module is off.",
+      "if_switched": "On: a Trx-ID already written is refused. Each capture gets a flag (ok, overpay, underpay, no target) and waits for a second person to verify it. Nothing is posted to the books by a capture.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "pay_capture_tol",
+      "kind": "setting",
+      "label": "Taka difference allowed when matching a payment",
+      "what_it_does": "The number of taka a payment may differ from the amount due before it is flagged as overpay or underpay.",
+      "why_it_matters": "Small differences from fees or rounding can be let through; big ones must be looked at.",
+      "default": "Blank. The amount must match exactly. No number is assumed.",
+      "if_switched": "A number such as 5 lets a payment within 5 taka of the due amount be flagged ok. Only the flag changes; nothing is posted.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "pay_verify",
+      "kind": "grant",
+      "label": "Verify mobile payments",
+      "what_it_does": "Lets a person approve or reject a written mobile payment. A person never approves a capture they wrote.",
+      "why_it_matters": "Two people look at each payment: the one who writes it and the one who checks it against the phone.",
+      "default": "Nobody holds it. Only the owner can verify until the owner gives it to a person or a role.",
+      "if_switched": "The holder sees the pending list for their place and can verify or reject with a note.",
+      "who_can_change": "Only the owner, in Access."
+    },
+    {
+      "key": "cake_flow_on",
+      "kind": "setting",
+      "label": "Custom cake workflow",
+      "what_it_does": "Turns on the cake job: quote, advance, production slip, baking, decoration, ready, delivered, with the time and the person at each step.",
+      "why_it_matters": "Custom cakes are the largest orders of the week and are easy to lose between the counter, the kitchen and the rider.",
+      "default": "Off. No cake job can be made.",
+      "if_switched": "On: a cake needs a price quote, a day that passes the lead time and the daily cap, and the advance in the order before it is confirmed.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "cake_capacity_day",
+      "kind": "setting",
+      "label": "Most cakes the shop takes for one day",
+      "what_it_does": "The number of cake jobs due on one day. A new cake for a full day is refused.",
+      "why_it_matters": "The kitchen can only bake and decorate so many cakes; a cap stops an overload before the promise is made.",
+      "default": "Blank. With the cake workflow on, no cake can be quoted until a number is typed. No number is assumed.",
+      "if_switched": "Cakes cancelled before delivery free their place again.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "cake_lead_days",
+      "kind": "setting",
+      "label": "How many days ahead a cake must be ordered",
+      "what_it_does": "The earliest day a cake can be due, counted from today.",
+      "why_it_matters": "A cake needs time to buy materials and bake; this rule stops same-day promises.",
+      "default": "Blank. With the cake workflow on, no cake can be taken until a number is typed.",
+      "if_switched": "A value of 1 means a cake for tomorrow at the earliest.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "cake_photo_required",
+      "kind": "setting",
+      "label": "Photo of the finished cake before delivery",
+      "what_it_does": "Requires a photo of the decorated cake before the cake is marked delivered.",
+      "why_it_matters": "A photo shows what left the shop when a customer disputes the design.",
+      "default": "Off. Delivery needs no photo.",
+      "if_switched": "On: the delivered step is refused until a photo path is stored for the job.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "cake_price_manage",
+      "kind": "grant",
+      "label": "Change the cake price list",
+      "what_it_does": "Lets a person change the base price per kg, the flavour prices and the design extras.",
+      "why_it_matters": "Prices change with the market; only a trusted person should change them.",
+      "default": "Nobody holds it. Only the owner can change the list.",
+      "if_switched": "The holder can save a price; the quote uses the new price for every cake made after the save.",
+      "who_can_change": "Only the owner, in Access."
+    },
+    {
+      "key": "xb_delivery_on",
+      "kind": "setting",
+      "label": "Riders and delivery status",
+      "what_it_does": "Lets the shop assign an order to a rider, move it through out, delivered, failed, reattempt and returned, and record the cash on delivery handed in.",
+      "why_it_matters": "Without this the shop does not know which rider has which order or how much cash a rider still holds.",
+      "default": "Off. No rider or delivery can be recorded.",
+      "if_switched": "On: a delivery can be assigned to an active rider with a zone fee. The cash collected per rider per day is compared with the deposits; a difference opens one case for the owner to explain. Nothing is sent to riders or customers and no cash is posted.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "rider_manage",
+      "kind": "grant",
+      "label": "Manage riders and delivery zones",
+      "what_it_does": "Lets a person add or change riders and the delivery zone fees.",
+      "why_it_matters": "A fee and a rider list are money decisions.",
+      "default": "Nobody holds it. Only the owner can change them.",
+      "if_switched": "The holder can add a rider and set a zone fee. Nothing already delivered changes.",
+      "who_can_change": "Only the owner, in Access."
+    }
+  ]
+}
