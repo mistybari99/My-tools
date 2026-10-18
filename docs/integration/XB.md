@@ -15,7 +15,7 @@ Local throwaway Postgres only (port 5860, database `xb_base` = phases 8 to 478 b
 | `tests/sql/xb_run.sh` | runner: copies `xb_base`, pastes each XB phase twice (second paste on a copy), runs the suite. |
 | `web/xb_paysms.js` | pure reader of a pasted bKash / Nagad / Rocket SMS: Trx-ID, amount, sender, date, direction, reasons. Saves nothing. Not loaded by `index.html`. |
 | `tests/web/xb_paysms_test.js` | 32 sample texts (test fixtures only, invented numbers, no names). |
-| `docs/integration/XB_info.json` | (i) texts for the 10 settings and grants above. `python3 tools/merge_pkg_info.py --dry` reports 10 entries. Not merged into `web/data/info.json` (integrator step). |
+| `docs/integration/XB_info.json` | (i) texts for the 10 settings and grants above. Already merged into `web/data/info.json` (the 10 XB entries are there; `python3 tools/merge_pkg_info.py --dry` reports 0 new because they are present). |
 
 Paste order: after phase 478, paste 491, 492, 493 in that order (each once; each is safe to paste again). `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` were not edited.
 
