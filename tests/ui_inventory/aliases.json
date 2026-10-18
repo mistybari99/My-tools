@@ -26,6 +26,12 @@
       "from": "ok ? `<button class=\" {...} \" data-act=\" {...} \" {...} > {...}",
       "to": "⎚ L:ফিল্টার|Filter|Filter {...}",
       "reason": "Same payables Filter button; the first baseline carried the text of the helper line above it (extractor artifact), the button text is unchanged."
+    },
+    {
+      "type": "rename",
+      "from": "rpc:itemmaster.js:item_new",
+      "to": "rpc:itemmaster.js:item_new2",
+      "reason": "X5 (phase 520): the item master save now calls item_new2, which adds client_id so a double tap cannot create two items. Same arguments plus p_client; item_new stays on the server for older screens."
     }
   ]
 }

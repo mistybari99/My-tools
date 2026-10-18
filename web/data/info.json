@@ -21,6 +21,20 @@
    "verified": true,
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
+  "feature:action_queue": {
+   "title": "Approval queue for proposed actions",
+   "does": "An agent or an automated job can propose one action from a short allowed list. The owner approves or rejects it (a rejection needs a reason). Nothing runs by itself: the owner's own session runs the approved action and records the result.",
+   "why": "A proposal is never a silent change. Every step is in the record.",
+   "default": "The list of allowed actions is empty. Nothing can be proposed until the owner allows an action.",
+   "change": "The owner adds an action to the allowed list. Rules, permissions, the audit trail and money can never be on that list.",
+   "who": "The owner decides. The person who proposed cannot decide the same proposal.",
+   "related": [
+    "feature:agent_accounts",
+    "screen:x1health"
+   ],
+   "verified": false,
+   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
+  },
   "feature:actual_yield": {
    "title": "Actual yield at production",
    "does": "An optional box in the production sheet for the real quantity made.",
@@ -30,6 +44,19 @@
    "who": "Who may post production.",
    "verified": true,
    "src": "RPT-B3 (docs/integration/RPT-B3_info.json)"
+  },
+  "feature:agent_accounts": {
+   "title": "Agent accounts (limited sign-in for software)",
+   "does": "A separate sign-in for an automated agent. It can only ask the gate and propose actions for the owner to approve. It can never hold a role or a permission, and it can never change rules, permissions, the audit trail or money.",
+   "why": "An agent can help, but it can never do what only a person may do.",
+   "default": "None exists. The owner creates one only when needed.",
+   "change": "The owner names an account that has no roles and no permissions.",
+   "who": "Only the owner creates one.",
+   "related": [
+    "feature:action_queue"
+   ],
+   "verified": false,
+   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
   },
   "feature:agreed_prices": {
    "title": "Agreed price per item and supplier",
@@ -205,6 +232,19 @@
    "who": "Anyone who may enter online orders.",
    "verified": true,
    "src": "RPT-C2 (docs/integration/RPT-C2_info.json)"
+  },
+  "feature:camera_recognition": {
+   "title": "Camera and recognition (X5)",
+   "does": "Barcode, label text (on phone), photo matching (on phone, not yet installed), name suggestions, duplicate check and a review record for unclear reads. Every part is a separate switch and is OFF by default.",
+   "why": "Faster item entry with fewer duplicates, and nothing changes until the owner switches a part on.",
+   "default": "All OFF. The item form works as before.",
+   "change": "Each part is switched on or off in Settings. Recognised text or photos only suggest; a person always chooses.",
+   "who": "Owner (switches). Staff with item permission (use).",
+   "related": [
+    "screen:camrec"
+   ],
+   "verified": false,
+   "src": "docs/ANDROID_WRAPPER.md; X5 build (not device-tested)"
   },
   "feature:campaigns_master": {
    "title": "Campaign list",
@@ -1677,6 +1717,20 @@
    "verified": true,
    "src": "RPT-C1 (docs/integration/RPT-C1_info.json)"
   },
+  "feature:x1_gate": {
+   "title": "The gate for outside and AI calls",
+   "does": "Every outside call, AI call and automated write asks one gate first. The gate checks, in order: automation ON, not paused, the connection ON and configured, read-only, do-not-contact for the customer, the monthly call cap, the calls per minute, and dry run. The reason for every answer is logged.",
+   "why": "Nothing is sent to a customer who asked not to be contacted, nothing runs over budget, and nothing writes while the owner is only testing.",
+   "default": "Denies everything until automation is ON, the connection is ON and a monthly cap is set.",
+   "change": "The switches and caps on the Connect Center and in the Switchboard.",
+   "who": "Used by the scheduled jobs and by the approved agents. Staff cannot call it.",
+   "related": [
+    "screen:connect",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
+  },
   "grant:announce_post": {
    "title": "Post announcements and instructions",
    "does": "Lets a person or a role post an announcement. A right without a place can post to everyone, a role, a place or one person. A right limited to one place can post only to that place.",
@@ -1705,6 +1759,16 @@
    ],
    "verified": true,
    "src": "phase89.sql; W1-B.md"
+  },
+  "grant:cake_price_manage": {
+   "title": "Change the cake price list",
+   "does": "Lets a person change the base price per kg, the flavour prices and the design extras.",
+   "why": "Prices change with the market; only a trusted person should change them.",
+   "default": "Nobody holds it. Only the owner can change the list.",
+   "change": "The holder can save a price; the quote uses the new price for every cake made after the save.",
+   "who": "Only the owner, in Access.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
   },
   "grant:capacity_manage": {
    "title": "Set production lines and rated capacity",
@@ -1856,6 +1920,36 @@
    "verified": true,
    "src": "phase89.sql; W1-B.md"
   },
+  "grant:market_manage": {
+   "title": "Add topics, sources, findings, prices and opportunities, and decide them",
+   "does": "Lets a person add research, record opportunities and move them through their statuses (each move needs a reason).",
+   "why": "The person who asks for an opportunity can not approve it themselves, so a decision always has a second person behind it.",
+   "default": "Given to nobody. Only the owner has it.",
+   "change": "The person can add and change research and opportunities, and create tasks from approved work. They can not set scraping permissions, link a provider or schedule jobs.",
+   "who": "Only the owner. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "grant:market_view": {
+   "title": "See the market intelligence workspace",
+   "does": "Lets a person read the findings, prices, opportunities and growth figures on the Market page.",
+   "why": "Market notes can be sensitive (competitor prices, plans). Only the people who need them should see them.",
+   "default": "Given to nobody. Only the owner has it.",
+   "change": "The person sees the Market page and its figures, but can not add or decide anything. Sales figures on the page still follow their places.",
+   "who": "Only the owner. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "grant:pay_verify": {
+   "title": "Verify mobile payments",
+   "does": "Lets a person approve or reject a written mobile payment. A person never approves a capture they wrote.",
+   "why": "Two people look at each payment: the one who writes it and the one who checks it against the phone.",
+   "default": "Nobody holds it. Only the owner can verify until the owner gives it to a person or a role.",
+   "change": "The holder sees the pending list for their place and can verify or reject with a note.",
+   "who": "Only the owner, in Access.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
+  },
   "grant:recall_manage": {
    "title": "Open and run a recall case",
    "does": "Lets a person open a recall case, add batches to it, mark what was done and close it. The affected-stock report shows who holds the batch.",
@@ -1883,6 +1977,16 @@
    "verified": true,
    "src": "phase91.sql; W1-C.md"
   },
+  "grant:rider_manage": {
+   "title": "Manage riders and delivery zones",
+   "does": "Lets a person add or change riders and the delivery zone fees.",
+   "why": "A fee and a rider list are money decisions.",
+   "default": "Nobody holds it. Only the owner can change them.",
+   "change": "The holder can add a rider and set a zone fee. Nothing already delivered changes.",
+   "who": "Only the owner, in Access.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
+  },
   "grant:sales_target_manage": {
    "title": "Set sales targets",
    "does": "Lets a role or person enter, change and retire the monthly sales target of a place.",
@@ -1907,6 +2011,26 @@
    ],
    "verified": true,
    "src": "phase132.sql (shift_manage, _r2c_ok); phase132_test.sql T2 and T3"
+  },
+  "grant:social_approve": {
+   "title": "Approve social posts",
+   "does": "Lets a person approve a post that someone else wrote, after looking at the preview.",
+   "why": "Every public post needs a second person to say yes.",
+   "default": "Nobody (except the owner).",
+   "change": "The approver can approve, send back or cancel posts. The person who wrote a post can never approve it.",
+   "who": "Only the owner (Settings, people rights).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "grant:social_manage": {
+   "title": "Write and submit social posts",
+   "does": "Lets a person write a post, add its pictures and send it for approval.",
+   "why": "Only the people who write posts should have this.",
+   "default": "Nobody (except the owner).",
+   "change": "The person can prepare posts; they cannot approve their own.",
+   "who": "Only the owner (Settings, people rights).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
   },
   "grant:stockout_log": {
    "title": "Log a stockout (unmet demand)",
@@ -1993,6 +2117,38 @@
    "verified": true,
    "src": "phase40.sql; phase89.sql"
   },
+  "rule:ai_default_provider": {
+   "title": "Default AI provider",
+   "does": "Chooses which provider the helpers use when an agent does not name one. local_rules runs on the phone for free. The other choices are paid providers and need a key, a model and a monthly budget first.",
+   "why": "A paid provider can spend money every month. Keeping local_rules as the default means no spending happens by accident.",
+   "default": "local_rules (on the phone, free).",
+   "change": "A paid provider is used only when it is enabled, has a model and a budget, and the data level it needs is allowed for it. The AI log shows each call.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_on": {
+   "title": "AI helpers are on (after a provider is linked)",
+   "does": "Lets the AI helpers run. Nothing runs while this is off, and no provider is called and no money is spent.",
+   "why": "This is the main on/off for every AI helper. It is safe to leave off until a provider and a monthly budget are set.",
+   "default": "Off. No AI call is made and nothing is spent.",
+   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews. Nothing is changed by the AI itself.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_pause_all": {
+   "title": "Pause all AI now (emergency stop)",
+   "does": "Stops every AI agent and every provider at once. No new suggestion or proposal is made while it is on.",
+   "why": "If an answer looks wrong or a cost looks too high, one switch stops everything at once.",
+   "default": "Off.",
+   "change": "On: every AI call is refused and the reason 'paused' is written in the AI log. Existing suggestions and their decisions are kept.",
+   "who": "Only the owner, in Settings."
+  },
+  "rule:ai_speech_on": {
+   "title": "Voice questions (browser speech-to-text)",
+   "does": "Shows a microphone button in the assistant. The phone's own speech recognition turns the voice into text, which is then shown for the person to check before it is asked.",
+   "why": "Helps people who prefer speaking, including in Bangla. The text is still checked and redacted like typed text.",
+   "default": "Off. No microphone button is shown.",
+   "change": "On: the microphone button appears in the assistant. The question is still answered by the same rules and permissions as typed text.",
+   "who": "Only the owner, in Settings."
+  },
   "rule:allow_test_reset": {
    "title": "Allow test data reset",
    "does": "When ON, the owner can delete all test data by typing a fixed phrase. The switch turns itself OFF after one reset and a log line is written.",
@@ -2034,6 +2190,34 @@
    ],
    "verified": true,
    "src": "phase89.sql"
+  },
+  "rule:automation_on": {
+   "title": "Automation (all) ON",
+   "does": "The one master switch for everything that talks to the outside or runs on a schedule: outside connections, AI calls, scheduled jobs and proposals made by agents. When it is OFF, every call is refused and every scheduled job is recorded as skipped.",
+   "why": "One place stops everything at once if something goes wrong, and nothing starts by surprise.",
+   "default": "Off. Nothing outside the app runs until the owner switches it on.",
+   "change": "Rule automation_on. The pause rule automation_pause_until stops it for a set time without switching it off.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:automation_pause_until",
+    "screen:connect",
+    "screen:x1health"
+   ],
+   "verified": false,
+   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
+  },
+  "rule:automation_pause_until": {
+   "title": "Pause automation until a time",
+   "does": "Stops all automation until the time written here (ISO time, for example 2026-11-01T00:00:00+06:00). A value that cannot be read counts as paused.",
+   "why": "A safe way to stop everything for a few days (for example during a holiday or an incident) without losing the settings.",
+   "default": "Empty = no pause.",
+   "change": "Write the time in the Switchboard rule. Clear it to end the pause.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (_x1_pause_active)"
   },
   "rule:backdate_max_days_cash_move": {
    "title": "Back-date limit: cash move date",
@@ -2169,6 +2353,46 @@
    ],
    "verified": true,
    "src": "phase93.sql; W1-D.md section 4"
+  },
+  "rule:cake_capacity_day": {
+   "title": "Most cakes the shop takes for one day",
+   "does": "The number of cake jobs due on one day. A new cake for a full day is refused.",
+   "why": "The kitchen can only bake and decorate so many cakes; a cap stops an overload before the promise is made.",
+   "default": "Blank. With the cake workflow on, no cake can be quoted until a number is typed. No number is assumed.",
+   "change": "Cakes cancelled before delivery free their place again.",
+   "who": "Only the owner, in Settings.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
+  },
+  "rule:cake_flow_on": {
+   "title": "Custom cake workflow",
+   "does": "Turns on the cake job: quote, advance, production slip, baking, decoration, ready, delivered, with the time and the person at each step.",
+   "why": "Custom cakes are the largest orders of the week and are easy to lose between the counter, the kitchen and the rider.",
+   "default": "Off. No cake job can be made.",
+   "change": "On: a cake needs a price quote, a day that passes the lead time and the daily cap, and the advance in the order before it is confirmed.",
+   "who": "Only the owner, in Settings.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
+  },
+  "rule:cake_lead_days": {
+   "title": "How many days ahead a cake must be ordered",
+   "does": "The earliest day a cake can be due, counted from today.",
+   "why": "A cake needs time to buy materials and bake; this rule stops same-day promises.",
+   "default": "Blank. With the cake workflow on, no cake can be taken until a number is typed.",
+   "change": "A value of 1 means a cake for tomorrow at the earliest.",
+   "who": "Only the owner, in Settings.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
+  },
+  "rule:cake_photo_required": {
+   "title": "Photo of the finished cake before delivery",
+   "does": "Requires a photo of the decorated cake before the cake is marked delivered.",
+   "why": "A photo shows what left the shop when a customer disputes the design.",
+   "default": "Off. Delivery needs no photo.",
+   "change": "On: the delivered step is refused until a photo path is stored for the job.",
+   "who": "Only the owner, in Settings.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
   },
   "rule:cash_short_post_on": {
    "title": "Post an approved cash short/over to the books",
@@ -3142,6 +3366,20 @@
    "verified": true,
    "src": "phase20.sql; phase48.sql; W1-G.md section 1"
   },
+  "rule:item_similar_check_on": {
+   "title": "Similar-name and barcode check when adding an item",
+   "does": "When ON, adding a new item first checks the name against existing items. An exact same name is refused, and a barcode already in use is refused. A look-alike name is shown and the person presses again to add anyway.",
+   "why": "Stops the same product being entered twice under small spelling differences.",
+   "default": "OFF. Items are added exactly as before.",
+   "change": "Nothing already saved changes. Only new items are checked.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "screen:camrec",
+    "rule:recog_ocr_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql; X5 section"
+  },
   "rule:journal_attach_over": {
    "title": "A manual journal above this total needs an attachment",
    "does": "Above this total in Tk, a manual journal must carry a photo or file reference.",
@@ -3353,6 +3591,96 @@
    "who": "Only the owner (Settings). Posting is run by the accounts manager.",
    "verified": true,
    "src": "RPT-C3 (docs/integration/RPT-C3_info.json)"
+  },
+  "rule:mi_ai_summary_on": {
+   "title": "Let the AI summariser propose a summary of chosen findings",
+   "does": "Lets the AI assistant write a short proposed summary of findings you selected. The proposal waits for a person to accept or reject it.",
+   "why": "Long sources are slow to read. A draft summary saves time; a person still checks it against the source.",
+   "default": "OFF. No AI call is made.",
+   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes. The person who asked can not accept their own proposal.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_alerts_on": {
+   "title": "Put competitor price alerts in the in-app notifications",
+   "does": "Adds one line a day to the owner's notifications when competitor prices moved beyond the threshold.",
+   "why": "The owner sees the alert without opening the Market page.",
+   "default": "OFF. Alerts are only listed on the Market page.",
+   "change": "ON: one in-app line per day with the count of items that moved. It has no customer data.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_digest_on": {
+   "title": "Weekly growth and market digest to the owner (in-app)",
+   "does": "Writes one in-app line for the owner with the top sales movers, open opportunities and the number of price alerts, when the weekly job runs it.",
+   "why": "A short weekly summary keeps the owner on the numbers without a long report.",
+   "default": "OFF. No digest is written.",
+   "change": "ON: the digest is written when the scheduled job (a later package) runs it. It has numbers from our own sales only and is not sent outside the app.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_elast_min_days": {
+   "title": "Minimum trading days at each price before a price-response hint is shown",
+   "does": "Sets how many trading days a price must have been charged before we compare how many units sold at that price.",
+   "why": "A price that was charged for one day says nothing. The hint is only a pattern in past data, never a forecast.",
+   "default": "Blank. No price-response hint is shown.",
+   "change": "A number lets the Growth page show the past pattern, with the days behind it, when at least two prices meet the minimum. It never changes a price.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_on": {
+   "title": "Market intelligence workspace (research, findings, opportunities)",
+   "does": "Turns on the Market page: research topics, source registry, findings you type in, competitor prices, opportunities with evidence and decisions, and measuring them from our own sales.",
+   "why": "It keeps what we learn about competitors, prices, festivals and customers in one place, with the source and the date, instead of in people's heads.",
+   "default": "OFF. The Market page is empty and nothing can be written. Nothing is searched on the internet by this switch.",
+   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever. OFF again: nothing new can be written, old records stay and can be read.",
+   "who": "Only the owner, in Settings (the Rules page). Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_quote_max_chars": {
+   "title": "Longest quoted snippet kept from a source (characters)",
+   "does": "Sets how many characters of a source may be kept as a direct quote on a finding.",
+   "why": "Keeping only short quotes and our own summary respects the source and keeps the record useful.",
+   "default": "Blank. Quotes are not stored; write your own summary only.",
+   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message. Existing findings are not changed.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_research_job_on": {
+   "title": "Run scheduled research jobs",
+   "does": "Lets the job runner (a later package) run the research jobs that are switched on.",
+   "why": "A job is only useful when it runs on its own. This is the master switch for all of them.",
+   "default": "OFF. Job definitions can be stored; none runs.",
+   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above. OFF again: nothing runs.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_scrape_on": {
+   "title": "Allow scheduled research to fetch a permitted source",
+   "does": "Lets a scheduled research job read a public page from a source, but only when the owner has allowed that source after reading its terms, the robots.txt check passed and a rate limit is typed.",
+   "why": "Reading a permitted page on a schedule saves hours. It is never used to get past a login or a paywall, and it never copies a page in bulk.",
+   "default": "OFF. No job fetches anything. Even ON, each source stays closed until the owner allows it.",
+   "change": "ON: the research gate opens only for sources that meet every condition. OFF again: every job stops at once, whatever the source settings.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "rule:mi_watch_threshold_pct": {
+   "title": "Alert when a competitor price moves by more than this %",
+   "does": "Lists each competitor price that moved more than this percentage since its previous observation.",
+   "why": "A big competitor price move is worth a look the same day.",
+   "default": "Blank. No competitor price alert.",
+   "change": "A number lists the moves on the Market page's price tab. Nothing is sent to customers.",
+   "who": "Only the owner, in Settings. Every change is written to the change log.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
   },
   "rule:mkt_repeat_days": {
    "title": "Repeat purchase window after a promotion (days)",
@@ -3661,6 +3989,26 @@
    ],
    "verified": true,
    "src": "phase120.sql; R1.md section 1 point 5"
+  },
+  "rule:pay_capture_on": {
+   "title": "Write down bKash, Nagad and Rocket payments",
+   "does": "Lets the counter write a mobile payment: the Trx-ID, sender number, amount and time, against an order, a sale or an advance.",
+   "why": "A Trx-ID is paid once.",
+   "default": "Off. Nothing can be written; the screens say the module is off.",
+   "change": "On: a Trx-ID already written is refused. Each capture gets a flag (ok, overpay, underpay, no target) and waits for a second person to verify it.",
+   "who": "Only the owner, in Settings.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
+  },
+  "rule:pay_capture_tol": {
+   "title": "Taka difference allowed when matching a payment",
+   "does": "The number of taka a payment may differ from the amount due before it is flagged as overpay or underpay.",
+   "why": "Small differences from fees or rounding can be let through; big ones must be looked at.",
+   "default": "Blank. The amount must match exactly. No number is assumed.",
+   "change": "A number such as 5 lets a payment within 5 taka of the due amount be flagged ok. Only the flag changes; nothing is posted.",
+   "who": "Only the owner, in Settings.",
+   "verified": true,
+   "src": "XB (docs/integration/XB_info.json)"
   },
   "rule:pay_request_advance_ceiling": {
    "title": "Highest open advance for one staff member",
@@ -4063,6 +4411,131 @@
    "verified": true,
    "src": "phase97.sql"
   },
+  "rule:recog_image_match_on": {
+   "title": "Match a photo to approved item photos (on the phone)",
+   "does": "When ON, a photo is compared with the approved item photos stored on this phone and the nearest items are listed with their distance. Nothing leaves the phone.",
+   "why": "Helps find an item when there is no barcode or readable label.",
+   "default": "OFF. No photo is compared.",
+   "change": "Needs an item photo index on the phone and a distance limit. Until both exist the list stays empty and says why.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_image_threshold",
+    "screen:camrec"
+   ],
+   "warn": "No model is installed in this version: the list stays empty.",
+   "verified": true,
+   "src": "phase520.sql; X5 scan.js"
+  },
+  "rule:recog_image_threshold": {
+   "title": "Photo match distance limit",
+   "does": "Only items whose photo distance is at or below this number are listed. Smaller is stricter. The distance is a number, never a percentage.",
+   "why": "Stops unrelated items from being suggested.",
+   "default": "Blank. Blank = not set: no photo candidates are shown.",
+   "change": "Changing it affects the next photo only.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_image_match_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_langs": {
+   "title": "Languages to read",
+   "does": "The language files to use, written like eng+ben (English and Bangla). Each language is one file downloaded once.",
+   "why": "Bangla labels need the Bangla file; English labels need the English file.",
+   "default": "Blank. Blank blocks label reading.",
+   "change": "A new language downloads its file the next time it is used.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_on",
+    "rule:recog_ocr_wifi_only"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_max_px": {
+   "title": "Label photo longest side in pixels",
+   "does": "The label photo is made smaller to this longest side before reading. Smaller is faster on old phones but reads less small print.",
+   "why": "Old phones run out of memory with large photos.",
+   "default": "Blank. Blank blocks label reading: no size is assumed.",
+   "change": "Changing it affects the next read only.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_ocr_on": {
+   "title": "Read label text on the phone (OCR)",
+   "does": "When ON, a label photo is read on this phone by the Tesseract engine. The text is shown for review; nothing is saved from it. The photo never leaves the phone.",
+   "why": "Lets staff find an item from the words on a packet without typing.",
+   "default": "OFF. No label is read.",
+   "change": "The first use downloads the chosen language file once (Wi-Fi only while the Wi-Fi switch is on). Nothing is saved automatically.",
+   "who": "Only the owner (Settings). The camera screen shows whether the phone can run it.",
+   "related": [
+    "rule:recog_ocr_max_px",
+    "rule:recog_ocr_langs",
+    "rule:recog_ocr_wifi_only",
+    "screen:camrec"
+   ],
+   "verified": true,
+   "src": "phase520.sql; X5 scan.js"
+  },
+  "rule:recog_ocr_wifi_only": {
+   "title": "Download language files on Wi-Fi only",
+   "does": "When ON, a language file that is not on the phone is downloaded only on Wi-Fi. A file already on the phone is always used.",
+   "why": "The language files are several megabytes; mobile data is paid for.",
+   "default": "ON.",
+   "change": "Nothing already downloaded is removed.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_ocr_langs"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_budget": {
+   "title": "Vision service monthly call cap",
+   "does": "The most calls to the vision service in one month. When reached, no more calls are made until next month.",
+   "why": "Keeps the bill under control.",
+   "default": "Blank. Blank = the service does not run.",
+   "change": "Changing it applies from the next call.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_consent_on": {
+   "title": "Consent to send label photos to the server vision service",
+   "does": "The owner confirms that label photos may be sent to the paid vision service. Without this, no photo is sent.",
+   "why": "Photos can show customers and suppliers; the owner must agree.",
+   "default": "OFF (no consent).",
+   "change": "Turning it off stops all sending at once.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "phase520.sql"
+  },
+  "rule:recog_vision_on": {
+   "title": "Server vision service (paid, needs consent)",
+   "does": "Would send a label photo to a server vision service for label suggestions. It also needs the consent switch and the monthly cap, and the X1 connection.",
+   "why": "Better reading for hard photos, at a cost.",
+   "default": "OFF. Nothing is sent.",
+   "change": "Not available yet: the X1 connection is not built, so this stays inactive.",
+   "who": "Only the owner (Settings).",
+   "related": [
+    "rule:recog_vision_consent_on",
+    "rule:recog_vision_budget"
+   ],
+   "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
+   "verified": true,
+   "src": "phase520.sql; tools/edge/vision-proxy.ts"
+  },
   "rule:report_cash_short_by_case_on": {
    "title": "Cash short/over report follows the shortage case",
    "does": "The cash short and over report leaves out sheets whose shortage case was rejected or voided, and shows how many cases are open, approved, rejected and void.",
@@ -4322,6 +4795,106 @@
    "verified": true,
    "src": "phase81.sql; B.md"
   },
+  "rule:social_max_per_day": {
+   "title": "Most posts per day",
+   "does": "The largest number of posts and customer messages that may be planned or sent in one Dhaka day.",
+   "why": "Stops a flood of posts that annoys followers and can get the page restricted.",
+   "default": "Blank. No post can be scheduled or published until a number is typed.",
+   "change": "A new schedule that would go over the number is refused with a day-limit message.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_max_per_hour": {
+   "title": "Most posts per hour",
+   "does": "The largest number of posts and customer messages in one clock hour.",
+   "why": "Spreads posts out so the page does not look like spam.",
+   "default": "Blank. No post can be scheduled or published until a number is typed.",
+   "change": "A schedule that would go over the number in its hour is refused.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_media_image_mb": {
+   "title": "Largest picture size (MB)",
+   "does": "The biggest JPEG or PNG picture that may be attached to a post.",
+   "why": "Large files are slow to upload and may be refused by the provider.",
+   "default": "5 MB. This is a proposed starting value, to be confirmed by the owner.",
+   "change": "Bigger pictures are refused when they are added.",
+   "who": "Only the owner (Settings).",
+   "verified": false,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_media_video_mb": {
+   "title": "Largest video size (MB)",
+   "does": "The biggest MP4 video that may be attached to a post.",
+   "why": "Video uploads are slow on a weak connection.",
+   "default": "50 MB. This is a proposed starting value, to be confirmed by the owner.",
+   "change": "Bigger videos are refused when they are added.",
+   "who": "Only the owner (Settings).",
+   "verified": false,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_on": {
+   "title": "Social and marketing workspace is on",
+   "does": "Turns on the content calendar, content items, the approval queue and the publishing screens. Nothing is posted by this switch alone.",
+   "why": "Keeps the social work in one place with an approval step before anything goes public.",
+   "default": "Off. No content can be written and no approval can be made.",
+   "change": "On: people with the write or approve right can prepare and approve content. Publishing still needs its own switch.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_publish_on": {
+   "title": "Publish approved posts automatically",
+   "does": "Lets the publisher send approved posts to the connected pages and accounts at their scheduled time.",
+   "why": "A post goes out on time without someone pressing a button, but only after a person approved it.",
+   "default": "Off. The publisher sends nothing.",
+   "change": "On: the publisher (run by GitHub Actions with the secrets you set) posts due items, within the limits and outside quiet hours. Off: due items wait.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_quiet_from": {
+   "title": "Quiet hours start (Dhaka time)",
+   "does": "The start of a window when no post and no customer message goes out. Written as HH:MM.",
+   "why": "Nobody wants a message at midnight.",
+   "default": "Blank. No quiet hours.",
+   "change": "Scheduling inside the window is refused; the publisher waits until it is over.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_quiet_to": {
+   "title": "Quiet hours end (Dhaka time)",
+   "does": "The end of the quiet window. Written as HH:MM. An end earlier than the start means the window crosses midnight.",
+   "why": "Together with the start it defines when the page stays silent.",
+   "default": "Blank. No quiet hours.",
+   "change": "As for the start: both must be written for the window to apply.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_retry_max": {
+   "title": "Most tries for one post",
+   "does": "How many times the publisher tries a post that failed before it is marked failed.",
+   "why": "A short problem with the provider heals itself; a long one must be seen by a person.",
+   "default": "5 tries. The waits grow: 2, 4, 8 and 16 minutes.",
+   "change": "A failed post after its last try shows in the queue as failed and can be scheduled again by the approver.",
+   "who": "Only the owner (Settings).",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
+  "rule:social_stop_all": {
+   "title": "Stop all publishing (emergency)",
+   "does": "Stops every post and every customer message at once. Queued items wait; nothing is deleted.",
+   "why": "A wrong post or a provider problem can be stopped in one step.",
+   "default": "Off.",
+   "change": "On: the publisher sends nothing and new schedules are refused until it is switched off again. Off: the waiting queue continues.",
+   "who": "Only the owner, and it needs a reason.",
+   "verified": true,
+   "src": "X3 (docs/integration/X3.md)"
+  },
   "rule:start_date_lock_after_opening": {
    "title": "Do not move the accounting start date after the opening is posted",
    "does": "When ON, once an opening entry exists the accounting start date cannot be changed. Reverse the opening first.",
@@ -4491,561 +5064,6 @@
    ],
    "verified": true,
    "src": "phase140.sql; W1-FIX.md section 2"
-  },
-  "screen:accounts": {
-   "title": "Accounts and ledger",
-   "does": "Shows the books: the journal, trial balance, balance sheet and income statement. The Opening tab posts the first balances. You can post new sales, purchases and expenses to the books here.",
-   "why": "This is where the records become the books.",
-   "default": "Accounting is OFF until the owner switches it on and sets a start date. While it is off, nothing is posted.",
-   "change": "Nothing dated before the start date goes into the books. Posted entries are corrected by a reversal, not by a delete.",
-   "who": "The owner and people with Accounts view or Accounts manage.",
-   "related": [
-    "rule:accounting_on",
-    "rule:accounting_start_date",
-    "feature:opening_balance",
-    "screen:balancecheck",
-    "screen:freshness"
-   ],
-   "verified": true,
-   "src": "phase40.sql; phase80.sql; W1-B.md"
-  },
-  "screen:announce": {
-   "title": "Announcements screen",
-   "does": "Shows what is on the bar for me, with an I have read this button. A poster also sees what he posted, who has read each one, and can withdraw a message with a reason.",
-   "why": "One place to post, check the read receipts and stop a wrong message.",
-   "default": "The menu entry is hidden while announce_on is off.",
-   "change": "Switch announce_on on to see it. A withdrawn message stays in the list with its reason and is never deleted.",
-   "who": "Everyone reads. Holders of announce_post and the owner post and see the receipts of their own posts.",
-   "related": [
-    "rule:announce_on",
-    "grant:announce_post",
-    "feature:announce_bar"
-   ],
-   "verified": true,
-   "src": "web/announce.js; phase130.sql; tests/web/announce_test.js"
-  },
-  "screen:balancecheck": {
-   "title": "Balance check",
-   "does": "Checks that the books agree. Red means the equation, the trial balance, a journal entry or a stock figure is wrong. Day book and other cross-checks show as amber warnings.",
-   "why": "A red line means a figure cannot be trusted.",
-   "default": "Read only. It changes nothing.",
-   "change": "There is no switch. It needs the accounting start date, and without it the page says data is needed.",
-   "who": "The owner and people with Accounts view or Accounts manage.",
-   "related": [
-    "screen:accounts",
-    "rule:allow_test_reset"
-   ],
-   "verified": true,
-   "src": "phase84.sql; integration E.md"
-  },
-  "screen:bankreceipt": {
-   "title": "Bank and cheque receipts",
-   "does": "Takes a customer payment by bank transfer or cheque, with the account it went to and a reference. A cheque is a bank receipt with its cheque number.",
-   "why": "Hotels and offices often pay by bank, and cash or card would be wrong.",
-   "default": "Nothing shows until \"Accept bank transfer and cheque from customers\" is switched on.",
-   "change": "A missing reference can be waived with a written reason. That adds an audit line and a yellow Exceptions row.",
-   "who": "People who can use the POS.",
-   "related": [
-    "rule:receipt_bank_on",
-    "rule:receipt_ref_required",
-    "rule:receipt_ref_from"
-   ],
-   "verified": true,
-   "src": "phase97.sql; W1-F.md"
-  },
-  "screen:exceptions": {
-   "title": "Exceptions",
-   "does": "Lists the lines that need a look: red lines are serious and yellow lines are notes. Every override that needs a reason lands here.",
-   "why": "It shows where a control was bypassed, so nothing is hidden.",
-   "default": "Read only. It does not block anything.",
-   "change": "There is no switch. Each control decides what it writes here.",
-   "who": "Approvers and the owner.",
-   "related": [
-    "feature:exception_reason",
-    "screen:moneycontrols"
-   ],
-   "verified": true,
-   "src": "phase46.sql; phase87.sql; I-1.md section 1 (one list of 18 kinds)"
-  },
-  "screen:freshness": {
-   "title": "Books freshness",
-   "does": "Shows when the last document was posted to the books, what still waits, and if the books are ready to fill by themselves. A button checks what the next run would post and changes nothing.",
-   "why": "The books fill only when something posts documents, so you should see how fresh they are.",
-   "default": "Read only. Scheduled posting is OFF.",
-   "change": "The owner can switch scheduled posting ON or OFF here. The page shows a warning first.",
-   "who": "People with Accounts view or Accounts manage can look. Only the owner switches posting.",
-   "related": [
-    "rule:journal_sched_post_on",
-    "screen:accounts"
-   ],
-   "verified": true,
-   "src": "phase98.sql; W1-G.md"
-  },
-  "screen:ledgerlinks": {
-   "title": "Ledger links",
-   "does": "Shows the master switch that makes approved forms post to the stock ledger, and the switch for each form.",
-   "why": "It is where you decide if paper forms drive the stock.",
-   "default": "The master switch is OFF.",
-   "change": "A warning shows what the switch will lock, before it is saved.",
-   "who": "Only the owner.",
-   "related": [
-    "rule:forms_post_to_ledger",
-    "screen:paths"
-   ],
-   "verified": true,
-   "src": "phase20.sql; W1-G.md"
-  },
-  "screen:moneyaccounts": {
-   "title": "Money accounts",
-   "does": "Lists your cash drawers, mobile wallets and bank accounts. Each one is its own account in the books. You can see a statement, move money, charge a fee and check the real balance.",
-   "why": "Every payment can come from the account you choose, and the books follow it.",
-   "default": "Nothing is drawn until at least one account exists. A payment with no account posts as before.",
-   "change": "Adding an account changes no old figure. An account with a balance, an unposted payment or a repeat transfer cannot be switched off.",
-   "who": "People with the Accounts view grant can see it. The owner and Accounts manage change it.",
-   "related": [
-    "feature:payment_source",
-    "feature:money_transfer",
-    "screen:exceptions"
-   ],
-   "verified": true,
-   "src": "phase87.sql; BUILD-LOG phase 87"
-  },
-  "screen:moneycontrols": {
-   "title": "Money controls",
-   "does": "One page for the cash, supplier and journal controls. It shows each setting and the requests that wait for the approver.",
-   "why": "It is the place to see which controls are on.",
-   "default": "Every control starts OFF or blank, so nothing changes until you set it.",
-   "change": "A held request is decided by the approver chosen under the owner approval setting. The maker never decides.",
-   "who": "People with Accounts view, Accounts manage, cash move or supplier pay can look. The owner changes the settings.",
-   "related": [
-    "rule:owner_money_entry_mode",
-    "rule:supplier_pay_dup_mode",
-    "rule:journal_control_acct_mode",
-    "screen:exceptions"
-   ],
-   "verified": true,
-   "src": "phase94.sql; phase95.sql; W1-E.md"
-  },
-  "screen:monthclose": {
-   "title": "Monthly Close",
-   "does": "Shows a month before you mark it reviewed. It carries salary accrual and the partner profit share. Mark the month reviewed or undo the mark.",
-   "why": "A month should be looked at once before it is left.",
-   "default": "The mark is only a log. It does not lock the month.",
-   "change": "To lock a month, set \"Books closed until\" separately.",
-   "who": "The owner and people with Accounts manage.",
-   "related": [
-    "rule:payroll_accrual_on",
-    "rule:partner_settlement_post_on",
-    "rule:period_closed_until"
-   ],
-   "verified": true,
-   "src": "phase82.sql; phase86.sql (m7); C.md"
-  },
-  "screen:openparties": {
-   "title": "Opening dues and payables",
-   "does": "Type what customers owed you and what you owed suppliers on day one, one by one or by paste. It also shows where the party lists and the books differ.",
-   "why": "Old dues can then be collected and counted in credit limits.",
-   "default": "Nothing changes until \"Count opening dues in customer balances\" is switched on.",
-   "change": "You can type or paste only before the opening batch is posted. After that, use an adjustment with a reason.",
-   "who": "People with Accounts manage for all places type and adjust. People with Accounts view can look. A branch accountant is refused.",
-   "related": [
-    "rule:open_parties_link",
-    "rule:open_parties_freeze",
-    "rule:open_parties_adjust_mode",
-    "feature:opening_balance"
-   ],
-   "verified": true,
-   "src": "W1-A.md sections 0, 3, 4, 5"
-  },
-  "screen:otherincome": {
-   "title": "Other income",
-   "does": "Records money that is not a sale: scrap, old oil, rent received, supplier discount. It posts to the Other income account.",
-   "why": "This money would otherwise have no place in the books.",
-   "default": "The screen refuses entries until \"Other income entry\" is switched on.",
-   "change": "A recorded entry can be voided. Entries dated before the \"from\" date are refused.",
-   "who": "The owner, and people with the cash move grant or Accounts view or manage.",
-   "related": [
-    "rule:other_income_on",
-    "rule:other_income_from"
-   ],
-   "verified": true,
-   "src": "phase96.sql; W1-F.md"
-  },
-  "screen:partyrequest": {
-   "title": "Ask to pay a supplier",
-   "does": "Write a request to pay a supplier and follow its status.",
-   "why": "Supplier payments start from a written request.",
-   "default": "Shows a notice while the switch is off.",
-   "change": "Setting party_requests_on.",
-   "who": "Any staff with a place.",
-   "related": [
-    "feature:party_requests"
-   ],
-   "verified": false,
-   "src": "web/payrequests.js"
-  },
-  "screen:paths": {
-   "title": "Path switches",
-   "does": "For jobs that can be done two ways, the app screen or the paper form, you choose which one is the main record. The other becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "The app screen (path a) is the main record, as set for each job.",
-   "change": "Nothing is deleted, and the other path keeps a locked shadow copy. A refused screen says path_locked.",
-   "who": "Only the owner.",
-   "related": [
-    "switch:path:payroll",
-    "switch:path:stock_issue",
-    "switch:path:stock_transfer",
-    "switch:path:stock_count",
-    "switch:path:production",
-    "switch:path:expense",
-    "switch:path:owner_money",
-    "rule:forms_post_to_ledger"
-   ],
-   "verified": true,
-   "src": "phase48.sql; paths.js; W1-G.md"
-  },
-  "screen:payapprovals": {
-   "title": "Pay requests to decide",
-   "does": "Waiting, due today, later and all. Approve on the date asked or on another date, reject with a reason, or pay from the list.",
-   "why": "The person responsible sees everything he must decide or pay today in one place.",
-   "default": "Empty until requests are switched on.",
-   "change": "The approver is set on the Pay request settings page.",
-   "who": "The chosen approver and the owner.",
-   "related": [
-    "feature:pay_requests"
-   ],
-   "verified": false,
-   "src": "web/payrequests.js"
-  },
-  "screen:payreqsettings": {
-   "title": "Pay request settings",
-   "does": "Switch requests on, choose who decides, switch the policy on, set the exception rule and the limits.",
-   "why": "Every owner decision is a setting that can change at any time.",
-   "default": "Everything off or blank.",
-   "change": "Each change is written to the change log.",
-   "who": "The owner.",
-   "related": [
-    "feature:pay_requests",
-    "feature:pay_request_required",
-    "feature:pay_request_limits"
-   ],
-   "verified": false,
-   "src": "web/payrequests.js"
-  },
-  "screen:payrequest": {
-   "title": "Ask for salary or advance",
-   "does": "Send a request and see the status and dates of your requests. You can cancel one that is not paid.",
-   "why": "One place for asking and for knowing the answer.",
-   "default": "Shows a notice while the switch is off.",
-   "change": "Setting pay_requests_on.",
-   "who": "Staff linked to an employee record. A payroll manager can enter one for a colleague.",
-   "related": [
-    "feature:pay_requests"
-   ],
-   "verified": false,
-   "src": "web/payrequests.js"
-  },
-  "screen:periodlock": {
-   "title": "Period lock",
-   "does": "Shows if the books are closed and up to what date. The owner can open an override window with a reason. It also lists held late sales and the back-date limits.",
-   "why": "A closed month should stay closed unless someone has a reason.",
-   "default": "Nothing changes by itself. The lock date is the one typed in \"Books closed until\". Every new rule starts OFF or blank.",
-   "change": "Changing a rule here affects new entries only. Past figures never change.",
-   "who": "The owner changes rules and opens windows. People with Accounts manage see the state.",
-   "related": [
-    "rule:period_closed_until",
-    "rule:period_lock_mode",
-    "rule:owner_closed_period_mode",
-    "rule:late_sale_policy"
-   ],
-   "verified": true,
-   "src": "phase89.sql; W1-B.md"
-  },
-  "screen:profitcheck": {
-   "title": "Profit check",
-   "does": "Compares the management profit with the journal profit and lists the difference by cause. You can leave one loss out of the profit with a reason. It also shows if day book, profit, expense report and journal agree, and holds the dated brand map.",
-   "why": "Branch ranking and partner shares rest on one profit number.",
-   "default": "Read only for most people. All profit settings start OFF, so every profit figure stays as it is today.",
-   "change": "Leaving a loss out needs a reason of 5 letters or more, and it writes an audit line and a yellow Exceptions row. It can be counted again, and no journal entry is written.",
-   "who": "People with Accounts view or Accounts manage can look. Only the owner changes settings and the brand map.",
-   "related": [
-    "rule:profit_one_number_on",
-    "rule:profit_source",
-    "feature:report_parity",
-    "rule:brand_map_dated_on"
-   ],
-   "verified": true,
-   "src": "phase92.sql; phase93.sql; W1-D.md"
-  },
-  "screen:returnrules": {
-   "title": "Return and exit rules",
-   "does": "Sets the rules for sale returns and for people who leave. For returns: the return window, the receipt need, which goods go back on the shelf, and what to do with expired goods.",
-   "why": "A returned sweet or cake should not go back on sale by mistake.",
-   "default": "Every rule starts OFF or blank, so returns work as today.",
-   "change": "A class rule can start on a later day. A rule that starts later is not used today.",
-   "who": "The owner sets the rules. People with the return override grant can pass a rule with a reason.",
-   "related": [
-    "rule:return_window_hours",
-    "rule:return_needs_receipt",
-    "rule:return_expired_restock",
-    "grant:return_override",
-    "rule:exit_revoke_mode"
-   ],
-   "verified": true,
-   "src": "phase90.sql; phase91.sql; W1-C.md"
-  },
-  "screen:shifts": {
-   "title": "Shift schedule screen",
-   "does": "My shifts lists the next 14 days with shift, time, off-days, approved leave, holidays and notes. A scheduler also gets a weekly roster by place, where a tap on a day sets a template, an off-day or a leave or swap note, plus copy last week and the templates.",
-   "why": "One short screen for staff to read and for the planner to edit.",
-   "default": "The menu entry is hidden while shift_on is off.",
-   "change": "Switch shift_on on to see it. Clearing a day returns it to the weekly pattern, and the old row is kept in the change log.",
-   "who": "Everyone reads their own shifts. Holders of shift_manage and the owner edit the roster.",
-   "related": [
-    "rule:shift_on",
-    "grant:shift_manage",
-    "rule:shift_mates_on",
-    "feature:shift_report"
-   ],
-   "verified": true,
-   "src": "web/shifts.js; phase132.sql; tests/web/shifts_test.js"
-  },
-  "screen:shortages": {
-   "title": "Cash short and transit short",
-   "does": "Lists cash short or over cases from the daily count and goods that arrived short between places. A decider approves, claims from the carrier, recovers or writes off. Each step posts a balanced entry.",
-   "why": "A shortage should have an owner and a reason, not just disappear.",
-   "default": "Cases are listed. Nothing is posted to the books until \"Post an approved cash short/over to the books\" is ON.",
-   "change": "There is no switch on the page. Backfill of old cases is not automatic.",
-   "who": "People with Accounts view can look. The decider is set by the \"Who decides\" setting.",
-   "related": [
-    "rule:cash_short_post_on",
-    "rule:short_decider",
-    "rule:transit_short_bearer"
-   ],
-   "verified": true,
-   "src": "phase81.sql; integration B.md"
-  },
-  "screen:todo": {
-   "title": "To-do list screen",
-   "does": "A person sees his own open tasks, with overdue ones in red, and marks each one done with an optional note or cannot do with a reason. A giver also sees every task he gave with its status and notes, and can cancel one with a reason or reopen it.",
-   "why": "Every extra task ends with a visible answer.",
-   "default": "The menu entry is hidden while todo_on is off.",
-   "change": "Switch todo_on on to see it. A cancelled or finished task stays in the giver's list and is never deleted.",
-   "who": "Each person sees only his own tasks. The giver and the owner see what they gave.",
-   "related": [
-    "rule:todo_on",
-    "grant:todo_assign",
-    "rule:todo_repeat_on"
-   ],
-   "verified": true,
-   "src": "web/todo.js; phase131.sql; tests/web/todo_test.js"
-  },
-  "screen:wallets": {
-   "title": "Mobile wallets",
-   "does": "A register for each wallet: bKash, Nagad, Rocket and Upay. You can add fees, move money, and count the wallet from the phone.",
-   "why": "It lets you match each wallet with what the phone really shows.",
-   "default": "The wallet register works alone. Nothing moves to its own wallet account until the wallet split switch is ON.",
-   "change": "The phone total is typed first, and the book figure comes back after it is saved. A difference needs a reason once.",
-   "who": "The owner, people with the 10-3 form right and people with Accounts view.",
-   "related": [
-    "rule:d_wallet_split_on",
-    "rule:d_wallet_fee_treatment",
-    "rule:d_wallet_negative_mode"
-   ],
-   "verified": true,
-   "src": "phase83.sql; D.md; phase86.sql"
-  },
-  "switch:path:expense": {
-   "title": "Path switch: expense",
-   "does": "Chooses which way counts for this job: the day-book quick expense or the 10-2 expense voucher. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "Quick entries get a 10-2 shadow copy at day end, confirmed with one click.",
-   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "switch:path:owner_money": {
-   "title": "Path switch: owner money",
-   "does": "Chooses which way counts for this job: partner capital or the cash move for an owner top-up or draw. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "Partner capital is the main record. The cash move gets the shadow copy.",
-   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "switch:path:payroll": {
-   "title": "Path switch: payroll",
-   "does": "Chooses which way counts for this job: app payroll runs or the 02-2 monthly salary sheet. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "Both are open. Once app payroll starts for a month, 02-2 is locked and kept as a shadow copy.",
-   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "switch:path:production": {
-   "title": "Path switch: production",
-   "does": "Chooses which way counts for this job: the recipe production run or the 05-1 factory daily sheet. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "The run is the main record. The form is a reference.",
-   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths",
-    "rule:forms_post_to_ledger"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "switch:path:stock_count": {
-   "title": "Path switch: stock count",
-   "does": "Chooses which way counts for this job: the stock screen count or the 04-3 count sheet. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "The screen is the main record. The form is a reference.",
-   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths",
-    "rule:forms_post_to_ledger"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "switch:path:stock_issue": {
-   "title": "Path switch: stock issue",
-   "does": "Chooses which way counts for this job: the stock screen issue or the 04-2 issue slip. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "The screen is the main record. The form is a reference.",
-   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths",
-    "rule:forms_post_to_ledger"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "switch:path:stock_transfer": {
-   "title": "Path switch: stock transfer",
-   "does": "Chooses which way counts for this job: the stock screen transfer or the 03-1 transfer challan. The other way becomes a locked shadow copy.",
-   "why": "One job must be counted once.",
-   "default": "The screen is the main record. The form is a reference.",
-   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
-   "who": "Only the owner, on the path switches page.",
-   "related": [
-    "screen:paths",
-    "rule:forms_post_to_ledger"
-   ],
-   "verified": true,
-   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
-  },
-  "feature:action_queue": {
-   "title": "Approval queue for proposed actions",
-   "does": "An agent or an automated job can propose one action from a short allowed list. The owner approves or rejects it (a rejection needs a reason). Nothing runs by itself: the owner's own session runs the approved action and records the result.",
-   "why": "A proposal is never a silent change. Every step is in the record.",
-   "default": "The list of allowed actions is empty. Nothing can be proposed until the owner allows an action.",
-   "change": "The owner adds an action to the allowed list. Rules, permissions, the audit trail and money can never be on that list.",
-   "who": "The owner decides. The person who proposed cannot decide the same proposal.",
-   "related": [
-    "feature:agent_accounts",
-    "screen:x1health"
-   ],
-   "verified": false,
-   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
-  },
-  "feature:agent_accounts": {
-   "title": "Agent accounts (limited sign-in for software)",
-   "does": "A separate sign-in for an automated agent. It can only ask the gate and propose actions for the owner to approve. It can never hold a role or a permission, and it can never change rules, permissions, the audit trail or money.",
-   "why": "An agent can help, but it can never do what only a person may do.",
-   "default": "None exists. The owner creates one only when needed.",
-   "change": "The owner names an account that has no roles and no permissions.",
-   "who": "Only the owner creates one.",
-   "related": [
-    "feature:action_queue"
-   ],
-   "verified": false,
-   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
-  },
-  "feature:x1_gate": {
-   "title": "The gate for outside and AI calls",
-   "does": "Every outside call, AI call and automated write asks one gate first. The gate checks, in order: automation ON, not paused, the connection ON and configured, read-only, do-not-contact for the customer, the monthly call cap, the calls per minute, and dry run. The reason for every answer is logged.",
-   "why": "Nothing is sent to a customer who asked not to be contacted, nothing runs over budget, and nothing writes while the owner is only testing.",
-   "default": "Denies everything until automation is ON, the connection is ON and a monthly cap is set.",
-   "change": "The switches and caps on the Connect Center and in the Switchboard.",
-   "who": "Used by the scheduled jobs and by the approved agents. Staff cannot call it.",
-   "related": [
-    "screen:connect",
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
-  },
-  "rule:automation_on": {
-   "title": "Automation (all) ON",
-   "does": "The one master switch for everything that talks to the outside or runs on a schedule: outside connections, AI calls, scheduled jobs and proposals made by agents. When it is OFF, every call is refused and every scheduled job is recorded as skipped.",
-   "why": "One place stops everything at once if something goes wrong, and nothing starts by surprise.",
-   "default": "Off. Nothing outside the app runs until the owner switches it on.",
-   "change": "Rule automation_on. The pause rule automation_pause_until stops it for a set time without switching it off.",
-   "who": "Only the owner.",
-   "related": [
-    "rule:automation_pause_until",
-    "screen:connect",
-    "screen:x1health"
-   ],
-   "verified": false,
-   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
-  },
-  "rule:automation_pause_until": {
-   "title": "Pause automation until a time",
-   "does": "Stops all automation until the time written here (ISO time, for example 2026-11-01T00:00:00+06:00). A value that cannot be read counts as paused.",
-   "why": "A safe way to stop everything for a few days (for example during a holiday or an incident) without losing the settings.",
-   "default": "Empty = no pause.",
-   "change": "Write the time in the Switchboard rule. Clear it to end the pause.",
-   "who": "Only the owner.",
-   "related": [
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase480.sql (_x1_pause_active)"
-  },
-  "screen:connect": {
-   "title": "Connect Center",
-   "does": "One place for every outside connection: website and domain, hosting, Facebook Page, Instagram, WhatsApp Business, SMS gateway, e-mail, bKash and Nagad, AI provider, image reading and analytics. It shows the status, the non-secret settings, the names of the server secrets each one needs and where to set them, and a Test connection button.",
-   "why": "When the owner buys a domain or gets a key, he links it here without changing the app.",
-   "default": "Every connection is OFF and not connected.",
-   "change": "Owner: switch a connection on, set its address (https only), rate and monthly call cap, read-only and dry-run. Secret VALUES are never typed here: they are set on the server under the names shown.",
-   "who": "Only the owner can see and change it.",
-   "related": [
-    "screen:x1health",
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
-  },
-  "screen:x1health": {
-   "title": "Automation & integration health",
-   "does": "Shows whether automation is on, whether it is paused, each connection and each scheduled job (ok, failed, stale, never run), failed intake items, the last backup, books freshness and proposals waiting for approval.",
-   "why": "One screen tells the owner what is working and what is not. A missing part is shown as missing, never as healthy.",
-   "default": "Owner only. The owner may add the health widget to the owner board.",
-   "change": "Nothing to set. It only reads.",
-   "who": "Only the owner.",
-   "related": [
-    "screen:connect",
-    "rule:automation_on"
-   ],
-   "verified": false,
-   "src": "phase481.sql (x1_health); web/connect.js"
   },
   "rule:website_brand_bn": {
    "title": "Shop name (Bangla)",
@@ -5450,445 +5468,15 @@
    "verified": true,
    "src": "phase490.sql; X2 (docs/integration/X2.md)"
   },
-  "grant:social_approve": {
-   "title": "Approve social posts",
-   "does": "Lets a person approve a post that someone else wrote, after looking at the preview.",
-   "why": "Every public post needs a second person to say yes.",
-   "default": "Nobody (except the owner).",
-   "change": "The approver can approve, send back or cancel posts. The person who wrote a post can never approve it.",
-   "who": "Only the owner (Settings, people rights).",
+  "rule:xb_delivery_on": {
+   "title": "Riders and delivery status",
+   "does": "Lets the shop assign an order to a rider, move it through out, delivered, failed, reattempt and returned, and record the cash on delivery handed in.",
+   "why": "Without this the shop does not know which rider has which order or how much cash a rider still holds.",
+   "default": "Off. No rider or delivery can be recorded.",
+   "change": "On: a delivery can be assigned to an active rider with a zone fee. The cash collected per rider per day is compared with the deposits; a difference opens one case for the owner to explain.",
+   "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "grant:social_manage": {
-   "title": "Write and submit social posts",
-   "does": "Lets a person write a post, add its pictures and send it for approval.",
-   "why": "Only the people who write posts should have this.",
-   "default": "Nobody (except the owner).",
-   "change": "The person can prepare posts; they cannot approve their own.",
-   "who": "Only the owner (Settings, people rights).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_max_per_day": {
-   "title": "Most posts per day",
-   "does": "The largest number of posts and customer messages that may be planned or sent in one Dhaka day.",
-   "why": "Stops a flood of posts that annoys followers and can get the page restricted.",
-   "default": "Blank. No post can be scheduled or published until a number is typed.",
-   "change": "A new schedule that would go over the number is refused with a day-limit message.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_max_per_hour": {
-   "title": "Most posts per hour",
-   "does": "The largest number of posts and customer messages in one clock hour.",
-   "why": "Spreads posts out so the page does not look like spam.",
-   "default": "Blank. No post can be scheduled or published until a number is typed.",
-   "change": "A schedule that would go over the number in its hour is refused.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_media_image_mb": {
-   "title": "Largest picture size (MB)",
-   "does": "The biggest JPEG or PNG picture that may be attached to a post.",
-   "why": "Large files are slow to upload and may be refused by the provider.",
-   "default": "5 MB. This is a proposed starting value, to be confirmed by the owner.",
-   "change": "Bigger pictures are refused when they are added.",
-   "who": "Only the owner (Settings).",
-   "verified": false,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_media_video_mb": {
-   "title": "Largest video size (MB)",
-   "does": "The biggest MP4 video that may be attached to a post.",
-   "why": "Video uploads are slow on a weak connection.",
-   "default": "50 MB. This is a proposed starting value, to be confirmed by the owner.",
-   "change": "Bigger videos are refused when they are added.",
-   "who": "Only the owner (Settings).",
-   "verified": false,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_on": {
-   "title": "Social and marketing workspace is on",
-   "does": "Turns on the content calendar, content items, the approval queue and the publishing screens. Nothing is posted by this switch alone.",
-   "why": "Keeps the social work in one place with an approval step before anything goes public.",
-   "default": "Off. No content can be written and no approval can be made.",
-   "change": "On: people with the write or approve right can prepare and approve content. Publishing still needs its own switch.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_publish_on": {
-   "title": "Publish approved posts automatically",
-   "does": "Lets the publisher send approved posts to the connected pages and accounts at their scheduled time.",
-   "why": "A post goes out on time without someone pressing a button, but only after a person approved it.",
-   "default": "Off. The publisher sends nothing.",
-   "change": "On: the publisher (run by GitHub Actions with the secrets you set) posts due items, within the limits and outside quiet hours. Off: due items wait.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_quiet_from": {
-   "title": "Quiet hours start (Dhaka time)",
-   "does": "The start of a window when no post and no customer message goes out. Written as HH:MM.",
-   "why": "Nobody wants a message at midnight.",
-   "default": "Blank. No quiet hours.",
-   "change": "Scheduling inside the window is refused; the publisher waits until it is over.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_quiet_to": {
-   "title": "Quiet hours end (Dhaka time)",
-   "does": "The end of the quiet window. Written as HH:MM. An end earlier than the start means the window crosses midnight.",
-   "why": "Together with the start it defines when the page stays silent.",
-   "default": "Blank. No quiet hours.",
-   "change": "As for the start: both must be written for the window to apply.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_retry_max": {
-   "title": "Most tries for one post",
-   "does": "How many times the publisher tries a post that failed before it is marked failed.",
-   "why": "A short problem with the provider heals itself; a long one must be seen by a person.",
-   "default": "5 tries. The waits grow: 2, 4, 8 and 16 minutes.",
-   "change": "A failed post after its last try shows in the queue as failed and can be scheduled again by the approver.",
-   "who": "Only the owner (Settings).",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:social_stop_all": {
-   "title": "Stop all publishing (emergency)",
-   "does": "Stops every post and every customer message at once. Queued items wait; nothing is deleted.",
-   "why": "A wrong post or a provider problem can be stopped in one step.",
-   "default": "Off.",
-   "change": "On: the publisher sends nothing and new schedules are refused until it is switched off again. Off: the waiting queue continues.",
-   "who": "Only the owner, and it needs a reason.",
-   "verified": true,
-   "src": "X3 (docs/integration/X3.md)"
-  },
-  "rule:ai_default_provider": {
-   "title": "Default AI provider",
-   "does": "Chooses which provider the helpers use when an agent does not name one. local_rules runs on the phone for free. The other choices are paid providers and need a key, a model and a monthly budget first.",
-   "why": "A paid provider can spend money every month. Keeping local_rules as the default means no spending happens by accident.",
-   "default": "local_rules (on the phone, free).",
-   "change": "A paid provider is used only when it is enabled, has a model and a budget, and the data level it needs is allowed for it. The AI log shows each call.",
-   "who": "Only the owner, in Settings."
-  },
-  "rule:ai_on": {
-   "title": "AI helpers are on (after a provider is linked)",
-   "does": "Lets the AI helpers run. Nothing runs while this is off, and no provider is called and no money is spent.",
-   "why": "This is the main on/off for every AI helper. It is safe to leave off until a provider and a monthly budget are set.",
-   "default": "Off. No AI call is made and nothing is spent.",
-   "change": "On: the helpers that are switched on for their own agent can make suggestions, within the provider budget. Every answer is a suggestion a person reviews. Nothing is changed by the AI itself.",
-   "who": "Only the owner, in Settings."
-  },
-  "rule:ai_pause_all": {
-   "title": "Pause all AI now (emergency stop)",
-   "does": "Stops every AI agent and every provider at once. No new suggestion or proposal is made while it is on.",
-   "why": "If an answer looks wrong or a cost looks too high, one switch stops everything at once.",
-   "default": "Off.",
-   "change": "On: every AI call is refused and the reason 'paused' is written in the AI log. Existing suggestions and their decisions are kept.",
-   "who": "Only the owner, in Settings."
-  },
-  "rule:ai_speech_on": {
-   "title": "Voice questions (browser speech-to-text)",
-   "does": "Shows a microphone button in the assistant. The phone's own speech recognition turns the voice into text, which is then shown for the person to check before it is asked.",
-   "why": "Helps people who prefer speaking, including in Bangla. The text is still checked and redacted like typed text.",
-   "default": "Off. No microphone button is shown.",
-   "change": "On: the microphone button appears in the assistant. The question is still answered by the same rules and permissions as typed text.",
-   "who": "Only the owner, in Settings."
-  },
-  "feature:camera_recognition": {
-   "title": "Camera and recognition (X5)",
-   "does": "Barcode, label text (on phone), photo matching (on phone, not yet installed), name suggestions, duplicate check and a review record for unclear reads. Every part is a separate switch and is OFF by default.",
-   "why": "Faster item entry with fewer duplicates, and nothing changes until the owner switches a part on.",
-   "default": "All OFF. The item form works as before.",
-   "change": "Each part is switched on or off in Settings. Recognised text or photos only suggest; a person always chooses.",
-   "who": "Owner (switches). Staff with item permission (use).",
-   "related": [
-    "screen:camrec"
-   ],
-   "verified": false,
-   "src": "docs/ANDROID_WRAPPER.md; X5 build (not device-tested)"
-  },
-  "rule:item_similar_check_on": {
-   "title": "Similar-name and barcode check when adding an item",
-   "does": "When ON, adding a new item first checks the name against existing items. An exact same name is refused, and a barcode already in use is refused. A look-alike name is shown and the person presses again to add anyway.",
-   "why": "Stops the same product being entered twice under small spelling differences.",
-   "default": "OFF. Items are added exactly as before.",
-   "change": "Nothing already saved changes. Only new items are checked.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "screen:camrec",
-    "rule:recog_ocr_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql; X5 section"
-  },
-  "rule:recog_image_match_on": {
-   "title": "Match a photo to approved item photos (on the phone)",
-   "does": "When ON, a photo is compared with the approved item photos stored on this phone and the nearest items are listed with their distance. Nothing leaves the phone.",
-   "why": "Helps find an item when there is no barcode or readable label.",
-   "default": "OFF. No photo is compared.",
-   "change": "Needs an item photo index on the phone and a distance limit. Until both exist the list stays empty and says why.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_image_threshold",
-    "screen:camrec"
-   ],
-   "warn": "No model is installed in this version: the list stays empty.",
-   "verified": true,
-   "src": "phase520.sql; X5 scan.js"
-  },
-  "rule:recog_image_threshold": {
-   "title": "Photo match distance limit",
-   "does": "Only items whose photo distance is at or below this number are listed. Smaller is stricter. The distance is a number, never a percentage.",
-   "why": "Stops unrelated items from being suggested.",
-   "default": "Blank. Blank = not set: no photo candidates are shown.",
-   "change": "Changing it affects the next photo only.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_image_match_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_ocr_langs": {
-   "title": "Languages to read",
-   "does": "The language files to use, written like eng+ben (English and Bangla). Each language is one file downloaded once.",
-   "why": "Bangla labels need the Bangla file; English labels need the English file.",
-   "default": "Blank. Blank blocks label reading.",
-   "change": "A new language downloads its file the next time it is used.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_ocr_on",
-    "rule:recog_ocr_wifi_only"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_ocr_max_px": {
-   "title": "Label photo longest side in pixels",
-   "does": "The label photo is made smaller to this longest side before reading. Smaller is faster on old phones but reads less small print.",
-   "why": "Old phones run out of memory with large photos.",
-   "default": "Blank. Blank blocks label reading: no size is assumed.",
-   "change": "Changing it affects the next read only.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_ocr_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_ocr_on": {
-   "title": "Read label text on the phone (OCR)",
-   "does": "When ON, a label photo is read on this phone by the Tesseract engine. The text is shown for review; nothing is saved from it. The photo never leaves the phone.",
-   "why": "Lets staff find an item from the words on a packet without typing.",
-   "default": "OFF. No label is read.",
-   "change": "The first use downloads the chosen language file once (Wi-Fi only while the Wi-Fi switch is on). Nothing is saved automatically.",
-   "who": "Only the owner (Settings). The camera screen shows whether the phone can run it.",
-   "related": [
-    "rule:recog_ocr_max_px",
-    "rule:recog_ocr_langs",
-    "rule:recog_ocr_wifi_only",
-    "screen:camrec"
-   ],
-   "verified": true,
-   "src": "phase520.sql; X5 scan.js"
-  },
-  "rule:recog_ocr_wifi_only": {
-   "title": "Download language files on Wi-Fi only",
-   "does": "When ON, a language file that is not on the phone is downloaded only on Wi-Fi. A file already on the phone is always used.",
-   "why": "The language files are several megabytes; mobile data is paid for.",
-   "default": "ON.",
-   "change": "Nothing already downloaded is removed.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_ocr_langs"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_vision_budget": {
-   "title": "Vision service monthly call cap",
-   "does": "The most calls to the vision service in one month. When reached, no more calls are made until next month.",
-   "why": "Keeps the bill under control.",
-   "default": "Blank. Blank = the service does not run.",
-   "change": "Changing it applies from the next call.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_vision_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_vision_consent_on": {
-   "title": "Consent to send label photos to the server vision service",
-   "does": "The owner confirms that label photos may be sent to the paid vision service. Without this, no photo is sent.",
-   "why": "Photos can show customers and suppliers; the owner must agree.",
-   "default": "OFF (no consent).",
-   "change": "Turning it off stops all sending at once.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_vision_on"
-   ],
-   "verified": true,
-   "src": "phase520.sql"
-  },
-  "rule:recog_vision_on": {
-   "title": "Server vision service (paid, needs consent)",
-   "does": "Would send a label photo to a server vision service for label suggestions. It also needs the consent switch and the monthly cap, and the X1 connection.",
-   "why": "Better reading for hard photos, at a cost.",
-   "default": "OFF. Nothing is sent.",
-   "change": "Not available yet: the X1 connection is not built, so this stays inactive.",
-   "who": "Only the owner (Settings).",
-   "related": [
-    "rule:recog_vision_consent_on",
-    "rule:recog_vision_budget"
-   ],
-   "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
-   "verified": true,
-   "src": "phase520.sql; tools/edge/vision-proxy.ts"
-  },
-  "screen:camrec": {
-   "title": "Camera & Recognition",
-   "does": "Lists each way the app can read a barcode, label or photo, says whether this phone can run it now and why not, and runs a self-test on each one.",
-   "why": "Shows the truth about this phone before anyone relies on the camera.",
-   "default": "Every recognition option is OFF, so the screen reports them as off.",
-   "change": "The screen only reads; switches are changed in Settings.",
-   "who": "Owner.",
-   "related": [
-    "rule:item_similar_check_on",
-    "rule:recog_ocr_on",
-    "rule:recog_image_match_on",
-    "rule:recog_vision_on"
-   ],
-   "verified": true,
-   "src": "web/scan.js"
-  },
-  "grant:market_manage": {
-   "title": "Add topics, sources, findings, prices and opportunities, and decide them",
-   "does": "Lets a person add research, record opportunities and move them through their statuses (each move needs a reason).",
-   "why": "The person who asks for an opportunity can not approve it themselves, so a decision always has a second person behind it.",
-   "default": "Given to nobody. Only the owner has it.",
-   "change": "The person can add and change research and opportunities, and create tasks from approved work. They can not set scraping permissions, link a provider or schedule jobs.",
-   "who": "Only the owner. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "grant:market_view": {
-   "title": "See the market intelligence workspace",
-   "does": "Lets a person read the findings, prices, opportunities and growth figures on the Market page.",
-   "why": "Market notes can be sensitive (competitor prices, plans). Only the people who need them should see them.",
-   "default": "Given to nobody. Only the owner has it.",
-   "change": "The person sees the Market page and its figures, but can not add or decide anything. Sales figures on the page still follow their places.",
-   "who": "Only the owner. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_ai_summary_on": {
-   "title": "Let the AI summariser propose a summary of chosen findings",
-   "does": "Lets the AI assistant write a short proposed summary of findings you selected. The proposal waits for a person to accept or reject it.",
-   "why": "Long sources are slow to read. A draft summary saves time; a person still checks it against the source.",
-   "default": "OFF. No AI call is made.",
-   "change": "ON: the assistant may propose text only. It never creates a finding, an opportunity or a price, and never publishes. The person who asked can not accept their own proposal.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_alerts_on": {
-   "title": "Put competitor price alerts in the in-app notifications",
-   "does": "Adds one line a day to the owner's notifications when competitor prices moved beyond the threshold.",
-   "why": "The owner sees the alert without opening the Market page.",
-   "default": "OFF. Alerts are only listed on the Market page.",
-   "change": "ON: one in-app line per day with the count of items that moved. It has no customer data.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_digest_on": {
-   "title": "Weekly growth and market digest to the owner (in-app)",
-   "does": "Writes one in-app line for the owner with the top sales movers, open opportunities and the number of price alerts, when the weekly job runs it.",
-   "why": "A short weekly summary keeps the owner on the numbers without a long report.",
-   "default": "OFF. No digest is written.",
-   "change": "ON: the digest is written when the scheduled job (a later package) runs it. It has numbers from our own sales only and is not sent outside the app.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_elast_min_days": {
-   "title": "Minimum trading days at each price before a price-response hint is shown",
-   "does": "Sets how many trading days a price must have been charged before we compare how many units sold at that price.",
-   "why": "A price that was charged for one day says nothing. The hint is only a pattern in past data, never a forecast.",
-   "default": "Blank. No price-response hint is shown.",
-   "change": "A number lets the Growth page show the past pattern, with the days behind it, when at least two prices meet the minimum. It never changes a price.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_on": {
-   "title": "Market intelligence workspace (research, findings, opportunities)",
-   "does": "Turns on the Market page: research topics, source registry, findings you type in, competitor prices, opportunities with evidence and decisions, and measuring them from our own sales.",
-   "why": "It keeps what we learn about competitors, prices, festivals and customers in one place, with the source and the date, instead of in people's heads.",
-   "default": "OFF. The Market page is empty and nothing can be written. Nothing is searched on the internet by this switch.",
-   "change": "ON: people with the market rights can add topics, sources, findings and prices. Opportunities can be recorded and moved through their statuses; every move asks for a reason that is kept for ever. OFF again: nothing new can be written, old records stay and can be read.",
-   "who": "Only the owner, in Settings (the Rules page). Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_quote_max_chars": {
-   "title": "Longest quoted snippet kept from a source (characters)",
-   "does": "Sets how many characters of a source may be kept as a direct quote on a finding.",
-   "why": "Keeping only short quotes and our own summary respects the source and keeps the record useful.",
-   "default": "Blank. Quotes are not stored; write your own summary only.",
-   "change": "A number lets quotes up to that length be saved. Longer quotes are refused with a message. Existing findings are not changed.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_research_job_on": {
-   "title": "Run scheduled research jobs",
-   "does": "Lets the job runner (a later package) run the research jobs that are switched on.",
-   "why": "A job is only useful when it runs on its own. This is the master switch for all of them.",
-   "default": "OFF. Job definitions can be stored; none runs.",
-   "change": "ON: the research gate is checked before each run. A job still needs its source and the fetch switch above. OFF again: nothing runs.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_scrape_on": {
-   "title": "Allow scheduled research to fetch a permitted source",
-   "does": "Lets a scheduled research job read a public page from a source, but only when the owner has allowed that source after reading its terms, the robots.txt check passed and a rate limit is typed.",
-   "why": "Reading a permitted page on a schedule saves hours. It is never used to get past a login or a paywall, and it never copies a page in bulk.",
-   "default": "OFF. No job fetches anything. Even ON, each source stays closed until the owner allows it.",
-   "change": "ON: the research gate opens only for sources that meet every condition. OFF again: every job stops at once, whatever the source settings.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "rule:mi_watch_threshold_pct": {
-   "title": "Alert when a competitor price moves by more than this %",
-   "does": "Lists each competitor price that moved more than this percentage since its previous observation.",
-   "why": "A big competitor price move is worth a look the same day.",
-   "default": "Blank. No competitor price alert.",
-   "change": "A number lists the moves on the Market page's price tab. Nothing is sent to customers.",
-   "who": "Only the owner, in Settings. Every change is written to the change log.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
-  },
-  "screen:market": {
-   "title": "Market & growth",
-   "does": "One page with five tabs: Overview, Research (topics, sources, findings), Prices (competitor prices and CSV import), Opportunities (evidence, KPI, status, tasks, measuring from sales) and Growth (our item and outlet growth, bought together, festival review).",
-   "why": "It joins what we read about the market with what our own sales show, so a decision can be checked against real numbers.",
-   "default": "Empty until the owner switches on the workspace and gives the rights.",
-   "change": "Every number says what it is based on: the days it covers and the assumptions. A warning reminds that a pattern is not a cause.",
-   "who": "The owner decides who has the rights. The page itself has no setting.",
-   "verified": false,
-   "src": "X6 (docs/integration/X6_info.json)"
+   "src": "XB (docs/integration/XB_info.json)"
   },
   "rule:xc_coaching_on": {
    "title": "Staff coaching board (owner only)",
@@ -5993,6 +5581,518 @@
    "default": "Off. Nothing is composed, sent or shown.",
    "change": "On: the end-of-day list and the outcome lines are available. An outcome line never moves stock or money; waste is still booked on the wastage screen.",
    "who": "Only the owner, in Settings."
+  },
+  "screen:accounts": {
+   "title": "Accounts and ledger",
+   "does": "Shows the books: the journal, trial balance, balance sheet and income statement. The Opening tab posts the first balances. You can post new sales, purchases and expenses to the books here.",
+   "why": "This is where the records become the books.",
+   "default": "Accounting is OFF until the owner switches it on and sets a start date. While it is off, nothing is posted.",
+   "change": "Nothing dated before the start date goes into the books. Posted entries are corrected by a reversal, not by a delete.",
+   "who": "The owner and people with Accounts view or Accounts manage.",
+   "related": [
+    "rule:accounting_on",
+    "rule:accounting_start_date",
+    "feature:opening_balance",
+    "screen:balancecheck",
+    "screen:freshness"
+   ],
+   "verified": true,
+   "src": "phase40.sql; phase80.sql; W1-B.md"
+  },
+  "screen:announce": {
+   "title": "Announcements screen",
+   "does": "Shows what is on the bar for me, with an I have read this button. A poster also sees what he posted, who has read each one, and can withdraw a message with a reason.",
+   "why": "One place to post, check the read receipts and stop a wrong message.",
+   "default": "The menu entry is hidden while announce_on is off.",
+   "change": "Switch announce_on on to see it. A withdrawn message stays in the list with its reason and is never deleted.",
+   "who": "Everyone reads. Holders of announce_post and the owner post and see the receipts of their own posts.",
+   "related": [
+    "rule:announce_on",
+    "grant:announce_post",
+    "feature:announce_bar"
+   ],
+   "verified": true,
+   "src": "web/announce.js; phase130.sql; tests/web/announce_test.js"
+  },
+  "screen:balancecheck": {
+   "title": "Balance check",
+   "does": "Checks that the books agree. Red means the equation, the trial balance, a journal entry or a stock figure is wrong. Day book and other cross-checks show as amber warnings.",
+   "why": "A red line means a figure cannot be trusted.",
+   "default": "Read only. It changes nothing.",
+   "change": "There is no switch. It needs the accounting start date, and without it the page says data is needed.",
+   "who": "The owner and people with Accounts view or Accounts manage.",
+   "related": [
+    "screen:accounts",
+    "rule:allow_test_reset"
+   ],
+   "verified": true,
+   "src": "phase84.sql; integration E.md"
+  },
+  "screen:bankreceipt": {
+   "title": "Bank and cheque receipts",
+   "does": "Takes a customer payment by bank transfer or cheque, with the account it went to and a reference. A cheque is a bank receipt with its cheque number.",
+   "why": "Hotels and offices often pay by bank, and cash or card would be wrong.",
+   "default": "Nothing shows until \"Accept bank transfer and cheque from customers\" is switched on.",
+   "change": "A missing reference can be waived with a written reason. That adds an audit line and a yellow Exceptions row.",
+   "who": "People who can use the POS.",
+   "related": [
+    "rule:receipt_bank_on",
+    "rule:receipt_ref_required",
+    "rule:receipt_ref_from"
+   ],
+   "verified": true,
+   "src": "phase97.sql; W1-F.md"
+  },
+  "screen:camrec": {
+   "title": "Camera & Recognition",
+   "does": "Lists each way the app can read a barcode, label or photo, says whether this phone can run it now and why not, and runs a self-test on each one.",
+   "why": "Shows the truth about this phone before anyone relies on the camera.",
+   "default": "Every recognition option is OFF, so the screen reports them as off.",
+   "change": "The screen only reads; switches are changed in Settings.",
+   "who": "Owner.",
+   "related": [
+    "rule:item_similar_check_on",
+    "rule:recog_ocr_on",
+    "rule:recog_image_match_on",
+    "rule:recog_vision_on"
+   ],
+   "verified": true,
+   "src": "web/scan.js"
+  },
+  "screen:connect": {
+   "title": "Connect Center",
+   "does": "One place for every outside connection: website and domain, hosting, Facebook Page, Instagram, WhatsApp Business, SMS gateway, e-mail, bKash and Nagad, AI provider, image reading and analytics. It shows the status, the non-secret settings, the names of the server secrets each one needs and where to set them, and a Test connection button.",
+   "why": "When the owner buys a domain or gets a key, he links it here without changing the app.",
+   "default": "Every connection is OFF and not connected.",
+   "change": "Owner: switch a connection on, set its address (https only), rate and monthly call cap, read-only and dry-run. Secret VALUES are never typed here: they are set on the server under the names shown.",
+   "who": "Only the owner can see and change it.",
+   "related": [
+    "screen:x1health",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
+  },
+  "screen:exceptions": {
+   "title": "Exceptions",
+   "does": "Lists the lines that need a look: red lines are serious and yellow lines are notes. Every override that needs a reason lands here.",
+   "why": "It shows where a control was bypassed, so nothing is hidden.",
+   "default": "Read only. It does not block anything.",
+   "change": "There is no switch. Each control decides what it writes here.",
+   "who": "Approvers and the owner.",
+   "related": [
+    "feature:exception_reason",
+    "screen:moneycontrols"
+   ],
+   "verified": true,
+   "src": "phase46.sql; phase87.sql; I-1.md section 1 (one list of 18 kinds)"
+  },
+  "screen:freshness": {
+   "title": "Books freshness",
+   "does": "Shows when the last document was posted to the books, what still waits, and if the books are ready to fill by themselves. A button checks what the next run would post and changes nothing.",
+   "why": "The books fill only when something posts documents, so you should see how fresh they are.",
+   "default": "Read only. Scheduled posting is OFF.",
+   "change": "The owner can switch scheduled posting ON or OFF here. The page shows a warning first.",
+   "who": "People with Accounts view or Accounts manage can look. Only the owner switches posting.",
+   "related": [
+    "rule:journal_sched_post_on",
+    "screen:accounts"
+   ],
+   "verified": true,
+   "src": "phase98.sql; W1-G.md"
+  },
+  "screen:ledgerlinks": {
+   "title": "Ledger links",
+   "does": "Shows the master switch that makes approved forms post to the stock ledger, and the switch for each form.",
+   "why": "It is where you decide if paper forms drive the stock.",
+   "default": "The master switch is OFF.",
+   "change": "A warning shows what the switch will lock, before it is saved.",
+   "who": "Only the owner.",
+   "related": [
+    "rule:forms_post_to_ledger",
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase20.sql; W1-G.md"
+  },
+  "screen:market": {
+   "title": "Market & growth",
+   "does": "One page with five tabs: Overview, Research (topics, sources, findings), Prices (competitor prices and CSV import), Opportunities (evidence, KPI, status, tasks, measuring from sales) and Growth (our item and outlet growth, bought together, festival review).",
+   "why": "It joins what we read about the market with what our own sales show, so a decision can be checked against real numbers.",
+   "default": "Empty until the owner switches on the workspace and gives the rights.",
+   "change": "Every number says what it is based on: the days it covers and the assumptions. A warning reminds that a pattern is not a cause.",
+   "who": "The owner decides who has the rights. The page itself has no setting.",
+   "verified": false,
+   "src": "X6 (docs/integration/X6_info.json)"
+  },
+  "screen:moneyaccounts": {
+   "title": "Money accounts",
+   "does": "Lists your cash drawers, mobile wallets and bank accounts. Each one is its own account in the books. You can see a statement, move money, charge a fee and check the real balance.",
+   "why": "Every payment can come from the account you choose, and the books follow it.",
+   "default": "Nothing is drawn until at least one account exists. A payment with no account posts as before.",
+   "change": "Adding an account changes no old figure. An account with a balance, an unposted payment or a repeat transfer cannot be switched off.",
+   "who": "People with the Accounts view grant can see it. The owner and Accounts manage change it.",
+   "related": [
+    "feature:payment_source",
+    "feature:money_transfer",
+    "screen:exceptions"
+   ],
+   "verified": true,
+   "src": "phase87.sql; BUILD-LOG phase 87"
+  },
+  "screen:moneycontrols": {
+   "title": "Money controls",
+   "does": "One page for the cash, supplier and journal controls. It shows each setting and the requests that wait for the approver.",
+   "why": "It is the place to see which controls are on.",
+   "default": "Every control starts OFF or blank, so nothing changes until you set it.",
+   "change": "A held request is decided by the approver chosen under the owner approval setting. The maker never decides.",
+   "who": "People with Accounts view, Accounts manage, cash move or supplier pay can look. The owner changes the settings.",
+   "related": [
+    "rule:owner_money_entry_mode",
+    "rule:supplier_pay_dup_mode",
+    "rule:journal_control_acct_mode",
+    "screen:exceptions"
+   ],
+   "verified": true,
+   "src": "phase94.sql; phase95.sql; W1-E.md"
+  },
+  "screen:monthclose": {
+   "title": "Monthly Close",
+   "does": "Shows a month before you mark it reviewed. It carries salary accrual and the partner profit share. Mark the month reviewed or undo the mark.",
+   "why": "A month should be looked at once before it is left.",
+   "default": "The mark is only a log. It does not lock the month.",
+   "change": "To lock a month, set \"Books closed until\" separately.",
+   "who": "The owner and people with Accounts manage.",
+   "related": [
+    "rule:payroll_accrual_on",
+    "rule:partner_settlement_post_on",
+    "rule:period_closed_until"
+   ],
+   "verified": true,
+   "src": "phase82.sql; phase86.sql (m7); C.md"
+  },
+  "screen:openparties": {
+   "title": "Opening dues and payables",
+   "does": "Type what customers owed you and what you owed suppliers on day one, one by one or by paste. It also shows where the party lists and the books differ.",
+   "why": "Old dues can then be collected and counted in credit limits.",
+   "default": "Nothing changes until \"Count opening dues in customer balances\" is switched on.",
+   "change": "You can type or paste only before the opening batch is posted. After that, use an adjustment with a reason.",
+   "who": "People with Accounts manage for all places type and adjust. People with Accounts view can look. A branch accountant is refused.",
+   "related": [
+    "rule:open_parties_link",
+    "rule:open_parties_freeze",
+    "rule:open_parties_adjust_mode",
+    "feature:opening_balance"
+   ],
+   "verified": true,
+   "src": "W1-A.md sections 0, 3, 4, 5"
+  },
+  "screen:otherincome": {
+   "title": "Other income",
+   "does": "Records money that is not a sale: scrap, old oil, rent received, supplier discount. It posts to the Other income account.",
+   "why": "This money would otherwise have no place in the books.",
+   "default": "The screen refuses entries until \"Other income entry\" is switched on.",
+   "change": "A recorded entry can be voided. Entries dated before the \"from\" date are refused.",
+   "who": "The owner, and people with the cash move grant or Accounts view or manage.",
+   "related": [
+    "rule:other_income_on",
+    "rule:other_income_from"
+   ],
+   "verified": true,
+   "src": "phase96.sql; W1-F.md"
+  },
+  "screen:partyrequest": {
+   "title": "Ask to pay a supplier",
+   "does": "Write a request to pay a supplier and follow its status.",
+   "why": "Supplier payments start from a written request.",
+   "default": "Shows a notice while the switch is off.",
+   "change": "Setting party_requests_on.",
+   "who": "Any staff with a place.",
+   "related": [
+    "feature:party_requests"
+   ],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:paths": {
+   "title": "Path switches",
+   "does": "For jobs that can be done two ways, the app screen or the paper form, you choose which one is the main record. The other becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The app screen (path a) is the main record, as set for each job.",
+   "change": "Nothing is deleted, and the other path keeps a locked shadow copy. A refused screen says path_locked.",
+   "who": "Only the owner.",
+   "related": [
+    "switch:path:payroll",
+    "switch:path:stock_issue",
+    "switch:path:stock_transfer",
+    "switch:path:stock_count",
+    "switch:path:production",
+    "switch:path:expense",
+    "switch:path:owner_money",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql; paths.js; W1-G.md"
+  },
+  "screen:payapprovals": {
+   "title": "Pay requests to decide",
+   "does": "Waiting, due today, later and all. Approve on the date asked or on another date, reject with a reason, or pay from the list.",
+   "why": "The person responsible sees everything he must decide or pay today in one place.",
+   "default": "Empty until requests are switched on.",
+   "change": "The approver is set on the Pay request settings page.",
+   "who": "The chosen approver and the owner.",
+   "related": [
+    "feature:pay_requests"
+   ],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:payreqsettings": {
+   "title": "Pay request settings",
+   "does": "Switch requests on, choose who decides, switch the policy on, set the exception rule and the limits.",
+   "why": "Every owner decision is a setting that can change at any time.",
+   "default": "Everything off or blank.",
+   "change": "Each change is written to the change log.",
+   "who": "The owner.",
+   "related": [
+    "feature:pay_requests",
+    "feature:pay_request_required",
+    "feature:pay_request_limits"
+   ],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:payrequest": {
+   "title": "Ask for salary or advance",
+   "does": "Send a request and see the status and dates of your requests. You can cancel one that is not paid.",
+   "why": "One place for asking and for knowing the answer.",
+   "default": "Shows a notice while the switch is off.",
+   "change": "Setting pay_requests_on.",
+   "who": "Staff linked to an employee record. A payroll manager can enter one for a colleague.",
+   "related": [
+    "feature:pay_requests"
+   ],
+   "verified": false,
+   "src": "web/payrequests.js"
+  },
+  "screen:periodlock": {
+   "title": "Period lock",
+   "does": "Shows if the books are closed and up to what date. The owner can open an override window with a reason. It also lists held late sales and the back-date limits.",
+   "why": "A closed month should stay closed unless someone has a reason.",
+   "default": "Nothing changes by itself. The lock date is the one typed in \"Books closed until\". Every new rule starts OFF or blank.",
+   "change": "Changing a rule here affects new entries only. Past figures never change.",
+   "who": "The owner changes rules and opens windows. People with Accounts manage see the state.",
+   "related": [
+    "rule:period_closed_until",
+    "rule:period_lock_mode",
+    "rule:owner_closed_period_mode",
+    "rule:late_sale_policy"
+   ],
+   "verified": true,
+   "src": "phase89.sql; W1-B.md"
+  },
+  "screen:profitcheck": {
+   "title": "Profit check",
+   "does": "Compares the management profit with the journal profit and lists the difference by cause. You can leave one loss out of the profit with a reason. It also shows if day book, profit, expense report and journal agree, and holds the dated brand map.",
+   "why": "Branch ranking and partner shares rest on one profit number.",
+   "default": "Read only for most people. All profit settings start OFF, so every profit figure stays as it is today.",
+   "change": "Leaving a loss out needs a reason of 5 letters or more, and it writes an audit line and a yellow Exceptions row. It can be counted again, and no journal entry is written.",
+   "who": "People with Accounts view or Accounts manage can look. Only the owner changes settings and the brand map.",
+   "related": [
+    "rule:profit_one_number_on",
+    "rule:profit_source",
+    "feature:report_parity",
+    "rule:brand_map_dated_on"
+   ],
+   "verified": true,
+   "src": "phase92.sql; phase93.sql; W1-D.md"
+  },
+  "screen:returnrules": {
+   "title": "Return and exit rules",
+   "does": "Sets the rules for sale returns and for people who leave. For returns: the return window, the receipt need, which goods go back on the shelf, and what to do with expired goods.",
+   "why": "A returned sweet or cake should not go back on sale by mistake.",
+   "default": "Every rule starts OFF or blank, so returns work as today.",
+   "change": "A class rule can start on a later day. A rule that starts later is not used today.",
+   "who": "The owner sets the rules. People with the return override grant can pass a rule with a reason.",
+   "related": [
+    "rule:return_window_hours",
+    "rule:return_needs_receipt",
+    "rule:return_expired_restock",
+    "grant:return_override",
+    "rule:exit_revoke_mode"
+   ],
+   "verified": true,
+   "src": "phase90.sql; phase91.sql; W1-C.md"
+  },
+  "screen:shifts": {
+   "title": "Shift schedule screen",
+   "does": "My shifts lists the next 14 days with shift, time, off-days, approved leave, holidays and notes. A scheduler also gets a weekly roster by place, where a tap on a day sets a template, an off-day or a leave or swap note, plus copy last week and the templates.",
+   "why": "One short screen for staff to read and for the planner to edit.",
+   "default": "The menu entry is hidden while shift_on is off.",
+   "change": "Switch shift_on on to see it. Clearing a day returns it to the weekly pattern, and the old row is kept in the change log.",
+   "who": "Everyone reads their own shifts. Holders of shift_manage and the owner edit the roster.",
+   "related": [
+    "rule:shift_on",
+    "grant:shift_manage",
+    "rule:shift_mates_on",
+    "feature:shift_report"
+   ],
+   "verified": true,
+   "src": "web/shifts.js; phase132.sql; tests/web/shifts_test.js"
+  },
+  "screen:shortages": {
+   "title": "Cash short and transit short",
+   "does": "Lists cash short or over cases from the daily count and goods that arrived short between places. A decider approves, claims from the carrier, recovers or writes off. Each step posts a balanced entry.",
+   "why": "A shortage should have an owner and a reason, not just disappear.",
+   "default": "Cases are listed. Nothing is posted to the books until \"Post an approved cash short/over to the books\" is ON.",
+   "change": "There is no switch on the page. Backfill of old cases is not automatic.",
+   "who": "People with Accounts view can look. The decider is set by the \"Who decides\" setting.",
+   "related": [
+    "rule:cash_short_post_on",
+    "rule:short_decider",
+    "rule:transit_short_bearer"
+   ],
+   "verified": true,
+   "src": "phase81.sql; integration B.md"
+  },
+  "screen:todo": {
+   "title": "To-do list screen",
+   "does": "A person sees his own open tasks, with overdue ones in red, and marks each one done with an optional note or cannot do with a reason. A giver also sees every task he gave with its status and notes, and can cancel one with a reason or reopen it.",
+   "why": "Every extra task ends with a visible answer.",
+   "default": "The menu entry is hidden while todo_on is off.",
+   "change": "Switch todo_on on to see it. A cancelled or finished task stays in the giver's list and is never deleted.",
+   "who": "Each person sees only his own tasks. The giver and the owner see what they gave.",
+   "related": [
+    "rule:todo_on",
+    "grant:todo_assign",
+    "rule:todo_repeat_on"
+   ],
+   "verified": true,
+   "src": "web/todo.js; phase131.sql; tests/web/todo_test.js"
+  },
+  "screen:wallets": {
+   "title": "Mobile wallets",
+   "does": "A register for each wallet: bKash, Nagad, Rocket and Upay. You can add fees, move money, and count the wallet from the phone.",
+   "why": "It lets you match each wallet with what the phone really shows.",
+   "default": "The wallet register works alone. Nothing moves to its own wallet account until the wallet split switch is ON.",
+   "change": "The phone total is typed first, and the book figure comes back after it is saved. A difference needs a reason once.",
+   "who": "The owner, people with the 10-3 form right and people with Accounts view.",
+   "related": [
+    "rule:d_wallet_split_on",
+    "rule:d_wallet_fee_treatment",
+    "rule:d_wallet_negative_mode"
+   ],
+   "verified": true,
+   "src": "phase83.sql; D.md; phase86.sql"
+  },
+  "screen:x1health": {
+   "title": "Automation & integration health",
+   "does": "Shows whether automation is on, whether it is paused, each connection and each scheduled job (ok, failed, stale, never run), failed intake items, the last backup, books freshness and proposals waiting for approval.",
+   "why": "One screen tells the owner what is working and what is not. A missing part is shown as missing, never as healthy.",
+   "default": "Owner only. The owner may add the health widget to the owner board.",
+   "change": "Nothing to set. It only reads.",
+   "who": "Only the owner.",
+   "related": [
+    "screen:connect",
+    "rule:automation_on"
+   ],
+   "verified": false,
+   "src": "phase481.sql (x1_health); web/connect.js"
+  },
+  "switch:path:expense": {
+   "title": "Path switch: expense",
+   "does": "Chooses which way counts for this job: the day-book quick expense or the 10-2 expense voucher. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "Quick entries get a 10-2 shadow copy at day end, confirmed with one click.",
+   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:owner_money": {
+   "title": "Path switch: owner money",
+   "does": "Chooses which way counts for this job: partner capital or the cash move for an owner top-up or draw. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "Partner capital is the main record. The cash move gets the shadow copy.",
+   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:payroll": {
+   "title": "Path switch: payroll",
+   "does": "Chooses which way counts for this job: app payroll runs or the 02-2 monthly salary sheet. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "Both are open. Once app payroll starts for a month, 02-2 is locked and kept as a shadow copy.",
+   "change": "The other path becomes a shadow copy, and its screen may be refused with path_locked; whichever-is-first is also allowed. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:production": {
+   "title": "Path switch: production",
+   "does": "Chooses which way counts for this job: the recipe production run or the 05-1 factory daily sheet. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The run is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:stock_count": {
+   "title": "Path switch: stock count",
+   "does": "Chooses which way counts for this job: the stock screen count or the 04-3 count sheet. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The screen is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:stock_issue": {
+   "title": "Path switch: stock issue",
+   "does": "Chooses which way counts for this job: the stock screen issue or the 04-2 issue slip. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The screen is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "switch:path:stock_transfer": {
+   "title": "Path switch: stock transfer",
+   "does": "Chooses which way counts for this job: the stock screen transfer or the 03-1 transfer challan. The other way becomes a locked shadow copy.",
+   "why": "One job must be counted once.",
+   "default": "The screen is the main record. The form is a reference.",
+   "change": "The other path becomes a shadow copy and its screen may be refused with path_locked. Nothing is deleted.",
+   "who": "Only the owner, on the path switches page.",
+   "related": [
+    "screen:paths",
+    "rule:forms_post_to_ledger"
+   ],
+   "verified": true,
+   "src": "phase48.sql (path_domains); paths.js; W1-G.md"
   }
  }
 }
