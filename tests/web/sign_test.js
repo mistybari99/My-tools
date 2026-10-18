@@ -4,7 +4,7 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
 const SP = process.argv[2];
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8352, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = 8350, srv = C.serve(PORT);   // own port: blindstock_test.js uses 8352 and the two EADDRINUSE when run together
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (process.env.V) log(c ? 'ok' : 'FAIL', m); if (!c) { bad++; log('FAIL:', m); } };
