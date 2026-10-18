@@ -1,0 +1,10 @@
+{
+  "name": "Shop online",
+  "short_name": "Shop",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#fdfbf8",
+  "theme_color": "#7a1f3d",
+  "lang": "bn",
+  "icons": [{ "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
