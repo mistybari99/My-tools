@@ -600,3 +600,31 @@ Tests run: phase510_test.sql 51/51, phase511_test.sql 34/34 on a throwaway Postg
 Not built yet: AI screens (agent picker, feedback thumbs, proposal inbox, usage/scorecard pages), ia.js registration, speech input, prompt library and redaction editor UI, rate limits per user beyond the existing assistant hour limit, provider adapter run against a live provider, X1 adapter (action_proposals), eval runner against providers. Not run: existing browser suites (kb.json changed).
 
 Owner checks: paste phase510 then phase511 (after phase478) on the TEST project first; confirm ai_on is OFF and ai_agents shows 10 disabled agents; nothing is deployed.
+## X5 camera and item recognition (phase 520, branch x5-camera)
+
+What changed:
+- SQL phase 520 (new file; phase 520_test.sql): rules (all recognition switches OFF; blank limits: photo threshold, OCR max size, OCR languages, vision monthly cap); item_similar (duplicate / similar check, option_similar contract, no pg_trgm); item_new2 (client_id idempotency, barcode and exact-name refusal, similar asks, force); item_new_clients; item_recognition_reviews + item_recognition_review_add; item_aliases + item_alias_approve / item_alias_find; assets brand, serial_no, warranty_until + asset_identity_set. Item_new itself is unchanged.
+- Web: web/scan_core.js (pure: engine choice with reasons, label parsing, name ranking, nearest neighbours, photo rules); web/scan.js (engines, name suggestions, Camera & Recognition screen #/camrec); web/scan_native.js (Android bridge, inert in the browser); web/photo.js (one shared shrink / validate / upload-with-retry; the three old shrink copies in entry.js, items2.js and stock2.js now delegate to it); barcode.js (ZXing fallback when BarcodeDetector is missing); item master new-item sheet (suggestions, item_new2 with client id, similar/exists/barcode answers); asset form (brand, serial with scan button, warranty).
+- Service worker bos-sw-v2 with an explicit PRECACHE list (ZXing 336 KB and the small X5 files; OCR files are not precached).
+- Vendored: web/vendor/zxing (@zxing/library 0.21.3, Apache-2.0), web/vendor/tesseract (tesseract.js 5.1.1 and core 5.1.1 SIMD LSTM, Apache-2.0). Checksums in web/vendor/X5_VENDOR.txt. Total about 7.3 MB.
+- Info entries: docs/integration/X5_info.json merged into web/data/info.json (12 entries).
+- Android scaffold: android/ (Capacitor 8.5.2, ML Kit plugins 8.2.1), docs/ANDROID_WRAPPER.md. No build run.
+- tools/edge/vision-proxy.ts: source only; refuses every call (X1 gate, consent, cap, provider, call counter missing).
+
+Checks run (local throwaway Postgres on port 5840, UTF8; never the live project):
+- Base build ORDER=all through phase 478, then phase520 pasted once and twice without error.
+- supabase/phase520_test.sql on a fresh build: 39 pass, 0 fail (run after a rebuild; earlier runs were polluted and are not counted).
+- tests/web/scan_core_test.js (node): 59 pass, 0 fail.
+- tests/web scan_web_test (360 px, headless): camrec rows, defaults OFF, self-test, no horizontal scroll: pass.
+- tests/web barcode_test: pass after one deliberate change: the 'no camera' case now removes the camera API (before, the real headless camera took the fallback path).
+- python3 tools/check_info_coverage.py: exit 0 after the merge. tools/check_no_demo_leak.py: OK.
+
+Not confirmed (must check on a real phone and the live project):
+- Real camera: BarcodeDetector, ZXing fallback, torch and continuous scan (torch and continuous scan are NOT built).
+- Tesseract OCR accuracy on Bangla labels and speed on an old phone; the language file download (tessdata host is an external call when OCR is switched on).
+- Photo match: no embedder or model is vendored, so the image engine reports 'no index'. Item photo index build is NOT built.
+- ML Kit plugin calls inside the Android wrapper: never run.
+- Supabase: item_new2, asset_identity_set and the new tables were run only on the local throwaway Postgres; no pg_trgm needed.
+
+Not built in this package (honest list): outbox queue with IndexedDB for photo uploads (the shared helper retries but does not queue offline); batch scan for stock counts; label / barcode printing; QR for assets; scan history log; the full product form still saves through item_new (the duplicate check runs on the quick new-item sheet only); review-queue UI (the RPC and table exist); X1 gate (x1-foundation has no commits yet, so the vision path refuses).
+- Manual checks for the owner: switch each recognition option on one at a time (Settings > Camera & Recognition); run the self-test on the phone you use at the counter.

@@ -227,6 +227,11 @@ function newItemSheet(o = {}) {
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" id="ni_go" data-act="im_ni_go">${esc(T('ni_go'))}</button></div></div>`);
   showNext('ni_cat', 'ni_code');
   if (B.listctl) B.listctl.enhance('#ni_unit', 'units', { keepPrev: true, form: 'ITEMS', ctx: { field: 'units', via: 'new_item' } });
+  // X5: name suggestions (dictionary, existing items, approved aliases) under both name fields; tapping fills the same field
+  if (B.scan && B.scan.suggest) {
+    const getItems = () => (B.items2 && B.items2.items ? B.items2.items() : []);
+    try { B.scan.suggest('#ni_bn', { field: 'bn', getItems }); B.scan.suggest('#ni_en', { field: 'en', getItems }); } catch (e) { /* suggestions are optional */ }
+  }
 }
 async function showNext(selId, hintId) {
   const s = $('#' + selId), h = $('#' + hintId); if (!s || !h) return;
@@ -239,14 +244,27 @@ async function niGo() {
   const bn = ($('#ni_bn').value || '').trim(); if (!bn) return toast(T('ni_need'));
   const patch = { name_bn: bn, item_type: $('#ni_type').value, unit: $('#ni_unit').value || null };
   const en = ($('#ni_en').value || '').trim(); if (en) patch.name_en = en; const cat = $('#ni_cat').value; if (cat) patch.category = cat;
+  // X5: one client id per attempt (a double tap or a retry never makes a second item); the server answers 'similar' / 'exists' / 'barcode_exists' without creating
+  if (!M.ni) M.ni = {};
+  if (!M.ni.cid) M.ni.cid = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
   const btn = $('#ni_go'); if (btn) btn.disabled = true;
-  const { data, error } = await sb.rpc('item_new', { p_patch: patch, p_note: null });
+  const force = !!M.ni.force;
+  const { data, error } = await sb.rpc('item_new2', { p_patch: patch, p_note: null, p_client: M.ni.cid, p_force: force });
   if (btn) btn.disabled = false;
   if (error) return failx(error);
+  if (data && (data.status === 'similar' || data.status === 'exists' || data.status === 'barcode_exists')) {
+    const names = ((data.similar || []).map((x) => (x.code ? x.code + ' · ' : '') + (x.name_en || x.name_bn || '')).join(', ')) || (data.barcode_hit ? (data.barcode_hit.code || '') : '');
+    const head = data.status === 'similar' ? lab(L('কাছাকাছি নাম আছে। নাম দেখে নিন, অথবা আবার চাপলে যোগ হবে:', 'A similar name exists. Check it, or press again to add anyway:', 'কাছাকাছি নাম আছে। দেখে নিন, অথবা আবার চাপলে যোগ হবে:'))
+      : data.status === 'exists' ? lab(L('এই নামে আইটেম আছে, নতুন যোগ হবে না:', 'An item with this name exists. It will not be added again:', 'এই নামে item আছে, নতুন যোগ হবে না:'))
+      : lab(L('এই বারকোড অন্য পণ্যে আছে, নতুন যোগ হবে না:', 'This barcode is already used. Not added:', 'এই barcode আগে থেকে আছে, নতুন যোগ হবে না:'));
+    toast(head + ' ' + names);
+    if (data.status === 'similar') { M.ni.force = true; M.ni.cid = null; if (btn) btn.textContent = lab(L('তবু যোগ করুন', 'Add anyway', 'তবু যোগ করুন')); }
+    return;
+  }
+  const cb = M.ni && M.ni.onCreated; M.ni = null;      // the callback is read before the sheet state is cleared
   closeSheet();
   if (data && data.status === 'created') { toast(T('ni_done') + ' ' + data.code); }
   else toast(T('ni_pend'));
-  const cb = M.ni && M.ni.onCreated; M.ni = null;
   if (B.items2 && B.items2.reload) { try { await B.items2.reload(); } catch (e) { /* ignore */ } }
   if (cb && data && data.status === 'created') await cb({ item_id: data.item_id, code: data.code });
 }
@@ -505,8 +523,16 @@ async function assetForm(id) {
     ${isOwner() || ctxPerms().ITEM_COST ? `<div><label for="af_cost">${esc(T('as_cost'))}</label><input id="af_cost" inputmode="decimal" value="${esc(cost === undefined || cost === null ? '' : cost)}"></div>` : ''}
     ${r ? `<div><label for="af_maint">${esc(T('as_maint'))}</label><select id="af_maint"><option value=""></option>${maint.map((m) => sopt(m.id, r.maintenance_ref, '#' + m.serial + ' · ' + m.entry_date)).join('')}${r.maintenance_ref && !maint.some((m) => m.id === r.maintenance_ref) ? sopt(r.maintenance_ref, r.maintenance_ref, '08-1') : ''}</select></div>` : ''}
     <div><label for="af_note">${esc(T('as_note'))}</label><input id="af_note" value="${esc(r ? r.note || '' : '')}" autocomplete="off"></div>
+    <div><label for="af_brand">${esc(lab(L('ব্র্যান্ড', 'Brand', 'Brand')))}</label><input id="af_brand" maxlength="80" autocomplete="off" value="${esc(r && r.brand ? r.brand : '')}"></div>
+    <div><label for="af_serial">${esc(lab(L('সিরিয়াল / ট্যাগ নম্বর', 'Serial / tag number', 'Serial / tag no')))}</label><div class="p2-inl"><input id="af_serial" maxlength="80" autocomplete="off" value="${esc(r && r.serial_no ? r.serial_no : '')}"><button type="button" data-act="as_scan">▮▮ ${esc(lab(L('স্ক্যান', 'Scan', 'Scan')))}</button></div></div>
+    <div><label for="af_warr">${esc(lab(L('ওয়ারেন্টি শেষ তারিখ', 'Warranty until', 'Warranty শেষ তারিখ')))}</label><input id="af_warr" type="date" value="${esc(r && r.warranty_until ? r.warranty_until : '')}"></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="as_save">${esc(T('save'))}</button></div></div>`);
   if (B.listctl) B.listctl.enhance('#af_cond', 'asset_conditions', { otherBlank: true, form: 'ASSET', ctx: () => ({ field: 'asset_condition', asset_id: String((r && r.id) || '') }) });
+}
+// X5: brand, serial and warranty (only the fields the form shows; blank clears a value)
+function identityPatch() {
+  if (!$('#af_brand')) return null;
+  return { brand: $('#af_brand').value.trim() || null, serial_no: $('#af_serial').value.trim() || null, warranty_until: $('#af_warr').value || null };
 }
 async function assetSave() {
   const id = AS.edit, num = (v) => (norm(v) === '' ? null : Number(norm(v)));
@@ -515,11 +541,14 @@ async function assetSave() {
     const r = AS.rows.find((x) => x.id === id), p = { location_id: Number($('#af_loc').value), condition: $('#af_cond').value || null, status: $('#af_st').value, bought_on: $('#af_date').value || null, note: $('#af_note').value.trim() || null, maintenance_ref: $('#af_maint') ? $('#af_maint').value || null : r.maintenance_ref };
     if (cost !== undefined && cost !== (AS.costs.get(id) === undefined ? null : Number(AS.costs.get(id)))) p.cost = cost;
     const { error } = await sb.rpc('asset_update', { p_id: id, p: p }); if (error) return fail(error);
+    const idp = identityPatch(); if (idp) { const r2 = await sb.rpc('asset_identity_set', { p_id: id, p: idp }); if (r2.error) return fail(r2.error); }
   } else {
     const q = Math.max(1, Math.min(200, Math.round(num($('#af_qty').value) || 1)));
     const p = { item_id: $('#af_item').value, location_id: Number($('#af_loc').value), qty: q, condition: $('#af_cond').value || null, bought_on: $('#af_date').value || null, note: $('#af_note').value.trim() || null };
     if (cost !== undefined && cost !== null) p.cost = cost;
-    const { error } = await sb.rpc('asset_add', { p: p }); if (error) return fail(error);
+    const { data: added, error } = await sb.rpc('asset_add', { p: p }); if (error) return fail(error);
+    const idp = identityPatch();
+    if (idp && q === 1 && added && added.ids && added.ids[0]) { const r3 = await sb.rpc('asset_identity_set', { p_id: added.ids[0], p: idp }); if (r3.error) return fail(r3.error); }
   }
   closeSheet(); toast(T('saved')); await viewAssets();
 }
@@ -557,6 +586,7 @@ Object.assign(H, {
     await B.reloadRules(); toast(T('saved')); drawTypes(); },
   im_ty_tg: async (a) => { const x = typeRow(a.dataset.c), k = a.dataset.k; if (!x) return; const { error } = await sb.rpc('item_type_set', { p_code: x.code, p_patch: { [k]: !x[k] } }); if (error) return fail(error); await refresh(); drawTypes(); },
   as_menu: (a) => assetMenu(a.dataset.v), as_add: () => assetForm(null), as_edit: (a) => assetForm(a.dataset.v), as_save: assetSave,
+  as_scan: async () => { if (!B.barcode) return; const c = await B.barcode.scan(); if (c && $('#af_serial')) $('#af_serial').value = c; },
   as_stat: async (a) => { closeSheet(); const { error } = await sb.rpc('asset_update', { p_id: a.dataset.v, p: { status: a.dataset.s } }); if (error) return fail(error); toast(T('saved')); await viewAssets(); },
   as_retire: (a) => { openSheet(`<h2>${esc(T('as_retire'))}</h2><div class="stack"><div><label for="ar_st">${esc(T('as_status'))}</label><select id="ar_st">${['retired', 'sold', 'lost'].map((k) => sopt(k, 'retired', lab(STATUS[k]))).join('')}</select></div>
       <div><label for="ar_reason">${esc(T('as_reason'))} *</label><input id="ar_reason" autocomplete="off"></div><div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="as_retire_do" data-v="${esc(a.dataset.v)}">${esc(T('save'))}</button></div></div>`); },

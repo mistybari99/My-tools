@@ -47,6 +47,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'stock_levels') return { data: [], error: null };
   if (fn === 'items_with_cost') return { data: [], error: null };
   if (fn === 'item_apply') { const it = T.items.find((x) => x.id === args.p_item); if (window.__OWNER === false && !window.__GRANT) return { data: { status: 'pending', id: 5 }, error: null }; Object.assign(it, args.p_patch); if ('is_active' in args.p_patch && !args.p_patch.is_active) it.retired_at = 'now'; return { data: { status: 'applied', item_id: it.id }, error: null }; }
+  if (fn === 'item_new2') { fn = 'item_new'; }   // X5: the quick sheet calls item_new2 (client id + duplicate check) before item_new
   if (fn === 'item_new') { const code = args.p_patch.category === 'c14' ? '14-200' : args.p_patch.item_type === 'asset' ? '01-002' : 'I-100'; const n = Object.assign({ id: 'n' + T.items.length, code, is_active: true, count_in_business: true, sellable: true, tracked: false, images: [], sell_units: [] }, args.p_patch); T.items.push(n); return { data: { status: 'created', item_id: n.id, code }, error: null }; }
   if (fn === 'item_next_code') return { data: args.p_category === 'c14' ? '14-201' : args.p_category === 'c01' ? '01-002' : null, error: null };
   if (fn === 'item_dup_check') return { data: args.p_name_bn === 'কালো মিষ্টি – কেজি' ? [{ id: 'x', code: 'I-099', name_bn: 'কালো মিষ্টি – কেজি', name_en: null, why: 'same_name_bn' }] : [], error: null };
@@ -234,7 +235,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await pp.click('[data-act=pu_newitem]'); await pp.waitForTimeout(300); ok((await pp.inputValue('#ni_type')) === 'asset', 'the new-item sheet starts as type Asset');
   await pp.fill('#ni_bn', 'নতুন ফ্রিজ'); await pp.selectOption('#ni_cat', 'c01'); await pp.waitForTimeout(250); ok(/01-002/.test(await pp.textContent('#ni_code')), 'sheet shows the next code: ' + await pp.textContent('#ni_code'));
   await pp.click('#ni_go'); await pp.waitForTimeout(900);
-  const nc = await pp.evaluate(() => window.__CALLS.filter((c) => c[0] === 'item_new').map((c) => c[1]));
+  const nc = await pp.evaluate(() => window.__CALLS.filter((c) => c[0] === 'item_new' || c[0] === 'item_new2').map((c) => c[1]));
   ok(nc.length === 1 && nc[0].p_patch.item_type === 'asset' && nc[0].p_patch.category === 'c01', 'item_new asked with type asset + category');
   ok(/01-002/.test(await pp.inputValue('[data-ln="0.item"]')), 'the new item is on the bill line: ' + await pp.inputValue('[data-ln="0.item"]'));
   ok(/asset register/i.test(await pp.textContent('#pe_lines')), 'line hint: goes to the asset register, not to stock'); await pp.close();

@@ -225,12 +225,7 @@ function filterSheet() {
 
 // ---------- form ----------
 const rid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
-function shrink(file, max = 1024, q = 0.72) {
-  return new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file);
-    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob((b) => (b ? res(b) : rej(new Error('image'))), 'image/jpeg', q); };
-    img.onerror = () => rej(new Error('image')); img.src = u; });
-}
+function shrink(file, max = 1024, q = 0.72) { return window.BOS.photo.shrink(file, { max: max, q: q }); }   // shared helper: web/photo.js (EXIF, type and size checks)
 const locId = () => { const l = (S.ctx.locations || [])[0]; if (l !== undefined) return l; const e = (B.ENV && B.ENV.locs) || []; return e[0] ? e[0].id : 1; };
 const opt = (v, cur, label) => `<option value="${esc(v)}" ${String(v) === String(cur ?? '') ? 'selected' : ''}>${esc(label)}</option>`;
 const tg = (on, id, extra = '') => `<button type="button" class="tog ${on ? 'on' : ''}" id="${id}" data-act="p2_tg" ${extra} aria-pressed="${on ? 'true' : 'false'}">${esc(on ? t('on') : t('off'))}</button>`;
@@ -292,6 +287,7 @@ async function viewForm(id, presetCat) {
   drawImgs();
   if (D.master && !cur && f.category) B.itemMaster.showNext('p_cat', 'im_code_h');
   wireLists();
+  if (B.scan && B.scan.suggest) { try { B.scan.suggest('#p_bn', { field: 'bn', getItems: () => D.items }); B.scan.suggest('#p_en', { field: 'en', getItems: () => D.items }); } catch (e) { /* optional */ } }
 }
 async function drawImgs() {
   const box = $('#p_imgs'); if (!box || !F) return;

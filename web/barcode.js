@@ -71,13 +71,19 @@ function scan() {
         <div class="stack">${m.dev ? `<button data-bc="dev">${esc(T('dev'))}</button>` : ''}<button data-bc="cancel">${esc(T('cancel'))}</button></div>`);
       on('[data-bc=cancel]', () => finish(null)); on('[data-bc=dev]', () => { teardownMedia(); showDevice(m); });
       const fallback = (key) => { if (m.dev) { teardownMedia(); showDevice(m, T(key)); } else { const el = c.querySelector('#bc_msg'); if (el) { el.textContent = T(key); el.className = 'notice warn'; } } };
-      if (!('BarcodeDetector' in window) || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return fallback('nosupport');
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return fallback('nosupport');
       let det;
-      try {
-        let f = FORMATS;
-        if (window.BarcodeDetector.getSupportedFormats) { const sup = await window.BarcodeDetector.getSupportedFormats(); const ok = FORMATS.filter((x) => sup.includes(x)); if (ok.length) f = ok; }
-        det = new window.BarcodeDetector({ formats: f });
-      } catch (e) { return fallback('nosupport'); }
+      if (!('BarcodeDetector' in window)) {
+        // X5: the vendored ZXing reader (web/scan.js) when this browser has no BarcodeDetector; OFF unless the camera switch is on
+        try { det = B.scan && B.scan.fallbackDetector ? await B.scan.fallbackDetector() : null; } catch (e) { det = null; }
+        if (!det) return fallback('nosupport');
+      } else {
+        try {
+          let f = FORMATS;
+          if (window.BarcodeDetector.getSupportedFormats) { const sup = await window.BarcodeDetector.getSupportedFormats(); const ok = FORMATS.filter((x) => sup.includes(x)); if (ok.length) f = ok; }
+          det = new window.BarcodeDetector({ formats: f });
+        } catch (e) { return fallback('nosupport'); }
+      }
       try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }); } catch (e) { return fallback('nocam'); }
       if (done || screen !== 'cam' || !root) { if (stream) stream.getTracks().forEach((tr) => tr.stop()); stream = null; return; }
       const v = root.querySelector('video'); v.srcObject = stream; v.play().catch(() => {});
