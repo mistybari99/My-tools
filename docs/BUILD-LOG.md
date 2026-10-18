@@ -714,3 +714,8 @@ Checks run: xb_screens_test 48 of 48; xb_paysms_test 32 of 32; xc_screens_test 2
 Could not confirm: the screens in a real browser at 360 px (no horizontal-scroll check run); the Bangla wording (written by the builder, owner to read); live Supabase behaviour (phase491, 492 and 493 are not pasted, so the screens show the server error text until then); the SMS layouts against real bKash, Nagad or Rocket messages (UNVERIFIED in xb_paysms.js).
 Not done: a payment screenshot upload, the cake photo and cancel, the festival playbook, the rider and zone set-up screen, the printable cake sheets. Each is listed in docs/integration/XB.md section 5.
 Owner to do: paste phase491, phase492 and phase493 in the live project (only the owner, after review; the *_test.sql files are not for the live project); check the Bangla texts; set the XB switches in Settings; decide who holds pay_verify, cake_price_manage and rider_manage.
+
+## XB and XC screens: info fix after the full web suite
+
+What changed: the five screen entries (screen:xcunsold, screen:xcsummary, screen:paycapture, screen:cakejobs, screen:riders) now carry the `src` field and one-sentence "why" / one-to-two-sentence "change" texts, as tests/web/infohint_test.js requires. Merged with `tools/check_info_coverage.py --merge ... --replace`.
+Checks run: infohint_test exit 0 (on a snapshot); crm_feedback_test and crm_leads_test passed on a snapshot after the full run had shown them failing (the full run's copy had filled the disk; not a code change). Full web suite: see the report of this pass.

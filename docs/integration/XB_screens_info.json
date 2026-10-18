@@ -6,20 +6,22 @@
     "screen:paycapture": {
       "title": "Mobile payment capture and verify",
       "does": "Writes a bKash, Nagad or Rocket payment: the Trx-ID, sender number, amount, time and what it is for (an order, an advance or nothing yet). A pasted SMS can be read to fill the boxes; the person checks every value before saving. The server flags the payment ok, over, under or no target, and lists the payments waiting for a second person.",
-      "why": "A Trx-ID can be used only once. Writing it down stops a double use and shows at the end of the day whether the phone and the app agree.",
+      "why": "A Trx-ID can be used only once, and writing it down stops a double use and shows at the end of the day whether the phone and the app agree.",
       "default": "Visible. Its switch 'Write down bKash, Nagad and Rocket payments' defaults OFF; with the switch OFF nothing can be written.",
-      "change": "Nothing is posted to the books by this screen. A second person verifies each payment; nobody verifies the payment they wrote. A rejected or flagged payment needs a note.",
+      "change": "Nothing is posted to the books by this screen, and a second person verifies each payment; nobody verifies the payment they wrote. A rejected or flagged payment needs a note.",
       "who": "The owner, and people who can use point of sale for the place. Verifying needs the 'Verify mobile payments' grant, which the server checks.",
-      "verified": false
+      "verified": false,
+      "src": "web/xb_paycapture.js; web/xb_paysms.js; supabase/phase491.sql (xb_pay_capture, xb_pay_capture_decide, xb_pay_captures_list)"
     },
     "screen:cakejobs": {
       "title": "Custom cake jobs and due tomorrow",
       "does": "Lists custom cakes for a place and date range with their state, and moves each one step forward: confirm, production slip, baked, decorated, ready, delivered. Shows the sheet of cakes due tomorrow with count, weight, flavour, message, design and allergy notes.",
-      "why": "Custom cakes are the largest orders of the week. The list shows what is due and the step each cake is at.",
+      "why": "Custom cakes are the largest orders of the week, and the list shows what is due and the step each cake is at.",
       "default": "Visible. Its switch 'Custom cake workflow' defaults OFF; with the switch OFF no cake job can be made or moved.",
-      "change": "A cake moves one step at a time and cannot be skipped. Delivery needs the app order delivered first and, when that switch is on, a photo. Nothing is sent to the customer from this screen.",
+      "change": "A cake moves one step at a time and cannot be skipped; delivery needs the app order delivered first and, when that switch is on, a photo. Nothing is sent to the customer from this screen.",
       "who": "The owner, and people who can use point of sale for the place. Price and capacity rules are set in the cake price list and the cake settings.",
-      "verified": false
+      "verified": false,
+      "src": "web/xb_cakejobs.js; supabase/phase492.sql (xb_cake_confirm, xb_cake_move, xb_cake_due)"
     },
     "screen:riders": {
       "title": "Riders, delivery status and cash on delivery",
@@ -28,7 +30,8 @@
       "default": "Visible. Its switch 'Riders and delivery status' defaults OFF; with the switch OFF no rider or delivery can be recorded.",
       "change": "Checking a day can open one case for a rider whose figures differ; a case is explained, never deleted. No cash is posted and no message is sent to a rider or a customer.",
       "who": "The owner, and people who can use point of sale for the place. Adding riders and zone fees needs the 'Manage riders and delivery zones' grant.",
-      "verified": false
+      "verified": false,
+      "src": "web/xb_riders.js; supabase/phase493.sql (xb_delivery_assign, xb_delivery_move, xb_cod_reconcile, xb_cod_deposit, xb_cod_case_explain)"
     }
   }
 }
