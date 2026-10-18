@@ -1,7 +1,7 @@
 {
  "package": "X4",
  "title": "AI helpers: switches",
- "note": "Plain-English texts for the (i) info sheet of each AI switch. Every entry says what it does, why it matters, the default, what changes if it is switched, and who can change it. English only. Keys are the rule keys of supabase/phase510.sql.",
+ "note": "Plain-English texts for the (i) info sheet of each AI switch. Every entry says what it does, why it matters, the default, what changes if it is switched, and who can change it. English only. Keys are the rule keys of supabase/phase484.sql.",
  "entries": {
   "rule:ai_on": {
    "title": "AI helpers are on (after a provider is linked)",

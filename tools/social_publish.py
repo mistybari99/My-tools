@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Social publisher for Islamia BOS (X3). Python 3 standard library only. DEFAULT OFF and DRY-RUN: it sends nothing unless BOTH switches are on.
 
-What one run does (see supabase/phase500.sql, docs/integration/X3.md):
+What one run does (see supabase/phase483.sql, docs/integration/X3.md):
   1. Logs in as the ops bot (purpose 'notify', the same login as tools/notify_sms.py) with the public anon key - never the service_role key.
   2. social_publish_claim(limit) -> the due deliveries. The server returns nothing while social_publish_on is OFF, while the emergency stop
      social_stop_all is ON, in quiet hours, when the per-day / per-hour limits are blank or reached, and it re-checks consent for WhatsApp rows.

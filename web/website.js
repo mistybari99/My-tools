@@ -1,5 +1,5 @@
 /* Islamia BOS · Website manager (#/website) - X2. Owner screen for the public website (site/).
-   Server: supabase/phase490.sql (settings, publishing, public reads), phase491.sql (checkout, holds, owner web_admin_* functions).
+   Server: supabase/phase481.sql (settings, publishing, public reads), phase482.sql (checkout, holds, owner web_admin_* functions).
    Reads: web_admin_board, web_admin_go_live, web_admin_drift, web_admin_holds_report, web_admin_web_orders, web_admin_cancel_list, web_admin_custom_list,
           rules (website_% keys), web_item_pub, items.
    Writes (owner only, each checked on the server): set_rule, web_admin_item_save, web_admin_publish_bulk, web_admin_image_add, web_admin_image_approve,

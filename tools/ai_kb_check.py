@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Checks docs/ai_kb/entries.json (the knowledge entries the AI helpers may quote) before they are proposed in the app.
 
-Rules (mirror supabase/phase511.sql):
+Rules (mirror supabase/phase485.sql):
   * key: lower-case dotted name; version >= 1; title 2-160 chars; body 10-4000 chars; source and owner present.
   * status proposed | verified | retired. Only a VERIFIED entry is authoritative; a verified entry must name a verifier and a date,
     and the verifier must differ from the proposer. The builder may never verify (the owner verifies in the app).

@@ -1,4 +1,4 @@
--- XC test head (phases 550-554): the tt helpers, one owner and one staff user (both test_* names), and the test fixture helpers.
+-- XC test head (phases 494-498): the tt helpers, one owner and one staff user (both test_* names), and the test fixture helpers.
 -- Included by supabase/phase55x_test.sql with  \ir ../tests/sql/xc_head.sql . Test data only; a throwaway database, never the live project.
 -- Fixture writes use session_replication_role = replica, so the sale and payment triggers do not run while the test rows are made; the code under test runs normally.
 \set ON_ERROR_STOP on

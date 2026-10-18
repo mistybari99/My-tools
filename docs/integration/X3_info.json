@@ -1,6 +1,6 @@
 {
   "package": "X3",
-  "note": "Plain-English (i) texts for the settings and rights of supabase/phase500.sql. Merge with: python3 tools/check_info_coverage.py --merge docs/integration/X3_info.json",
+  "note": "Plain-English (i) texts for the settings and rights of supabase/phase483.sql. Merge with: python3 tools/check_info_coverage.py --merge docs/integration/X3_info.json",
   "entries": {
     "rule:social_on": {
       "title": "Social and marketing workspace is on",

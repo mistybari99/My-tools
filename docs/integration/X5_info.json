@@ -14,7 +14,7 @@
     "rule:recog_ocr_on"
    ],
    "verified": true,
-   "src": "phase520.sql; X5 section"
+   "src": "phase486.sql; X5 section"
   },
   "rule:recog_ocr_on": {
    "title": "Read label text on the phone (OCR)",
@@ -30,7 +30,7 @@
     "screen:camrec"
    ],
    "verified": true,
-   "src": "phase520.sql; X5 scan.js"
+   "src": "phase486.sql; X5 scan.js"
   },
   "rule:recog_ocr_max_px": {
    "title": "Label photo longest side in pixels",
@@ -43,7 +43,7 @@
     "rule:recog_ocr_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_ocr_langs": {
    "title": "Languages to read",
@@ -57,7 +57,7 @@
     "rule:recog_ocr_wifi_only"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_ocr_wifi_only": {
    "title": "Download language files on Wi-Fi only",
@@ -70,7 +70,7 @@
     "rule:recog_ocr_langs"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_image_match_on": {
    "title": "Match a photo to approved item photos (on the phone)",
@@ -85,7 +85,7 @@
    ],
    "warn": "No model is installed in this version: the list stays empty.",
    "verified": true,
-   "src": "phase520.sql; X5 scan.js"
+   "src": "phase486.sql; X5 scan.js"
   },
   "rule:recog_image_threshold": {
    "title": "Photo match distance limit",
@@ -98,7 +98,7 @@
     "rule:recog_image_match_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_vision_on": {
    "title": "Server vision service (paid, needs consent)",
@@ -113,7 +113,7 @@
    ],
    "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
    "verified": true,
-   "src": "phase520.sql; tools/edge/vision-proxy.ts"
+   "src": "phase486.sql; tools/edge/vision-proxy.ts"
   },
   "rule:recog_vision_consent_on": {
    "title": "Consent to send label photos to the server vision service",
@@ -126,7 +126,7 @@
     "rule:recog_vision_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_vision_budget": {
    "title": "Vision service monthly call cap",
@@ -139,7 +139,7 @@
     "rule:recog_vision_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "screen:camrec": {
    "title": "Camera & Recognition",

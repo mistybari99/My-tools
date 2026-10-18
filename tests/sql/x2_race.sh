@@ -1,6 +1,6 @@
 #!/bin/bash
 # X2 oversell race test (local throwaway Postgres only, never the live project).
-# usage: PORT=5810 bash tests/sql/x2_race.sh <db built through phases 490 + 491 + phase491_test>
+# usage: PORT=5810 bash tests/sql/x2_race.sh <db built through phases 481 + 482 + phase482_test>
 # Makes its own copy of the database, sets up ONE tracked test item with stock 1 and reserve ON,
 # then fires N checkouts in parallel for that one unit. Exactly one may succeed (advisory lock per item and branch).
 set -u

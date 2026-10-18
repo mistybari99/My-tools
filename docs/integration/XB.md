@@ -8,16 +8,16 @@ Local throwaway Postgres only (port 5860, database `xb_base` = phases 8 to 478 b
 
 | File | What |
 |---|---|
-| `supabase/phase540.sql` | payment captures (`pay_captures`), statement lines (`pay_statement_lines`), capture, verify, screenshot, statement import, daily tie-out. Rules `pay_capture_on` (OFF), `pay_capture_tol` (blank). Grant `pay_verify`. Bucket `payproof` (private). |
-| `supabase/phase541.sql` | cake price table (`cake_price_rules`), cake jobs (`cake_jobs`) and trail (`cake_job_events`), quote, create, confirm, move, photo, cancel (calls `c2_order_cancel`), due sheet, customer text. Rules `cake_flow_on`, `cake_capacity_day`, `cake_lead_days`, `cake_photo_required` (all OFF or blank). Grant `cake_price_manage`. |
-| `supabase/phase542.sql` | riders (`riders`), zones (`delivery_zones`), delivery jobs and trail (`delivery_jobs`, `delivery_events`), COD deposits (`cod_deposits`), reconciliation and cases (`cod_cases`), performance. Rule `xb_delivery_on` (OFF). Grant `rider_manage`. |
-| `supabase/phase540_test.sql`, `phase541_test.sql`, `phase542_test.sql` | SQL suites on `test_*` data (fixture `tests/sql/c2_fixture.sql`). |
+| `supabase/phase491.sql` | payment captures (`pay_captures`), statement lines (`pay_statement_lines`), capture, verify, screenshot, statement import, daily tie-out. Rules `pay_capture_on` (OFF), `pay_capture_tol` (blank). Grant `pay_verify`. Bucket `payproof` (private). |
+| `supabase/phase492.sql` | cake price table (`cake_price_rules`), cake jobs (`cake_jobs`) and trail (`cake_job_events`), quote, create, confirm, move, photo, cancel (calls `c2_order_cancel`), due sheet, customer text. Rules `cake_flow_on`, `cake_capacity_day`, `cake_lead_days`, `cake_photo_required` (all OFF or blank). Grant `cake_price_manage`. |
+| `supabase/phase493.sql` | riders (`riders`), zones (`delivery_zones`), delivery jobs and trail (`delivery_jobs`, `delivery_events`), COD deposits (`cod_deposits`), reconciliation and cases (`cod_cases`), performance. Rule `xb_delivery_on` (OFF). Grant `rider_manage`. |
+| `supabase/phase491_test.sql`, `phase492_test.sql`, `phase493_test.sql` | SQL suites on `test_*` data (fixture `tests/sql/c2_fixture.sql`). |
 | `tests/sql/xb_run.sh` | runner: copies `xb_base`, pastes each XB phase twice (second paste on a copy), runs the suite. |
 | `web/xb_paysms.js` | pure reader of a pasted bKash / Nagad / Rocket SMS: Trx-ID, amount, sender, date, direction, reasons. Saves nothing. Not loaded by `index.html`. |
 | `tests/web/xb_paysms_test.js` | 32 sample texts (test fixtures only, invented numbers, no names). |
 | `docs/integration/XB_info.json` | (i) texts for the 10 settings and grants above. `python3 tools/merge_pkg_info.py --dry` reports 10 entries. Not merged into `web/data/info.json` (integrator step). |
 
-Paste order: after phase 478, paste 540, 541, 542 in that order (each once; each is safe to paste again). `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` were not edited.
+Paste order: after phase 478, paste 491, 492, 493 in that order (each once; each is safe to paste again). `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` were not edited.
 
 ## 2. Hook sites
 
@@ -54,9 +54,9 @@ Web hook sites: none (no screen, no `ia.js` line, no `index.html` tag). The SMS 
 
 | Suite | Result |
 |---|---|
-| `PGPORT=5860 bash tests/sql/xb_run.sh phase540` (paste twice: no ERROR) | 36 pass, 0 fail |
-| `... phase541` | 37 pass, 0 fail |
-| `... phase542` | 29 pass, 0 fail |
+| `PGPORT=5860 bash tests/sql/xb_run.sh phase491` (paste twice: no ERROR) | 36 pass, 0 fail |
+| `... phase492` | 37 pass, 0 fail |
+| `... phase493` | 29 pass, 0 fail |
 | Total SQL | 102 checks, 0 fail |
 | `node tests/web/xb_paysms_test.js` | 32 of 32 pass |
 | `python3 tools/check_no_demo_leak.py` | OK |

@@ -1,13 +1,13 @@
 #!/bin/bash
 # XB package SQL runner on a LOCAL throwaway Postgres (never the live project).
-# usage: PGPORT=5860 bash tests/sql/xb_run.sh phase540 [phase541 ...]
+# usage: PGPORT=5860 bash tests/sql/xb_run.sh phase491 [phase492 ...]
 #   needs database xb_base = tests/sql/build_fresh_db.sh with ORDER=all (phases 8..478), built once.
 #   for each named phase N: copies xb_base, pastes every XB phase up to N twice (second paste on a copy), runs supabase/N_test.sql.
 #   result lines: FAIL ... / RESULT n pass, m fail
 HERE="$(cd "$(dirname "$0")" && pwd)"; R="$(cd "$HERE/../.." && pwd)"
 PORT=${PGPORT:-5860}; BASE=${XB_BASE:-xb_base}
 PSQL="psql -h /tmp -p $PORT -U postgres"; P="$PSQL -v ON_ERROR_STOP=1 -q"
-XB="phase540 phase541 phase542"
+XB="phase491 phase492 phase493"
 for t in "$@"; do
   db=xb_$t
   $PSQL -q -c "drop database if exists $db" -c "create database $db template $BASE" 2>&1 | grep -v NOTICE

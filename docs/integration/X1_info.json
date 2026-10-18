@@ -10,7 +10,7 @@
    "who": "Only the owner.",
    "related": ["rule:automation_pause_until", "screen:connect", "screen:x1health"],
    "verified": false,
-   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
+   "src": "phase479.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
   },
   "rule:automation_pause_until": {
    "title": "Pause automation until a time",
@@ -21,7 +21,7 @@
    "who": "Only the owner.",
    "related": ["rule:automation_on"],
    "verified": false,
-   "src": "phase480.sql (_x1_pause_active)"
+   "src": "phase479.sql (_x1_pause_active)"
   },
   "screen:connect": {
    "title": "Connect Center",
@@ -32,7 +32,7 @@
    "who": "Only the owner can see and change it.",
    "related": ["screen:x1health", "rule:automation_on"],
    "verified": false,
-   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
+   "src": "phase479.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
   },
   "screen:x1health": {
    "title": "Automation & integration health",
@@ -43,7 +43,7 @@
    "who": "Only the owner.",
    "related": ["screen:connect", "rule:automation_on"],
    "verified": false,
-   "src": "phase481.sql (x1_health); web/connect.js"
+   "src": "phase480.sql (x1_health); web/connect.js"
   },
   "feature:x1_gate": {
    "title": "The gate for outside and AI calls",
@@ -54,7 +54,7 @@
    "who": "Used by the scheduled jobs and by the approved agents. Staff cannot call it.",
    "related": ["screen:connect", "rule:automation_on"],
    "verified": false,
-   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
+   "src": "phase479.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
   },
   "feature:agent_accounts": {
    "title": "Agent accounts (limited sign-in for software)",
@@ -65,7 +65,7 @@
    "who": "Only the owner creates one.",
    "related": ["feature:action_queue"],
    "verified": false,
-   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
+   "src": "phase479.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
   },
   "feature:action_queue": {
    "title": "Approval queue for proposed actions",
@@ -76,7 +76,7 @@
    "who": "The owner decides. The person who proposed cannot decide the same proposal.",
    "related": ["feature:agent_accounts", "screen:x1health"],
    "verified": false,
-   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
+   "src": "phase480.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
   }
  }
 }

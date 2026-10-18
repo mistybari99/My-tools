@@ -33,7 +33,7 @@
     "screen:x1health"
    ],
    "verified": false,
-   "src": "phase481.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
+   "src": "phase480.sql (action_targets, action_propose, action_decide, action_proposal_mark_executed)"
   },
   "feature:actual_yield": {
    "title": "Actual yield at production",
@@ -56,7 +56,7 @@
     "feature:action_queue"
    ],
    "verified": false,
-   "src": "phase480.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
+   "src": "phase479.sql (agent_accounts, _x1_agent_guard_roles, _x1_agent_guard_grants)"
   },
   "feature:agreed_prices": {
    "title": "Agreed price per item and supplier",
@@ -1729,7 +1729,7 @@
     "rule:automation_on"
    ],
    "verified": false,
-   "src": "phase480.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
+   "src": "phase479.sql (x1_gate, x1_gate_log, crm_contact_prefs)"
   },
   "grant:announce_post": {
    "title": "Post announcements and instructions",
@@ -2212,7 +2212,7 @@
     "screen:x1health"
    ],
    "verified": false,
-   "src": "phase480.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
+   "src": "phase479.sql (rules, x1_gate, job_run_start); docs/integration/X1.md"
   },
   "rule:automation_pause_until": {
    "title": "Pause automation until a time",
@@ -2225,7 +2225,7 @@
     "rule:automation_on"
    ],
    "verified": false,
-   "src": "phase480.sql (_x1_pause_active)"
+   "src": "phase479.sql (_x1_pause_active)"
   },
   "rule:backdate_max_days_cash_move": {
    "title": "Back-date limit: cash move date",
@@ -3386,7 +3386,7 @@
     "rule:recog_ocr_on"
    ],
    "verified": true,
-   "src": "phase520.sql; X5 section"
+   "src": "phase486.sql; X5 section"
   },
   "rule:journal_attach_over": {
    "title": "A manual journal above this total needs an attachment",
@@ -4432,7 +4432,7 @@
    ],
    "warn": "No model is installed in this version: the list stays empty.",
    "verified": true,
-   "src": "phase520.sql; X5 scan.js"
+   "src": "phase486.sql; X5 scan.js"
   },
   "rule:recog_image_threshold": {
    "title": "Photo match distance limit",
@@ -4445,7 +4445,7 @@
     "rule:recog_image_match_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_ocr_langs": {
    "title": "Languages to read",
@@ -4459,7 +4459,7 @@
     "rule:recog_ocr_wifi_only"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_ocr_max_px": {
    "title": "Label photo longest side in pixels",
@@ -4472,7 +4472,7 @@
     "rule:recog_ocr_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_ocr_on": {
    "title": "Read label text on the phone (OCR)",
@@ -4488,7 +4488,7 @@
     "screen:camrec"
    ],
    "verified": true,
-   "src": "phase520.sql; X5 scan.js"
+   "src": "phase486.sql; X5 scan.js"
   },
   "rule:recog_ocr_wifi_only": {
    "title": "Download language files on Wi-Fi only",
@@ -4501,7 +4501,7 @@
     "rule:recog_ocr_langs"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_vision_budget": {
    "title": "Vision service monthly call cap",
@@ -4514,7 +4514,7 @@
     "rule:recog_vision_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_vision_consent_on": {
    "title": "Consent to send label photos to the server vision service",
@@ -4527,7 +4527,7 @@
     "rule:recog_vision_on"
    ],
    "verified": true,
-   "src": "phase520.sql"
+   "src": "phase486.sql"
   },
   "rule:recog_vision_on": {
    "title": "Server vision service (paid, needs consent)",
@@ -4542,7 +4542,7 @@
    ],
    "warn": "Costs money. Photos leave the phone when this is ON and consent is given.",
    "verified": true,
-   "src": "phase520.sql; tools/edge/vision-proxy.ts"
+   "src": "phase486.sql; tools/edge/vision-proxy.ts"
   },
   "rule:report_cash_short_by_case_on": {
    "title": "Cash short/over report follows the shortage case",
@@ -5084,7 +5084,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_brand_en": {
    "title": "Shop name (English)",
@@ -5097,7 +5097,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_captcha_on": {
    "title": "Captcha required for web orders",
@@ -5110,7 +5110,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_custom_cake_on": {
    "title": "Custom cake request form",
@@ -5123,7 +5123,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_cutoff_hour": {
    "title": "Same-day order cut-off (hour)",
@@ -5136,7 +5136,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_festival_mode_on": {
    "title": "Festival pre-order mode",
@@ -5149,7 +5149,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_ga_id": {
    "title": "Google Analytics ID",
@@ -5162,7 +5162,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_holiday_text_bn": {
    "title": "Closure banner (Bangla)",
@@ -5175,7 +5175,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_holiday_text_en": {
    "title": "Closure banner (English)",
@@ -5188,7 +5188,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_lead_days": {
    "title": "Minimum lead days for an order",
@@ -5201,7 +5201,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_location_id": {
    "title": "Branch that receives web orders",
@@ -5214,7 +5214,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_messenger_url": {
    "title": "Messenger page link",
@@ -5227,7 +5227,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_min_order": {
    "title": "Minimum order (Tk)",
@@ -5240,7 +5240,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_on": {
    "title": "Website (online shop) on",
@@ -5253,7 +5253,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pay_cod_on": {
    "title": "Cash on delivery offered",
@@ -5266,7 +5266,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pay_manual_on": {
    "title": "bKash / Nagad payment with a Trx ID",
@@ -5279,7 +5279,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pay_mobile_number": {
    "title": "bKash / Nagad number shown to customers",
@@ -5292,7 +5292,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pixel_id": {
    "title": "Facebook Pixel ID",
@@ -5305,7 +5305,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_privacy_bn": {
    "title": "Privacy policy (Bangla)",
@@ -5318,7 +5318,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_privacy_en": {
    "title": "Privacy policy (English)",
@@ -5331,7 +5331,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_refund_bn": {
    "title": "Refund and cancellation (Bangla)",
@@ -5344,7 +5344,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_refund_en": {
    "title": "Refund and cancellation (English)",
@@ -5357,7 +5357,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_terms_bn": {
    "title": "Terms (Bangla)",
@@ -5370,7 +5370,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_terms_en": {
    "title": "Terms (English)",
@@ -5383,7 +5383,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_public_url": {
    "title": "Public address of the website",
@@ -5396,7 +5396,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_rate_max": {
    "title": "Web orders per device in the time window",
@@ -5409,7 +5409,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_rate_window_min": {
    "title": "Web order limit window (minutes)",
@@ -5422,7 +5422,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_reserve_minutes": {
    "title": "Hold time for reserved stock (minutes)",
@@ -5435,7 +5435,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_reserve_on": {
    "title": "Hold stock at web checkout (hard reservation)",
@@ -5448,7 +5448,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_stock_threshold": {
    "title": "Stock level that shows Limited",
@@ -5461,7 +5461,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_whatsapp": {
    "title": "WhatsApp number for orders",
@@ -5474,7 +5474,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:xb_delivery_on": {
    "title": "Riders and delivery status",
@@ -5705,7 +5705,7 @@
     "rule:automation_on"
    ],
    "verified": false,
-   "src": "phase480.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
+   "src": "phase479.sql (integration_registry, integration_set); web/connect.js; tools/edge/x1-connect-check.ts (not deployed)"
   },
   "screen:exceptions": {
    "title": "Exceptions",
@@ -6031,7 +6031,7 @@
     "rule:automation_on"
    ],
    "verified": false,
-   "src": "phase481.sql (x1_health); web/connect.js"
+   "src": "phase480.sql (x1_health); web/connect.js"
   },
   "switch:path:expense": {
    "title": "Path switch: expense",

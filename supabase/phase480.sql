@@ -1,380 +1,177 @@
--- Phase 480 (bos480) - X1 FOUNDATION, part 1: connection registry, job runs, one gate for every outside or AI call, agent identities, audit actor columns, public site config.
--- Paste after phase 478 (tests/sql/ORDER.txt). Paste-twice safe. Earlier phase files are not edited. No existing function is patched: the audit actor columns use a NEW trigger.
--- Defaults (every new behaviour OFF / safe):
---   rule automation_on = false  -> the gate denies every call and job_run_start records a skipped run.
---   every integration is disabled, not_connected, read_only, dry_run, with monthly_call_cap = 0 (= budget not set, denies).
---   Secrets are NEVER stored: config is non-secret fields only (trigger refuses secret-looking keys and values); env_names holds the NAMES of server secrets only.
---   The Connect Center shows the owner where to set a secret; the value never comes back to the database or the browser.
--- Who may do what:
---   owner               : integration_add / integration_set / site_config_set / agent_account_set / webhook_rotation_record, reads everything here.
---   ops bot (backup / notify purpose, phase46): job_run_start / job_run_finish / job_heartbeat / integration_test_record, and x1_gate.
---   agent account (agent_accounts, below): x1_gate only. It can never hold a role or a grant (triggers below).
--- Tags: bos480. Test data only (test_*). Tests: supabase/phase480_test.sql.
+-- Phase 480 (bos481) - X1 FOUNDATION, part 2: approval queue for agent and automation proposals, and the health view.
+-- Paste after phase 480. Paste-twice safe. Nothing existing is edited.
+-- Rules of the queue:
+--   * A proposal names ONE target RPC from the allowlist action_targets (enabled OFF by default). Rules, grants, audit and finance posting can never be a target (trigger).
+--   * Only the owner decides. The proposer never decides its own proposal. A rejection needs a reason.
+--   * A decision does NOT run anything. The approver's own session calls the target RPC (under the approver's own grants), then records the result with action_proposal_mark_executed.
+--     Nothing runs twice: client_id is unique, and a proposal leaves 'approved' once it is executed or failed.
+--   * Expired proposals (expires_at passed) can not be approved.
+-- Health: x1_health() (owner only) reads the registry, job runs, outbox, intake failures, backup and books freshness. A missing source is shown as missing or unverified, never as healthy.
+-- Tags: bos481. Test data only (test_*). Tests: supabase/phase481_test.sql.
 
--- ---------- rules (switches; new behaviour OFF) ----------
-insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values
- ('automation_on', 'automation', 'switch', 'false', null, null, null, null,
-  'স্বয়ংক্রিয় কাজ (সব) চালু', 'Automation (all) ON', 'Automation ON (every outside call, AI call and scheduled job)',
-  'বন্ধ থাকলে কোনো বাইরের সেবা, AI বা নির্ধারিত কাজ চলবে না।', 'OFF = no outside service, no AI call and no scheduled job runs.', 400),
- ('automation_pause_until', 'automation', 'text', null, 'YYYY-MM-DDTHH:MM:SSZ', null, null, null,
-  'স্বয়ংক্রিয় কাজ এই সময় পর্যন্ত বিরতি (খালি = বিরতি নেই)', 'Automation pause until (empty = no pause)', 'Pause automation until this time (empty = not paused)',
-  'যেমন 2026-11-01T00:00:00+06:00। বোঝা না গেলে বিরতি ধরা হবে।', 'Example 2026-11-01T00:00:00+06:00. A value that cannot be read counts as paused.', 401)
- on conflict (key) do nothing;
-
--- ---------- helpers (not callable from the browser) ----------
-create or replace function public._x1_is_bot() returns boolean language sql stable security definer set search_path = public as $$
-  select public._is_ops('notify') or public._is_ops('backup');
-$$;
-create or replace function public._x1_job_ok() returns boolean language sql stable security definer set search_path = public as $$
-  select public.is_owner() or public._x1_is_bot();
-$$;
--- the active agent identity of the caller (null when the caller is not an agent)
-create or replace function public._x1_agent() returns text language plpgsql stable security definer set search_path = public as $$
-declare ag text;
-begin
-  select a.agent_name into ag from public.agent_accounts a where a.user_id = auth.uid() and a.active and public.is_active() limit 1;
-  return ag;
-end $$;
--- true while the owner's pause is in force; an unreadable pause value counts as paused (fail closed)
-create or replace function public._x1_pause_active() returns boolean language plpgsql stable security definer set search_path = public as $$
-declare p text := public.rule_txt('automation_pause_until');
-begin
-  if p is null then return false; end if;
-  return now() < p::timestamptz;
-exception when others then return true;
-end $$;
--- removes what looks like a secret from free text (phone numbers and e-mail addresses); used on every error text the screens show
-create or replace function public.x1_redact(p_text text) returns text language sql immutable as $$
-  select regexp_replace(regexp_replace(coalesce(p_text, ''),
-    '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', '[email]', 'g'),
-    '(\+?880|0)?1[3-9][0-9]{8}', '[phone]', 'g');
-$$;
-
--- ---------- integration registry ----------
-create table if not exists public.integration_registry (
-  code text primary key check (code ~ '^[a-z][a-z0-9_]{2,40}$'),
-  kind text not null check (kind in ('website', 'hosting', 'facebook_page', 'instagram', 'whatsapp_business', 'sms_gateway', 'email_smtp', 'payment', 'ai_provider', 'vision_provider', 'analytics', 'other')),
+-- ---------- allowlist of proposal targets ----------
+create table if not exists public.action_targets (
+  rpc_name text primary key check (rpc_name ~ '^[a-z][a-z0-9_]{2,60}$'),
   label_bn text not null, label_en text not null,
-  status text not null default 'not_connected' check (status in ('not_connected', 'configured', 'connected', 'error', 'disabled')),
+  risk text not null default 'medium' check (risk in ('low', 'medium', 'high')),
   enabled boolean not null default false,
-  read_only boolean not null default true,
-  dry_run boolean not null default true,
-  config jsonb not null default '{}'::jsonb,                 -- NON-SECRET fields only (guarded by the trigger below)
-  env_names text[] not null default '{}'::text[],            -- NAMES of server-side secrets (for example an Edge secret name). Never a value.
-  rate_per_min int not null default 10 check (rate_per_min between 0 and 10000),
-  monthly_call_cap int not null default 0 check (monthly_call_cap >= 0),   -- 0 = budget not set: every call is denied
-  config_version int not null default 1,
-  last_ok_at timestamptz, last_error_at timestamptz, last_error text,
-  last_test_at timestamptz, last_test_ok boolean, last_test_detail text,
   updated_at timestamptz not null default now(), updated_by uuid
 );
-create table if not exists public.integration_config_versions (
-  id bigserial primary key,
-  code text not null references public.integration_registry(code),
-  version int not null, config jsonb not null, env_names text[] not null,
-  changed_by uuid, changed_at timestamptz not null default now()
-);
-
-create or replace function public._x1_registry_guard() returns trigger language plpgsql set search_path = public as $$
-declare k text; v jsonb; e text;
+create or replace function public._x1_target_guard() returns trigger language plpgsql set search_path = public as $$
 begin
-  for k in select jsonb_object_keys(coalesce(new.config, '{}'::jsonb)) loop
-    if k ~* '(secret|token|passw|pwd|api_?key|private|credential|pin|bearer|signing|auth)' then raise exception 'secret_not_allowed: config key %', k; end if;
-    v := new.config -> k;
-    if jsonb_typeof(v) = 'string' and (length(v #>> '{}') > 300 or (v #>> '{}') ~ '^(eyJ|sk[-_]|ghp_|xox[abp]-|AKIA|Bearer )') then raise exception 'secret_not_allowed: value of %', k; end if;
-  end loop;
-  foreach e in array coalesce(new.env_names, '{}'::text[]) loop
-    if e !~ '^[A-Z][A-Z0-9_]{2,60}$' then raise exception 'env_name_must_be_a_name: only the NAME of the secret, never its value'; end if;
-  end loop;
-  return new;
-end $$;
-drop trigger if exists integration_registry_guard on public.integration_registry;
-create trigger integration_registry_guard before insert or update on public.integration_registry for each row execute function public._x1_registry_guard();
-
-insert into public.integration_registry (code, kind, label_bn, label_en) select * from (values
-  ('website', 'website', 'ওয়েবসাইট / ডোমেইন', 'Website / domain'),
-  ('hosting', 'hosting', 'হোস্টিং', 'Hosting'),
-  ('facebook_page', 'facebook_page', 'ফেসবুক পেজ', 'Facebook Page'),
-  ('instagram', 'instagram', 'ইনস্টাগ্রাম', 'Instagram'),
-  ('whatsapp_business', 'whatsapp_business', 'হোয়াটসঅ্যাপ বিজনেস', 'WhatsApp Business'),
-  ('sms_gateway', 'sms_gateway', 'এসএমএস গেটওয়ে', 'SMS gateway'),
-  ('email_smtp', 'email_smtp', 'ইমেইল (SMTP)', 'E-mail (SMTP)'),
-  ('bkash', 'payment', 'বিকাশ', 'bKash'),
-  ('nagad', 'payment', 'নগদ', 'Nagad'),
-  ('ai_provider', 'ai_provider', 'AI সেবা', 'AI provider'),
-  ('vision_provider', 'vision_provider', 'ছবি পড়া (OCR / vision)', 'Image reading (OCR / vision)'),
-  ('analytics', 'analytics', 'বিশ্লেষণ (analytics)', 'Analytics'),
-  ('other', 'other', 'অন্যান্য সংযোগ', 'Other connection')
-) as v(code, kind, label_bn, label_en)
-on conflict (code) do nothing;
-
--- ---------- job runs and heartbeat ----------
-create table if not exists public.job_runs (
-  id bigserial primary key,
-  job text not null check (job ~ '^[a-z_]{2,40}$'),
-  started_at timestamptz not null default now(),
-  finished_at timestamptz,
-  ok boolean,                                    -- null = skipped (automation off or paused) or still running
-  dry_run boolean not null default true,
-  error text,
-  counts jsonb not null default '{}'::jsonb,
-  bot uuid
-);
-create index if not exists job_runs_job_recent on public.job_runs (job, id desc);
-create table if not exists public.job_heartbeat (
-  job text primary key check (job ~ '^[a-z_]{2,40}$'),
-  seen_at timestamptz not null default now(),
-  note text
-);
-
--- ---------- agent identities (least privilege: no role, no grant, ever) ----------
-create table if not exists public.agent_accounts (
-  user_id uuid primary key references public.profiles(id),
-  agent_name text not null check (agent_name ~ '^[a-z][a-z0-9_]{2,40}$'),
-  active boolean not null default true,
-  created_by uuid, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
-);
-create or replace function public._x1_agent_guard_roles() returns trigger language plpgsql security definer set search_path = public as $$
-begin
-  if exists (select 1 from public.agent_accounts a where a.user_id = new.user_id) then raise exception 'agent_cannot_hold_roles'; end if;
-  return new;
-end $$;
-create or replace function public._x1_agent_guard_grants() returns trigger language plpgsql security definer set search_path = public as $$
-begin
-  if exists (select 1 from public.agent_accounts a where a.user_id = new.user_id) then raise exception 'agent_cannot_hold_grants'; end if;
-  return new;
-end $$;
-drop trigger if exists user_roles_agent_guard on public.user_roles;
-create trigger user_roles_agent_guard before insert or update on public.user_roles for each row execute function public._x1_agent_guard_roles();
-drop trigger if exists user_grants_agent_guard on public.user_grants;
-create trigger user_grants_agent_guard before insert or update on public.user_grants for each row execute function public._x1_agent_guard_grants();
-
--- ---------- the gate: every outside or AI call goes through it ----------
-create table if not exists public.x1_gate_log (
-  id bigserial primary key,
-  at timestamptz not null default now(),
-  code text not null, kind text not null, write boolean not null default false,
-  allowed boolean not null, reason text not null,
-  actor uuid, actor_type text not null default 'human'
-);
-create index if not exists x1_gate_log_code_at on public.x1_gate_log (code, at);
-
--- x1_gate(kind, code, write, customer): allow / deny with a reason. Checks, in order: automation_on, pause, integration exists, enabled, configured,
--- read-only (writes), do-not-contact (crm_contact_prefs), budget (monthly_call_cap, 0 = not set), rate (rate_per_min), dry run (writes). Every decision is logged.
--- A write while dry_run is ON is never allowed: the caller only reports what it would have sent.
-create or replace function public.x1_gate(p_kind text, p_code text, p_write boolean default false, p_customer uuid default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare r public.integration_registry; reason text := null; allow boolean := false; dry boolean := false; act_type text; ag text := public._x1_agent();
-begin
-  if not (public.is_owner() or public._x1_is_bot() or ag is not null) then raise exception 'not allowed'; end if;
-  if p_kind is null or p_kind !~ '^[a-z_]{2,40}$' or p_code is null then raise exception 'bad_input'; end if;
-  act_type := case when ag is not null then 'agent' when public._x1_is_bot() then 'bot' else 'human' end;
-  if not public.rule_on('automation_on') then reason := 'automation_off';
-  elsif public._x1_pause_active() then reason := 'paused';
-  else
-    select * into r from public.integration_registry where code = p_code;
-    if not found then reason := 'unknown_integration';
-    elsif not r.enabled or r.status = 'disabled' then reason := 'integration_off';
-    elsif r.status not in ('configured', 'connected') then reason := 'not_configured';
-    elsif coalesce(p_write, false) and r.read_only then reason := 'read_only';
-    elsif p_customer is not null and exists (select 1 from public.crm_contact_prefs c where c.customer_id = p_customer and c.dnc) then reason := 'do_not_contact';
-    elsif r.monthly_call_cap = 0 then reason := 'budget_not_set';
-    elsif (select count(*) from public.x1_gate_log g where g.code = p_code and g.allowed and g.at >= date_trunc('month', now())) >= r.monthly_call_cap then reason := 'budget_exhausted';
-    elsif (select count(*) from public.x1_gate_log g where g.code = p_code and g.allowed and g.at >= now() - interval '1 minute') >= r.rate_per_min then reason := 'rate_limited';
-    elsif coalesce(p_write, false) and r.dry_run then reason := 'dry_run'; dry := true;
-    else allow := true; reason := 'ok';
-    end if;
-  end if;
-  insert into public.x1_gate_log (code, kind, write, allowed, reason, actor, actor_type) values (p_code, p_kind, coalesce(p_write, false), allow, reason, auth.uid(), act_type);
-  return jsonb_build_object('allow', allow, 'reason', reason, 'dry_run', dry, 'code', p_code, 'kind', p_kind);
-end $$;
-
--- ---------- job functions (ops bots and the owner) ----------
-create or replace function public.job_run_start(p_job text, p_dry boolean default true) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare rid bigint; reason text := null;
-begin
-  if not public._x1_job_ok() then raise exception 'not allowed'; end if;
-  if p_job is null or p_job !~ '^[a-z_]{2,40}$' then raise exception 'bad_input'; end if;
-  if not public.rule_on('automation_on') then reason := 'automation_off'; elsif public._x1_pause_active() then reason := 'paused'; end if;
-  if reason is not null then
-    insert into public.job_runs (job, dry_run, finished_at, ok, error, bot) values (p_job, coalesce(p_dry, true), now(), null, 'skipped: ' || reason, auth.uid()) returning id into rid;
-    return jsonb_build_object('allowed', false, 'reason', reason, 'run_id', rid, 'dry_run', coalesce(p_dry, true));
-  end if;
-  insert into public.job_runs (job, dry_run, bot) values (p_job, coalesce(p_dry, true), auth.uid()) returning id into rid;
-  return jsonb_build_object('allowed', true, 'reason', 'ok', 'run_id', rid, 'dry_run', coalesce(p_dry, true));
-end $$;
-
-create or replace function public.job_run_finish(p_run bigint, p_ok boolean, p_error text default null, p_counts jsonb default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare n int;
-begin
-  if not public._x1_job_ok() then raise exception 'not allowed'; end if;
-  update public.job_runs set finished_at = now(), ok = p_ok, error = left(public.x1_redact(p_error), 500), counts = coalesce(p_counts, '{}'::jsonb)
-    where id = p_run and (bot = auth.uid() or public.is_owner());
-  get diagnostics n = row_count;
-  return jsonb_build_object('updated', n);
-end $$;
-
-create or replace function public.job_heartbeat(p_job text, p_note text default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-begin
-  if not public._x1_job_ok() then raise exception 'not allowed'; end if;
-  if p_job is null or p_job !~ '^[a-z_]{2,40}$' then raise exception 'bad_input'; end if;
-  insert into public.job_heartbeat (job, seen_at, note) values (p_job, now(), left(public.x1_redact(p_note), 200))
-    on conflict (job) do update set seen_at = now(), note = excluded.note;
-  return jsonb_build_object('job', p_job, 'ok', true);
-end $$;
-
--- ---------- owner: the registry ----------
-create or replace function public.integration_set(p_code text, p_fields jsonb) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare r public.integration_registry; f jsonb := coalesce(p_fields, '{}'::jsonb); k text; newcfg jsonb; newenv text[]; changed boolean := false;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  select * into r from public.integration_registry where code = p_code for update;
-  if not found then raise exception 'integration_not_found'; end if;
-  for k in select jsonb_object_keys(f) loop
-    if k not in ('config', 'env_names', 'rate_per_min', 'monthly_call_cap', 'enabled', 'read_only', 'dry_run') then raise exception 'field_not_allowed: %', k; end if;
-  end loop;
-  newcfg := case when f ? 'config' then f -> 'config' else r.config end;
-  newenv := case when f ? 'env_names' then array(select jsonb_array_elements_text(f -> 'env_names')) else r.env_names end;
-  if jsonb_typeof(newcfg) <> 'object' then raise exception 'bad_input: config must be an object'; end if;
-  changed := newcfg is distinct from r.config or newenv is distinct from r.env_names;
-  update public.integration_registry set
-    config = newcfg, env_names = newenv,
-    rate_per_min = coalesce((f ->> 'rate_per_min')::int, rate_per_min),
-    monthly_call_cap = coalesce((f ->> 'monthly_call_cap')::int, monthly_call_cap),
-    enabled = coalesce((f ->> 'enabled')::boolean, enabled),
-    read_only = coalesce((f ->> 'read_only')::boolean, read_only),
-    dry_run = coalesce((f ->> 'dry_run')::boolean, dry_run),
-    status = case when changed and status = 'not_connected' and (newcfg <> '{}'::jsonb or cardinality(newenv) > 0) then 'configured' else status end,
-    config_version = config_version + case when changed then 1 else 0 end,
-    updated_at = now(), updated_by = auth.uid()
-  where code = p_code returning * into r;
-  if changed then insert into public.integration_config_versions (code, version, config, env_names, changed_by) values (p_code, r.config_version, r.config, r.env_names, auth.uid()); end if;
-  return jsonb_build_object('code', p_code, 'status', r.status, 'enabled', r.enabled, 'read_only', r.read_only, 'dry_run', r.dry_run, 'config_version', r.config_version);
-end $$;
-
--- a test result comes from the server-side check (ops bot or owner); the detail is redacted and short. Never sets a secret.
-create or replace function public.integration_test_record(p_code text, p_ok boolean, p_detail text default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare r public.integration_registry;
-begin
-  if not public._x1_job_ok() then raise exception 'not allowed'; end if;
-  update public.integration_registry set last_test_at = now(), last_test_ok = p_ok, last_test_detail = left(public.x1_redact(p_detail), 300),
-    last_ok_at = case when p_ok then now() else last_ok_at end,
-    last_error_at = case when p_ok then last_error_at else now() end,
-    last_error = case when p_ok then null else left(public.x1_redact(p_detail), 300) end,
-    status = case when status = 'disabled' then 'disabled' when p_ok then 'connected' else 'error' end,
-    updated_at = now(), updated_by = auth.uid()
-  where code = p_code returning * into r;
-  if not found then raise exception 'integration_not_found'; end if;
-  return jsonb_build_object('code', p_code, 'status', r.status, 'last_test_ok', r.last_test_ok);
-end $$;
-
--- the owner records that a webhook / API secret was rotated: the NAME and the time only, never the value
-create table if not exists public.webhook_rotations (
-  id bigserial primary key,
-  code text not null references public.integration_registry(code),
-  env_name text not null check (env_name ~ '^[A-Z][A-Z0-9_]{2,60}$'),
-  rotated_at timestamptz not null default now(), rotated_by uuid,
-  note text
-);
-create or replace function public.webhook_rotation_record(p_code text, p_env_name text, p_note text default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare rid bigint;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  insert into public.webhook_rotations (code, env_name, rotated_by, note) values (p_code, p_env_name, auth.uid(), left(public.x1_redact(p_note), 200)) returning id into rid;
-  return jsonb_build_object('id', rid, 'code', p_code);
-end $$;
-
--- ---------- owner: agent accounts ----------
-create or replace function public.agent_account_set(p_user uuid, p_agent_name text, p_active boolean default true) returns jsonb
-language plpgsql security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if p_user is null or p_agent_name is null or p_agent_name !~ '^[a-z][a-z0-9_]{2,40}$' or p_active is null then raise exception 'bad_input'; end if;
-  if p_user = auth.uid() then raise exception 'owner_cannot_be_agent'; end if;
-  if not exists (select 1 from public.profiles where id = p_user) then raise exception 'user_not_found'; end if;
-  if exists (select 1 from public.user_roles where user_id = p_user) or exists (select 1 from public.user_grants where user_id = p_user) then
-    raise exception 'agent_must_have_no_roles_or_grants';
-  end if;
-  insert into public.agent_accounts (user_id, agent_name, active, created_by) values (p_user, p_agent_name, p_active, auth.uid())
-    on conflict (user_id) do update set agent_name = excluded.agent_name, active = excluded.active, updated_at = now();
-  return jsonb_build_object('user_id', p_user, 'agent_name', p_agent_name, 'active', p_active);
-end $$;
-
--- ---------- audit actor columns (nullable; default human) ----------
-alter table public.audit_log add column if not exists actor_type text default 'human';
-alter table public.audit_log add column if not exists agent_id text;
-alter table public.audit_log add column if not exists on_behalf_of uuid;
-create or replace function public._x1_audit_actor() returns trigger language plpgsql security definer set search_path = public as $$
-declare ag text := public._x1_agent();
-begin
-  if ag is not null then new.actor_type := 'agent'; new.agent_id := ag;
-  elsif public._x1_is_bot() then new.actor_type := 'bot';
-  elsif new.actor_type is null then new.actor_type := 'human';
+  if new.rpc_name ~ '(set_rule|grant|audit|journal|post|ledger|finance|account|role|user|secret|period|close|void|refund|pay|set_)' then
+    raise exception 'target_not_allowed: % can never be a proposal target (rules, grants, audit and money are never proposed)', new.rpc_name;
   end if;
   return new;
 end $$;
-drop trigger if exists audit_log_x1_actor on public.audit_log;
-create trigger audit_log_x1_actor before insert on public.audit_log for each row execute function public._x1_audit_actor();
+drop trigger if exists action_targets_guard on public.action_targets;
+create trigger action_targets_guard before insert or update on public.action_targets for each row execute function public._x1_target_guard();
 
--- ---------- public site config (read by the website, phase X2) ----------
-create table if not exists public.site_config (
-  id int primary key default 1 check (id = 1),
-  domain text, public_base_url text,
-  brand_name_bn text, brand_name_en text,
-  logo_ref text, contact_phone text, contact_email text,
-  theme jsonb not null default '{}'::jsonb,
-  allowed_origins text[] not null default '{}'::text[],
-  published boolean not null default false,
-  updated_at timestamptz not null default now(), updated_by uuid
+-- ---------- proposals ----------
+create table if not exists public.action_proposals (
+  id bigserial primary key,
+  client_id uuid not null unique,                              -- idempotency key: the same proposal is never queued twice
+  proposed_by uuid not null,
+  proposer_kind text not null check (proposer_kind in ('agent', 'automation', 'owner')),
+  target_rpc text not null references public.action_targets(rpc_name),
+  args jsonb not null default '{}'::jsonb,
+  risk text not null check (risk in ('low', 'medium', 'high')),
+  reason_for text not null check (length(btrim(reason_for)) > 0),
+  status text not null default 'proposed' check (status in ('proposed', 'approved', 'rejected', 'executed', 'failed', 'expired')),
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default now() + interval '3 days',
+  decided_by uuid, decided_at timestamptz, decision_reason text,
+  executed_at timestamptz, exec_ok boolean, exec_result jsonb,
+  constraint action_proposals_reject_reason check (status <> 'rejected' or length(btrim(coalesce(decision_reason, ''))) > 0),
+  constraint action_proposals_not_self check (decided_by is null or decided_by <> proposed_by)
 );
-insert into public.site_config (id) values (1) on conflict (id) do nothing;
-create or replace function public.site_config_set(p_fields jsonb) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare f jsonb := coalesce(p_fields, '{}'::jsonb); k text; o text; r public.site_config;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  for k in select jsonb_object_keys(f) loop
-    if k not in ('domain', 'public_base_url', 'brand_name_bn', 'brand_name_en', 'logo_ref', 'contact_phone', 'contact_email', 'theme', 'allowed_origins', 'published') then raise exception 'field_not_allowed: %', k; end if;
-  end loop;
-  if f ? 'public_base_url' and f ->> 'public_base_url' is not null and f ->> 'public_base_url' !~ '^https://[a-z0-9.-]+(/.*)?$' then raise exception 'bad_input: public_base_url must be https'; end if;
-  if f ? 'allowed_origins' then
-    for o in select jsonb_array_elements_text(f -> 'allowed_origins') loop
-      if o !~ '^https://[a-z0-9.-]+$' then raise exception 'bad_input: allowed origin must be https://host'; end if;
-    end loop;
-  end if;
-  if f ? 'theme' and jsonb_typeof(f -> 'theme') <> 'object' then raise exception 'bad_input: theme must be an object'; end if;
-  update public.site_config set
-    domain = case when f ? 'domain' then f ->> 'domain' else domain end,
-    public_base_url = case when f ? 'public_base_url' then f ->> 'public_base_url' else public_base_url end,
-    brand_name_bn = case when f ? 'brand_name_bn' then f ->> 'brand_name_bn' else brand_name_bn end,
-    brand_name_en = case when f ? 'brand_name_en' then f ->> 'brand_name_en' else brand_name_en end,
-    logo_ref = case when f ? 'logo_ref' then f ->> 'logo_ref' else logo_ref end,
-    contact_phone = case when f ? 'contact_phone' then f ->> 'contact_phone' else contact_phone end,
-    contact_email = case when f ? 'contact_email' then f ->> 'contact_email' else contact_email end,
-    theme = case when f ? 'theme' then f -> 'theme' else theme end,
-    allowed_origins = case when f ? 'allowed_origins' then array(select jsonb_array_elements_text(f -> 'allowed_origins')) else allowed_origins end,
-    published = case when f ? 'published' then (f ->> 'published')::boolean else published end,
-    updated_at = now(), updated_by = auth.uid()
-  where id = 1 returning * into r;
-  return jsonb_build_object('published', r.published, 'domain', r.domain, 'public_base_url', r.public_base_url);
-end $$;
--- signed-in readers only (anon is refused); the website reads it through this function
-create or replace function public.site_config_get() returns jsonb
-language sql stable security definer set search_path = public as $$
-  select case when public.is_active() then (select jsonb_build_object('published', s.published, 'domain', s.domain, 'public_base_url', s.public_base_url,
-      'brand_name_bn', s.brand_name_bn, 'brand_name_en', s.brand_name_en, 'logo_ref', s.logo_ref, 'contact_phone', s.contact_phone,
-      'contact_email', s.contact_email, 'theme', s.theme, 'allowed_origins', to_jsonb(s.allowed_origins)) from public.site_config s where s.id = 1) end;
+create index if not exists action_proposals_open on public.action_proposals (status, id);
+
+-- ---------- helpers ----------
+create or replace function public._x1_can_propose() returns boolean language sql stable security definer set search_path = public as $$
+  select public.is_owner() or public._x1_is_bot() or public._x1_agent() is not null;
 $$;
 
--- ---------- row level security: read by the owner, writes only through the functions above ----------
+-- ---------- owner: the allowlist ----------
+create or replace function public.action_target_set(p_rpc text, p_label_bn text, p_label_en text, p_risk text, p_enabled boolean) returns jsonb
+language plpgsql security definer set search_path = public as $$
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  if p_rpc is null or p_risk not in ('low', 'medium', 'high') or p_enabled is null or p_label_en is null or p_label_bn is null then raise exception 'bad_input'; end if;
+  insert into public.action_targets (rpc_name, label_bn, label_en, risk, enabled, updated_by) values (p_rpc, p_label_bn, p_label_en, p_risk, p_enabled, auth.uid())
+    on conflict (rpc_name) do update set label_bn = excluded.label_bn, label_en = excluded.label_en, risk = excluded.risk, enabled = excluded.enabled, updated_at = now(), updated_by = auth.uid();
+  return jsonb_build_object('rpc', p_rpc, 'enabled', p_enabled, 'risk', p_risk);
+end $$;
+
+-- ---------- propose (agent, automation bot or owner) ----------
+create or replace function public.action_propose(p_client uuid, p_target text, p_args jsonb, p_reason text, p_expires_hours int default 72) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare t public.action_targets; rid bigint; kind text; ex int := least(greatest(coalesce(p_expires_hours, 72), 1), 720);
+begin
+  if not public._x1_can_propose() then raise exception 'not allowed'; end if;
+  if p_client is null or p_target is null or p_reason is null or length(btrim(p_reason)) = 0 then raise exception 'bad_input'; end if;
+  if jsonb_typeof(coalesce(p_args, '{}'::jsonb)) <> 'object' then raise exception 'bad_input: args must be an object'; end if;
+  select * into t from public.action_targets where rpc_name = p_target;
+  if not found or not t.enabled then raise exception 'target_not_enabled'; end if;
+  if exists (select 1 from public.action_proposals where client_id = p_client) then
+    select id into rid from public.action_proposals where client_id = p_client;
+    return jsonb_build_object('id', rid, 'duplicate', true);
+  end if;
+  kind := case when public.is_owner() then 'owner' when public._x1_agent() is not null then 'agent' else 'automation' end;
+  insert into public.action_proposals (client_id, proposed_by, proposer_kind, target_rpc, args, risk, reason_for, expires_at)
+    values (p_client, auth.uid(), kind, p_target, coalesce(p_args, '{}'::jsonb), t.risk, left(public.x1_redact(p_reason), 300), now() + make_interval(hours => ex))
+    returning id into rid;
+  return jsonb_build_object('id', rid, 'status', 'proposed', 'risk', t.risk, 'duplicate', false);
+end $$;
+
+-- ---------- decide (owner only, never the proposer) ----------
+create or replace function public.action_decide(p_id bigint, p_decision text, p_reason text default null) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare pr public.action_proposals; ns text;
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  select * into pr from public.action_proposals where id = p_id for update;
+  if not found then raise exception 'proposal_not_found'; end if;
+  if pr.proposed_by = auth.uid() then raise exception 'own_proposal_cannot_be_decided'; end if;
+  if pr.status <> 'proposed' then raise exception 'not_open: status is %', pr.status; end if;
+  if p_decision not in ('approve', 'reject') then raise exception 'bad_input'; end if;
+  if pr.expires_at <= now() then
+    update public.action_proposals set status = 'expired' where id = p_id;
+    return jsonb_build_object('id', p_id, 'status', 'expired');
+  end if;
+  if p_decision = 'reject' and length(btrim(coalesce(p_reason, ''))) = 0 then raise exception 'reject_reason_required'; end if;
+  ns := case when p_decision = 'approve' then 'approved' else 'rejected' end;
+  update public.action_proposals set status = ns, decided_by = auth.uid(), decided_at = now(), decision_reason = left(public.x1_redact(p_reason), 300) where id = p_id;
+  return jsonb_build_object('id', p_id, 'status', ns, 'target_rpc', pr.target_rpc, 'args', pr.args);
+end $$;
+
+-- ---------- record the result after the approver's own session ran the target (owner only) ----------
+create or replace function public.action_proposal_mark_executed(p_id bigint, p_ok boolean, p_result jsonb default null) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare ns text;
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  if p_ok is null then raise exception 'bad_input'; end if;
+  ns := case when p_ok then 'executed' else 'failed' end;
+  update public.action_proposals set status = ns, executed_at = now(), exec_ok = p_ok,
+      exec_result = case when length(coalesce(p_result, '{}'::jsonb)::text) <= 2000 then coalesce(p_result, '{}'::jsonb) else jsonb_build_object('truncated', true) end
+    where id = p_id and status = 'approved' and decided_by = auth.uid();
+  if not found then raise exception 'not_approved_by_you'; end if;
+  return jsonb_build_object('id', p_id, 'status', ns);
+end $$;
+
+-- ---------- list (owner sees all; a proposer sees its own) ----------
+create or replace function public.action_proposals_list(p_status text default null, p_limit int default 100) returns jsonb
+language sql stable security definer set search_path = public as $$
+  select case when public.is_owner() or public._x1_can_propose() then coalesce((select jsonb_agg(to_jsonb(z) order by z.id desc) from (
+    select p.id, p.proposer_kind, p.target_rpc, p.risk, p.reason_for, p.status, p.created_at, p.expires_at, p.decided_at, p.decision_reason, p.executed_at, p.exec_ok
+      from public.action_proposals p where (p_status is null or p.status = p_status) and (public.is_owner() or p.proposed_by = auth.uid())
+      order by p.id desc limit least(greatest(coalesce(p_limit, 100), 1), 500)) z), '[]'::jsonb) end;
+$$;
+
+-- ---------- health (owner only; a missing source is reported as missing, never as healthy) ----------
+create or replace function public.x1_health() returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare res jsonb := '{}'::jsonb; jobs jsonb; regs jsonb; bk jsonb; fr jsonb; fails int; outbox jsonb;
+begin
+  if not public.is_owner() then raise exception 'not allowed'; end if;
+  select coalesce(jsonb_agg(jsonb_build_object('code', r.code, 'kind', r.kind, 'label_en', r.label_en, 'status', r.status, 'enabled', r.enabled,
+      'last_ok_at', r.last_ok_at, 'last_error_at', r.last_error_at, 'last_error', r.last_error, 'last_test_at', r.last_test_at,
+      'state', case when r.status = 'disabled' or not r.enabled then 'off' when r.status = 'not_connected' then 'not_connected'
+                    when r.status = 'error' then 'error' when r.last_test_at is null then 'unverified' else 'ok' end) order by r.code), '[]'::jsonb)
+    into regs from public.integration_registry r;
+  -- expected jobs and how long each may stay quiet before it is called stale
+  with exp(job, max_hours) as (values ('notify_digest', 2), ('notify_sms', 2), ('intake_retry', 2), ('kb_rebuild', 36), ('backup', 36)),
+  last_ok as (select j.job, max(j.started_at) filter (where j.ok) as ok_at, max(j.started_at) filter (where j.ok is not null) as any_at, count(*) filter (where j.ok is false) as fails_recent
+    from public.job_runs j where j.started_at > now() - interval '7 days' group by j.job)
+  select coalesce(jsonb_agg(jsonb_build_object('job', e.job, 'last_ok_at', l.ok_at, 'last_run_at', l.any_at,
+      'state', case when l.any_at is null then 'never_run'
+                    when l.ok_at is null then 'failed'
+                    when l.ok_at < now() - make_interval(hours => e.max_hours) then 'stale'
+                    else 'ok' end) order by e.job), '[]'::jsonb)
+    into jobs from exp e left join last_ok l on l.job = e.job;
+  select count(*) into fails from public.intake_failures where state in ('failed', 'dead');
+  begin bk := public.backup_status(); exception when others then bk := jsonb_build_object('state', 'missing'); end;
+  begin fr := public._w1g_freshness(); exception when others then fr := jsonb_build_object('state', 'missing'); end;
+  select coalesce(jsonb_object_agg(s.status, s.n), '{}'::jsonb) into outbox from (select status, count(*) n from public.notify_outbox group by status) s;
+  res := jsonb_build_object(
+    'automation_on', public.rule_on('automation_on'),
+    'paused', public._x1_pause_active(),
+    'pause_until', public.rule_txt('automation_pause_until'),
+    'integrations', regs,
+    'jobs', jobs,
+    'intake_failed_or_dead', fails,
+    'outbox', outbox,
+    'backup', coalesce(bk, '{}'::jsonb),
+    'books', coalesce(fr, '{}'::jsonb),
+    'proposals_open', (select count(*) from public.action_proposals where status = 'proposed'),
+    'generated_at', now());
+  return res;
+end $$;
+
+-- ---------- row level security, rights ----------
 do $$ declare t text; begin
-  foreach t in array array['integration_registry', 'integration_config_versions', 'job_runs', 'job_heartbeat', 'agent_accounts', 'x1_gate_log', 'webhook_rotations', 'site_config'] loop
+  foreach t in array array['action_targets', 'action_proposals'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('revoke all on public.%I from public, anon, authenticated', t);
     execute format('grant select on public.%I to authenticated', t);
@@ -382,38 +179,21 @@ do $$ declare t text; begin
     execute format('create trigger %I before delete on public.%I for each row execute function public.no_hard_delete()', t || '_no_delete', t);
   end loop;
 end $$;
-drop policy if exists x1_registry_read on public.integration_registry;
-create policy x1_registry_read on public.integration_registry for select to authenticated using (public.is_owner());
-drop policy if exists x1_versions_read on public.integration_config_versions;
-create policy x1_versions_read on public.integration_config_versions for select to authenticated using (public.is_owner());
-drop policy if exists x1_jobs_read on public.job_runs;
-create policy x1_jobs_read on public.job_runs for select to authenticated using (public.is_owner());
-drop policy if exists x1_heartbeat_read on public.job_heartbeat;
-create policy x1_heartbeat_read on public.job_heartbeat for select to authenticated using (public.is_owner());
-drop policy if exists x1_agents_read on public.agent_accounts;
-create policy x1_agents_read on public.agent_accounts for select to authenticated using (public.is_owner());
-drop policy if exists x1_gate_read on public.x1_gate_log;
-create policy x1_gate_read on public.x1_gate_log for select to authenticated using (public.is_owner());
-drop policy if exists x1_rotations_read on public.webhook_rotations;
-create policy x1_rotations_read on public.webhook_rotations for select to authenticated using (public.is_owner());
-drop policy if exists x1_site_read on public.site_config;
-create policy x1_site_read on public.site_config for select to authenticated using (public.is_owner());
-drop trigger if exists x1_registry_audit on public.integration_registry;
-create trigger x1_registry_audit after insert or update on public.integration_registry for each row execute function public.log_change('code');
-drop trigger if exists x1_site_audit on public.site_config;
-create trigger x1_site_audit after update on public.site_config for each row execute function public.log_change('id');
-drop trigger if exists x1_agents_audit on public.agent_accounts;
-create trigger x1_agents_audit after insert or update on public.agent_accounts for each row execute function public.log_change('user_id');
+drop policy if exists x1_targets_read on public.action_targets;
+create policy x1_targets_read on public.action_targets for select to authenticated using (public.is_owner());
+drop policy if exists x1_proposals_read on public.action_proposals;
+create policy x1_proposals_read on public.action_proposals for select to authenticated using (public.is_owner() or proposed_by = auth.uid());
+drop trigger if exists x1_targets_audit on public.action_targets;
+create trigger x1_targets_audit after insert or update on public.action_targets for each row execute function public.log_change('rpc_name');
+drop trigger if exists x1_proposals_audit on public.action_proposals;
+create trigger x1_proposals_audit after insert or update on public.action_proposals for each row execute function public.log_change('id');
 
--- ---------- execute rights: nothing for anon; signed-in roles only where the function checks the caller ----------
 do $$ declare f text; begin
-  foreach f in array array['public._x1_is_bot()', 'public._x1_job_ok()', 'public._x1_agent()', 'public._x1_pause_active()', 'public._x1_registry_guard()', 'public._x1_agent_guard_roles()',
-    'public._x1_agent_guard_grants()', 'public._x1_audit_actor()', 'public.x1_redact(text)'] loop
+  foreach f in array array['public._x1_can_propose()', 'public._x1_target_guard()'] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);
   end loop;
-  foreach f in array array['public.x1_gate(text,text,boolean,uuid)', 'public.job_run_start(text,boolean)', 'public.job_run_finish(bigint,boolean,text,jsonb)',
-    'public.job_heartbeat(text,text)', 'public.integration_set(text,jsonb)', 'public.integration_test_record(text,boolean,text)', 'public.webhook_rotation_record(text,text,text)',
-    'public.agent_account_set(uuid,text,boolean)', 'public.site_config_set(jsonb)', 'public.site_config_get()'] loop
+  foreach f in array array['public.action_target_set(text,text,text,text,boolean)', 'public.action_propose(uuid,text,jsonb,text,int)', 'public.action_decide(bigint,text,text)',
+    'public.action_proposal_mark_executed(bigint,boolean,jsonb)', 'public.action_proposals_list(text,int)', 'public.x1_health()'] loop
     execute format('revoke all on function %s from public, anon', f);
     execute format('grant execute on function %s to authenticated', f);
   end loop;

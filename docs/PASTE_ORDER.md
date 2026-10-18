@@ -1,6 +1,6 @@
 # PASTE ORDER: the Supabase SQL files, in order
 
-This is the owner's list of every phase file in `supabase/` from phase 8 to phase 554, in the order to paste them. One line per file.
+This is the owner's list of every phase file in `supabase/` from phase 8 to phase 498, in the order to paste them. One line per file.
 
 **Read first.** Nothing in this list was pasted by an agent. The owner pastes the SQL himself, after review, into the live project (CLAUDE.md, Database safety). Everything new starts OFF or blank: pasting a file adds tables, functions and settings, but no feature turns on until the owner switches it on (see `docs/GO_LIVE.md`).
 
@@ -11,15 +11,42 @@ This is the owner's list of every phase file in `supabase/` from phase 8 to phas
 - **Package.** The build package the file belongs to (W1-A, RPT-B4, X1 and so on). `base` is the product as it was before the packages.
 - **What it does.** One line. The file's own header says what it needs ("Run AFTER ...") and what it leaves alone; read that header before a paste if you are unsure.
 
-## Numbering of phases 480 to 554: read this
+## Numbering of phases 479 to 498: read this
 
-Phases 480 to 554 (the X-packages X1 to XC, the XB package and the RPT, CRM and XC work in that range) were numbered by **several builders working in parallel**. The numbers were picked to avoid clashes, not to show the build or the dependency order. So a higher number does not mean "built later", and two neighbouring numbers may not depend on each other at all.
+Phases 479 to 498 (the X-packages X1 to XC, the XB package and the RPT, CRM and XC work in that range) were numbered by **several builders working in parallel**. The numbers were picked to avoid clashes, not to show the build or the dependency order. So a higher number does not mean "built later", and two neighbouring numbers may not depend on each other at all.
 
 The positions below follow the numbers, which is the order `tests/sql/ORDER.txt` uses. Each file's header lists what it needs. If a file's header says it needs another phase, paste that phase first, even if its number is higher.
 
-## Phases 540 to 542 (XB): not yet in `tests/sql/ORDER.txt`
+## Renumbered from (paste order kept)
 
-Phases 540, 541 and 542 say "Run AFTER phase 478" in their headers, but they are missing from `tests/sql/ORDER.txt`, so the build scripts never build them. They are listed here at their numeric position (after 533, before 550). Before pasting them in the live project, the owner or a builder should add them to `tests/sql/ORDER.txt` and run the local build once.
+The parallel-builder files were renumbered in paste order so the sequence continues after phase 478. No SQL body changed; only file names, references in text files and the header comments that named their own file. Old name -> new name, with `_test` files following their main file:
+
+| Old number | New number |
+|---|---|
+| 480 | 479 |
+| 481 | 480 |
+| 490 | 481 |
+| 491 | 482 |
+| 500 | 483 |
+| 510 | 484 |
+| 511 | 485 |
+| 520 | 486 |
+| 530 | 487 |
+| 531 | 488 |
+| 532 | 489 |
+| 533 | 490 |
+| 540 | 491 |
+| 541 | 492 |
+| 542 | 493 |
+| 550 | 494 |
+| 551 | 495 |
+| 552 | 496 |
+| 553 | 497 |
+| 554 | 498 |
+
+## Phases 491 to 493 (XB): not yet in `tests/sql/ORDER.txt`
+
+Phases 491, 492 and 493 say "Run AFTER phase 478" in their headers, but they are missing from `tests/sql/ORDER.txt`, so the build scripts never build them. They are listed here at their numeric position (after 490, before 494). Before pasting them in the live project, the owner or a builder should add them to `tests/sql/ORDER.txt` and run the local build once.
 
 ## Never paste these
 
@@ -28,7 +55,7 @@ Phases 540, 541 and 542 say "Run AFTER phase 478" in their headers, but they are
 - `ALL_NEW*.sql`: full bundles for a brand-new empty project only (see `docs/SETUP.md`). Do not mix them with this list.
 - `phase14_import*` and `phase30_controls*`: data and UI helper files, not schema phases.
 
-Phases 8 to 554 have 184 files in `supabase/`. The numbers between them (for example 29 to 39, 55 to 59, 100 to 119) have no file, so no line here.
+Phases 8 to 498 have 184 files in `supabase/`. The numbers between them (for example 29 to 39, 55 to 59, 100 to 119) have no file, so no line here.
 
 ## Paste steps (short)
 
@@ -207,26 +234,26 @@ Positions 8 to 99 are the base and Wave 1. If the live project already has some 
 | 162 | `phase476.sql` | RPT-HUB | Spend explorer: how much was spent on what, for whom, where (RPT-HUB) |
 | 163 | `phase477.sql` | integrator | Re-patch of every package hook plus integration glue; paste after 476 (integrator) |
 | 164 | `phase478.sql` | integrator | Closes the small helper functions to the signed-out role; paste after 477 (integrator) |
-| 165 | `phase480.sql` | X1 | X1 foundation part 1: connection registry, job runs, one gate for outside and AI calls, agent identities (X1) |
-| 166 | `phase481.sql` | X1 | X1 foundation part 2: approval queue for agent proposals, health view (X1) |
-| 167 | `phase490.sql` | X2 | X2 website part 1: settings (OFF), catalogue publishing, public read functions (X2) |
-| 168 | `phase491.sql` | X2 | X2 website part 2: checkout, stock holds, tracking, custom cake requests, owner admin (X2) |
-| 169 | `phase500.sql` | X3 | X3 social and marketing workspace: content, approval, publishing queue, metrics (X3, OFF) |
-| 170 | `phase510.sql` | X4 | X4 AI foundation: provider registry, monthly budgets, redaction, agent catalogue, call log (X4, OFF) |
-| 171 | `phase511.sql` | X4 | X4 AI knowledge, suggestions, feedback, evaluation (X4, OFF) |
-| 172 | `phase520.sql` | X5 | X5 item recognition foundation: duplicate check, review record, aliases, asset details (X5) |
-| 173 | `phase530.sql` | X6 | X6 market intelligence foundation: settings (OFF), rights, tables (X6) |
-| 174 | `phase531.sql` | X6 | X6 workspace: topics, sources, findings, competitor prices, opportunities (X6) |
-| 175 | `phase532.sql` | X6 | X6 growth intelligence from own data, read-only (X6) |
-| 176 | `phase533.sql` | X6 | X6 scheduled research hook (OFF), AI summariser slot, competitor price alerts, weekly digest (X6) |
-| 177 | `phase540.sql` | XB | XB part 1: bKash, Nagad, Rocket payment capture and reconciliation (XB) |
-| 178 | `phase541.sql` | XB | XB part 2: custom-cake workflow on top of an app order (XB) |
-| 179 | `phase542.sql` | XB | XB part 3: riders, delivery status, zones, cash on delivery per rider per day (XB) |
-| 180 | `phase550.sql` | XC | XC-1 owner daily summary, recipients, send log, receipt continuity (XC, OFF) |
-| 181 | `phase551.sql` | XC | XC-2 daily production suggestion, baker's confirmation, accuracy report (XC, OFF) |
-| 182 | `phase552.sql` | XC | XC-3 supplier price board, rise alert (threshold blank), recipe-cost preview (XC, OFF) |
-| 183 | `phase553.sql` | XC | XC-4 unsold stock and markdown list, wastage share (XC, OFF, markdown % blank) |
-| 184 | `phase554.sql` | XC | XC-5 owner-only staff coaching board, no rankings (XC, OFF) |
+| 165 | `phase479.sql` | X1 | X1 foundation part 1: connection registry, job runs, one gate for outside and AI calls, agent identities (X1) |
+| 166 | `phase480.sql` | X1 | X1 foundation part 2: approval queue for agent proposals, health view (X1) |
+| 167 | `phase481.sql` | X2 | X2 website part 1: settings (OFF), catalogue publishing, public read functions (X2) |
+| 168 | `phase482.sql` | X2 | X2 website part 2: checkout, stock holds, tracking, custom cake requests, owner admin (X2) |
+| 169 | `phase483.sql` | X3 | X3 social and marketing workspace: content, approval, publishing queue, metrics (X3, OFF) |
+| 170 | `phase484.sql` | X4 | X4 AI foundation: provider registry, monthly budgets, redaction, agent catalogue, call log (X4, OFF) |
+| 171 | `phase485.sql` | X4 | X4 AI knowledge, suggestions, feedback, evaluation (X4, OFF) |
+| 172 | `phase486.sql` | X5 | X5 item recognition foundation: duplicate check, review record, aliases, asset details (X5) |
+| 173 | `phase487.sql` | X6 | X6 market intelligence foundation: settings (OFF), rights, tables (X6) |
+| 174 | `phase488.sql` | X6 | X6 workspace: topics, sources, findings, competitor prices, opportunities (X6) |
+| 175 | `phase489.sql` | X6 | X6 growth intelligence from own data, read-only (X6) |
+| 176 | `phase490.sql` | X6 | X6 scheduled research hook (OFF), AI summariser slot, competitor price alerts, weekly digest (X6) |
+| 177 | `phase491.sql` | XB | XB part 1: bKash, Nagad, Rocket payment capture and reconciliation (XB) |
+| 178 | `phase492.sql` | XB | XB part 2: custom-cake workflow on top of an app order (XB) |
+| 179 | `phase493.sql` | XB | XB part 3: riders, delivery status, zones, cash on delivery per rider per day (XB) |
+| 180 | `phase494.sql` | XC | XC-1 owner daily summary, recipients, send log, receipt continuity (XC, OFF) |
+| 181 | `phase495.sql` | XC | XC-2 daily production suggestion, baker's confirmation, accuracy report (XC, OFF) |
+| 182 | `phase496.sql` | XC | XC-3 supplier price board, rise alert (threshold blank), recipe-cost preview (XC, OFF) |
+| 183 | `phase497.sql` | XC | XC-4 unsold stock and markdown list, wastage share (XC, OFF, markdown % blank) |
+| 184 | `phase498.sql` | XC | XC-5 owner-only staff coaching board, no rankings (XC, OFF) |
 
 Package names: `base` = the product before the packages; W1-A to W1-G, I-1 = Wave 1 (phases 88 to 99); R1 = pay requests; R2-A to R2-C = announcements, to-do, shifts; W1-FIX = Wave 1 fixes (140 to 143); CRM-A to CRM-H = customer work; RPT-B1 to RPT-C3 and RPT-HUB = reports; integrator = the re-patch and the anon lock (477, 478); X1 to X6, XB and XC = the later packages (all OFF by default).
 

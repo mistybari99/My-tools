@@ -575,35 +575,35 @@ Merge of all finished packages onto one branch; see docs/integration/INTEGRATION
 - Not confirmed: live Supabase, real devices, PostgREST exposure of underscore functions, pg_cron, offline queue for new capture screens, Bangla wording.
 - Manual checks for the owner: switch settings on one at a time in the order given in PASTE_ORDER section 6; run Balance Check after each accounting switch.
 
-## X1 foundation (phases 480 and 481) - local throwaway Postgres only, nothing pushed
+## X1 foundation (phases 479 and 480) - local throwaway Postgres only, nothing pushed
 - Built: Connect Center registry (13 connections, all OFF), job runs and heartbeat, one gate x1_gate for every outside or AI call, agent identities with no role and no grant, audit actor columns (new trigger, no old function patched), approval queue with an allowlist, owner health view, public site config, webhook rotation record. Screens #/connect and #/x1health (owner board widget, off by default), workflow automation.yml (dry run by default), tools/x1_job.py, Test-connection edge source (not deployed).
-- Changed: supabase/phase480*.sql, phase481*.sql (new), tests/sql/ORDER.txt (two lines), web/ia.js (two records), web/index.html (one script tag), web/data/info.json (7 entries merged), tests/web/x1_web_test.js (new), tools/x1_job.py + test, docs/integration/X1.md and X1_info.json.
-- Tests: phase480_test 83/0, phase481_test 43/0, phase99 parity with 480+481 all equal (33 snapshots), test_x1_job OK, x1_web_test OK (360px), ia_test 0 failures, check_info_coverage exit 0.
+- Changed: supabase/phase479*.sql, phase480*.sql (new), tests/sql/ORDER.txt (two lines), web/ia.js (two records), web/index.html (one script tag), web/data/info.json (7 entries merged), tests/web/x1_web_test.js (new), tools/x1_job.py + test, docs/integration/X1.md and X1_info.json.
+- Tests: phase479_test 83/0, phase480_test 43/0, phase99 parity with 479+480 all equal (33 snapshots), test_x1_job OK, x1_web_test OK (360px), ia_test 0 failures, check_info_coverage exit 0.
 - Not confirmed: live Supabase, real GitHub Actions run, deployed Test-connection function, real phone, anon read of site_config (owner decision).
 - Manual checks for the owner: link nothing until a domain or key exists; the first live automation run needs automation_on ON and intake_bots set up (see X1.md section 5).
 ## X2 - website and online shop (branch x2-website, from 6bf2f6f)
-- Changed: new phases `supabase/phase490.sql` (settings, publishing, public reads, closures, pickup, zones) and `supabase/phase491.sql` (checkout, holds, tracking, cancel and custom requests, owner `web_admin_*`, drift, go-live, buckets); tests `supabase/phase491_test.sql` (54 checks), `tests/sql/x2_race.sh` (oversell race); storefront `site/` (10 pages, JS, CSS, sw, manifest); `tools/build_site.py`; `tests/web/site_pages_test.js` (41), `tests/web/website_test.js` (16), `tests/py/test_build_site.py` (13); ERP screen `web/website.js` (route `website` in `web/ia.js`, script tag in `web/index.html`); `.github/workflows/site.yml` (manual only); `docs/WEBSITE_DEPLOY.md`; `docs/integration/X2.md`, `docs/integration/X2_info.json` (merged into `web/data/info.json`, 31 entries); `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` rows 29-30.
-- Checked here: phases 490 and 491 pasted twice on a copy of the base build (local Postgres 16, port 5810): no error. Site pages at 360 px: 41 of 41. ERP screen: 16 of 16. Build check: 13 of 13. Race: 1 sale of 20 parallel checkouts. Info coverage and strict: exit 0. Demo-leak check: OK. UI inventory: OK.
+- Changed: new phases `supabase/phase481.sql` (settings, publishing, public reads, closures, pickup, zones) and `supabase/phase482.sql` (checkout, holds, tracking, cancel and custom requests, owner `web_admin_*`, drift, go-live, buckets); tests `supabase/phase482_test.sql` (54 checks), `tests/sql/x2_race.sh` (oversell race); storefront `site/` (10 pages, JS, CSS, sw, manifest); `tools/build_site.py`; `tests/web/site_pages_test.js` (41), `tests/web/website_test.js` (16), `tests/py/test_build_site.py` (13); ERP screen `web/website.js` (route `website` in `web/ia.js`, script tag in `web/index.html`); `.github/workflows/site.yml` (manual only); `docs/WEBSITE_DEPLOY.md`; `docs/integration/X2.md`, `docs/integration/X2_info.json` (merged into `web/data/info.json`, 31 entries); `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` rows 29-30.
+- Checked here: phases 481 and 482 pasted twice on a copy of the base build (local Postgres 16, port 5810): no error. Site pages at 360 px: 41 of 41. ERP screen: 16 of 16. Build check: 13 of 13. Race: 1 sale of 20 parallel checkouts. Info coverage and strict: exit 0. Demo-leak check: OK. UI inventory: OK.
 - Not confirmed: the full SQL suite (run_all_sql.sh), the full web suite, the GitHub workflow run, a real Supabase storage upload, a real browser against the live project. Not built: accounts and OTP, public coupon check, online payment gateway, captcha provider, loyalty on the site.
-- Manual checks for the owner: paste 490 then 491 on the live project only after review; keep website_on off until a branch, names and one published item are set; place and cancel one test order before sharing the address.
+- Manual checks for the owner: paste 481 then 482 on the live project only after review; keep website_on off until a branch, names and one published item are set; place and cancel one test order before sharing the address.
 ## X3 (social and marketing workspace, publisher, chat-order parser), branch x3-social
 
-* Added: supabase/phase500.sql (+ phase500_test.sql, pasted twice clean on a throwaway database), tools/social_publish.py (+ tests/py/test_social_publish.py), web/order_parser.js (+ tests/web/order_parser_test.js), .github/workflows/social.yml (manual), docs/integration/X3.md, docs/integration/X3_info.json (merged into web/data/info.json), tests/sql/ORDER.txt (phase500 appended).
+* Added: supabase/phase483.sql (+ phase483_test.sql, pasted twice clean on a throwaway database), tools/social_publish.py (+ tests/py/test_social_publish.py), web/order_parser.js (+ tests/web/order_parser_test.js), .github/workflows/social.yml (manual), docs/integration/X3.md, docs/integration/X3_info.json (merged into web/data/info.json), tests/sql/ORDER.txt (phase483 appended).
 * Checked: SQL 62 checks, Python 15, parser 81; check_info_coverage OK, check_no_demo_leak OK, phase477 and report registry checks OK.
 * Not checked: any screen, any live provider, the existing reports before and after (defaults parity), the meta-webhook path. See docs/integration/X3.md section 2 and 5.
-## X4 AI helpers (phases 510-511, branch x4-agents)
+## X4 AI helpers (phases 484-485, branch x4-agents)
 
-What changed: SQL phases 510 (provider registry without key column, monthly budgets, redaction rules, 10 agents all OFF, forbidden action and grant guards, untrusted-input rule, append-only `ai_calls`, owner RPCs) and 511 (verified knowledge with second-owner verification, suggestions with accept/reject/correct and no self-decision, outcomes, evaluation cases and runs, scorecard, usage with owner-typed prices only). JS core `web/ai_core.js` (redaction, schema subset, tool whitelist, untrusted rule, one-round tool limit, gate before provider call, BM25 with authoritative flag). Edge source `tools/edge/ai-proxy.ts` (not deployed). `tools/ai_kb_check.py` + `docs/ai_kb/entries.json` (two PROPOSED entries; nothing verified by the builder). CI `ai-kb.yml` OFF unless repository variable AI_KB_REBUILD is 'true'. Docs: docs/AI_DEPLOY.md, docs/integration/X4.md. (i) entries for the 4 switches merged into web/data/info.json. kb.json rebuilt.
+What changed: SQL phases 484 (provider registry without key column, monthly budgets, redaction rules, 10 agents all OFF, forbidden action and grant guards, untrusted-input rule, append-only `ai_calls`, owner RPCs) and 485 (verified knowledge with second-owner verification, suggestions with accept/reject/correct and no self-decision, outcomes, evaluation cases and runs, scorecard, usage with owner-typed prices only). JS core `web/ai_core.js` (redaction, schema subset, tool whitelist, untrusted rule, one-round tool limit, gate before provider call, BM25 with authoritative flag). Edge source `tools/edge/ai-proxy.ts` (not deployed). `tools/ai_kb_check.py` + `docs/ai_kb/entries.json` (two PROPOSED entries; nothing verified by the builder). CI `ai-kb.yml` OFF unless repository variable AI_KB_REBUILD is 'true'. Docs: docs/AI_DEPLOY.md, docs/integration/X4.md. (i) entries for the 4 switches merged into web/data/info.json. kb.json rebuilt.
 
-Tests run: phase510_test.sql 51/51, phase511_test.sql 34/34 on a throwaway Postgres (port 5830), each file pasted twice without error. tests/web/ai_core_test.js 87/87 (includes 36 injection cases, mock provider only). check_no_demo_leak OK, build_kb --check OK, check_info_coverage OK, build_phase477 --check OK, ai_kb_check OK.
+Tests run: phase484_test.sql 51/51, phase485_test.sql 34/34 on a throwaway Postgres (port 5830), each file pasted twice without error. tests/web/ai_core_test.js 87/87 (includes 36 injection cases, mock provider only). check_no_demo_leak OK, build_kb --check OK, check_info_coverage OK, build_phase477 --check OK, ai_kb_check OK.
 
 Not built yet: AI screens (agent picker, feedback thumbs, proposal inbox, usage/scorecard pages), ia.js registration, speech input, prompt library and redaction editor UI, rate limits per user beyond the existing assistant hour limit, provider adapter run against a live provider, X1 adapter (action_proposals), eval runner against providers. Not run: existing browser suites (kb.json changed).
 
-Owner checks: paste phase510 then phase511 (after phase478) on the TEST project first; confirm ai_on is OFF and ai_agents shows 10 disabled agents; nothing is deployed.
-## X5 camera and item recognition (phase 520, branch x5-camera)
+Owner checks: paste phase484 then phase485 (after phase478) on the TEST project first; confirm ai_on is OFF and ai_agents shows 10 disabled agents; nothing is deployed.
+## X5 camera and item recognition (phase 486, branch x5-camera)
 
 What changed:
-- SQL phase 520 (new file; phase 520_test.sql): rules (all recognition switches OFF; blank limits: photo threshold, OCR max size, OCR languages, vision monthly cap); item_similar (duplicate / similar check, option_similar contract, no pg_trgm); item_new2 (client_id idempotency, barcode and exact-name refusal, similar asks, force); item_new_clients; item_recognition_reviews + item_recognition_review_add; item_aliases + item_alias_approve / item_alias_find; assets brand, serial_no, warranty_until + asset_identity_set. Item_new itself is unchanged.
+- SQL phase 486 (new file; phase 486_test.sql): rules (all recognition switches OFF; blank limits: photo threshold, OCR max size, OCR languages, vision monthly cap); item_similar (duplicate / similar check, option_similar contract, no pg_trgm); item_new2 (client_id idempotency, barcode and exact-name refusal, similar asks, force); item_new_clients; item_recognition_reviews + item_recognition_review_add; item_aliases + item_alias_approve / item_alias_find; assets brand, serial_no, warranty_until + asset_identity_set. Item_new itself is unchanged.
 - Web: web/scan_core.js (pure: engine choice with reasons, label parsing, name ranking, nearest neighbours, photo rules); web/scan.js (engines, name suggestions, Camera & Recognition screen #/camrec); web/scan_native.js (Android bridge, inert in the browser); web/photo.js (one shared shrink / validate / upload-with-retry; the three old shrink copies in entry.js, items2.js and stock2.js now delegate to it); barcode.js (ZXing fallback when BarcodeDetector is missing); item master new-item sheet (suggestions, item_new2 with client id, similar/exists/barcode answers); asset form (brand, serial with scan button, warranty).
 - Service worker bos-sw-v2 with an explicit PRECACHE list (ZXing 336 KB and the small X5 files; OCR files are not precached).
 - Vendored: web/vendor/zxing (@zxing/library 0.21.3, Apache-2.0), web/vendor/tesseract (tesseract.js 5.1.1 and core 5.1.1 SIMD LSTM, Apache-2.0). Checksums in web/vendor/X5_VENDOR.txt. Total about 7.3 MB.
@@ -612,8 +612,8 @@ What changed:
 - tools/edge/vision-proxy.ts: source only; refuses every call (X1 gate, consent, cap, provider, call counter missing).
 
 Checks run (local throwaway Postgres on port 5840, UTF8; never the live project):
-- Base build ORDER=all through phase 478, then phase520 pasted once and twice without error.
-- supabase/phase520_test.sql on a fresh build: 39 pass, 0 fail (run after a rebuild; earlier runs were polluted and are not counted).
+- Base build ORDER=all through phase 478, then phase486 pasted once and twice without error.
+- supabase/phase486_test.sql on a fresh build: 39 pass, 0 fail (run after a rebuild; earlier runs were polluted and are not counted).
 - tests/web/scan_core_test.js (node): 59 pass, 0 fail.
 - tests/web scan_web_test (360 px, headless): camrec rows, defaults OFF, self-test, no horizontal scroll: pass.
 - tests/web barcode_test: pass after one deliberate change: the 'no camera' case now removes the camera API (before, the real headless camera took the fallback path).
@@ -631,16 +631,16 @@ Not built in this package (honest list): outbox queue with IndexedDB for photo u
 ## X6 - Market intelligence and growth (branch x6-research)
 
 What changed
-- New phases 530 (foundation: 9 settings all OFF or blank, 2 rights owner-only, 15 tables with RLS closed by default, append-only and no-delete guards, adapter catalogue with no network), 531 (workspace functions), 532 (own-data growth, read-only), 533 (research gate OFF, adapter switch, job definitions, AI summariser proposals, price alerts, owner digest).
-- tests/sql/ORDER.txt: phases 530-533 added at the end. tests/sql/x6_head.sql and x6_run.sh are the X6 harness; supabase/phase530_test.sql .. phase533_test.sql are the suites.
+- New phases 487 (foundation: 9 settings all OFF or blank, 2 rights owner-only, 15 tables with RLS closed by default, append-only and no-delete guards, adapter catalogue with no network), 488 (workspace functions), 489 (own-data growth, read-only), 533 (research gate OFF, adapter switch, job definitions, AI summariser proposals, price alerts, owner digest).
+- tests/sql/ORDER.txt: phases 487-490 added at the end. tests/sql/x6_head.sql and x6_run.sh are the X6 harness; supabase/phase487_test.sql .. phase490_test.sql are the suites.
 - web/market.js (page #/market, five tabs), web/ia.js (one rec line, group reports), web/index.html (script tag), web/ownerboard.js (widget market_growth: open opportunities, hidden when the workspace is off or the person has no right).
 - docs/integration/X6_info.json merged into web/data/info.json (12 entries: 9 rules, 2 rights, 1 screen). tools/check_info_coverage.py exits 0.
 - docs/PASTE_ORDER.md: row 29.
 
 Checks run (local throwaway Postgres 16, UTF8, port 5850; no live project, no network)
-- Full build with ORDER=all through phase 533: clean.
-- Phases 530-533 each applied twice on the built base: no error (paste-twice).
-- SQL suites: 530 = 17 pass, 531 = 47 pass, 532 = 13 pass, 533 = 30 pass, 0 fail (107 checks: defaults, rights, anon denied, RLS, append-only and no-delete, status machine, own-request block, reasons, tasks, measuring from ERP net, gate, adapters, summariser, alerts, digest).
+- Full build with ORDER=all through phase 490: clean.
+- Phases 487-490 each applied twice on the built base: no error (paste-twice).
+- SQL suites: 487 = 17 pass, 488 = 47 pass, 489 = 13 pass, 490 = 30 pass, 0 fail (107 checks: defaults, rights, anon denied, RLS, append-only and no-delete, status machine, own-request block, reasons, tasks, measuring from ERP net, gate, adapters, summariser, alerts, digest).
 - Web: tests/web/x6_market_test.js (360px, all tabs, no page errors) passes. ia_test, nav2_test, control_test, ownerboard_test, nav_test pass (run from copies on free ports; the originals are fixed to ports another session uses).
 - check_no_demo_leak: OK.
 
@@ -657,19 +657,19 @@ Owner links later
 - Notifications and digest: X1 schedules mi_alert_notify and mi_growth_digest after the switches are set.
 ## XB (order-to-cash, part 1 of 3; branch xb-orders)
 
-- Built (backend only): mobile payment capture, verify, screenshot, statement import and tie-out (phase 540); custom-cake quote, chain, capacity, lead time, cancel via c2_order_cancel, due sheet, customer text (phase 541); riders, zones, delivery states, COD deposits, per-rider reconciliation and cases (phase 542); payment-SMS reader web/xb_paysms.js.
+- Built (backend only): mobile payment capture, verify, screenshot, statement import and tie-out (phase 491); custom-cake quote, chain, capacity, lead time, cancel via c2_order_cancel, due sheet, customer text (phase 492); riders, zones, delivery states, COD deposits, per-rider reconciliation and cases (phase 493); payment-SMS reader web/xb_paysms.js.
 - Not built: festival playbook, ingredient pre-purchase list, web screens, most of item 5. Details in docs/integration/XB.md section 5.
-- Tests: 102 SQL checks (phase540 36, phase541 37, phase542 29; each pasted twice on a local throwaway Postgres, port 5860), 32 SMS samples. check_no_demo_leak OK.
+- Tests: 102 SQL checks (phase491 36, phase492 37, phase493 29; each pasted twice on a local throwaway Postgres, port 5860), 32 SMS samples. check_no_demo_leak OK.
 - Not confirmed: live Supabase, real bKash / Nagad / Rocket SMS wording, defaults-parity snapshot, journal balance run, Bangla wording of new texts.
 - Manual checks for the owner: read docs/integration/XB.md section 3 and 5 before switching anything on; the three new switches are OFF by default.
 ## XC package (branch xc-ops, local only, not pushed)
 
 What changed: new files only, plus appended rows in `tests/sql/ORDER.txt` and `docs/PASTE_ORDER.md` (rows 29 to 33), 13 info entries merged into `web/data/info.json`.
-New SQL: `supabase/phase550.sql` to `phase554.sql` (owner summary and sync alert; production suggestion; price board and alert; unsold and markdown; staff board), each with `*_test.sql`; shared test head `tests/sql/xc_head.sql`.
+New SQL: `supabase/phase494.sql` to `phase498.sql` (owner summary and sync alert; production suggestion; price board and alert; unsold and markdown; staff board), each with `*_test.sql`; shared test head `tests/sql/xc_head.sql`.
 New tools: `tools/owner_summary.py` (dry run unless `--send`), `tools/bump_sw.py`; workflow `.github/workflows/owner_summary.yml`; tests `tests/py/test_xc_owner_summary.py`, `tests/py/test_xc_bump_sw.py`.
 Docs: `docs/integration/XC.md`, `docs/integration/XC_info.json`.
 
-Manual checks run (local throwaway Postgres, port 5870, database built through the whole owner order): full chain builds; phases 550 to 554 pasted twice with no error; SQL suites 38, 28, 23, 27 and 10 checks all pass on the full chain; Python suites all pass; `check_no_demo_leak` OK; `check_info_coverage` exit 0.
+Manual checks run (local throwaway Postgres, port 5870, database built through the whole owner order): full chain builds; phases 494 to 498 pasted twice with no error; SQL suites 38, 28, 23, 27 and 10 checks all pass on the full chain; Python suites all pass; `check_no_demo_leak` OK; `check_info_coverage` exit 0.
 
 Could not confirm: the live Supabase project, a real Gmail send, a real Telegram chat, any phone or 360px screen (no screen was built), the old SQL suites 8 to 87 with these phases, the web suite.
 Not built: screens, the unsynced badge and outbox viewer, low-stock draft orders, cash-count reminder, shop checklist with photos, temperature reminders, SMS and WhatsApp summary.
@@ -687,4 +687,4 @@ Manual check for the owner: open #/switchboard as owner, pick All optional secti
 What changed: `web/app.js` shell() shows "2 ধাপ পেছনে / 2 steps back" and "3 ধাপ পেছনে / 3 steps back" buttons (data-act goback with data-n) only when the chain is deep enough (BOS_NAVSTACK.depth()); the existing arrow and Main button are unchanged. `web/i18n.js` gets keys back2, back3; `web/styles.css` gets `.navback`; `web/sw.js` bumped to bos-sw-v3. `docs/PASTE_ORDER.md` rewritten: one line for each of the 184 phase files from phase 8 to 554 (position, file, package, what it does), with the note that 480 to 554 were numbered by parallel builders and that 540 to 542 are missing from tests/sql/ORDER.txt. `docs/GO_LIVE.md` added (owner steps only; no feature turned on).
 Checks run: navstack_test 14 checks OK; tools/check_info_coverage.py OK; tools/check_ui_inventory.py OK; tools/check_no_demo_leak.py OK; tests/py/test_xc_bump_sw.py ALL PASS. Screens listed in docs/integration X1, X5, X6 info files are all registered in web/ia.js; no screen was built.
 Could not confirm: the full web suite result (see the report of this pass); the back 2/3 buttons on a real phone width; the Bangla wording of the new texts.
-Open: X3 social workspace (phase 500), XC screens and XB screens have no web screen (backend only, as their docs say).
+Open: X3 social workspace (phase 483), XC screens and XB screens have no web screen (backend only, as their docs say).

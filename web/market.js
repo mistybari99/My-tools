@@ -1,6 +1,6 @@
 /* Islamia BOS · Market intelligence and growth (#/market). Package X6. Research topics, sources and findings (with the source, the date and a reliability rating),
    competitor prices (manual or CSV), opportunities (evidence, KPI, confidence limits, a reason on every move, tasks, measuring from ERP sales) and growth from our own sales.
-   Server: supabase/phase530.sql (tables, rights, switches), phase531.sql (write functions), phase532.sql (growth), phase533.sql (research gate OFF, summariser, alerts, digest).
+   Server: supabase/phase487.sql (tables, rights, switches), phase488.sql (write functions), phase489.sql (growth), phase490.sql (research gate OFF, summariser, alerts, digest).
    The server decides every call; a hidden button is also a refused request. Everything is OFF until the owner switches on "Market intelligence workspace".
    Nothing here fetches the internet. Labels are Bangla + English (bn | en). UNVERIFIED on a real phone and on a real Supabase project. */
 (() => {

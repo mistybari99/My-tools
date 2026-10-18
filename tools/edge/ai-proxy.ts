@@ -4,7 +4,7 @@
 //
 // What it does (and only this):
 //   1. Reads the caller's Supabase JWT and asks the database `ai_check(provider, agent, data_level, est_tokens)` AS THAT USER.
-//      Switch, pause, provider enabled, agent enabled, data level, monthly token/money budget: all decided in SQL (phase510).
+//      Switch, pause, provider enabled, agent enabled, data level, monthly token/money budget: all decided in SQL (phase484).
 //      Any refusal -> HTTP 403 with the reason. No model call is made.
 //   2. Sends the REDACTED payload from the browser (web/ai_core.js redacts first; this function re-applies the redaction list it reads
 //      from ai_redaction_rules, so a browser bug cannot send a phone number). Tools are NAMES + descriptions only; the model returns

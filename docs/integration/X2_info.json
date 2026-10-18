@@ -11,7 +11,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_location_id": {
    "title": "Branch that receives web orders",
@@ -24,7 +24,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_brand_bn": {
    "title": "Shop name (Bangla)",
@@ -37,7 +37,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_brand_en": {
    "title": "Shop name (English)",
@@ -50,7 +50,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_whatsapp": {
    "title": "WhatsApp number for orders",
@@ -63,7 +63,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_messenger_url": {
    "title": "Messenger page link",
@@ -76,7 +76,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_public_url": {
    "title": "Public address of the website",
@@ -89,7 +89,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_stock_threshold": {
    "title": "Stock level that shows Limited",
@@ -102,7 +102,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_min_order": {
    "title": "Minimum order (Tk)",
@@ -115,7 +115,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_cutoff_hour": {
    "title": "Same-day order cut-off (hour)",
@@ -128,7 +128,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_lead_days": {
    "title": "Minimum lead days for an order",
@@ -141,7 +141,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pay_cod_on": {
    "title": "Cash on delivery offered",
@@ -154,7 +154,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pay_manual_on": {
    "title": "bKash / Nagad payment with a Trx ID",
@@ -167,7 +167,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pay_mobile_number": {
    "title": "bKash / Nagad number shown to customers",
@@ -180,7 +180,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_reserve_on": {
    "title": "Hold stock at web checkout (hard reservation)",
@@ -193,7 +193,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_reserve_minutes": {
    "title": "Hold time for reserved stock (minutes)",
@@ -206,7 +206,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_rate_max": {
    "title": "Web orders per device in the time window",
@@ -219,7 +219,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_rate_window_min": {
    "title": "Web order limit window (minutes)",
@@ -232,7 +232,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_captcha_on": {
    "title": "Captcha required for web orders",
@@ -245,7 +245,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_custom_cake_on": {
    "title": "Custom cake request form",
@@ -258,7 +258,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_festival_mode_on": {
    "title": "Festival pre-order mode",
@@ -271,7 +271,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_holiday_text_bn": {
    "title": "Closure banner (Bangla)",
@@ -284,7 +284,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_holiday_text_en": {
    "title": "Closure banner (English)",
@@ -297,7 +297,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_ga_id": {
    "title": "Google Analytics ID",
@@ -310,7 +310,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_pixel_id": {
    "title": "Facebook Pixel ID",
@@ -323,7 +323,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_privacy_bn": {
    "title": "Privacy policy (Bangla)",
@@ -336,7 +336,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_privacy_en": {
    "title": "Privacy policy (English)",
@@ -349,7 +349,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_terms_bn": {
    "title": "Terms (Bangla)",
@@ -362,7 +362,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_terms_en": {
    "title": "Terms (English)",
@@ -375,7 +375,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_refund_bn": {
    "title": "Refund and cancellation (Bangla)",
@@ -388,7 +388,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   },
   "rule:website_policy_refund_en": {
    "title": "Refund and cancellation (English)",
@@ -401,7 +401,7 @@
     "screen:website"
    ],
    "verified": true,
-   "src": "phase490.sql; X2 (docs/integration/X2.md)"
+   "src": "phase481.sql; X2 (docs/integration/X2.md)"
   }
  }
 }

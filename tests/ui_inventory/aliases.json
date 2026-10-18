@@ -31,7 +31,7 @@
       "type": "rename",
       "from": "rpc:itemmaster.js:item_new",
       "to": "rpc:itemmaster.js:item_new2",
-      "reason": "X5 (phase 520): the item master save now calls item_new2, which adds client_id so a double tap cannot create two items. Same arguments plus p_client; item_new stays on the server for older screens."
+      "reason": "X5 (phase 486): the item master save now calls item_new2, which adds client_id so a double tap cannot create two items. Same arguments plus p_client; item_new stays on the server for older screens."
     }
   ]
 }

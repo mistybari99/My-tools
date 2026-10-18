@@ -10,10 +10,10 @@ Nothing in this file is done by an agent. The owner does each step himself, afte
 
 ## 2. SQL: paste the files in order
 
-- The full list, one line per file, is `docs/PASTE_ORDER.md` (phases 8 to 554, with the position of each file).
+- The full list, one line per file, is `docs/PASTE_ORDER.md` (phases 8 to 498, with the position of each file).
 - Paste ONE file at a time into the Supabase SQL editor (the live project only after review). Wait for "Success" before the next one.
 - Never paste: `supabase/phase84_test_project_only.sql`, `supabase/phase84b_*`, `supabase/phase84c_*`, any `*_test.sql`, `ALL_NEW*.sql`.
-- XB phases 540 to 542 are not yet in `tests/sql/ORDER.txt`; they are listed in `docs/PASTE_ORDER.md` at their numeric position. Run the local build once before pasting them.
+- XB phases 491 to 493 are not yet in `tests/sql/ORDER.txt`; they are listed in `docs/PASTE_ORDER.md` at their numeric position. Run the local build once before pasting them.
 - After the last file run: `select * from public._i2_state() where not present;` It must return no rows.
 
 ### Old phase files (3 to 98), if you ever paste one again

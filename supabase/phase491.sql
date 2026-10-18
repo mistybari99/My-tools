@@ -1,583 +1,297 @@
 -- ============================================================
--- Phase 491 (X2 website, part 2) - CHECKOUT, HARD STOCK HOLDS, TRACKING, CANCEL / CUSTOM CAKE REQUESTS, OWNER ADMIN, DRIFT, GO-LIVE CHECKLIST.
--- Run AFTER phase490. Additive + idempotent (paste twice = no error). No earlier phase file is edited.
---   1. CHECKOUT      web_checkout_submit(): PUBLIC (anon). Idempotent on a browser-made submission id (same id twice = the same order).
---                    Rate limited per device hash (rule website_rate_max). Re-prices and re-checks the cart on the server (web_quote).
---                    Writes ONE online_orders row (channel 'website', status 'new'). Staff then confirm/pack/deliver with the existing screens.
---                    Payment: COD, or bKash/Nagad manual with a Trx ID (verified by staff; nothing is paid automatically).
---   2. HOLDS         rule website_reserve_on (OFF). When on, checkout locks the items and writes web_stock_holds rows (expire after
---                    website_reserve_minutes). Holds are released on expiry (web_holds_expire, also run inside checkout), released on
---                    cancel, consumed on delivery. Two checkouts can never take the last unit (advisory lock per item and branch).
---   3. TRACKING      web_order_track(code, mobile): customer sees status only (no staff names, no internal notes).
---                    web_order_cancel_request(): customer asks; owner decides (nothing is cancelled by the customer directly).
---   4. CUSTOM CAKE   web_custom_request() (rule website_custom_cake_on): flavour, weight, message, date, slot and a reference photo
---                    in a PRIVATE bucket 'web-refs' (size and type limits on the bucket). Owner confirms; the cake spec is entered by staff.
---   5. PHOTOS        bucket 'web-public' (PUBLIC READ, 800 KB, jpeg/png/webp, owner-only write). An item photo appears on the web only
---                    after the owner approves its row (web_item_images.approved). The private `photos` bucket is not changed.
---   6. OWNER ADMIN   web_admin_* functions (owner only): item publishing (single and bulk by category), images, zones, pickup points,
---                    closures, board, drift report, holds report, web orders, cancel and custom-request decisions, go-live checklist.
---   7. GRANTS        anon: web_checkout_submit, web_order_track, web_order_cancel_request, web_custom_request only (plus phase490 reads).
---                    Every other new function is closed to anon and public.
+-- Phase 491 - XB package part 1: bKash / Nagad / Rocket payment capture and reconciliation.
+-- Run AFTER phase 478 (needs phase61 online_orders, phase83 d_wallets, phase6 sales). New file only; no old phase or function is edited.
+-- Paste twice = no error, no second row.
+--
+--   * pay_captures          one row per mobile payment the counter writes down: provider, Trx-ID, sender number, amount, time, wallet,
+--                           the order / sale / advance it is for, the amount expected, the flag (ok / overpay / underpay / no_target).
+--                           A Trx-ID is unique (a duplicate is refused). Verification: pending -> verified | rejected (approver holds
+--                           grant pay_verify or is the owner; never the person who captured it). Append-only (decision fields only).
+--   * xb_pay_capture        write a capture (rule pay_capture_on OFF = refused). Nothing is posted to the books: a capture is evidence.
+--   * xb_pay_capture_decide approve / reject; a flagged capture needs a note.
+--   * xb_pay_capture_screenshot  attach a payment screenshot (private bucket 'payproof', path pay/<place>/<file>.jpg), once.
+--   * pay_statement_lines   wallet statement lines imported from CSV / paste (append-only, deduplicated on wallet + Trx-ID + direction).
+--   * xb_pay_statement_import   owner or a pay_verify holder (place-less grant) imports a statement; duplicates are counted, not written twice.
+--   * xb_pay_tieout         daily tie-out per wallet: captured vs statement, with the lists of what does not match.
+--   * Rules (OFF / blank): pay_capture_on (OFF), pay_capture_tol (blank = the amount must match exactly; no tolerance is invented).
+-- No merchant API adapter is built: statement and capture records are the only inputs; no outbound call exists anywhere.
+-- Paper form code for any printed version: to be given by owner (none invented).
 -- ============================================================
+do $guard$ begin
+  if to_regclass('public.online_orders') is null or to_regclass('public.d_wallets') is null or to_regclass('public.sales') is null
+     or to_regprocedure('public.c2_orders_features()') is null then
+    raise exception 'phase540 needs phase61, phase83, phase6 and phase445 pasted first';
+  end if;
+end $guard$;
 
--- ---------- extra columns / tables ----------
-alter table public.online_orders add column if not exists web_code text check (web_code is null or web_code ~ '^[A-Z0-9]{6,12}$');
-create unique index if not exists online_orders_web_code on public.online_orders (web_code) where web_code is not null;
+insert into public.grant_defs (grant_code, module, sort, label_bn, label_mix, label_en, window_type, emergency_rule) values
+ ('pay_verify', 'pos', 90, 'মোবাইল পেমেন্ট যাচাই করা', 'Mobile payment verify করা', 'Verify mobile payments (bKash / Nagad / Rocket)', 'once', null)
+on conflict (grant_code) do nothing;
 
-create table if not exists public.web_rate_hits (
-  id bigint generated always as identity primary key, key_hash text not null, at timestamptz not null default now()
-);
-create index if not exists web_rate_hits_k on public.web_rate_hits (key_hash, at desc);
-alter table public.web_rate_hits enable row level security;
-revoke all on public.web_rate_hits from public, anon, authenticated;
+insert into public.rules (key, module, kind, default_value, unit, choices, min_value, max_value, label_bn, label_mix, label_en, hint_bn, hint_en, sort) values
+ ('pay_capture_on', 'pos', 'switch', 'false', null, null, null, null, 'মোবাইল পেমেন্ট (Trx-ID) লেখা চালু', 'Mobile payment (Trx-ID) capture চালু', 'Mobile payment capture is on',
+  'চালু হলে বিকাশ/নগদ/রকেটের Trx-ID, নম্বর, টাকা লেখা যাবে; একই Trx-ID দুবার ঢোকে না।', 'When on, bKash / Nagad / Rocket Trx-ID, sender, amount and time can be written; a Trx-ID is never accepted twice.', 540),
+ ('pay_capture_tol', 'pos', 'number', null, 'taka', null, 0, 1000000, 'মেলানোর সহনশীলতা (টাকা)', 'Match tolerance (taka)', 'Amount match tolerance (taka)',
+  'ফাঁকা = টাকা হুবহু মিলতে হবে। কোনো সংখ্যা ধরে নেওয়া হয় না।', 'Blank = the amount must match exactly. No number is assumed.', 541)
+on conflict (key) do nothing;
 
-create table if not exists public.web_cancel_requests (
+-- ---------- tables ----------
+create table if not exists public.pay_captures (
   id bigint generated always as identity primary key,
-  order_id uuid not null references public.online_orders(id),
-  reason text not null check (char_length(btrim(reason)) between 1 and 300),
-  state text not null default 'open' check (state in ('open', 'approved', 'declined')),
+  client_id uuid unique,
+  provider text not null check (provider in ('bkash', 'nagad', 'rocket', 'other')),
+  wallet_code text not null references public.d_wallets(code),
+  trx_id text not null check (trx_id ~ '^[A-Z0-9]{6,20}$'),
+  sender_no text check (sender_no is null or char_length(sender_no) between 6 and 20),
+  amount numeric not null check (amount > 0 and amount <= 1000000000000),
+  paid_at timestamptz not null,
+  location_id int not null references public.locations(id),
+  target text not null check (target in ('order', 'sale', 'advance', 'none')),
+  online_order_id uuid references public.online_orders(id),
+  sale_id uuid references public.sales(id),
+  expected numeric,
+  diff numeric,
+  flag text not null check (flag in ('ok', 'overpay', 'underpay', 'no_target')),
+  status text not null default 'pending' check (status in ('pending', 'verified', 'rejected', 'void')),
+  source text not null default 'manual' check (source in ('manual', 'sms_paste')),
+  screenshot_path text check (screenshot_path is null or char_length(screenshot_path) <= 200),
+  note text check (note is null or char_length(note) <= 300),
+  captured_by uuid, captured_staff text, captured_at timestamptz not null default now(),
   decided_by uuid, decided_at timestamptz, decide_note text check (decide_note is null or char_length(decide_note) <= 300),
-  created_at timestamptz not null default now()
+  check ((target = 'order') = (online_order_id is not null) or target = 'advance'), check ((target = 'sale') = (sale_id is not null))
 );
-create unique index if not exists web_cancel_one_open on public.web_cancel_requests (order_id) where state = 'open';
-alter table public.web_cancel_requests enable row level security;
-revoke all on public.web_cancel_requests from public, anon, authenticated;
-grant select on public.web_cancel_requests to authenticated;
-drop policy if exists web_cancel_owner_read on public.web_cancel_requests;
-create policy web_cancel_owner_read on public.web_cancel_requests for select to authenticated using (public.is_owner());
-drop trigger if exists web_cancel_no_delete on public.web_cancel_requests;
-create trigger web_cancel_no_delete before delete on public.web_cancel_requests for each row execute function public.no_hard_delete();
-drop trigger if exists audit_web_cancel on public.web_cancel_requests;
-create trigger audit_web_cancel after insert or update on public.web_cancel_requests for each row execute function public.log_change('id');
+create unique index if not exists pay_captures_trx_live on public.pay_captures (trx_id) where status <> 'void';
+create index if not exists pay_captures_day on public.pay_captures (location_id, paid_at);
 
-create table if not exists public.web_custom_requests (
+create table if not exists public.pay_statement_lines (
   id bigint generated always as identity primary key,
-  code text not null unique check (code ~ '^[A-Z0-9]{6,12}$'),
-  submission uuid not null unique,
-  name text not null check (char_length(btrim(name)) between 1 and 80),
-  mobile text not null check (char_length(mobile) between 6 and 20),
-  flavour text check (flavour is null or char_length(flavour) <= 80),
-  weight_kg numeric check (weight_kg is null or (weight_kg > 0 and weight_kg <= 50)),
-  message text check (message is null or char_length(message) <= 200),
-  wanted_date date not null,
-  slot text check (slot is null or char_length(slot) <= 40),
-  ref_path text check (ref_path is null or char_length(ref_path) <= 300),
-  state text not null default 'new' check (state in ('new', 'confirmed', 'declined')),
-  decided_by uuid, decided_at timestamptz, decide_note text check (decide_note is null or char_length(decide_note) <= 300),
-  created_at timestamptz not null default now()
+  wallet_code text not null references public.d_wallets(code),
+  trx_id text not null check (trx_id ~ '^[A-Z0-9]{6,20}$'),
+  direction text not null check (direction in ('in', 'out')),
+  amount numeric not null check (amount > 0 and amount <= 1000000000000),
+  stmt_at timestamptz not null,
+  counterpart text check (counterpart is null or char_length(counterpart) <= 40),
+  import_batch uuid not null,
+  imported_by uuid, imported_at timestamptz not null default now(),
+  unique (wallet_code, trx_id, direction)
 );
-alter table public.web_custom_requests enable row level security;
-revoke all on public.web_custom_requests from public, anon, authenticated;
-grant select on public.web_custom_requests to authenticated;
-drop policy if exists web_custom_owner_read on public.web_custom_requests;
-create policy web_custom_owner_read on public.web_custom_requests for select to authenticated using (public.is_owner());
-drop trigger if exists web_custom_no_delete on public.web_custom_requests;
-create trigger web_custom_no_delete before delete on public.web_custom_requests for each row execute function public.no_hard_delete();
-drop trigger if exists audit_web_custom on public.web_custom_requests;
-create trigger audit_web_custom after insert or update on public.web_custom_requests for each row execute function public.log_change('id');
 
--- ---------- storage buckets (guarded: only where the storage schema exists) ----------
-do $$
+-- captures: only the decision fields and the screenshot path move; nothing is deleted
+create or replace function public._xb540_pay_ro() returns trigger language plpgsql set search_path = public as $$
 begin
-  if to_regclass('storage.buckets') is null or to_regclass('storage.objects') is null then
-    raise notice 'phase491: no storage schema here - photo buckets not created';
-    return;
+  if tg_op = 'DELETE' then raise exception 'append_only: a payment capture is never deleted, void it through the decision'; end if;
+  if (to_jsonb(new) - 'status' - 'decided_by' - 'decided_at' - 'decide_note' - 'screenshot_path')
+     is distinct from (to_jsonb(old) - 'status' - 'decided_by' - 'decided_at' - 'decide_note' - 'screenshot_path') then
+    raise exception 'append_only: a payment capture changes only its decision and its screenshot';
   end if;
-  insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    values ('web-refs', 'web-refs', false, 3145728, array['image/jpeg', 'image/png', 'image/webp'])
-    on conflict (id) do update set public = false, file_size_limit = 3145728, allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
-  insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    values ('web-public', 'web-public', true, 819200, array['image/jpeg', 'image/png', 'image/webp'])
-    on conflict (id) do update set public = true, file_size_limit = 819200, allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
-  drop policy if exists web_refs_anon_insert on storage.objects;
-  create policy web_refs_anon_insert on storage.objects for insert to anon, authenticated with check (bucket_id = 'web-refs');
-  drop policy if exists web_refs_owner_read on storage.objects;
-  create policy web_refs_owner_read on storage.objects for select to authenticated using (bucket_id = 'web-refs' and public.is_owner());
-  drop policy if exists web_public_owner_write on storage.objects;
-  create policy web_public_owner_write on storage.objects for insert to authenticated with check (bucket_id = 'web-public' and public.is_owner());
-  drop policy if exists web_public_owner_delete on storage.objects;
-  create policy web_public_owner_delete on storage.objects for delete to authenticated using (bucket_id = 'web-public' and public.is_owner());
-end $$;
-
--- ---------- helpers ----------
-create or replace function public._web_rate91(p_key text) returns boolean
-language plpgsql security definer set search_path = public as $$
-declare mx int := coalesce(public.rule_num('website_rate_max'), 0)::int; win int := greatest(1, coalesce(public.rule_num('website_rate_window_min'), 60)::int); c int;
-begin
-  if coalesce(p_key, '') = '' then return true; end if;     -- no device hash: the limit cannot apply (the edge caller should always send one)
-  if mx > 0 then
-    select count(*) into c from public.web_rate_hits where key_hash = p_key and at > now() - make_interval(mins => win);
-    if c >= mx then return false; end if;
-  end if;
-  insert into public.web_rate_hits (key_hash) values (p_key);
-  return true;
-end $$;
-
--- release holds whose time is up (nothing is deleted; the row keeps its trail)
-create or replace function public.web_holds_expire() returns int
-language plpgsql security definer set search_path = public as $$
-declare n int;
-begin
-  update public.web_stock_holds set state = 'released', closed_at = now(), close_note = 'expired'
-   where state = 'held' and expires_at <= now();
-  get diagnostics n = row_count;
-  return n;
-end $$;
-
-create or replace function public._web_hold_sync91() returns trigger
-language plpgsql security definer set search_path = public as $$
-begin
-  if new.status is distinct from old.status then
-    if new.status = 'cancelled' then
-      update public.web_stock_holds set state = 'released', closed_at = now(), close_note = 'order cancelled' where order_id = new.id and state = 'held';
-    elsif new.status = 'delivered' then
-      update public.web_stock_holds set state = 'consumed', closed_at = now(), close_note = 'delivered' where order_id = new.id and state = 'held';
-    end if;
-  end if;
+  if old.screenshot_path is not null and new.screenshot_path is distinct from old.screenshot_path then raise exception 'already_attached'; end if;
+  if old.status in ('verified', 'rejected', 'void') and new.status is distinct from old.status then raise exception 'decided: a decided capture cannot change'; end if;
   return new;
 end $$;
-drop trigger if exists online_orders_holds91 on public.online_orders;
-create trigger online_orders_holds91 after update of status on public.online_orders for each row execute function public._web_hold_sync91();
+drop trigger if exists pay_captures_ro on public.pay_captures;
+create trigger pay_captures_ro before update or delete on public.pay_captures for each row execute function public._xb540_pay_ro();
+drop trigger if exists audit_pay_captures on public.pay_captures;
+create trigger audit_pay_captures after insert or update on public.pay_captures for each row execute function public.log_change('id');
 
-create or replace function public._web_newcode91() returns text
-language plpgsql volatile set search_path = public as $$
-declare c text;
+create or replace function public._xb540_lines_ro() returns trigger language plpgsql set search_path = public as $$
+begin raise exception 'append_only: a statement line is never changed or deleted'; end $$;
+drop trigger if exists pay_statement_lines_ro on public.pay_statement_lines;
+create trigger pay_statement_lines_ro before update or delete on public.pay_statement_lines for each row execute function public._xb540_lines_ro();
+drop trigger if exists audit_pay_statement_lines on public.pay_statement_lines;
+create trigger audit_pay_statement_lines after insert on public.pay_statement_lines for each row execute function public.log_change('id');
+
+-- ---------- helpers ----------
+create or replace function public._xb540_verifier(p_loc int) returns boolean language sql stable security definer set search_path = public as $$
+  select public.is_owner() or public.has_grant('pay_verify', p_loc);
+$$;
+create or replace function public._xb540_verifier_any() returns boolean language sql stable security definer set search_path = public as $$
+  select public.is_owner() or exists (select 1 from public.user_grants g where g.user_id = auth.uid() and g.grant_code = 'pay_verify' and g.location_id is null);
+$$;
+create or replace function public._xb540_gate(p_loc int) returns void language plpgsql stable security definer set search_path = public as $$
 begin
-  loop
-    c := upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 8));
-    exit when not exists (select 1 from public.online_orders where web_code = c) and not exists (select 1 from public.web_custom_requests where code = c);
-  end loop;
-  return c;
+  if not public.is_active() then raise exception 'not allowed'; end if;
+  if not public.rule_on('pay_capture_on') then raise exception 'module_off'; end if;
+  if not public.can_do('POS', 'enter') or not public.can_loc(p_loc) then raise exception 'not allowed'; end if;
 end $$;
 
--- ---------- 1. CHECKOUT (PUBLIC) ----------
-create or replace function public.web_checkout_submit(p_submission uuid, p_name text, p_mobile text, p_mode text, p_zone int, p_address text, p_lines jsonb,
-  p_note text, p_pay text, p_trx text, p_delivery_date date, p_pickup_loc int default null, p_utm jsonb default null, p_key_hash text default null) returns jsonb
+-- ---------- capture ----------
+create or replace function public.xb_pay_capture(p_client uuid, p_provider text, p_trx text, p_sender text, p_amount numeric, p_paid_at timestamptz,
+  p_wallet text, p_loc int, p_target text, p_order uuid default null, p_sale uuid default null, p_source text default 'manual', p_note text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare loc int; today date := public._dhaka_today(); q jsonb; ex public.online_orders; o public.online_orders; mob text; chg numeric; sub numeric; tot numeric;
-  lead int := coalesce(public.rule_num('website_lead_days'), 0)::int; ilead int; cut int := coalesce(public.rule_num('website_cutoff_hour'), 0)::int; n int; src text; cmp text;
-  rec record; av text; need numeric; have numeric; bad text; cd text; ps public.web_pickup_points; reserve boolean := public.rule_on('website_reserve_on'); code text;
+declare trx text := upper(btrim(coalesce(p_trx, ''))); o public.online_orders; s public.sales; ex numeric; df numeric; fl text; tol numeric := coalesce(public.rule_num('pay_capture_tol'), 0);
+        rec public.pay_captures; wok boolean; id_ bigint; ol uuid; sl uuid; sndr text;
 begin
-  if not public.rule_on('website_on') then return jsonb_build_object('ok', false, 'error', 'off'); end if;
-  if p_submission is null then return jsonb_build_object('ok', false, 'error', 'bad_input'); end if;
-  perform pg_advisory_xact_lock(hashtextextended('x2web:' || p_submission::text, 0));
-  select * into ex from public.online_orders where channel = 'website' and external_ref = p_submission::text;
-  if found then
-    return jsonb_build_object('ok', true, 'dup', true, 'order_no', ex.order_no, 'web_code', ex.web_code, 'status', ex.status, 'subtotal', ex.subtotal, 'delivery_charge', ex.delivery_charge, 'total', ex.subtotal - ex.discount + ex.delivery_charge);
+  if p_client is not null then
+    select * into rec from public.pay_captures where client_id = p_client;
+    if found then return jsonb_build_object('id', rec.id, 'status', rec.status, 'flag', rec.flag, 'dup', true); end if;
   end if;
-  if public.rule_on('website_captcha_on') then return jsonb_build_object('ok', false, 'error', 'captcha_required'); end if;
-  if not public._web_rate91(p_key_hash) then return jsonb_build_object('ok', false, 'error', 'rate_limited'); end if;
-  if p_pickup_loc is not null and p_mode = 'pickup' then
-    select * into ps from public.web_pickup_points where location_id = p_pickup_loc and public;
-    if not found then return jsonb_build_object('ok', false, 'error', 'pickup_point_unavailable'); end if;
-    loc := p_pickup_loc;
+  perform public._xb540_gate(p_loc);
+  if p_provider not in ('bkash', 'nagad', 'rocket', 'other') then raise exception 'bad_provider'; end if;
+  if trx !~ '^[A-Z0-9]{6,20}$' then raise exception 'bad_trx_id'; end if;
+  if p_amount is null or p_amount <= 0 or p_amount > 1000000000000 then raise exception 'bad_amount'; end if;
+  if p_paid_at is null or p_paid_at > now() + interval '10 minutes' then raise exception 'bad_time'; end if;
+  if p_source not in ('manual', 'sms_paste') then raise exception 'bad_source'; end if;
+  if p_target not in ('order', 'sale', 'advance', 'none') then raise exception 'bad_target'; end if;
+  select exists (select 1 from public.d_wallets w where w.code = p_wallet and w.active) into wok;
+  if not wok then raise exception 'bad_wallet'; end if;
+  sndr := nullif(btrim(coalesce(p_sender, '')), '');
+  if sndr is not null then sndr := public.norm_mobile(sndr); if sndr is null or char_length(sndr) < 6 then raise exception 'bad_sender'; end if; end if;
+  if exists (select 1 from public.pay_captures where trx_id = trx and status <> 'void') then raise exception 'duplicate_trx: this Trx-ID is already written'; end if;
+  ex := null;
+  if p_target = 'order' then
+    select * into o from public.online_orders where id = p_order;
+    if not found then raise exception 'not_found'; end if;
+    if o.location_id <> p_loc then raise exception 'other_location'; end if;
+    if o.status in ('delivered', 'cancelled') then raise exception 'order_closed'; end if;
+    ex := o.subtotal - o.discount + o.delivery_charge - o.advance; ol := o.id;
+  elsif p_target = 'sale' then
+    select * into s from public.sales where id = p_sale;
+    if not found then raise exception 'not_found'; end if;
+    if s.location_id <> p_loc then raise exception 'other_location'; end if;
+    ex := s.due_amount; sl := s.id;
+  elsif p_target = 'advance' then
+    select * into o from public.online_orders where id = p_order;
+    if not found then raise exception 'not_found'; end if;
+    if o.location_id <> p_loc then raise exception 'other_location'; end if;
+    ol := o.id;
+    ex := case when o.advance > 0 then o.advance end;
+  end if;
+  if ex is null then fl := 'no_target'; df := null;
   else
-    loc := coalesce(public.rule_num('website_location_id'), 0)::int;
+    df := round(p_amount - ex, 2);
+    fl := case when abs(df) <= tol then 'ok' when df > 0 then 'overpay' else 'underpay' end;
   end if;
-  if loc is null or loc = 0 then return jsonb_build_object('ok', false, 'error', 'orders_closed'); end if;
-  if exists (select 1 from public.web_closures c where c.day = today and not c.reopened) then return jsonb_build_object('ok', false, 'error', 'closed_today'); end if;
-  if nullif(btrim(p_name), '') is null or char_length(btrim(p_name)) > 80 then return jsonb_build_object('ok', false, 'error', 'customer_name_required'); end if;
-  mob := public.norm_mobile(p_mobile);
-  if mob is null or char_length(mob) < 6 or char_length(mob) > 20 then return jsonb_build_object('ok', false, 'error', 'bad_mobile'); end if;
-  if p_mode not in ('pickup', 'home') then return jsonb_build_object('ok', false, 'error', 'bad_mode'); end if;
-  if p_mode = 'home' and nullif(btrim(p_address), '') is null then return jsonb_build_object('ok', false, 'error', 'address_required'); end if;
-  if char_length(coalesce(p_address, '')) > 300 or char_length(coalesce(p_note, '')) > 300 then return jsonb_build_object('ok', false, 'error', 'too_long'); end if;
-  if p_delivery_date is null then return jsonb_build_object('ok', false, 'error', 'date_required'); end if;
-  if p_delivery_date > today + 365 or p_delivery_date < today then return jsonb_build_object('ok', false, 'error', 'bad_date'); end if;
-  if p_pay not in ('cod', 'manual') then return jsonb_build_object('ok', false, 'error', 'bad_pay'); end if;
-  if p_pay = 'cod' and not public.rule_on('website_pay_cod_on') then return jsonb_build_object('ok', false, 'error', 'pay_off'); end if;
-  if p_pay = 'manual' and (not public.rule_on('website_pay_manual_on') or nullif(public.rule_txt('website_pay_mobile_number'), '') is null) then
-    return jsonb_build_object('ok', false, 'error', 'pay_off');
-  end if;
-  if p_pay = 'manual' and (nullif(btrim(p_trx), '') is null or char_length(btrim(p_trx)) > 80) then return jsonb_build_object('ok', false, 'error', 'trx_required'); end if;
-
-  -- price and availability from the server (never from the browser)
-  q := public.web_quote(p_lines, p_zone, p_mode);
-  if not coalesce((q->>'ok')::boolean, false) then return jsonb_build_object('ok', false, 'error', q->>'error') || (q - 'ok' - 'error' - 'lines'); end if;
-  if jsonb_array_length(q->'problems') > 0 then return jsonb_build_object('ok', false, 'error', 'sold_out', 'problems', q->'problems'); end if;
-  sub := (q->>'subtotal')::numeric; chg := (q->>'delivery_charge')::numeric; tot := (q->>'total')::numeric;
-  select coalesce(max(p.lead_days), 0) into ilead from public.web_item_pub p where p.item_id in (select (x->>'item_id')::uuid from jsonb_array_elements(q->'lines') x);
-  if p_delivery_date < today + greatest(lead, ilead) then return jsonb_build_object('ok', false, 'error', 'too_soon', 'earliest', today + greatest(lead, ilead)); end if;
-  if p_delivery_date = today and cut > 0 and extract(hour from (now() at time zone 'Asia/Dhaka')) >= cut then return jsonb_build_object('ok', false, 'error', 'cutoff_passed'); end if;
-
-  -- hard reservation (only when the owner switched it on): lock each tracked item at this branch, then check, then write
-  if reserve then
-    perform public.web_holds_expire();
-    for rec in select distinct (x->>'item_id')::uuid as iid from jsonb_array_elements(q->'lines') x order by 1 loop
-      perform pg_advisory_xact_lock(hashtextextended('x2stk:' || rec.iid::text || ':' || loc::text, 0));
-    end loop;
-    for rec in select (x->>'item_id')::uuid as iid, sum((x->>'qty')::numeric) as qty from jsonb_array_elements(q->'lines') x group by 1 loop
-      if (select i.tracked from public.items i where i.id = rec.iid) then
-        select coalesce(sb.qty, 0) into have from public.stock_balance sb where sb.item_id = rec.iid and sb.location_id = loc;
-        select coalesce(sum(h.qty), 0) into need from public.web_stock_holds h where h.item_id = rec.iid and h.location_id = loc and h.state = 'held' and h.expires_at > now();
-        if coalesce(have, 0) - need < rec.qty then return jsonb_build_object('ok', false, 'error', 'sold_out', 'problems', jsonb_build_array(jsonb_build_object('item_id', rec.iid, 'availability', 'sold_out'))); end if;
-      end if;
-    end loop;
-  end if;
-
-  -- writes
-  insert into public.serials (form_code, location_id, last) values ('ORD', loc, 1)
-    on conflict (form_code, location_id) do update set last = public.serials.last + 1 returning last into n;
-  src := left(nullif(concat_ws('/', nullif(btrim(p_utm->>'source'), ''), nullif(btrim(p_utm->>'medium'), ''), nullif(btrim(p_utm->>'campaign'), '')), ''), 80);
-  code := public._web_newcode91();
-  insert into public.online_orders (order_no, location_id, channel, customer_name, customer_mobile, address, lines, subtotal, discount, delivery_mode, delivery_date,
-      delivery_charge, advance, note, status, external_ref, source, pay_mode, pay_ref, created_by, created_staff, web_code, is_draft)
-    values (n, loc, 'website', left(btrim(p_name), 80), mob, case when p_mode = 'home' then nullif(btrim(p_address), '') end, q->'lines', sub, 0, p_mode, p_delivery_date,
-      chg, 0, nullif(btrim(p_note), ''), 'new', p_submission::text, src, case when p_pay = 'cod' then 'cod' else 'mobile' end,
-      case when p_pay = 'manual' then left(btrim(p_trx), 80) end, null, 'web', code, false)
-    returning * into o;
-  insert into public.online_order_events (order_id, from_status, to_status, note, by_user, by_staff) values (o.id, null, 'new', 'web checkout', null, 'web');
-  cmp := left(regexp_replace(coalesce(p_utm->>'campaign', ''), '[^A-Za-z0-9_-]', '', 'g'), 40);
-  if cmp <> '' then
-    insert into public.mkt_order_tags (order_id, campaign_code, location_id, tagged_staff) values (o.id, cmp, loc, 'web') on conflict (order_id) do nothing;
-  end if;
-  if reserve then
-    insert into public.web_stock_holds (submission, order_id, item_id, location_id, qty, expires_at)
-      select p_submission, o.id, (x->>'item_id')::uuid, loc, (x->>'qty')::numeric, now() + make_interval(mins => coalesce(public.rule_num('website_reserve_minutes'), 30)::int)
-        from jsonb_array_elements(q->'lines') x
-       where (select i.tracked from public.items i where i.id = (x->>'item_id')::uuid)
-    on conflict (submission, item_id) do nothing;
-  end if;
-  return jsonb_build_object('ok', true, 'dup', false, 'order_no', o.order_no, 'web_code', o.web_code, 'status', o.status, 'subtotal', sub, 'delivery_charge', chg, 'total', tot,
-    'held', reserve, 'pay', p_pay);
+  insert into public.pay_captures (client_id, provider, wallet_code, trx_id, sender_no, amount, paid_at, location_id, target, online_order_id, sale_id, expected, diff, flag, source, note, captured_by, captured_staff)
+    values (p_client, p_provider, p_wallet, trx, sndr, round(p_amount, 2), p_paid_at, p_loc, p_target, ol, sl, ex, df, fl, p_source, left(nullif(btrim(p_note), ''), 300), auth.uid(), (select staff_id from public.profiles where id = auth.uid()))
+    returning id into id_;
+  return jsonb_build_object('id', id_, 'status', 'pending', 'flag', fl, 'expected', ex, 'diff', df, 'note_needed_to_verify', fl <> 'ok');
+exception when unique_violation then
+  raise exception 'duplicate_trx: this Trx-ID is already written';
 end $$;
 
--- ---------- 3. TRACKING + CANCEL REQUEST (PUBLIC) ----------
-create or replace function public.web_order_track(p_code text, p_mobile text) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-declare o public.online_orders; mob text := public.norm_mobile(p_mobile);
-begin
-  if not public.rule_on('website_on') then return jsonb_build_object('ok', false, 'error', 'off'); end if;
-  select * into o from public.online_orders where web_code = upper(btrim(coalesce(p_code, ''))) and channel = 'website';
-  if not found or mob is null or o.customer_mobile <> mob then return jsonb_build_object('ok', false, 'error', 'not_found'); end if;
-  return jsonb_build_object('ok', true, 'order_no', o.order_no, 'status', o.status, 'delivery_mode', o.delivery_mode, 'delivery_date', o.delivery_date,
-    'subtotal', o.subtotal, 'delivery_charge', o.delivery_charge, 'total', o.subtotal - o.discount + o.delivery_charge, 'pay_mode', o.pay_mode,
-    'cancel_requested', exists (select 1 from public.web_cancel_requests r where r.order_id = o.id and r.state = 'open'),
-    'can_request_cancel', o.status in ('new', 'confirmed') and not exists (select 1 from public.web_cancel_requests r where r.order_id = o.id and r.state = 'open'),
-    'events', coalesce((select jsonb_agg(jsonb_build_object('status', e.to_status, 'at', e.at) order by e.id) from public.online_order_events e where e.order_id = o.id and e.to_status <> 'edited'), '[]'::jsonb));
-end $$;
-
-create or replace function public.web_order_cancel_request(p_code text, p_mobile text, p_reason text, p_key_hash text default null) returns jsonb
+-- ---------- verify (nobody approves the capture they wrote; a flagged or rejected one needs a note) ----------
+create or replace function public.xb_pay_capture_decide(p_id bigint, p_approve boolean, p_note text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare o public.online_orders; mob text := public.norm_mobile(p_mobile); rid bigint;
+declare rec public.pay_captures;
 begin
-  if not public.rule_on('website_on') then return jsonb_build_object('ok', false, 'error', 'off'); end if;
-  if not public._web_rate91(p_key_hash) then return jsonb_build_object('ok', false, 'error', 'rate_limited'); end if;
-  select * into o from public.online_orders where web_code = upper(btrim(coalesce(p_code, ''))) and channel = 'website';
-  if not found or mob is null or o.customer_mobile <> mob then return jsonb_build_object('ok', false, 'error', 'not_found'); end if;
-  if o.status not in ('new', 'confirmed') then return jsonb_build_object('ok', false, 'error', 'too_late', 'status', o.status); end if;
-  if nullif(btrim(p_reason), '') is null or char_length(btrim(p_reason)) > 300 then return jsonb_build_object('ok', false, 'error', 'reason_required'); end if;
-  insert into public.web_cancel_requests (order_id, reason) values (o.id, btrim(p_reason))
-    on conflict (order_id) where state = 'open' do nothing returning id into rid;
-  return jsonb_build_object('ok', true, 'requested', rid is not null, 'note', 'The shop will confirm the cancellation.');
-end $$;
-
--- ---------- 4. CUSTOM CAKE REQUEST (PUBLIC) ----------
-create or replace function public.web_custom_request(p_submission uuid, p_name text, p_mobile text, p_flavour text, p_weight numeric, p_message text,
-  p_wanted date, p_slot text, p_ref_path text, p_key_hash text default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare mob text := public.norm_mobile(p_mobile); ex public.web_custom_requests; r public.web_custom_requests; ok_ref boolean := true; today date := public._dhaka_today();
-begin
-  if not (public.rule_on('website_on') and public.rule_on('website_custom_cake_on')) then return jsonb_build_object('ok', false, 'error', 'off'); end if;
-  if p_submission is null then return jsonb_build_object('ok', false, 'error', 'bad_input'); end if;
-  select * into ex from public.web_custom_requests where submission = p_submission;
-  if found then return jsonb_build_object('ok', true, 'dup', true, 'code', ex.code, 'state', ex.state); end if;
-  if not public._web_rate91(p_key_hash) then return jsonb_build_object('ok', false, 'error', 'rate_limited'); end if;
-  if nullif(btrim(p_name), '') is null or char_length(btrim(p_name)) > 80 then return jsonb_build_object('ok', false, 'error', 'customer_name_required'); end if;
-  if mob is null or char_length(mob) < 6 then return jsonb_build_object('ok', false, 'error', 'bad_mobile'); end if;
-  if p_weight is not null and (p_weight <= 0 or p_weight > 50) then return jsonb_build_object('ok', false, 'error', 'bad_weight'); end if;
-  if p_wanted is null or p_wanted < today + 1 or p_wanted > today + 365 then return jsonb_build_object('ok', false, 'error', 'bad_date'); end if;
-  if char_length(coalesce(p_message, '')) > 200 or char_length(coalesce(p_flavour, '')) > 80 or char_length(coalesce(p_slot, '')) > 40 then return jsonb_build_object('ok', false, 'error', 'too_long'); end if;
-  -- the photo must be an object that really sits in the private 'web-refs' bucket (the bucket itself limits size and type)
-  if nullif(p_ref_path, '') is not null and to_regclass('storage.objects') is not null then
-    execute 'select exists (select 1 from storage.objects where bucket_id = $1 and name = $2)' into ok_ref using 'web-refs', p_ref_path;
-    if not ok_ref then return jsonb_build_object('ok', false, 'error', 'photo_not_found'); end if;
-  end if;
-  insert into public.web_custom_requests (code, submission, name, mobile, flavour, weight_kg, message, wanted_date, slot, ref_path)
-    values (public._web_newcode91(), p_submission, btrim(p_name), mob, nullif(btrim(p_flavour), ''), p_weight, nullif(btrim(p_message), ''), p_wanted,
-      nullif(btrim(p_slot), ''), nullif(btrim(p_ref_path), ''))
-    returning * into r;
-  return jsonb_build_object('ok', true, 'dup', false, 'code', r.code, 'state', r.state);
-end $$;
-
--- ---------- 6. OWNER ADMIN ----------
-create or replace function public.web_admin_item_save(p_item uuid, p jsonb) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare it public.items; cur public.web_item_pub; d text[]; pub boolean := coalesce((p->>'published')::boolean, false); av text := coalesce(p->>'avail_mode', 'auto');
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  select * into it from public.items where id = p_item;
-  if not found then raise exception 'item_not_found'; end if;
-  if av not in ('auto', 'preorder', 'sold_out') then raise exception 'bad_avail'; end if;
-  d := coalesce(array(select jsonb_array_elements_text(coalesce(p->'diet', '[]'::jsonb))), '{}');
-  if not (d <@ array['halal', 'eggless', 'sugar_free', 'vegan']::text[]) then raise exception 'bad_diet'; end if;
-  if char_length(coalesce(p->>'desc_bn', '')) > 1000 or char_length(coalesce(p->>'desc_en', '')) > 1000 then raise exception 'too_long'; end if;
-  if pub and not (it.is_active and it.sellable and not it.hidden and it.retired_at is null and it.sell_price is not null) then
-    raise exception 'item_not_sellable: an item must be active, sellable, not hidden, not retired and priced to show on the web';
-  end if;
-  select * into cur from public.web_item_pub where item_id = p_item;
-  insert into public.web_item_pub (item_id, published, name_bn, name_en, desc_bn, desc_en, category_pub, category_sort, sort, avail_mode, lead_days, allergens, diet,
-      price_snapshot, published_at, published_by, updated_at, updated_by)
-    values (p_item, pub, nullif(btrim(p->>'name_bn'), ''), nullif(btrim(p->>'name_en'), ''), nullif(btrim(p->>'desc_bn'), ''), nullif(btrim(p->>'desc_en'), ''),
-      nullif(btrim(p->>'category_pub'), ''), coalesce((p->>'category_sort')::int, 0), coalesce((p->>'sort')::int, 0), av, coalesce((p->>'lead_days')::int, 0),
-      nullif(btrim(p->>'allergens'), ''), d, it.sell_price, case when pub then now() end, case when pub then auth.uid() end, now(), auth.uid())
-    on conflict (item_id) do update set published = excluded.published, name_bn = excluded.name_bn, name_en = excluded.name_en, desc_bn = excluded.desc_bn,
-      desc_en = excluded.desc_en, category_pub = excluded.category_pub, category_sort = excluded.category_sort, sort = excluded.sort, avail_mode = excluded.avail_mode,
-      lead_days = excluded.lead_days, allergens = excluded.allergens, diet = excluded.diet,
-      price_snapshot = case when excluded.published then it.sell_price else web_item_pub.price_snapshot end,
-      published_at = case when excluded.published and not coalesce(web_item_pub.published, false) then now() else web_item_pub.published_at end,
-      published_by = case when excluded.published and not coalesce(web_item_pub.published, false) then auth.uid() else web_item_pub.published_by end,
-      updated_at = now(), updated_by = auth.uid();
-  return jsonb_build_object('item_id', p_item, 'published', pub, 'avail_mode', av);
-end $$;
-
--- bulk publish / unpublish every active sellable item of one ERP category (the owner picks the category; nothing is published by default)
-create or replace function public.web_admin_publish_bulk(p_category text, p_published boolean) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare it public.items; n int := 0;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if nullif(btrim(p_category), '') is null then raise exception 'category_required'; end if;
-  for it in select * from public.items where category = p_category and is_active and sellable and not hidden and retired_at is null and sell_price is not null loop
-    perform public.web_admin_item_save(it.id, jsonb_build_object('published', coalesce(p_published, false),
-      'category_pub', coalesce((select p.category_pub from public.web_item_pub p where p.item_id = it.id), it.category_bn, it.category)));
-    n := n + 1;
-  end loop;
-  return jsonb_build_object('category', p_category, 'published', coalesce(p_published, false), 'items', n);
-end $$;
-
-create or replace function public.web_admin_image_add(p_item uuid, p_path text, p_mime text, p_bytes int) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare r public.web_item_images;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if p_path is null or p_path not like 'items/' || p_item::text || '/%' or char_length(p_path) > 300 then raise exception 'bad_path: the photo must sit under items/<item id>/'; end if;
-  insert into public.web_item_images (item_id, storage_path, mime, bytes, created_by) values (p_item, p_path, p_mime, p_bytes, auth.uid())
-    on conflict (item_id, storage_path) do nothing returning * into r;
-  if r.id is null then select * into r from public.web_item_images where item_id = p_item and storage_path = p_path; end if;
-  return jsonb_build_object('id', r.id, 'approved', r.approved);
-end $$;
-
-create or replace function public.web_admin_image_approve(p_id bigint, p_approve boolean) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare r public.web_item_images;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  select * into r from public.web_item_images where id = p_id for update;
+  if not public.is_active() then raise exception 'not allowed'; end if;
+  select * into rec from public.pay_captures where id = p_id for update;
   if not found then raise exception 'not_found'; end if;
-  update public.web_item_images set approved = coalesce(p_approve, false), approved_by = case when coalesce(p_approve, false) then auth.uid() end,
-    approved_at = case when coalesce(p_approve, false) then now() end where id = p_id;
-  return jsonb_build_object('id', p_id, 'approved', coalesce(p_approve, false));
+  if not public.can_loc(rec.location_id) or not public._xb540_verifier(rec.location_id) then raise exception 'not allowed'; end if;
+  if p_approve is null then raise exception 'bad_input'; end if;
+  if rec.status <> 'pending' then raise exception 'already_decided'; end if;
+  if rec.captured_by = auth.uid() then raise exception 'own_capture: nobody approves the capture they wrote'; end if;
+  if (rec.flag <> 'ok' or not p_approve) and length(btrim(coalesce(p_note, ''))) < 3 then raise exception 'note_required'; end if;
+  update public.pay_captures set status = case when p_approve then 'verified' else 'rejected' end, decided_by = auth.uid(), decided_at = now(),
+    decide_note = left(nullif(btrim(p_note), ''), 300) where id = rec.id;
+  return jsonb_build_object('id', rec.id, 'status', case when p_approve then 'verified' else 'rejected' end, 'flag', rec.flag);
 end $$;
 
-create or replace function public.web_admin_zone_save(p_id int, p jsonb) returns jsonb
+create or replace function public.xb_pay_capture_screenshot(p_id bigint, p_path text) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare r public.web_zones;
+declare rec public.pay_captures;
 begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if p_id is null then
-    insert into public.web_zones (name_bn, name_en, charge, min_order, active, sort, updated_by)
-      values (btrim(p->>'name_bn'), nullif(btrim(p->>'name_en'), ''), (p->>'charge')::numeric, coalesce((p->>'min_order')::numeric, 0), coalesce((p->>'active')::boolean, true),
-        coalesce((p->>'sort')::int, 0), auth.uid()) returning * into r;
-  else
-    update public.web_zones set name_bn = coalesce(nullif(btrim(p->>'name_bn'), ''), name_bn), name_en = nullif(btrim(p->>'name_en'), ''),
-      charge = coalesce((p->>'charge')::numeric, charge), min_order = coalesce((p->>'min_order')::numeric, min_order),
-      active = coalesce((p->>'active')::boolean, active), sort = coalesce((p->>'sort')::int, sort), updated_at = now(), updated_by = auth.uid()
-      where id = p_id returning * into r;
-    if r.id is null then raise exception 'not_found'; end if;
-  end if;
-  return jsonb_build_object('id', r.id, 'active', r.active, 'charge', r.charge);
+  if not public.is_active() then raise exception 'not allowed'; end if;
+  select * into rec from public.pay_captures where id = p_id;
+  if not found then raise exception 'not_found'; end if;
+  if not public.can_loc(rec.location_id) or not public.can_do('POS', 'enter') then raise exception 'not allowed'; end if;
+  if rec.screenshot_path is not null then raise exception 'already_attached'; end if;
+  if p_path is null or p_path !~ ('^pay/' || rec.location_id || '/[A-Za-z0-9_.-]{1,120}\.jpe?g$') then raise exception 'bad_path'; end if;
+  update public.pay_captures set screenshot_path = p_path where id = rec.id;
+  return jsonb_build_object('id', rec.id, 'screenshot_path', p_path);
 end $$;
 
-create or replace function public.web_admin_pickup_save(p_loc int, p jsonb) returns jsonb
+create or replace function public.xb_pay_captures_list(p_loc int default null, p_status text default null, p_day date default null, p_limit int default 200) returns jsonb
+language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_agg(to_jsonb(z) order by z.paid_at desc), '[]'::jsonb) from (
+    select c.id, c.provider, c.wallet_code, c.trx_id, c.sender_no, c.amount, c.paid_at, c.location_id, c.target, c.online_order_id, c.sale_id, c.expected, c.diff, c.flag, c.status,
+           c.screenshot_path is not null as has_screenshot, c.captured_staff, c.decided_at, c.decide_note
+      from public.pay_captures c
+     where public.is_active() and (public.is_owner() or public.can_do('POS', 'view')) and public.can_loc(c.location_id)
+       and (p_loc is null or c.location_id = p_loc) and (p_status is null or c.status = p_status)
+       and (p_day is null or (c.paid_at at time zone 'Asia/Dhaka')::date = p_day)
+     order by c.paid_at desc limit least(greatest(coalesce(p_limit, 200), 1), 1000)) z;
+$$;
+
+-- ---------- statement import and tie-out ----------
+create or replace function public.xb_pay_statement_import(p_wallet text, p_lines jsonb) returns jsonb
 language plpgsql security definer set search_path = public as $$
+declare batch uuid := gen_random_uuid(); ln jsonb; ins int := 0; dup int := 0; bad int := 0; n int;
 begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if not exists (select 1 from public.locations where id = p_loc and is_active) then raise exception 'location_not_found'; end if;
-  insert into public.web_pickup_points (location_id, public, hours_bn, hours_en, address_public, updated_by) values (p_loc, coalesce((p->>'public')::boolean, false),
-      nullif(btrim(p->>'hours_bn'), ''), nullif(btrim(p->>'hours_en'), ''), nullif(btrim(p->>'address'), ''), auth.uid())
-    on conflict (location_id) do update set public = excluded.public, hours_bn = excluded.hours_bn, hours_en = excluded.hours_en, address_public = excluded.address_public,
-      updated_at = now(), updated_by = auth.uid();
-  return jsonb_build_object('location_id', p_loc, 'public', coalesce((p->>'public')::boolean, false));
-end $$;
-
-create or replace function public.web_admin_closure_save(p_day date, p_bn text, p_en text, p_reopen boolean default false) returns jsonb
-language plpgsql security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if p_day is null then raise exception 'bad_date'; end if;
-  insert into public.web_closures (day, note_bn, note_en, reopened, created_by) values (p_day, nullif(btrim(p_bn), ''), nullif(btrim(p_en), ''), coalesce(p_reopen, false), auth.uid())
-    on conflict (day) do update set note_bn = coalesce(excluded.note_bn, web_closures.note_bn), note_en = coalesce(excluded.note_en, web_closures.note_en), reopened = excluded.reopened;
-  return jsonb_build_object('day', p_day, 'closed', not coalesce(p_reopen, false));
-end $$;
-
--- drift between what is published and what the ERP says now (read only)
-create or replace function public.web_admin_drift() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-declare loc int := coalesce(public.rule_num('website_location_id'), 0)::int; price_rows jsonb; off_rows jsonb; hold_rows jsonb; cat_rows jsonb;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  select coalesce(jsonb_agg(jsonb_build_object('item_id', p.item_id, 'published_price', p.price_snapshot, 'erp_price', i.sell_price) order by i.name_bn), '[]') into price_rows
-    from public.web_item_pub p join public.items i on i.id = p.item_id where p.published and p.price_snapshot is distinct from i.sell_price;
-  select coalesce(jsonb_agg(jsonb_build_object('item_id', p.item_id, 'why', case when not i.is_active then 'inactive' when not i.sellable then 'not_sellable'
-      when i.hidden then 'hidden' when i.retired_at is not null then 'retired' when i.sell_price is null then 'no_price' end) order by i.name_bn), '[]') into off_rows
-    from public.web_item_pub p join public.items i on i.id = p.item_id
-    where p.published and (not i.is_active or not i.sellable or i.hidden or i.retired_at is not null or i.sell_price is null);
-  select coalesce(jsonb_agg(jsonb_build_object('item_id', h.item_id, 'held', h.held, 'in_stock', coalesce(sb.qty, 0)) order by h.item_id), '[]') into hold_rows
-    from (select item_id, sum(qty) as held from public.web_stock_holds where state = 'held' and expires_at > now() and location_id = loc group by item_id) h
-    left join public.stock_balance sb on sb.item_id = h.item_id and sb.location_id = loc
-    where h.held > coalesce(sb.qty, 0);
-  select coalesce(jsonb_agg(jsonb_build_object('item_id', p.item_id) order by p.item_id), '[]') into cat_rows from public.web_item_pub p where p.published and p.category_pub is null;
-  return jsonb_build_object('price_changed', price_rows, 'not_sellable', off_rows, 'holds_over_stock', hold_rows, 'no_category', cat_rows,
-    'counts', jsonb_build_object('price_changed', jsonb_array_length(price_rows), 'not_sellable', jsonb_array_length(off_rows),
-      'holds_over_stock', jsonb_array_length(hold_rows), 'no_category', jsonb_array_length(cat_rows)),
-    'note', 'Read only. Price drift is fixed by publishing again (the snapshot is refreshed) or by changing the ERP price back. Nothing is pushed to any shop.');
-end $$;
-
-create or replace function public.web_admin_holds_report() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  return jsonb_build_object(
-    'held_now', (select count(*) from public.web_stock_holds where state = 'held' and expires_at > now()),
-    'held_qty', coalesce((select sum(qty) from public.web_stock_holds where state = 'held' and expires_at > now()), 0),
-    'expired_not_closed', (select count(*) from public.web_stock_holds where state = 'held' and expires_at <= now()),
-    'released', (select count(*) from public.web_stock_holds where state = 'released'),
-    'consumed', (select count(*) from public.web_stock_holds where state = 'consumed'),
-    'reserve_on', public.rule_on('website_reserve_on'));
-end $$;
-
-create or replace function public.web_admin_board() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  return jsonb_build_object('on', public.rule_on('website_on'), 'orders_open', coalesce(public.rule_num('website_location_id'), 0) > 0,
-    'published_items', (select count(*) from public.web_item_pub where published),
-    'approved_photos', (select count(*) from public.web_item_images where approved),
-    'web_orders_today', (select count(*) from public.online_orders where channel = 'website' and (created_at at time zone 'Asia/Dhaka')::date = public._dhaka_today()),
-    'web_orders_new', (select count(*) from public.online_orders where channel = 'website' and status = 'new'),
-    'cancel_requests_open', (select count(*) from public.web_cancel_requests where state = 'open'),
-    'custom_requests_new', (select count(*) from public.web_custom_requests where state = 'new'),
-    'holds_held', (select count(*) from public.web_stock_holds where state = 'held' and expires_at > now()),
-    'reserve_on', public.rule_on('website_reserve_on'));
-end $$;
-
-create or replace function public.web_admin_web_orders(p_limit int default 100) returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  return coalesce((select jsonb_agg(to_jsonb(z) order by z.created_at desc) from (
-    select o.order_no, o.web_code, o.location_id, o.customer_name, o.customer_mobile, o.delivery_mode, o.delivery_date, o.subtotal, o.delivery_charge,
-           o.pay_mode, o.pay_ref, o.status, o.source, o.sale_id, o.created_at
-      from public.online_orders o where o.channel = 'website' order by o.created_at desc limit least(greatest(coalesce(p_limit, 100), 1), 500)) z), '[]'::jsonb);
-end $$;
-
-create or replace function public.web_admin_cancel_list() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  return coalesce((select jsonb_agg(jsonb_build_object('id', r.id, 'order_no', o.order_no, 'web_code', o.web_code, 'reason', r.reason, 'status', o.status, 'created_at', r.created_at)
-    order by r.created_at) from public.web_cancel_requests r join public.online_orders o on o.id = r.order_id where r.state = 'open'), '[]'::jsonb);
-end $$;
-
-create or replace function public.web_admin_cancel_decide(p_id bigint, p_approve boolean, p_note text default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-declare r public.web_cancel_requests; o public.online_orders; res jsonb;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  select * into r from public.web_cancel_requests where id = p_id for update;
-  if not found or r.state <> 'open' then raise exception 'not_open'; end if;
-  if coalesce(p_approve, false) then
-    select * into o from public.online_orders where id = r.order_id;
-    res := public.online_order_cancel(o.id, r.reason, 'none');   -- the existing cancel rules (status, reason, advance) apply
-  end if;
-  update public.web_cancel_requests set state = case when coalesce(p_approve, false) then 'approved' else 'declined' end, decided_by = auth.uid(), decided_at = now(),
-    decide_note = left(nullif(btrim(p_note), ''), 300) where id = p_id;
-  return jsonb_build_object('id', p_id, 'state', case when coalesce(p_approve, false) then 'approved' else 'declined' end, 'cancel', res);
-end $$;
-
-create or replace function public.web_admin_custom_list() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  return coalesce((select jsonb_agg(to_jsonb(z) order by z.created_at desc) from (
-    select id, code, name, mobile, flavour, weight_kg, message, wanted_date, slot, ref_path, state, created_at from public.web_custom_requests order by created_at desc limit 200) z), '[]'::jsonb);
-end $$;
-
-create or replace function public.web_admin_custom_decide(p_id bigint, p_state text, p_note text default null) returns jsonb
-language plpgsql security definer set search_path = public as $$
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  if p_state not in ('confirmed', 'declined') then raise exception 'bad_state'; end if;
-  update public.web_custom_requests set state = p_state, decided_by = auth.uid(), decided_at = now(), decide_note = left(nullif(btrim(p_note), ''), 300)
-    where id = p_id and state = 'new';
-  if not found then raise exception 'not_open'; end if;
-  return jsonb_build_object('id', p_id, 'state', p_state);
-end $$;
-
--- go-live checklist: tells honestly what is missing. No secrets are read or shown.
-create or replace function public.web_admin_go_live() returns jsonb
-language plpgsql stable security definer set search_path = public as $$
-declare items jsonb := '[]'; loc int := coalesce(public.rule_num('website_location_id'), 0)::int; anon_ok boolean;
-  function_ok boolean; ok boolean;
-begin
-  if not public.is_owner() then raise exception 'not allowed'; end if;
-  anon_ok := has_function_privilege('anon', 'public.web_catalog_v2(text)', 'execute') and has_function_privilege('anon', 'public.web_checkout_submit(uuid,text,text,text,int,text,jsonb,text,text,text,date,int,jsonb,text)', 'execute');
-  function_ok := not has_function_privilege('anon', 'public.web_admin_board()', 'execute') and not has_function_privilege('anon', 'public.web_admin_drift()', 'execute');
-  items := items || jsonb_build_object('key', 'site_on', 'required', true, 'ok', public.rule_on('website_on'), 'bn', 'ওয়েবসাইট চালু', 'en', 'Website switched on', 'how_bn', 'সেটিংসে ওয়েবসাইট চালু করুন', 'how_en', 'Turn the website switch on in settings');
-  items := items || jsonb_build_object('key', 'branch', 'required', true, 'ok', loc > 0 and exists (select 1 from public.locations where id = loc and is_active),
-    'bn', 'ওয়েব অর্ডারের শাখা', 'en', 'Branch for web orders', 'how_bn', 'ওয়েব অর্ডারের শাখা বেছে নিন', 'how_en', 'Choose the branch that receives web orders');
-  items := items || jsonb_build_object('key', 'staff_orders', 'required', true, 'ok', public.rule_on('online_orders_on'),
-    'bn', 'অর্ডার ব্যবস্থাপনা (online order) চালু', 'en', 'Order screens switched on', 'how_bn', 'অনলাইন অর্ডার চ্যানেল চালু করুন', 'how_en', 'Switch on the online order channel so staff can handle orders');
-  items := items || jsonb_build_object('key', 'names', 'required', true, 'ok', nullif(public.rule_txt('website_brand_bn'), '') is not null and nullif(public.rule_txt('website_brand_en'), '') is not null,
-    'bn', 'দোকানের নাম (বাংলা ও ইংরেজি)', 'en', 'Shop name in Bangla and English', 'how_bn', 'সেটিংসে নাম লিখুন', 'how_en', 'Enter the name in settings');
-  items := items || jsonb_build_object('key', 'published', 'required', true, 'ok', exists (select 1 from public.web_item_pub where published),
-    'bn', 'অন্তত একটি আইটেম পাবলিশ', 'en', 'At least one item published', 'how_bn', 'ক্যাটালগে আইটেম পাবলিশ করুন', 'how_en', 'Publish items from the Website screen');
-  items := items || jsonb_build_object('key', 'delivery', 'required', true, 'ok', exists (select 1 from public.web_pickup_points where public) or exists (select 1 from public.web_zones where active),
-    'bn', 'পিকআপ বিন্দু বা ডেলিভারি এলাকা', 'en', 'A pickup point or a delivery zone', 'how_bn', 'পিকআপ শাখা বা ডেলিভারি এলাকা যোগ করুন', 'how_en', 'Make a branch a public pickup point or add a zone');
-  items := items || jsonb_build_object('key', 'payment', 'required', true, 'ok', public.rule_on('website_pay_cod_on') or (public.rule_on('website_pay_manual_on') and nullif(public.rule_txt('website_pay_mobile_number'), '') is not null),
-    'bn', 'অন্তত একটি পেমেন্ট পদ্ধতি', 'en', 'At least one payment method', 'how_bn', 'COD অথবা bKash/Nagad চালু করুন', 'how_en', 'Switch on COD, or bKash/Nagad with a number');
-  items := items || jsonb_build_object('key', 'anon_grants', 'required', true, 'ok', anon_ok and function_ok,
-    'bn', 'পাবলিক ও অ্যাডমিন অনুমতি ঠিক', 'en', 'Public / admin permissions are right', 'how_bn', 'মাইগ্রেশন আবার চালান (phase 490-491)', 'how_en', 'Re-paste phases 490-491 and run the permission test');
-  items := items || jsonb_build_object('key', 'domain', 'required', false, 'ok', nullif(public.rule_txt('website_public_url'), '') is not null,
-    'bn', 'ডোমেইন/হোস্টিং ঠিকানা', 'en', 'Domain / hosting address', 'how_bn', 'ডোমেইন বা হোস্টিং কিনে ঠিকানা এখানে লিখুন; এর আগে শুধু লোকাল পরীক্ষা', 'how_en', 'Buy a domain or hosting, deploy site/ and enter its address here. Until then: local test only');
-  items := items || jsonb_build_object('key', 'https', 'required', false, 'ok', nullif(public.rule_txt('website_public_url'), '') is not null and public.rule_txt('website_public_url') like 'https://%',
-    'bn', 'HTTPS ঠিকানা', 'en', 'HTTPS address', 'how_bn', 'ডোমেইনের ঠিকানা https:// দিয়ে শুরু হতে হবে', 'how_en', 'The address must start with https://');
-  items := items || jsonb_build_object('key', 'whatsapp', 'required', false, 'ok', nullif(public.rule_txt('website_whatsapp'), '') is not null,
-    'bn', 'হোয়াটসঅ্যাপ নম্বর', 'en', 'WhatsApp number', 'how_bn', 'দেশের কোড সহ নম্বর লিখুন', 'how_en', 'Enter the number with country code');
-  items := items || jsonb_build_object('key', 'test_order', 'required', true, 'ok', exists (select 1 from public.online_orders where channel = 'website'),
-    'bn', 'একটি পরীক্ষা অর্ডার সফলভাবে এসেছে', 'en', 'One test order arrived', 'how_bn', 'লোকাল ঠিকানা থেকে একটি পরীক্ষা অর্ডার দিন এবং বাতিল করুন', 'how_en', 'Place a test order from the local site and cancel it');
-  items := items || jsonb_build_object('key', 'drift', 'required', false, 'ok', (public.web_admin_drift()->'counts'->>'price_changed')::int = 0 and (public.web_admin_drift()->'counts'->>'not_sellable')::int = 0,
-    'bn', 'পাবলিশড আইটেম ও ERP-র মিল', 'en', 'Published items match the ERP', 'how_bn', 'Drift রিপোর্ট দেখে মেলান', 'how_en', 'Check the drift report and fix the items it lists');
-  ok := not exists (select 1 from jsonb_array_elements(items) x where (x->>'required')::boolean and not (x->>'ok')::boolean);
-  return jsonb_build_object('ready', ok, 'items', items, 'note', 'Required items must be OK before the public address is shared. Optional items can wait.');
-end $$;
-
--- ---------- grants ----------
--- every new function: closed to public and anon first, then opened only where a role needs it
-do $$
-declare f text;
-begin
-  for f in select unnest(array[
-      'public._web_rate91(text)', 'public.web_holds_expire()', 'public._web_hold_sync91()', 'public._web_newcode91()',
-      'public.web_checkout_submit(uuid,text,text,text,int,text,jsonb,text,text,text,date,int,jsonb,text)',
-      'public.web_order_track(text,text)', 'public.web_order_cancel_request(text,text,text,text)', 'public.web_custom_request(uuid,text,text,text,numeric,text,date,text,text,text)',
-      'public.web_admin_item_save(uuid,jsonb)', 'public.web_admin_publish_bulk(text,boolean)', 'public.web_admin_image_add(uuid,text,text,int)',
-      'public.web_admin_image_approve(bigint,boolean)', 'public.web_admin_zone_save(int,jsonb)', 'public.web_admin_pickup_save(int,jsonb)',
-      'public.web_admin_closure_save(date,text,text,boolean)', 'public.web_admin_drift()', 'public.web_admin_holds_report()', 'public.web_admin_board()',
-      'public.web_admin_web_orders(int)', 'public.web_admin_cancel_list()', 'public.web_admin_cancel_decide(bigint,boolean,text)', 'public.web_admin_custom_list()',
-      'public.web_admin_custom_decide(bigint,text,text)', 'public.web_admin_go_live()']) loop
-    execute format('revoke all on function %s from public, anon', f);
+  if not public.is_active() or not public._xb540_verifier_any() then raise exception 'not allowed'; end if;
+  if not exists (select 1 from public.d_wallets where code = p_wallet and active) then raise exception 'bad_wallet'; end if;
+  if p_lines is null or jsonb_typeof(p_lines) <> 'array' or jsonb_array_length(p_lines) > 2000 then raise exception 'bad_lines'; end if;
+  for ln in select * from jsonb_array_elements(p_lines) loop
+    if upper(btrim(coalesce(ln->>'trx_id', ''))) !~ '^[A-Z0-9]{6,20}$' or coalesce(ln->>'direction', '') not in ('in', 'out')
+       or (ln->>'amount') is null or (ln->>'amount')::numeric <= 0 or (ln->>'at') is null then bad := bad + 1; continue; end if;
+    insert into public.pay_statement_lines (wallet_code, trx_id, direction, amount, stmt_at, counterpart, import_batch, imported_by)
+      values (p_wallet, upper(btrim(ln->>'trx_id')), ln->>'direction', round((ln->>'amount')::numeric, 2), (ln->>'at')::timestamptz,
+              left(nullif(btrim(ln->>'counterpart'), ''), 40), batch, auth.uid())
+      on conflict (wallet_code, trx_id, direction) do nothing;
+    get diagnostics n = row_count;
+    if n = 1 then ins := ins + 1; else dup := dup + 1; end if;
   end loop;
-  -- the public (anon) entry points of this phase
-  grant execute on function public.web_checkout_submit(uuid,text,text,text,int,text,jsonb,text,text,text,date,int,jsonb,text) to anon, authenticated;
-  grant execute on function public.web_order_track(text,text) to anon, authenticated;
-  grant execute on function public.web_order_cancel_request(text,text,text,text) to anon, authenticated;
-  grant execute on function public.web_custom_request(uuid,text,text,text,numeric,text,date,text,text,text) to anon, authenticated;
-  -- owner-only admin (each function also checks is_owner() itself)
-  grant execute on function public.web_admin_item_save(uuid,jsonb), public.web_admin_publish_bulk(text,boolean), public.web_admin_image_add(uuid,text,text,int),
-    public.web_admin_image_approve(bigint,boolean), public.web_admin_zone_save(int,jsonb), public.web_admin_pickup_save(int,jsonb),
-    public.web_admin_closure_save(date,text,text,boolean), public.web_admin_drift(), public.web_admin_holds_report(), public.web_admin_board(),
-    public.web_admin_web_orders(int), public.web_admin_cancel_list(), public.web_admin_cancel_decide(bigint,boolean,text), public.web_admin_custom_list(),
-    public.web_admin_custom_decide(bigint,text,text), public.web_admin_go_live(), public.web_holds_expire() to authenticated;
+  return jsonb_build_object('wallet', p_wallet, 'batch', batch, 'inserted', ins, 'already_there', dup, 'bad_rows', bad);
 end $$;
+
+create or replace function public.xb_pay_tieout(p_date date, p_wallet text default null) returns jsonb
+language plpgsql stable security definer set search_path = public as $$
+declare d date := coalesce(p_date, (now() at time zone 'Asia/Dhaka')::date); out_ jsonb := '[]';
+        w record; cap numeric; cap_ver numeric; stm_in numeric; stm_out numeric; l_stmt jsonb; l_erp jsonb; l_mis jsonb; nmis int; nstm int; nerp int; has_stm boolean;
+begin
+  if not public.is_active() or not public._xb540_verifier_any() then raise exception 'not allowed'; end if;
+  for w in select code, name_en from public.d_wallets where active and (p_wallet is null or code = p_wallet) order by sort, id loop
+    select coalesce(sum(amount), 0), coalesce(sum(amount) filter (where status = 'verified'), 0) into cap, cap_ver
+      from public.pay_captures where wallet_code = w.code and status in ('pending', 'verified') and (paid_at at time zone 'Asia/Dhaka')::date = d;
+    select coalesce(sum(amount) filter (where direction = 'in'), 0), coalesce(sum(amount) filter (where direction = 'out'), 0) into stm_in, stm_out
+      from public.pay_statement_lines where wallet_code = w.code and (stmt_at at time zone 'Asia/Dhaka')::date = d;
+    has_stm := exists (select 1 from public.pay_statement_lines s where s.wallet_code = w.code and (s.stmt_at at time zone 'Asia/Dhaka')::date = d);
+    select coalesce(jsonb_agg(jsonb_build_object('trx_id', s.trx_id, 'amount', s.amount) order by s.trx_id), '[]'::jsonb), count(*)
+      into l_stmt, nstm from public.pay_statement_lines s
+     where s.wallet_code = w.code and s.direction = 'in' and (s.stmt_at at time zone 'Asia/Dhaka')::date = d
+       and not exists (select 1 from public.pay_captures c where c.trx_id = s.trx_id and c.status <> 'void');
+    select coalesce(jsonb_agg(jsonb_build_object('trx_id', c.trx_id, 'amount', c.amount, 'status', c.status) order by c.trx_id), '[]'::jsonb), count(*)
+      into l_erp, nerp from public.pay_captures c
+     where c.wallet_code = w.code and c.status = 'verified' and (c.paid_at at time zone 'Asia/Dhaka')::date = d
+       and not exists (select 1 from public.pay_statement_lines s where s.wallet_code = w.code and s.trx_id = c.trx_id and s.direction = 'in');
+    select coalesce(jsonb_agg(jsonb_build_object('trx_id', c.trx_id, 'captured', c.amount, 'statement', s.amount) order by c.trx_id), '[]'::jsonb), count(*)
+      into l_mis, nmis from public.pay_captures c join public.pay_statement_lines s on s.wallet_code = c.wallet_code and s.trx_id = c.trx_id and s.direction = 'in'
+     where c.wallet_code = w.code and c.status in ('pending', 'verified') and c.amount <> s.amount;
+    out_ := out_ || jsonb_build_object('wallet', w.code, 'name_en', w.name_en, 'captured_total', cap, 'captured_verified', cap_ver,
+      'statement_in', stm_in, 'statement_out', stm_out, 'statement_lines_without_capture', nstm, 'captured_not_on_statement', nerp,
+      'amount_mismatch', nmis, 'statement_only', l_stmt, 'captured_only', l_erp, 'mismatch', l_mis, 'statement_imported', has_stm,
+      'status', case when not has_stm then 'no_statement_imported'
+                     when nstm = 0 and nerp = 0 and nmis = 0 then 'matched' else 'difference' end);
+  end loop;
+  return jsonb_build_object('date', d, 'wallets', out_, 'notes', jsonb_build_array('a_capture_is_evidence_not_a_posting', 'blank_tolerance_means_exact_match'));
+end $$;
+
+-- ---------- privileges and RLS ----------
+alter table public.pay_captures enable row level security;
+alter table public.pay_statement_lines enable row level security;
+revoke all on public.pay_captures, public.pay_statement_lines from public, anon, authenticated;
+grant select on public.pay_captures to authenticated;
+grant select on public.pay_statement_lines to authenticated;
+drop policy if exists pay_captures_sel on public.pay_captures;
+create policy pay_captures_sel on public.pay_captures for select to authenticated
+  using (public.is_active() and (public.is_owner() or public.can_do('POS', 'view')) and public.can_loc(location_id));
+drop policy if exists pay_statement_lines_sel on public.pay_statement_lines;
+create policy pay_statement_lines_sel on public.pay_statement_lines for select to authenticated using (public.is_owner() or public._xb540_verifier_any());
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+  values ('payproof', 'payproof', false, 3145728, array['image/jpeg']) on conflict (id) do nothing;
+drop policy if exists xb540_payproof_ins on storage.objects;
+create policy xb540_payproof_ins on storage.objects for insert to authenticated
+  with check (bucket_id = 'payproof' and split_part(name, '/', 1) = 'pay' and public.is_active() and public.can_do('POS', 'enter') and public.can_loc(split_part(name, '/', 2)::int));
+drop policy if exists xb540_payproof_read on storage.objects;
+create policy xb540_payproof_read on storage.objects for select to authenticated
+  using (bucket_id = 'payproof' and split_part(name, '/', 1) = 'pay' and public.is_active() and (public.is_owner() or public.can_do('POS', 'view')) and public.can_loc(split_part(name, '/', 2)::int));
+
+do $x$ declare f record; begin
+  for f in select p.oid::regprocedure as sig, p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+            where n.nspname = 'public' and (p.proname like 'xb\_pay\_%' or p.proname like '\_xb540\_%') loop
+    execute format('revoke all on function %s from public, anon, authenticated', f.sig);
+    if f.proname like 'xb\_pay\_%' then execute format('grant execute on function %s to authenticated', f.sig); end if;
+  end loop;
+end $x$;
+notify pgrst, 'reload schema';

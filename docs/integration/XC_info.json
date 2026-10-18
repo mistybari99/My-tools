@@ -1,7 +1,7 @@
 {
  "package": "XC",
  "title": "Owner summary, production suggestion, price alerts, unsold stock, staff board",
- "note": "Plain-English info for the settings added by phases 550-554. Every setting starts OFF or blank. No setting is assumed.",
+ "note": "Plain-English info for the settings added by phases 494-498. Every setting starts OFF or blank. No setting is assumed.",
  "entries": {
   "rule:xc_summary_on": {
    "title": "Owner daily summary",

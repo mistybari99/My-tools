@@ -1,6 +1,6 @@
 /* Islamia BOS · X1 foundation screens: Connect Center (#/connect) and Automation & Integration Health (#/x1health).
-   Server: supabase/phase480.sql (integration_registry, integration_set, integration_config_versions, webhook_rotation_record, job_runs, site_config),
-   supabase/phase481.sql (x1_health, action_proposals_list). Edge check (source only): tools/edge/x1-connect-check.ts.
+   Server: supabase/phase479.sql (integration_registry, integration_set, integration_config_versions, webhook_rotation_record, job_runs, site_config),
+   supabase/phase480.sql (x1_health, action_proposals_list). Edge check (source only): tools/edge/x1-connect-check.ts.
    Rules this file follows: a secret VALUE is never shown, typed or stored here; the screen only shows the NAMES that must be set on the server and where.
    Every connection is OFF until the owner switches it on. A "connected" state appears only after a successful test, never because a value was typed.
    The owner board widget "x1_health" is NOT in the default board: the owner adds it. */
@@ -30,7 +30,7 @@ const X = {
   h_intake: E('ইনটেক ব্যর্থ / মৃত', 'Intake failed / dead'), h_back: E('ব্যাকআপ', 'Backup'), h_books: E('হিসাবের সতেজতা', 'Books freshness'), h_props: E('অনুমোদনের অপেক্ষায় প্রস্তাব', 'Proposals waiting for approval'),
   s_ok: E('ঠিক', 'OK'), s_failed: E('ব্যর্থ', 'Failed'), s_stale: E('পুরনো', 'Stale'), s_never_run: E('চালানো হয়নি', 'Never run'), s_off: E('বন্ধ', 'Off'), s_not_connected: E('সংযুক্ত নয়', 'Not connected'),
   s_unverified: E('যাচাই হয়নি', 'Unverified'), s_error: E('ত্রুটি', 'Error'), s_missing: E('অনুপস্থিত', 'Missing'),
-  denied: E('এই পাতা শুধু মালিক দেখতে পারেন।', 'Only the owner can open this page.'), nofn: E('সার্ভারে এই অংশ এখনও চালু হয়নি (phase 480/481 চালাতে হবে)।', 'This part is not on the server yet (phase 480/481 must be run).'),
+  denied: E('এই পাতা শুধু মালিক দেখতে পারেন।', 'Only the owner can open this page.'), nofn: E('সার্ভারে এই অংশ এখনও চালু হয়নি (phase 479/480 চালাতে হবে)।', 'This part is not on the server yet (phase 479/480 must be run).'),
   fail_load: E('এখন আনা যায়নি', 'Could not load now'), again: E('আবার চেষ্টা', 'Try again'),
   kinds: { website: E('ওয়েবসাইট / ডোমেইন', 'Website / domain'), hosting: E('হোস্টিং', 'Hosting'), facebook_page: E('ফেসবুক পেজ', 'Facebook Page'), instagram: E('ইনস্টাগ্রাম', 'Instagram'), whatsapp_business: E('হোয়াটসঅ্যাপ বিজনেস', 'WhatsApp Business'), sms_gateway: E('এসএমএস গেটওয়ে', 'SMS gateway'), email_smtp: E('ইমেইল (SMTP)', 'E-mail (SMTP)'), payment: E('পেমেন্ট (bKash/Nagad)', 'Payment (bKash/Nagad)'), ai_provider: E('AI সেবা', 'AI provider'), vision_provider: E('ছবি পড়া (OCR)', 'Image reading (OCR)'), analytics: E('বিশ্লেষণ', 'Analytics'), other: E('অন্যান্য', 'Other') },
 };

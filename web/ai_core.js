@@ -1,6 +1,6 @@
 /* Islamia BOS · AI core (X4). Provider-independent, pure JavaScript: runs in the browser (window.BOS.aiCore) and under node (module.exports) for tests.
    Nothing here calls the network by itself. A provider is an adapter object { call(payload) -> Promise<{ toolCalls, output, usage }> }.
-   Rules enforced here (the server re-checks every one of them in supabase/phase510.sql / phase511.sql):
+   Rules enforced here (the server re-checks every one of them in supabase/phase484.sql / phase485.sql):
      1. Redaction runs BEFORE any text leaves the phone (redact()). The data level is checked against the provider's data_sharing.
      2. Every tool call is checked against the agent's read_tools list, the person's own rights (needs(me)), and the parameter schema. Unknown keys are refused.
      3. UNTRUSTED input (customer messages, web pages, photos): the run gets NO write or proposal tools, and no proposal action is accepted.
