@@ -2370,7 +2370,11 @@
    "change": "Cakes cancelled before delivery free their place again.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "rule:cake_flow_on",
+    "screen:cakejobs"
+   ]
   },
   "rule:cake_flow_on": {
    "title": "Custom cake workflow",
@@ -2380,7 +2384,12 @@
    "change": "On: a cake needs a price quote, a day that passes the lead time and the daily cap, and the advance in the order before it is confirmed.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:cakejobs",
+    "rule:cake_capacity_day",
+    "rule:cake_lead_days"
+   ]
   },
   "rule:cake_lead_days": {
    "title": "How many days ahead a cake must be ordered",
@@ -2390,7 +2399,11 @@
    "change": "A value of 1 means a cake for tomorrow at the earliest.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "rule:cake_flow_on",
+    "screen:cakejobs"
+   ]
   },
   "rule:cake_photo_required": {
    "title": "Photo of the finished cake before delivery",
@@ -2400,7 +2413,10 @@
    "change": "On: the delivered step is refused until a photo path is stored for the job.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:cakejobs"
+   ]
   },
   "rule:cash_short_post_on": {
    "title": "Post an approved cash short/over to the books",
@@ -4006,7 +4022,11 @@
    "change": "On: a Trx-ID already written is refused. Each capture gets a flag (ok, overpay, underpay, no target) and waits for a second person to verify it.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:paycapture",
+    "rule:pay_capture_tol"
+   ]
   },
   "rule:pay_capture_tol": {
    "title": "Taka difference allowed when matching a payment",
@@ -4016,7 +4036,11 @@
    "change": "A number such as 5 lets a payment within 5 taka of the due amount be flagged ok. Only the flag changes; nothing is posted.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "rule:pay_capture_on",
+    "screen:paycapture"
+   ]
   },
   "rule:pay_request_advance_ceiling": {
    "title": "Highest open advance for one staff member",
@@ -5484,7 +5508,10 @@
    "change": "On: a delivery can be assigned to an active rider with a zone fee. The cash collected per rider per day is compared with the deposits; a difference opens one case for the owner to explain.",
    "who": "Only the owner, in Settings.",
    "verified": true,
-   "src": "XB (docs/integration/XB_info.json)"
+   "src": "XB (docs/integration/XB_info.json)",
+   "related": [
+    "screen:riders"
+   ]
   },
   "rule:xc_coaching_on": {
    "title": "Staff coaching board (owner only)",
@@ -6177,6 +6204,96 @@
    ],
    "verified": true,
    "src": "phase48.sql (path_domains); paths.js; W1-G.md"
+  },
+  "rule:transfer_overdraw_block": {
+   "title": "Refuse a send bigger than the stock on hand (transfers)",
+   "does": "When ON, a transfer from a place is refused if the place has less stock of that item than the quantity sent.",
+   "why": "Stops a factory from sending goods it does not have, which makes its stock negative in the books.",
+   "default": "Off. A send bigger than the stock is accepted and the sender balance can go negative (as before).",
+   "change": "On: the send is refused with \"insufficient_stock\". Sends within stock still work.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:transfer_paused_block": {
+   "title": "Refuse a transfer to a paused or closed place",
+   "does": "When ON, a transfer to a place whose status is not live (paused or closed) is refused.",
+   "why": "Goods sent to a place nobody is open to receive end up in transit for ever.",
+   "default": "Off. A send to a paused place is accepted (as before).",
+   "change": "On: the send is refused with \"destination_paused\".",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:transfer_partial_on": {
+   "title": "Receive a transfer in parts",
+   "does": "When ON, the receiver can take in part of a transfer now and the rest later. The transfer stays open until all of it arrives, or the owner closes the rest as short.",
+   "why": "A factory ships by van in several lots, so one receipt for the whole transfer is not how it arrives.",
+   "default": "Off. One receipt closes the transfer, as before.",
+   "change": "On: a part receipt leaves the transfer open. The owner can close the rest as short with the close-short action (one short-in-transit line is written).",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:stock_unit_unknown_block": {
+   "title": "Refuse a sale when the unit conversion is unknown",
+   "does": "When ON, a sale of a tracked item whose unit has no conversion to the base unit is refused.",
+   "why": "Without a conversion the sale is kept but the stock is not reduced, so the stock figure is wrong.",
+   "default": "Off. The sale is kept with a yellow warning and the stock is not reduced (as before).",
+   "change": "On: the sale is refused with \"stock_unit_unknown\". Fix the conversion first.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:return_sale_factor_on": {
+   "title": "Return at the conversion factor of the sale",
+   "does": "When ON, a sale return puts back stock using the conversion factor that the sale used, not today factor.",
+   "why": "If the conversion was edited after the sale, today factor puts back the wrong quantity.",
+   "default": "Off. A return uses today factor (as before). Sales made before the new table have no saved factor and always use today factor.",
+   "change": "On: the returned quantity matches what the sale took out.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:biz_items_net_returns": {
+   "title": "Item analysis takes sale returns off",
+   "does": "When ON, the item analysis (per item revenue and quantity) takes off the returns made in the period.",
+   "why": "The returns line of the other reports already takes them off, and the item analysis did not.",
+   "default": "Off. The item analysis shows sales before returns (as before).",
+   "change": "On: quantity and revenue per item are after returns, for the day the return was made.",
+   "who": "Owner, in Settings (reports).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:dues_net_advance_on": {
+   "title": "Customer due takes off applied advances",
+   "does": "When ON, an advance that was applied to a customer sale reduces the customer due in the due list.",
+   "why": "An advance that was used still showed the sale as owed, so the same money could be collected twice.",
+   "default": "Off. The due list shows the sale as owed (as before).",
+   "change": "On: the due list shows the due after the applied advance.",
+   "who": "Owner, in Settings (customers / POS).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:recipe_intermediate_on": {
+   "title": "A made product as an ingredient of another recipe",
+   "does": "When ON, a finished item made by its own recipe (for example chhana or dough) can be an ingredient of another recipe. A loop (A needs B needs A) is refused.",
+   "why": "Two-stage sweets need the made intermediate, and without this the recipe cannot be saved.",
+   "default": "Off. Only raw material, packaging and resale items can be ingredients (as before).",
+   "change": "On: the recipe can use a made product. Production uses its stock at the average cost.",
+   "who": "Owner, in Settings (recipes).",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
+  },
+  "rule:tracking_map_apply_on": {
+   "title": "Apply the reviewed stock tracking map",
+   "does": "When ON, the owner can apply the reviewed tracking proposal to the items of one item type. The proposal is shown first and changes nothing until applied.",
+   "why": "Not every item should be stock-tracked, so the proposal is decided once per item type.",
+   "default": "Off. The map can be read and reviewed; nothing changes.",
+   "change": "On: the owner can apply a reviewed type. Opening stock must be counted first.",
+   "who": "Owner only.",
+   "verified": false,
+   "src": "phase499 or phase501 to phase505 (SW, docs/PLAN_NEXT.md section 2); not yet checked in the app"
   }
  }
 }

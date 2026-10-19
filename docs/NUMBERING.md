@@ -76,3 +76,7 @@ printed form কোড এখনো ছাপা হয়নি, তাই স�
 - `web/` ফাইলের JavaScript কমেন্টে phase নম্বর এই যন্ত্রের scope-এ নেই। পুনঃনম্বরের পরে সেগুলো হাতে দেখুন।
 - `docs/` ফাইলের ইতিহাসমূলক লেখা (যেমন BUILD-LOG) বদলানো হয় না, কারণ তা ইতিহাস।
 - BLOCKED SQL লাইনগুলো যন্ত্র ঠিক করে না। মালিকের সিদ্ধান্তের পরেই সেগুলো বদলানো যাবে।
+
+## 8. 500 is skipped (sweets fixes, SW)
+
+The sweets fixes after phase 498 are phases 499 and 501 to 505. Number 500 is an old-only number (the pre-renumber series used it for a file that is not in this branch), and `tools/check_numbering.py` lists it as stale. It is skipped on purpose, so no old reference to phase 500 can be read as the new file. Do not create a phase 500.

@@ -258,9 +258,17 @@ Positions 8 to 99 are the base and Wave 1. If the live project already has some 
 | 182 | `phase496.sql` | XC | XC-3 supplier price board, rise alert (threshold blank), recipe-cost preview (XC, OFF) |
 | 183 | `phase497.sql` | XC | XC-4 unsold stock and markdown list, wastage share (XC, OFF, markdown % blank) |
 | 184 | `phase498.sql` | XC | XC-5 owner-only staff coaching board, no rankings (XC, OFF) |
+| 185 | `phase499.sql` | SW | SW-1 sweets transfers: over-send, paused place, receipt in steps, close short (3 switches, OFF) |
+| 186 | `phase501.sql` | SW | SW-2 sweets sale stock: unknown unit refused on request, return at the sale's factor (2 switches, OFF) |
+| 187 | `phase502.sql` | SW | SW-3 item analysis takes sale returns off (switch, OFF) |
+| 188 | `phase503.sql` | SW | SW-4 customer due takes off applied advances (switch, OFF) |
+| 189 | `phase504.sql` | SW | SW-5 a made product as an ingredient, loop refused (switch, OFF) |
+| 190 | `phase505.sql` | SW | SW-6 stock tracking map and owner review; nothing applied (switch, OFF) |
 
-Package names: `base` = the product before the packages; W1-A to W1-G, I-1 = Wave 1 (phases 88 to 99); R1 = pay requests; R2-A to R2-C = announcements, to-do, shifts; W1-FIX = Wave 1 fixes (140 to 143); CRM-A to CRM-H = customer work; RPT-B1 to RPT-C3 and RPT-HUB = reports; integrator = the re-patch and the anon lock (477, 478); X1 to X6, XB and XC = the later packages (all OFF by default).
+Package names: `SW` = sweets fixes after phase 498 (phases 499 and 501 to 505, all OFF by default; paste in this order; 500 is not used, see docs/NUMBERING.md). `base` = the product before the packages; W1-A to W1-G, I-1 = Wave 1 (phases 88 to 99); R1 = pay requests; R2-A to R2-C = announcements, to-do, shifts; W1-FIX = Wave 1 fixes (140 to 143); CRM-A to CRM-H = customer work; RPT-B1 to RPT-C3 and RPT-HUB = reports; integrator = the re-patch and the anon lock (477, 478); X1 to X6, XB and XC = the later packages (all OFF by default).
 
 ## Old phase files: if you ever paste one again
+
+After phase 498 the phases 499 and 501 to 505 (SW) re-define some old functions (`_sale_stock_out`, `stock_transfer`, `stock_receive_transfer`, `sale_return`, `biz_items`, `customer_dues`, `_recipe_lines_ok`). If an old file is pasted again: paste 477 and 478, then paste 499 and 501 to 505 again, in order.
 
 Old phase files (3 to 98) re-create functions, and that removes the hooks other phases added to them. If you paste any old file again, paste phase 477 afterwards (it puts every hook back and calls `public._i2_apply_all()`), then paste phase 478 again (it closes the helper functions to anon). Then run the check in step 4 above. The full rule is in the old version of this file and in `docs/GO_LIVE.md`.
