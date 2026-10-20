@@ -144,7 +144,7 @@ Our line registers 139 routes, the advanced line 128, the merged `web/ia.js` 185
 | OK | `purchaseprint` (adv) | `web/ia.js` group `purch`; lazy: purchaseprint.js |
 | OK | `purchrep` (ours) | `web/ia.js` group `purch`; lazy: purchrep.js |
 | OK | `quickexp` (both) | `web/ia.js` group `acc`; lazy: paths.js |
-| OK | `recall` (ours) | `web/ia.js` group `stock`; core page |
+| OK | `recall` (ours) | `web/ia.js` group `stock`; lazy: trace.js |
 | OK | `recipebook` (both) | `web/ia.js` group `factory`; lazy: recipebook.js |
 | OK | `recipes` (both) | `web/ia.js` group `factory`; core page |
 | OK | `releases` (both) | `web/ia.js` group `appr`; core page |
@@ -183,7 +183,7 @@ Our line registers 139 routes, the advanced line 128, the merged `web/ia.js` 185
 | OK | `tiers` (both) | `web/ia.js` group `cust`; lazy: customers.js, crm_dupes.js |
 | OK | `tinting` (adv) | `web/ia.js` group `stock`; lazy: tinting129.js |
 | OK | `todo` (ours) | `web/ia.js` group `people`; core page |
-| OK | `trace` (ours) | `web/ia.js` group `stock`; core page |
+| OK | `trace` (ours) | `web/ia.js` group `stock`; lazy: trace.js |
 | OK | `transitshort` (adv) | `web/ia.js` group `appr`; lazy: stepw_common.js, formscreens.js |
 | OK | `twofa` (both) | `web/ia.js` group `settings`; lazy: twofa.js |
 | OK | `unmatched` (adv) | `web/ia.js` group `appr`; lazy: stepw_common.js, formscreens.js |
@@ -385,7 +385,7 @@ Our line has 145 scripts, the advanced line 124. Each must exist in `web/` and b
 | OK | `web/tpl_registry.js` (adv) | exists; named in index.html; core |
 | OK | `web/tpl_samples.js` (adv) | exists; named in index.html; core |
 | OK | `web/tplpicker.js` (adv) | exists; named in index.html; core |
-| OK | `web/trace.js` (ours) | exists; named in index.html; core |
+| OK | `web/trace.js` (ours) | exists; named in index.html; lazy/idle |
 | OK | `web/twofa.js` (both) | exists; named in index.html; lazy/idle |
 | OK | `web/variants125.js` (adv) | exists; named in index.html; lazy/idle |
 | OK | `web/wallets.js` (ours) | exists; named in index.html; lazy/idle |
@@ -1040,6 +1040,41 @@ Databases (local throwaway Postgres): final = the merged chain `tests/sql/ORDER.
 ## 7. Checks run on the merged tree
 
 See section "Verification" at the end (filled in from the real runs).
+
+## Verification (real runs, 20 Oct 2026)
+
+| check | result |
+|---|---|
+| `python3 tools/check_no_demo_leak.py` | OK |
+| `python3 tools/check_info_coverage.py` | OK (701 entries; all 386 rules and 30 grants since phase 80 covered) |
+| `python3 tools/check_ui_inventory.py` | OK: nothing lost (8,823 baseline items; 222 accepted through aliases with reasons; the baseline now also holds the 2,254 new items) |
+| `python3 tools/check_numbering.py`, `check_paste_order.py`, `build_paste_parts.py --check` | PASS / OK / OK |
+| `python3 tools/build_phase477.py --check`, `build_report_registry.py --check`, `check_backup_guard.py`, `test_testonly_files.py` | OK |
+| SQL chain `tests/sql/ORDER.txt` (255 phases) on local PostgreSQL 16, every phase pasted twice (`tests/sql/run_all_union.sh`) | 0 errors on the first paste, 0 errors on the second paste; `_i2_state()` no missing hook; `_union_audit()` 156 merged |
+| SQL suites at their own position | 71 suites of the advanced line: identical failing lines to the advanced line alone (0 worse); 148 of ours: identical to our line alone except `phase84b/84c` (test-project reset refuses because of the advanced tables, safe) and 5 suites replaced by union copies (`tests/sql/union_replaced_tests.txt`, all 0 fail); union suites 529-539: 0 fail (14+8+6+10+8+7+3+3+3+3+7 checks). Known fails: `tests/sql/union_known_fails.txt` |
+| Live delta | simulated live database + `phase499,501-505,529-539` = 0 differences in 2,891 function texts against the fresh merged build; second paste changes nothing (`docs/LIVE_DELTA.md` section 7) |
+| Web suite `tests/web/run_all.py` (186 suites), exit codes AND assertion lines counted | after the fixes every suite ends like on the advanced line alone or better. Still non-zero, same as the advanced line alone (not caused by the merge): a11y (axe-core missing), catpick, controls, errlog, glass and glass_b2 and swupdate (need the git history copy), landed_pw, nav, rollout, scan, sec2_itemimg, stockx |
+| 360 px | `rptb4_test` overflow of 20 px fixed in `web/catpick.js` (`.cat-bar` wraps); every suite that measures `scrollWidth` at 360 px passes |
+| Bundle | `tools/build_web.sh`: 193 scripts, 83 in the start-up bundle, 104 lazy, 120 routes; CSP hash of the inline theme script valid (`sec2_csp_test`: 23 pass); start-up `core.js` is about 31 percent larger (gzip) than the advanced build alone |
+
+## Decisions (the owner asked the agent to decide)
+
+1. The live site is NOT reverted; the two lines are merged into one version (this branch).
+2. Shell (index.html, CSP, glass, drawer, switcher, sw.js, lazy/bundle, theme) from the advanced line; our screens, navstack, Back-2/3/Main, X1-XC, CRM, reports ported in; every route of both resolves (section 1).
+3. Our X5 `scan.js` is `web/scan_items.js` (`B.scanitems`); the advanced `scan.js` (bill photo) keeps its name and route.
+4. Duplicated work: advanced implementation canonical; ours kept under its own OFF switch (list in `docs/LIVE_DELTA.md` section 8). Nothing of either side dropped.
+5. Two action-name collisions fixed by renaming ours (`er_open` to `exr_open`, `rc_csv` to `rcl_csv`) with UI aliases.
+6. Owner word list: Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ applied to our strings only (`tools/apply_owner_words.py`); older texts untouched.
+7. Phases 8-478 and the advanced files were not edited; advanced collisions renamed 506-528; union phases start at 529.
+
+## Not done / needs the owner
+
+- Nothing was pasted on the live database and nothing was pushed to the public repository.
+- Real-phone checks (360 px layout beyond the headless run, camera/OCR under the new CSP with the vendored Tesseract, Liquid Glass look, offline cold start) are not done.
+- The start-up bundle is larger than the advanced build; moving more of our scripts to idle/lazy loading is a later optimisation (`tools/web_lazy.json`).
+- Tests that need the git history of an old branch, axe-core, or the public repository clone cannot pass in the sandbox copy (same as before the merge).
+- Two switches that do the same job must not both be turned on (see LIVE_DELTA section 8).
+
 
 ## Open items (rows marked MISSING above)
 
