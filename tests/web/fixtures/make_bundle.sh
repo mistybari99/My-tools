@@ -29,7 +29,8 @@ grep -qx 'stepw_common.js' "$LIST" || { [ -f "$SRC/stepw_common.js" ] && echo st
 # any other .html besides index.html is not part of the app
 sed -i -E '/\.html$/{/^index\.html$/!d}' "$LIST"
 # node scripts must never be shipped
-if ( cd "$SRC" && grep -lE "require\(['\"](fs|path|http|child_process)['\"]\)|^#!/usr/bin/env node|module\.exports" $(grep -E '\.js$' "$LIST") 2>/dev/null ); then echo "ABORT: node-style file(s) in the publish list (above)"; exit 4; fi
+# (a browser file may carry the guarded UMD line "if (typeof module !== 'undefined' && module.exports) module.exports = api" for its node test: that line is not node-style)
+if ( cd "$SRC" && for f in $(grep -E '\.js$' "$LIST"); do grep -vE "typeof module *!==? *['\"]undefined['\"]" "$f" | grep -qE "require\(['\"](fs|path|http|child_process)['\"]\)|^#!/usr/bin/env node|module\.exports *=" && echo "$f"; done | grep . ); then echo "ABORT: node-style file(s) in the publish list (above)"; exit 4; fi
 
 # 4) sync: copy changed/new, remove files that vanished from source (never the protected ones)
 ADD=0; CHG=0; DEL=0; SAME=0

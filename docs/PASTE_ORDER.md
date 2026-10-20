@@ -56,7 +56,7 @@ Phases 479 to 498 (the X-packages X1 to XC, the XB package and the RPT, CRM and 
 
 The positions below follow the numbers, which is the order `tests/sql/ORDER.txt` uses. Each file's header lists what it needs. If a file's header says it needs another phase, paste that phase first, even if its number is higher.
 
-## Renumbered earlier: phases 480-554 -> 479-498 (our line, before the merge)
+## Renumbered earlier: the parallel-builder phases -> 479-498 (our line, before the merge)
 
 The parallel-builder files were renumbered in paste order so the sequence continues after phase 478. No SQL body changed; only file names, references in text files and the header comments that named their own file. Old name -> new name, with `_test` files following their main file:
 
