@@ -32,7 +32,7 @@ const X = {
   csv: L('CSV', 'CSV', 'CSV'), expLock: L('এক্সপোর্টের অনুমতি নেই', 'Export not allowed', 'Export এর permission নেই'), expDone: L('ফাইল নামানো হয়েছে', 'File downloaded', 'File নামানো হয়েছে'),
   noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), trunc: L('তালিকা ছোট করা হয়েছে', 'The list is cut short', 'List ছোট করা হয়েছে'),
   paperCode: L('কাগজের ফর্মের কোড: মালিক দেবেন', 'paper form code: to be given by owner', 'paper form code: owner দেবেন'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('থাক', 'Cancel', 'Cancel'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), close: L('বন্ধ', 'Close', 'Close'), open: L('খুলুন', 'Open', 'Open'),
+  save: L('সেভ', 'Save', 'Save'), cancel: L('থাক', 'Cancel', 'Cancel'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), close: L('বন্ধ', 'Close', 'Close'), open: L('খুলুন', 'Open', 'Open'),
   why: L('কারণ (কমপক্ষে ৩ অক্ষর)', 'Reason (at least 3 characters)', 'Reason (কমপক্ষে ৩ অক্ষর)'), note: L('নোট', 'Note', 'Note'), details: L('বিস্তারিত', 'Details', 'Details'), sources: L('উৎস', 'Source', 'Source'),
   basis: L('হিসাবের ভিত্তি', 'Basis', 'Basis'), loading: L('দেখা হচ্ছে…', 'Loading…', 'Loading…'), unit: L('একক', 'Unit', 'Unit'), itemph: L('কোড বা নাম লিখুন', 'Type code or name', 'Code বা নাম লিখুন'),
   generated: L('তৈরি', 'Generated', 'Generated'),
@@ -66,10 +66,10 @@ function notesHtml(notes) {
 // ---------- server errors in the reader's language ----------
 const ERR = {
   not_allowed: X.noperm, 'not allowed': X.noperm, 'not allowed for this location': L('এই জায়গা আপনার নয়', 'You may not see this place', 'এই place আপনার নয়'),
-  bad_range: L('তারিখের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'), bad_status: L('অবস্থা ঠিক নয়', 'The status is not valid', 'Status ঠিক নয়'),
+  bad_range: L('ডেটের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'), bad_status: L('অবস্থা ঠিক নয়', 'The status is not valid', 'Status ঠিক নয়'),
   note_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (at least 3 characters)', 'Reason লিখুন (কমপক্ষে ৩ অক্ষর)'),
   item_not_found: L('পণ্য পাওয়া যায়নি', 'Item not found', 'Item পাওয়া যায়নি'), unit_unknown: L('এককের রূপান্তর জানা নেই', 'Unit conversion unknown', 'Unit conversion জানা নেই'),
-  bad_qty: L('পরিমাণ ঠিক নয়', 'The quantity is not valid', 'Quantity ঠিক নয়'), bad_date: L('তারিখ ঠিক নয়', 'The date is not valid', 'Date ঠিক নয়'), bad_location: L('জায়গা ঠিক নয়', 'The place is not valid', 'Place ঠিক নয়'),
+  bad_qty: L('পরিমাণ ঠিক নয়', 'The quantity is not valid', 'Quantity ঠিক নয়'), bad_date: L('ডেট ঠিক নয়', 'The date is not valid', 'Date ঠিক নয়'), bad_location: L('জায়গা ঠিক নয়', 'The place is not valid', 'Place ঠিক নয়'),
   plan_needs_batches_or_qty: L('ব্যাচ সংখ্যা বা পরিমাণ — একটি লিখুন', 'Write the batches or the quantity', 'Batch সংখ্যা বা quantity লিখুন'), recipe_not_found: L('রেসিপি এই পণ্যের নয়', 'The recipe is not for this item', 'Recipe এই item-এর নয়'),
   order_not_open: L('অর্ডারটি আর খোলা নেই', 'The order is no longer open', 'Order আর open নেই'), link_mismatch: L('পরিকল্পনা / অর্ডার এই রানের পণ্য বা জায়গার সাথে মেলে না', "The plan / order does not match the run's item or place", 'Plan / order run-এর item বা place-এর সাথে মেলে না'),
   plan_cancelled: L('পরিকল্পনাটি বাতিল', 'The plan is cancelled', 'Plan cancelled'), run_void: L('রানটি বাতিল হয়ে গেছে', 'The run is void', 'Run void হয়ে গেছে'),

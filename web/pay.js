@@ -23,7 +23,7 @@ async function loadReceiptCfg() {
   return RC;
 }
 const X = {
-  chq: L('চেক নম্বর', 'Cheque no.', 'Cheque no.'), chqd: L('চেকের তারিখ', 'Cheque date', 'Cheque date'), refb: L('ট্রানজেকশন / স্লিপ নং', 'Transaction / slip no.', 'Transaction / slip no.'),
+  chq: L('চেক নম্বর', 'Cheque no.', 'Cheque no.'), chqd: L('চেকের ডেট', 'Cheque date', 'Cheque date'), refb: L('ট্রানজেকশন / স্লিপ নং', 'Transaction / slip no.', 'Transaction / slip no.'),
   why: L('নম্বর না থাকলে কারণ (ঐচ্ছিক)', 'Reason if the number is missing (optional)', 'Number না থাকলে reason (ঐচ্ছিক)'),
   paid: L('পরিশোধ', 'Paid', 'Paid'), due: L('বাকি', 'Due', 'Due (বাকি)'), amount: L('টাকা', 'Amount', 'Amount'), wallet: L('কোন মাধ্যম', 'Which service', 'Which service'),
   ref: L('ট্রানজেকশন নং (ঐচ্ছিক)', 'Transaction no. (optional)', 'Transaction no. (ঐচ্ছিক)'), given: L('গ্রাহক দিলেন', 'Customer gave', 'Customer দিলেন'), change: L('ফেরত', 'Change', 'Change (ফেরত)'),

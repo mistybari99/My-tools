@@ -18,9 +18,9 @@ const X = {
   title: L('স্টক শেষ (চাহিদা পূরণ হয়নি)', 'Stockout log (unmet demand)', 'Stockout log (চাহিদা পূরণ হয়নি)'),
   intro: L('ক্রেতা যা চেয়েছিলেন কিন্তু দোকানে ছিল না — এখানে লিখে রাখুন। আনুমানিক কত চাহিদা ছিল তা না জানলে খালি রাখুন।', 'Write down what a customer asked for and the shop did not have. Leave the estimate blank if you do not know it.', 'Customer যা চেয়েছিল কিন্তু ছিল না — লিখে রাখুন। আনুমানিক পরিমাণ না জানলে খালি রাখুন।'),
   paperCode: L('কাগজের ফর্মের কোড: মালিক দেবেন', 'paper form code: to be given by owner', 'paper form code: owner দেবেন'),
-  date: L('তারিখ', 'Date', 'Date'), place: L('জায়গা', 'Place', 'Place'), item: L('আইটেম', 'Item', 'Item'), itemph: L('কোড বা নাম লিখুন', 'Type code or name', 'Code বা নাম লিখুন'), note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (optional)'),
+  date: L('ডেট', 'Date', 'Date'), place: L('জায়গা', 'Place', 'Place'), item: L('আইটেম', 'Item', 'Item'), itemph: L('কোড বা নাম লিখুন', 'Type code or name', 'Code বা নাম লিখুন'), note: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (optional)'),
   est: L('আনুমানিক কত চাহিদা (ঐচ্ছিক)', 'Estimated quantity missed (optional)', 'আনুমানিক চাহিদা (optional)'), unit: L('একক', 'Unit', 'Unit'), baseUnit: L('— বেস একক —', '— base unit —', '— base unit —'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), dup: L('আগেই সংরক্ষিত', 'Already saved', 'আগেই saved'), cancel: L('থাক', 'Cancel', 'Cancel'),
+  save: L('সেভ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), dup: L('আগেই সংরক্ষিত', 'Already saved', 'আগেই saved'), cancel: L('থাক', 'Cancel', 'Cancel'),
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), all: L('সব', 'All', 'All'), show: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
   summary: L('সারাংশ: কোন মাল কতবার শেষ', 'Summary: which item ran out how often', 'Summary: কোন মাল কতবার শেষ'), entries: L('এন্ট্রি', 'Entries', 'Entries'),
   ev: L('বার', 'times', 'times'), days: L('দিন', 'days', 'days'), last: L('শেষবার', 'last', 'last'), estTotal: L('আনুমানিক চাহিদা (যেখানে লেখা)', 'Estimated missed (where written)', 'আনুমানিক চাহিদা (যেখানে লেখা)'),
@@ -32,9 +32,9 @@ const X = {
 };
 const T = (k) => lab(X[k]);
 const ERR = {
-  not_allowed: X.noperm, bad_date: L('তারিখ আজকের পরে হতে পারে না', 'The date cannot be in the future', 'Date আজকের পরে হবে না'), item_not_found: L('আইটেম পাওয়া যায়নি', 'Item not found', 'Item পাওয়া যায়নি'),
+  not_allowed: X.noperm, bad_date: L('ডেট আজকের পরে হতে পারে না', 'The date cannot be in the future', 'Date আজকের পরে হবে না'), item_not_found: L('আইটেম পাওয়া যায়নি', 'Item not found', 'Item পাওয়া যায়নি'),
   bad_qty: X.needQty, unit_unknown: L('এককের রূপান্তর জানা নেই', 'Unit conversion unknown', 'Unit conversion জানা নেই'), bad_note: L('নোট ৩০০ অক্ষরের মধ্যে', 'Note: max 300 characters', 'Note: max 300 অক্ষর'),
-  note_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (at least 3 characters)', 'Reason লিখুন (কমপক্ষে ৩ অক্ষর)'), bad_range: L('তারিখের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'),
+  note_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (at least 3 characters)', 'Reason লিখুন (কমপক্ষে ৩ অক্ষর)'), bad_range: L('ডেটের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'),
   bad_location: L('জায়গা ঠিক নয়', 'The place is not valid', 'Place ঠিক নয়'), 'not allowed for this location': L('এই জায়গা আপনার নয়', 'You may not use this place', 'এই place আপনার নয়'),
 };
 const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? lab(ERR[k]) : m || 'error'; };

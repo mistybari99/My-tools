@@ -20,7 +20,7 @@ const X = {
   none: L('এখন আপনার কোনো করণীয় নেই।', 'Nothing to do right now.', 'এখন কোনো করণীয় নেই।'), noneGiven: L('এখনো কাউকে কাজ দেননি।', 'You have not given any task yet.', 'এখনো কাউকে কাজ দেননি।'),
   showDone: L('শেষ হওয়াগুলোও দেখান', 'Show finished ones too', 'শেষ হওয়াগুলোও দেখান'),
   newBtn: L('নতুন কাজ দিন', 'Give a task', 'নতুন কাজ দিন'), cantAssign: L('কাজ দেওয়ার অনুমতি আপনার নেই। মালিক "কাজ দেওয়া" অধিকার দিলে পারবেন।', 'You cannot give tasks. The owner can give you the right "Give extra tasks".', 'কাজ দেওয়ার permission নেই। মালিক "Give extra tasks" অধিকার দিলে পারবেন।'),
-  fTitle: L('কাজের নাম', 'Task', 'কাজের নাম'), fDetail: L('বিস্তারিত', 'Details', 'বিস্তারিত'), fDue: L('শেষ তারিখ (ফাঁকা = নির্দিষ্ট নেই)', 'Due date (blank = none)', 'শেষ তারিখ (ফাঁকা = নেই)'),
+  fTitle: L('কাজের নাম', 'Task', 'কাজের নাম'), fDetail: L('বিস্তারিত', 'Details', 'বিস্তারিত'), fDue: L('শেষ ডেট (ফাঁকা = নির্দিষ্ট নেই)', 'Due date (blank = none)', 'শেষ Date (ফাঁকা = নেই)'),
   fPri: L('গুরুত্ব', 'Priority', 'Priority'), fTo: L('কাকে', 'Give to', 'কাকে'), kPerson: L('একজনকে', 'One person', 'একজন'), kRole: L('একটি ভূমিকার সবাইকে', 'Everyone with a role', 'একটি role-এর সবাই'),
   pick: L('বাছুন…', 'Choose…', 'বাছুন…'), fRep: L('পুনরাবৃত্তি', 'Repeat', 'Repeat'), rNone: L('একবার', 'Once', 'একবার'), rDaily: L('প্রতিদিন', 'Daily', 'প্রতিদিন'), rWeekly: L('প্রতি সপ্তাহে', 'Weekly', 'প্রতি সপ্তাহে'),
   pLow: L('কম', 'Low', 'Low'), pNormal: L('সাধারণ', 'Normal', 'Normal'), pHigh: L('বেশি', 'High', 'High'), pUrgent: L('জরুরি', 'Urgent', 'জরুরি'),
@@ -28,16 +28,16 @@ const X = {
   giveBtn: L('দিন', 'Give', 'Give'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ করুন', 'Close', 'Close'),
   done: L('হয়েছে', 'Done', 'Done'), cannot: L('করা যায়নি', 'Cannot do', 'Cannot do'), overdue: L('দেরি', 'Overdue', 'Overdue'), due: L('শেষ', 'Due', 'Due'),
   doneNote: L('কী করা হলো (ঐচ্ছিক)', 'What was done (optional)', 'কী করা হলো (optional)'), cannotWhy: L('কেন করা যায়নি (লিখতে হবে)', 'Why it cannot be done (required)', 'কেন করা যায়নি (লিখতে হবে)'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), from: L('দিয়েছেন', 'from', 'from'), to: L('কাকে', 'to', 'to'), repeats: L('পুনরাবৃত্ত', 'repeats', 'repeats'),
+  save: L('সেভ', 'Save', 'Save'), from: L('দিয়েছেন', 'from', 'from'), to: L('কাকে', 'to', 'to'), repeats: L('পুনরাবৃত্ত', 'repeats', 'repeats'),
   cancelTask: L('কাজটি বাতিল করুন', 'Cancel this task', 'Task বাতিল'), reopen: L('আবার খুলুন', 'Reopen', 'Reopen'), why: L('কারণ (লিখতে হবে)', 'Reason (required)', 'কারণ (লিখতে হবে)'),
   all: L('সব', 'All', 'সব'), given_ok: L('কাজ দেওয়া হয়েছে', 'Task given', 'Task দেওয়া হয়েছে'), people: L('জন', 'people', 'জন'), seeAll: L('সব দেখুন', 'See all', 'সব দেখুন'),
-  note: L('নোট', 'Note', 'Note'), saved: L('সংরক্ষণ হয়েছে', 'Saved', 'Saved'),
+  note: L('নোট', 'Note', 'Note'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
 };
 const T = (k) => lab(X[k]);
 const E = {
   not_allowed: L('এটির অনুমতি নেই।', 'You are not allowed to do this.', 'এটির permission নেই।'), todo_off: L('করণীয় তালিকা বন্ধ আছে।', 'The to-do list is switched off.', 'To-do list বন্ধ আছে।'),
   bad_target: L('কাকে দেবেন তা ঠিকভাবে বাছুন।', 'Choose who it is for.', 'কাকে দেবেন তা বাছুন।'), title_required: L('কাজের নাম লিখুন।', 'Write the task.', 'কাজের নাম লিখুন।'),
-  bad_date: L('শেষ তারিখ আজ বা তার পরের হতে হবে।', 'The due date must be today or later.', 'Due date আজ বা পরের হতে হবে।'), bad_priority: L('গুরুত্ব ঠিক নয়।', 'Priority is not valid.', 'Priority ঠিক নয়।'),
+  bad_date: L('শেষ ডেট আজ বা তার পরের হতে হবে।', 'The due date must be today or later.', 'Due date আজ বা পরের হতে হবে।'), bad_priority: L('গুরুত্ব ঠিক নয়।', 'Priority is not valid.', 'Priority ঠিক নয়।'),
   bad_repeat: L('পুনরাবৃত্তি ঠিক নয়।', 'Repeat is not valid.', 'Repeat ঠিক নয়।'), repeat_off: L('পুনরাবৃত্তি বন্ধ আছে (সেটিংসে চালু করুন)।', 'Repeating tasks are switched off (todo_repeat_on).', 'Repeat বন্ধ (todo_repeat_on)।'),
   no_recipients: L('এই ভূমিকায় কেউ নেই।', 'Nobody holds this role.', 'এই role-এ কেউ নেই।'), reason_required: L('কারণ লিখুন।', 'Write a reason.', 'কারণ লিখুন।'),
   not_open: L('কাজটি আর খোলা নেই।', 'The task is not open any more.', 'Task আর open নেই।'), text_too_long: L('লেখা বেশি লম্বা।', 'The text is too long.', 'লেখা বেশি লম্বা।'),

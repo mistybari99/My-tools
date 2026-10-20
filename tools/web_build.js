@@ -47,7 +47,8 @@ fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive:
 const SKIP = /(^|\/)(.*_test\.js|.*\.test\.js|smoke\.js|stub\.js|.*\.(png|jpg|jpeg|gif|md|sh|sql|map))$/;
 const files = []; (function walk(d, rel) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const r = rel ? rel + '/' + e.name : e.name; if (e.isDirectory()) walk(path.join(d, e.name), r); else files.push(r); } })(SRC, '');
 files.sort();
-const NODEY = /require\(['"](fs|path|http|child_process)['"]\)|^#!\/usr\/bin\/env node|module\.exports/m;
+const NODEY_RE = /require\(['"](fs|path|http|child_process)['"]\)|^#!\/usr\/bin\/env node|module\.exports\s*=/m;
+const NODEY = { test: (code) => NODEY_RE.test(code.replace(/if\s*\(\s*typeof module\s*!==?\s*['"]undefined['"]\s*&&\s*module\.exports\s*\)\s*module\.exports\s*=\s*[^;]+;/g, '')) };   // a browser file may carry the guarded UMD line 'if (typeof module !== undefined && module.exports) module.exports = api' so its logic can be unit-tested in node; any other module.exports / require of node modules still aborts the build
 async function minJs(code, name) {
   if (NOMIN) return code;
   const r = await terser.minify({ [name]: code }, { compress: { passes: 1, ecma: 2020 }, mangle: { toplevel: false }, format: { comments: false, ecma: 2020 }, sourceMap: false });

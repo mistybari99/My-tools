@@ -1,37 +1,1755 @@
 {
-  "note": "Intended renames only. Each entry needs a reason. Types: rename, prefix, label, placement. See docs/UI_NO_LOSS_RULE.md.",
-  "aliases": [
-    {
-      "type": "rename",
-      "from": "rpc:customers.js:customer_points_adjust",
-      "to": "rpc:customers.js:crmf_points_adjust",
-      "reason": "CRM-F hook H4 (docs/integration/CRM-F_hooks.json): the customer screen calls crmf_points_adjust, which has the same arguments and the same permission and reason rules, and adds the owner alert for a large change. The old function stays on the server."
-    },
-    {
-      "type": "rename",
-      "from": "rpc:customers.js:customer_points_redeem",
-      "to": "rpc:customers.js:crmf_points_redeem",
-      "reason": "CRM-F hooks H5 and H6: the points redeem preview and the real redemption call crmf_points_redeem, which applies the burn rules (all blank = the same answer as before). The old function stays on the server."
-    },
-    {
-      "type": "rename",
-      "from": "ctl:purchase.js:button:#pl_fb",
-      "to": "ctl:purchase.js:button:pu_filter",
-      "reason": "The first baseline read the payables Filter button through a regular-expression artifact (its id pl_fb with the text of the helper above it). It is the same button: data-act pu_filter, still on the screen, text unchanged."
-    },
-    {
-      "type": "label",
-      "id": "ctl:purchase.js:button:#pl_fb",
-      "lang": "texts",
-      "from": "ok ? `<button class=\" {...} \" data-act=\" {...} \" {...} > {...}",
-      "to": "⎚ L:ফিল্টার|Filter|Filter {...}",
-      "reason": "Same payables Filter button; the first baseline carried the text of the helper line above it (extractor artifact), the button text is unchanged."
-    },
-    {
-      "type": "rename",
-      "from": "rpc:itemmaster.js:item_new",
-      "to": "rpc:itemmaster.js:item_new2",
-      "reason": "X5 (phase 486): the item master save now calls item_new2, which adds client_id so a double tap cannot create two items. Same arguments plus p_client; item_new stays on the server for older screens."
-    }
-  ]
+ "note": "Intended renames only. Each entry needs a reason. Types: rename, prefix, label, placement. See docs/UI_NO_LOSS_RULE.md.",
+ "aliases": [
+  {
+   "type": "rename",
+   "from": "rpc:customers.js:customer_points_adjust",
+   "to": "rpc:customers.js:crmf_points_adjust",
+   "reason": "CRM-F hook H4 (docs/integration/CRM-F_hooks.json): the customer screen calls crmf_points_adjust, which has the same arguments and the same permission and reason rules, and adds the owner alert for a large change. The old function stays on the server."
+  },
+  {
+   "type": "rename",
+   "from": "rpc:customers.js:customer_points_redeem",
+   "to": "rpc:customers.js:crmf_points_redeem",
+   "reason": "CRM-F hooks H5 and H6: the points redeem preview and the real redemption call crmf_points_redeem, which applies the burn rules (all blank = the same answer as before). The old function stays on the server."
+  },
+  {
+   "type": "rename",
+   "from": "ctl:purchase.js:button:#pl_fb",
+   "to": "ctl:purchase.js:button:pu_filter",
+   "reason": "The first baseline read the payables Filter button through a regular-expression artifact (its id pl_fb with the text of the helper above it). It is the same button: data-act pu_filter, still on the screen, text unchanged."
+  },
+  {
+   "type": "label",
+   "id": "ctl:purchase.js:button:#pl_fb",
+   "lang": "texts",
+   "from": "ok ? `<button class=\" {...} \" data-act=\" {...} \" {...} > {...}",
+   "to": "⎚ L:ফিল্টার|Filter|Filter {...}",
+   "reason": "Same payables Filter button; the first baseline carried the text of the helper line above it (extractor artifact), the button text is unchanged."
+  },
+  {
+   "type": "rename",
+   "from": "rpc:itemmaster.js:item_new",
+   "to": "rpc:itemmaster.js:item_new2",
+   "reason": "X5 (phase 486): the item master save now calls item_new2, which adds client_id so a double tap cannot create two items. Same arguments plus p_client; item_new stays on the server for older screens."
+  },
+  {
+   "type": "rename",
+   "from": "ctl:listctl.js:button:label-l-বাতিল-cancel-cancel",
+   "to": "ctl:listctl.js:button:label-l-ক্যান্সেল-cancel-cancel",
+   "reason": "Owner word list: Cancel is ক্যান্সেল in Bangla letters (advanced line wording step). The button id of this control is made from its label; the button is the same one."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:button:ac_addgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:button:ac_setstart",
+   "lang": "texts",
+   "from": "L:শুরুর তারিখ ঠিক করুন|Set the start date|শুরুর date ঠিক করুন",
+   "to": "L:শুরুর ডেট ঠিক করুন|Set the start date|শুরুর date ঠিক করুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:input:**_p",
+   "lang": "texts",
+   "from": "L:গ্রাহকের মোবাইল|Customer mobile|Customer mobile",
+   "to": "L:কাস্টমারের মোবাইল|Customer mobile|Customer mobile",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:input:ac_jdate",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:input:ac_pmob",
+   "lang": "texts",
+   "from": "L:গ্রাহকের মোবাইল|Customer mobile|Customer mobile",
+   "to": "L:কাস্টমারের মোবাইল|Customer mobile|Customer mobile",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:input:ac_start",
+   "lang": "texts",
+   "from": "L:শুরুর তারিখ|Start date|শুরুর date",
+   "to": "L:শুরুর ডেট|Start date|শুরুর date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:option:ac_l*_t:customer",
+   "lang": "texts",
+   "from": "L:গ্রাহক|Customer|Customer",
+   "to": "L:কাস্টমার|Customer|Customer",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:option:ac_l*_t:supplier",
+   "lang": "texts",
+   "from": "L:সরবরাহকারী|Supplier|Supplier",
+   "to": "L:সাপ্লায়ার|Supplier|Supplier",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:option:ac_ptype:customer",
+   "lang": "texts",
+   "from": "L:গ্রাহক|Customer|Customer",
+   "to": "L:কাস্টমার|Customer|Customer",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:option:ac_ptype:supplier",
+   "lang": "texts",
+   "from": "L:সরবরাহকারী|Supplier|Supplier",
+   "to": "L:সাপ্লায়ার|Supplier|Supplier",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:select:**_p",
+   "lang": "texts",
+   "from": "L:সরবরাহকারী|Supplier|Supplier",
+   "to": "L:সাপ্লায়ার|Supplier|Supplier",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:select:ac_pid",
+   "lang": "texts",
+   "from": "L:সরবরাহকারী|Supplier|Supplier",
+   "to": "L:সাপ্লায়ার|Supplier|Supplier",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:assistant.js:button:asst_nsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:assistant.js:input:asst_q",
+   "lang": "texts",
+   "from": "L:প্রশ্ন লিখুন… যেমন: আজ বিক্রি কত?|Ask… e.g. How are sales today?|প্রশ্ন লিখুন… যেমন: আজ sale কত?",
+   "to": "L:প্রশ্ন লিখুন… যেমন: আজ সেল কত?|Ask… e.g. How are sales today?|প্রশ্ন লিখুন… যেমন: আজ sale কত?",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attend2.js:button:a2_marksave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attend2.js:input:a2_day",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:at_appr",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:at_ot",
+   "lang": "texts",
+   "from": "L:ওভারটাইম অনুমোদন|Approve overtime|OT approve ( {...} )",
+   "to": "L:ওভারটাইম অ্যাপ্রুভ|Approve overtime|OT approve ( {...} )",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:dv_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:ho_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:lr_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:lv_cancel",
+   "lang": "texts",
+   "from": "L:বাতিল করুন|Cancel|Cancel",
+   "to": "L:ক্যান্সেল করুন|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:lv_dec",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:lv_new",
+   "lang": "texts",
+   "from": "L:＋ ছুটির আবেদন|＋ Leave request|＋ Leave request",
+   "to": "L:＋ ছুটির অনুরোধ|＋ Leave request|＋ Leave request",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:mk_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:sh_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:button:shf_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:input:at_day",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:attendance.js:input:ho_d",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:balancecheck.js:input:bc_date",
+   "lang": "texts",
+   "from": "L:তারিখ পর্যন্ত|As of|As of",
+   "to": "L:ডেট পর্যন্ত|As of|As of",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:bulkitems.js:button:bk_apply",
+   "lang": "texts",
+   "from": "L:এখন প্রয়োগ করুন|Apply now|এখন Apply করুন",
+   "to": "L:এখন অ্যাপ্লাই করুন|Apply now|এখন Apply করুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:bulkitems.js:button:bk_bn_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:bulkitems.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:campaigns.js:button:cp_m_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:cashmoves.js:button:cm_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:cashmoves.js:button:cm_void",
+   "lang": "texts",
+   "from": "⋮ L:বাতিল|Void|Void",
+   "to": "⋮ L:ভয়েড|Void|Void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:cashmoves.js:input:cm_cust",
+   "lang": "texts",
+   "from": "L:গ্রাহকের মোবাইল|Customer mobile|Customer mobile",
+   "to": "L:কাস্টমারের মোবাইল|Customer mobile|Customer mobile",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:cashmoves.js:input:cm_date",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:cashmoves.js:option:cm_mode:cash",
+   "lang": "texts",
+   "from": "L:নগদ|Cash|Cash",
+   "to": "L:ক্যাশ|Cash|Cash",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costattrib.js:select:ca_hg",
+   "lang": "texts",
+   "from": "L:কোন অধিকার|Which right|কোন right",
+   "to": "L:কোন অনুমতি|Which right|কোন right",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costattrib.js:select:ca_type",
+   "lang": "texts",
+   "from": "L:খরচের ধরন|Cost type|Cost type",
+   "to": "L:কস্টের ধরন|Cost type|Cost type",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costing.js:button:cs_locsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costing.js:button:cs_poolsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costing.js:button:cs_rcsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_ack",
+   "lang": "texts",
+   "from": "L:এটি আলাদা খরচ|This is a different cost|এটি আলাদা",
+   "to": "L:এটি আলাদা কস্ট|This is a different cost|এটি আলাদা",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_bsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_bvoid",
+   "lang": "texts",
+   "from": "L:বাতিল|Void|Void",
+   "to": "L:ভয়েড|Void|Void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_rapp",
+   "lang": "texts",
+   "from": "L:অনুমোদন করুন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ করুন|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_rgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_rsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:button:cb_ssave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:input:cb_date",
+   "lang": "texts",
+   "from": "L:বিলের তারিখ|Bill date|Bill date",
+   "to": "L:বিলের ডেট|Bill date|Bill date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:select:cs_type",
+   "lang": "texts",
+   "from": "L:খরচের ধরন|Cost type|Cost type",
+   "to": "L:কস্টের ধরন|Cost type|Cost type",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:action:cu_open",
+   "lang": "texts",
+   "from": "{...} {...} {...} L:বন্ধ গ্রাহক|Switched-off customers|বন্ধ customer {...}",
+   "to": "{...} {...} {...} L:বন্ধ কাস্টমার|Switched-off customers|বন্ধ customer {...}",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:cu_add",
+   "lang": "texts",
+   "from": "L:＋ নতুন গ্রাহক|＋ New customer|＋ নতুন Customer",
+   "to": "L:＋ নতুন কাস্টমার|＋ New customer|＋ নতুন Customer",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:cu_pts_ok",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:cu_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:cu_tier_ok",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:gr_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:ti_apply",
+   "lang": "texts",
+   "from": "L:প্রয়োগ করুন|Apply these changes|Apply করুন",
+   "to": "L:অ্যাপ্লাই করুন|Apply these changes|Apply করুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:ti_num",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:button:ti_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:input:tf_name_bn",
+   "lang": "texts",
+   "from": "L:নাম|Name|নাম (বাংলা)",
+   "to": "L:নাম|Name|নাম ( L:বাংলা|Bangla|Bangla )",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:customers.js:select:cu_fstat",
+   "lang": "texts",
+   "from": "L:চালু গ্রাহক|Active customers|Active customer",
+   "to": "L:চালু কাস্টমার|Active customers|Active customer",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:daybook.js:button:db_day",
+   "lang": "texts",
+   "from": "{...} L:জমা (ইন)|Money in|Money in {...} · L:খরচ (আউট)|Money out|Money out {...} L:শেষ জের|Closing|Closing L:শুরু থেকে নিট (শেষে)|Net since start (at day end)|Net since start (day end) {...} L:ঋণাত্মক|Negative|Negative {...} <span class=\"chip {...} \"> {...} ›",
+   "to": "{...} L:জমা (ইন)|Money in|Money in {...} · L:খরচ (আউট)|Money out|Money out {...} L:শেষ জের|Closing|Closing L:শুরু থেকে নিট (শেষে)|Net since start (at day end)|Net since start (day end) {...} L:মাইনাস|Negative|Negative {...} <span class=\"chip {...} \"> {...} ›",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:daybook.js:button:db_ob_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:daybook.js:button:db_st_clear",
+   "lang": "texts",
+   "from": "L:তারিখ মুছুন|Clear date|Date মুছুন",
+   "to": "L:ডেট মুছুন|Clear date|Date মুছুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:daybook.js:button:db_st_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:daybook.js:input:db_st",
+   "lang": "texts",
+   "from": "L:শুরুর তারিখ (YYYY-MM-DD)|Start date (YYYY-MM-DD)|Start date (YYYY-MM-DD)",
+   "to": "L:শুরুর ডেট (YYYY-MM-DD)|Start date (YYYY-MM-DD)|Start date (YYYY-MM-DD)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:delegation.js:input:dg_q",
+   "lang": "texts",
+   "from": "L:নাম বা অধিকার খুঁজুন|Search person or right|নাম বা অধিকার খুঁজুন",
+   "to": "L:নাম বা অনুমতি খুঁজুন|Search person or right|নাম বা অধিকার খুঁজুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:delegation.js:option:dg_c:",
+   "lang": "texts",
+   "from": "L:কোন অধিকার|Which right|কোন right — L:বাছুন|Choose|বাছুন",
+   "to": "L:কোন অনুমতি|Which right|কোন right — L:বাছুন|Choose|বাছুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:employees.js:button:em_pay_save",
+   "lang": "texts",
+   "from": "L:নতুন কাঠামো সংরক্ষণ|Save as new version|নতুন কাঠামো save",
+   "to": "L:নতুন কাঠামো সেভ|Save as new version|নতুন কাঠামো save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:employees.js:link:#/employee/*",
+   "lang": "texts",
+   "from": "{...} L:খসড়া|Draft|Draft {...} {...} {...} {...} {...}",
+   "to": "{...} L:ড্রাফট|Draft|Draft {...} {...} {...} {...} {...}",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:finance2.js:button:f2_fpgo",
+   "lang": "texts",
+   "from": "L:নিশ্চিত — সংরক্ষণ|Confirm - save|Confirm — save",
+   "to": "L:নিশ্চিত — সেভ|Confirm - save|Confirm — save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:finance2.js:button:f2_fsave",
+   "lang": "texts",
+   "from": "L:নিশ্চিত — সংরক্ষণ|Confirm - save|Confirm — save",
+   "to": "L:নিশ্চিত — সেভ|Confirm - save|Confirm — save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:finance2.js:button:f2_usave",
+   "lang": "texts",
+   "from": "L:নিশ্চিত — সংরক্ষণ|Confirm - save|Confirm — save",
+   "to": "L:নিশ্চিত — সেভ|Confirm - save|Confirm — save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:finance2.js:textarea:f2_btext",
+   "lang": "texts",
+   "from": "L:স্টেটমেন্ট পেস্ট করুন (CSV বা JSON)। টাকা ঢুকলে +, বের হলে −। কলাম: তারিখ, টাকা, রেফারেন্স, বিবরণ।|Paste the statement (CSV or JSON). Money in is +, out is −. Columns: date, amount, reference, description.|Statement paste করুন (CSV/JSON)। ঢুকলে +, বের হলে −। Column: date, amount, reference, description।",
+   "to": "L:স্টেটমেন্ট পেস্ট করুন (CSV বা JSON)। টাকা ঢুকলে +, বের হলে −। কলাম: ডেট, টাকা, রেফারেন্স, বিবরণ।|Paste the statement (CSV or JSON). Money in is +, out is −. Columns: date, amount, reference, description.|Statement paste করুন (CSV/JSON)। ঢুকলে +, বের হলে −। Column: date, amount, reference, description।",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:forecast.js:button:fc_f_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:inbox.js:button:ib_addline",
+   "lang": "texts",
+   "from": "L:+ পণ্য যোগ|+ Add item|+ Item যোগ",
+   "to": "L:+ আইটেম যোগ|+ Add item|+ Item যোগ",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:inbox.js:button:ib_ignore",
+   "lang": "texts",
+   "from": "L:উপেক্ষা|Ignore|Ignore",
+   "to": "L:বাদ|Ignore|Ignore",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:inbox.js:button:ib_save",
+   "lang": "texts",
+   "from": "L:অর্ডার সংরক্ষণ|Save order|Order save",
+   "to": "L:অর্ডার সেভ|Save order|Order save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:inbox.js:input:data-ib-qty=*",
+   "lang": "texts",
+   "from": "L:পরিমাণ|Qty|Qty",
+   "to": "L:Qty|Qty|Qty",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:inbox.js:input:ib_f_name",
+   "lang": "texts",
+   "from": "L:গ্রাহকের নাম|Customer name|Customer নাম",
+   "to": "L:কাস্টমারের নাম|Customer name|Customer নাম",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:integrations.js:button:ig_cancel",
+   "lang": "texts",
+   "from": "L:বাতিল করুন|Cancel|Cancel",
+   "to": "L:ক্যান্সেল করুন|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:button:*",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:button:as_retire_do",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:button:as_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:input:af_cost",
+   "lang": "texts",
+   "from": "L:দাম ৳|Cost ৳|Cost ৳",
+   "to": "L:কস্ট ৳|Cost ৳|Cost ৳",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:items2.js:button:p2_fg",
+   "lang": "texts",
+   "from": "L:দাম-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (দাম দিন বা লুকান)|Unpriced finished goods / resale (to price or hide)|দাম-ছাড়া finished / resale (দাম দিন বা লুকান) · {...}",
+   "to": "L:প্রাইস-ছাড়া তৈরি পণ্য / কিনে-বিক্রি (প্রাইস দিন বা লুকান)|Unpriced finished goods / resale (to price or hide)|price-ছাড়া finished / resale (price দিন বা লুকান) · {...}",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_edit",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_newcancel",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_view#options",
+   "lang": "texts",
+   "from": "L:← অপশনে ফিরুন|← Back to the options|← Option এ ফিরুন",
+   "to": "L:← অপশনে ফিরুন|← Back to the options|← Option-এ ফিরুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_view#requests",
+   "lang": "texts",
+   "from": "L:নতুন অপশনের অনুরোধ|New-option requests|নতুন option এর Request {...}",
+   "to": "L:নতুন অপশনের অনুরোধ|New-option requests|নতুন option-এর Request {...}",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:input:ls2_reason",
+   "lang": "texts",
+   "from": "L:বন্ধ করার কারণ (আবশ্যক)|Reason for retiring (required)|বন্ধ করার কারণ (আবশ্যক)",
+   "to": "L:বন্ধ করার কারণ (লাগবেই)|Reason for retiring (required)|বন্ধ করার কারণ (লাগবেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_edit_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_override_go",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_sh_approve",
+   "lang": "texts",
+   "from": "L:অনুমোদন করুন|Approve this version|Approve this version",
+   "to": "L:অ্যাপ্রুভ করুন|Approve this version|Approve this version",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_sh_discard",
+   "lang": "texts",
+   "from": "L:খসড়া বাতিল|Discard draft|Discard draft",
+   "to": "L:ড্রাফট বাতিল|Discard draft|Discard draft",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_sh_new",
+   "lang": "texts",
+   "from": "L:নতুন সংস্করণ (খসড়া) শুরু|Start a new version (draft)|নতুন version (draft) শুরু",
+   "to": "L:নতুন সংস্করণ (ড্রাফট) শুরু|Start a new version (draft)|নতুন version (draft) শুরু",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_sh_save",
+   "lang": "texts",
+   "from": "L:খসড়া সংরক্ষণ|Save draft|Save draft",
+   "to": "L:ড্রাফট সেভ|Save draft|Save draft",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_status_go",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_sup_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:button:lo_wiz_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:input:ov_reason",
+   "lang": "texts",
+   "from": "L:কারণ (আবশ্যক)|Reason (required)|Reason (আবশ্যক)",
+   "to": "L:কারণ (লাগবেই)|Reason (required)|Reason (লাগবেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:input:st_reason",
+   "lang": "texts",
+   "from": "L:কারণ (আবশ্যক)|Reason (required)|Reason (আবশ্যক)",
+   "to": "L:কারণ (লাগবেই)|Reason (required)|Reason (লাগবেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:nav.js:button:nav_rn_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:ownerboard.js:button:ob_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:ownerboard.js:input:ob_days",
+   "lang": "texts",
+   "from": "L:কত দিনের বেশি পুরনো হলে \"মেয়াদোত্তীর্ণ\"|Overdue after this many days|কত দিন পরে \"overdue\"",
+   "to": "L:কত দিনের বেশি পুরনো হলে \"মেয়াদ শেষ\"|Overdue after this many days|কত দিন পরে \"overdue\"",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:parallel.js:button:pl_pair",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:paths.js:button:qx_void",
+   "lang": "texts",
+   "from": "L:বাতিল|Void|Void",
+   "to": "L:ভয়েড|Void|Void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:pay.js:input:data-pay=*.cheque_date",
+   "lang": "texts",
+   "from": "L:চেকের তারিখ|Cheque date|Cheque date",
+   "to": "L:চেকের ডেট|Cheque date|Cheque date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payrequests.js:button:prq_appr",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payrequests.js:button:prq_decide",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payrequests.js:button:prq_decide",
+   "lang": "texts",
+   "from": "⋮ L:দেওয়ার তারিখ|Pay date|Pay date",
+   "to": "⋮ L:দেওয়ার ডেট|Pay date|Pay date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payrequests.js:button:prq_decide_go",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payrequests.js:button:prq_limsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payrequests.js:button:prq_selsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:adv_void",
+   "lang": "texts",
+   "from": "L:বাতিল|Void|Void",
+   "to": "L:ভয়েড|Void|Void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:aj_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:av_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:fb_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:pr_approve",
+   "lang": "texts",
+   "from": "L:অনুমোদন ও মাস বন্ধ|Approve and lock the month|Approve ও মাস lock",
+   "to": "L:অ্যাপ্রুভ ও মাস বন্ধ|Approve and lock the month|Approve ও মাস lock",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:pr_create",
+   "lang": "texts",
+   "from": "L:বেতন শিট তৈরি করুন (খসড়া)|Create the payroll (draft)|Payroll তৈরি (draft)",
+   "to": "L:বেতন শিট তৈরি করুন (ড্রাফট)|Create the payroll (draft)|Payroll তৈরি (draft)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:button:pr_void",
+   "lang": "texts",
+   "from": "L:শিট বাতিল|Void this payroll|Payroll বাতিল",
+   "to": "L:শিট ভয়েড|Void this payroll|Payroll void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:input:av_d",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:input:py_d",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:option:av_m:cash",
+   "lang": "texts",
+   "from": "L:নগদ|Cash|Cash",
+   "to": "L:ক্যাশ|Cash|Cash",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:option:py_m:cash",
+   "lang": "texts",
+   "from": "L:নগদ|Cash|Cash",
+   "to": "L:ক্যাশ|Cash|Cash",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:pos.js:button:pos_conv_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:printbooks.js:button:pb_add",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:printbooks.js:button:pb_clear",
+   "lang": "texts",
+   "from": "L:নতুন ছাপা লিখুন|Record the new print|নতুন print লিখুন",
+   "to": "L:নতুন প্রিন্ট লিখুন|Record the new print|নতুন print লিখুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:printbooks.js:button:pb_note",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:purchase.js:button:pu_newitem",
+   "lang": "texts",
+   "from": "＋ L:নতুন আইটেম (সম্পদ) তালিকায় যোগ|New item (asset) added to the item list|নতুন Item (Asset) list এ যোগ",
+   "to": "＋ L:নতুন আইটেম (সম্পদ) তালিকায় যোগ|New item (asset) added to the item list|নতুন Item (Asset) list-এ যোগ",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:purchase.js:button:py_voidrefgo",
+   "lang": "texts",
+   "from": "L:রিফান্ড বাতিল|Void refund|Refund void",
+   "to": "L:রিফান্ড ভয়েড|Void refund|Refund void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:purchrep.js:button:pr_pgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipebook.js:button:rb_approve",
+   "lang": "texts",
+   "from": "L:অনুমোদন করুন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ করুন|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipebook.js:button:rb_asave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipebook.js:button:rb_ssave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:button:rc_back",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:button:rc_pksave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:button:rc_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:input:pk_q",
+   "lang": "texts",
+   "from": "L:পরিমাণ|Quantity|Quantity ( L:প্রতি ১ বেস এককে|per 1 base unit|per 1 base unit )",
+   "to": "L:Qty|Quantity|Quantity ( L:প্রতি ১ বেস এককে|per 1 base unit|per 1 base unit )",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:input:rl_qty_*",
+   "lang": "texts",
+   "from": "L:পরিমাণ|Quantity|Quantity",
+   "to": "L:Qty|Quantity|Quantity",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:reporthub_time.js:input:rh_date",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:reports.js:button:px_onlyap",
+   "lang": "texts",
+   "from": "L:শুধু অনুমোদিত|Approved only|Approved only",
+   "to": "L:শুধু অ্যাপ্রুভড|Approved only|Approved only",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:reports.js:input:rp_pf",
+   "lang": "texts",
+   "from": "L:এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই তারিখ)|Compare with (optional; blank = the same dates last year)|Compare with (ঐচ্ছিক; না দিলে গত বছরের একই তারিখ)",
+   "to": "L:এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই ডেট)|Compare with (optional; blank = the same dates last year)|Compare with (ঐচ্ছিক; না দিলে গত বছরের একই Date)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:reports.js:input:rp_pt",
+   "lang": "texts",
+   "from": "L:এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই তারিখ)|Compare with (optional; blank = the same dates last year)|Compare with (ঐচ্ছিক; না দিলে গত বছরের একই তারিখ)",
+   "to": "L:এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই ডেট)|Compare with (optional; blank = the same dates last year)|Compare with (ঐচ্ছিক; না দিলে গত বছরের একই Date)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:restoredrill.js:button:rdr_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:restoredrill.js:input:rdr_name",
+   "lang": "texts",
+   "from": "L:ব্যাকআপের নাম / তারিখ|Backup name / date|Backup-এর নাম / তারিখ",
+   "to": "L:ব্যাকআপের নাম / ডেট|Backup name / date|Backup-এর নাম / date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:restoredrill.js:input:rdr_when",
+   "lang": "texts",
+   "from": "L:ড্রিলের তারিখ (ফাঁকা = এখন)|Drill date (empty = now)|Drill-এর তারিখ (ফাঁকা = এখন)",
+   "to": "L:ড্রিলের ডেট (ফাঁকা = এখন)|Drill date (empty = now)|Drill-এর date (ফাঁকা = এখন)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:rollout.js:button:bk_go",
+   "lang": "texts",
+   "from": "L:প্রয়োগ করুন|Apply|Apply",
+   "to": "L:অ্যাপ্লাই করুন|Apply|Apply",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:rollout.js:button:ch_approve",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:rollout.js:button:closesheet",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:rollout.js:textarea:ch_note",
+   "lang": "texts",
+   "from": "L:বাতিলের কারণ (আবশ্যক)|Reason for rejecting (required)|Reject-এর কারণ (আবশ্যক)",
+   "to": "L:বাতিলের কারণ (লাগবেই)|Reason for rejecting (required)|Reject-এর কারণ (লাগবেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salereturn.js:button:sr_voidgo",
+   "lang": "texts",
+   "from": "L:ফেরত বাতিল|Void this return|Return void",
+   "to": "L:ফেরত ভয়েড|Void this return|Return void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salereturn.js:input:data-rq=*",
+   "lang": "texts",
+   "from": "L:ফেরত পরিমাণ|Return quantity|Return quantity",
+   "to": "L:ফেরত Qty|Return quantity|Return quantity",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salereturn.js:input:sr_date",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salereturn.js:input:vn_note",
+   "lang": "texts",
+   "from": "L:বাতিলের কারণ (আবশ্যক)|Reason for voiding (required)|Void-এর reason (আবশ্যক)",
+   "to": "L:ভয়েডের কারণ (লাগবেই)|Reason for voiding (required)|Void-এর reason (লাগবেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:button:bx_go",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:button:sx_addline",
+   "lang": "texts",
+   "from": "L:+ পণ্য যোগ|+ Add item|+ Item যোগ",
+   "to": "L:+ আইটেম যোগ|+ Add item|+ Item যোগ",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:button:sx_cancel_go",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:button:sx_link_go",
+   "lang": "texts",
+   "from": "L:আগের বিক্রির সাথে জুড়ুন|Link an existing sale|আগের sale-এর সাথে জুড়ুন",
+   "to": "L:আগের সেলের সাথে জুড়ুন|Link an existing sale|আগের sale-এর সাথে জুড়ুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:button:sx_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:input:bx_f",
+   "lang": "texts",
+   "from": "L:শুরুর তারিখ|From date|From date",
+   "to": "L:শুরুর ডেট|From date|From date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:input:data-sxl=qty",
+   "lang": "texts",
+   "from": "L:পরিমাণ|Qty|Qty",
+   "to": "L:Qty|Qty|Qty",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:input:sx_dd",
+   "lang": "texts",
+   "from": "L:ডেলিভারির তারিখ|Delivery date|Delivery date",
+   "to": "L:ডেলিভারির ডেট|Delivery date|Delivery date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:input:sx_n",
+   "lang": "texts",
+   "from": "L:গ্রাহকের নাম|Customer name|Customer নাম",
+   "to": "L:কাস্টমারের নাম|Customer name|Customer নাম",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:option:sx_pm:cash",
+   "lang": "texts",
+   "from": "L:নগদ|Cash|Cash",
+   "to": "L:ক্যাশ|Cash|Cash",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:select:bx_e",
+   "lang": "texts",
+   "from": "L:কর্মী|Employee|Employee",
+   "to": "L:কর্মচারী|Employee|Employee",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:select:sx_ls",
+   "lang": "texts",
+   "from": "L:কোন বিক্রি|Which sale|কোন sale",
+   "to": "L:কোন সেল|Which sale|কোন sale",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:shifts.js:button:r2s_cellsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:shifts.js:button:r2s_tplsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:shortages.js:button:sh_go",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:shortages.js:button:sh_open",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:shortages.js:button:sh_open",
+   "lang": "texts",
+   "from": "⋮ L:অনুমোদন তুলে নিন|Void|Void",
+   "to": "⋮ L:অ্যাপ্রুভ তুলে নিন|Void|Void",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stock2.js:button:s2_wa_yes",
+   "lang": "texts",
+   "from": "L:অনুমোদন|Approve|Approve",
+   "to": "L:অ্যাপ্রুভ|Approve|Approve",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stock2.js:input:a_note",
+   "lang": "texts",
+   "from": "L:নামঞ্জুরের কারণ (আবশ্যক)|Reason for rejecting (required)|Reject-এর reason (আবশ্যক)",
+   "to": "L:নামঞ্জুরের কারণ (লাগবেই)|Reason for rejecting (required)|Reject-এর reason (লাগবেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stock2.js:tab:s2_tab",
+   "lang": "texts",
+   "from": "{...} {...}",
+   "to": "{...} {...} {...}",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stockout.js:button:so_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stockout.js:input:so_date",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stockx.js:button:sx_addb",
+   "lang": "texts",
+   "from": "L:প্রাপ্ত মালের ব্যাচ ও মেয়াদ লিখুন|Record batch & expiry of received goods|Received goods এর batch ও expiry",
+   "to": "L:প্রাপ্ত মালের ব্যাচ ও মেয়াদ লিখুন|Record batch & expiry of received goods|Received goods-এর batch ও expiry",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stockx.js:button:sx_bsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:stockx.js:button:sx_qsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:switchboard.js:input:sw_q",
+   "lang": "texts",
+   "from": "L:নাম বা কী দিয়ে খুঁজুন|Search by name or key|নাম বা key দিয়ে খুঁজুন",
+   "to": "L:নাম বা কোড দিয়ে খুঁজুন|Search by name or key|নাম বা key দিয়ে খুঁজুন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:todo.js:button:r2t_set",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:todo.js:input:r2t_du",
+   "lang": "texts",
+   "from": "L:শেষ তারিখ (ফাঁকা = নির্দিষ্ট নেই)|Due date (blank = none)|শেষ তারিখ (ফাঁকা = নেই)",
+   "to": "L:শেষ ডেট (ফাঁকা = নির্দিষ্ট নেই)|Due date (blank = none)|শেষ Date (ফাঁকা = নেই)",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:trace.js:button:rc_addgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:trace.js:button:rc_create",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:trace.js:button:rc_markgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:twofa.js:button:tf_cancel",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|বাতিল",
+   "to": "L:ক্যান্সেল|Cancel|cancel",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:wallets.js:button:wl_count",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:wallets.js:button:wl_explain",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:wallets.js:button:wl_fee",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:wallets.js:button:wl_move",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:wallets.js:input:wl_date",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:appr",
+   "lang": "bn",
+   "from": "অনুমোদন ও ব্যতিক্রম",
+   "to": "অ্যাপ্রুভাল ও এক্সেপশন",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:cust",
+   "lang": "bn",
+   "from": "গ্রাহক, অর্ডার ও ইনভয়েস",
+   "to": "কাস্টমার, অর্ডার ও ইনভয়েস",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:people",
+   "lang": "bn",
+   "from": "স্টাফ, ভূমিকা ও অনুমতি",
+   "to": "স্টাফ, রোল ও অনুমতি",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:purch",
+   "lang": "bn",
+   "from": "ক্রয় ও সরবরাহকারী",
+   "to": "ক্রয় ও সাপ্লায়ার",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:sale",
+   "lang": "bn",
+   "from": "বিক্রি ও POS",
+   "to": "সেল ও POS",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:settings",
+   "lang": "bn",
+   "from": "প্রশাসন ও সেটিংস",
+   "to": "অ্যাডমিন ও সেটিংস",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "group:settings",
+   "lang": "mix",
+   "from": "Administration ও Settings",
+   "to": "Admin ও Settings",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "text:gl_approval",
+   "lang": "bn",
+   "from": "অনুমোদন",
+   "to": "অ্যাপ্রুভ",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "text:gl_pay_supplier",
+   "lang": "bn",
+   "from": "সরবরাহকারীকে পরিশোধ",
+   "to": "সাপ্লায়ারকে পরিশোধ",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "text:gl_price",
+   "lang": "bn",
+   "from": "দাম",
+   "to": "প্রাইস",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "text:gl_sale",
+   "lang": "bn",
+   "from": "বিক্রয়",
+   "to": "সেল",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "text:gl_supplier",
+   "lang": "bn",
+   "from": "সরবরাহকারী",
+   "to": "সাপ্লায়ার",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "text:stv_inactive",
+   "lang": "bn",
+   "from": "নিষ্ক্রিয়",
+   "to": "বন্ধ",
+   "reason": "Owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ, Customer = কাস্টমার, Cost = কস্ট, ...), docs/briefs_p2p3/step_Wording_REPORT.md; applied to the strings of our line by tools/apply_owner_words.py. The control and its action are unchanged, only the Bangla/mix wording."
+  },
+  {
+   "type": "label",
+   "id": "ctl:listctl.js:button:label-l-বাতিল-cancel-cancel",
+   "lang": "texts",
+   "from": "L:বাতিল|Cancel|Cancel",
+   "to": "L:ক্যান্সেল|Cancel|Cancel",
+   "reason": "Owner word list: Cancel is ক্যান্সেল in Bangla letters (advanced line wording step); same button."
+  }
+ ]
 }

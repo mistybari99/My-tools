@@ -32,7 +32,8 @@
   "tpl_msgs.js",
   "tpl_samples.js",
   "tplpicker.js",
-  "listctl.js"
+  "listctl.js",
+  "scan_core.js"
  ],
  "idle": [
   "badges107.js",
@@ -46,6 +47,14 @@
    "landed.js",
    "landed_q4.js",
    "purchaseprint.js"
+  ],
+  "reports": [
+   "reporthub_parse.js",
+   "reporthub_ask.js",
+   "reporthub_time.js"
+  ],
+  "paycapture": [
+   "xb_paysms.js"
   ]
  },
  "ignore": {

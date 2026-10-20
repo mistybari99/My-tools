@@ -37,7 +37,7 @@ const X = {
   nocap: L('সংগ্রহ হয়নি', 'Not captured', 'Not captured'), totalrow: L('মোট', 'Total', 'Total'), back: L('আগের অবস্থায় ফিরুন', 'Back to previous view', 'আগের View-তে ফিরুন'),
   period: L('সময়', 'Period', 'Period'), drillhint: L('সারিতে চাপলে সেই অংশের ফিল্টার বসে', 'Tap a row to filter to it', 'Row-তে চাপলে সেই অংশের Filter বসে'),
   srchint: L('সারিতে চাপলে মূল লেনদেনগুলো দেখা যাবে', 'Tap a row to see the transactions behind it', 'Row-তে চাপলে মূল লেনদেন দেখা যাবে'), srcnone: L('এই সারির মূল লেনদেন পাওয়া যায়নি', 'No source transactions found for this row', 'এই row-র মূল লেনদেন পাওয়া যায়নি'),
-  cmpw: L('এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই তারিখ)', 'Compare with (optional; blank = the same dates last year)', 'Compare with (ঐচ্ছিক; না দিলে গত বছরের একই তারিখ)'),
+  cmpw: L('এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই ডেট)', 'Compare with (optional; blank = the same dates last year)', 'Compare with (ঐচ্ছিক; না দিলে গত বছরের একই Date)'),
   nodrill: L('এই সারিতে আর গভীরে যাওয়া যায় না', 'No deeper view for this row', 'এই row-তে আর deeper view নেই'),
   empty: L('তথ্য দরকার: এই সময়/ফিল্টারে কিছু নেই', 'Data needed: nothing matches this period / filters', 'Data দরকার: এই সময়/ফিল্টারে কিছু নেই'),
   need: L('তথ্য দরকার', 'Data needed', 'Data দরকার'), nc: L('ধরা হয়নি', 'Not captured', 'ধরা হয়নি / Not captured'),

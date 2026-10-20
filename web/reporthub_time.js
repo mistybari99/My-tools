@@ -12,7 +12,7 @@ const { money, qtyf, addDays, monthStart, monthEnd, dhakaToday } = R;
 const T = R.T;
 
 const Y = {
-  prev_day: L('আগের দিন', 'Previous day', 'Previous day'), next_day: L('পরের দিন', 'Next day', 'Next day'), date: L('তারিখ', 'Date', 'Date'), outlet: L('শাখা / জায়গা', 'Outlet / place', 'Outlet'),
+  prev_day: L('আগের দিন', 'Previous day', 'Previous day'), next_day: L('পরের দিন', 'Next day', 'Next day'), date: L('ডেট', 'Date', 'Date'), outlet: L('শাখা / জায়গা', 'Outlet / place', 'Outlet'),
   day_t: L('একটি দিনের গল্প', 'Day replay', 'Day replay'), ent_t: L('একটির ইতিহাস', 'Timeline of one thing', 'Timeline'), cmp_t: L('কী বদলেছে', 'What changed', 'What changed'), drill_t: L('এই সংখ্যার পেছনে', 'Behind this number', 'Behind this number'), trail_t: L('রেকর্ডের ইতিহাস', 'Record trail', 'Record trail'),
   rec_ok: L('দৈনিক সারসংক্ষেপের সাথে মিলেছে', 'Matches the daily summary', 'Daily summary-র সাথে মিলেছে'), rec_bad: L('দৈনিক সারসংক্ষেপের সাথে মিলছে না', 'Does NOT match the daily summary', 'Daily summary-র সাথে মিলছে না'),
   rec_na_no_summary_right: L('মেলানো যায়নি: সারসংক্ষেপ দেখার অনুমতি নেই', 'Not compared: you may not open the daily summary', 'মেলানো যায়নি: summary-র permission নেই'), rec_na_no_sales_right: L('মেলানো যায়নি: বিক্রির অনুমতি নেই', 'Not compared: no sales right', 'মেলানো যায়নি: sales right নেই'),
@@ -42,7 +42,7 @@ const Y = {
   ev_ended: L('শেষ', 'Ended', 'Ended'), ev_logged: L('লেখা', 'Logged', 'Logged'),
   nr_who_created: L('কে বানিয়েছে', 'who created it', 'who created it'), nr_who_voided: L('কে বাতিল করেছে', 'who voided it', 'who voided it'), nr_void_reason: L('বাতিলের কারণ', 'the reason for the void', 'void reason'),
   nr_audit_log_has_no_line_for_this_record: L('অডিট লগে এই রেকর্ডের কোনো লাইন নেই', 'the audit log has no line for this record', 'audit log-এ line নেই'), nr_who_changed_the_form_after_approval: L('অনুমোদনের পর কে ফর্ম বদলেছে', 'who changed the form after approval', 'who changed the form'),
-  n_audit_log_owner_only: L('অডিট লগ শুধু মালিক দেখতে পারেন', 'The audit log can be read by the owner only', 'Audit log শুধু owner দেখেন'), n_only_the_date_is_recorded: L('শুধু তারিখ লেখা আছে, সময় নয়', 'Only the date is recorded, not the time', 'শুধু date, time নয়'),
+  n_audit_log_owner_only: L('অডিট লগ শুধু মালিক দেখতে পারেন', 'The audit log can be read by the owner only', 'Audit log শুধু owner দেখেন'), n_only_the_date_is_recorded: L('শুধু ডেট লেখা আছে, সময় নয়', 'Only the date is recorded, not the time', 'শুধু date, time নয়'),
   owed_c: L('বাকি আছে', 'owed', 'owed'),
 };
 const TY = (k) => lab(Y[k]);

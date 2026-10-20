@@ -33,7 +33,7 @@ const X = R.X = Object.assign(R.X || {}, {
   ask_h: L('জিজ্ঞাসা করুন / খুঁজুন', 'Ask / Find', 'Ask / Find'), ask_ph: L('যেমন: গত ৮ মাসে মেইন শাখার বিদ্যুৎ বিল কত', 'e.g. electricity bill of one branch, last 8 months', 'যেমন: গত ৮ মাসে মেইন শাখার বিদ্যুৎ বিল কত'), ask_go: L('খুঁজুন', 'Find', 'Find'),
   ask_hint: L('বাংলা বা ইংরেজিতে লিখুন। আমি কী বুঝলাম নিচে দেখাব, ভুল হলে ঠিক করে নিন।', 'Write in Bengali or English. I show what I understood; fix it if it is wrong.', 'বাংলা বা English-এ লিখুন। কী বুঝলাম দেখাব, ভুল হলে ঠিক করুন।'),
   tools: L('কী ঘটেছিল দেখুন', 'What happened?', 'কী ঘটেছিল দেখুন'),
-  t_day: L('একটি দিনের গল্প', 'Day replay', 'Day replay'), t_day_s: L('যেকোনো তারিখে কী কী হয়েছিল', 'Everything that happened on one date', 'যেকোনো তারিখে কী কী হয়েছিল'),
+  t_day: L('একটি দিনের গল্প', 'Day replay', 'Day replay'), t_day_s: L('যেকোনো ডেটে কী কী হয়েছিল', 'Everything that happened on one date', 'যেকোনো Dateে কী কী হয়েছিল'),
   t_ent: L('একটির ইতিহাস', 'Timeline of one thing', 'Timeline'), t_ent_s: L('আইটেম, গ্রাহক, সরবরাহকারী, কর্মী, শাখা, ব্যাচ', 'Item, customer, supplier, staff, outlet, batch', 'Item, Customer, Supplier, Staff, Outlet, Batch'),
   t_cmp: L('কী বদলেছে', 'Compare', 'Compare'), t_cmp_s: L('দুটি সময় পাশাপাশি, কারণসহ', 'Two periods side by side, with the reasons', 'দুটি Period পাশাপাশি'),
   t_spend: L('খরচ খুঁজুন', 'Spend finder', 'Spend finder'), t_spend_s: L('কাকে, কী বাবদ, কোথায়, কত', 'Who, for what, where, how much', 'কাকে, কী বাবদ, কোথায়, কত'),
@@ -54,14 +54,14 @@ const X = R.X = Object.assign(R.X || {}, {
   gen: L('তৈরির সময়', 'Generated at', 'Generated at'), filters: L('ফিল্টার', 'Filters', 'Filters'), from: L('শুরু', 'From', 'From'), to: L('শেষ', 'To', 'To'), place: L('শাখা / জায়গা', 'Outlet / place', 'Outlet / place'), all_places: L('আমার সব জায়গা', 'All my places', 'সব Place'),
   csv: L('CSV', 'CSV', 'CSV'), csv_lock: L('এক্সপোর্টের অনুমতি নেই', 'Export is not allowed for you', 'Export-এর permission নেই'), csv_busy: L('তৈরি হচ্ছে…', 'Preparing…', 'Preparing…'), csv_done: L('ফাইল তৈরি', 'File ready', 'File ready'),
   more: L('আরও দেখান', 'Show more', 'আরও দেখান'), prev: L('আগের', 'Previous', 'Previous'), next: L('পরের', 'Next', 'Next'), of: L('/', 'of', '/'), rows: L('সারি', 'rows', 'rows'),
-  save_view: L('ভিউ সংরক্ষণ', 'Save this view', 'Save this view'), view_name: L('ভিউয়ের নাম', 'View name', 'View name'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), removed: L('সরানো হয়েছে', 'Removed', 'Removed'),
+  save_view: L('ভিউ সেভ', 'Save this view', 'Save this view'), view_name: L('ভিউয়ের নাম', 'View name', 'View name'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), removed: L('সরানো হয়েছে', 'Removed', 'Removed'),
   pin: L('হোমে পিন', 'Pin to Home', 'Pin to Home'), pinned: L('পিন করা হয়েছে', 'Pinned', 'Pinned'), unpin: L('পিন সরান', 'Unpin', 'Unpin'),
   empty_day: L('এই দিনে এই জায়গায় কিছু লেখা নেই', 'Nothing is recorded for this day at this place', 'এই দিনে কিছু লেখা নেই'),
   nr: L('লেখা নেই', 'not recorded', 'not recorded'), hidden_h: L('আপনাকে দেখানো হচ্ছে না', 'Not shown to you', 'আপনাকে দেখানো হচ্ছে না'),
   hidden_t: L('এগুলোর জন্য সংশ্লিষ্ট রিপোর্টের অনুমতি লাগে। যা দেখানো হয়নি তার সংখ্যা বা টাকাও এখানে নেই।', 'These need the matching report right. Their counts and amounts are not included here either.', 'এগুলোর জন্য report right লাগে। count বা টাকাও এখানে নেই।'),
   cost_hidden: L('খরচ ও মূল্যের কলাম আপনার ভূমিকার জন্য বন্ধ', 'Cost and value figures are hidden for your role', 'Cost ও value আপনার role-এর জন্য বন্ধ'),
   e_off: L('ইন্টারনেট নেই — দেখতে অনলাইন লাগবে', 'You are offline — this needs a connection', 'Internet নেই — online লাগবে'), e_na: L('এই বিভাগ ডেটাবেসে এখনও চালু হয়নি (phase470-476)', 'This part is not installed on the database yet (phases 470-476)', 'Database-এ এখনও চালু হয়নি (phase470-476)'),
-  e_perm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), e_range: L('তারিখের পরিসর ঠিক নেই বা খুব বড়', 'The date range is not valid or too long', 'Date range ঠিক নেই'), e_nf: L('পাওয়া যায়নি', 'Not found', 'পাওয়া যায়নি'),
+  e_perm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), e_range: L('ডেটের পরিসর ঠিক নেই বা খুব বড়', 'The date range is not valid or too long', 'Date range ঠিক নেই'), e_nf: L('পাওয়া যায়নি', 'Not found', 'পাওয়া যায়নি'),
   e_gen: L('কিছু একটা ভুল হয়েছে', 'Something went wrong', 'কিছু ভুল হয়েছে'), e_filter: L('ফিল্টারের মান ঠিক নেই', 'A filter value is not valid', 'Filter-এর value ঠিক নেই'),
 });
 const T = (k) => lab(X[k]);
@@ -71,7 +71,7 @@ R.T = T;
 const AREA = R.AREA = {
   sales: L('বিক্রি', 'Sales', 'Sales'), customers: L('গ্রাহক ও বাকি', 'Customers & dues', 'Customer ও বাকি'), cash: L('ক্যাশ ও ব্যাংক', 'Cash & bank', 'Cash ও Bank'), pos: L('POS শিট', 'POS sheets', 'POS sheet'),
   stock: L('স্টক ও উৎপাদন', 'Stock & production', 'Stock ও Production'), purchase: L('ক্রয় ও সরবরাহকারী', 'Purchases & suppliers', 'Purchase ও Supplier'), expense: L('খরচ', 'Expenses', 'Expenses'),
-  payroll: L('বেতন ও অগ্রিম', 'Pay & advances', 'Pay ও Advance'), hr: L('কর্মীর অবস্থা', 'Staff status', 'Staff status'), control: L('অনুমোদন ও ব্যতিক্রম', 'Approvals & exceptions', 'Approval ও Exception'),
+  payroll: L('বেতন ও অগ্রিম', 'Pay & advances', 'Pay ও Advance'), hr: L('কর্মীর অবস্থা', 'Staff status', 'Staff status'), control: L('অ্যাপ্রুভ ও ব্যতিক্রম', 'Approvals & exceptions', 'Approval ও Exception'),
   accounts: L('হিসাব ও মাস বন্ধ', 'Accounts & period lock', 'Accounts ও Period lock'), cost: L('খরচের অঙ্ক', 'Cost figures', 'Cost figure'),
 };
 const EV = R.EV = {
@@ -82,7 +82,7 @@ const EV = R.EV = {
   wastage: L('অপচয়', 'Wastage', 'Wastage'), count_adjust: L('গণনার সমন্বয়', 'Count adjustment', 'Count adjustment'), ledger: L('স্টক চলাচল', 'Stock movement', 'Stock movement'), cash_move: L('ক্যাশ/ব্যাংক লেনদেন', 'Cash / bank move', 'Cash/Bank move'),
   cash_short: L('ক্যাশ কম/বেশি', 'Cash short / over', 'Cash short/over'), other_income: L('অন্যান্য আয়', 'Other income', 'Other income'), money_transfer: L('টাকা স্থানান্তর', 'Money transfer', 'Money transfer'),
   handover: L('ক্যাশ হ্যান্ডওভার (১০-১)', 'Cash handover (10-1)', 'Cash handover (10-1)'), day_sheet: L('শোরুম দৈনিক শিট (১৪-১)', 'Daily showroom sheet (14-1)', 'Daily sheet (14-1)'), count_sheet: L('স্টক গণনা শিট (০৪-৩)', 'Stock count sheet (04-3)', 'Count sheet (04-3)'), factory_sheet: L('কারখানা দৈনিক শিট (০৫-১)', 'Factory daily sheet (05-1)', 'Factory sheet (05-1)'),
-  transit_short: L('পথে কম মাল', 'Short in transit', 'Short in transit'), approval: L('অনুমোদন', 'Approval', 'Approval'), exception: L('ব্যতিক্রম', 'Exception', 'Exception'), exception_resolved: L('ব্যতিক্রম নিষ্পত্তি', 'Exception resolved', 'Exception resolved'),
+  transit_short: L('পথে কম মাল', 'Short in transit', 'Short in transit'), approval: L('অ্যাপ্রুভ', 'Approval', 'Approval'), exception: L('ব্যতিক্রম', 'Exception', 'Exception'), exception_resolved: L('ব্যতিক্রম নিষ্পত্তি', 'Exception resolved', 'Exception resolved'),
   period: L('মাস/বছর বন্ধ ও লক', 'Period / lock', 'Period / lock'), staff_status: L('কর্মীর অবস্থা বদল', 'Staff status change', 'Staff status'), staff_exit: L('কর্মীর প্রস্থান', 'Staff exit', 'Staff exit'), payroll: L('বেতন পরিশোধ', 'Salary payment', 'Salary payment'),
   advance: L('কর্মীর অগ্রিম', 'Staff advance', 'Staff advance'), price_change: L('দাম বদল', 'Price change', 'Price change'),
 };

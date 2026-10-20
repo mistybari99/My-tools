@@ -527,7 +527,7 @@ async function assetForm(id) {
     <div><label for="af_note">${esc(T('as_note'))}</label><input id="af_note" value="${esc(r ? r.note || '' : '')}" autocomplete="off"></div>
     <div><label for="af_brand">${esc(lab(L('ব্র্যান্ড', 'Brand', 'Brand')))}</label><input id="af_brand" maxlength="80" autocomplete="off" value="${esc(r && r.brand ? r.brand : '')}"></div>
     <div><label for="af_serial">${esc(lab(L('সিরিয়াল / ট্যাগ নম্বর', 'Serial / tag number', 'Serial / tag no')))}</label><div class="p2-inl"><input id="af_serial" maxlength="80" autocomplete="off" value="${esc(r && r.serial_no ? r.serial_no : '')}"><button type="button" data-act="as_scan">▮▮ ${esc(lab(L('স্ক্যান', 'Scan', 'Scan')))}</button></div></div>
-    <div><label for="af_warr">${esc(lab(L('ওয়ারেন্টি শেষ তারিখ', 'Warranty until', 'Warranty শেষ তারিখ')))}</label><input id="af_warr" type="date" value="${esc(r && r.warranty_until ? r.warranty_until : '')}"></div>
+    <div><label for="af_warr">${esc(lab(L('ওয়ারেন্টি শেষ ডেট', 'Warranty until', 'Warranty শেষ Date')))}</label><input id="af_warr" type="date" value="${esc(r && r.warranty_until ? r.warranty_until : '')}"></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="as_save">${esc(T('save'))}</button></div></div>`);
   if (B.listctl) B.listctl.enhance('#af_cond', 'asset_conditions', { otherBlank: true, form: 'ASSET', ctx: () => ({ field: 'asset_condition', asset_id: String((r && r.id) || '') }) });
 }

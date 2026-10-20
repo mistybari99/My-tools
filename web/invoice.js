@@ -324,7 +324,8 @@ function pickLogo(file) {
 // ----- barcode label sheet -----
 const LB = { tpl: null, sel: {}, q: '', items: [], tpls: [] };
 async function labelsPage() {
-  try { if (B.tpl && B.tpl.ensure) B.tpl.ensure(sb); } catch (e) { /* bos98: warm the template choice cache; offline = today's labels */ }
+  // bos98: warm the template choice cache; offline = the labels as before. Keep block comments out of this file below the logo file input: the UI inventory extractor reads from its accept pattern to the next closing one.
+  try { if (B.tpl && B.tpl.ensure) B.tpl.ensure(sb); } catch (e) { void e; }
   await loadAll(); if (V.err) return shell(T('title'), `<div class="notice bad">${esc(T('sql'))}</div>`, true);
   const ir = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,sell_price,barcode,is_active').eq('is_active', true).order('code'));
   LB.items = (ir.data || []); LB.tpls = V.tpls.filter((x) => x.kind === 'label' && x.active);
@@ -339,8 +340,8 @@ function tplLabels(items) {
     const uniq = []; items.forEach((x) => { const u = uniq.find((z) => z.code === String(x.barcode ?? '') && z.name === x.name); if (u) u.copies++; else uniq.push({ name: x.name, code: String(x.barcode ?? ''), price: x.price, copies: 1 }); });
     const parts = uniq.map((u) => B.tpl.render('barcode_label', u, undefined, o)); if (!parts.length || parts.some((h) => !h)) return false;   // null = nothing chosen
     const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
-    f.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}</style></head><body>${parts.join('')}</body></html>`;
-    f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { /* print blocked */ } setTimeout(() => f.remove(), 2000); };
+    f.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}</style></head><body>' + parts.join('') + '</body></html>';   // concatenated, not a template literal: the UI inventory extractor mis-reads a whole-document template
+    f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { void e; } setTimeout(() => f.remove(), 2000); };   // a blocked print is ignored
     return true;
   } catch (e) { return false; }
 }

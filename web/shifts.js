@@ -23,8 +23,8 @@ const X = {
   place: L('জায়গা', 'Place', 'জায়গা'), prev: L('আগের সপ্তাহ', 'Previous week', 'আগের সপ্তাহ'), next: L('পরের সপ্তাহ', 'Next week', 'পরের সপ্তাহ'), copy: L('আগের সপ্তাহ কপি করুন', 'Copy last week', 'আগের সপ্তাহ copy'),
   tpls: L('শিফট টেমপ্লেট', 'Shift templates', 'Shift template'), legend: L('সংকেত', 'Key', 'Key'), noEmp: L('এই জায়গায় কোনো কর্মী নেই।', 'No staff at this place.', 'এই জায়গায় কোনো কর্মী নেই।'),
   pickShift: L('শিফট', 'Shift', 'Shift'), clearOpt: L('— কিছু ঠিক নেই (সাপ্তাহিক নিয়ম চলবে) —', '— nothing set (weekly pattern applies) —', '— কিছু নেই (weekly pattern চলবে) —'), offOpt: L('অফ-ডে', 'Off-day', 'Off-day'),
-  note: L('ছুটি / বদলের নোট (ঐচ্ছিক)', 'Leave / swap note (optional)', 'Leave / swap note (optional)'), save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ করুন', 'Close', 'Close'),
-  saved: L('সংরক্ষণ হয়েছে', 'Saved', 'Saved'), copied: L('কপি হয়েছে', 'Copied', 'Copied'), skipped: L('বাদ', 'skipped', 'skipped'),
+  note: L('ছুটি / বদলের নোট (ঐচ্ছিক)', 'Leave / swap note (optional)', 'Leave / swap note (optional)'), save: L('সেভ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ করুন', 'Close', 'Close'),
+  saved: L('সেভ হয়েছে', 'Saved', 'Saved'), copied: L('কপি হয়েছে', 'Copied', 'Copied'), skipped: L('বাদ', 'skipped', 'skipped'),
   addTpl: L('নতুন টেমপ্লেট', 'New template', 'নতুন template'), edit: L('বদলান', 'Edit', 'Edit'), retire: L('বন্ধ করুন', 'Retire', 'Retire'),
   nameBn: L('নাম (বাংলা)', 'Name (Bangla)', 'নাম (বাংলা)'), nameEn: L('নাম (ইংরেজি)', 'Name (English)', 'Name (English)'), start: L('শুরু', 'Start', 'Start'), end: L('শেষ', 'End', 'End'), allPlaces: L('সব জায়গা (শুধু মালিক)', 'Every place (owner only)', 'সব জায়গা (owner)'),
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), show: L('দেখান', 'Show', 'Show'), noAtt: L('হাজিরার তথ্য এই সার্ভারে নেই, তাই তুলনা করা গেল না।', 'There is no attendance data on this server, so nothing to compare.', 'হাজিরার data নেই, তুলনা করা গেল না।'),
@@ -36,7 +36,7 @@ const X = {
 const T = (k) => lab(X[k]);
 const E = {
   not_allowed: L('এটির অনুমতি নেই।', 'You are not allowed to do this.', 'এটির permission নেই।'), shift_off: L('শিফট রোস্টার বন্ধ আছে।', 'The shift schedule is switched off.', 'Shift roster বন্ধ আছে।'),
-  bad_date: L('তারিখ ঠিক নয় (খুব আগের বা খুব পরের)।', 'The date is not valid (too far back or ahead).', 'তারিখ ঠিক নয়।'), bad_shift: L('একটি শিফট অথবা অফ-ডে বাছুন।', 'Choose a shift or an off-day.', 'Shift অথবা off-day বাছুন।'),
+  bad_date: L('ডেট ঠিক নয় (খুব আগের বা খুব পরের)।', 'The date is not valid (too far back or ahead).', 'Date ঠিক নয়।'), bad_shift: L('একটি শিফট অথবা অফ-ডে বাছুন।', 'Choose a shift or an off-day.', 'Shift অথবা off-day বাছুন।'),
   not_found: L('পাওয়া যায়নি।', 'Not found.', 'পাওয়া যায়নি।'), text_too_long: L('নোট বেশি লম্বা (২০০ অক্ষর পর্যন্ত)।', 'The note is too long (200 characters).', 'Note বেশি লম্বা (২০০)।'),
   name_required: L('নাম লিখুন।', 'Write a name.', 'নাম লিখুন।'), bad_time: L('সময় ঠিক নয়।', 'The time is not valid.', 'সময় ঠিক নয়।'), bad_location: L('জায়গা ঠিক নয়।', 'The place is not valid.', 'জায়গা ঠিক নয়।'),
 };

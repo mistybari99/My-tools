@@ -16,7 +16,7 @@ const X = {
   csv: L('CSV', 'CSV', 'CSV'), info: L('এটা কী?', 'About this report', 'About this report'), close: L('বন্ধ', 'Close', 'Close'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'),
   need: L('তথ্য নেই', 'Data not captured', 'Data নেই'), none: L('কিছু নেই', 'Nothing in this period', 'কিছু নেই'), more: L('বিস্তারিত', 'Details', 'Details'),
   notAllowed: L('এই রিপোর্ট দেখার অনুমতি নেই', 'You are not allowed to see this report', 'এই report দেখার permission নেই'), sqlMissing: L('এই রিপোর্টের ডেটাবেস অংশ এখনও চালু হয়নি', 'The database part of this report is not installed yet', 'এই report-এর database অংশ এখনও চালু হয়নি'),
-  badRange: L('তারিখ বা সংখ্যা ঠিক নয়', 'The dates or numbers are not valid', 'Date বা সংখ্যা ঠিক নয়'), notes: L('জেনে রাখুন', 'Read this first', 'জেনে রাখুন'), assumptions: L('অনুমান ও তথ্যের পরিধি', 'Assumptions and data coverage', 'অনুমান ও data coverage'),
+  badRange: L('ডেট বা সংখ্যা ঠিক নয়', 'The dates or numbers are not valid', 'Date বা সংখ্যা ঠিক নয়'), notes: L('জেনে রাখুন', 'Read this first', 'জেনে রাখুন'), assumptions: L('অনুমান ও তথ্যের পরিধি', 'Assumptions and data coverage', 'অনুমান ও data coverage'),
   basis: L('কীভাবে গোনা', 'How it is counted', 'কীভাবে গোনা'), expDone: L('ফাইল তৈরি হয়েছে', 'File created', 'File তৈরি হয়েছে'), expLock: L('এক্সপোর্টের অনুমতি নেই', 'Export is not allowed', 'Export-এর permission নেই'),
   dataNeeded: L('আগে এই তথ্য দিতে হবে', 'This must be filled in first', 'আগে এই তথ্য দিতে হবে'), prev: L('আগের', 'Previous', 'Previous'), next: L('পরের', 'Next', 'Next'),
   page: L('পাতা', 'Page', 'Page'), of: L('মোট', 'of', 'of'), by: L('কে', 'By', 'By'), at: L('সময়', 'Time', 'Time'), period: L('সময়কাল', 'Period', 'Period'), yes: L('হ্যাঁ', 'Yes', 'Yes'), no: L('না', 'No', 'No'),

@@ -509,13 +509,13 @@ async function printChallan(m) {
   const d = chModel(m);
   try {
     if (B.tpl && B.tpl.printHTML) {
-      try { if (B.tpl.ensure) await B.tpl.ensure(sb); } catch (e) { /* no choice known: built-in sheet */ }
+      try { if (B.tpl.ensure) await B.tpl.ensure(sb); } catch (e) { void e; }   // no choice known: built-in sheet (line comment: a block comment here would hide the code above it from the UI inventory extractor, see the accept="image/..." input)
       if (B.tpl.printHTML('stock_transfer', d, undefined, { lang: S.lang, loc: m.from_id, shop: {} }) && B.tpl.print('stock_transfer', d, undefined, { lang: S.lang, loc: m.from_id, shop: {} })) return true;
     }
-  } catch (e) { /* fall through to the built-in sheet */ }
+  } catch (e) { void e; }   // fall through to the built-in sheet
   try {
     const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
-    f.srcdoc = chBuiltin(d); f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { /* print blocked */ } setTimeout(() => f.remove(), 2000); };
+    f.srcdoc = chBuiltin(d); f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { void e; } setTimeout(() => f.remove(), 2000); };
     return true;
   } catch (e) { toast(T('printFail')); return false; }
 }
@@ -619,7 +619,7 @@ Object.assign(H, {
   s2_more: () => { D.shown += 50; paintRows(rowsFor()); },
   s2_filter: filterSheet,
   s2_freset: () => { D.f = { category: '', below: false, zero: false }; closeSheet(); loadLevels(); },
-  s2_fapply: () => { D.f.sub = ($('#sf_sub') || {}).value || ''; /* bos100 */ D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
+  s2_fapply: () => { D.f.sub = ($('#sf_sub') || {}).value || ''; D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
     const l = $('#sf_loc'); closeSheet(); if (l) { D.loc = l.value === '' ? null : Number(l.value); const s = $('#s2_loc'); if (s) s.value = l.value; refreshActs(); } loadLevels(); },
   s2_item: (a) => { const r = D.rows[Number(a.dataset.i)]; if (r) drill(r); },
   s2_actions: actionsSheet,

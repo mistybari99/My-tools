@@ -71,7 +71,7 @@ K.qs = () => { const q = (location.hash.split('?')[1] || ''); const o = {}; q.sp
 K.parts = () => location.hash.replace(/^#\/?/, '').split('?')[0].split('/');
 K.locs = () => { const all = (B.ENV && B.ENV.locs) || []; return B.liveLocs ? B.liveLocs(all) : all; };
 K.locSel = (id, cur) => `<label>${esc(K.T('place'))} <select id="${id}"><option value="">${esc(K.T('all'))}</option>${K.locs().map((l) => `<option value="${l.id}" ${String(cur) === String(l.id) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select></label>`;
-K.err = (e) => { const m = String((e && e.message) || ''); if (/not allowed/.test(m)) return toast(K.T('denied')); if (/bad_range/.test(m)) return toast(lab(L('তারিখের সীমা ঠিক নেই', 'The date range is wrong', 'Date range ঠিক নেই'))); return fail(e); };
+K.err = (e) => { const m = String((e && e.message) || ''); if (/not allowed/.test(m)) return toast(K.T('denied')); if (/bad_range/.test(m)) return toast(lab(L('ডেটের সীমা ঠিক নেই', 'The date range is wrong', 'Date range ঠিক নেই'))); return fail(e); };
 K.tabs = (route, tabs, cur) => `<div class="ptabs" role="tablist">${tabs.map((t) => `<button role="tab" data-act="rk_tab" data-r="${route}" data-v="${t[0]}" aria-selected="${cur === t[0]}">${esc(lab(t[1]))}</button>`).join('')}</div>`;
 B.repkit = K;
 H.rk_csv = (a) => K.exportNow(a.dataset.key);

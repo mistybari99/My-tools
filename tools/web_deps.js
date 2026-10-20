@@ -35,6 +35,8 @@ function analyzeFile(code) {
       }
     }
   });
+  // screens registered through a helper: R.page({ route: 'prodplan', ... }) (web/rb4common.js)
+  for (const m of code.matchAll(/\.page\(\s*\{\s*route:\s*['"]([A-Za-z0-9_]+)['"]/g)) r.pages.add(m[1]);
   // wrappers: a read of BOS_PAGES.<k> / (BOS_PAGES||{}).<k> that is also assigned by this file
   for (const m of code.matchAll(/(?:const|let|var)\s+\w+\s*=\s*\(?(?:window\.)?BOS_PAGES(?:\s*\|\|\s*\{\})?\)?\.(\w+)/g)) r.pageWraps.add(m[1]);
   return r;

@@ -784,7 +784,7 @@ def scan_controls(root, files, i18n, items, stats):
                     mw = re.search(r'<label\b[^>]*>(?!.*</label>)((?:.){0,200})$', pre, re.S)
                     if mm:
                         lab, conf = canon(mm.group(1), res)
-                    elif mw:
+                    elif mw and canon(mw.group(1), res)[0]:
                         lab, _ = canon(mw.group(1), res)
                         conf = 'medium'
                     elif at.get('placeholder'):

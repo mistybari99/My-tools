@@ -32,11 +32,11 @@ const X = {
   // prices
   priceList: L('নির্ধারিত দামের তালিকা', 'Agreed price list', 'Agreed price list'), addPrice: L('নতুন নির্ধারিত দাম', 'New agreed price', 'নতুন agreed price'), item: L('আইটেম', 'Item', 'Item'), itemph: L('কোড বা নাম লিখুন', 'Type code or name', 'Code বা নাম লিখুন'),
   price: L('দাম', 'Price', 'Price'), perUnit: L('প্রতি একক', 'per unit', 'per unit'), unit: L('একক', 'Unit', 'Unit'), baseUnit: L('— বেস একক —', '— base unit —', '— base unit —'), validFrom: L('কবে থেকে', 'Valid from', 'Valid from'), note: L('নোট', 'Note', 'Note'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('থাক', 'Cancel', 'Cancel'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), retire: L('বন্ধ করুন', 'Retire', 'Retire'), why: L('কারণ (কমপক্ষে ৩ অক্ষর)', 'Reason (at least 3 characters)', 'Reason (কমপক্ষে ৩ অক্ষর)'),
+  save: L('সেভ', 'Save', 'Save'), cancel: L('থাক', 'Cancel', 'Cancel'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), retire: L('বন্ধ করুন', 'Retire', 'Retire'), why: L('কারণ (কমপক্ষে ৩ অক্ষর)', 'Reason (at least 3 characters)', 'Reason (কমপক্ষে ৩ অক্ষর)'),
   current: L('চলতি', 'current', 'current'), ended: L('শেষ', 'ended', 'ended'), retired: L('বন্ধ', 'retired', 'retired'), until: L('পর্যন্ত', 'until', 'until'),
   variancePrice: L('নির্ধারিত দামের সাথে তুলনা', 'Against the agreed price', 'Agreed price এর সাথে তুলনা'), actual: L('আসল দাম', 'Actual', 'Actual'), agreed: L('নির্ধারিত', 'Agreed', 'Agreed'), diff: L('পার্থক্য', 'Diff', 'Diff'), extra: L('বাড়তি খরচ', 'Extra cost', 'Extra cost'),
   withAgreed: L('নির্ধারিত দাম আছে', 'with an agreed price', 'agreed price আছে'), withoutAgreed: L('নির্ধারিত দাম লেখা নেই', 'without an agreed price', 'agreed price লেখা নেই'), lines: L('লাইন', 'lines', 'lines'), fAgreed: L('নির্ধারিত দাম', 'agreed price', 'agreed price'),
-  basis: L('বিলের লাইনের দাম (বিলের ছাড়ের আগে) বিলের তারিখে চালু নির্ধারিত দামের সাথে মেলানো হয়।', 'Bill line price (before the bill discount) against the agreed price valid on the bill date.', 'Bill line price (bill discount এর আগে) bill date এ চালু agreed price এর সাথে মেলানো।'),
+  basis: L('বিলের লাইনের দাম (বিলের ছাড়ের আগে) বিলের ডেটে চালু নির্ধারিত দামের সাথে মেলানো হয়।', 'Bill line price (before the bill discount) against the agreed price valid on the bill date.', 'Bill line price (bill discount এর আগে) bill date এ চালু agreed price এর সাথে মেলানো।'),
   // rejection
   checks: L('পরীক্ষা', 'Checks', 'Checks'), pass: L('পাস', 'Pass', 'Pass'), hold: L('আটক', 'Hold', 'Hold'), reject: L('বাতিল', 'Reject', 'Reject'), rate: L('বাতিলের হার', 'Reject rate', 'Reject rate'), qtyRate: L('পরিমাণে হার', 'by quantity', 'by quantity'),
   qtyChecked: L('পরীক্ষিত পরিমাণ', 'Qty checked', 'Qty checked'), qtyRej: L('বাতিল পরিমাণ', 'Qty rejected', 'Qty rejected'), qtyNc: L('টি পরীক্ষায় পরিমাণ লেখা নেই', 'checks without a quantity', 'check এ quantity লেখা নেই'), fQty: L('পরিমাণ', 'quantity', 'quantity'),
@@ -50,21 +50,21 @@ const X = {
   fl_used_supplier_not_declared: L('ব্যবহৃত সাপ্লায়ার ঘোষিত নয়', 'a used supplier is not declared', 'used supplier declared নয়'), addLink: L('সাপ্লায়ার যোগ', 'Add a supplier', 'Supplier যোগ'),
   sFlags: L('ঝুঁকি গণনা', 'Risk count', 'Risk count'),
   // delivery
-  po: L('পিও', 'PO', 'PO'), promised: L('কথা দেওয়া তারিখ', 'Promised', 'Promised'), firstGrn: L('প্রথম গ্রহণ', 'First GRN', 'First GRN'), lastGrn: L('শেষ গ্রহণ', 'Last GRN', 'Last GRN'), late: L('দেরি (দিন)', 'Days late', 'Days late'),
+  po: L('পিও', 'PO', 'PO'), promised: L('কথা দেওয়া ডেট', 'Promised', 'Promised'), firstGrn: L('প্রথম গ্রহণ', 'First GRN', 'First GRN'), lastGrn: L('শেষ গ্রহণ', 'Last GRN', 'Last GRN'), late: L('দেরি (দিন)', 'Days late', 'Days late'),
   onTime: L('সময়ে', 'On time', 'On time'), lateN: L('দেরিতে', 'Late', 'Late'), onTimePct: L('সময়ে পাওয়ার হার', 'On-time rate', 'On-time rate'), avgLate: L('গড় দেরি (দিন)', 'Avg days late', 'Avg days late'), lead: L('গড় আসতে সময় (দিন)', 'Avg lead days', 'Avg lead days'),
-  overdue: L('সময় পেরিয়েও আসেনি', 'Overdue, not received', 'Overdue'), partial: L('আংশিক', 'Partial', 'Partial'), fPromised: L('কথা দেওয়া তারিখ', 'promised date', 'promised date'),
-  st_on_time: L('সময়ে এসেছে', 'on time', 'on time'), st_late: L('দেরিতে এসেছে', 'late', 'late'), st_received_no_promised_date: L('এসেছে, কথা দেওয়া তারিখ নেই', 'received, no promised date', 'received, promised date নেই'),
-  st_partial: L('আংশিক এসেছে', 'partly received', 'partly received'), st_partial_overdue: L('আংশিক, সময় পেরিয়েছে', 'partly received, overdue', 'partial, overdue'), st_partial_no_promised_date: L('আংশিক, কথা দেওয়া তারিখ নেই', 'partly received, no promised date', 'partial, promised date নেই'),
-  st_open: L('খোলা', 'open', 'open'), st_overdue_open: L('সময় পেরিয়েছে', 'overdue', 'overdue'), st_open_no_promised_date: L('খোলা, কথা দেওয়া তারিখ নেই', 'open, no promised date', 'open, promised date নেই'),
+  overdue: L('সময় পেরিয়েও আসেনি', 'Overdue, not received', 'Overdue'), partial: L('আংশিক', 'Partial', 'Partial'), fPromised: L('কথা দেওয়া ডেট', 'promised date', 'promised date'),
+  st_on_time: L('সময়ে এসেছে', 'on time', 'on time'), st_late: L('দেরিতে এসেছে', 'late', 'late'), st_received_no_promised_date: L('এসেছে, কথা দেওয়া ডেট নেই', 'received, no promised date', 'received, promised date নেই'),
+  st_partial: L('আংশিক এসেছে', 'partly received', 'partly received'), st_partial_overdue: L('আংশিক, সময় পেরিয়েছে', 'partly received, overdue', 'partial, overdue'), st_partial_no_promised_date: L('আংশিক, কথা দেওয়া ডেট নেই', 'partly received, no promised date', 'partial, promised date নেই'),
+  st_open: L('খোলা', 'open', 'open'), st_overdue_open: L('সময় পেরিয়েছে', 'overdue', 'overdue'), st_open_no_promised_date: L('খোলা, কথা দেওয়া ডেট নেই', 'open, no promised date', 'open, promised date নেই'),
   delBasis: L('কাগজের পিও (06-3) ও মাল গ্রহণ (04-1) মিলিয়ে। ক্রয় বিলে পিওর লিংক নেই, তাই সেগুলো এতে নেই।', 'From the paper purchase orders (06-3) and goods received notes (04-1). Purchase bills carry no PO link, so they are not in it.', 'Paper PO (06-3) ও GRN (04-1) থেকে। Purchase bill এ PO link নেই, তাই সেগুলো নেই।'),
 };
 const T = (k) => lab(X[k]);
 const NC = (k) => `${T('nc')}: ${T(k)}`;
 const ERR = {
-  not_allowed: X.noperm, 'not allowed for this location': L('এই জায়গা আপনার নয়', 'You may not see this place', 'এই place আপনার নয়'), bad_range: L('তারিখের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'),
-  bad_price: L('দাম ঠিক নয়', 'The price is not valid', 'Price ঠিক নয়'), unit_unknown: L('এককের রূপান্তর জানা নেই', 'Unit conversion unknown', 'Unit conversion জানা নেই'), overlaps_existing: L('এর আগের তারিখে চালু দাম আছে — আগে সেটি বন্ধ করুন', 'An open price starts on or after that date — retire it first', 'আগের date এ চালু price আছে — আগে retire করুন'),
+  not_allowed: X.noperm, 'not allowed for this location': L('এই জায়গা আপনার নয়', 'You may not see this place', 'এই place আপনার নয়'), bad_range: L('ডেটের সীমা ঠিক নয়', 'The date range is not valid', 'Date range ঠিক নয়'),
+  bad_price: L('দাম ঠিক নয়', 'The price is not valid', 'Price ঠিক নয়'), unit_unknown: L('এককের রূপান্তর জানা নেই', 'Unit conversion unknown', 'Unit conversion জানা নেই'), overlaps_existing: L('এর আগের ডেটে চালু দাম আছে — আগে সেটি বন্ধ করুন', 'An open price starts on or after that date — retire it first', 'আগের date এ চালু price আছে — আগে retire করুন'),
   item_not_found: L('আইটেম পাওয়া যায়নি', 'Item not found', 'Item পাওয়া যায়নি'), supplier_not_found: L('সাপ্লায়ার পাওয়া যায়নি', 'Supplier not found', 'Supplier পাওয়া যায়নি'), note_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (at least 3 characters)', 'Reason লিখুন (কমপক্ষে ৩ অক্ষর)'),
-  bad_rank: L('ধরন ঠিক নয়', 'Rank is not valid', 'Rank ঠিক নয়'), bad_date: L('তারিখ ঠিক নয়', 'The date is not valid', 'Date ঠিক নয়'),
+  bad_rank: L('ধরন ঠিক নয়', 'Rank is not valid', 'Rank ঠিক নয়'), bad_date: L('ডেট ঠিক নয়', 'The date is not valid', 'Date ঠিক নয়'),
 };
 const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? lab(ERR[k]) : m || 'error'; };
 const D = { tab: 'ret', from: null, to: null, loc: '', sup: '', locs: [], sups: [], items: [], data: {}, canTerms: false, busy: false, sheet: null };
