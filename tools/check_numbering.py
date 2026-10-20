@@ -35,6 +35,8 @@ def main():
     olds = {p['old'] for p in phases}
     news = {p['new'] for p in phases}
     old_only = olds - news
+    # union merge: a number that has a real phase file again (imported advanced-line phases 506-528, union phases 529+) is no longer a stale old number
+    old_only = {n for n in old_only if not os.path.exists(os.path.join(ROOT, 'supabase', f'phase{n}.sql'))}
     ambig = olds & news
     fails, warns, review = [], [], {}
     lines_out = []
