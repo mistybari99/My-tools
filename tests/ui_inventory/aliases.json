@@ -1750,6 +1750,18 @@
    "from": "L:বাতিল|Cancel|Cancel",
    "to": "L:ক্যান্সেল|Cancel|Cancel",
    "reason": "Owner word list: Cancel is ক্যান্সেল in Bangla letters (advanced line wording step); same button."
+  },
+  {
+   "type": "rename",
+   "from": "ctl:expenseregister.js:action:er_open",
+   "to": "ctl:expenseregister.js:action:exr_open",
+   "reason": "Union merge: the advanced error-log footer button already uses the action name er_open (web/errlog.js), so two handlers with one name overwrote each other and the expense report line did not open. The expense register action is renamed exr_open; it is the same row action with the same behaviour."
+  },
+  {
+   "type": "rename",
+   "from": "ctl:trace.js:button:rc_csv",
+   "to": "ctl:trace.js:button:rcl_csv",
+   "reason": "Union merge: the advanced recipe-cost reconciliation (web/recon118.js) defines a handler rc_csv too; the later script overwrote the recall CSV button of the trace screen. The recall CSV action is renamed rcl_csv; same button, same file, same behaviour."
   }
  ]
 }

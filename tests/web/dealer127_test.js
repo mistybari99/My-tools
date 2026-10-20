@@ -58,7 +58,7 @@ const EXTRA9 = `(function(){ const real = window.supabase.createClient; window.s
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
   async function open(hash, lang = 'en') {
-    const ctx = await br.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
+    const ctx = await br.newContext({ bypassCSP: true, viewport: { width: 360, height: 780 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|code: P0001/.test(m.text())) errors.push('console: ' + m.text()); });
     p.on('dialog', (d) => { const q = (window_prompts.shift() || {}); if (d.type() === 'prompt') d.accept(q.v !== undefined ? q.v : (d.defaultValue() || 'reason test')); else d.accept(); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA9 }));

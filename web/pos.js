@@ -387,7 +387,7 @@ async function submitSale(p, change) {
   if (P.busy) return; P.busy = true;
   const btn = $('#cart_ok') || $('[data-act="pos_qs_cash"]'); if (btn) btn.disabled = true;
   try {
-    if (B.drawer) B.drawer.beforeSale(p);   // bos95: cash drawer (rule cash_drawer_mode; off = nothing happens; never blocks the sale)
+    if (B.drawer) B.drawer.beforeSale(p);   // bos95: cash drawer (rule cash_drawer_mode, off = nothing happens, never blocks the sale)
     const { data, error } = await send(p);
     if (error) {
       if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); if (B.mkt && B.mkt.queued) B.mkt.queued(p.p_client); if (B.invoiceview) B.invoiceview.afterSale({ p, pending: true }); /* bos92 */ if (B.drawer) B.drawer.afterSale(p); /* bos95 */ return afterSale(); }   // RPT-C3: remember the campaign tag of a queued sale

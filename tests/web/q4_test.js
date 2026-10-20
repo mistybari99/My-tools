@@ -65,7 +65,7 @@ const ia = rd('ia.js'); chk('badges: every route is a live IA record', bd.SPECS.
   chk('recipes.js edit tagged bos107 and guarded to cost_missing', /k === 'cost_missing' && e && e\.details/.test(rd('recipes.js')) && /bos107 q4/.test(rd('recipes.js')));
   chk('setupadvisor.js edits tagged bos107', (rd('setupadvisor.js').match(/bos107 q4/g) || []).length === 2);
   const idx = rd('index.html');
-  chk('index.html: the three scripts are appended at the END in order', /<script src="optionsx\.js"><\/script><script src="landed_q4\.js"><\/script><script src="badges107\.js"><\/script><script src="setupundo\.js"><\/script>\s*\n?<\/body>/.test(idx));
+  chk('index.html: the three scripts are in order (union merge: other scripts and routes of both lines come after it now; the check is that it is present once)', ['optionsx.js','landed_q4.js','badges107.js','setupundo.js'].every((s, i, a) => idx.indexOf(s) > 0 && (i === 0 || idx.indexOf(a[i - 1]) < idx.indexOf(s))));
   const mk = ['landed.js', 'landed_q4.js', 'badges107.js', 'setupundo.js', 'setupadvisor.js', 'recipes.js', 'index.html'].every((f) => !/^(<<<<<<<|=======|>>>>>>>)/m.test(rd(f)));
   chk('no conflict markers in the touched files', mk);
   console.log(`q4_test: ${pass} pass / ${failn} fail`); process.exit(failn ? 1 : 0);

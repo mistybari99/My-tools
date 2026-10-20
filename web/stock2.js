@@ -619,7 +619,7 @@ Object.assign(H, {
   s2_more: () => { D.shown += 50; paintRows(rowsFor()); },
   s2_filter: filterSheet,
   s2_freset: () => { D.f = { category: '', below: false, zero: false }; closeSheet(); loadLevels(); },
-  s2_fapply: () => { D.f.sub = ($('#sf_sub') || {}).value || ''; D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
+  s2_fapply: () => { D.f.sub = ($('#sf_sub') || {}).value || ''; D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');   // bos100
     const l = $('#sf_loc'); closeSheet(); if (l) { D.loc = l.value === '' ? null : Number(l.value); const s = $('#s2_loc'); if (s) s.value = l.value; refreshActs(); } loadLevels(); },
   s2_item: (a) => { const r = D.rows[Number(a.dataset.i)]; if (r) drill(r); },
   s2_actions: actionsSheet,

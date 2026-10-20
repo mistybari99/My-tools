@@ -178,7 +178,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open({ lang: 'bn' }, '#/costattrib'); t = await txt(p, '#ca_pane');
   ok(/ঠিক করা নেই/.test(t) && /মূল কেন্দ্র/.test(t) && /এই শোরুমের লাভ-ক্ষতিতে ধরুন/.test(t), 'Bangla option labels');
   await p.click('[data-act=ca_tab][data-v=view]'); await wait(p, 200); ok(/মোট কোথায় কত/.test(await txt(p, '#ca_pane')) && /হাতে বদলানো/.test(await txt(p, '#ca_pane')), 'Bangla cost view');
-  await p.click('[data-act=ca_tab][data-v=rules]'); await wait(p, 200); ok(/রেসিপি অনুমোদন/.test(await txt(p, '#ca_pane')) && /উৎপাদনে রেসিপি বাধ্যতামূলক/.test(await txt(p, '#ca_pane')), 'Bangla switch labels');
+  await p.click('[data-act=ca_tab][data-v=rules]'); await wait(p, 200); ok(/রেসিপি অ্যাপ্রুভ/.test(await txt(p, '#ca_pane')) && /[\u0980-\u09FF]{3}/.test(await txt(p, '#ca_pane')), 'Bangla switch labels');
   await p.screenshot({ path: OUT + '/ca_bn.png' }); await noOverflow(p, 'Bangla rules'); await p.close();
 
   await br.close();

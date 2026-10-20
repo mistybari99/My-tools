@@ -223,7 +223,7 @@ async function caseView(id) {
     <h3>${esc(T('batches'))}</h3>${ent}${open && D.canRecall ? `<button class="full" data-act="trc_add">${esc(T('addBatch'))}</button>` : ''}
     <h2>${esc(T('affected'))}</h2>${fwdHTML(d.forward)}
     ${unl.length ? `<div class="notice warn"><b>${esc(T('unlot'))}</b>${unl.map((u) => `<div>${esc(u.supplier)} · ${esc(T('oBill'))} ${esc(u.bill_no || '—')} ${esc(d10(u.bill_date))} · ${esc(u.code)} · ${q4(u.qty)}</div>`).join('')}</div>` : ''}
-    <div class="row"><button data-act="rc_csv">${esc(T('csv'))}</button>${open && D.canRecall ? `<button class="danger" data-act="rc_close">${esc(T('closeCase'))}</button>` : ''}</div>
+    <div class="row"><button data-act="rcl_csv">${esc(T('csv'))}</button>${open && D.canRecall ? `<button class="danger" data-act="rc_close">${esc(T('closeCase'))}</button>` : ''}</div>
     <button class="full" data-act="go" data-v="recall">←</button></div>`, true);
 }
 function caseCSV() {
@@ -270,7 +270,7 @@ Object.assign(H, {
   rc_close: () => openSheet(`<h2>${esc(T('closeCase'))}</h2><div class="stack"><div><label for="rc_cn">${esc(T('note'))}</label><input id="rc_cn" maxlength="500" autocomplete="off"></div>
     <div class="row"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="danger full" data-act="rc_closego">${esc(T('closeCase'))}</button></div></div>`),
   rc_closego: () => { const n = (($('#rc_cn') || {}).value || '').trim(); if (n.length < 3) return toast(lab(ERR.note_required)); const c = D.caseData.case; return act(sb.rpc('recall_close', { p_case: c.id, p_note: n }), () => caseView(c.id)); },
-  rc_csv: caseCSV,
+  rcl_csv: caseCSV,
 });
 
 async function viewTrace() {

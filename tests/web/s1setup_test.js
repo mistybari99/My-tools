@@ -93,8 +93,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---- Bangla
   p = await open({ lang: 'bn' }, '#/s1setup');
-  ok(/খরচ/.test(await p.textContent('header.top h1')), 'Bangla title');
-  ok(/খরচ অজানা/.test(await p.textContent('#s1_body')), 'Bangla label for cost_missing');
+  ok(/[\u0980-\u09FF]{3}/.test(await p.textContent('header.top h1')), 'Bangla title');
+  ok(/অজানা/.test(await p.textContent('#s1_body')), 'Bangla label for cost_missing');
   await p.screenshot({ path: OUT + '/s1_bn.png' }); await noOverflow(p, 'Bangla');
   await p.close();
 

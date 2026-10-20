@@ -6877,7 +6877,7 @@
   },
   "rule:cash_drawer_method": {
    "title": "Cash drawer: connection type",
-   "does": "none = nothing. browser_print_pulse = a tiny print job; works when the printer driver is set to open the drawer on print. web_serial / web_usb / bluetooth = send the ESC/POS pulse straight to the device (Chrome on Android or a computer; iPhone browsers cannot). kiosk_url = PLANNED, not built yet.",
+   "does": "none = nothing. browser_print_pulse = a tiny print job; works when the printer driver is set to open the drawer on print. web_serial / web_usb / bluetooth = send the ESC/POS pulse straight to the device (Chrome on Android or a computer; iPhone browsers cannot).",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "none (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -6887,7 +6887,7 @@
   },
   "rule:cash_drawer_mode": {
    "title": "Cash drawer: when it opens",
-   "does": "off = as today (the drawer does nothing). on_cash_sale = ask the drawer to open when cash is taken. on_any_sale = on every sale. manual_only = only from the \"No sale\" button. A missing or broken drawer never blocks a sale. Recommended once a drawer is fitted: on_cash_sale.",
+   "does": "off = as today (the drawer does nothing). on_cash_sale = ask the drawer to open when cash is taken. on_any_sale = on every sale.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -6947,7 +6947,7 @@
   },
   "rule:client_errors_on": {
    "title": "Collect error reports from the app automatically",
-   "does": "Off = as before (default). On: when a screen breaks, a short note (which screen, what error, which build) is saved and the owner reads it on the Problems page. Passwords, tokens and customer data are never stored. The Report a problem button works even while this is off.",
+   "does": "Off = as before (default). On: when a screen breaks, a short note (which screen, what error, which build) is saved and the owner reads it on the Problems page. Passwords, tokens and customer data are never stored.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "Off.",
    "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
@@ -7107,7 +7107,7 @@
   },
   "rule:inbox_pii_mode": {
    "title": "Mask customer details in the inbox",
-   "does": "off = today. mask_phone = phone hidden. mask_phone_address = phone and address hidden. mask_all_pii = name, handle, message text and attachment hidden too. Authorised people reveal one at a time (logged).",
+   "does": "off = today. mask_phone = phone hidden. mask_phone_address = phone and address hidden.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7167,7 +7167,7 @@
   },
   "rule:item_images_mode": {
    "title": "Show item photos",
-   "does": "off = today (photos only in the item form). pos_only = POS item cards only. everywhere = POS and every item picker / list. An item without a photo shows its first letter.",
+   "does": "off = today (photos only in the item form). pos_only = POS item cards only. everywhere = POS and every item picker / list.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7217,7 +7217,7 @@
   },
   "rule:landed_alloc_default": {
    "title": "equal",
-   "does": "value = costly goods take more. qty = the same per unit. weight or volume = best for freight, but the weight must be known (it is never guessed). manual % = you give the shares. equal = the same per line. Recommended: value, and weight for freight when every line has a known weight.",
+   "does": "value = costly goods take more. qty = the same per unit. weight or volume = best for freight, but the weight must be known (it is never guessed).",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "value (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7237,7 +7237,7 @@
   },
   "rule:landed_cost_mode": {
    "title": "per shipment",
-   "does": "off = as today, item cost = the invoice price. manual = you add it when you need it. per bill = one landed cost per bill. per shipment = one landed cost spread over several bills / GRNs of one shipment (lot). Recommended: per shipment for imports, manual for a local delivery charge.",
+   "does": "off = as today, item cost = the invoice price. manual = you add it when you need it. per bill = one landed cost per bill.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7257,7 +7257,7 @@
   },
   "rule:landed_late_mode": {
    "title": "variance account",
-   "does": "split = the part still on the shelf goes into stock cost, the part already sold goes to the landed-cost variance (profit and loss). remaining stock = the whole charge is added to what is left (its cost looks higher). variance account = stock is not touched, the whole charge is an expense. Recommended: split.",
+   "does": "split = the part still on the shelf goes into stock cost, the part already sold goes to the landed-cost variance (profit and loss). remaining stock = the whole charge is added to what is left (its cost looks higher). variance account = stock is not touched, the whole charge is an expense.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "split_remaining_and_cogs (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7337,7 +7337,7 @@
   },
   "rule:org_scope_on": {
    "title": "Separate data scope per business (when on, staff of one business cannot see another business's data)",
-   "does": "Off = everything works as before. On = management is limited to its own business, role/personal grants without a place stop at the business border, the listed reports and settings tables are filtered. Read org_scope_preflight() first. Owner sees all.",
+   "does": "Off = everything works as before. On = management is limited to its own business, role/personal grants without a place stop at the business border, the listed reports and settings tables are filtered. Read org_scope_preflight() first.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "Off.",
    "change": "On or off in Settings. The change applies the next time the function that reads it runs.",
@@ -7417,7 +7417,7 @@
   },
   "rule:pos_show_invoice_after_sale": {
    "title": "Show the invoice on screen after a sale: never, ask or always",
-   "does": "never = as before (only the small \"Print receipt\" bar). ask = a \"Show invoice\" bar appears after a sale. always = the invoice opens on screen after every sale, with Print, Email, SMS and WhatsApp buttons. Recommended: always, so the customer can see and receive the invoice even when no printer is connected. Email, SMS and WhatsApp open the phone's own app; nothing is sent from our server.",
+   "does": "never = as before (only the small \"Print receipt\" bar). ask = a \"Show invoice\" bar appears after a sale. always = the invoice opens on screen after every sale, with Print, Email, SMS and WhatsApp buttons.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "never (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7447,7 +7447,7 @@
   },
   "rule:profit_truth_mode": {
    "title": "One true net profit (shop P&L and dashboard tile): off or on",
-   "does": "off = as before (the shop P&L ignores wastage, card fees, app payroll and shared bills; the dashboard tile shows the books figure). on = the shop P&L and the Net profit tile use ONE figure: sales with a known cost minus cost of goods, expenses, salary (paper sheet OR payroll app, never both), wastage, card fees, fixed cost and attributed shared bills. Unallocated shared bills show as their own row. Sales whose cost is unknown are shown apart and the figure is marked provisional.",
+   "does": "off = as before (the shop P&L ignores wastage, card fees, app payroll and shared bills; the dashboard tile shows the books figure).",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7487,7 +7487,7 @@
   },
   "rule:purchase_grn_guard": {
    "title": "When GRN is the stock source, does the purchase bill add stock: off, skip or link required",
-   "does": "off = as before (both add stock, goods can be counted twice). skip = the bill only records money / dues, stock comes from the GRN. link = the bill must be linked to its GRN before posting. Works only when the bought-goods source is GRN.",
+   "does": "off = as before (both add stock, goods can be counted twice). skip = the bill only records money / dues, stock comes from the GRN. link = the bill must be linked to its GRN before posting.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",
@@ -7516,8 +7516,8 @@
    "src": "phase508.sql (imported from the advanced line phase82); entry written from the rule text in the database seed, not yet checked in the app"
   },
   "rule:report_cost_source": {
-   "title": "Where every report takes the product cost from: stock-ledger average, typed item cost, or ledger first then typed item cost",
-   "does": "ledger_then_item_costs (default) = the cost the journal uses, typed item cost only where the ledger has none (marked as estimate). ledger_avg = ledger only, no ledger cost = unknown. item_costs = typed cost only. The journal itself always uses the ledger.",
+   "title": "Where every report takes the product cost from: stock-ledger average, typed item cost, or ledger first then typed...",
+   "does": "ledger_then_item_costs (default) = the cost the journal uses, typed item cost only where the ledger has none (marked as estimate). ledger_avg = ledger only, no ledger cost = unknown. item_costs = typed cost only.",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "ledger_then_item_costs (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",

@@ -102,7 +102,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   c = await calls(p, 'recall_batch_mark'); ok(c.length === 1 && c[0].p_status === 'written_off' && c[0].p_batch === 11, 'mark sends the status');
   await p.click('[data-act=rc_close]'); await wait(p, 200); await p.click('[data-act=rc_closego]'); await wait(p, 200); ok((await calls(p, 'recall_close')).length === 0, 'closing needs a note');
   await p.click('.sheet-x'); await wait(p, 200);
-  const rcsv = await csvOf(p, '[data-act=rc_csv]'); ok(/Recall,3,test recall/.test(rcsv) && /B-9/.test(rcsv), 'case CSV'); await noOverflow(p, 'recall case'); await p.close();
+  const rcsv = await csvOf(p, '[data-act=rcl_csv]'); ok(/Recall,3,test recall/.test(rcsv) && /B-9/.test(rcsv), 'case CSV'); await noOverflow(p, 'recall case'); await p.close();
 
   // ---- stockout
   p = await open({}, '#/stockout'); await wait(p, 300);

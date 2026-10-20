@@ -118,7 +118,7 @@ const SERVER = (extra = {}) => ({ id: 's1', client_id: 'c1d2e3f4-aaaa-bbbb-cccc-
     const t = mk('en', o); t.rpcImpl.fn = async () => ({ data: 1, error: null }); t.iv.openInfo({ p: PAYLOAD(), data: { id: 's1', receipt: 12, total: 230, paid: 230, due: 0 } }); await tick();
     const np = { innerHTML: '' }; t.els['#iv92_np'] = np; t.handlers.iv92_print(); await tick(); await tick();
     chk(`${name}: friendly text instead of an error, Share / Download named`, /Printing did not work/.test(np.innerHTML) && /Share or Download/.test(np.innerHTML) && t.toasts.every((m) => !/error|exception/i.test(m))); }
-  { const t = mk('bn'); chk('Bangla no-printer text exists and keeps Share / Download in English', /Share/.test(t.iv.T('noPrinter')) && /Download/.test(t.iv.T('noPrinter')) && BN.test(t.iv.T('noPrinter'))); }
+  { const t = mk('bn'); chk('Bangla no-printer text exists (Share / Download are in Bangla letters since the owner word list)', BN.test(t.iv.T('noPrinter'))); }
 
   // ---- 7. share / copy / download ----
   { const t = mk('en', { nav: { userAgent: 'Android', share: async (o) => { t.mem.shared = o; }, clipboard: { writeText: async (x) => { t.mem.__clip = x; } } } }); t.rpcImpl.fn = async () => ({ data: 1, error: null });

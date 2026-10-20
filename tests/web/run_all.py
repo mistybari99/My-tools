@@ -58,7 +58,7 @@ for ts in byport.values():
 groups = {}
 for t in tests:
     groups.setdefault(find(t), []).append(t)
-env = dict(os.environ, BOS_WEB=cp + '/web', BOS_WEB_ROOT=cp + '/web')
+env = dict(os.environ, BOS_WEB=cp + '/web', BOS_WEB_ROOT=cp + '/web', BOS_REPO_DIR=cp)
 
 
 def run_group(ts):

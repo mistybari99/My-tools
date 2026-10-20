@@ -38,7 +38,7 @@ const SHAPE_TYPES = { time1: ['line', 'area', 'column', 'bar'], multi: ['line', 
 
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
-  const ctx = await br.newContext({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2, hasTouch: true });
+  const ctx = await br.newContext({ bypassCSP: true, viewport: { width: 360, height: 800 }, deviceScaleFactor: 2, hasTouch: true });
   const page = await ctx.newPage();
   const errs = []; page.on('pageerror', (e) => errs.push(String(e))); page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
   await page.setContent('<!doctype html><html data-theme="dark"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:16px;background:#17181c;font-family:system-ui}#h{width:328px}.card{width:328px;margin:0 0 12px;padding:0}</style></head><body><div id="h"></div></body></html>');

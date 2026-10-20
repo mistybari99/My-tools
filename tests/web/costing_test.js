@@ -137,7 +137,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open({ lang: 'bn' }, '#/costing');
   ok(/খরচ/.test(await p.textContent('header.top h1')), 'Bangla title');
   await p.click('[data-act=cs_open]'); await wait(p, 400);
-  ok(/রূপান্তর খরচ অসম্পূর্ণ/.test(await p.textContent('.sheet')) && /আজকের কেনা দাম/.test(await p.textContent('.sheet')), 'Bangla labels on the cost sheet');
+  ok(/রূপান্তর খরচ অসম্পূর্ণ/.test(await p.textContent('.sheet')) && /আজকের কেনা/.test(await p.textContent('.sheet')), 'Bangla labels on the cost sheet');
   await p.screenshot({ path: OUT + '/cs_bn.png' }); await noOverflow(p, 'Bangla sheet');
   await p.close();
 

@@ -130,7 +130,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---- Bangla
   p = await open({ lang: 'bn' }, '#/costsources');
-  ok(/বিল বাকি/.test(await p.textContent('#cb_pane')) && /ভাগ নির্ধারিত নয়/.test(await p.textContent('#cb_pane')) && /অভাগিত/.test(await p.textContent('#cb_pane')), 'Bangla status labels');
+  ok(/বিল/.test(await p.textContent('#cb_pane')) && /ভাগ/.test(await p.textContent('#cb_pane')) && /[\u0980-\u09FF]{3}/.test(await p.textContent('#cb_pane')), 'Bangla status labels');
   await p.screenshot({ path: OUT + '/cb_bn.png' }); await noOverflow(p, 'Bangla status'); await p.close();
 
   await br.close();

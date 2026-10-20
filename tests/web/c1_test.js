@@ -120,18 +120,18 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   t = await text(p, '#er_res');
   ok(/Expense report\s*৳ 790/.test(t.replace(/\n/g, ' ')) && /1,102/.test(t) && /837/.test(t) && /1,500/.test(t), 'the three totals and the 18-1 amount are shown');
   ok(/The totals differ/.test(t) && /Why the totals differ/.test(t), 'the reconciliation is there and says the totals differ');
-  ok(await p.locator('[data-act=er_open]').count() === 3, 'three lines');
+  ok(await p.locator('[data-act=exr_open]').count() === 3, 'three lines');
   ok(/Expense report ✓/.test(await text(p, '#er_res')) && /Expense report –/.test(await text(p, '#er_res')), 'each line shows which totals count it (tick and dash)');
   await noOverflow(p, 'expense register');
   await p.click('[data-act=er_basis][data-b=report]'); await p.waitForTimeout(500);
   c = await calls(p, 'expense_register'); ok(c[c.length - 1].p_basis === 'report', 'tapping a total lists the lines behind it (basis report)');
-  ok(await p.locator('[data-act=er_open]').count() === 1, 'only the line the expense report counts');
+  ok(await p.locator('[data-act=exr_open]').count() === 1, 'only the line the expense report counts');
   await p.click('[data-act=er_basis][data-b=report]'); await p.waitForTimeout(500);
   c = await calls(p, 'expense_register'); ok(c[c.length - 1].p_basis === 'all', 'tapping it again goes back to every line');
   await p.click('[data-act=er_kind][data-k=quick]'); await p.click('[data-act=er_run]'); await p.waitForTimeout(500);
   c = await calls(p, 'expense_register'); ok(JSON.stringify(c[c.length - 1].p_kinds) === '["quick"]', 'the kind chip filters');
   await p.click('[data-act=er_kind][data-k=quick]'); await p.click('[data-act=er_run]'); await p.waitForTimeout(400);
-  await p.click('[data-act=er_open] >> nth=2'); await p.waitForTimeout(300);
+  await p.click('[data-act=exr_open] >> nth=2'); await p.waitForTimeout(300);
   t = await text(p, '#sheet');
   ok(/1,500/.test(t) && /test_campaign/.test(t) && /Not in the books/.test(t) && /may also be typed as a voucher/.test(t), 'the line detail shows the amount, paid to and the notes');
   ok(await p.locator('#sheet a[href="#/entry/e-9"]').count() === 1, 'a link opens the source record');
@@ -147,7 +147,7 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   ok(/Not allowed/.test(await text(p, '#er_res')), 'a refusal is shown in words'); await p.close();
   p = await open({ p: { noPhase: true } }, '#/expenseregister');
   ok(/not installed/.test(await text(p, '#er_res')), 'an old database says the database part is missing'); await p.close();
-  for (const lang of ['bn', 'mix']) { p = await open({}, '#/expenseregister', lang); await noOverflow(p, 'expense register ' + lang); ok(await p.locator('[data-act=er_open]').count() === 3, 'lines in ' + lang); await p.close(); }
+  for (const lang of ['bn', 'mix']) { p = await open({}, '#/expenseregister', lang); await noOverflow(p, 'expense register ' + lang); ok(await p.locator('[data-act=exr_open]').count() === 3, 'lines in ' + lang); await p.close(); }
 
   // ---------------- 3. statements
   p = await open({}, '#/statements');

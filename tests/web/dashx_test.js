@@ -108,7 +108,7 @@ const OBD = () => ({
   const renders = (p) => p.evaluate(() => (window.__CR || []).filter((c) => c.op === 'render').map((c) => ({ type: c.type, title: c.title, converted: !!c.spec.converted, spec: c.spec })));
   const order = (p) => p.evaluate(() => Array.from(document.querySelectorAll('#dx_grid .dx-t')).map((e) => e.dataset.m));
   const overflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1 && document.body.scrollWidth <= window.innerWidth + 1), 'horizontal overflow: ' + m);
-  const focus = async (p, m) => { await p.evaluate((mm) => { const e = document.querySelector(`.dx-t[data-m=${mm}]`); window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - 60); }, m); await wait(p, 200); };
+  const focus = async (p, m) => { await p.evaluate((mm) => { const e = document.querySelector(`.dx-t[data-m=${mm}]`); window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - 160); }, m); await wait(p, 200); };
   const reset = () => { SRV.layout = null; SRV.updated = null; SRV.saves = []; SRV.gets = 0; SRV.missing = false; };
 
   // ================= 1. default layout renders (owner, 360px) =================

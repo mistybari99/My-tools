@@ -200,7 +200,9 @@ def main():
             fin, o, ad = set(sqlq(a.db_final, port, q)), set(sqlq(a.db_ours, port, q)), set(sqlq(a.db_adv, port, q))
             miss_o, miss_a = sorted(o - fin), sorted(ad - fin)
             # known, intended: the old overloads the advanced line itself replaced
-            exc = {'public.acct_journal_post(date,integer,text,jsonb,uuid,text,boolean,text)'}
+            # intended supersessions: a function replaced by the same function with more arguments (callers by name keep working): qc_list (our phase 432 adds two), inbound_message_receive and web_order_submit (the advanced line adds one)
+            exc = {'qc_list(integer,date,date,text)', 'inbound_message_receive(text,text,text,text,text,text,timestamp with time zone,text,boolean)', 'web_order_submit(text,uuid,text,text,text,text,jsonb,text,text,text,text,text,boolean)'}
+            miss_o = [m for m in miss_o if m not in exc]
             item(not miss_o, 'every %s of OUR line exists in the merged database (%d of %d)' % (key, len(o) - len(miss_o), len(o)), 'missing: ' + ', '.join(miss_o[:12]) if miss_o else 'checked all')
             item(not [m for m in miss_a if m not in exc], 'every %s of the ADVANCED line exists in the merged database (%d of %d)' % (key, len(ad) - len(miss_a), len(ad)), 'missing: ' + ', '.join(miss_a[:12]) if miss_a else 'checked all')
             if key == 'rule':
@@ -213,7 +215,7 @@ def main():
         P('')
         n_ok = sqlq(a.db_final, port, "select count(*) from public._i2_state() where not present")
         item(n_ok == ['0'], '`select * from public._i2_state() where not present` returns no row', 'count = %s' % (n_ok[0] if n_ok else '?'))
-        au = sqlq(a.db_final, port, "select state||'='||count(*) from public._union_audit() group by 1")
+        au = sqlq(a.db_final, port, "select s||'='||n from (select state s, count(*) n from public._union_audit() group by 1) z")
         item(au == ['merged=156'], '`select state, count(*) from public._union_audit() group by 1` shows only merged=156', ', '.join(au))
         P('')
 

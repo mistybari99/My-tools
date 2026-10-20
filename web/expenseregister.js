@@ -86,7 +86,7 @@ function rowHTML(r, i) {
   const kk = KINDS.find((k) => k[0] === r.kind), kindTxt = kk ? T(kk[1]) : r.kind;
   const tick = (ok, k) => `<span class="chip ${ok ? 'ok' : ''}">${esc(T(k))} ${esc(ok ? '✓' : '–')}</span>`;
   const st = r.status && !['done'].includes(r.status) ? `<span class="chip ${r.status === 'void' || r.status === 'rejected' ? 'bad' : ''}">${esc(r.status)}</span>` : '';
-  return `<div class="card stack tap" role="button" tabindex="0" data-act="er_open" data-i="${i}">
+  return `<div class="card stack tap" role="button" tabindex="0" data-act="exr_open" data-i="${i}">
     <div class="row between"><b>${esc(String(r.entry_date || ''))}</b><b>${esc(num(r.amount))}</b></div>
     <div class="row between wrap"><span>${esc(kindTxt)} ${st}</span><span class="muted">${esc(locName(r.location_id))}</span></div>
     <div class="muted">${esc([r.paid_to, r.ref].filter(Boolean).join(' · '))}</div>
@@ -163,10 +163,10 @@ Object.assign(H, {
     return run(false);
   },
   er_more: () => run(true),
-  er_open: (a) => openRow(Number(a.dataset.i)),
+  exr_open: (a) => openRow(Number(a.dataset.i)),
   er_csv: exportCSV,
 });
-document.addEventListener('keydown', (e) => { const t = e.target; if (t && t.dataset && t.dataset.act === 'er_open' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openRow(Number(t.dataset.i)); } });
+document.addEventListener('keydown', (e) => { const t = e.target; if (t && t.dataset && t.dataset.act === 'exr_open' && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openRow(Number(t.dataset.i)); } });
 async function view() {
   if (B.loadStatic) await B.loadStatic();
   const t = today(); D.to = t; D.from = t.slice(0, 8) + '01'; D.basis = 'all'; D.kinds = []; D.status = ''; D.loc = ''; D.data = null; D.rows = []; D.err = null;

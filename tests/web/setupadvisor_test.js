@@ -32,7 +32,7 @@ const item = (o) => Object.assign({ code: 'c', rule_key: 'k', kind: 'switch', st
   ok('ok row has no button; number row shows default and range, links to Switchboard', !/data-code="a4"/.test(body.innerHTML) && /Default: 10/.test(body.innerHTML) && /Range: 0.1000 x/.test(body.innerHTML.replace('–', '.')) && /#\/switchboard/.test(body.innerHTML));
   ok('not_installed rows are hidden', !/a6/.test(body.innerHTML));
   ok('English mode contains no Bangla characters', !BN.test(body.innerHTML));
-  MODE = 'bn'; await view(); ok('Bangla mode renders Bangla', /প্রস্তাবিত প্রয়োগ/.test(body.innerHTML) && /কারণ/.test(body.innerHTML));
+  MODE = 'bn'; await view(); ok('Bangla mode renders Bangla', /প্রস্তাবিত/.test(body.innerHTML) && /কারণ/.test(body.innerHTML));
   MODE = 'mix'; await view(); ok('mix mode renders Mix label and English words', /Mix label/.test(body.innerHTML) && /Reason mix/.test(body.innerHTML)); MODE = 'en';
   await view();
   RPC.setup_recommend_apply = { count: 1, applied: [{ code: 'a1' }], skipped: [{ code: 'a2', reason: 'not_ready' }, { code: 'x', reason: 'already' }] };

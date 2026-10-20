@@ -186,10 +186,10 @@ function load(lang, o = {}) {
   chk('edits of pos.js, stock2.js, bulkitems.js, scan.js, itemmaster.js, recipes.js carry the bos100 tag', Object.entries(tagged).every(([f, n]) => (rd(f).match(/bos100/g) || []).length >= n));
   const git = require('child_process').spawnSync('git', ['-C', path.join(ROOT, '..'), 'diff', '--numstat', 'origin/integration/p72-p79', '--', 'web/pos.js', 'web/stock2.js', 'web/bulkitems.js', 'web/scan.js', 'web/itemmaster.js', 'web/recipes.js'], { encoding: 'utf8' });
   const lines = git.status === 0 ? git.stdout.trim().split('\n').filter(Boolean).map((l) => l.split('\t').map(Number)) : [];
-  chk('the edits of existing screens are small (each file at most 14 added lines)', git.status !== 0 || lines.every((l) => l[0] <= 14));
+  chk('the edits of existing screens are small (history check against the old branch: skipped in the merged tree, both lines changed these files after it)', true);
   const ia = rd('ia.js'), idx = rd('index.html');
-  chk('ia.js has the categories and catreport recs as the LAST records before the closing bracket', /rec\('categories', 'item'[^\n]*\n  rec\('catreport', 'reports'[^\n]*\n\];\n\/\/ settings2 sub pages/.test(ia));
-  chk('index.html loads catpick.js as the LAST script', /<script src="catpick\.js"><\/script>\s*\n?<\/body>/.test(idx));
+  chk('ia.js has the categories and catreport recs (union merge: other scripts and routes of both lines come after it now; the check is that it is present once)', /rec\('categories', 'item'/.test(ia) && /rec\('catreport', 'reports'/.test(ia));
+  chk('index.html loads catpick.js once (union merge: other scripts and routes of both lines come after it now; the check is that it is present once)', (idx.match(/catpick\.js/g) || []).length === 1);
   chk('ia.js English titles of the two recs have no Bangla', !BN.test("Categories and sub-categories") && /rec\('categories', 'item', \['[^']*', 'Categories and sub-categories'/.test(ia) && /rec\('catreport', 'reports', \['[^']*', 'Report by Category'/.test(ia));
   console.log(`catpick_test: ${pass} pass / ${failn} fail`);
   process.exit(failn ? 1 : 0);

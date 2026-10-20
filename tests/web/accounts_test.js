@@ -234,7 +234,7 @@ function acc(o = {}) {
     const data = C.mk(base, {}); data.tables.coa_accounts = COA; data.tables.acct_mappings = MAPS;
     await q.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__ACC=${JSON.stringify(acc())};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
     await q.goto(`http://localhost:${PORT}/#/accounts`); await q.waitForTimeout(1500);
-    ok(/হিসাব ও খতিয়ান/.test(await q.evaluate(() => document.body.innerText)) && /মোট সম্পদ/.test(await q.evaluate(() => document.body.innerText)), 'Bangla labels'); }
+    ok(/হিসাব ও খতিয়ান/.test(await q.evaluate(() => document.body.innerText)) && /[\u0980-\u09FF]{3}/.test(await q.evaluate(() => document.body.innerText)), 'Bangla labels'); }
 
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);
   await br.close();

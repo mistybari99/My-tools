@@ -1,6 +1,6 @@
 {
  "note": "Pre-existing language violations (do not edit old texts). key=sha1(file|rule|string)[0:16]. Rebuild: LANG_BASELINE_WRITE=1 node tests/web/lang_all_test.js",
- "total": 2861,
+ "total": 2914,
  "violations": {
   "ddc5be4911b77e75": {
    "file": "assistant.js",
@@ -42,6 +42,12 @@
    "file": "bulkitems.js",
    "rule": "en-has-bangla",
    "sample": "Cost ৳ (owner)",
+   "count": 1
+  },
+  "77bb96821c610d0b": {
+   "file": "campaigns.js",
+   "rule": "en-has-bangla",
+   "sample": "Budget ৳ (blank = none)",
    "count": 1
   },
   "a7c9cfb1f8f5148c": {
@@ -378,6 +384,12 @@
    "file": "forms.js",
    "rule": "L-missing-mix(2 args)",
    "sample": "সীমা ও রসিদ|Limit & receipts",
+   "count": 1
+  },
+  "602793b3e5e6836f": {
+   "file": "forms.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "Payment source|Payment source",
    "count": 1
   },
   "96f976e191822943": {
@@ -3818,6 +3830,18 @@
    "sample": "মালিকের ব্যক্তিগত (লেজারে দুই দিকে)|Owner personal (both sid",
    "count": 1
   },
+  "0a331672aa2e605d": {
+   "file": "forms_cash.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "ইসলামিয়া মিষ্টি ঘর|ISLAMIYA MISTY GHAR",
+   "count": 1
+  },
+  "ec8c6251a73ed78e": {
+   "file": "forms_cash.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "সব|All",
+   "count": 1
+  },
   "95688ec15c24ad68": {
    "file": "forms_cash.js",
    "rule": "L-missing-mix(2 args)",
@@ -3834,18 +3858,6 @@
    "file": "forms_cash.js",
    "rule": "L-missing-mix(2 args)",
    "sample": "ব্র্যান্ড|Brand",
-   "count": 1
-  },
-  "0a331672aa2e605d": {
-   "file": "forms_cash.js",
-   "rule": "L-missing-mix(2 args)",
-   "sample": "ইসলামিয়া মিষ্টি ঘর|ISLAMIYA MISTY GHAR",
-   "count": 1
-  },
-  "ec8c6251a73ed78e": {
-   "file": "forms_cash.js",
-   "rule": "L-missing-mix(2 args)",
-   "sample": "সব|All",
    "count": 1
   },
   "0cbdef1d4347d40a": {
@@ -3888,6 +3900,12 @@
    "file": "forms_cash.js",
    "rule": "L-missing-mix(2 args)",
    "sample": "পণ্য বা ক্যাম্পেইন|Product or campaign",
+   "count": 1
+  },
+  "2ed11197e31fe47b": {
+   "file": "forms_cash.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "ক্যাম্পেইন (তালিকা থেকে)|Campaign (from the list)",
    "count": 1
   },
   "e95da35e2522e052": {
@@ -4572,6 +4590,12 @@
    "file": "forms_cash.js",
    "rule": "L-missing-mix(2 args)",
    "sample": "মার্কেটিং খাতের মাসিক সীমা (তালিকা পাতায় দিন)|Marketing hea",
+   "count": 1
+  },
+  "35da7f90f43fffb3": {
+   "file": "forms_cash.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "ক্যাশিয়ার (Cashier)|Cashier",
    "count": 1
   },
   "79c339a2a259ee30": {
@@ -13952,6 +13976,102 @@
    "sample": "Monthly limit (৳)",
    "count": 1
   },
+  "11442e2c8e10b895": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "হিসাবের শুরুর তারিখ দেওয়া নেই|The accounts start date is no",
+   "count": 1
+  },
+  "9f2475b627b26607": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "মাস এখনও শেষ হয়নি|The month is not over yet",
+   "count": 1
+  },
+  "5aea838f96fca176": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "একটি বেতন শিট এখনও অনুমোদিত নয়|A payroll run is still a dra",
+   "count": 1
+  },
+  "d88a4b4805bc2032": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "বেতনের এন্ট্রি খতিয়ানে ওঠা বাকি - \"বাকি এন্ট্রি তুলুন\" চাপু",
+   "count": 1
+  },
+  "36a16f9f9ba267e1": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "অগ্রিম কাটা বাকি অগ্রিমের চেয়ে বেশি - শিটটি ঠিক করুন|An adv",
+   "count": 1
+  },
+  "6917c27d170cb7bd": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "খতিয়ানে অমিল এন্ট্রি আছে|There are unbalanced journal entri",
+   "count": 1
+  },
+  "9130a9b7d6e5674b": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "মাস ইতিমধ্যে দেখা হয়েছে বলে চিহ্নিত|The month is already ma",
+   "count": 1
+  },
+  "cdcc78ee7c141d69": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এই মাসে কোনো বেতন শিট নেই|There is no payroll run for this m",
+   "count": 1
+  },
+  "6eee595d50562231": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "accrual চালু কিন্তু খতিয়ানের সাথে সংযোগ বসেনি, তাই আগের নিয",
+   "count": 1
+  },
+  "679403cd77204d7a": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "accrual চালু কিন্তু শুরুর মাস ফাঁকা|Accrual is on but the fi",
+   "count": 1
+  },
+  "329006a4a1701512": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "খতিয়ানের বেতন শিটের মোটের সাথে মেলে না (অন্য মাসে উল্টানো এ",
+   "count": 1
+  },
+  "6cbcaa5fb7616f6f": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এই কাজের অনুমতি নেই|You are not allowed to do this",
+   "count": 1
+  },
+  "582f350bb0ff8634": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "কারণ লিখতে হবে|A reason is required",
+   "count": 1
+  },
+  "391ed16d8ad387b9": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "মাস চিহ্নিত নয়|The month is not marked as reviewed",
+   "count": 1
+  },
+  "35fb8cd6246c4964": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "মান ঠিক নয়|That value is not allowed",
+   "count": 1
+  },
+  "96db958d4480d7a5": {
+   "file": "monthclose.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "হিসাব চালু নেই|Accounting is off",
+   "count": 1
+  },
   "ddb23d15f6efc30c": {
    "file": "partners.js",
    "rule": "L-missing-mix(2 args)",
@@ -14876,10 +14996,208 @@
    "sample": "Discount by amount (৳)",
    "count": 1
   },
+  "9af9f7cad9680879": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "কারণ লিখুন|Write a reason",
+   "count": 1
+  },
+  "8750a70383a31316": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এর সিদ্ধান্ত আগেই হয়ে গেছে|Already decided",
+   "count": 1
+  },
+  "43f1779aa56208b2": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "যিনি গুনেছেন তিনি নিজের গোনার সিদ্ধান্ত নিতে পারবেন না|Nobod",
+   "count": 1
+  },
+  "ecc16d03fc06d74f": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "একই কম/বেশি হয়তো আগেই হাতে লেখা হয়েছে|This may already be ",
+   "count": 1
+  },
+  "9d58072b1b1473bc": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "কোন কর্মীর কাছ থেকে আদায় হবে বাছুন|Choose the employee to c",
+   "count": 1
+  },
+  "709bbb6a24f2afde": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "হিসাব শুরুর তারিখের আগের তারিখ|Before the accounting start d",
+   "count": 1
+  },
+  "597c17db474cb7c1": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এই মাস বন্ধ|This period is locked",
+   "count": 1
+  },
+  "87b1d806bf95489b": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "হিসাবের লিংক নেই (Accounts-এ ঠিক করুন)|An account link is mi",
+   "count": 1
+  },
+  "a29b08e8d5527949": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "আগে দাম লিখুন|Enter the cost first",
+   "count": 1
+  },
+  "28db9d74b16f124b": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "নিয়ম অনুযায়ী আগে বাহকের কাছে দাবি করতে হবে|By the setting,",
+   "count": 1
+  },
+  "e2f3b90fb8d3ac2f": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "নিয়ম অনুযায়ী ক্ষতি দোকানের, দাবি নয়|By the setting the sh",
+   "count": 1
+  },
+  "733ce4c586c74450": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "আগে দাবি করুন|Claim first",
+   "count": 1
+  },
+  "d9483f94bc1b21b7": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "টাকার অঙ্ক ঠিক নয়|Amount is not valid",
+   "count": 1
+  },
+  "dbe61dc9cce53818": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "মাধ্যম বাছুন|Choose cash, bank or mobile",
+   "count": 1
+  },
+  "5aec8a470353e52c": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "তারিখ ঠিক নয়|Date is not valid",
+   "count": 1
+  },
+  "cfdf754e2627cc1c": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "হিসাব শুরুর তারিখ ঠিক করা নেই|The accounting start date is n",
+   "count": 1
+  },
+  "b94479c4539f7a14": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "অনুমোদিত নয়|Not approved",
+   "count": 1
+  },
+  "6675e378c472cf6b": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "দাম আগেই জানা আছে|Cost is already known",
+   "count": 1
+  },
+  "6b919f9936779b37": {
+   "file": "shortages.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "হিসাব বন্ধ আছে|Accounting is off",
+   "count": 1
+  },
   "abc9dc28664a044a": {
    "file": "stock2.js",
    "rule": "en-has-bangla",
    "sample": "Unit cost ৳ (per chosen unit)",
+   "count": 1
+  },
+  "405c71a3e0d4dec6": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "ক্যাশ আউট|Cash out",
+   "count": 1
+  },
+  "678adcb3a1f88847": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "সেন্ড মানি|Send money",
+   "count": 1
+  },
+  "d1ca2cc284e0cfea": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "মার্চেন্ট পেমেন্ট|Merchant payment",
+   "count": 1
+  },
+  "4b880afb4dd3b14a": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "পেমেন্ট|Payment",
+   "count": 1
+  },
+  "acca824e86450989": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "অন্য|Other",
+   "count": 1
+  },
+  "6f88713543711e83": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "ওয়ালেটে এত টাকা নেই (জের শূন্যের নিচে যেত)|The wallet does ",
+   "count": 1
+  },
+  "6c107708530eb46a": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "অপর ওয়ালেট ঠিক নয়|The other wallet does not fit the choice",
+   "count": 1
+  },
+  "ddbec0ce549fc7ae": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "টাকার অঙ্ক ঠিক নয়|Amount is not valid",
+   "count": 1
+  },
+  "1d7f6cb0ced4c9c9": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "তারিখ ঠিক নয়|Date is not valid",
+   "count": 1
+  },
+  "a0eca38175598e19": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এই মাস বন্ধ|This period is locked",
+   "count": 1
+  },
+  "c70574f60445d5a9": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "কারণ লিখুন|Write a reason",
+   "count": 1
+  },
+  "9dd64156cc32c70c": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "ওয়ালেট পাওয়া যায়নি|Wallet not found",
+   "count": 1
+  },
+  "15d969eede7c1e42": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এখানে কারণ লেখার কিছু নেই|Nothing to explain here",
+   "count": 1
+  },
+  "5075bac059c178b0": {
+   "file": "wallets.js",
+   "rule": "L-missing-mix(2 args)",
+   "sample": "এটি আগেই সংরক্ষিত|Already saved",
    "count": 1
   }
  }
