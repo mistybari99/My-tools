@@ -40,7 +40,8 @@
   "itemimg.js",
   "charts.js",
   "dashx_metrics.js",
-  "dashx.js"
+  "dashx.js",
+  "infohint.js"
  ],
  "attach": {
   "purchase": [

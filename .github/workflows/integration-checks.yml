@@ -23,3 +23,9 @@ jobs:
         run: python3 tools/test_testonly_files.py
       - name: database dumps never reach a public place (backup guard first, no data artifacts, only backup pushes)
         run: python3 tools/check_backup_guard.py
+      - name: the phase numbering and the paste order (union of the two lines)
+        run: |
+          python3 tools/check_numbering.py
+          python3 tools/check_paste_order.py
+      - name: the owner paste parts are what the generator writes from the phase files
+        run: python3 tools/build_paste_parts.py --check

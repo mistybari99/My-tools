@@ -10,21 +10,23 @@ Nothing in this file is done by an agent. The owner does each step himself, afte
 
 ## 2. SQL: paste the files in order
 
-- The full list, one line per file, is `docs/PASTE_ORDER.md` (phases 8 to 498, with the position of each file).
-- Paste ONE file at a time into the Supabase SQL editor (the live project only after review). Wait for "Success" before the next one.
-- Never paste: `supabase/phase84_test_project_only.sql`, `supabase/phase84b_*`, `supabase/phase84c_*`, any `*_test.sql`, `ALL_NEW*.sql`.
-- XB phases 491 to 493 are not yet in `tests/sql/ORDER.txt`; they are listed in `docs/PASTE_ORDER.md` at their numeric position. Run the local build once before pasting them.
-- After the last file run: `select * from public._i2_state() where not present;` It must return no rows.
+This repository now holds ONE merged version of the two lines (the advanced line and our line). Read `docs/LIVE_DELTA.md` first if the project already holds data.
 
-### Old phase files (3 to 98), if you ever paste one again
-Old files re-create functions and remove the hooks other phases added. If you paste one again: paste every file from that phase up to phase 98 in order, then paste phase 99 (or phase 477 by itself, which calls `public._i2_apply_all()`), then paste phase 478 again (it closes the helper functions to anon). Finish with the `_i2_state()` check in section 2.
+- **New (empty) project:** paste `docs/paste_parts/part01.sql` ... `part20.sql` in order (made by `tools/build_paste_parts.py`, copy page `docs/paste_parts/setup-all.html`), or the single files in the order of `docs/PASTE_ORDER.md` section B (= `tests/sql/ORDER.txt`). The parts are at most 500 KB each.
+- **The current live project:** do NOT paste that list. Run the read-only probe of `docs/LIVE_DELTA.md` section 3, then paste only `docs/paste_parts/delta01.sql` and `delta02.sql` (phases 499, 501-505 and 529-539). They change nothing silently: every replaced function text is saved in `public._union_fn_backup`, and an unknown text stops the file with one message.
+- Paste ONE part (or file) at a time into the Supabase SQL editor (the live project only after review). Wait for "Success" before the next.
+- Never paste: `supabase/phase84_test_project_only.sql`, `supabase/phase84b_*`, `supabase/phase84c_*`, any `*_test.sql`, `ALL_NEW2` to `ALL_NEW11*`.
+- After the last file run: `select * from public._i2_state() where not present;` (no rows) and `select state, count(*) from public._union_audit() group by 1;` (only `merged`, 156).
+
+### Old phase files, if you ever paste one again
+Old files re-create functions and remove the hooks other phases added. If you paste one again: paste phase 477, then 478, then 499 and 501 to 505, then the union files 529 to 539 again (all safe to paste twice). Never paste phase 40 or `ALL_NEW10.sql` after the advanced phase 511 without 529 after it (see `docs/PASTE_ORDER.md`). Run the two checks above.
 
 ## 3. Web app (the ERP screens)
 
-1. The web app is the `web/` folder (static files). Before publishing, run `python3 tools/build_kb.py` if `docs/ai_kb/` changed.
-2. Bump the service-worker cache version whenever a file under `web/` changes: `python3 tools/bump_sw.py` (dry run), then `python3 tools/bump_sw.py --write`, then `python3 tests/py/test_xc_bump_sw.py`. This branch is already bumped to `bos-sw-v3`; bump again if you change `web/` after this.
-3. Copy the `web/` folder (except `setup-sql.html`) to the public Pages repository used by the app, commit and push it there.
-4. On each phone: reload the app once, then reload again (the service worker is network-first).
+1. The web app is the `web/` folder, but **the public site is the BUILD of it**: `tools/build_web.sh --out <folder>` (needs node; installs `terser` and `esbuild` once) makes `core.js` (the start-up files in one), the lazy screen files, `app.css`, `index.html` with the content hash `?v=` on every file, and `sw.js` with a matching cache name. Before building, run `python3 tools/build_kb.py` if `docs/ai_kb/` changed.
+2. Do not copy `web/` to the public repository as it is any more (that is what lost the advanced screens before). Do not run `tools/bump_sw.py` for the public build: the build writes the cache name itself (`bos-sw-<build id>`). `web/sw.js` carries `bos-sw-v6` only for a plain copy of `web/`.
+3. Put the build into the public Pages repository on a **preview** location first, check it on the phone with the list at the end of `docs/RECOVERY_ROADMAP.md` (Appendix C), then publish. `tools/build_web.sh --to <public clone on a pages/* branch>` copies the build and never pushes; it prints the files it removed. The public repository is changed only by the owner.
+4. On each phone: reload the app once, then reload again (the service worker is network-first, and a new build replaces the cache by itself).
 
 ## 4. Storefront (the public shop, `site/`)
 

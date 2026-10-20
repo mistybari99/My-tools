@@ -84,9 +84,16 @@ def main():
         m = re.fullmatch(r"phase(1\d\d)\.sql", f)
         if m and int(m.group(1)) not in env["NEW"]:
             problems.append("%s exists on disk but is not in paste_order.env" % f)
-    for sh in ("tests/sql/final_build.sh", "tests/sql/run_all_sql.sh"):
+    for sh in ("tests/sql/final_build.sh", "tests/sql/run_all_sql_adv.sh"):
         if "paste_order.env" not in open(os.path.join(REPO, sh), encoding="utf-8").read():
             problems.append("%s does not read tests/sql/paste_order.env" % sh)
+    # union merge: tests/sql/ORDER.txt (read by run_all_union.sh, check_numbering.py, build_phase477.py, build_paste_parts.py) must be the same list as FOUNDATION + NEW
+    words = []
+    for ln in open(os.path.join(REPO, "tests", "sql", "ORDER.txt"), encoding="utf-8"):
+        if not ln.lstrip().startswith("#"):
+            words += re.findall(r"phase(\d+)", ln)
+    if [int(x) for x in words] != env["FOUNDATION"] + env["NEW"]:
+        problems.append("tests/sql/ORDER.txt is not FOUNDATION + NEW of tests/sql/paste_order.env")
 
     print("== 2. doc table vs paste_order.env ==")
     print("canonical: " + " ".join(str(p) for p in canon))

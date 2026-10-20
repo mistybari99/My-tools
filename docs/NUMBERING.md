@@ -80,3 +80,10 @@ printed form কোড এখনো ছাপা হয়নি, তাই স�
 ## 8. 500 is skipped (sweets fixes, SW)
 
 The sweets fixes after phase 498 are phases 499 and 501 to 505. Number 500 is an old-only number (the pre-renumber series used it for a file that is not in this branch), and `tools/check_numbering.py` lists it as stale. It is skipped on purpose, so no old reference to phase 500 can be read as the new file. Do not create a phase 500.
+
+## 9. Union merge (20 Oct 2026): 506-528 and 529-539
+
+- Phases 506 to 528 are the **advanced line's** phases 80-99, 120, 131, 132 under new file names (the live database holds them under the ORIGINAL numbers; they are never pasted on the live project). Their SQL is unchanged; only comment lines, test include paths and `raise` labels name the new number, and the first two lines say "imported from". The map is in `docs/PASTE_ORDER.md` ("Renumbering of the advanced line") and `tools/merge_checklist.py` (MAP).
+- Phases 529 to 539 are the union phases (new content, paste after phase 505, 529 right after the advanced block). 500 is still unused.
+- `tools/check_numbering.py` no longer treats 510, 511, 520, 530-533 as stale old numbers when a real phase file with that number exists.
+- Test-only: `phase130_integration_test.sql` (advanced) and the union copies `phase81b/92b/96b/97b/302b_test.sql` (`tests/sql/union_replaced_tests.txt`).

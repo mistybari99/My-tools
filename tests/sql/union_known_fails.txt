@@ -1,0 +1,7 @@
+# Suites that do not end with "0 fail" in the merged database, and why (tests/sql/run_all_union.sh, 20 Oct 2026). Every other suite of both lines ends exactly as it does in its own line's database.
+# Baselines: tests/sql/baseline_fails.txt (advanced line, final build) and the run of our line alone (same harness, ORDER_FILE = our old ORDER.txt).
+phase84b_test | 4 fails in our line alone, 5 in the merged database: the test-project reset refuses to run because tables of the advanced line (dealer_cheques, invoice_shares, landed_cost_*) point at cleared tables and are not in its clear list. The safety check works as designed; these files are for TEST projects only and are never pasted on the live project.
+phase84c_test | same reason (5 fails in both; one more line names the new tables)
+phase305_test | 1 known fail in both; the error text differs (the advanced line's customer_phones id is bigint)
+phase21_test, phase22_test, phase46_test, phase73_test, phase76_test (old suites, run on the final database) | the same failures as in baseline_fails.txt / our line alone
+phase81_test, phase92_test, phase96_test, phase97_test, phase302_test | replaced by union copies, see tests/sql/union_replaced_tests.txt (the copies end with 0 fail)

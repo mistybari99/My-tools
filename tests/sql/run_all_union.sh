@@ -24,6 +24,7 @@ run1() { # template label file
   grep -E 'FAIL|ERROR|RESULT|SUMMARY|^--- (FAILED|TOTAL)' $OUT/$l/$n.raw | sed 's/^psql:[^:]*:[0-9]*: //' > $OUT/$l/$n.txt
   $PSQL -q -c "drop database if exists $db" >/dev/null 2>&1
 }
+SKIP=" $(grep -v '^#' $HERE/union_replaced_tests.txt 2>/dev/null | cut -d'|' -f1 | tr -d ' ' | tr '\n' ' ') "   # originals replaced by a union copy (tests/sql/union_replaced_tests.txt)
 FINALSET=" 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495 496 497 498 499 501 502 503 504 505 530 531 532 533 534 535 536 537 538 539 "
 prev=${PFX}_t79
 for n in $NEW; do
@@ -31,14 +32,14 @@ for n in $NEW; do
   mk ${PFX}_t$n $prev; (cd $R && $P -d ${PFX}_t$n -f $f 2>&1 | grep -E "ERROR|FATAL" | sed "s/^/phase$n paste 1: /") | tee -a $OUT/twice/errors1.txt
   mk ${PFX}_tw ${PFX}_t$n; (cd $R && $P -d ${PFX}_tw -f $f 2>&1 | grep -E "ERROR|FATAL" | sed "s/^/phase$n paste 2: /") | tee -a $OUT/twice/errors.txt
   case "$FINALSET" in *" $n "*) ;; *)   # suites of the phases that need the whole build run on the final database below
-    for t in $R/supabase/phase${n}_test.sql $R/supabase/phase${n}[a-z]_test.sql; do [ -f $t ] && run1 ${PFX}_t$n own $t & done;; esac
+    for t in $R/supabase/phase${n}_test.sql $R/supabase/phase${n}[a-z]_test.sql; do case "$SKIP" in *" $(basename $t .sql) "*) continue;; esac; [ -f $t ] && run1 ${PFX}_t$n own $t & done;; esac
   wait
   [ "$prev" != "${PFX}_t79" ] && $PSQL -q -c "drop database if exists $prev" >/dev/null 2>&1
   prev=${PFX}_t$n
 done
 $PSQL -q -c "drop database if exists ${PFX}_tw" 2>&1 | grep -v NOTICE
 FINAL=${PFX}_t$LAST
-for n in $FINALSET; do for t in $R/supabase/phase${n}_test.sql $R/supabase/phase${n}[a-z]_test.sql; do [ -f $t ] && run1 $FINAL own $t; done; done
+for n in $FINALSET; do for t in $R/supabase/phase${n}_test.sql $R/supabase/phase${n}[a-z]_test.sql; do case "$SKIP" in *" $(basename $t .sql) "*) continue;; esac; [ -f $t ] && run1 $FINAL own $t; done; done
 mk ${PFX}_t79tp ${PFX}_t79; $P -d ${PFX}_t79tp -f $R/supabase/phase84_test_project_only.sql >/dev/null 2>&1; $P -d ${PFX}_t79tp -f $R/supabase/phase84b_test_project_only_wave1.sql >/dev/null 2>&1   # TEST databases only
 # 3. old suites: base (through 79) and the final build
 for f in $R/supabase/phase*_test.sql; do

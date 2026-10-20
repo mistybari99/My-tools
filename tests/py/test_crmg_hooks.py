@@ -83,6 +83,10 @@ def scratch(d, hooks):
     os.makedirs(os.path.join(d, 'tests'))
     shutil.copytree(os.path.join(ROOT, 'tests', 'web'), os.path.join(d, 'tests', 'web'), ignore=shutil.ignore_patterns('*.png', '*.jpg', '*.webp'))
     shutil.copytree(os.path.join(ROOT, 'tools'), os.path.join(d, 'tools'), ignore=shutil.ignore_patterns('__pycache__', 'edge', 'kb_playbooks'))
+    # tests/web/smoke.js (merged helper of the advanced line) reads data/items_seed.csv and supabase/schema.sql from the repo root of the copy
+    shutil.copytree(os.path.join(ROOT, 'data'), os.path.join(d, 'data'))
+    os.makedirs(os.path.join(d, 'supabase'))
+    shutil.copy(os.path.join(ROOT, 'supabase', 'schema.sql'), os.path.join(d, 'supabase', 'schema.sql'))
     for h in ALL:
         unapply(d, h)
     for h in hooks:

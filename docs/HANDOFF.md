@@ -3,6 +3,14 @@
 হালনাগাদ: ১৮ অক্টোবর ২০২৬। ব্রাঞ্চ: `claude/supabase-readonly-audit-xo3qkp`।
 এই ফাইলটি পড়লে কোনো নতুন সেশন বা এজেন্ট বুঝবে কী হয়েছে, কী বাকি, আর কোন নিয়ম মানতে হবে। আগে `CLAUDE.md` পড়ুন।
 
+## ০. ২০ অক্টোবর ২০২৬: দুই লাইন এক হয়েছে (আগে এটি পড়ুন)
+- আগে দুটি লাইন আলাদা ছিল: "অ্যাডভান্সড লাইন" (`origin/ccr-9c1f9be7-3s9qnz`: Liquid Glass থিম, ড্রয়ারের ফুটার, বিজনেস সুইচার, CSP, bundle ও lazy loading, offline cold start, ফেজ ৭২–১৩৫) এবং আমাদের লাইন (navstack, X1–XC, ফেজ ৮০–৫০৫)। এখন এই ব্রাঞ্চে দুটোই এক সংস্করণে আছে। কিছু বাদ যায়নি: প্রমাণসহ তালিকা `docs/MERGE_CHECKLIST.md`।
+- ফেজ নম্বর: অ্যাডভান্সড লাইনের ৮০–৯৯, ১২০, ১৩১, ১৩২ নামে দ্বন্দ্ব ছিল; ওগুলো ৫০৬–৫২৮ নামে এসেছে (SQL একই, শুধু নাম)। জোড়া লাগানোর নতুন ফেজ ৫২৯–৫৩৯। পুরো ক্রম `docs/PASTE_ORDER.md` ও `tests/sql/ORDER.txt`।
+- লাইভ ডাটাবেসের জন্য আলাদা ছোট তালিকা: `docs/LIVE_DELTA.md` (আগে শুধু-পড়া probe, তারপর `delta01.sql`, `delta02.sql`)। পুরনো ফেজ আবার paste করবেন না।
+- ওয়েব: সাইট এখন `tools/build_web.sh` দিয়ে বানানো build (`web/` সরাসরি কপি নয়)। `docs/GO_LIVE.md` §৩।
+- নতুন যাচাই: `python3 tools/check_paste_order.py`, `bash tests/sql/run_all_union.sh` (সব `*_test.sql` নিজ নিজ অবস্থানে), `python3 tools/merge_checklist.py`।
+- নতুন সংস্করণ বদলালে `python3 tools/build_paste_parts.py` আবার চালিয়ে `docs/paste_parts/` হালনাগাদ করুন (`--check` পুরনো হলে ধরে)।
+
 ## ১. মূল নিয়ম (ভাঙবেন না)
 - কোনো demo, বানানো নাম বা বানানো স্টাফ কোড, ডাটাবেস বা docs-এ যাবে না। প্রতিটি commit-এর আগে `python3 tools/check_no_demo_leak.py` (OK ছাপতে হবে)।
 - লাইভ Supabase-এ এজেন্ট কখনো লেখে না। SQL মালিক নিজে paste করেন।
