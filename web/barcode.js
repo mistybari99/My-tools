@@ -74,8 +74,8 @@ function scan() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return fallback('nosupport');
       let det;
       if (!('BarcodeDetector' in window)) {
-        // X5: the vendored ZXing reader (web/scan.js) when this browser has no BarcodeDetector; OFF unless the camera switch is on
-        try { det = B.scan && B.scan.fallbackDetector ? await B.scan.fallbackDetector() : null; } catch (e) { det = null; }
+        // X5: the vendored ZXing reader (web/scan_items.js) when this browser has no BarcodeDetector; OFF unless the camera switch is on
+        try { det = B.scanitems && B.scanitems.fallbackDetector ? await B.scanitems.fallbackDetector() : null; } catch (e) { det = null; }
         if (!det) return fallback('nosupport');
       } else {
         try {

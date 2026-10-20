@@ -4,6 +4,7 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, t, esc, shell, nm, fmt, fail } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
 const $ = (s, el = document) => el.querySelector(s);
 const L = B.L, lab = B.lab;
 const money = (n) => '৳ ' + fmt(n);
@@ -50,7 +51,7 @@ async function render() {
     owner ? q(sb.from('location_settings').select('location_id,value')) : { data: null },
     anyApprove ? q(sb.rpc('number_audit_summary')) : { data: null },
     canPos ? q(sb.rpc('payments_summary', { p_from: td })) : { data: null },
-    canPos ? q(sb.rpc('customer_dues')) : { data: null },
+    canPos ? q(sb.rpc(duesFn())) : { data: null },
     owner ? q(sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     q(sb.rpc('my_emergency')),
     q(sb.rpc('needs_you_oldest', { p_limit: 6 })),

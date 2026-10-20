@@ -256,12 +256,13 @@ B.forms['05-4'] = {
 };
 
 /* ============ 05-5 · New product decision sheet ============ */
+// brands come from report_brand_map of the chosen business (B.biz.brandOpts); this list is only the fallback when the table gives nothing
 const BRANDS = [['islamia', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['bari', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['alcakes', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')]];
 const TRIAL_ROWS = [L('মালামাল ইস্যু স্লিপ — ট্রায়াল', 'Material issue slip: trial'), L('মালামাল ইস্যু স্লিপ — ট্রায়াল', 'Material issue slip: trial'), L('মার্কেটিং ব্যয় রেজিস্টার — স্যাম্পল', 'Marketing expense register: sample'), L('মার্কেটিং ব্যয় রেজিস্টার — স্যাম্পল', 'Marketing expense register: sample')];
 const isoAdd = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
 B.forms['05-5'] = {
   title: L('নতুন প্রোডাক্ট সিদ্ধান্ত শিট', 'New product decision sheet'),
-  head: [SEL('brand', L('ব্র্যান্ড', 'Brand'), BRANDS, { req: true }), T('brand_other', L('অন্য ব্র্যান্ড (লিখুন)', 'Other brand (write it)'), { show: (x) => x.d.brand === 'other' }),
+  head: [SEL('brand', L('ব্র্যান্ড', 'Brand'), () => (B.biz ? B.biz.brandOpts(BRANDS, ['other']) : BRANDS), { req: true }), T('brand_other', L('অন্য ব্র্যান্ড (লিখুন)', 'Other brand (write it)'), { show: (x) => x.d.brand === 'other' }),
     T('product', L('পণ্যের নাম', 'Product name'), { req: true }), T('new_code', L('নতুন আইটেম কোড', 'New item code'), { req: true }),
     D('start_date', L('শুরুর তারিখ', 'Start date'), { req: true }), D('review_date', L('পর্যালোচনার তারিখ', 'Review date'), { req: true }),
     CALC('review_hint', L('সেটিংস অনুযায়ী পর্যালোচনার তারিখ', 'Review date according to settings'), 'text')],

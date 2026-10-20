@@ -1,7 +1,8 @@
 // web/inbox.js - stub-DOM test (no browser): board strip, masked rows, make-order pre-fill + save call, friendly errors, escaping, 3 language modes.
 // Run: node tests/web/inbox_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'web', 'inbox.js'), 'utf8');
+const src = fs.readFileSync(path.join(_P.WEB_DIR, 'inbox.js'), 'utf8');
 let pass = 0, fail = 0; const ok = (n, c) => { if (c) pass++; else { fail++; console.log('FAIL ' + n); } };
 const body = { innerHTML: '' }, acts = {}, toasts = [], calls = [];
 let MODE = 'en', RPC = {};
@@ -73,5 +74,45 @@ const view = win.BOS_PAGES.inbox; const mk = (o) => ({ dataset: o });
   RPC.web_form_embed = { configured: false }; await acts.ib_embed(mk({ code: 'webform' })); ok('share link: not configured message, no fake link', /Public URL not set yet/.test(body.innerHTML));
   RPC.web_form_embed = { configured: true, link: 'https://x/fn?c=webform', embed: '<iframe src="x"></iframe>' }; await acts.ib_embed(mk({ code: 'webform' })); ok('share link and embed code shown (escaped)', /https:\/\/x\/fn\?c=webform/.test(body.innerHTML) && /&lt;iframe/.test(body.innerHTML));
   ok('helpers: phoneLike', win.BOS.inbox.phoneLike('8801711000009') === '01711000009' && win.BOS.inbox.phoneLike('psid-77') === '');
+  // ---- Telegram (Step Tg) ----
+  MODE = 'en'; RPC.inbox_board = { on: true, new_count: 1, last_at: 'x', hours_since: 1, silent: false, failed_count: 0, dup_open: 0, drafts: 0 };
+  RPC.inbox_list = [{ id: 21, channel: 'TG <shop>', kind: 'telegram', status: 'new', received_at: '2026-10-14T01:02:03Z', masked: false, name: 'Chat <i>', handle: 'tg:555', text: 'hi' },
+    { id: 22, channel: 'WA', kind: 'whatsapp', status: 'new', received_at: '2026-10-14T01:02:03Z', masked: false, name: 'W', text: 'w' }];
+  await view(); await acts.ib_tab(mk({ t: 'msg' }));
+  ok('telegram shows as a channel kind (English)', win.BOS.inbox.kindTxt('telegram') === 'Telegram' && /TG &lt;shop&gt; · Telegram/.test(body.innerHTML));
+  ok('chat-info button only on telegram messages', (body.innerHTML.match(/data-act="ib_tg_info"/g) || []).length === 1 && /data-act="ib_tg_info" data-id="21"/.test(body.innerHTML));
+  MODE = 'bn'; ok('Bangla mode: telegram label', win.BOS.inbox.kindTxt('telegram') === 'টেলিগ্রাম'); MODE = 'mix'; ok('mix mode keeps Telegram in English', win.BOS.inbox.kindTxt('telegram') === 'Telegram'); MODE = 'en';
+  RPC.telegram_chat_info = { msg_id: 21, linked: true, masked: false, customer_name: 'Test <b>', customer_mobile: '01700000001', order_no: 7, message_count: 3 };
+  await acts.ib_tg_info(mk({ id: '21' }));
+  ok('info block: linked, customer, order no, count, escaped', /Linked/.test(body.innerHTML) && /Test &lt;b&gt;/.test(body.innerHTML) && /Order no\. #7/.test(body.innerHTML) && /Messages in this chat: 3/.test(body.innerHTML) && !/<b>Test/.test(body.innerHTML));
+  ok('unlink button only while linked', /data-act="ib_tg_unlink"/.test(body.innerHTML));
+  RPC.telegram_chat_info = { msg_id: 21, linked: true, masked: true, customer_name: null, customer_mobile: null, order_no: null, message_count: 3 };
+  await acts.ib_tg_info(mk({ id: '21' })); await acts.ib_tg_info(mk({ id: '21' }));
+  ok('masked info shows no customer name or mobile', /Linked/.test(body.innerHTML) && !/01700000001/.test(body.innerHTML));
+  win.prompt = () => '+8801700000001';
+  RPC.telegram_chat_link = { id: 1 }; RPC.telegram_chat_info = { msg_id: 21, linked: true, masked: false, customer_name: 'Cu', customer_mobile: '01700000001', message_count: 1 };
+  await acts.ib_tg_link(mk({ id: '21' })); const lk = calls.filter((c) => c[0] === 'telegram_chat_link').pop();
+  ok('link looks the customer up by mobile and calls the server function (no price, no order made)', !!lk && lk[1].p_msg_id === 21 && lk[1].p_customer === 'i1' && lk[1].p_order === null);
+  win.prompt = () => ''; const nl = calls.length; await acts.ib_tg_unlink(mk({ id: '21' }));
+  ok('unlink without a reason does not call the server', calls.length === nl && toasts.pop() === 'A reason is needed');
+  win.prompt = () => 'wrong person'; RPC.telegram_chat_unlink = { unlinked: true }; await acts.ib_tg_unlink(mk({ id: '21' }));
+  ok('unlink sends the reason', calls.filter((c) => c[0] === 'telegram_chat_unlink').pop()[1].p_reason === 'wrong person');
+  RPC.telegram_chat_link = new Error('not_telegram: x'); win.prompt = () => '01700000001'; await acts.ib_tg_link(mk({ id: '21' })); ok('friendly error for a non-telegram message', toasts.pop() === 'This is not a Telegram message');
+  // channels tab: owner sees setup buttons, others do not
+  RPC.sales_channels_list = [{ id: 4, code: 'tg_ab12', kind: 'telegram', name_bn: 'TG', active: true }];
+  RPC.telegram_status = { channels: [{ id: 4, secret_set: false }] };
+  await acts.ib_tab(mk({ t: 'ch' }));
+  ok('owner: token-not-set warning, set-token and add buttons, webhook code shown', /Token not set/.test(body.innerHTML) && /data-act="ib_tg_secret" data-id="4"/.test(body.innerHTML) && /data-act="ib_tg_add"/.test(body.innerHTML) && /\?c=tg_ab12/.test(body.innerHTML));
+  RPC.telegram_status = new Error('not allowed'); await acts.ib_tab(mk({ t: 'ch' }));
+  ok('non-owner: channel listed, no setup buttons', /Telegram/.test(body.innerHTML) && !/ib_tg_secret|ib_tg_add/.test(body.innerHTML));
+  RPC.telegram_status = { channels: [{ id: 4, secret_set: true }] }; await acts.ib_tab(mk({ t: 'ch' })); ok('token set is shown', /Token set/.test(body.innerHTML));
+  win.prompt = () => 'abcdefghij1234567890'; RPC.telegram_secret_set = { set: true }; await acts.ib_tg_secret(mk({ id: '4' }));
+  ok('secret goes to the server function only; saved toast', calls.filter((c) => c[0] === 'telegram_secret_set').pop()[1].p_secret === 'abcdefghij1234567890' && toasts.pop() === 'Secret token saved');
+  RPC.telegram_secret_set = new Error('bad_secret: x'); await acts.ib_tg_secret(mk({ id: '4' })); ok('bad token friendly error', /The token is not valid/.test(toasts.pop()));
+  const q = ['My shop', 'my_shop_bot', 'i1']; win.prompt = () => q.shift(); RPC.sales_channel_save = { id: 9 };
+  await acts.ib_tg_add();
+  const ad = calls.filter((c) => c[0] === 'sales_channel_save').pop()[1];
+  ok('add telegram channel: kind telegram, bot ref, place, generated code', ad.p_kind === 'telegram' && ad.p_account_ref === 'my_shop_bot' && ad.p_loc === 'i1' && /^tg_[0-9a-f]{6}$/.test(ad.p_code) && ad.p_id === null);
+  ok('no secret appears in the page html', !/abcdefghij1234567890/.test(body.innerHTML));
   console.log(`RESULT pass=${pass} fail=${fail}`); process.exit(fail ? 1 : 0);
 })();

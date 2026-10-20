@@ -1,12 +1,13 @@
 // Step C-0: artisan recipe book page (#/recipebook): pickers show id + post (never a name), book render, cost gating, steps editor (add / move / suggestion), unassigned list with
 // "add a new artisan" last option, owner register (the only place a name is shown), print/share, Bangla, no horizontal overflow at 360px.
 // Run: node recipebook_test.js <abs tests/web dir>     (serves ../../web of THIS checkout and injects the script tag, since web/index.html is integrated by the lead)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const WEB = path.join(SP, '..', '..', 'web'); const OUT = process.argv[3] || SP;
-const base = C.baseData(SP), PORT = 8373;
+const WEB = _P.WEB_DIR; const OUT = process.argv[3] || SP;
+const base = C.baseData(SP), PORT = _P.freePort();
 function serve(port) {
   return http.createServer((q, r) => { const u = q.url.split('?')[0]; const f = path.join(WEB, u === '/' ? 'index.html' : u);
     fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }

@@ -294,10 +294,12 @@ const MKT_HEADS = [['1', L('1 · অনলাইন বিজ্ঞাপন ও
   ['9', L('9 · পার্টনার', '9 · Partners')], ['10', L('10 · অন্যান্য (লিখুন)', '10 · Other (write it)')]];
 const MKT_SRC = [['imprest', L('ইমপ্রেস্ট (খরচের বাক্স)', 'Imprest (petty cash)')], ['bank', L('ব্যাংক', 'Bank')], ['card', L('কার্ড', 'Card')], ['mobile', L('মোবাইল', 'Mobile')], ['owner', L('মালিকের ব্যক্তিগত (লেজারে দুই দিকে)', 'Owner personal (both sides in the ledger)')]];
 const MONTHS = ['জানুয়ারি:January', 'ফেব্রুয়ারি:February', 'মার্চ:March', 'এপ্রিল:April', 'মে:May', 'জুন:June', 'জুলাই:July', 'আগস্ট:August', 'সেপ্টেম্বর:September', 'অক্টোবর:October', 'নভেম্বর:November', 'ডিসেম্বর:December'].map((m, i) => [String(i + 1), L(m.split(':')[0], m.split(':')[1])]);
+const MKT_BRANDS = [['imh', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['mb', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['ak', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')], ['all', L('সব', 'All')]];
 B.forms['18-1'] = {
   title: L('মার্কেটিং ব্যয় রেজিস্টার', 'Marketing expense register'),
   head: [SEL('month', L('মাস', 'Month'), MONTHS),
-    CH('brand', L('ব্র্যান্ড', 'Brand'), [['imh', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['mb', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['ak', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')], ['all', L('সব', 'All')]]),
+    CH('brand', L('ব্র্যান্ড', 'Brand'), () => (B.biz ? B.biz.brandOpts(MKT_BRANDS, ['other', 'all']) : MKT_BRANDS)),   // report_brand_map of the chosen business; MKT_BRANDS is the fallback
+
     T('brand_other', L('অন্য ব্র্যান্ড', 'Other brand'), { show: (x) => x.d.brand === 'other' })],
   sections: [
     { title: L('নিয়ম', 'Rule'), fields: [

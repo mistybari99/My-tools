@@ -4,6 +4,7 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, t, esc, nm, fmt, store, openSheet, closeSheet, fail } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
 const H = A.H;
 const $ = (s, el = document) => el.querySelector(s);
 const L = B.L, lab = B.lab;
@@ -11,9 +12,10 @@ const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en:
 
 // ---------- labels (3 modes) ----------
 const X = {
-  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'),
+  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'), /* bos109 */ th_glass_light: L('লিকুইড গ্লাস লাইট', 'Liquid Glass Light', 'Liquid Glass Light'), th_glass_dark: L('লিকুইড গ্লাস ডার্ক', 'Liquid Glass Dark', 'Liquid Glass Dark'),
   menu: L('মেনু', 'Menu', 'Menu'), me: L('আমি', 'Me', 'Me'), search: L('মেনু খুঁজুন…', 'Search menu…', 'Menu খুঁজুন…'), close: L('বন্ধ করুন', 'Close', 'Close'),
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
+  foot_t: L('নিচের অংশ দেখান/লুকান', 'Show or hide menu options', 'Menu options দেখান/লুকান'),
   online: L('অনলাইন', 'Online', 'Online'), offline: L('অফলাইন', 'Offline', 'Offline'), pin: L('প্রিয়তে রাখুন', 'Pin to favourites', 'Favourite-এ রাখুন'), unpin: L('প্রিয় থেকে সরান', 'Unpin', 'Favourite থেকে সরান'),
   g_dash: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard'), g_acc: L('হিসাব', 'Accounting', 'Accounting (হিসাব)'), g_item: L('আইটেম', 'Items', 'Item'), g_cust: L('কাস্টমার', 'Customers', 'Customer'),
   g_supp: L('সরবরাহকারী', 'Suppliers', 'Supplier'), g_sale: L('বিক্রি', 'Sales', 'Sale (বিক্রি)'), g_purch: L('ক্রয়', 'Purchase', 'Purchase'), g_ops: L('স্টক ও কারখানা', 'Stock & factory', 'Stock ও Factory'),
@@ -34,20 +36,20 @@ const X = {
   today_sheet: L('শোরুমের দৈনিক শিট', 'Showroom daily sheet', 'Showroom-এর Daily Sheet'),
   period_note: L('বছর = অর্থবছরের শুরু থেকে (সেটিংসের নিয়ম; না থাকলে ১ জানুয়ারি)', 'Year = from the fiscal-year start (a setting; 1 January when none is set)', 'Year = fiscal year শুরু থেকে (setting; না থাকলে ১ জানুয়ারি)'),
   sheets: L('আজ যে শিটগুলো পূরণ করতে হবে', "Today's sheets to fill", 'আজ যে Sheet পূরণ করতে হবে'), sheets_none: L('আপনার জন্য কোনো শিট নেই', 'No sheets for you here', 'আপনার জন্য কোনো Sheet নেই'),
-  st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('বাকি', 'Pending', 'Pending'), st_draft: L('খসড়া', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
+  st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('অপেক্ষায়', 'Pending', 'Pending'), st_draft: L('ড্রাফট', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
   sheets_of: L('জমা', 'done', 'done'), sheets_hint: L('মালিক চাইলে সেটিংসে "হোমে দৈনিক শিট" নিয়মে শুধু দৈনিক শিটগুলো বেছে দিতে পারেন', 'The owner can narrow this to the daily sheets with the rule "Daily sheets on home"', 'Owner চাইলে rule-এ শুধু দৈনিক Sheet বেছে দিতে পারেন'),
   locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
-  s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
+  s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('কাস্টমার', 'Customers', 'Customer'), s_more: L('আইটেম ও কাস্টমার খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
-  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
+  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর কাস্টমার খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অ্যাপ্রুভের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('ক্যাটাগরি অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই ক্যাটাগরির সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
   more: L('আরও', 'More', 'More'), fav_edit: L('সাজান', 'Edit', 'Edit'), fav_done: L('হয়েছে', 'Done', 'Done'), m_up: L('উপরে নিন', 'Move up', 'Move up'), m_down: L('নিচে নিন', 'Move down', 'Move down'), m_top: L('একদম উপরে', 'Move to top', 'Move to top'), m_bottom: L('একদম নিচে', 'Move to bottom', 'Move to bottom'),
   m_rename: L('নিজের নাম দিন', 'Rename label', 'নিজের নাম দিন'), m_hide: L('হোম থেকে লুকান', 'Hide from Home', 'Home থেকে লুকান'), m_open: L('খুলুন', 'Open', 'Open'), m_copy: L('লিংক কপি করুন', 'Copy link', 'Link copy করুন'), m_reset: L('প্রিয়র ক্রম আগের মতো করুন', 'Reset order', 'Favourite-এর order reset করুন'),
   m_unhide: L('লুকানো সব আবার দেখান', 'Show hidden again', 'Hidden সব আবার দেখান'), m_refresh: L('হোম নতুন করে দেখুন', 'Refresh Home', 'Home refresh'), copied: L('লিংক কপি হয়েছে', 'Link copied', 'Link copied'), rn_t: L('নিজের নাম (শুধু আপনার জন্য)', 'Your own label (only for you)', 'নিজের নাম (শুধু আপনার জন্য)'),
-  rn_h: L('খালি রাখলে আসল নাম ফিরবে', 'Leave empty to use the original name', 'খালি রাখলে আসল নাম ফিরবে'), rn_save: L('সংরক্ষণ', 'Save', 'Save'), added: L('যোগ করা হয়েছে', 'Added', 'Added'), omode: L('মালিকের বোর্ড', 'Owner mode', 'Owner mode'), omode_d: L('আজ যা দেখা দরকার', 'What to check today', 'আজ যা দেখা দরকার'),
+  rn_h: L('খালি রাখলে আসল নাম ফিরবে', 'Leave empty to use the original name', 'খালি রাখলে আসল নাম ফিরবে'), rn_save: L('সেভ', 'Save', 'Save'), added: L('যোগ করা হয়েছে', 'Added', 'Added'), omode: L('মালিকের বোর্ড', 'Owner mode', 'Owner mode'), omode_d: L('আজ যা দেখা দরকার', 'What to check today', 'আজ যা দেখা দরকার'),
   omode_on: L('হোমে মালিকের বোর্ড দেখান', 'Show the owner board as Home', 'Home-এ Owner board দেখান'), omode_off: L('সাধারণ হোমে ফিরুন', 'Back to the normal Home', 'Normal Home-এ ফিরুন'), omode_open: L('মালিকের বোর্ড খুলুন', 'Open the owner board', 'Owner board খুলুন'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
   ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
-  n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
+  n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের ড্রাফট অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অ্যাপ্রুভ অপেক্ষায়', 'Wastage approvals waiting', 'Wastage approval অপেক্ষায়'),
   set2: L('সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'), inv: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'),
 };
 const T = (k) => lab(X[k]);
@@ -91,7 +93,7 @@ function entries() {
     const live = f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code]);
     out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code, drawer: true });
   });
-  return out;
+  return B.optviews && B.optviews.apply ? B.optviews.apply(out) : out;   // bos91: owner's Hide / Locked choices (no data = unchanged)
 }
 const byKey = (k) => entries().find((e) => e.key === k);
 function keyOfHash() {
@@ -208,7 +210,7 @@ async function counts(force) {
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view', 'view_cost', 'view_stock_recon', 'view_branch_statement', 'view_net_profit', 'export_data'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
@@ -223,6 +225,7 @@ function ensureStatic() {
     if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
     try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
     syncFavs();
+    try { if (B.optviews && B.optviews.load) await B.optviews.load(); } catch (e) { /* views unavailable: everything shows as before */ }   // bos91
     await loadGrantFlags();
   })();
   return staticP;
@@ -250,6 +253,12 @@ function drawLocBox() {
   const cur = curLoc();
   box.innerHTML = `<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label>
     <select id="nav_loc" aria-label="${esc(T('locsw'))}" style="width:100%;min-height:44px"><option value="all" ${cur === null ? 'selected' : ''}>${esc(T('all_loc'))}</option>${ch.map((l) => `<option value="${l.id}" ${cur === l.id ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+}
+// business switch (bizctx): the drawer is redrawn, the open screen draws again with the new business' places
+function afterBiz() {
+  setDrawer(false); HS.data = null; try { sig = ''; if (drawerOpen) dr_body(); } catch (e) { /* drawer redraws on open */ }
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') loadStats(); else window.dispatchEvent(new HashChangeEvent('hashchange'));
+  if ($('#hv_sheets')) loadSheets();
 }
 document.addEventListener('change', (e) => {
   if (!e.target || e.target.id !== 'nav_loc') return;
@@ -306,7 +315,7 @@ function mount() {
 const groupOpen = () => { if (!openGroups) { openGroups = jget('bos_navg_' + uid(), null); if (!openGroups) openGroups = { dash: true }; } return openGroups; };
 // ---------- theme control (Premium Dark / Premium Light / Classic): compact dropdown in the drawer footer and the Me sheet ----------
 const themeSel = (id) => { const TH = window.BOS_THEME; if (!TH) return ''; const cur = TH.get();
-  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic']].map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
+  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic'], ['glass-light', 'th_glass_light'], ['glass-dark', 'th_glass_dark']]  /* bos109 */.map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
 document.addEventListener('change', (ev) => {
   const t0 = ev.target; if (!t0 || !t0.matches || !t0.matches('[data-theme-pick]') || !window.BOS_THEME) return;
   window.BOS_THEME.set(t0.value); sig = '';
@@ -320,15 +329,25 @@ function renderDrawer() {
   dr_body();
 }
 function dr_shell() {
-  const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : ''); if (s === sig && el.drawer.firstChild) return; sig = s;
+  const bz = B.biz ? B.biz.sig() : ''; const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : '') + '|' + bz; if (s === sig && el.drawer.firstChild) return; sig = s;
   el.drawer.setAttribute('aria-label', T('menu'));
-  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(BRAND.bn)}</b><i>${esc(BRAND.en)}</i></div>
+  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(((B.biz && B.biz.brand()) || BRAND).bn)}</b><i>${esc(((B.biz && B.biz.brand()) || BRAND).en)}</i></div>
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
+    ${B.biz ? B.biz.switcherHTML() : ''}
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
-    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
-      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
+    <div class="dr-foot${footOpen() ? ' open' : ''}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${footOpen()}" aria-controls="nav_fx" aria-label="${esc(T('foot_t'))}" title="${esc(T('foot_t'))}">${IC.cv.replace('<svg', '<svg class="cv"')}</button><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${footOpen() ? '' : ' inert'}><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div></div></div>`;
 }
+// bos101: collapsible drawer footer (default collapsed, remembered per device)
+const footOpen = () => { try { return localStorage.getItem('bos_navfoot') === '1'; } catch (e) { return false; } };
+document.addEventListener('click', (ev) => {
+  const b = ev.target && ev.target.closest && ev.target.closest('[data-act=foot_tog]'); if (!b) return;
+  const f = b.closest('.dr-foot'); if (!f) return; const on = !f.classList.contains('open');
+  f.classList.toggle('open', on); b.setAttribute('aria-expanded', String(on));
+  const fi = f.querySelector('.dr-fxi'); if (fi) { if (on) fi.removeAttribute('inert'); else fi.setAttribute('inert', ''); }
+  try { localStorage.setItem('bos_navfoot', on ? '1' : '0'); } catch (e) { /* private mode */ }
+});
 const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
 function dr_body() {
   const body = $('#nav_body'); if (!body) return;
@@ -410,7 +429,7 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('input', (e) => { if (e.target.id === 'nav_q') { q = e.target.value; queueSearch(); dr_body(); } if (e.target.id === 'pk_q') drawPicker(e.target.value); });
 window.addEventListener('online', netDot); window.addEventListener('offline', netDot);
-function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
+function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; const d2 = $('#nav_net2'); if (d2) d2.className = 'dot ' + (on ? 'ok' : 'bad'); d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
 
 // ---------- bottom nav ----------
 function hideBnav() {
@@ -688,7 +707,7 @@ async function loadStats() {
   box.innerHTML = `<p class="muted">${esc(t('loading'))}</p>`;
   if (!HS.data || HS.dataFrom !== key) {
     const qq = (x) => x.then((r) => (r && !r.error ? r.data || [] : []), () => []);
-    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(sb.rpc('customer_dues'))]);
+    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(sb.rpc(duesFn()))]);
     HS.data = { s, pay, dues }; HS.dataFrom = key;
   }
   drawStats();
@@ -857,5 +876,5 @@ H.lang = (a) => { sig = ''; return prevLang(a); };
 })();
 
 B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
-window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
+window.BOS_NAV = { afterBiz, loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
 })();

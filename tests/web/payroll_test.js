@@ -1,12 +1,13 @@
 // Module B2 web: payroll month flow Preview (trial) -> Create -> Adjust -> Approve -> Pay, calculation trail, payslip print, CSV export,
 // month summary by place, advances, festival bonus, final settlement, salary privacy (no salary right = nothing is even fetched), friendly errors.
 // Run: timeout 250 node payroll_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const ROOT = '/home/user/My-tools/web';
-const base = C.baseData(SP), PORT = 8443;
+const ROOT = _P.WEB_DIR;
+const base = C.baseData(SP), PORT = _P.freePort();
 const srv = http.createServer((q, r) => {
   const u = q.url.split('?')[0]; const f = path.join(ROOT, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f);

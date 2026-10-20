@@ -1,10 +1,11 @@
 // W7: nav leftovers - fiscal-year "Year" tab, drawer search (items / customers / screens), location switcher, staff "today's sheets", biz FY chip, reports2 merge.
 // Run: node nav2_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5_common.js');
-const base = C.baseData(SP), PORT = 8461, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const dhaka = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 const rule = (key, v) => ({ key, module: 'settings', kind: 'number', value: v, default_value: null, label_bn: key, label_en: key, label_mix: key, sort: 1 });
 // in-page helpers: record every rpc, give the stub builder .or() for the customer search

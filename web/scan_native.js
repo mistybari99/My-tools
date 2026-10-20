@@ -1,6 +1,6 @@
 /* Islamia BOS · native bridge for the Android wrapper (X5). OFF and inert in the PWA: available() is false, every call returns
    { error: 'not_native' }. Inside the Capacitor wrapper (android/, see docs/ANDROID_WRAPPER.md) it calls the ML Kit plugins that the
-   wrapper installs. web/scan.js picks this bridge automatically when available() is true (caps().native).
+   wrapper installs. web/scan_items.js picks this bridge automatically when available() is true (caps().native).
    Plugin names and methods (BarcodeScanner.scan, TextRecognition.processImage, ImageLabeling.processImage) are taken from the published
    @capacitor-mlkit/* 8.2.1 type definitions; they are NOT run in this package (no APK was built). */
 (() => {

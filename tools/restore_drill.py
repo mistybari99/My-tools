@@ -38,7 +38,7 @@ import restore_backup as rb  # noqa: E402
 LOCAL_HOSTS = {'localhost', '127.0.0.1', '::1', '[::1]'}
 KEY_FUNCTIONS = ['is_owner', 'is_active', 'can_loc', 'rule_num', 'set_rule', 'backup_manifest', 'backup_dump', 'backup_log', 'backup_status', '_backup_tables',
                  'save_entry', 'stock_opening', 'stock_issue', 'path_switch_set', 'no_hard_delete', 'log_change']
-OPTIONAL_FUNCTIONS = ['restore_drill_record', 'restore_drill_status']          # phase70: reported but never a failure
+OPTIONAL_FUNCTIONS = ['restore_drill_record', 'restore_drill_status', 'backup_coverage106']          # phase70: reported but never a failure
 SKIP_REASONS = [                                                                   # why the dump leaves a table out (mirrors public._backup_tables())
     (r'_secret', 'name contains _secret (credentials)'), (r'^ops_', 'ops_* (bot accounts)'),
     (r'^(login_failures|login_attempts|login_throttle)$', 'login throttle data (re-created by use)'),
@@ -128,7 +128,7 @@ def chk(name, ok, detail=None):
 def skipped_by_dump(db, expected):
     rows = db.json("select coalesce(jsonb_agg(jsonb_build_object('table', c.relname, 'bad_columns', (select coalesce(jsonb_agg(a.attname order by a.attnum), '[]'::jsonb) "
                    "from pg_attribute a where a.attrelid = c.oid and a.attnum > 0 and not a.attisdropped and a.attname ~* '(password|passwd|pin_hash|secret|token|salt|api_key|private_key)' "
-                   "and a.attname !~ '^tokens_(in|out)$')) order by c.relname), '[]'::jsonb) from pg_class c where c.relnamespace = 'public'::regnamespace "
+                   "and a.attname !~ '^(tokens_(in|out)|token_[ab])$')) order by c.relname), '[]'::jsonb) from pg_class c where c.relnamespace = 'public'::regnamespace "
                    "and c.relkind in ('r', 'p') and not c.relispartition")
     out = []
     for r in rows or []:

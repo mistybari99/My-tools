@@ -719,3 +719,12 @@ Owner to do: paste phase491, phase492 and phase493 in the live project (only the
 
 What changed: the five screen entries (screen:xcunsold, screen:xcsummary, screen:paycapture, screen:cakejobs, screen:riders) now carry the `src` field and one-sentence "why" / one-to-two-sentence "change" texts, as tests/web/infohint_test.js requires. Merged with `tools/check_info_coverage.py --merge ... --replace`.
 Checks run: infohint_test exit 0 (on a snapshot); crm_feedback_test and crm_leads_test passed on a snapshot after the full run had shown them failing (the full run's copy had filled the disk; not a code change). Full web suite: see the report of this pass.
+
+## From the advanced line (merged in the union merge)
+
+* Stage B2 (local-b2): web/org122.js #/organization (registered in ia.js: rec 'organization', group settings) + web/bizctx.js business context/switcher; brand and location lists DB-driven with fallbacks. See HANDOVER_7.
+- 2026-10-14 integration: registered impexp, variants, cheques, schemes, tinting (docs/regs) in web/ia.js and script tags in web/index.html after org122.js.
+- 2026-10-14 integration local-int: INTEGRATION_REPORT_7.md, phase130_integration_test.sql (test only), lang fixes in impexp124.js / variants125.js.
+- 2026-10-14 reports Stage 1 (local-rpt): web/reports131.js #/reports131 registered in web/ia.js (group reports) and web/index.html after recon118.js; server phase131.sql (rule rpt131_on OFF).
+- Stage D (local-prof): `profile` screen (#/profile, web/profile134.js) registered in web/ia.js (group settings, same right as `organization`) and web/index.html; brand / logo / receipt text from the business profile via bizctx; phase134 (business_profiles, upper-layer blindness); see docs/INTEGRATION_REPORT_9.md.
+- Stage D2 (local-loc): places of a business (`web/places135.js`, loaded after `org122.js` in `web/index.html`; buttons drawn inside `#/organization`, no new route; keywords added to the `organization` record in `web/ia.js`); server phase135 (`business_place_create135`, `business_place_move135`, `business_places_list135`, `business_profile_ensure135`); see docs/INTEGRATION_REPORT_10.md.

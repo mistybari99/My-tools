@@ -1,10 +1,11 @@
 // Module F web piece: the bell + #/notifications (list, filters, open + mark read, mark all read, friendly errors, backup card, 60 s poll, 360px width).
 // Run: node notifications_test.js <abs tests/web dir>      (web/notifications.js is injected into index.html here; the lead adds the real <script> tag, see docs/regs/notifications.md)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8361, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const iso = (minAgo) => new Date(Date.now() - minAgo * 60000).toISOString();
 const NOTES = () => [
   { id: 14, kind: 'red_exceptions', level: 'bad', title_bn: '৩টি লাল এক্সেপশন খোলা পড়ে আছে', title_en: '3 red exception(s) still open', body_bn: 'সবচেয়ে পুরনোটি ৩০ ঘণ্টা', body_en: 'The oldest has been open 30 hours', route: 'exceptions', location_id: null, created_at: iso(5), is_read: false },

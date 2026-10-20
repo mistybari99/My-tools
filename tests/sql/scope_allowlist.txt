@@ -1,0 +1,267 @@
+# Reviewed list for phase133_test: every exposed SECURITY DEFINER function that scope_gaps133() reports (not scope-aware by construction).
+# name|class|reason   classes: PRIM OWNER OWN MASTER CONFIG INFRA HELPER FIXED DEFER (tools/scope_classify133.py, docs/audit_c1/C3_COVERAGE.md).
+# A new function that lands in scope_gaps133() makes the test fail until a person adds it here with a reason (never a catch-all).
+_a53_mgr|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_acct_view|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_assistant_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_cs_view|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_i62_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_i62_pay_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_is_ops|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_list_mgr|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_loc_mgr|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_org_on123|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_other_approver_exists|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_recipe_cost_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_recipe_read|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_recipe_view_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_release_can_see|HELPER|has_grant(release_decide, <place of the entry>): the place is passed as a sub-select, scoped through has_grant (business border since phase123)
+_setup_view81|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+_sheet_viewer|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+acct_account_save|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+acct_autopost_runs_list|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+acct_mapping_set|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+acct_opening|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+acct_scheduler_disable|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+acct_scheduler_enable|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+acct_set_start|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+anon_exec_audit94|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+artisan_register|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+artisan_save|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+artisan_set_active|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+assistant_access_list|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+assistant_log|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+assistant_note_retire|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+assistant_note_save|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+assistant_proxy_check|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+assistant_usage_summary|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+att_self_lock_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+att_site_geo_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+attendance_device_register|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+attendance_device_set_active|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+attendance_device_token_reset|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+attendance_punch_push|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+backup_coverage106|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+backup_dump|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+backup_log|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+backup_manifest|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+backup_status|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+backup_stock_balance|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+backup_stock_ledger|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+bank_recon_lines|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+bank_recon_unmatch|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+bank_stmt_import|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+benefit_type_save|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+bi_export_log_list|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+bill_pay_default_set99|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+bill_pay_defaults_list99|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+biz_cost_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+biz_ok|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+biz_suggest|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+blind_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+business_place_move135|OWNER|owner only (hard gate, phase135): moving a place between businesses is a group-level act; dry-run first, people / open documents / supply links always block, transactions need force
+cancel_emergency|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+category_merge|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+category_move|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+category_rename|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+category_reorder|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+category_rule_state|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+category_save|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+category_sync100|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+client_error_log|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+client_error_resolve|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+client_errors_list|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+client_errors_purge|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+client_errors_summary|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+comparison_pair_save|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+cost_attrib_main_set|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+cost_source_type_add|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+cost_type_add|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+cost_type_driver_set116|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+cost_type_gl_set117|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+cost_type_smoothing|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+customer_points|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+dash_layout_get|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+dash_layout_save|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+decide_release|HELPER|has_grant(release_decide, <place of the entry>): the place is passed as a sub-select, scoped through has_grant (business border since phase123)
+dup_suspects|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+entry_change_cancel|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+fa_asset_dispose|HELPER|updates one fixed asset by id: trigger fa_assets_xb133 refuses a foreign-business row ("not found" while the switch is ON)
+fav_meta_set|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+fav_order_set|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+fiscal_year_end|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
+fiscal_year_start|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
+forms_ledger_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+gift_rule_save|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+grant_scope_set133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
+grant_separation_hint|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+grant_separation_report|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+guard_recommendations|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+inbound_message_receive|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+inbox_unmask_log_list99|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_bot_check|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_bot_create|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_bot_set|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_failure_dismiss|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_proof_set94|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_proof_status94|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+intake_purge|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+is_active|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+is_owner|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+item_class_map_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+item_mapping_load|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+item_master_import_apply|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+item_master_import_preview|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+item_next_code|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+item_type_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+items_missing_category|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+items_search_info126|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+landed_charge_type_save|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+landed_info|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+list_def_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+list_manager_set|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+list_queue_counts|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+loc_cost_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+loc_cost_driver_set116|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+location_block_override|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+log_report_export|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+log_report_export2|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+login_failed|FIXED|patched in phase133: place filter / business check on the rows it reads or writes (old text kept as the OFF branch)
+login_precheck|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+login_success|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+manual_reason_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+manual_reasons85|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+master_scope_report132|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+master_share_create|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+master_share_list|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+master_share_revoke|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+my_context|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+my_emergency|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+my_option_views|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+never_opened_negative_items|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+notifications_mark_emailed|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+notify_cancel|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+notify_config|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+notify_outbox_claim|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+notify_outbox_report|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+notify_outbox_summary|FIXED|owner gate while the switch is ON (company-level books / outbox record: one chart, one set of bank statements, one queue until the per-entity books)
+notify_template_save|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+opening_stock_apply96|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+ops_account_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+option_add|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_other_log|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_other_resolve|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_reactivate|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_reorder|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_request_decide|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_retire|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_similar|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_update|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+option_views_for_user|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+org_masters_relax_unique|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+org_masters_restore_unique|OWNER|owner only (hard gate; list and report: owner or the group-level org_manage grant): the Stage C2 (phase132) share registry, the master coverage report and the unique-key relax / restore are group-level tools
+org_scope_grant|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
+org_scope_revoke|OWNER|group owner or the group-level org_manage grant (phase122/123); org_tree already shows a non-owner only the chain of his own places
+owner_board_get|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+owner_board_save|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+owner_self_approve_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+paper_serial_collisions|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+parallel_waiting|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+partner_agreement_activate|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_agreement_amend|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_agreement_close|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_agreement_from_template|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_agreement_party_set|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_agreement_save|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_calculate|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_capital_add|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_capital_balances|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_capital_void|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_overview|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_party_save|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_party_statement|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_rule_save|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_rule_validate|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_rules_reorder|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_settlement_approve|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_settlement_pay|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_settlement_save|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_settlement_void|OWNER|partners module: every function starts with _a44_guard() = owner only
+partner_venture_save|OWNER|partners module: every function starts with _a44_guard() = owner only
+payment_intent_set_ref|HELPER|updates one payment intent by id: trigger payment_intents_xb133 refuses a foreign-business row
+payment_webhook_receive|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+payroll_approve|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+payroll_payment_void|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+permission_recommendations|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+pii_exposure_report94|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+pin_sig_active|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+pin_sig_cfg_set|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+production_recommendations|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+receipt_duplicates|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+recipe_cost_component_retire|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+recipe_cost_components_get|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+recipe_labour_suggest|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+recipe_set_active|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+recipe_unassigned|MASTER|[c2] shared master data (items, customers, suppliers, recipes, artisans, categories, vocabularies): rows are scoped by Stage C2 (phase132); the function reads no place-bound business row
+reco_apply|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+reco_conflict_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+reco_ignore_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+reco_role_set|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+recon_export_log118|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+reopen_entry|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+report_catalog|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+report_catalog2|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+report_catalog3|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+report_fact_rebuild|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+report_presets|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+request_release|HELPER|only the maker of the draft entry (or the owner) can ask; the entry is the caller's own
+restore_drill_list|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+restore_drill_record|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+restore_drill_status|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+role_form_override_set133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
+role_option_views|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+role_scope_set133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
+rpt131_catalog|CONFIG|configuration / catalogue / vocabulary / diagnostics: no business rows (report catalogues list report names and filters; client errors are technical messages)
+rpt131_log_export|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+rule_grant_override_set133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
+rule_num|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+rule_on|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+rule_override_set133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
+rule_txt|PRIM|permission / identity helper: returns a flag, reads no business row (the readers that use it filter by place themselves)
+sale_form_unlink|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+sales_channel_save|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+scope_gaps133|OWNER|owner only (new in phase133): per-business settings, coverage checker, storage overview
+set_daybook_opening|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+set_daybook_start|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+set_doc_template|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner
+set_grant|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+set_my_lang|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+set_option_view|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+set_option_view_bulk|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+set_pin|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+set_role_option_view|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+set_role_option_view_bulk|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+set_rule|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+set_unit_conversion|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+set_user_grant|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+setup_apply_history|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+shadow_count_once_check|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+shadow_void|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+staff_role_save|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+stock_batch_reconcile|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+stock_reconcile|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+telegram_message_receive|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+telegram_secret_set|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+telegram_status|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+tier_reorder|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+tier_save|OWNER|owner only (hard gate) and master data: the owner edits the shared vocabularies / master (Stage C2 scopes the rows)
+touch_favourite|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+twofa_policy|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+twofa_status_report|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+unlock_staff|OWNER|owner only (hard gate): people, roles, grants and group settings are group-wide; per-business values are rule_overrides / rule_grant_overrides133 / role_form_overrides133
+urgent_alerts|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+wastage_cancel|OWN|reads / writes only rows of the caller (own favourites, own request, own error line, own export log line, own roles)
+web_form_catalog|INFRA|bot / device / webhook / queue / scheduler entry point: bound to its token, channel or device, or group infrastructure by design (writes are location-tagged and stopped by the border triggers for a business-limited bot; group scans belong to the owner or to a bot that is a member of every business)
+web_form_embed|OWNER|owner only (hard gate): whole-database tool of the group owner (reconciliation, backup, audit, bots and their secrets, payroll approval)
+week_start_date|PRIM|pure date / unit arithmetic over the shared item and unit tables (items are master data, Stage C2)
+year_close_reverse|OWNER|owner only (hard gate): configuration of a place / of the books written by the group owner

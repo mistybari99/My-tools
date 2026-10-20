@@ -11,13 +11,14 @@ const store = {
 };
 // the brand name is fixed in every language: never translated, never re-spelled
 const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };
-window.BOS = Object.assign(window.BOS || {}, { BRAND: { hub: { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' }, bari: { bn: 'মিষ্টি বাড়ি', en: 'MISTY BARI' }, cakiz: { bn: 'AL-CAKIZ', en: 'AL-CAKIZ' } } });
-const S = { ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
+window.BOS = Object.assign(window.BOS || {}, {});   // bos B2: the old BRAND {hub,bari,cakiz} constant (unused) is gone; brands come from report_brand_map via B.biz.brandOpts
+const S = { offline: false, csNeeds: false, ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (k) => (T[k] && (T[k][S.lang] || T[k].bn)) || k;
 const nm = (o) => !o ? '' : (S.lang === 'en' ? (o.name_en || o.name_bn) : S.lang === 'mix' ? (o.name_mix || o.name_bn) : o.name_bn);
-const fmt = (n) => (n === null || n === undefined) ? '—' : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const NF_IN = (() => { try { return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }); } catch (e) { return null; } })();   // bos114: one formatter (toLocaleString built a new one on every call: 1369 POS cards = 200 ms on a phone)
+const fmt = (n) => (n === null || n === undefined) ? '—' : (NF_IN ? NF_IN.format(Number(n)) : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }));
 const AREAS = ['master', 'showroom', 'cash', 'stock', 'purchase', 'factory', 'sales', 'staff', 'assets', 'owner', 'settings'];
 const CAT = {
   sweet_kg: { bn: 'মিষ্টি (কেজি)', mix: 'মিষ্টি (KG)', en: 'Sweets (KG)' },
@@ -59,8 +60,10 @@ function shell(title, body, back) {
   // back 2 / back 3 steps: shown only when the chain is deep enough (BOS_NAVSTACK.depth() counts the current screen)
   const depth = nav && pg !== 'home' && window.BOS_NAVSTACK ? window.BOS_NAVSTACK.depth() : 0;
   const backN = [2, 3].filter((n) => depth > n).map((n) => `<button type="button" class="navback" data-act="goback" data-n="${n}" aria-label="${esc(t('back' + n))}">${esc(t('back' + n))}</button>`).join('');
-  const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
+  const bnd = (window.BOS.biz && window.BOS.biz.brand()) || BRAND;   // bizctx: the chosen business name when the owner set one, else the legacy name
+  const h1 = title === t('app') ? `<span class="bn">${esc(bnd.bn)}</span><span class="lat">${esc(bnd.en)}</span>` : esc(title);
   $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}${mainBtn}${backN}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
+
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
 }
 function openSheet(html) {
@@ -69,6 +72,7 @@ function openSheet(html) {
   d.innerHTML = `<div class="sheet"><button type="button" class="sheet-x" data-act="closesheet" aria-label="${S.lang === 'en' ? 'Close' : 'বন্ধ করুন'}">✕</button>${html}</div>`;
   d.addEventListener('click', (e) => { if (e.target === d) closeSheet(); });
   document.body.appendChild(d);
+  if (window.BOS_KBD) window.BOS_KBD.sheet(d); // bos102: sticky action bar + keyboard-aware sizing
 }
 function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
@@ -130,9 +134,11 @@ async function doLogin() {
   const sid = val('#a_sid'), pin = val('#a_pin');
   if (!SID_RE.test(sid)) return authErr(t('err_staff_id'));
   if (!PIN_RE.test(pin)) return authErr(t('err_pin'));
+  if (navigator.onLine === false && CS()) return authErr(CS().T('first'));   // bos112: no internet = say so, do not count a wrong PIN
   const pre = await sb.rpc('login_precheck', { p_staff: sid });
   if (pre.data && pre.data.locked) return authErr(t('err_locked'));
   const { error } = await sb.auth.signInWithPassword({ email: emailOf(sid), password: pwOf(pin) });
+  if (error && CS() && CS().isNet(error)) return authErr(CS().T('first'));   // bos112: the server was not reached: not a wrong PIN
   if (error) { await sb.rpc('login_failed', { p_staff: sid }); return authErr(t('err_login')); }
   await sb.rpc('login_success');
   await start();
@@ -147,20 +153,73 @@ async function doRegister() {
   if (!data.session) return authErr(t('err_confirm'));
   await start();
 }
-async function logout() { await sb.auth.signOut(); S.ctx = null; location.hash = ''; viewAuth(); }
+async function logout() {
+  if (CS()) CS().clear();   // bos112: sign-out forgets the saved offline context
+  S.offline = false; csStop(); if (CS()) CS().paint();
+  try { await sb.auth.signOut(); if (CS() && CS().storedUid()) await sb.auth.signOut({ scope: 'local' }); } catch (e) { /* offline: the saved session is dropped on this phone below */ try { await sb.auth.signOut({ scope: 'local' }); } catch (e2) { /* ignore */ } }
+  S.ctx = null; location.hash = ''; viewAuth();
+}
 
 async function loadCtx() {
   const { data, error } = await sb.rpc('my_context');
   if (error) throw error;
-  S.ctx = data;
+  S.ctx = data; if (data && CS()) CS().save(data);   // bos112: remember the last good sign-in (active profiles only) for an offline cold start
   if (data && data.profile && !store.get('bos_lang')) S.lang = data.profile.lang || 'bn';
 }
+// bos112: offline cold start. See coldstart.js for what is kept and why.
+const CS = () => window.BOS_CS;
+let csTimer = null, csBusy = false;
+function csStop() { if (csTimer) clearInterval(csTimer); csTimer = null; }
+function offlineBoot(uid) {
+  const c = CS() ? CS().load(uid) : { refused: 'none' };
+  if (!c.ctx) { viewAuth('login', CS() ? CS().T(c.refused === 'old' ? 'old' : 'first') : ''); return false; }
+  S.ctx = c.ctx; S.offline = true;
+  if (c.ctx.profile && !store.get('bos_lang')) S.lang = c.ctx.profile.lang || 'bn';
+  CS().envApply(); CS().paint();
+  if (!csTimer) csTimer = setInterval(csRecheck, 30000);
+  route(); return true;
+}
+async function csLockout(msg) {
+  CS().clear(); S.ctx = null; S.offline = false; csStop(); CS().paint();
+  try { await sb.auth.signOut(); } catch (e) { /* offline again: the cache is already gone */ }
+  const had = location.hash; location.hash = ''; if (had) await new Promise((r) => setTimeout(r, 60));   // let the hashchange render finish, then show the message
+  viewAuth('login', msg);
+}
+async function csRecheck() {   // background retry: every 30 s and on 'online'. Never reloads the page; a removed / inactive user is signed out here.
+  if (!S.offline || csBusy) return; csBusy = true;
+  try {
+    let r; try { r = await sb.auth.getSession(); } catch (e) { r = { data: {}, error: e }; }
+    const session = r && r.data && r.data.session;
+    if (!session) { if ((r && r.error && CS().isNet(r.error)) || navigator.onLine === false) return; return await csLockout(CS().T('out')); }
+    const { data, error } = await sb.rpc('my_context');
+    if (error) { if (CS().isNet(error)) return; return await csLockout(CS().T('out')); }
+    if (!data || !data.profile || data.profile.status !== 'active') return await csLockout(t('err_disabled'));
+    S.ctx = data; CS().save(data); S.offline = false; csStop(); CS().paint();
+    window.dispatchEvent(new Event('online'));   // the queues (POS sales, outbox) resend now; every resend carries its client id, so nothing is written twice
+    if (S.csNeeds) route();
+  } catch (e) { /* still offline */ } finally { csBusy = false; }
+}
+window.addEventListener('online', () => { if (S.offline) csRecheck(); });
 async function start() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return viewAuth();
-  try { await loadCtx(); } catch (e) { fail(e); return viewAuth(); }
+  let session = null;
+  try { const r = await sb.auth.getSession(); session = r && r.data && r.data.session; } catch (e) { session = null; }
+  if (!session) {
+    const u = CS() && CS().storedUid();   // bos112: supabase-js gives no session when the token is expired and cannot refresh offline; the stored sign-in is still there
+    if (u) { offlineBoot(u); return; }
+    return viewAuth('login', navigator.onLine === false && CS() ? CS().T('first') : '');
+  }
+  try { await loadCtx(); } catch (e) { if (CS() && CS().isNet(e)) { offlineBoot(session.user.id); return; } fail(e); return viewAuth(); }
   if (!S.ctx) { await sb.auth.signOut(); return viewAuth(); }
   route();
+  if (CS()) setTimeout(() => { try { csWarm(); } catch (e) { /* convenience only */ } }, 4000);
+}
+// keep the offline snapshot of locations / rules / items for POS users (once a day at most; reads what POS reads anyway)
+async function csWarm() {
+  const B = window.BOS, c = S.ctx, p = c && c.perms && c.perms.POS;
+  if (S.offline || !B || !B.loadStatic || !(c.is_owner || (p && (p.view || p.enter)))) return;
+  let last = 0; try { last = Number(store.get('bos_cs_warm_' + c.profile.id) || 0); } catch (e) { /* ignore */ }
+  if (Date.now() - last < 86400000) return;
+  await B.loadStatic(); store.set('bos_cs_warm_' + c.profile.id, String(Date.now()));
 }
 
 // ---------- routing ----------
@@ -192,11 +251,14 @@ async function hasAnyGrant(codes) {
   return false;
 }
 function route() {
+  S.lzTok = (S.lzTok || 0) + 1;   // bos114: a screen script that arrives late for an older route must not draw
   if (!S.ctx) return viewAuth();
+  S.csNeeds = false; if (CS()) CS().paint();   // bos112
   const st = S.ctx.profile.status;
   if (st === 'pending') return viewPending();
-  if (st === 'disabled') { sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
+  if (st === 'disabled') { if (CS()) CS().clear(); sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  if (S.offline && CS() && !CS().allowed(page)) return CS().needsNet(page);   // bos112: server-only screens say "Needs internet" instead of failing
   if (OWNER_ONLY.has(page) && !S.ctx.is_owner) {
     const gs = ROUTE_GRANTS[page];
     if (!gs) return viewHome();
@@ -210,9 +272,13 @@ function dispatch(page) {
   const extra = window.BOS_PAGES || {};
   if (page === 'exceptions' && !S.ctx.is_owner && !Object.values(S.ctx.perms).some((p) => p.approve)) return viewHome();
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
-  (local[page] || extra[page] || viewHome)();
+  const Z = window.BOS_LAZY;   // bos114: lazy.js - fetch the screen's script first when the build made it lazy; loading bar / "slow connection" notice for every screen that waits
+  const draw = () => { const r = (local[page] || extra[page] || viewHome)(); if (Z) Z.track(r, page); };
+  if (Z) { Z.first(); if (Z.need(page)) { const tok = (S.lzTok = (S.lzTok || 0) + 1); return Z.track(Z.load(page).then(() => { if (tok === S.lzTok && (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === page) dispatch(page); }, () => { if (tok === S.lzTok) Z.fail(page); }), page); } }
+  draw();
 }
 window.__navCount = 1; window.addEventListener('hashchange', () => { window.__navCount = (window.__navCount || 1) + 1; route(); });
+try { if (sb.auth.onAuthStateChange) sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT' && window.BOS_CS) window.BOS_CS.clear(); }); } catch (e) { /* bos112: stub or old client */ }
 window.BOS_APP = { hasAnyGrant, sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
 
 function viewPending() {

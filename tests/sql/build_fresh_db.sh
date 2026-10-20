@@ -1,5 +1,6 @@
-S="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"      # this checkout, not a fixed path
-R="$S/../../supabase"
+REPO=${REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
+S=$REPO/tests/sql
+R=$REPO/supabase
 PGP=${PGPORT:-5544}                                         # local throwaway Postgres port (default 5544; PGPORT=5610 to use another)
 P="psql -h /tmp -p $PGP -U postgres -v ON_ERROR_STOP=1 -q"
 DB=$1; shift

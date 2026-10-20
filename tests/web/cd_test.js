@@ -1,10 +1,11 @@
 // Groups C and D web pieces: parallel month, print & books, guided flows, delegation board, Needs-you list, item badges, service worker files.
 // Run: node cd_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8354, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA9 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  c.rpc = async (fn, args) => {
   (window.__AC9 = window.__AC9 || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);
@@ -83,7 +84,7 @@ const EXTRA9 = `(function(){ const real = window.supabase.createClient; window.s
   const rowsTxt = await p.locator('#hv_oldest .hrow').allTextContents(); const i1 = rowsTxt.findIndex((t) => /9002/.test(t)), i2 = rowsTxt.findIndex((t) => /cash_over/.test(t)); ok(i1 >= 0 && i2 > i1, 'oldest first');
 
   // files
-  ok(fs.existsSync('/home/user/My-tools/web/sw.js') && /bos-sw-/.test(fs.readFileSync('/home/user/My-tools/web/sw.js', 'utf8')), 'service worker file present');
+  ok(fs.existsSync(_P.WEB_DIR + '/sw.js') && /bos-sw-/.test(fs.readFileSync(_P.WEB_DIR + '/sw.js', 'utf8')), 'service worker file present');
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);
   await br.close();
 } catch (e) { console.log('CRASH', e); process.exitCode = 1; } finally { srv.close(); } })();

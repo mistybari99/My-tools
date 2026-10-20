@@ -1,8 +1,9 @@
 // Item master (W2): ⋮ menu + flags, add-by-category, import page (preview/apply/resume), needs-decision list, type defaults, asset register, purchase asset button, POS picker filter.
-// Run: node itemmaster_test.js /home/user/My-tools/tests/web
+// Run: node itemmaster_test.js tests/web
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web', PORT = 8341;
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR, PORT = _P.freePort();
 const C = require(SP + '/s10_common.js');
 const base = C.baseData(SP);
 const TYPES = [['finished_good', 'তৈরি পণ্য', 'Finished good', true, true], ['resale', 'কিনে বিক্রি', 'Resale', true, true], ['raw_material', 'কাঁচামাল', 'Raw material', true, false], ['packaging', 'প্যাকেজিং', 'Packaging', true, false],

@@ -1,0 +1,63 @@
+{
+ "_doc": "Input of tools/web_build.js. eager = scripts that must be in the first download (start-up shell, POS path, offline start, keyboard/a11y/cold-start fixes); the build ADDS every script whose exports an eager script mentions (it prints why). idle = decorators fetched in the background after the first screen. attach = decorators of a screen: loaded together with the route. Everything else is fetched when its route opens.",
+ "eager": [
+  "pager.js",
+  "config.js",
+  "i18n.js",
+  "app.js",
+  "lazy.js",
+  "entry.js",
+  "errlog.js",
+  "kbdfix.js",
+  "a11yfix.js",
+  "ia.js",
+  "icons3d.js",
+  "nav.js",
+  "coldstart.js",
+  "swreg.js",
+  "theme_glass.js",
+  "pay.js",
+  "pos.js",
+  "invoice.js",
+  "invoiceview.js",
+  "barcode.js",
+  "cashdrawer.js",
+  "catpick.js",
+  "salereturn.js",
+  "posfail.js",
+  "rules.js",
+  "tpl_registry.js",
+  "tpl_docs.js",
+  "tpl_labels.js",
+  "tpl_msgs.js",
+  "tpl_samples.js",
+  "tplpicker.js",
+  "listctl.js"
+ ],
+ "idle": [
+  "badges107.js",
+  "itemimg.js",
+  "charts.js",
+  "dashx_metrics.js",
+  "dashx.js"
+ ],
+ "attach": {
+  "purchase": [
+   "landed.js",
+   "landed_q4.js",
+   "purchaseprint.js"
+  ]
+ },
+ "ignore": {
+  "itemimg.js": [
+   "scan.js"
+  ]
+ },
+ "precache": [
+  "vendor/zxing/zxing-library-0.21.3.min.js",
+  "scan_core.js",
+  "photo.js",
+  "scan_items.js",
+  "scan_native.js"
+ ]
+}

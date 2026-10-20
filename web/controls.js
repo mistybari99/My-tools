@@ -16,7 +16,7 @@ const A = window.BOS_APP, B = window.BOS;
 const { S, esc } = A;
 const L = B.L, lab = B.lab;
 const X = {
-  apply: L('প্রয়োগ', 'Apply', 'Apply'), all: L('সব বাছুন', 'Select all', 'Select all'), clear: L('মুছুন', 'Clear', 'Clear'), close: L('বন্ধ', 'Close', 'Close'),
+  apply: L('অ্যাপ্লাই', 'Apply', 'Apply'), all: L('সব বাছুন', 'Select all', 'Select all'), clear: L('মুছুন', 'Clear', 'Clear'), close: L('বন্ধ', 'Close', 'Close'),
   search: L('খুঁজুন', 'Search', 'Search'), none: L('— বাছুন —', '— choose —', '— বাছুন —'), noval: L('(কিছু নয়)', '(none)', '(কিছু নয়)'), more: L('আরও', 'More', 'আরও'),
   nsel: L('টি বাছা', 'selected', 'selected'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'Nothing found'), cur: L('বর্তমান', 'current', 'current'),
 };
@@ -288,7 +288,7 @@ function schedule() {
 }
 function run() { if (busy) return; busy = true; last = Date.now(); try { enhance(document.body); } catch (e) { /* never break the app */ if (window.console) console.warn('ctl', e && e.message); } busy = false; }
 function start() {
-  sync(); const mo = new MutationObserver((recs) => { if (!on()) { sync(); return; } if (recs.every((r) => r.target.closest && r.target.closest('.ctl-bg'))) return; schedule(); });
+  sync(); const mo = new MutationObserver((recs) => { if (!on()) { sync(); return; } if (recs.every((r) => r.target.closest && r.target.closest('.ctl-bg,#pos_items'))) return; schedule(); });   /* bos114: POS cards (drawn in chunks) hold nothing to enhance */
   mo.observe(document.body, { childList: true, subtree: true }); run();
 }
 

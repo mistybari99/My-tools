@@ -32,11 +32,11 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
 
   // ---- helpers present and defaults OFF
   let p = await open({}, '#/home'); await p.waitForTimeout(300);
-  ok(await p.evaluate(() => !!(window.BOS_SCAN_CORE && window.BOS.scan && window.BOS.photo && window.BOS_SCAN_NATIVE)), 'scan core, scan, photo and native bridge loaded');
+  ok(await p.evaluate(() => !!(window.BOS_SCAN_CORE && window.BOS.scanitems && window.BOS.photo && window.BOS_SCAN_NATIVE)), 'scan core, scan, photo and native bridge loaded');
   ok(await p.evaluate(() => window.BOS_SCAN_NATIVE.available() === false), 'native bridge is inert in the browser');
-  ok(await p.evaluate(() => window.BOS.scan.settings().recog_ocr_on === false && window.BOS.scan.settings().recog_vision_on === false), 'every recognition switch reads OFF');
-  ok(await p.evaluate(() => window.BOS.scan.settings().recog_image_threshold === null), 'blank threshold stays blank (no invented value)');
-  ok(await p.evaluate(() => window.BOS.scan.status().find((r) => r.id === 'vision').choice.reason === 'off'), 'vision reports off, not a guess');
+  ok(await p.evaluate(() => window.BOS.scanitems.settings().recog_ocr_on === false && window.BOS.scanitems.settings().recog_vision_on === false), 'every recognition switch reads OFF');
+  ok(await p.evaluate(() => window.BOS.scanitems.settings().recog_image_threshold === null), 'blank threshold stays blank (no invented value)');
+  ok(await p.evaluate(() => window.BOS.scanitems.status().find((r) => r.id === 'vision').choice.reason === 'off'), 'vision reports off, not a guess');
   await p.close();
 
   // ---- the screen at 360 px
@@ -54,7 +54,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
 
   // ---- barcode fallback: no BarcodeDetector and the camera switch ON -> fallbackDetector loads the vendored reader (or says not supported)
   p = await open({ cam: true }, '#/home'); await p.waitForTimeout(400);
-  ok(await p.evaluate(async () => { const d = await window.BOS.scan.fallbackDetector(); return d === null || typeof d.detect === 'function'; }), 'fallbackDetector returns a detector or null (never throws)');
+  ok(await p.evaluate(async () => { const d = await window.BOS.scanitems.fallbackDetector(); return d === null || typeof d.detect === 'function'; }), 'fallbackDetector returns a detector or null (never throws)');
   ok(await p.evaluate(() => typeof window.BOS.barcode.scan === 'function'), 'barcode scan still exposed');
   await p.close();
 
