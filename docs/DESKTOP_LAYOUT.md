@@ -119,7 +119,7 @@ For list pages (customers, items, dues, purchase bills, staff, exceptions...) at
 
 - Default: `.sheet-bg { align-items: center }`, `.sheet { width: min(720px, 92vw); max-height: 86vh; border-radius: 18px; border-top-width: 1px }`; the drag handle pseudo-element `.sheet::before` (`theme.css:231`) is hidden. Same for `.bc-bg/.bc-card` and `.ihint-sheet`. `.ctl-*` already centred.
 - Side panel: sheets that show a record or a long form (class `.sheet.side`, opted in per screen later) dock to the inline-end edge: `align-items: stretch; justify-content: flex-end; .sheet { width: 520px; height: 100vh; border-radius: 0 }`.
-- Backdrop covers sidebar and top bar (z-index 20 over 41? no: the drawer is `z-index: 41`; on desktop the sidebar is set to `z-index: 6` so every scrim/sheet, which sit at 20 to 70, covers it, exactly like a normal modal).
+- Backdrop covers sidebar and top bar: the drawer is `z-index: 41` today, so on desktop the sidebar is set to `z-index: 6` and every scrim or sheet (z-index 20 to 70) covers it, like a normal modal.
 - Focus: on open focus moves to the first field (or the close button), on close returns to the opener; Esc closes (`closesheet`); Tab is trapped inside. This is a small JS addition in `openSheet` (app.js, listed in the plan).
 - `BOS_KBD.sheet` keyboard-height logic is guarded by `(pointer: coarse)` already in practice; verify it does nothing on desktop (test in section 5).
 
