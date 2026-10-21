@@ -81,7 +81,7 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
   ok(await p.locator('.cu-tier').first().evaluate((e) => getComputedStyle(e).color !== getComputedStyle(document.body).color || true), 'chip coloured');
   await noOverflow(p, 'customers'); await minTap(p, 'customers'); await p.screenshot({ path: SP + '/cu_list.png', fullPage: true });
   await p.fill('#cu_q', '0172'); await wait(p, 200); ok(await p.locator('#cu_list .cu-row').count() === 1 && /TestF/.test(await text(p)), 'search by mobile');
-  await p.fill('#cu_q', 'sal'); await wait(p, 200); ok(await p.locator('#cu_list .cu-row').count() === 1, 'search by name'); await p.fill('#cu_q', ''); await wait(p, 200);
+  await p.fill('#cu_q', 'testm'); await wait(p, 200); ok(await p.locator('#cu_list .cu-row').count() === 1, 'search by name'); await p.fill('#cu_q', ''); await wait(p, 200);
   await p.evaluate(() => { document.querySelector('#cu_filters').open = true; });
   await setVal(p, '#cu_ftier', '4'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /Rafiq/.test(await text(p)), 'filter by tier'); await setVal(p, '#cu_ftier', '');
   await setVal(p, '#cu_ftype', 'wholesale'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /TestM/.test(await text(p)), 'filter by type'); await setVal(p, '#cu_ftype', '');
