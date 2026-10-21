@@ -12,7 +12,7 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
   if (fn === 'cash_move_add') { if (window.__ERR8) { const m = window.__ERR8; window.__ERR8 = null; return { data: null, error: { message: m, code: 'P0001' } }; } if (args.p_dry) return { data: { dry: true, daybook: 'cash out, bank in' }, error: null };
     T.cash_moves.unshift({ id: 'cm' + T.cash_moves.length, location_id: args.p_loc, kind: args.p_kind, mode: args.p_mode, amount: args.p_amount, move_date: args.p_date, ref: args.p_ref, note: args.p_note, status: 'done', customer_id: args.p_customer, created_at: '2026-10-13T10:00:00Z' }); return { data: { id: 'x' }, error: null }; }
   if (fn === 'cash_move_void') { const r = T.cash_moves.find((x) => x.id === args.p_id); if (r) r.status = 'void'; return { data: { status: 'void' }, error: null }; }
-  if (fn === 'customer_advances') return { data: [{ customer_id: 'c1', name: 'Karim', mobile: '01711', balance: 600 }], error: null };
+  if (fn === 'customer_advances') return { data: [{ customer_id: 'c1', name: 'TestF', mobile: '01711', balance: 600 }], error: null };
   if (fn === 'has_grant') return { data: true, error: null };
   if (fn === 'production_void') return { data: { status: 'void', reversed_lines: 4 }, error: null };
   if (fn === 'set_rule') { const r = T.rules.find((x) => x.key === args.p_key); if (r) r.value = args.p_value; return { data: null, error: null }; }
@@ -47,7 +47,7 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
   // ---- cash moves ----
   let p = await open('#/cashmoves');
   ok(await p.locator('#cm_body').count() === 1 && /Bank deposit/.test(await p.evaluate(() => document.body.innerText)), 'cash moves page lists the existing row');
-  ok(/Karim/.test(await p.evaluate(() => document.body.innerText)), 'customer advances held are shown');
+  ok(/TestF/.test(await p.evaluate(() => document.body.innerText)), 'customer advances held are shown');
   ok(await p.locator('#cm_modew').isHidden(), 'mode hidden for a bank deposit');
   await p.selectOption('#cm_kind', 'owner_topup'); await wait(p, 100);
   ok(await p.locator('#cm_modew').isVisible(), 'mode shown for an owner top-up');

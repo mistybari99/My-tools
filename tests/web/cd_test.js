@@ -31,7 +31,7 @@ const EXTRA9 = `(function(){ const real = window.supabase.createClient; window.s
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const data = C.mk(base, {}); const T = data.tables;
     T.form_rollout = [{ form_code: '14-1', location_id: 1, mode: 'parallel' }]; T.comparison_pairs = o.pairs ? [{ id: 7, form_code: '14-1', name_bn: 'ড্রয়ার', name_en: 'Drawer', how_paper: 'paper page', how_app: 'app calc', is_active: true }] : []; T.comparison_days = []; T.parallel_months = [];
-    T.paper_books = [{ id: 1, form_code: '14-1', location_id: 1, prefix: null, first_no: 1, last_no: 50, status: 'active', holder: 'Karim', issued_on: '2026-10-01' }];
+    T.paper_books = [{ id: 1, form_code: '14-1', location_id: 1, prefix: null, first_no: 1, last_no: 50, status: 'active', holder: 'TestF', issued_on: '2026-10-01' }];
     T.print_notes = [{ id: 3, form_code: null, location_id: 1, reason: 'place renamed: A -> B', change_to: 'Change the place line', created_at: '2026-10-10T00:00:00Z', cleared_at: null }];
     T.flow_skips = []; T.exceptions = T.exceptions || []; T.grant_defs = [{ grant_code: 'cash_move', module: 'cash', sort: 1, label_bn: 'ক্যাশ লেনদেন', label_en: 'Cash moves', window_type: 'once' }]; T.user_grants = [{ id: 1, user_id: 'u1', grant_code: 'cash_move', location_id: 1, valid_until: new Date(Date.now() + 2 * 864e5).toISOString() }];
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__ENDED=${o.ended ? 'true' : 'false'};try{localStorage.setItem('bos_lang','en')}catch(e){}`);

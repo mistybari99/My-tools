@@ -91,7 +91,7 @@ select tt.chk('T1 tier edits are in the audit log', exists (select 1 from audit_
 
 \echo == T2 customers: add, duplicate, rights
 select tt.as(:'sp');
-select customer_save(null, '{"mobile":"01711111111","name":"Rahim","birthday":"1990-05-05","address":"Dhaka","note":"likes tea","source":"walk-in","whatsapp":"01711111111"}', gen_random_uuid()) as c1 \gset
+select customer_save(null, '{"mobile":"01711111111","name":"TestK","birthday":"1990-05-05","address":"Dhaka","note":"likes tea","source":"walk-in","whatsapp":"01711111111"}', gen_random_uuid()) as c1 \gset
 select (:'c1'::jsonb ->> 'id')::uuid as cid1 \gset
 select tt.chk('T2 salesperson adds a customer: default tier, start date, columns stored', (select tier_id=:t_walk and customer_since=(now() at time zone 'Asia/Dhaka')::date and birthday='1990-05-05' and address='Dhaka' and note='likes tea' and source='walk-in' and not tier_locked from customers where id=:'cid1'));
 select tt.chk('T2 a second add with the same mobile returns dup, not an error', (customer_save(null, '{"mobile":"০১৭১১১১১১১১","name":"Other"}') ->> 'dup')::boolean and (customer_save(null, '{"mobile":"+8801711111111","name":"Other"}') ->> 'id')::uuid=:'cid1'::uuid);
@@ -103,14 +103,14 @@ select tt.err('T2 bad date refused', $$select customer_save(null, '{"mobile":"01
 select tt.err('T2 salesperson cannot choose a tier', format($$select customer_save(null, '{"mobile":"01722222222","name":"X","tier_id":"%s"}')$$, :t_gold), 'not allowed');
 select tt.err('T2 salesperson cannot set a credit limit', format($$select customer_save(%L, '{"credit_limit":"5000"}')$$, :'cid1'), 'not allowed');
 select tt.err('T2 salesperson cannot deactivate', format($$select customer_save(%L, '{"active":false}')$$, :'cid1'), 'not allowed');
-select customer_save(:'cid1'::uuid, '{"name":"Rahim Uddin","note":"vip soon"}') ->> 'name' as nn \gset
-select tt.chk('T2 salesperson edits name and note', :'nn'='Rahim Uddin' and (select note from customers where id=:'cid1')='vip soon');
+select customer_save(:'cid1'::uuid, '{"name":"TestK Uddin","note":"vip soon"}') ->> 'name' as nn \gset
+select tt.chk('T2 salesperson edits name and note', :'nn'='TestK Uddin' and (select note from customers where id=:'cid1')='vip soon');
 with u as (update customers set name='Z' where id=:'cid1' returning 1) select count(*) as touched from u \gset
 select tt.chk('T2 salesperson cannot update the table directly (no row is touched)', :touched=0);
 select tt.as(:'k'); select tt.err('T2 a storekeeper (no POS right) cannot add customers', $$select customer_save(null, '{"mobile":"01733333333","name":"Nope"}')$$, 'not allowed');
 select tt.err('T2 a storekeeper cannot read the directory', $$select * from customer_directory()$$, 'not allowed');
 select tt.as(:'s');
-select customer_save(null, ('{"mobile":"01744444444","name":"Karim Gold","tier_id":"'||:t_gold||'","credit_limit":"1000"}')::jsonb) ->> 'id' as cidg \gset
+select customer_save(null, ('{"mobile":"01744444444","name":"TestF Gold","tier_id":"'||:t_gold||'","credit_limit":"1000"}')::jsonb) ->> 'id' as cidg \gset
 select tt.chk('T2 manager (grant) registers a customer straight into a tier (locked: a manual choice); an explicit limit beats the tier default', (select tier_id=:t_gold and credit_limit=1000 and tier_locked from customers where id=:'cidg'));
 select tt.chk('T2 that registration left a manual history row', (select count(*) from customer_tier_history where customer_id=:'cidg' and reason='manual' and to_tier=:t_gold)=1);
 reset role;

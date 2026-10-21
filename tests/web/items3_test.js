@@ -48,7 +48,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   const calls = (p, fn) => p.evaluate((f) => window.__CALLS.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const IT = base.tables.items, id0 = IT[0].id;
   const LOW = `window.__LOW=[{item_id:"${id0}",code:"${IT[0].code}",name_bn:"x",category:"c",base_unit:"kg",location_id:1,qty:2.5,min_stock:5,below_min:true}];`;
-  const NO = 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
 
   // ---------- low stock now ----------
   let p = await open({ init: LOW }, '#/items');

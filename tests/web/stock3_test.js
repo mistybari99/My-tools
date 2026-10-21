@@ -26,7 +26,7 @@ const IT = base.tables.items;
   const lv = (i, id, code, bn, en, cat, bu, q, min) => ({ item_id: id, code, name_bn: bn, name_en: en, category: cat, base_unit: bu, location_id: 1, qty: q, min_stock: min, below_min: min !== null && q < min, avg_cost: null, value: null });
   const levels = [lv(0, IT[0].id, 'I-001', 'সাদা মিষ্টি', 'White sweet', 'sweet_kg', 'kg', 3.5, 5), lv(1, IT[1].id, 'I-002', 'কালো মিষ্টি', 'Black sweet', 'sweet_kg', 'kg', 8, null), lv(2, IT[2].id, 'I-003', 'রসমালাই', 'Rasmalai', 'sweet_pc', 'piece', 40, 10)];
   const patch = [{ sell_units: ['kg', 'box'], name_mix: 'Shada Mishti', barcode: '8801' }, {}, { barcode: '8803' }];
-  const wa = [{ id: 'w1', item_id: IT[0].id, code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', location_id: 1, qty: 10, base_unit: 'kg', reason_code: 'spoiled', note: 'tray fell', photo: null, status: 'pending', requested_staff: 'karim02', requested_at: '2026-10-11T05:00:00Z', mine: false, can_decide: true, decision_note: null }];
+  const wa = [{ id: 'w1', item_id: IT[0].id, code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', location_id: 1, qty: 10, base_unit: 'kg', reason_code: 'spoiled', note: 'tray fell', photo: null, status: 'pending', requested_staff: 'testf02', requested_at: '2026-10-11T05:00:00Z', mine: false, can_decide: true, decision_note: null }];
 
   // ---------- category labels, unit lists, search, row menu ----------
   let p = await open({ itemPatch: patch, m: { levels } }, '#/stock');
@@ -88,7 +88,7 @@ const IT = base.tables.items;
   await p.fill('#a_note', 'not wasted'); await p.click('[data-act=s2_wa_go_no]'); await wait(p, 500); wd = await calls(p, 'wastage_decide'); ok(wd.length === 2 && wd[1].p_approve === false && wd[1].p_note === 'not wasted', 'reject call with the note');
   await p.close();
   // the maker sees own request, cannot decide, can take it back
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
   const mine = [{ ...wa[0], mine: true, can_decide: false }];
   p = await open({ init: NO, m: { levels, wa: mine, grants: ['wastage_write_off'], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock');
   ok(await p.locator('.ptabs [data-v=wa]').count() === 1, 'a maker with a waiting request sees the tab'); await p.click('.ptabs [data-v=wa]'); await wait(p, 500);

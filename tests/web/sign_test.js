@@ -31,10 +31,10 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.click('#pinbox [data-act=e_pin_sign][data-v=witness]'); await wait(p, 700);
   ok((await calls(p, 'save_entry')).length === 1, 'the draft is saved first (the signature needs an entry)');
   const opts = await p.$$eval('#ps_staff option', (o) => o.map((x) => x.value));
-  ok(opts.includes('karim02') && opts.includes('jamal03') && !opts.includes('owner1'), 'the maker is not offered as a signer');
+  ok(opts.includes('testf02') && opts.includes('teste03') && !opts.includes('owner1'), 'the maker is not offered as a signer');
   // wrong PIN
-  await p.selectOption('#ps_staff', 'karim02'); await p.fill('#ps_pin', '0000'); await p.click('[data-act=ps_go]'); await wait(p, 600);
-  let lf = await calls(p, 'login_failed'); ok(lf.length === 1 && lf[0][1].p_staff === 'karim02', 'wrong PIN goes through login_failed (lockout of phase11)');
+  await p.selectOption('#ps_staff', 'testf02'); await p.fill('#ps_pin', '0000'); await p.click('[data-act=ps_go]'); await wait(p, 600);
+  let lf = await calls(p, 'login_failed'); ok(lf.length === 1 && lf[0][1].p_staff === 'testf02', 'wrong PIN goes through login_failed (lockout of phase11)');
   ok(!(await calls(p, 'sign_entry')).length, 'no signature was attempted');
   ok(await p.locator('#ps_err:visible').count() === 1, 'an error is shown in the sheet');
   // bad format
@@ -43,28 +43,28 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.fill('#ps_pin', '4321'); await p.click('[data-act=ps_go]'); await wait(p, 800);
   let se = await calls(p, 'sign_entry');
   ok(se.length === 1 && se[0][1].p_role === 'witness' && se[0][2] === 'second', 'sign_entry ran on the SECOND client');
-  let sec = await p.evaluate(() => window.__W6S.second); ok(sec.length === 2 && sec[1].email === 'karim02@staff.islamia-bos.app' && sec[1].pw === '4321-bos', 'second client signed the other person in with their own staff id and PIN');
+  let sec = await p.evaluate(() => window.__W6S.second); ok(sec.length === 2 && sec[1].email === 'testf02@staff.islamia-bos.app' && sec[1].pw === '4321-bos', 'second client signed the other person in with their own staff id and PIN');
   ok(await p.evaluate(() => ((window.__AC || []).filter((c) => c[0] === 'sign_entry' && c[2] === 'main')).length === 0), 'never on the main (maker) session');
-  ok(/Signed by: Karim/.test(await p.textContent('#pinbox')), 'box shows who signed');
+  ok(/Signed by: TestF/.test(await p.textContent('#pinbox')), 'box shows who signed');
   ok(await p.evaluate(() => { const s = JSON.parse(localStorage.getItem('supabase.auth.token') || 'null'); return true; }), 'main session untouched');
-  const sv = await calls(p, 'save_entry'); ok(sv.length >= 2 && sv[sv.length - 1][1].p_data.witness === 'karim02', 'the signer is written into the sheet (witness)');
+  const sv = await calls(p, 'save_entry'); ok(sv.length >= 2 && sv[sv.length - 1][1].p_data.witness === 'testf02', 'the signer is written into the sheet (witness)');
   ok(await p.locator('#pinbox [data-act=e_pin_sign]').count() === 1, 'only the second signature is left');
-  // another login for the second signature: karim02 is not offered again
+  // another login for the second signature: testf02 is not offered again
   await p.click('#pinbox [data-act=e_pin_sign][data-v=second_sig]'); await wait(p, 600);
-  const opts2 = await p.$$eval('#ps_staff option', (o) => o.map((x) => x.value)); ok(!opts2.includes('karim02') && opts2.includes('jamal03'), 'a login that already signed is not offered again');
-  await p.selectOption('#ps_staff', 'jamal03'); await p.fill('#ps_pin', '5555'); await p.click('[data-act=ps_go]'); await wait(p, 800);
-  ok(/Signed by: Jamal/.test(await p.textContent('#pinbox')) && await p.locator('#pinbox [data-act=e_pin_sign]').count() === 0, 'both signed');
+  const opts2 = await p.$$eval('#ps_staff option', (o) => o.map((x) => x.value)); ok(!opts2.includes('testf02') && opts2.includes('teste03'), 'a login that already signed is not offered again');
+  await p.selectOption('#ps_staff', 'teste03'); await p.fill('#ps_pin', '5555'); await p.click('[data-act=ps_go]'); await wait(p, 800);
+  ok(/Signed by: TestE/.test(await p.textContent('#pinbox')) && await p.locator('#pinbox [data-act=e_pin_sign]').count() === 0, 'both signed');
   // server refusal text
   p = await open({}, '#/entry/new/14-1/1'); await p.click('#pinbox [data-act=e_pin_sign][data-v=witness]'); await wait(p, 600);
   await p.evaluate(() => { window.__W6S.err.sign_entry = 'signer_already_signed'; });
-  await p.selectOption('#ps_staff', 'karim02'); await p.fill('#ps_pin', '4321'); await p.click('[data-act=ps_go]'); await wait(p, 700);
+  await p.selectOption('#ps_staff', 'testf02'); await p.fill('#ps_pin', '4321'); await p.click('[data-act=ps_go]'); await wait(p, 700);
   ok(/already signed/i.test(await p.textContent('#ps_err')), 'server refusal gets a clear message (sheet stays open)');
   // client refuses the maker without any sign-in
   const r = await p.evaluate(async () => { const n0 = window.__W6S.second.length; const x = await window.BOS.signWithPin({ entryId: 'e1', role: 'witness', staffId: 'OWNER1', pin: '1234' }); return { x, n: window.__W6S.second.length - n0 }; });
   ok(r.x.ok === false && r.x.code === 'self' && r.n === 0, 'the maker is refused before any sign-in');
   // locked login is refused before any sign-in
   await p.evaluate(() => { window.__W6S.locked = true; });
-  const r2 = await p.evaluate(async () => { const n0 = window.__W6S.second.length; const x = await window.BOS.signWithPin({ entryId: 'e1', role: 'witness', staffId: 'karim02', pin: '4321' }); return { x, n: window.__W6S.second.length - n0 }; });
+  const r2 = await p.evaluate(async () => { const n0 = window.__W6S.second.length; const x = await window.BOS.signWithPin({ entryId: 'e1', role: 'witness', staffId: 'testf02', pin: '4321' }); return { x, n: window.__W6S.second.length - n0 }; });
   ok(r2.x.code === 'locked' && r2.n === 0, 'a locked login is refused without trying the PIN');
 
   // ---------- submit needs the signatures ----------
@@ -74,9 +74,9 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   // ---------- 10-1 pair ----------
   p = await open({}, '#/entry/new/10-1/1');
   ok(await p.locator('#pinbox [data-act=e_pin_sign][data-v=hub_pair]').count() === 1, '10-1: one pair signature');
-  await signSheet(p, 'hub_pair', 'jamal03', '5555');
+  await signSheet(p, 'hub_pair', 'teste03', '5555');
   se = await calls(p, 'sign_entry'); ok(se.length === 1 && se[0][1].p_role === 'hub_pair', '10-1 pair signed through sign_entry');
-  ok(/Signed by: Jamal/.test(await p.textContent('#pinbox')), '10-1 shows the signer');
+  ok(/Signed by: TestE/.test(await p.textContent('#pinbox')), '10-1 shows the signer');
 
   // ---------- switch OFF / phase18 missing: the old name picker ----------
   for (const w6 of [{ pin: false, blind: false }, { pin: 'missing', blind: 'missing' }]) {

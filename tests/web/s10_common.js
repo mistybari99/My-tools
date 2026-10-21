@@ -34,7 +34,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ledger: [{ id: 3, item_id: 'i0', location_id: 1, qty_delta: -1.5, unit_cost: 210, reason: 'sale_out', made_at: '2026-10-10T09:00:00Z', note: null }, { id: 2, item_id: 'i0', location_id: 1, qty_delta: 5, unit_cost: 210, reason: 'opening', made_at: '2026-10-09T09:00:00Z', note: 'start' }],
   exp: [{ batch_id: 11, item_id: 'i0', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', location_id: 1, made_at: '2026-10-10T02:00:00Z', expires_at: '2026-10-11T20:00:00Z', qty_remaining: 2, hours_left: 5.5, expired: false },
         { batch_id: 12, item_id: 'i2', code: 'I-003', name_bn: 'রসমালাই', name_en: 'Rasmalai', location_id: 1, made_at: '2026-10-09T02:00:00Z', expires_at: '2026-10-10T20:00:00Z', qty_remaining: 12, hours_left: -3, expired: true }],
-  tr: [{ id: 't1', item_id: 'i0', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', from_location_id: 2, to_location_id: 1, qty: 10, sent_at: '2026-10-10T08:00:00Z', sent_staff: 'karim02', note: 'van' },
+  tr: [{ id: 't1', item_id: 'i0', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', from_location_id: 2, to_location_id: 1, qty: 10, sent_at: '2026-10-10T08:00:00Z', sent_staff: 'testf02', note: 'van' },
         { id: 't2', item_id: 'i2', code: 'I-003', name_bn: 'রসমালাই', name_en: 'Rasmalai', from_location_id: 1, to_location_id: 2, qty: 20, sent_at: '2026-10-10T08:30:00Z', sent_staff: 'owner1', note: null }],
   recon: [],
   list: [

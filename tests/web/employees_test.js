@@ -63,8 +63,8 @@ const EXTRA41 = `(function(){ const real = window.supabase.createClient; window.
     T.leave_types = [['annual', 'বার্ষিক ছুটি', 'Annual leave', 0], ['sick', 'অসুস্থতার ছুটি', 'Sick leave', 14], ['casual', 'নৈমিত্তিক ছুটি', 'Casual leave', 10]].map((r, i) => ({ code: r[0], name_bn: r[1], name_en: r[2], paid: true, default_days: r[3], active: true, sort: i + 1 }));
     T.option_lists = (T.option_lists || []).concat([['emp_designation', 'cashier', 'ক্যাশিয়ার', 'Cashier'], ['emp_designation', 'salesperson', 'সেলসম্যান', 'Salesperson'], ['emp_department', 'showroom', 'শোরুম', 'Showroom']].map((r, i) => ({ list_code: r[0], value_code: r[1], label_bn: r[2], label_en: r[3], sort: i + 1, active: true })));
     T.employees = [
-      { id: 'e1', employee_no: 'E-0001', full_name_bn: 'আব্দুল করিম', full_name_en: 'Abdul Karim', mobile: '01711000001', nid_no: '1990123456789', designation: 'cashier', department: 'showroom', primary_location_id: 1, primary_role_code: 'cashier', employment_type: 'permanent', status: 'active', joining_date: '2026-01-05', photo_path: 'EMP/1/a.jpg', profile_id: null },
-      { id: 'e2', employee_no: 'E-0002', full_name_bn: 'সালমা বেগম', full_name_en: 'Salma Begum', mobile: '01811000002', nid_no: '19901234567890123', designation: 'salesperson', primary_location_id: 2, primary_role_code: 'helper', employment_type: 'contract', status: 'on_leave', joining_date: '2026-02-01' },
+      { id: 'e1', employee_no: 'E-0001', full_name_bn: 'আব্দুল করিম', full_name_en: 'Abdul TestF', mobile: '01711000001', nid_no: '1990123456789', designation: 'cashier', department: 'showroom', primary_location_id: 1, primary_role_code: 'cashier', employment_type: 'permanent', status: 'active', joining_date: '2026-01-05', photo_path: 'EMP/1/a.jpg', profile_id: null },
+      { id: 'e2', employee_no: 'E-0002', full_name_bn: 'সালমা বেগম', full_name_en: 'TestM Begum', mobile: '01811000002', nid_no: '19901234567890123', designation: 'salesperson', primary_location_id: 2, primary_role_code: 'helper', employment_type: 'contract', status: 'on_leave', joining_date: '2026-02-01' },
       { id: 'e3', employee_no: 'E-0003', full_name_bn: 'রফিক', mobile: '01911000003', primary_location_id: 1, employment_type: 'daily', status: 'resigned', joining_date: '2025-05-01' },
       { id: 'e4', employee_no: null, full_name_bn: 'খসড়া ব্যক্তি', primary_location_id: 1, employment_type: 'permanent', status: 'draft' }];
     T.employee_documents = [{ id: 1, employee_id: 'e1', kind: 'nid', file_path: 'EMPDOC/1/n.jpg', note: 'front', void: false, uploaded_at: '2026-10-01T00:00:00Z' }];
@@ -86,7 +86,7 @@ const EXTRA41 = `(function(){ const real = window.supabase.createClient; window.
   // ---------- list ----------
   let p = await open('#/employees');
   ok(await p.locator('#em_list .card.em-row').count() === 4, 'four rows (discarded excluded)');
-  let t = await text(p); ok(/Active 1/.test(t) && /On leave 1/.test(t) && /Draft 1/.test(t), 'summary counts'); ok(/Abdul Karim/.test(t) && /E-0001/.test(t) && /Cashier/.test(t), 'name, number, designation');
+  let t = await text(p); ok(/Active 1/.test(t) && /On leave 1/.test(t) && /Draft 1/.test(t), 'summary counts'); ok(/Abdul TestF/.test(t) && /E-0001/.test(t) && /Cashier/.test(t), 'name, number, designation');
   ok(await p.locator('#em_list img.em-av').count() === 1 && await p.locator('#em_list span.em-av').count() === 3, 'avatar photo for one, initials for the others');
   await p.fill('#em_q', '01811'); await wait(p, 200); ok(await p.locator('#em_list .card.em-row').count() === 1, 'search by mobile');
   await p.fill('#em_q', '19901234567890123'); await wait(p, 200); ok(await p.locator('#em_list .card.em-row').count() === 1, 'search by NID');
@@ -149,7 +149,7 @@ const EXTRA41 = `(function(){ const real = window.supabase.createClient; window.
   await p.click('#wd_cl [data-act=cl_add]'); await wait(p, 150); await p.fill('#cl_e2', 'Extra rule'); await p.click('[data-act=cl_up][data-v="2"]'); await wait(p, 150);
   ok(await p.inputValue('#cl_e1') === 'Extra rule', 'clause moved up');
   await p.click('[data-act=cl_del][data-v="0"]'); await wait(p, 150); ok(await p.locator('#wd_cl [data-cl]').count() === 2, 'clause removed');
-  await p.fill('#wd_start', '2026-10-01'); await p.fill('#wd_dep', '5000'); await p.fill('#wd_gn', 'Rahim'); await p.click('[data-act=em_next]'); await wait(p, 600);
+  await p.fill('#wd_start', '2026-10-01'); await p.fill('#wd_dep', '5000'); await p.fill('#wd_gn', 'TestK'); await p.click('[data-act=em_next]'); await wait(p, 600);
   c = await calls(p, 'deed_save'); ok(c.length === 1 && c[0].p_emp === 'n5' && c[0].p_role === 'cashier' && c[0].p_template === 1 && c[0].p_deposit === 5000 && c[0].p_clauses.length === 2 && c[0].p_clauses[0].text_en === 'Extra rule' && c[0].p_start === '2026-10-01', 'draft deed saved with the edited clauses');
   ok(/6\/6/.test(await text(p)) && /নতুন কর্মী|New Worker/.test(await text(p)), 'review step');
   await p.click('[data-act=em_finish]'); await wait(p, 900);
@@ -165,7 +165,7 @@ const EXTRA41 = `(function(){ const real = window.supabase.createClient; window.
 
   // ---------- profile ----------
   p = await open('#/employee/e1');
-  t = await text(p); ok(/Abdul Karim/.test(t) && /E-0001/.test(t), 'profile header');
+  t = await text(p); ok(/Abdul TestF/.test(t) && /E-0001/.test(t), 'profile header');
   const tabs = await p.locator('.ptabs button').allTextContents(); ok(tabs.join('|') === 'Overview|Pay|Facilities|Documents|Deeds|History', 'tabs for owner: ' + tabs.join('|'));
   await p.click('[data-act=pf_tab][data-v=pay]'); await wait(p, 200); t = await text(p); ok(/25,000/.test(t) && /35,000/.test(t) && /34,000/.test(t) && /DBBL 123/.test(t) && /Eid/.test(t), 'pay tab: basic, gross, net, account, bonus');
   await p.click('[data-act=pf_tab][data-v=fac]'); await wait(p, 200); t = await text(p); ok(/Lunch/.test(t) && /1,200/.test(t) && /Casual/.test(t), 'facilities tab with value for salary people');
@@ -180,7 +180,7 @@ const EXTRA41 = `(function(){ const real = window.supabase.createClient; window.
   ok(await p.locator('.sheet #dd_cl [data-cl]').count() === 1, 'revision opens a draft form with the clauses');
   await p.fill('#cl_e0', 'Rule one changed'); await p.click('[data-act=dd_save][data-v="1"]'); await wait(p, 700);
   c = await calls(p, 'deed_save'); ok(c.length === 1 && c[0].p_id === 31 && c[0].p_clauses[0].text_en === 'Rule one changed', 'revision draft saved'); c = await calls(p, 'deed_activate'); ok(c.length === 1 && c[0].p_id === 31, 'revision put in force');
-  await p.click('[data-act=pf_print][data-v=card]'); await wait(p, 300); let pr = await p.evaluate(() => window.__PRINTED || ''); ok(/Abdul Karim/.test(pr) && /E-0001/.test(pr), 'ID card print');
+  await p.click('[data-act=pf_print][data-v=card]'); await wait(p, 300); let pr = await p.evaluate(() => window.__PRINTED || ''); ok(/Abdul TestF/.test(pr) && /E-0001/.test(pr), 'ID card print');
   await p.click('[data-act=pf_print][data-v=sheet]'); await wait(p, 300); pr = await p.evaluate(() => window.__PRINTED || ''); ok(/01711000001/.test(pr) && /1990123456789/.test(pr), 'profile sheet print');
   await noOverflow(p, 'profile'); await p.screenshot({ path: SP + '/emp_profile.png', fullPage: true });
   // no salary right: no Pay tab, no pay call

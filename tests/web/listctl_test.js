@@ -23,7 +23,7 @@ function mk(o = {}) {
   T.list_defs = [d('expense_heads', 'open'), d('marketing_heads', 'approval'), d('units', 'owner'), d('wastage_reasons', 'open'), d('supplier_types', 'approval', { allow_other: false })].map((x) => ({ ...x, ...((o.defs || {})[x.list_code] || {}) }));
   T.rules = [{ key: 'ui_noperm_mode', module: 'x', kind: 'choice', value: null, default_value: 'lock', label_bn: 'x', sort: 1 }];
   T.location_settings = []; T.list_other_entries = o.other || []; T.option_requests = o.req || []; T.list_managers = [];
-  T.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'Rahim', status: 'active' }, { id: 'u2', staff_id: 'karim02', full_name: 'Karim', status: 'active' }];
+  T.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'TestK', status: 'active' }, { id: 'u2', staff_id: 'testf02', full_name: 'TestF', status: 'active' }];
   T.audit_log = [{ id: 1, at: '2026-10-02T00:00:00Z', staff_id: 'owner1', action: 'update', table_name: 'option_lists', record_id: 'expense_heads:oldhead', detail: { old: { active: true }, new: { active: false, retired_reason: 'not used' } } }];
   return data;
 }
@@ -187,7 +187,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   c = await calls(p, 'option_add'); ok(c.length === 1 && c[0].p_bn === 'বিবিধ', 'owner add uses option_add');
   // Other queue
   await p.click('[data-act=ls2_lmenu]'); await wait(p, 200); await p.click('.sheet [data-act=ls2_view][data-v=other]'); await wait(p, 400);
-  ok(await p.locator('[data-act=ls2_qmenu]').count() === 2, 'two pending Other entries have ⋮'); ok(/Karim/.test(await p.textContent('body')) && /10-2/.test(await p.textContent('body')), 'who and form code shown');
+  ok(await p.locator('[data-act=ls2_qmenu]').count() === 2, 'two pending Other entries have ⋮'); ok(/TestF/.test(await p.textContent('body')) && /10-2/.test(await p.textContent('body')), 'who and form code shown');
   await p.click('[data-act=ls2_qmenu][data-id=o1]'); await wait(p, 200);
   const qm = await p.textContent('.sheet'); ok(/Add as a new option/.test(qm) && /Merge into an existing option/.test(qm) && /Reject/.test(qm), 'queue menu: approve as new / merge / reject');
   await p.click('[data-act=ls2_qadd]'); await wait(p, 200); await p.click('[data-act=ls2_qadd_go]'); await wait(p, 400);

@@ -120,14 +120,14 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.close();
 
   // ---------- non-owner: approval path, no cost ----------
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   ok(!/Cost/.test(await p.textContent('#p2_list')), 'no cost on rows without ITEM_COST'); ok(/Wholesale/.test(await p.textContent('#p2_list')), 'wholesale still visible');
   await p.click('.p2-row'); await p.waitForTimeout(600); ok(await p.locator('#p_cost').count() === 0, 'no cost field'); ok(await p.locator('.notice.warn').count() >= 1, 'needs-approval notice'); ok(await p.locator('[data-act=p2_newbox]').count() === 0, 'no add-category for non-owner');
   ok(await p.locator('a[href^="#/settings2/units/"]').count() === 0, 'no conversion edit link for non-owner'); await p.fill('#p_sell', '999'); await p.click('[data-act=p2_save]'); await p.waitForTimeout(500);
   ok(/approval/i.test(await p.textContent('#toast')), 'sent for approval toast'); const np = (await calls(p, 'submit_item_change'))[0].p_patch; ok(!('cost_price' in np) && np.sell_price === 999, 'non-owner patch has no cost');
   await p.close();
   // read-only role: rows are not clickable
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   ok(await p.locator('[data-act=itemnew]').count() === 0 && await p.locator('.p2-row[data-act]').count() === 0, 'view-only: no add, rows not editable'); await p.close();
 
   // ---------- supplier picker (goods received 04-1 / quotation 06-2) ----------
@@ -146,7 +146,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await s2.fill('Random Shop'); await s2.dispatchEvent('change'); await p.waitForTimeout(150); ok(/Not in the list/.test(await p.textContent('.supwrap + .hint')), 'free text keeps working');
   await p.close();
   // without supplier_manage: no add button; unknown rpc: free text only
-  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"04-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/entry/new/04-1/1');
+  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"04-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/entry/new/04-1/1');
   ok(await p.locator('.supnew').count() === 0, 'no add-new without supplier_manage'); ok(await p.locator('input[data-sup]').count() >= 1, 'picker still shown');
   await p.close();
 

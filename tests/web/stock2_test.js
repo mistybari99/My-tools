@@ -61,7 +61,7 @@ const base = C.baseData(SP), srv = C.serve(PORT);
   await p.click('[data-act=s2_xcancel] >> nth=1'); await wait(p, 300); await p.click('[data-act=s2_go_xcancel]'); await wait(p, 400); const cn = await calls(p, 'stock_cancel_transfer'); ok(cn.length === 1 && cn[0].p_id === 't2', 'cancel transfer called');
   await p.close();
   // non-owner: only the destination can receive; sender can take back own transfer
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};', m: { grants: ['stock_transfer'], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};', m: { grants: ['stock_transfer'], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock');
   await p.click('[data-v=tr]'); await wait(p, 500); ok(await p.locator('[data-act=s2_xrecv]').count() === 1, 'storekeeper receives only at own location'); ok(await p.locator('[data-act=s2_xcancel]').count() >= 1, 'sender sees take back'); await p.close();
 
   // ---------- actions: opening / idempotency / unit error ----------
@@ -114,7 +114,7 @@ const base = C.baseData(SP), srv = C.serve(PORT);
   p = await open({ m: { recon: [{ item_id: 'i0', location_id: 1, ledger_qty: 3, cached_qty: 4, qty_diff: 1 }] } }, '#/stock'); await p.click('[data-act=s2_recon]'); await wait(p, 400);
   ok(/Mismatch: 1/.test(await p.textContent('.sheet')), 'reconcile mismatch'); await p.screenshot({ path: SP + '/st_recon.png' }); await p.click('[data-act=s2_fix]'); await wait(p, 300); await p.click('[data-act=s2_fix_go]'); await wait(p, 200); ok((await calls(p, 'stock_reconcile_fix')).length === 0, 'no repair without the typed word'); await p.fill('#s2_fixw', 'FIX'); await p.click('[data-act=s2_fix_go]'); await wait(p, 300); const rf = await calls(p, 'stock_reconcile'); const rfx = await calls(p, 'stock_reconcile_fix'); ok(rf.length === 1 && rf[0].p_fix === false && rfx.length === 1 && rfx[0].p_confirm === 'FIX', 'repair only through the confirmed call'); await p.close();
   p = await open({}, '#/stock'); await p.click('[data-act=s2_recon]'); await wait(p, 300); ok(/matches/.test(await p.textContent('.sheet')), 'reconcile ok'); await p.close();
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
   p = await open({ init: NO, m: { grants: [], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock'); ok(await p.locator('[data-act=s2_recon]').count() === 0, 'no reconcile for non-owner');
 
   // ---------- permissions: lock mode ----------

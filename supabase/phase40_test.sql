@@ -105,7 +105,7 @@ select post_purchase(:'b2'::uuid) is not null as pp2 \gset
 select save_purchase(null,null,:'sup1'::uuid,1,'S-3',tt.today(),'[{"description":"draft only","qty":1,"unit_cost":99}]'::jsonb) ->> 'id' as b3 \gset
 select pay_supplier(:'sup1'::uuid,1,'[{"mode":"mobile","amount":500}]') is not null as ps \gset
 select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":2,"price":500}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":1000}]',null,null,'retail',null,false) ->> 'id' as s1 \gset
-select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":500}]',:'ic')::jsonb,50,'[{"mode":"mobile","amount":200}]','01711111111','Rahim','retail',null,false) ->> 'id' as s2 \gset
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":500}]',:'ic')::jsonb,50,'[{"mode":"mobile","amount":200}]','01711111111','TestK','retail',null,false) ->> 'id' as s2 \gset
 select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":500}]',:'ifg')::jsonb,0,'[{"mode":"card","amount":500}]',null,null,'retail',null,false) ->> 'id' as s3 \gset
 select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":500}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":500}]',null,null,'retail',null,false) ->> 'id' as s4 \gset
 select record_sale2(gen_random_uuid(),2,'[{"amount":100}]',0,'[{"mode":"cash","amount":100}]',null,null,'retail',null,true) ->> 'id' as s5 \gset

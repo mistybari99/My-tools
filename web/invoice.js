@@ -19,13 +19,13 @@ const KL = { common: L('সাধারণ (A4 / যেকোনো প্রি
   thermal80: L('থার্মাল ৮০ মিমি', 'Thermal 80 mm', 'Thermal 80 mm'), label: L('বারকোড লেবেল', 'Barcode label', 'Barcode Label') };
 const KW = { common: 210, a4: 210, thermal58: 58, thermal80: 80, label: 210 };
 const FLAGS = { brand: L('প্রতিষ্ঠানের নাম', 'Business name', 'Business নাম'), logo: L('লোগো', 'Logo', 'Logo'), location: L('শাখার নাম', 'Branch name', 'Branch নাম'), receipt_no: L('রসিদ নম্বর', 'Receipt number', 'Receipt number'),
-  datetime: L('তারিখ ও সময়', 'Date and time', 'Date ও Time'), cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), customer: L('গ্রাহক', 'Customer', 'Customer'), item_code: L('আইটেম কোড', 'Item code', 'Item code'),
+  datetime: L('ডেট ও সময়', 'Date and time', 'Date ও Time'), cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), customer: L('গ্রাহক', 'Customer', 'Customer'), item_code: L('আইটেম কোড', 'Item code', 'Item code'),
   unit_price: L('একক দাম', 'Unit price', 'Unit price'), discount: L('ডিসকাউন্ট', 'Discount', 'Discount'), payments: L('পেমেন্টের ধরন', 'Payment lines', 'Payment lines'), due: L('বাকি', 'Due', 'Due'), barcode: L('রসিদে বারকোড', 'Barcode on receipt', 'Receipt এ Barcode') };
 const LFLAGS = { l_name: L('আইটেমের নাম', 'Item name', 'Item নাম'), l_price: L('দাম', 'Price', 'Price'), l_code: L('বারকোডের নিচে নম্বর', 'Number under the barcode', 'Barcode এর নিচে number') };
 const dflFlags = (k) => (k === 'label' ? { l_name: true, l_price: true, l_code: true, label_w: 50, label_h: 30, cols: 4 }
   : { brand: true, logo: k !== 'thermal58', location: true, receipt_no: true, datetime: true, cashier: true, customer: true, item_code: k === 'a4', unit_price: true, discount: true, payments: true, due: true, barcode: false });
 const X = {
-  title: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), edit: L('বদলান', 'Edit', 'Edit'), del: L('মুছুন', 'Delete', 'Delete'), add: L('＋ নতুন', '＋ New', '＋ New'),
+  title: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), save: L('সেভ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), edit: L('বদলান', 'Edit', 'Edit'), del: L('মুছুন', 'Delete', 'Delete'), add: L('＋ নতুন', '＋ New', '＋ New'),
   on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), need: L('তথ্য লাগবে', 'Data needed', 'Data লাগবে'), back: L('সব টেমপ্লেট', 'All templates', 'সব Template'),
   noacc: L('এই পাতা দেখতে ইনভয়েস-সেটিংসের অনুমতি লাগবে।', 'The invoice-settings permission is needed for this page.', 'এই page এর জন্য Invoice-settings permission লাগবে।'),
   sql: L('এই অংশ চালু করতে নতুন SQL চালাতে হবে।', 'The new SQL must be run to switch this part on.', 'এই অংশ চালু করতে নতুন SQL চালাতে হবে।'),
@@ -45,7 +45,7 @@ const X = {
   // labels page
   lb_tpl: L('লেবেল টেমপ্লেট', 'Label template', 'Label template'), lb_items: L('আইটেম বাছুন', 'Choose items', 'Item বাছুন'), lb_copies: L('প্রতিটির কপি', 'Copies each', 'Copies each'), lb_search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), lb_none: L('অন্তত একটি আইটেম বাছুন', 'Choose at least one item', 'অন্তত একটি item বাছুন'), lb_sel: L('বাছাই করা', 'selected', 'selected'),
   // document words
-  d_receipt: L('রসিদ', 'Receipt', 'Receipt'), d_invoice: L('ইনভয়েস', 'Invoice', 'Invoice'), d_date: L('তারিখ', 'Date', 'Date'), d_cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), d_customer: L('গ্রাহক', 'Customer', 'Customer'), d_item: L('আইটেম', 'Item', 'Item'), d_qty: L('পরিমাণ', 'Qty', 'Qty'), d_price: L('দাম', 'Price', 'Price'), d_amount: L('টাকা', 'Amount', 'Amount'),
+  d_receipt: L('রসিদ', 'Receipt', 'Receipt'), d_invoice: L('ইনভয়েস', 'Invoice', 'Invoice'), d_date: L('ডেট', 'Date', 'Date'), d_cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), d_customer: L('গ্রাহক', 'Customer', 'Customer'), d_item: L('আইটেম', 'Item', 'Item'), d_qty: L('পরিমাণ', 'Qty', 'Qty'), d_price: L('দাম', 'Price', 'Price'), d_amount: L('টাকা', 'Amount', 'Amount'),
   d_sub: L('মোট (ছাড়ের আগে)', 'Subtotal', 'Subtotal'), d_disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), d_total: L('সর্বমোট', 'Total', 'Total'), d_due: L('বাকি', 'Due', 'Due'), d_vat: L('ভ্যাট', 'VAT', 'VAT'), d_incl: L('অন্তর্ভুক্ত', 'included', 'included'), d_thanks: L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'),
   m_cash: L('নগদ', 'Cash', 'Cash'), m_mobile: L('মোবাইল', 'Mobile', 'Mobile'), m_card: L('কার্ড', 'Card', 'Card'),
   // offer
@@ -71,7 +71,7 @@ function barcodeSvg(text, h = 40) {
 }
 
 // ---------- document rendering ----------
-const SAMPLE = { loc: { bn: 'ইসলামিয়া মিষ্টি ঘর — প্রধান শাখা', en: 'Islamiya Misty Ghar — Main branch' }, receipt: 'M-1042', date: '2026-10-11', time: '18:42', cashier: 'karim02', customer: 'Rafiq · 01711111111',
+const SAMPLE = { loc: { bn: 'ইসলামিয়া মিষ্টি ঘর — প্রধান শাখা', en: 'Islamiya Misty Ghar — Main branch' }, receipt: 'M-1042', date: '2026-10-11', time: '18:42', cashier: 'cashier01', customer: 'Sample customer · 01711111111',
   lines: [{ code: 'S-01', name: { bn: 'রসগোল্লা', en: 'Rasgolla' }, qty: 1.5, unit: 'kg', price: 520, amount: 780 }, { code: 'S-14', name: { bn: 'সন্দেশ', en: 'Sandesh' }, qty: 0.5, unit: 'kg', price: 640, amount: 320 }, { code: 'D-02', name: { bn: 'মিষ্টি দই', en: 'Sweet doi' }, qty: 2, unit: 'pc', price: 90, amount: 180 }],
   subtotal: 1280, discount: 80, total: 1200, pays: [{ mode: 'cash', amount: 1000 }, { mode: 'mobile', amount: 100 }], due: 100 };
 function vatInfo(tpl, total) {

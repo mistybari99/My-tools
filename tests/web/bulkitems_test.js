@@ -124,14 +124,14 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.close();
 
   // ---------- non-owner without a grant: requests ----------
-  p = await open({ init: 'window.__OWNER=false;window.__GRANT=false;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/bulkitems');
+  p = await open({ init: 'window.__OWNER=false;window.__GRANT=false;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/bulkitems');
   ok(await p.locator('#bk_grid tbody tr').count() === 50, 'ITEMS-enter user sees the grid'); ok(await p.locator('[data-act=bk_export]').count() === 0, 'no export for non-owner'); ok(await p.locator('#bk_cost').count() === 0, 'no cost toggle for non-owner');
   await p.locator('#bk_grid tbody tr').nth(10).locator('[data-f=sell_price]').fill('55'); await p.locator('.bk-sel').nth(2).check(); ok(await p.locator('[data-act=bk_hide_sel]').count() === 0, 'no bulk hide without the direct right');
   await p.click('[data-act=bk_preview]'); await p.waitForTimeout(400); ok(/become requests|request/i.test(await p.textContent('.sheet')) && /1 will become requests/.test(await p.textContent('.sheet')), 'preview says requests for approval'); await p.close();
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};window.__GRANT=false;' }, '#/bulkitems');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};window.__GRANT=false;' }, '#/bulkitems');
   ok(/do not have access/.test(await p.textContent('#app')), 'view-only user has no access'); await p.close();
 
-  p = await open({ init: 'window.__OWNER=false;window.__GRANT=true;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};window.__DATA.tables.item_mapping_review[0].status="replaced";' }, '#/itemmap');
+  p = await open({ init: 'window.__OWNER=false;window.__GRANT=true;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};window.__DATA.tables.item_mapping_review[0].status="replaced";' }, '#/itemmap');
   await p.click('[data-act=mp_tab][data-v=repl]'); await p.waitForTimeout(200);
   ok(await p.locator('.mp2').count() === 1 && await p.locator('[data-act=mp_undo]').count() === 0, 'non-owner sees a replaced row but no Undo button');
   await p.click('.mp2 .im-dots'); await p.waitForTimeout(200); ok(await p.locator('.sheet [data-act=mp_undo]').count() === 0, 'and no Undo in the menu'); await p.close();

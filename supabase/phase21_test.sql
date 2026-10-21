@@ -79,8 +79,8 @@ insert into entries (form_code,location_id,serial,entry_date,status,data,flags,c
  ('14-1',1,9106,current_date-2,'submitted','{}','[]',:'s','bob'),
  ('14-1',3,9107,current_date,'approved','{}','[{"code":"cash_short_over","level":"red","amount":"-30"}]',:'s','carol'),
 -- 02-1 attendance: loc1 two sheets (same person twice), loc3 one
- ('02-1',1,9108,current_date,'approved','{"staff":[{"name":"Rahim","present":20,"absent":3,"late":2,"ot_hours":10},{"name":"Karim","present":"23","absent":0}]}','[]',:'s','st'),
- ('02-1',1,9109,current_date,'submitted','{"staff":[{"name":"Rahim","present":2,"absent":1,"ot_hours":"x"}]}','[]',:'s','st'),
+ ('02-1',1,9108,current_date,'approved','{"staff":[{"name":"TestK","present":20,"absent":3,"late":2,"ot_hours":10},{"name":"TestF","present":"23","absent":0}]}','[]',:'s','st'),
+ ('02-1',1,9109,current_date,'submitted','{"staff":[{"name":"TestK","present":2,"absent":1,"ot_hours":"x"}]}','[]',:'s','st'),
  ('02-1',3,9110,current_date,'approved','{"staff":[{"name":"Far","present":25,"absent":1}]}','[]',:'s','st');
 -- exceptions
 insert into exceptions (form_code,location_id,entry_date,flag_code,level,status,created_at,resolved_at) values
@@ -189,8 +189,8 @@ select tt.chk('T9 person x only loc3 (1 sheet)', (tt.run('cash_short_over','{"pr
 select tt.as(:'o');
 
 \echo == T10 attendance_summary
-select tt.chk('T10 Rahim: present 22 absent 4 late 2 ot 10 over two sheets (bad ot "x" skipped)', (select (r->>'present')::numeric=22 and (r->>'absent')::numeric=4 and (r->>'late')::numeric=2 and (r->>'ot_hours')::numeric=10 and (r->>'sheets')::int=2 from jsonb_array_elements(tt.run('attendance_summary','{"preset":"today"}')->'rows') r where r->>'person'='Rahim'));
-select tt.chk('T10 Karim text "23" read as 23', (select (r->>'present')::numeric from jsonb_array_elements(tt.run('attendance_summary','{"preset":"today"}')->'rows') r where r->>'person'='Karim')=23);
+select tt.chk('T10 TestK: present 22 absent 4 late 2 ot 10 over two sheets (bad ot "x" skipped)', (select (r->>'present')::numeric=22 and (r->>'absent')::numeric=4 and (r->>'late')::numeric=2 and (r->>'ot_hours')::numeric=10 and (r->>'sheets')::int=2 from jsonb_array_elements(tt.run('attendance_summary','{"preset":"today"}')->'rows') r where r->>'person'='TestK'));
+select tt.chk('T10 TestF text "23" read as 23', (select (r->>'present')::numeric from jsonb_array_elements(tt.run('attendance_summary','{"preset":"today"}')->'rows') r where r->>'person'='TestF')=23);
 select tt.chk('T10 by location: loc3 has Far only', (select (r->>'present')::numeric from jsonb_array_elements(tt.run('attendance_summary','{"preset":"today"}','location')->'rows') r where r->>'location_id'='3')=25);
 select tt.chk('T10 loc filter [3] -> only Far', (select count(*) from jsonb_array_elements(tt.run('attendance_summary','{"preset":"today","locations":[3]}')->'rows') r)=1);
 

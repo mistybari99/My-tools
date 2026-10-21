@@ -22,7 +22,7 @@ const base = C.baseData(SP), srv = C.serve(PORT);
   const toastTxt = async (p) => { await p.waitForTimeout(150); return p.textContent('#toast'); };
   const wait = (p, n = 300) => p.waitForTimeout(n);
   const hash = (p) => p.evaluate(() => location.hash);
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
 
   // ---------- list + filters ----------
   let p = await open({}, '#/purchase');

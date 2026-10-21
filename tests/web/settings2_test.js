@@ -13,7 +13,7 @@ data.tables.unit_conversions = [{ id: 1, item_id: null, from_unit: 'kg', to_unit
 data.tables.shelf_life_rules = [{ id: 11, item_id: null, category: null, season_label: null, start_month: null, start_day: null, end_month: null, end_day: null, value: 3, unit: 'days', active: true },
   { id: 12, item_id: I1.id, category: null, season_label: 'Winter', start_month: 11, start_day: 15, end_month: 2, end_day: 15, value: 5, unit: 'days', active: true }];
 data.tables.suppliers = [{ id: 'sp1', name: 'Dudh Ghor', mobile: '01711111111', type_code: 'milk', credit_days: 7, opening_balance: null, active: true }];
-data.tables.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'Rahim Uddin', status: 'active' }, { id: 'u2', staff_id: 'karim02', full_name: 'Karim', status: 'active' }];
+data.tables.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'TestK Uddin', status: 'active' }, { id: 'u2', staff_id: 'testf02', full_name: 'TestF', status: 'active' }];
 data.tables.user_grants = [{ id: 1, user_id: 'u2', grant_code: 'view_cost', location_id: null, valid_until: null, note: null }];
 data.tables.roles = [{ code: 'owner', name_bn: 'মালিক', name_en: 'Owner', active: true, sort: 1 }, { code: 'showroom_manager', name_bn: 'শোরুম ম্যানেজার', name_en: 'Showroom manager', active: true, sort: 2 }];
 data.tables.rule_grants = []; data.tables.grant_defs = [{ grant_code: 'view_cost', module: 'cost', sort: 20, label_bn: 'কস্ট', label_en: 'cost' }];

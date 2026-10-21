@@ -126,7 +126,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await noOverflow(p, 'list'); await p.close();
 
   // ---------- non-owner: requests, no lock ----------
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   await p.click('.p2-row:has-text("I-001") .im-dots'); await wait(p, 250);
   ok(!(await menuHas(p, 'im_lock')) && await menuHas(p, 'im_hide'), 'staff: no Lock, but Hide');
   await p.click('.sheet [data-act=im_hide]'); await wait(p, 300); ok(/approval/i.test(await p.textContent('#toast')), 'staff change = sent for approval: ' + await p.textContent('#toast')); await p.close();
@@ -148,7 +148,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.selectOption('#im_type', 'raw_material'); await wait(p, 100); ok(await p.locator('#im_sell_f.on').count() === 0 && (await p.getAttribute('#im_sell_f', 'disabled')) !== null, 'raw material: for-sale off and fixed');
   await noOverflow(p, 'form'); await p.close();
   // edit a locked item as staff -> notice
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items/edit/' + base.tables.items[2].id);
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items/edit/' + base.tables.items[2].id);
   ok(/locked/i.test(await p.textContent('#im_form')), 'locked item: the form says it is locked'); await p.close();
 
   // ---------- import page ----------

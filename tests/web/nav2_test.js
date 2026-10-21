@@ -63,17 +63,17 @@ const EXTRA_NAV = `(function(){ const real = window.supabase.createClient; windo
   await p.close();
 
   // ---------- drawer search ----------
-  const cust = [{ id: 'c1', name: 'Karim Store', mobile: '01711000001' }, { id: 'c2', name: 'Jamal Mistan', mobile: '01811000002' }];
+  const cust = [{ id: 'c1', name: 'TestF Store', mobile: '01711000001' }, { id: 'c2', name: 'TestE Mistan', mobile: '01811000002' }];
   p = await open({ customers: cust }, '#/home');
   const item = base.tables.items[0]; const frag = String(item.name_en || item.code).slice(0, 4);
   await p.click('header.top [data-act=nav_open]'); await wait(p, 400);
   await p.fill('#nav_q', frag); await wait(p, 120);
   await wait(p, 900);
   ok(await p.locator('#nav_body .dr-it[data-v^="items/edit/"]').count() >= 1, 'item hit "' + frag + '" is listed and opens its edit page');
-  await p.fill('#nav_q', 'jamal'); await wait(p, 900);
-  ok(await p.locator('#nav_body .dr-it[data-v=dues]').count() === 1 && /Jamal Mistan/.test(await p.textContent('#nav_body')), 'customer hit by name');
+  await p.fill('#nav_q', 'teste'); await wait(p, 900);
+  ok(await p.locator('#nav_body .dr-it[data-v=dues]').count() === 1 && /TestE Mistan/.test(await p.textContent('#nav_body')), 'customer hit by name');
   await p.fill('#nav_q', '0171100'); await wait(p, 900);
-  ok(/Karim Store/.test(await p.textContent('#nav_body')) && !/Jamal/.test(await p.textContent('#nav_body')), 'customer hit by mobile fragment');
+  ok(/TestF Store/.test(await p.textContent('#nav_body')) && !/TestE/.test(await p.textContent('#nav_body')), 'customer hit by mobile fragment');
   await p.fill('#nav_q', '10-2'); await wait(p, 900);
   ok(await p.locator('#nav_body .dr-it[data-v="form/10-2"]').count() === 1, 'form hit by code');
   await p.fill('#nav_q', 'k'); await wait(p, 600);

@@ -104,7 +104,7 @@ const IT = base.tables.items;
   await p.click('[data-act=py_voidref]'); await wait(p, 300); await p.click('[data-act=py_voidrefgo]'); await wait(p, 150); ok(/Write the reason/.test(await toastTxt(p)), 'void needs a reason'); await p.fill('#vn_note', 'typo'); await p.click('[data-act=py_voidrefgo]'); await wait(p, 400);
   const vr = await calls(p, 'void_supplier_refund'); ok(vr.length === 1 && vr[0].p_id === 9 && vr[0].p_note === 'typo', 'void_supplier_refund call'); await p.close();
   // no permission: lock row instead of a button
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
   p = await open({ init: NO, m: { levels, credits, sled, grants: ['purchase_entry'], ctx: { locations: [1], roles: ['management'] }, summary: { total_payable: 0, suppliers_owed: 0, overdue: 0, overdue_suppliers: 0, oldest: null, credit_total: 500 }, dues: [] } }, '#/payables');
   await p.click('#py_credits .card'); await wait(p, 500); ok(await p.locator('[data-act=py_refund_open]').count() === 0 && await p.locator('.sheet .s2-lockrow').count() >= 1, 'refund locked without supplier_pay'); await p.close();
   // detail bar

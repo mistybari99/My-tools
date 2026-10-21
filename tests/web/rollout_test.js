@@ -109,9 +109,9 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   c = await calls(p, 'save_entry'); ok(c.length === 1 && c[0].p_meta && !('entered_later' in c[0].p_meta) && c[0].p_meta.client_id, 'plain entry: only a client id in the meta'); await p.context().close();
 
   // ---------- locked entry: request change + revision history ----------
-  const ent = { id: 'a1', form_code: '10-2', location_id: 1, serial: 7, entry_date: '2026-10-05', status: 'approved', data: { lines: [{ amount: '100', head: 'staff_meal', receipt: 'yes' }], cash_now: '500', receipts_total: '100', drawer_untouched: true }, flags: [], check_data: {}, created_by: 'u2', created_staff: 'karim02', rev_no: 2, entered_later: false };
+  const ent = { id: 'a1', form_code: '10-2', location_id: 1, serial: 7, entry_date: '2026-10-05', status: 'approved', data: { lines: [{ amount: '100', head: 'staff_meal', receipt: 'yes' }], cash_now: '500', receipts_total: '100', drawer_untouched: true }, flags: [], check_data: {}, created_by: 'u2', created_staff: 'testf02', rev_no: 2, entered_later: false };
   const revs = [{ rev_no: 2, current: true, data: { lines: [{ amount: '100' }] }, at: '2026-10-06T10:00:00Z', changed_staff: null, approved_staff: 'owner1', reason: null },
-    { rev_no: 1, current: false, data: { lines: [{ amount: '90' }] }, at: '2026-10-06T10:00:00Z', changed_staff: 'karim02', approved_staff: 'owner1', reason: 'typo in amount' }];
+    { rev_no: 1, current: false, data: { lines: [{ amount: '90' }] }, at: '2026-10-06T10:00:00Z', changed_staff: 'testf02', approved_staff: 'owner1', reason: 'typo in amount' }];
   p = await open({ entries: [ent], w: { revs } }, '#/entry/a1');
   ok(await p.locator('#e_rev_chip').count() === 1, 'revision chip on a revised entry');
   ok(await p.locator('[data-act=e_save]').count() === 0, 'locked: no save button');
@@ -133,9 +133,9 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   p = await open({ entries: [{ ...ent, id: 'd1', status: 'draft', rev_no: 1 }] }, '#/entry/d1'); await p.click('[data-act=e_menu]').catch(() => {}); ok(!/Request change/.test(await p.textContent('#app')), 'a draft has no request-change item'); await p.context().close();
 
   // ---------- change requests inbox ----------
-  const reqs = [{ id: 1, entry_id: 'a1', base_rev: 2, requested_by: 'u2', requested_staff: 'karim02', reason: 'amount typed wrong', patch: { data: { lines: [{ amount: '150', head: 'staff_meal', receipt: 'yes' }], cash_now: '500' } }, status: 'pending', created_at: '2026-10-11T09:00:00Z' },
+  const reqs = [{ id: 1, entry_id: 'a1', base_rev: 2, requested_by: 'u2', requested_staff: 'testf02', reason: 'amount typed wrong', patch: { data: { lines: [{ amount: '150', head: 'staff_meal', receipt: 'yes' }], cash_now: '500' } }, status: 'pending', created_at: '2026-10-11T09:00:00Z' },
     { id: 2, entry_id: 'a1', base_rev: 1, requested_by: 'u1', requested_staff: 'owner1', reason: 'my own ask', patch: { data: { cash_now: '600' } }, status: 'pending', created_at: '2026-10-11T10:00:00Z' },
-    { id: 3, entry_id: 'a1', base_rev: 1, requested_by: 'u2', requested_staff: 'karim02', reason: 'old one', patch: { data: {} }, status: 'rejected', decision_note: 'no', created_at: '2026-10-01T10:00:00Z' }];
+    { id: 3, entry_id: 'a1', base_rev: 1, requested_by: 'u2', requested_staff: 'testf02', reason: 'old one', patch: { data: {} }, status: 'rejected', decision_note: 'no', created_at: '2026-10-01T10:00:00Z' }];
   p = await open({ entries: [ent], reqs }, '#/changes');
   ok(await p.locator('#ch_list [data-req]').count() === 2, 'pending tab: two waiting');
   ok(/lines\.0\.amount: 100 → 150/.test(await p.textContent('[data-req="1"]')), 'shows what changes');

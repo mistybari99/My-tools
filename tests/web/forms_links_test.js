@@ -12,8 +12,8 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
  const L2 = window.__L2 = Object.assign({ prob: [{ entry_id: 'e1', form_code: '04-2', serial: 7, location_id: 1, entry_date: '2026-10-10', failed: 2, skipped: 1, first_reason: 'insufficient_stock' }],
    brand: [{ brand_code: 'islamiya', brand_bn: 'ইসলামিয়া', brand_en: 'ISLAMIYA', locations: 2, n: 10, revenue: 1000, discount: 50, void_n: 1, void_amt: 30, costed_rev: 800, cogs: 500, gross_profit: 300, gp_pct: 37.5 },
            { brand_code: 'misty_bari', brand_bn: 'মিষ্টি বাড়ি', brand_en: 'MISTY BARI', locations: 1, n: 4, revenue: 400, discount: 0, void_n: 0, void_amt: 0, costed_rev: 400, cogs: 100, gross_profit: 300, gp_pct: 75 }],
-   disc: [{ sale_id: 's1', location_id: 1, receipt: 12, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 150, discount_kind: 'percent', discount_input: 30, total: 350, seller_staff: 'karim02', approver_staff: 'owner1', approval: 'emergency', over_limit: true, customer: null },
-          { sale_id: 's2', location_id: 1, receipt: 11, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 50, discount_kind: 'amount', discount_input: 50, total: 450, seller_staff: 'karim02', approver_staff: null, approval: null, over_limit: false, customer: null }],
+   disc: [{ sale_id: 's1', location_id: 1, receipt: 12, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 150, discount_kind: 'percent', discount_input: 30, total: 350, seller_staff: 'testf02', approver_staff: 'owner1', approval: 'emergency', over_limit: true, customer: null },
+          { sale_id: 's2', location_id: 1, receipt: 11, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 50, discount_kind: 'amount', discount_input: 50, total: 450, seller_staff: 'testf02', approver_staff: null, approval: null, over_limit: false, customer: null }],
    sup: [{ supplier_id: 'sp1', name: 'Dudh Ghor', balance: 600 }] }, window.__L20 || {});
  const OWN = ['ledger_post_problems', 'entry_post_ledger_retry', 'set_rule', 'forms_ledger_cfg_set', 'brand_pnl', 'discounts_report', 'report_catalog', 'report_presets'];
  c.rpc = async (fn, args) => { if (!OWN.includes(fn) || (fn === 'set_rule' && args.p_key !== 'forms_post_to_ledger')) return rpc(fn, args); M.calls.push([fn, clone(args || {})]);
@@ -94,7 +94,7 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
   await p.click('[data-act=lk_retry]'); await wait(p, 400); const rt = await calls(p, 'entry_post_ledger_retry'); ok(rt.length === 1 && rt[0].p_entry === 'e1', 'retry sent for the entry'); ok(await p.locator('[data-act=lk_retry]').count() === 0 && /No problems/.test(await p.textContent('#app')), 'list refreshed');
   await p.close();
   // non-owner: buttons disabled
-  p = await open({ on: true, init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};', m: { ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/ledgerlinks');
+  p = await open({ on: true, init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};', m: { ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/ledgerlinks');
   ok(await p.locator('[data-act=lk_set][disabled]').count() === 12, 'non-owner cannot change the switches'); await p.close();
 
   // ---- brand P&L ----

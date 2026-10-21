@@ -53,13 +53,13 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     T.entries = [{ id: 'q1', form_code: '10-2', serial: 1, entry_date: '2026-10-12', status: 'submitted', location_id: 1, data: {}, flags: [] }, { id: 'w1', form_code: '02-2', serial: 4, entry_date: '2026-10-11', status: 'draft', location_id: 1, data: {}, flags: [] }];
     const emp = (id, n, bn, en, st) => ({ employee_id: id, employee_no: n, name_bn: bn, name_en: en, status: st || 'absent', rest_minutes: null, mark_source: null, pending: false, is_me: false, person_locked: false, role: 'salesperson', evidence: [] });
     const A2 = {
-      me: o.me || { employee: true, employee_id: 'e5', name_bn: 'সালমা', name_en: 'Salma', can_punch: true, state: 'ok', evidence: [], last_punch: null, geo_check_on: true },
-      board: { day: '2026-10-13', location_id: 1, rows: [emp('e1', 'E01', 'করিম', 'Karim'), Object.assign(emp('e11', 'E11', 'ম্যানেজার', 'Manager Emp', 'present'), { is_me: true })] },
-      staff: { location_id: 1, self_punch_master: true, rows: [Object.assign(emp('e1', 'E01', 'করিম', 'Karim'), { evidence: [{ id: 1, kind: 'finger_device' }] }), emp('e5', 'E05', 'সালমা', 'Salma')], role_locks: [] },
+      me: o.me || { employee: true, employee_id: 'e5', name_bn: 'সালমা', name_en: 'TestM', can_punch: true, state: 'ok', evidence: [], last_punch: null, geo_check_on: true },
+      board: { day: '2026-10-13', location_id: 1, rows: [emp('e1', 'E01', 'করিম', 'TestF'), Object.assign(emp('e11', 'E11', 'ম্যানেজার', 'Manager Emp', 'present'), { is_me: true })] },
+      staff: { location_id: 1, self_punch_master: true, rows: [Object.assign(emp('e1', 'E01', 'করিম', 'TestF'), { evidence: [{ id: 1, kind: 'finger_device' }] }), emp('e5', 'E05', 'সালমা', 'TestM')], role_locks: [] },
       count: { location_id: 1, month: '2026-09-01', primary: 'a', counted: 'attendance_record', path_a_has_month: true, a_open: true, b_open: true, mismatches: 1,
         forms: [{ entry_id: 'f1', serial: 1, status: 'submitted', is_shadow: true }, { entry_id: 'f2', serial: 2, status: 'submitted', is_shadow: false }],
-        rows: [{ employee_id: 'e1', name_bn: 'করিম', name_en: 'Karim', employee_no: 'E01', mismatch: true, device: { present: 2, late: 0, absent: 1, ot_hours: 2 }, form: { present: 5, late: 0, absent: 0, ot_hours: 0 } },
-               { employee_id: 'e5', name_bn: 'সালমা', name_en: 'Salma', employee_no: 'E05', mismatch: false, device: { present: 3, late: 1, absent: 0, ot_hours: 0 }, form: { present: 3, late: 1, absent: 0, ot_hours: 0 } }] },
+        rows: [{ employee_id: 'e1', name_bn: 'করিম', name_en: 'TestF', employee_no: 'E01', mismatch: true, device: { present: 2, late: 0, absent: 1, ot_hours: 2 }, form: { present: 5, late: 0, absent: 0, ot_hours: 0 } },
+               { employee_id: 'e5', name_bn: 'সালমা', name_en: 'TestM', employee_no: 'E05', mismatch: false, device: { present: 3, late: 1, absent: 0, ot_hours: 0 }, form: { present: 3, late: 1, absent: 0, ot_hours: 0 } }] },
       eq: { q1: { form: '10-2', supported: true, ok: false, recomputed: { total: 500, imprest_diff: -200 }, mismatches: [{ code: 'imprest_mismatch', kind: 'flag_missing', recomputed: -200, stored: null }], observations: [] },
             w1: { form: '02-2', supported: true, ok: true, recomputed: { t_net: 1600 }, mismatches: [], observations: [{ code: 'receipts_vs_net', receipts_total: 2100, sheet_net: 1600 }] } } };
     const m0 = o.staff ? { grants: [], ctx: { is_owner: false, roles: ['salesperson'], locations: [1] } } : {};
@@ -88,7 +88,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('[data-act=a2_punch][data-v=in]'); await wait(p, 400);
   ok(/locked self punch/.test(await text(p)), 'friendly text when the owner locked self punch');
   await noOverflow(p, 'me');
-  p = await open('#/attend2', { me: { employee: true, employee_id: 'e5', name_bn: 'সালমা', name_en: 'Salma', can_punch: false, state: 'self_punch_locked', evidence: [], geo_check_on: false } });
+  p = await open('#/attend2', { me: { employee: true, employee_id: 'e5', name_bn: 'সালমা', name_en: 'TestM', can_punch: false, state: 'self_punch_locked', evidence: [], geo_check_on: false } });
   t = await text(p); ok(/locked self punch/.test(t) && await p.locator('[data-act=a2_punch]').count() === 0, 'locked person sees why and has no punch buttons');
 
   // ---------- mark others + client-id outbox ----------
@@ -137,7 +137,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   // ---------- staff and locks ----------
   p = await open('#/attend2');
   await p.click('[data-act=a2_tab][data-v=staff]'); await wait(p, 600);
-  t = await text(p); ok(/Karim/.test(t) && /finger \(device\)/.test(t) && /Master switch app_punch_on: ON/.test(t), 'people with evidence chips and the master switch state');
+  t = await text(p); ok(/TestF/.test(t) && /finger \(device\)/.test(t) && /Master switch app_punch_on: ON/.test(t), 'people with evidence chips and the master switch state');
   await p.click('[data-act=a2_lockp][data-v=e5]'); await wait(p, 500);
   c = await calls(p, 'att_self_lock_set'); ok(c.length === 1 && c[0].p_scope === 'person' && c[0].p_ref === 'e5' && c[0].p_locked === true, 'person lock sent');
   ok(/Self-punch lock: Locked/.test(await text(p)), 'lock shown after reload');

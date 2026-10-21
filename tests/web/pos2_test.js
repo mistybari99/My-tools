@@ -48,7 +48,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('#cart_ok'); log('no mobile ->', await toast());
   await p.fill('#cu_mobile', '+880 1712-345678'); await p.waitForTimeout(500);
   log('new customer name field:', await p.locator('#cu_name').count());
-  await p.fill('#cu_name', 'Karim'); await p.screenshot({ path: SP + '/q_wholesale.png' });
+  await p.fill('#cu_name', 'TestF'); await p.screenshot({ path: SP + '/q_wholesale.png' });
   await p.click('#cart_ok'); await p.waitForTimeout(500);
   const L1 = await p.evaluate(() => window.__LAST); log('wholesale sent:', JSON.stringify({ type: L1.p_sale_type, mobile: L1.p_customer_mobile, name: L1.p_customer_name, pay: L1.p_payments }));
   log('toast:', await toast());

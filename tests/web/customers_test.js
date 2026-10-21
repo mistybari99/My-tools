@@ -9,11 +9,11 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const MON = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' }).slice(5, 7);
 const EXTRA43 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x)); const W = window.__W43 = window.__W43 || { err: {}, dup: false, dry: { dry: true, count: 2, changes: [
-   { customer_id: 'c2', name: 'Karim', mobile: '01722222222', from_code: 'walkin', to_code: 'silver', direction: 'up', spend: 1200, orders: 1 }, { customer_id: 'c3', name: 'Salma', mobile: '01733333333', from_code: 'silver', to_code: 'gold', direction: 'up', spend: 6000, orders: 3 }] } };
+   { customer_id: 'c2', name: 'TestF', mobile: '01722222222', from_code: 'walkin', to_code: 'silver', direction: 'up', spend: 1200, orders: 1 }, { customer_id: 'c3', name: 'TestM', mobile: '01733333333', from_code: 'silver', to_code: 'gold', direction: 'up', spend: 6000, orders: 3 }] } };
  const D = T.__dir = T.__dir || [
   { id: 'c1', mobile: '01711111111', name: 'Rafiq', type: 'retail', active: true, tier_id: 4, tier_locked: true, birthday: '1990-${MON}-10', anniversary: null, address: 'Dhaka', whatsapp: null, note: null, credit_limit: 5000, customer_since: '2026-01-01', balance: 350, spend: 6000, orders: 3, last_sale: '2026-10-10', points: 40 },
-  { id: 'c2', mobile: '01722222222', name: 'Karim', type: 'retail', active: true, tier_id: 1, tier_locked: false, birthday: null, anniversary: null, address: null, whatsapp: null, note: null, credit_limit: null, customer_since: '2026-05-01', balance: 0, spend: 1200, orders: 1, last_sale: '2026-09-01', points: 0 },
-  { id: 'c3', mobile: '01733333333', name: 'Salma', type: 'wholesale', active: true, tier_id: 3, tier_locked: false, birthday: '1985-01-02', anniversary: null, address: null, whatsapp: null, note: null, credit_limit: null, customer_since: '2026-03-01', balance: 0, spend: 6000, orders: 3, last_sale: null, points: 5 },
+  { id: 'c2', mobile: '01722222222', name: 'TestF', type: 'retail', active: true, tier_id: 1, tier_locked: false, birthday: null, anniversary: null, address: null, whatsapp: null, note: null, credit_limit: null, customer_since: '2026-05-01', balance: 0, spend: 1200, orders: 1, last_sale: '2026-09-01', points: 0 },
+  { id: 'c3', mobile: '01733333333', name: 'TestM', type: 'wholesale', active: true, tier_id: 3, tier_locked: false, birthday: '1985-01-02', anniversary: null, address: null, whatsapp: null, note: null, credit_limit: null, customer_since: '2026-03-01', balance: 0, spend: 6000, orders: 3, last_sale: null, points: 5 },
   { id: 'c4', mobile: '01744444444', name: 'OldMan', type: 'retail', active: false, tier_id: 1, tier_locked: false, birthday: null, anniversary: null, address: null, whatsapp: null, note: null, credit_limit: null, customer_since: '2025-01-01', balance: 0, spend: 0, orders: 0, last_sale: null, points: 0 }];
  c.rpc = async (fn, args) => {
   (window.__AC43 = window.__AC43 || []).push([fn, clone(args || {})]);
@@ -25,7 +25,7 @@ const EXTRA43 = `(function(){ const real = window.supabase.createClient; window.
       spend: x.spend, orders: x.orders, orders_12m: x.orders, first_sale: '2026-02-01', last_sale: x.last_sale, avg_bill: x.orders ? x.spend / x.orders : null, balance: x.balance, points: x.points,
       history: [{ at: '2026-09-01T00:00:00Z', from_tier: 1, to_tier: 4, reason: 'manual', note: 'loyal for years', by: 'mgr2' }], gifts: [{ id: 'g0', text_bn: 'মিষ্টির বাক্স', text_en: 'Sweet box', value: 300, issued_at: '2026-08-01T00:00:00Z', valid_until: '2026-08-31', claimed_at: '2026-08-02T00:00:00Z' }], points_log: [],
       recent_sales: [{ id: 's1', receipt: 12, date: '2026-10-10', total: 2000, due: 350, status: 'done', loc: 1 }] }, error: null }; }
-  if (fn === 'customer_save') { if (W.dup) return { data: { dup: true, id: 'c2', name: 'Karim', active: true }, error: null };
+  if (fn === 'customer_save') { if (W.dup) return { data: { dup: true, id: 'c2', name: 'TestF', active: true }, error: null };
     if (!args.p_id) { const n = { id: 'cn' + D.length, mobile: args.p.mobile, name: args.p.name, type: args.p.type || 'retail', active: true, tier_id: 1, tier_locked: false, birthday: args.p.birthday || null, balance: 0, spend: 0, orders: 0, last_sale: null, points: 0 }; D.push(n); return { data: { id: n.id, mobile: n.mobile, name: n.name, dup: false }, error: null }; }
     const x = D.find((u) => u.id === args.p_id); if (x && 'active' in args.p) x.active = args.p.active; if (x && args.p.name) x.name = args.p.name; return { data: { id: args.p_id, dup: false }, error: null }; }
   if (fn === 'customer_set_tier') { const x = D.find((u) => u.id === args.p_customer); if (x) { x.tier_id = args.p_tier; x.tier_locked = args.p_lock !== false; } return { data: { id: args.p_customer, changed: true }, error: null }; }
@@ -80,11 +80,11 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
   let t = await text(p); ok(/Rafiq/.test(t) && /Gold/.test(t) && /Walk-in/.test(t) && /Silver/.test(t), 'names and tier chips'); ok(/Due ৳ 350/.test(t), 'due chip');
   ok(await p.locator('.cu-tier').first().evaluate((e) => getComputedStyle(e).color !== getComputedStyle(document.body).color || true), 'chip coloured');
   await noOverflow(p, 'customers'); await minTap(p, 'customers'); await p.screenshot({ path: SP + '/cu_list.png', fullPage: true });
-  await p.fill('#cu_q', '0172'); await wait(p, 200); ok(await p.locator('#cu_list .cu-row').count() === 1 && /Karim/.test(await text(p)), 'search by mobile');
+  await p.fill('#cu_q', '0172'); await wait(p, 200); ok(await p.locator('#cu_list .cu-row').count() === 1 && /TestF/.test(await text(p)), 'search by mobile');
   await p.fill('#cu_q', 'sal'); await wait(p, 200); ok(await p.locator('#cu_list .cu-row').count() === 1, 'search by name'); await p.fill('#cu_q', ''); await wait(p, 200);
   await p.evaluate(() => { document.querySelector('#cu_filters').open = true; });
   await setVal(p, '#cu_ftier', '4'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /Rafiq/.test(await text(p)), 'filter by tier'); await setVal(p, '#cu_ftier', '');
-  await setVal(p, '#cu_ftype', 'wholesale'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /Salma/.test(await text(p)), 'filter by type'); await setVal(p, '#cu_ftype', '');
+  await setVal(p, '#cu_ftype', 'wholesale'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /TestM/.test(await text(p)), 'filter by type'); await setVal(p, '#cu_ftype', '');
   await p.check('#cu_fdue'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /Rafiq/.test(await text(p)), 'filter: has a due'); await p.uncheck('#cu_fdue');
   await p.check('#cu_fbday'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /Rafiq/.test(await text(p)), 'filter: birthday this month'); await p.uncheck('#cu_fbday');
   await setVal(p, '#cu_fstat', 'inactive'); await wait(p, 150); ok(await p.locator('#cu_list .cu-row').count() === 1 && /OldMan/.test(await text(p)), 'filter: switched-off customers'); await setVal(p, '#cu_fstat', 'active');
@@ -153,7 +153,7 @@ const rule = (key, kind, def, value) => ({ key, module: 'customers', kind, value
   ok(await p.locator('[data-act=ti_active][data-v="1"]').count() === 0, 'the default tier has no retire button');
   await p.click('[data-act=ti_sw][data-k=loyalty_points_on]'); await wait(p, 400); c = await calls(p, 'set_rule'); ok(c.length === 1 && c[0].p_key === 'loyalty_points_on' && c[0].p_value === false, 'switch sent to set_rule');
   await p.fill('#nr_points_per_100_taka', '2'); await p.click('[data-act=ti_num][data-k=points_per_100_taka]'); await wait(p, 400); c = await calls(p, 'set_rule'); ok(c.slice(-1)[0].p_key === 'points_per_100_taka' && c.slice(-1)[0].p_value === 2, 'number sent to set_rule');
-  await p.click('[data-act=ti_dry]'); await wait(p, 400); t = await p.locator('#ti_dry').innerText(); ok(/2 customers would change tier/.test(t) && /Karim/.test(t) && /Salma/.test(t), 'dry-run list'); c = await calls(p, 'customer_tier_refresh'); ok(c.length === 1 && c[0].p_dry === true, 'dry run asked with p_dry=true');
+  await p.click('[data-act=ti_dry]'); await wait(p, 400); t = await p.locator('#ti_dry').innerText(); ok(/2 customers would change tier/.test(t) && /TestF/.test(t) && /TestM/.test(t), 'dry-run list'); c = await calls(p, 'customer_tier_refresh'); ok(c.length === 1 && c[0].p_dry === true, 'dry run asked with p_dry=true');
   ok(await p.locator('[data-act=ti_apply]').count() === 0 && /Turn/.test(t), 'apply is not offered while the automatic switch is OFF');
   p = await open('#/tiers', { autoOn: true }); await p.click('[data-act=ti_dry]'); await wait(p, 400); ok(await p.locator('[data-act=ti_apply]').count() === 1, 'apply offered once the switch is ON');
   await p.click('[data-act=ti_apply]'); await wait(p, 500); c = await calls(p, 'customer_tier_refresh'); ok(c.length === 2 && c[1].p_dry === false, 'apply runs the real refresh (after a confirm)');
