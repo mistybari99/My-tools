@@ -9,3 +9,8 @@
   h.setAttribute('data-fx', lite ? 'lite' : 'full');
   window.BOS_GLASS = { lite: lite, reasons: { motion: mq('(prefers-reduced-motion: reduce)'), transparency: mq('(prefers-reduced-transparency: reduce)'), noBackdrop: !sup(), lowMem: lowMem, lowCpu: lowCpu } };
 })();
+/* desktop layout flag (docs/DESKTOP_LAYOUT.md 4.2): html[data-layout] from localStorage.bos_layout. 'phone' forces the phone layout (desktop.css and the sidebar switch off), 'desktop' is kept for the rules, anything else = automatic by width.
+   Lives here, not in the inline theme script of index.html, because that script's hash is pinned in the CSP. */
+(function () {
+  try { var v = localStorage.getItem('bos_layout'); if (v === 'phone' || v === 'desktop') document.documentElement.setAttribute('data-layout', v); else document.documentElement.removeAttribute('data-layout'); } catch (e) { /* storage blocked: automatic */ }
+})();

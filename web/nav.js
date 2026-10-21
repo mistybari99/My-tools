@@ -319,6 +319,30 @@ function mount() {
   const bn = document.createElement('nav'); bn.className = 'bnav'; bn.id = 'bnav';
   document.body.append(sc, dr, bn); el.scrim = sc; el.drawer = dr; el.bnav = bn;
   if (!document.body.dataset.ui && store.get('bos_ui') !== 'off') document.body.dataset.ui = 'calm';
+  // desktop layout (docs/DESKTOP_LAYOUT.md 2.3): at >= 1024px the same drawer is a persistent sidebar (body.desk-sb, styled by desktop.css)
+  try {
+    deskMq = window.matchMedia('(min-width:1024px)');
+    const f = () => deskApply();
+    if (deskMq.addEventListener) deskMq.addEventListener('change', f); else if (deskMq.addListener) deskMq.addListener(f);
+    new MutationObserver(f).observe(document.documentElement, { attributes: true, attributeFilter: ['data-layout'] });   // bos_layout = phone switches the sidebar off at once
+  } catch (e) { /* no matchMedia: phone layout */ }
+  deskApply();
+}
+let deskMq = null, desk = false, deskLive = false;
+function deskApply() {
+  if (!el.drawer) return;
+  const want = !!(deskLive && deskMq && deskMq.matches && document.documentElement.getAttribute('data-layout') !== 'phone');
+  if (want === desk) return;
+  desk = want; document.body.classList.toggle('desk-sb', desk);
+  if (desk) {
+    el.drawer.setAttribute('role', 'navigation'); el.drawer.removeAttribute('aria-modal'); el.drawer.setAttribute('aria-label', T('menu'));
+    drawerOpen = true; el.drawer.classList.add('on'); el.scrim.classList.remove('on'); sig = '';
+    ensureStatic().then(() => { if (desk) renderDrawer(); }, () => {});
+  } else {
+    el.drawer.setAttribute('role', 'dialog'); el.drawer.setAttribute('aria-modal', 'true'); el.drawer.removeAttribute('aria-label');
+    drawerOpen = false; el.drawer.classList.remove('on'); el.scrim.classList.remove('on');
+  }
+  syncBnav();
 }
 const groupOpen = () => { if (!openGroups) { openGroups = jget('bos_navg_' + uid(), null); if (!openGroups) openGroups = { dash: true }; } return openGroups; };
 // ---------- theme control (Premium Dark / Premium Light / Classic): compact dropdown in the drawer footer and the Me sheet ----------
@@ -420,7 +444,7 @@ function dr_body() {
   }).join('');
 }
 function setDrawer(on) {
-  mount(); drawerOpen = on;
+  mount(); if (desk) on = true; drawerOpen = on;   // the desktop sidebar never closes
   el.scrim.classList.toggle('on', on); el.drawer.classList.toggle('on', on);
   syncBnav();
 }
@@ -433,17 +457,17 @@ async function openDrawer() {
   counts().then((c) => { if (drawerOpen) dr_body(); return c; }, () => {});
 }
 function closeDrawer() {
-  if (!drawerOpen) return;
+  if (!drawerOpen || desk) return;
   setDrawer(false);
   try { if (history.state && history.state.bosNav) history.back(); } catch (e) { /* ignore */ }
 }
 window.addEventListener('popstate', () => {
-  if (drawerOpen) setDrawer(false);                 // hardware Back: close the drawer first
+  if (drawerOpen && !desk) setDrawer(false);        // hardware Back: close the drawer first
   if (pendingRoute) { const r = pendingRoute; pendingRoute = null; location.hash = '#/' + r; }
 });
-window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen) setDrawer(false); syncBnav(); });
+window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen && !desk) setDrawer(false); syncBnav(); });
 document.addEventListener('keydown', (e) => {
-  if (!drawerOpen) return;
+  if (!drawerOpen || desk) return;   // desktop sidebar: no Esc close, no Tab trap
   if (e.key === 'Escape') { closeDrawer(); return; }
   if (e.key === 'Tab') {   // keep focus inside the drawer
     const f = [...el.drawer.querySelectorAll('button:not([disabled]),input')].filter((x) => x.offsetParent !== null || x === document.activeElement);
@@ -501,7 +525,7 @@ function crumb() {
 }
 let syncUid = null;
 function sync(live) {
-  mount();
+  mount(); deskLive = !!live; deskApply();
   const who0 = live ? uid() : null;
   if (who0 !== syncUid) { syncUid = who0; ITEMS_ALL = null; ITEMS_AT = 0; SR.items = []; SR.cust = []; SR.q = ''; CNT = null; }   // other person / logged out: no cached item list
   if (!live) { setDrawer(false); document.body.classList.remove('has-bnav'); return; }
