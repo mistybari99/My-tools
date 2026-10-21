@@ -59,7 +59,7 @@ Not changed: any web file (except `info.json`), any live database, any grant, an
 8. **DECIDED (D-02)** – Late sales (sold more than 2 minutes before the server receives them) under `stock_negative_mode = block` are NOT refused. They are kept, the stock can go negative, and a yellow `stock_negative` exception is written. Reproduced: 9 kg sold at 10 minutes old on 5 kg: accepted, stock -4, exception written. A fresh sale of the same quantity is refused.
 9. **TODO (needs client change)** – Phone clock skew: a phone whose clock is behind looks like a late sale and skips the block. The fix is a replay marker from the phone's offline queue (the POS sends `p_sold_at` and drops its queue time `_t` in `clean()`), plus a server rule that treats only marked replays as late. Not done: it changes the POS and the RPC signature.
 10. **REPRO, DECIDED (D-07)** – A sale at the receiving place while the goods are still in transit: reproduced (20 kg in transit, 5 kg sold at the receiving place: stock -5, `sale_out` posted) under the default `stock_negative_mode = warn`. Decision: no code change; the owner sets `block` (Settings, stock rules). Under `block` the same sale is refused.
-11. **TODO** – A very old offline sale re-dated to now (the `_w1b_late_sale` path, the 72 hour window): NOT REPRO yet; check first.
+11. **REPRO, OWNER decision** – A very old offline sale is re-dated to now. Checked on the local build (21 Oct): with the default `late_sale_policy` = `redate`, `_w1b_late_sale` accepts a sale made 100 hours before it reached the server (limit `pos_offline_hours` = 72) and returns NULL: the sale is re-dated to now, with no exception. Only `park` applies the 72-hour rule (held for the owner) and `redate_flag` writes a yellow exception. Which policy is right is the owner's choice (phase 89 default). Not changed.
 12. **TODO** – Combo / kit consumption, opening stock without batch sold last, count gain without batch, silent variance alert when tolerance is unset: NOT REPRO yet.
 13. **OWNER** – The live sale with no item id (audit F-10: 1 of 14 sale lines). Read-only check first (which receipt, which item name), then the owner decides whether to correct the record.
 14. **OWNER** – The 10 live sales (4,461 taka, no stock or journal trail). The audit asks whether they are real or test records. The owner answers; nothing is changed by the agent (audit F-10, F-11).
@@ -71,7 +71,7 @@ Not changed: any web file (except `info.json`), any live database, any grant, an
 17. **DONE-OFF (phase 499)** – Partial receipt in steps: `transfer_partial_on` lets the receipt come in parts. The transfer stays `sent` until all of it arrives or the owner runs `stock_close_transfer_short`. Reproduced: 20 sent, 8 received, second receipt returned `dup`, 12 kg stuck in transit for ever.
 18. **DONE-OFF (phase 499)** – Close the rest short: `stock_close_transfer_short` writes one `transit_short` exception and closes the transfer. Works only with item 17 on.
 19. **NOT REPRO (in this branch)** – `transit_short` GL mismatch (location-tagged accounting, "loss" mode): in this branch `transit_short` writes a stock exception only and posts no journal. The audit's GL mismatch belongs to the advanced branch's accounting. Check on the advanced branch before any fix.
-20. **TODO** – Different-user replay of a reused client id returns the first user's transfer id (audit A5 minor): NOT REPRO yet.
+20. **DONE-OFF (phase 544)** – Different-user replay of a reused client id. Reproduced on the local build: user A sends 5 kg with client id X; user B sends 7 kg with the same X and is answered `dup` with A's transfer id, B's 7 kg is not moved. Switch `transfer_client_reuse_block` (OFF): ON = refused with `client_id_reused`. The same user replaying its own id still gets `dup`. Tests: `phase544_test` 12/12 on a fresh local build, paste-twice clean; `phase499_test` 23/23. Owner: switch on after a test.
 21. **TODO** – Receiver notification when goods are sent; factory-to-branch statement (sent / received / short / in transit / sold / returned / wasted by branch and period). The statement is a report: design first.
 22. **TODO** – Return-to-factory as a dedicated document with reason and original transfer (today: a reverse transfer).
 
@@ -105,7 +105,7 @@ Not changed: any web file (except `info.json`), any live database, any grant, an
 42. **TODO (decision D-11)** – Overhead over- or under-absorption true-up is a report only. Decide the month-end journal rule before any code.
 43. **TODO** – Actual-yield loss is not a separate monetary variance; `std_cost` uses actual spend over theoretical output.
 44. **TODO** – Packaging allocation uses planned yield in one path (not actual yield).
-45. **TODO** – Today's purchase price comparison omits freight (landed cost is in the average separately).
+45. **TODO (owner decision: freight rule)** – Today's purchase price comparison omits freight. The check is defined in several overrides (`purchase_price_jump`: phases 508, 513, 515, 535, 537); landed cost is separate (phases 523, 524). Whether freight counts in "today's price" is a rule decision, not a code fix. Not changed.
 46. **OWNER** – `recipe_approval_required` is `off` and `production_requires_cost` is `warn` in the live audit. These are owner settings; not changed.
 
 ### 2.7 Stock tracking (audit F-10; scope 3)
@@ -153,6 +153,13 @@ Not changed: any web file (except `info.json`), any live database, any grant, an
 75. **OWNER** – If any old phase file (3 to 98, or any 300 to 477 file) is pasted again: paste 477 and 478 after it, then paste 499 and 501 to 505 again (they re-define some old functions).
 76. **OWNER** – Web upload: `web/data/info.json` changed (9 new entries, 7 `related` links). Upload it with the next web release (`docs/GO_LIVE.md` §3). No other web file changed in this branch.
 77. **OWNER** – Switch on each new behaviour only after a test in the owner's own use (each switch is in the rules table and in Settings, with its (i) text).
+
+### 2.12 Owner-visible items added on 21 Oct 2026
+
+78. **DONE (owner-visible) – Backup reliability.** Home > Backup (JSON download): one run at a time, progress shown, four tables read at once, the file kept for "save the file again" (a new tap), a Bengali message with a retry button when the run fails, and a notice naming any table that could not be read (the file is still saved without it). Cause and evidence: commit `36254db`, `web/app.js` (backup section), test `tests/web/backup_button_test.js` (5 taps, double tap, failure, partial, save again; 360 px). The browser's own download blocking was not reproduced headless; the owner should test on a phone (tap Backup five times; each run ends in a saved file or a message).
+79. **DEFERRED-BY-OWNER – Show or hide whole main features.** The owner has not decided. Recorded as deferred in `docs/DEMAND_VERIFY.md` (N4) and `docs/DESIGN_ROADMAP.md` section 2. The switch `ia_show_off_features` does NOT exist (no rule row, no read in `web/`); it is created only after the owner decides. Nothing implemented.
+
+80. **N11 pass (21 Oct 2026)** – Sweets TODO list: closed in code this pass: item 20 (phase 544). Checked and left as owner decisions: items 11 and 45 (see above). Left open, with reasons: 9 (needs a POS replay marker: a client and RPC change, not done here), 12 (combo and kit: several cases, each needs its own reproduction), 21 and 22 (design first), 25 (D-08, changes every report), 30 (design first), 32 (waits for the owner's due-list switch), 37 (VAT method: owner), 42 (D-11 month-end rule: owner), 43 and 44 (monetary variance and packaging basis: design, needs reproduction), 52 (daily sales-versus-stock check: not built).
 
 ## 3. Decisions made (and why)
 
