@@ -111,10 +111,10 @@ async function listSheet(bizId) {
   const r = await sb.rpc('business_places_list135', { p_business: Number(bizId) });
   if (r.error) return toast(eText(r.error));
   const rows = r.data || [];
-  openSheet(`<h3>${esc(T('places'))} · ${esc(nm(biz))}</h3><div class="stack" id="pl_rows">${rows.length ? rows.map((x) => `<div class="card" style="word-break:break-word;overflow-wrap:anywhere" data-loc="${esc(x.id)}">
+  openSheet(`<h3>${esc(T('places'))} · ${esc(nm(biz))}</h3><div class="stack" id="pl_rows">${rows.length ? B.locGroups.listHTML(rows, (x) => `<div class="card" style="word-break:break-word;overflow-wrap:anywhere" data-loc="${esc(x.id)}">
       <div class="row" style="flex-wrap:wrap;gap:6px;align-items:center"><b>${esc(lab(L(x.name_bn, x.name_en || x.name_bn, x.name_en || x.name_bn)))}</b><span class="muted">${esc(x.code)}</span><span class="chip">${esc(kindName(x.kind))}</span><span class="chip muted">${esc(x.status)}</span></div>
       ${x.unit_kind === 'branch' || x.unit_kind === 'site' ? `<div class="muted">${esc(T('inBranch'))}: ${esc(lab(L(x.unit_name_bn, x.unit_name_en || x.unit_name_bn, x.unit_name_en || x.unit_name_bn)))}</div>` : ''}
-      ${isOwner() ? `<button class="mini" style="min-height:40px" data-act="pl_move" data-v="${esc(x.id)}" data-biz="${esc(bizId)}" data-nm="${esc(x.name_en || x.name_bn)}">${esc(T('move'))}</button>` : ''}</div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`}
+      ${isOwner() ? `<button class="mini" style="min-height:40px" data-act="pl_move" data-v="${esc(x.id)}" data-biz="${esc(bizId)}" data-nm="${esc(x.name_en || x.name_bn)}">${esc(T('move'))}</button>` : ''}</div>`) : `<p class="muted">${esc(T('none'))}</p>`}
     <div class="row">${btn('closesheet', T('close'))}${btn('pl_add', T('addPlace'), `data-v="${esc(bizId)}"`, 'primary')}</div></div>`);
 }
 function moveSheet(loc, fromBiz, name) {

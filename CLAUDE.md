@@ -17,3 +17,4 @@
 - Every journal entry must balance (Dr = Cr). New behaviour is OFF or safe by default.
 - Every owner decision is a setting with a safe default; new behaviour starts only when the owner switches it on or from its effective-from date.
 - Register new screens only through `web/ia.js` (see `docs/IA_RULES.md`).
+- Printed form codes (NN-1, A-Z by English short name, owner decision 21 Oct 2026): the rule is `docs/FORM_SEQUENCE.md`. Change a code only through `tools/renumber.py` and a numbered phase, never by hand.

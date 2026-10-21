@@ -82,7 +82,7 @@ async function can(code) {
   const k = code + '|' + D.loc; if (k in D.can) return D.can[k];
   D.can[k] = await U.grant(code, D.loc); return D.can[k];
 }
-const locSel = (id) => `<select id="${id}" aria-label="${esc(T('place'))}">${LOCS().map((l) => `<option value="${l.id}" ${l.id === D.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+const locSel = (id) => `<select id="${id}" aria-label="${esc(T('place'))}">${B.locGroups.optionsHTML(LOCS(), D.loc, nm)}</select>`;
 const empName = (e) => (S.lang === 'en' && (e.full_name_en || e.name_en) ? (e.full_name_en || e.name_en) : (e.full_name_bn || e.name_bn || ''));
 async function loadEmps() {
   const r = await sb.from('employees').select('id,employee_no,full_name_bn,full_name_en,primary_location_id,status,device_user_id,photo_path,profile_id').in('status', ['active', 'on_leave']).order('employee_no');

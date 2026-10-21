@@ -158,7 +158,7 @@ if (!document.getElementById('a2css')) document.head.appendChild(css);
 
 const D = { tab: 'me', loc: null, day: today(), month: today().slice(0, 7), me: null, board: null, staff: null, count: null, can: {}, ev: null, geo: false };
 const tabsHTML = (list) => `<div class="ptabs" role="tablist">${list.map(([k, l]) => `<button role="tab" data-act="a2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}</button>`).join('')}</div>`;
-const locSel = () => `<select id="a2_loc" aria-label="${esc(T('place'))}">${LOCS().map((l) => `<option value="${l.id}" ${l.id === D.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+const locSel = () => `<select id="a2_loc" aria-label="${esc(T('place'))}">${B.locGroups.optionsHTML(LOCS(), D.loc, nm)}</select>`;
 const limitsBox = () => `<details data-ctl="off" class="card"><summary>${esc(T('limitsT'))}</summary><p class="a2-lim">${esc(T('limits'))}</p></details>`;
 async function grant(code) {
   if (S.ctx.is_owner) return true; const k = code + '|' + D.loc; if (k in D.can) return D.can[k];

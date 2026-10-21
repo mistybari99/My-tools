@@ -90,7 +90,7 @@ function draw() {
   shell(T('title'), `<div class="row between"><b>${D.locs.length}</b><button class="primary" data-act="lo_wiz">${esc(T('add'))}</button></div>
     <input id="lo_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(D.q)}">
     <div class="row wrap" id="lo_chips" data-ctl="select">${['all', ...STATUSES].map((s) => `<button class="tog ${D.f === s ? 'on' : ''}" data-act="lo_filter" data-v="${s}">${esc(T(s))} ${cnt(s)}</button>`).join('')}</div>
-    <div id="lo_list">${rows.length ? rows.map(card).join('') : `<p class="muted">${esc(T('noLoc'))}</p>`}</div>`, 'control');
+    <div id="lo_list">${rows.length ? B.locGroups.listHTML(rows, card) : `<p class="muted">${esc(T('noLoc'))}</p>`}</div>`, 'control');
 }
 function card(l) {
   const si = stepsInfo(l.id), pending = l.status === 'planned' || l.status === 'setting_up';
@@ -101,7 +101,7 @@ function card(l) {
     <div class="row wrap" style="gap:6px;margin-top:4px"><span class="chip ${TONE[l.status] || ''}">${esc(T(l.status))}</span>${l.hub_functions ? `<span class="chip info">${esc(T('hubchip'))}</span>` : ''}${l.is_active ? '' : `<span class="chip">${esc(T('inactive'))}</span>`}${sup}${pending && si.total ? `<span class="chip warn">${si.n}/${si.total} ${esc(T('done_of'))}</span>` : ''}</div>${why}</div>
     <button class="mini" data-act="lo_menu" data-v="${l.id}" aria-label="${esc(T('more'))}">⋮</button></div>`;
 }
-document.addEventListener('input', (e) => { if (e.target && e.target.id === 'lo_q' && /^#\/locations/.test(location.hash)) { D.q = e.target.value; const box = $('#lo_list'); if (box) { const q = D.q.trim().toLowerCase(); const rows = D.locs.filter((l) => (D.f === 'all' || l.status === D.f) && (!q || (l.code + ' ' + (l.name_bn || '') + ' ' + (l.name_en || '') + ' ' + (l.name_mix || '')).toLowerCase().includes(q))); box.innerHTML = rows.length ? rows.map(card).join('') : `<p class="muted">${esc(T('noLoc'))}</p>`; } } });
+document.addEventListener('input', (e) => { if (e.target && e.target.id === 'lo_q' && /^#\/locations/.test(location.hash)) { D.q = e.target.value; const box = $('#lo_list'); if (box) { const q = D.q.trim().toLowerCase(); const rows = D.locs.filter((l) => (D.f === 'all' || l.status === D.f) && (!q || (l.code + ' ' + (l.name_bn || '') + ' ' + (l.name_en || '') + ' ' + (l.name_mix || '')).toLowerCase().includes(q))); box.innerHTML = rows.length ? B.locGroups.listHTML(rows, card) : `<p class="muted">${esc(T('noLoc'))}</p>`; } } });
 
 // ---------- ⋮ menu ----------
 const mbtn = (act, label, attrs) => `<button class="full" style="margin-top:8px;text-align:left" data-act="${act}" ${attrs || ''}>${esc(label)}</button>`;
