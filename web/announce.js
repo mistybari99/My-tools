@@ -2,7 +2,7 @@
    What it does: the owner (or a person he designates with the grant announce_post) posts a message to everyone, a role, a place or one person, with a start and an
    expiry time and an urgent flag. People it is addressed to see a slim scrolling headline bar at the top of every screen; tap it to read the full text and press
    "I have read this" (a read receipt the poster can see). With no active announcement for the viewer the bar is not drawn at all.
-   Switch: announce_on (rules, OFF by default). OFF = no bar, no request to the server, no menu entry; the screen only says it is off.
+   Switch: announce_on (rules, OFF by default). OFF = no bar, no request to the server; the menu entry stays visible to the owner and the grant holder and the screen says it is off.
    Server: supabase/phase130.sql (r2_announce_state / _post / _active / _seen / _mine / _receipts / _withdraw). The server is the authority on who may post and who may see.
    Motion: the bar scrolls slowly; it pauses on touch / hover / focus and with its own pause button; with prefers-reduced-motion it is a static one-line headline
    (the first item and "+N") and the full list is one tap away.
@@ -16,7 +16,7 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
   title: L('ঘোষণা ও নির্দেশ', 'Announcements', 'Announcements (ঘোষণা)'), bar: L('ঘোষণা', 'Announcements', 'ঘোষণা'),
-  off: L('ঘোষণা এখন বন্ধ আছে। মালিক সেটিংসে "ঘোষণা চালু" করলে এটি কাজ করবে।', 'Announcements are switched off. The owner can switch them on in Settings (announce_on).', 'Announcements এখন বন্ধ। মালিক Settings-এ "announce_on" চালু করলে কাজ করবে।'),
+  off: L('ঘোষণা এখন বন্ধ আছে। মালিক সেটিংসে "ঘোষণা চালু" করলে এটি কাজ করবে।', 'Off: announcements are switched off. Turn on in Settings (announce_on). Nothing is lost; the bar and the posting start when it is ON.', 'Announcements এখন বন্ধ। মালিক Settings-এ "announce_on" চালু করলে কাজ করবে।'),
   nofn: L('এই সুবিধা এখনো সার্ভারে বসানো হয়নি (phase130)।', 'The server does not have this yet (phase130).', 'এটি এখনো server-এ বসানো হয়নি (phase130)।'),
   nowon: L('এখন চলছে', 'On now', 'এখন চলছে'), none: L('এখন আপনার জন্য কোনো ঘোষণা নেই।', 'No announcement for you right now.', 'এখন আপনার জন্য কোনো ঘোষণা নেই।'),
   seenBtn: L('পড়েছি', 'I have read this', 'পড়েছি (Seen)'), seenDone: L('পড়েছেন', 'Read', 'পড়েছেন'), urgent: L('জরুরি', 'Urgent', 'জরুরি'),

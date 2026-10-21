@@ -3,7 +3,7 @@
    priority, optional repeat (daily / weekly). The person sees ONLY his own list (and a small card on Home when it is not empty): he marks a task Done (note optional) or
    "Cannot do" (reason required). Whoever gave a task sees everything he gave, with the status and notes; overdue tasks are highlighted. A task given to a role becomes
    one task for each person who holds that role at that moment.
-   Switches: todo_on (OFF by default: no card, no menu entry, no request) and todo_repeat_on (OFF: the repeat field is not shown and the server refuses it).
+   Switches: todo_on (OFF by default: no card, no request; the entry stays visible to the owner and the grant holder) and todo_repeat_on (OFF: the repeat field is not shown and the server refuses it).
    Server: supabase/phase131.sql (r2_todo_state / _assign / _mine / _given / _set / _manage). The server is the authority; the screen only guides.
    Home hook (docs/integration/R2.md): nav.js home() adds <div id="hv_todo"></div> and calls BOS.todo.mount(el). UNVERIFIED on a real phone and a real Supabase project. */
 (() => {
@@ -14,7 +14,7 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
   title: L('করণীয় তালিকা', 'To-do list', 'To-do list (করণীয়)'), card: L('আমার করণীয়', 'My to-do', 'আমার To-do'),
-  off: L('করণীয় তালিকা এখন বন্ধ আছে। মালিক সেটিংসে "করণীয় তালিকা চালু" করলে এটি কাজ করবে।', 'The to-do list is switched off. The owner can switch it on in Settings (todo_on).', 'To-do list বন্ধ। মালিক Settings-এ "todo_on" চালু করলে কাজ করবে।'),
+  off: L('করণীয় তালিকা এখন বন্ধ আছে। মালিক সেটিংসে "করণীয় তালিকা চালু" করলে এটি কাজ করবে।', 'Off: the to-do list is switched off. Turn on in Settings (todo_on). Nothing is lost; tasks start when it is ON.', 'To-do list বন্ধ। মালিক Settings-এ "todo_on" চালু করলে কাজ করবে।'),
   nofn: L('এই সুবিধা এখনো সার্ভারে বসানো হয়নি (phase131)।', 'The server does not have this yet (phase131).', 'এটি এখনো server-এ বসানো হয়নি (phase131)।'),
   mine: L('আমার', 'Mine', 'আমার'), given: L('আমি দিয়েছি', 'I gave', 'আমি দিয়েছি'), allGiven: L('সবার দেওয়া', 'All given', 'সবার দেওয়া'),
   none: L('এখন আপনার কোনো করণীয় নেই।', 'Nothing to do right now.', 'এখন কোনো করণীয় নেই।'), noneGiven: L('এখনো কাউকে কাজ দেননি।', 'You have not given any task yet.', 'এখনো কাউকে কাজ দেননি।'),

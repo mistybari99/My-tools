@@ -4,7 +4,7 @@
    template, an off-day or a leave / swap note; copy last week; shift templates (name, start, end, place); and a report that compares the roster with what attendance
    recorded (read only; shown only when the server has attendance data).
    Reuses the existing tables: templates = shifts, the weekly pattern = employee_shift_assignments, holidays, approved leave, attendance_days. This file writes only through r2_* functions.
-   Switches: shift_on (OFF by default: no menu entry, no request, the page says it is off), shift_mates_on (ON; only matters when shift_on is ON).
+   Switches: shift_on (OFF by default: entry stays visible to the owner and the grant holder, no request, the page says it is off), shift_mates_on (ON; only matters when shift_on is ON).
    Server: supabase/phase132.sql. The server is the authority on who may schedule. UNVERIFIED on a real phone and a real Supabase project. */
 (() => {
 'use strict';
@@ -14,7 +14,7 @@ const L = B.L, lab = B.lab;
 const $ = (s, el = document) => el.querySelector(s);
 const X = {
   title: L('শিফট রোস্টার', 'Shift schedule', 'Shift roster'), my: L('আমার শিফট', 'My shifts', 'আমার shift'), roster: L('রোস্টার সাজান', 'Roster', 'Roster সাজান'), report: L('রোস্টার বনাম হাজিরা', 'Roster vs attendance', 'Roster বনাম হাজিরা'),
-  off: L('শিফট রোস্টার এখন বন্ধ আছে। মালিক সেটিংসে "শিফট রোস্টার চালু" করলে এটি কাজ করবে।', 'The shift schedule is switched off. The owner can switch it on in Settings (shift_on).', 'Shift roster বন্ধ। মালিক Settings-এ "shift_on" চালু করলে কাজ করবে।'),
+  off: L('শিফট রোস্টার এখন বন্ধ আছে। মালিক সেটিংসে "শিফট রোস্টার চালু" করলে এটি কাজ করবে।', 'Off: the shift schedule is switched off. Turn on in Settings (shift_on). Nothing is lost; rosters start when it is ON.', 'Shift roster বন্ধ। মালিক Settings-এ "shift_on" চালু করলে কাজ করবে।'),
   nofn: L('এই সুবিধা এখনো সার্ভারে বসানো হয়নি (phase132)।', 'The server does not have this yet (phase132).', 'এটি এখনো server-এ বসানো হয়নি (phase132)।'),
   notLinked: L('আপনার লগইন কোনো কর্মচারীর নথির সাথে যুক্ত নয়, তাই ব্যক্তিগত শিফট দেখানো যাচ্ছে না।', 'Your login is not linked to an employee record, so there is no personal schedule to show.', 'আপনার login কোনো employee record-এর সাথে যুক্ত নয়, তাই শিফট দেখানো যাচ্ছে না।'),
   none: L('আগামী ১৪ দিনের জন্য কোনো শিফট ঠিক করা হয়নি।', 'No shifts are planned for the next 14 days.', 'আগামী ১৪ দিনের জন্য কোনো shift ঠিক করা হয়নি।'),

@@ -16,7 +16,7 @@ const ON = { todo_on: true };
   let p = await R.open('#/home', { rules: { todo_on: false }, init: { todo: { mine: MINE, on: false } } });
   ok(await p.locator('#hv_todo').count() === 0 && await p.locator('[data-r2-card]').count() === 0, 'OFF: nothing on Home');
   ok((await names(p)).length === 0, 'OFF: no to-do request at all');
-  ok(await p.evaluate(() => { const r = window.BOS.IA.find((x) => x.route === 'todo'); return !!r && r.ok({}) === false; }), 'OFF: the registry hides the menu entry');
+  ok(await p.evaluate(() => { const r = window.BOS.IA.find((x) => x.route === 'todo'); return !!r && r.ok({}) === false && r.ok({ own: true }) === true && r.ok({ GF: { todo_assign: true } }) === true && r.ok({ own: false, GF: {} }) === false; }), 'OFF: the entry stays visible to the owner and to a grant holder, not to other staff');
   await p.goto('http://localhost:9312/#/todo'); await wait(p, 900);
   ok(/switched off/i.test(await R.text(p)), 'OFF: the screen says it is off');
   const homeOff = await p.evaluate(() => 0);

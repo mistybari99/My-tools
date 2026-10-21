@@ -14,7 +14,7 @@ const ON = { announce_on: true };
   let p = await R.open('#/home', { rules: { announce_on: false }, init: { ann: { active: ACT, state: { on: false, can_post: false, can_post_all: false, post_locations: [] } } } });
   ok(await hasBar(p) === 0, 'OFF: no bar on Home');
   ok((await R.callNames(p)).filter((n) => /^r2_announce/.test(n)).length === 0, 'OFF: no announcement request at all (' + (await R.callNames(p)).join(',') + ')');
-  ok(await p.evaluate(() => { const r = window.BOS.IA.find((x) => x.route === 'announce'); return !!r && r.ok({}) === false; }), 'OFF: the registry hides the menu entry');
+  ok(await p.evaluate(() => { const r = window.BOS.IA.find((x) => x.route === 'announce'); return !!r && r.ok({}) === false && r.ok({ own: true }) === true && r.ok({ GF: { announce_post: true } }) === true && r.ok({ own: false, GF: {} }) === false; }), 'OFF: the entry stays visible to the owner and to a grant holder, not to other staff');
   await p.goto('http://localhost:9311/#/announce'); await wait(p, 900);
   ok(/switched off/i.test(await R.text(p)), 'OFF: the screen says it is off (state came from the server)');
   p = await R.open('#/home', { init: { ann: { active: ACT } } });       // rule absent altogether

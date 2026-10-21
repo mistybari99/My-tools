@@ -27,7 +27,7 @@ const weekStartSat = (iso) => R.addDays(iso, -((dow(iso) - 6 + 7) % 7));
   // 1. OFF: nothing offered, nothing asked, the screen says it is off
   let p = await R.open('#/home', { rules: { shift_on: false }, init: { shift: { my: MY, state: { on: false, can_manage: false, locations: [], linked: false, mates_on: false } } } });
   ok((await names(p)).length === 0, 'OFF: no shift request on Home');
-  ok(await p.evaluate(() => { const r = window.BOS.IA.find((x) => x.route === 'shifts'); return !!r && r.ok({}) === false; }), 'OFF: the registry hides the menu entry');
+  ok(await p.evaluate(() => { const r = window.BOS.IA.find((x) => x.route === 'shifts'); return !!r && r.ok({}) === false && r.ok({ own: true }) === true && r.ok({ GF: { shift_manage: true } }) === true && r.ok({ own: false, GF: {} }) === false; }), 'OFF: the entry stays visible to the owner and to a grant holder, not to other staff');
   await p.goto('http://localhost:9313/#/shifts'); await wait(p, 900);
   ok(/switched off/i.test(await R.text(p)), 'OFF: the screen says it is off');
   ok(await p.locator('.seg').count() === 0, 'OFF: no tabs');

@@ -39,8 +39,8 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 
   // ---------- owner: every live drawer screen reachable from the drawer ----------
   p = await open({}, '#/home'); await openDrawer(p);
-  const miss = await p.evaluate(() => window.BOS.IA.filter((r) => r.status === 'live' && r.drawer && !['announce', 'todo', 'shifts'].includes(r.route)).filter((r) => !document.querySelector('#nav_body .dr-it[data-v="' + r.route + '"]')).map((r) => r.route));
-  ok(miss.length === 0, 'owner: every live drawer screen is in the drawer: ' + miss);
+  const miss = await p.evaluate(() => window.BOS.IA.filter((r) => r.status === 'live' && r.drawer && !['variants', 'cheques', 'schemes', 'tinting', 'impexp'].includes(r.route)).filter((r) => !document.querySelector('#nav_body .dr-it[data-v="' + r.route + '"]')).map((r) => r.route));
+  ok(miss.length === 0, 'owner: every live drawer screen is in the drawer (announce / todo / shifts included while their switch is OFF; other-trade screens are gated by business template): ' + miss);
   ok(await p.locator('.dr-g').count() >= 10, 'owner sees the categories: ' + await p.locator('.dr-g').count());
   for (const r of ['bulkitems', 'itemmap', 'itemimport', 'assets', 'recipes', 'rollout', 'changes', 'outbox', 'locations', 'control', 'daybook', 'salary', 'brandpnl', 'discounts', 'ledgerlinks', 'salereturn']) ok(await p.locator(`#nav_body .dr-it[data-v="${r}"]`).count() === 1, 'reachable from the drawer: ' + r);
   // every group has the "everything in this category" page and it lists screens
