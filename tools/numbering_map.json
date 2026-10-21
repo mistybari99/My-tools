@@ -65,6 +65,7 @@
     {"sort": 41, "old": "05-4", "new": "41-1", "en": "Yield Test", "bn": "ফলন টেস্ট", "status": "to review"},
     {"sort": null, "old": "0-1", "new": "0-1", "en": "Location Settings", "bn": "লোকেশন সেটিংস", "status": "fixed (not sorted)"}
   ],
-  "form_groups_approved": false,
+  "form_groups_approved": true,
+  "form_groups_approved_note": "Owner approved the clean sequence (Option B, A-Z by English short name, NN-1) on 21 Oct 2026, final, in Bengali. Short names are to review by the owner.",
   "form_codes_note": "Printed form codes: per-code map from docs/FORM_SEQUENCE.md (owner decision, clean sequence, A-Z by English short name). Short names are to review by the owner. form_groups (group level) was removed: it was not the agreed mapping."
 }
