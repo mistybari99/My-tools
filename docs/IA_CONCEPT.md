@@ -280,7 +280,7 @@ Tabs/sections: **Needs you | Exceptions | Delegation | Switchboard** (top segmen
 
 ### 5.1 Needs-you inbox
 - One merged list across NEEDS (exceptions, releases, emergency, item requests, staff pending, wastage, location setup, settings drafts, change requests). Current screen shows counts only (REMAINING P4-14); the target shows rows.
-- Row: edge marker (tone), type icon, 1-line summary ("Rahim - discount 12% - Mirpur"), who/where, age, amount if any, chevron.
+- Row: edge marker (tone), type icon, 1-line summary ("Staff A - discount 12% - Place 1"), who/where, age, amount if any, chevron.
 - Sort: oldest first, overdue (SLA) first. Filters: type chips, location, person. Group toggle: by type / by place.
 - Inline: Approve / Reject (primary + a ⋮ with "Ask question", "Defer", "Open full record"). Reject requires a note; approve of money-affecting items opens the record for one glance (no blind bulk-approve of money items).
 - Bulk: only for low-risk types (e.g. staff pending, list "Other" queue). Money/stock types: single decisions only.
