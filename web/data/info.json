@@ -6205,6 +6205,16 @@
    "verified": true,
    "src": "phase48.sql (path_domains); paths.js; W1-G.md"
   },
+  "rule:transfer_client_reuse_block": {
+   "title": "Refuse a transfer id already used by another user",
+   "does": "When ON, a factory-to-branch send whose id was already used by a different user is refused. Without it, the second send is answered as done with the first transfer's id and its goods are not moved.",
+   "why": "A send that is reported as done but never moved goods hides stock that is still in the factory.",
+   "default": "Off. The second send is answered as done with the first transfer's id (as before).",
+   "change": "On: the second send is refused with \"client_id_reused\"; nothing moves. The same user retrying the same send still gets the first result.",
+   "who": "Owner, in Settings (stock rules).",
+   "verified": false,
+   "src": "phase544 (SW-7, docs/PLAN_NEXT.md item 20); reproduced on a local database, not yet checked in the app"
+  },
   "rule:transfer_overdraw_block": {
    "title": "Refuse a send bigger than the stock on hand (transfers)",
    "does": "When ON, a transfer from a place is refused if the place has less stock of that item than the quantity sent.",

@@ -30,7 +30,7 @@ SQL = os.path.join(ROOT, 'supabase')
 LIMIT = 500 * 1024
 BASE = ['schema', 'phase2', 'phase3', 'phase4', 'ALL_NEW']
 # the delta for the live database (docs/LIVE_DELTA.md): what a database built from the earlier sqlparts + the advanced phases 72-135 still needs. Read docs/LIVE_DELTA.md before pasting.
-DELTA = ['phase499', 'phase501', 'phase502', 'phase503', 'phase504', 'phase505', 'phase529', 'phase530', 'phase531', 'phase532', 'phase533', 'phase534', 'phase535', 'phase536', 'phase537', 'phase538', 'phase539', 'phase543']
+DELTA = ['phase499', 'phase501', 'phase502', 'phase503', 'phase504', 'phase505', 'phase529', 'phase530', 'phase531', 'phase532', 'phase533', 'phase534', 'phase535', 'phase536', 'phase537', 'phase538', 'phase539', 'phase543', 'phase544']
 CHECK = {
     'fresh_last': "select * from public._i2_state() where not present;   -- must return no rows",
     'delta_last': "select * from public._i2_state() where not present;   -- must return no rows\nselect fn, saved_at, why from public._union_fn_backup order by id;   -- the bodies that were saved before a change",
