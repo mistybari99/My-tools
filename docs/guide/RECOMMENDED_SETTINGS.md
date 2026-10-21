@@ -84,7 +84,7 @@
 
 | সুইচ | প্রস্তাব | কেন | উৎস |
 |---|---|---|---|
-| `form_051_mode` | 05-1 শিটই production-record হলে `post`, নইলে `reference` | `post` না হলে তৈরি মাল বিনা cost-এ ঢোকে | F83 |
+| `form_051_mode` | 12-1 শিটই production-record হলে `post`, নইলে `reference` | `post` না হলে তৈরি মাল বিনা cost-এ ঢোকে | F83 |
 | `transit_short_mode` | `loss` | কম পৌঁছানো মাল তখন cost সহ ledger-এ থাকে | F83 |
 | `transit_open_hours` | নেই | আপনার delivery-র সাধারণ সময়ের একটু বেশি লিখুন | F83 |
 | `offline_soft_stock` | চালু | offline বিক্রিতে মাল দেওয়া হয়ে গেছে; আটকালে বিক্রি হারায় | F83 |

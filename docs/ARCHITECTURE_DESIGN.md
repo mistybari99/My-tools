@@ -24,7 +24,7 @@ Standing rules applied to every line: nothing is lost (no form name, form code, 
 
 - They open the app on **Today**: their own jobs, at most 6 big cards, the main job as one big round button. Every person gets the same five buttons in the same places: **Today, Find, main job, To do, Menu**.
 - Everything else is under **Menu**: 8 areas (Sell, Goods, Make, Money, People, Checks, Reports, Setup), the 42 paper forms in paper-book order, an A-Z list of every screen, and the **Classic** menu (the old 13 categories, kept).
-- **Find** finds anything: screens, jobs, form codes (`04-1`), old names ("GRN"), receipt and phone numbers, and settings by plain sentence.
+- **Find** finds anything: screens, jobs, form codes (`13-1`), old names ("GRN"), receipt and phone numbers, and settings by plain sentence.
 - Jobs that exist as a paper form and as a screen become **one job with two ways**. Both ways stay. A small line says which one counts.
 
 **What you get as owner**
@@ -44,10 +44,10 @@ Standing rules applied to every line: nothing is lost (no form name, form code, 
 | Screen | Now | After |
 |---|---:|---:|
 | Home | 4.5 pages | 1.0 (staff) to 1.3 (owner) |
-| Daily showroom sheet 14-1 | 12.5 pages | 6.3 in total, at most 2.5 per step |
+| Daily showroom sheet 06-1 | 12.5 pages | 6.3 in total, at most 2.5 per step |
 | Switchboard | 18 pages | 1.6 |
 | Role x form matrix | 6.3 pages | 1.3 |
-| Expense voucher 10-2 | 3.7 pages | 1.4 |
+| Expense voucher 11-1 | 3.7 pages | 1.4 |
 
 **Easy to teach**: staff learn three things (Today, Find, Menu). A 10-minute script and a printed card per role are generated from the registry. A new person passes if they do their role's 5 jobs alone in 10 minutes.
 
@@ -158,7 +158,7 @@ Format of each record: **Proposed** (X, Y, Z), **Winner and why**, **Evidence**,
 | Winner | **X's names and order, Z's constraints**: one-word labels (at most 8 Bangla letters), icon-only fallback instead of clipping, no sixth slot. Me moves to the top row of Menu and the Me sheet. |
 | Why | Today shows jobs; **To do** shows things waiting on me. A thing is a job card on Today or a waiting item in To do, never both; the Now line on Today is only the top item of To do (fixes the duplicate Z-A found in R2). Fixed positions keep muscle memory for people who cover another shift. |
 | Evidence | Label clipping: "Me" and the unsent-sales label are cut at 360 px (C-08, Z E4) [code]. |
-| Tie-breaker | T14 (find form 20-3 by number) and a label-comprehension check: 10 labels read aloud, at least 90% say what each does (low-literacy group at least 80%). |
+| Tie-breaker | T14 (find form 32-1 by number) and a label-comprehension check: 10 labels read aloud, at least 90% say what each does (low-literacy group at least 80%). |
 | Status | Decided |
 
 **D04 Header, strips, bottom region, chrome budget**
@@ -191,7 +191,7 @@ Format of each record: **Proposed** (X, Y, Z), **Winner and why**, **Evidence**,
 | Winner | **Z's screen + X's sections + Y's number resolver.** Prefixes (`c:`, `i:`, `#`) are expert-only and hidden. Keyboard keys, desktop overlay and the scan sink go to PV-3. |
 | Why | Search is hidden in the drawer and its field is not focused (C-04) [code]. Typing Bangla on a cheap keyboard is slow, so every item also has a browse path (hard rule). Resolver: 11 digits starting `01` is a mobile number; 8 to 13 digits is a barcode; `14-1-main-5` is an entry serial; ambiguous shapes show grouped candidates. |
 | Evidence | C-04; `ia.js` `search()` scoring exists [code]. |
-| Tie-breaker | T14 (form 20-3 by number then by name, <= 20 s each); T19 (find a screen by typing Bangla: if success is under 80%, browse stays first in the layout). |
+| Tie-breaker | T14 (form 32-1 by number then by name, <= 20 s each); T19 (find a screen by typing Bangla: if success is under 80%, browse stays first in the layout). |
 | Status | Decided (keys: PV-3) |
 
 **D07 Job page (form and screen as one job)**
@@ -199,7 +199,7 @@ Format of each record: **Proposed** (X, Y, Z), **Winner and why**, **Evidence**,
 | | |
 |---|---|
 | Proposed | **X**: a job card with an inline two-segment "way switch" and one status line. **Y**: a document hub with surface tabs, merged list, linked-copy chip, paper twin. **Z**: a "Way" chip and a job sheet, later a merged Job page. |
-| Winner | **Z's R2 synthesis of X and Y.** Header shows `Job` plus the form-code chip (the form code is never replaced). A 44 px **Way strip** (`Quick screen / Paper-style form 04-1`) on the Job page and the first step of a new entry; after the first typed character it collapses into a subtitle chip. One status line: "Counted from: Quick screen. Paper copy: 2 owed". Merged **Records** list with a `Via` chip and a tappable "Covered by voucher 10-2 #123" chip. Rules, History and paper-twin controls live in the header menu and as end rows. |
+| Winner | **Z's R2 synthesis of X and Y.** Header shows `Job` plus the form-code chip (the form code is never replaced). A 44 px **Way strip** (`Quick screen / Paper-style form 13-1`) on the Job page and the first step of a new entry; after the first typed character it collapses into a subtitle chip. One status line: "Counted from: Quick screen. Paper copy: 2 owed". Merged **Records** list with a `Via` chip and a tappable "Covered by voucher 11-1 #123" chip. Rules, History and paper-twin controls live in the header menu and as end rows. |
 | Why | 27 of the 42 forms have a dedicated screen (21 twin, 6 partial); 15 are form-only (from X and Audit C 2.5; each pair is [unverified] until read on screen). Neither way may be removed (BUILD-RULES 1). |
 | Rules | Chip words "Counts for stock/money" and "Paper copy" appear **only** where a rule or path row says so (`path_switch` domains: payroll, stock_issue, stock_transfer, stock_count, production, expense, owner_money; rules `grn_receipt_source`, `sale_forms_link_on`). Otherwise the chip says "Two ways". Only 9 of the 27 pairs have a stored fact today [code, X]. A locked way is shown greyed with "Locked by owner on <date>", never hidden. Switching way after typing asks "Keep this as a draft and start a new one?"; no data is converted between the two stores. |
 | Tie-breaker | **TB7** (PV-1) and T5b: "which way counts for stock?" at least 90% correct. |
@@ -296,7 +296,7 @@ Format of each record: **Proposed** (X, Y, Z), **Winner and why**, **Evidence**,
 
 | ID | Settles | Protocol | Gate |
 |---|---|---|---|
-| **TB1** Tree test | PV-2, D01 vocabulary | Text-only menu trees (no visuals), both trees, 28 tasks: 10 daily jobs, 10 rare ones (digital reconcile 10-3, number-gap audit, restore drill, role x form matrix, unit conversions, deeds, parallel month, bank reconcile, period lock, item import), 8 trace tasks (all bills of one supplier for last March exported; open one customer and see dues, returns, history; who changed an item price; open the journal entry of receipt R). 15 people per tree, between subjects. Measure success, directness (no backtracking), first click, time. | Gap >= 10 points: higher wins. Below 10: the tree with fewer top-level rows (8 areas). Rare tasks: success >= 85%, folded row <= 4 taps, Find <= 3. |
+| **TB1** Tree test | PV-2, D01 vocabulary | Text-only menu trees (no visuals), both trees, 28 tasks: 10 daily jobs, 10 rare ones (digital reconcile 07-1, number-gap audit, restore drill, role x form matrix, unit conversions, deeds, parallel month, bank reconcile, period lock, item import), 8 trace tasks (all bills of one supplier for last March exported; open one customer and see dues, returns, history; who changed an item price; open the journal entry of receipt R). 15 people per tree, between subjects. Measure success, directness (no backtracking), first click, time. | Gap >= 10 points: higher wins. Below 10: the tree with fewer top-level rows (8 areas). Rare tasks: success >= 85%, folded row <= 4 taps, Find <= 3. |
 | **TB2** New-hire test | D01 | For each of 5 staff roles (salesperson, storekeeper, showroom manager, factory in-charge, cash controller) 3 people who never used the app get the 10-minute script (7.8), then do the role's 5 jobs alone with the printed card. | >= 90% unaided success and total <= 10 min. With 15 people this allows at most 1 failure. Failing: fix the kit, retest. |
 | **TB3** Timed entry | PV-3 grids | `purchase/new`, 30 lines from a paper bill; stock count of 80 items (blind); attendance for 40 staff x 30 days. Three builds: current, compact rows, composer sheet/grid. At least 2 people per build and role (accountant, storekeeper). Measure seconds per line, taps per line, errors per 100 lines, phone pages, blind-count leaks. | Grid must be >= 30% faster than current, errors not higher, <= 2.7 pages for 30 lines, **0 leaks**. Else that job's `ui_grid_<job>` stays off. If compact rows alone reach 30%, keep rows only. |
 | **TB4** Trace | D08 drill | Current build, accountant: (a) April sales total to the journal entry of one receipt; (b) who changed this item's price and when. | Build drill/History tiers if median > 90 s or > 6 steps; after build <= 4 steps and <= 30 s. |
@@ -367,9 +367,9 @@ Gate: **at most 30% (180 px)**; with the state strip visible up to 192 px is acc
 | Next: Close the day (16:00)          |  Now line = first row of To do
 | [ Close day                        > ] |  56 px button
 | My jobs                              |
-|  Count drawer   14-1        To do  > |  card 76 px: icon 32, verb <= 3 words,
-|  Receive goods  04-1        Draft  > |  state WORD, small form chip
-|  Hand cash to hub 10-1      Later  > |
+|  Count drawer   06-1        To do  > |  card 76 px: icon 32, verb <= 3 words,
+|  Receive goods  13-1        Draft  > |  state WORD, small form chip
+|  Hand cash to hub 03-1      Later  > |
 | Done (3)                           v |  folded
 | More jobs (12)                     > |  includes locked rows with Ask
 | > Numbers: My sales today            |  collapsed for staff
@@ -386,15 +386,15 @@ Owner variant adds, above My jobs: **Needs you** (inbox rows with age; inline de
 ```
 +--------------------------------------+
 | [<-] Expense                  [find] [:] |
-|      Money > Expense   [10-2] [18-1]  |  form-code chips never replaced
+|      Money > Expense   [11-1] [17-1]  |  form-code chips never replaced
 +--------------------------------------+
-| New with: [Quick screen | Voucher 10-2] |  Way strip 44 px (Job page, step 1 only)
+| New with: [Quick screen | Voucher 11-1] |  Way strip 44 px (Job page, step 1 only)
 | Counted from: Quick screen. Paper copy: 2 owed |  status line, one sentence
 | (This month v) (Main v)  [Filter]    |  scope chips 36 px
 |--------------------------------------|
 | | Staff meals - test_person   Tk 1,500|  row 64 px: edge marker, 1-line title,
 | | 2026-10-14 Wed [Via Quick][Pending] |  2 facts, Via chip, status chip with words
-| | Fuel   [Covered by voucher 10-2 #123 >]|  linked-copy chip, tappable
+| | Fuel   [Covered by voucher 11-1 #123 >]|  linked-copy chip, tappable
 | Show 50 more (112 left)              |
 |                      [ + New expense ] |  FAB 48 px, flat
 +--------------------------------------+
@@ -426,7 +426,7 @@ History is a timeline, newest first, collapsed beyond 3, with who, when, note. D
 
 ```
 +--------------------------------------+
-| [<-] 14-1 Daily showroom sheet [Saved]|  save-state chip
+| [<-] 06-1 Daily showroom sheet [Saved]|  save-state chip
 |      Sell > Forms              [:]   |
 |  Main - 2026-10-14 Wed - Draft       |  identity folds to one line on scroll
 |--------------------------------------|
@@ -452,10 +452,10 @@ The identity card (date, place, weekday, status, rollout chip, "Not sent yet", r
 | [<-] Close day                    [:] |
 |  Main shop v              3 of 8 [###--] |
 |--------------------------------------|
-| [x] 1. Count the drawer (14-1)   Done |  whole row is the button
+| [x] 1. Count the drawer (06-1)   Done |  whole row is the button
 | [ ] 2. Release request if red open  To do |
 |        needs Manager                  |
-| [ ] 3. Hand the cash to the hub (10-1) To do |
+| [ ] 3. Hand the cash to the hub (03-1) To do |
 | [-] 5. Bank deposit     Skipped (note)|
 | [?] 6. Digital reconcile  Check by hand |  never a green tick when unknown
 +--------------------------------------+
@@ -508,10 +508,10 @@ A switch is a real switch with its state word beside it, never a button whose la
 | [=] Goods                        [bell] [:] |
 | Today's routine: Receive goods [Start]|
 | JOBS                                 |
-|  Receive goods  04-1          Draft > |  <= 6 rows
-|  Issue material 04-2                > |
+|  Receive goods  13-1          Draft > |  <= 6 rows
+|  Issue material 18-1                > |
 | > More in Goods (5)                  |  folded, by section
-| FORMS  [03-1][04-1][04-2][04-3][04-4][08-1] |  chips in paper-book order
+| FORMS  [39-1][13-1][18-1][36-1][37-1][16-1] |  chips in paper-book order
 | Locked (2)                         > |
 | [ Show all ]                         |
 +--------------------------------------+
@@ -570,7 +570,7 @@ What may go inside: optional or rare fields, notes, secondary tables. **Never in
 4. Defaults come from the form designer (today's `collapsed` flag), not from the user.
 5. One level only: no More inside More, no accordion inside an accordion.
 6. "Show all / Collapse all" in the header menu for everyone; "Show everything" persistent per phone for the owner.
-7. The first group of a step is open unless it is an "if it happened" group (B, C, D of 14-1), which stays closed with its badge.
+7. The first group of a step is open unless it is an "if it happened" group (B, C, D of 06-1), which stays closed with its badge.
 8. "Reset layout" in Me clears the remembered state.
 
 In the new view the items-edit group "Advance options" is called "More options" (D 5.5; "advance" also means a money advance here). The old words stay as a search keyword and in the old code path. This is the one intended label difference between the old and the new view (section 5.4).
@@ -580,7 +580,7 @@ In the new view the items-edit group "Advance options" is called "More options" 
 | Use | When | Must have | Never |
 |---|---|---|---|
 | **Tabs** (max 5, 4 at Text size L) | Peer views of one record or list, read in any order | text badge with a count when a tab has a problem; last tab remembered | tabs inside tabs; more than 5 (use a hub page); sequential data entry |
-| **Steps** (step bar + Back/Next, last step = Review) | Data entry in the order things happen with a sign-off: 14-1, 14-2, 01-1, 01-2, 03-1, 02-2, employee wizard, location wizard | per-step state glyph and word (`not started / partly / done / problem`); free jumping; draft saved on every Next; Review lists what is missing with jump buttons | more than 6 steps; steps inside tabs; forced order unless the data demands it |
+| **Steps** (step bar + Back/Next, last step = Review) | Data entry in the order things happen with a sign-off: 06-1, 14-1, 40-1, 20-1, 39-1, 21-1, employee wizard, location wizard | per-step state glyph and word (`not started / partly / done / problem`); free jumping; draft saved on every Next; Review lists what is missing with jump buttons | more than 6 steps; steps inside tabs; forced order unless the data demands it |
 | **Accordion** (52 px header, remembered, badge) | Extra groups on one page | badge on every closed group; auto-open on problem | accordion in accordion; hiding Submit |
 | **Segmented control** (2 to 3 options, 44 px) | A mode or filter: Business/Accounting, period, Counts/Copy, the four dial positions | | more than 3 options except the dial (4 labelled words) |
 | **Sheet** | One decision or a short choice: filter, confirm, grant, location | primary at the bottom, safe choice easiest to reach | long forms |
@@ -658,19 +658,19 @@ Dense mode (PV-3) adds only: `@media (pointer: fine) and (min-width: 900px)` wit
 
 | # | Screen | Before (pages) | After default | Max in one step or tab | After all open | Main mechanism |
 |--:|---|---:|---:|---:|---:|---|
-| 1 | **14-1 Daily showroom sheet** | 12.5 [measured], 21 all open [est] | **6.3** in total | 2.5 (Opening); closing sitting 3.5 | 14.2 | 5 steps, More groups, compact rows, denomination pad |
+| 1 | **06-1 Daily showroom sheet** | 12.5 [measured], 21 all open [est] | **6.3** in total | 2.5 (Opening); closing sitting 3.5 | 14.2 | 5 steps, More groups, compact rows, denomination pad |
 | 2 | **Switchboard** `#/switchboard` | 18 [est] (2.1 with 5 test rules) | **1.6** | 1.6 | 14.1 | search, chips, pinned Safety group, module accordions, inline switches |
-| 3 | **01-2 Monthly P&L and KPI** | 9.2 [est] | **6.0** | 1.9 | 6.0 | 4 steps, compact KPI rows |
-| 4 | **01-1 Weekly review note** | 8.1 [est] | **4.7** | 1.8 | 4.7 | 5 steps, one compact row per showroom |
-| 5 | **14-2 Jalebi counter record** | 7.1 [est] | **4.6** | 1.4 | 4.6 | 5 steps, calc cards read-only |
-| 6 | **02-2 Monthly salary sheet** | 4.9 (3 staff), 19 (30 staff) [est] | **3.5** / **7.1** | 2.2 / 3.9 | 3.5 / 7.1 | one row per person, find-person, sticky totals |
-| 7 | **03-1 Transfer challan** | 5.5 [measured] | **2.8** | 1.1 | 4.3 | 4 steps, compact item rows |
+| 3 | **20-1 Monthly P&L and KPI** | 9.2 [est] | **6.0** | 1.9 | 6.0 | 4 steps, compact KPI rows |
+| 4 | **40-1 Weekly review note** | 8.1 [est] | **4.7** | 1.8 | 4.7 | 5 steps, one compact row per showroom |
+| 5 | **14-1 Jalebi counter record** | 7.1 [est] | **4.6** | 1.4 | 4.6 | 5 steps, calc cards read-only |
+| 6 | **21-1 Monthly salary sheet** | 4.9 (3 staff), 19 (30 staff) [est] | **3.5** / **7.1** | 2.2 / 3.9 | 3.5 / 7.1 | one row per person, find-person, sticky totals |
+| 7 | **39-1 Transfer challan** | 5.5 [measured] | **2.8** | 1.1 | 4.3 | 4 steps, compact item rows |
 | 8 | **Role x form matrix** `#/matrix` and **Form rules** `#/rules` | 6.3 [est] each | **1.3** | 1.3 | 4.7 | role chips, area accordions, three labelled toggles per row |
 | 9 | **Home** `#/home` | 4.5 [measured] | **1.0 to 1.3** (+ Menu 0.6) | 1.3 | n/a | T1 Today, all other blocks move to Menu |
-| 10 | **10-2 Expense voucher** | 3.7 [measured] | **1.4** | 0.9 | 2.0 | 3 steps, paper block folded |
-| 11 | 02-7 Duty and backup card | 4.5 (14.8 all open) [est] | 1.8 | 1.8 | 4.2 | More groups with `3 vacant - 1 partial` badges, compact slot rows |
-| 12 | 02-8 Skill checklist | 3.8 (9.7) [est] | 1.3 | 1.3 | 3.3 | sections B to G closed with `n/m done` |
-| 13 | 04-3 Stock count sheet | 3.5 [measured] | 1.9 | 1.9 | not modelled | compact rows, Enter flow, blind mask kept |
+| 10 | **11-1 Expense voucher** | 3.7 [measured] | **1.4** | 0.9 | 2.0 | 3 steps, paper block folded |
+| 11 | 09-1 Duty and backup card | 4.5 (14.8 all open) [est] | 1.8 | 1.8 | 4.2 | More groups with `3 vacant - 1 partial` badges, compact slot rows |
+| 12 | 34-1 Skill checklist | 3.8 (9.7) [est] | 1.3 | 1.3 | 3.3 | sections B to G closed with `n/m done` |
+| 13 | 36-1 Stock count sheet | 3.5 [measured] | 1.9 | 1.9 | not modelled | compact rows, Enter flow, blind mask kept |
 | 14 | Location settings `#/locset` | 5.5 [est] | 1.2 per tab | 1.2 | 3.5 | tabs, dirty-only Save, "Save n changes" |
 | 15 | Access manager `#/settings2/access` | 2.4 [measured] | 1.0 | 1.0 | not modelled | granted grants as rows, "Not granted (11)" closed |
 | 16 | Customer tiers `#/tiers` | 3.0 [measured] | 0.8 per tab | 0.9 | not modelled | 3 tabs, tier row with menu |
@@ -683,15 +683,15 @@ Dense mode (PV-3) adds only: `@media (pointer: fine) and (min-width: 900px)` wit
 | 23 | POS cart and pay sheet | 1.8 inside a sheet [est] | 0.8, no scroll | 0.8 | not modelled | sticky foot with Due, Total, Confirm |
 | 24 | Business analysis `#/biz` | 2.4 [measured] | 1.0 per tab | 1.0 | not modelled | 5 tabs, staff table as expandable rows |
 
-Honest notes. (a) "All open" is a stress case; the gain is from not being in it, and "Show all" still exists. (b) Salary at 30 staff stays long because 30 people are 30 rows; it gains find-person and sticky totals. (c) Audit D's own figures for 14-1 are 1.8 pages per step at 12.5 px; Z's model at 14 px is higher. (d) The field-count unit differs: Z counts a table as one id (142 ids for 14-1); the baseline counts every table column as its own field (181 field items for 14-1) [baseline]. The parity gate uses the baseline ids, so every column is guarded.
+Honest notes. (a) "All open" is a stress case; the gain is from not being in it, and "Show all" still exists. (b) Salary at 30 staff stays long because 30 people are 30 rows; it gains find-person and sticky totals. (c) Audit D's own figures for 06-1 are 1.8 pages per step at 12.5 px; Z's model at 14 px is higher. (d) The field-count unit differs: Z counts a table as one id (142 ids for 06-1); the baseline counts every table column as its own field (181 field items for 06-1) [baseline]. The parity gate uses the baseline ids, so every column is guarded.
 
-What a person sees: at 9:00 the manager opens 14-1 on step 1 (2.5 pages); at closing time steps 3 and 5 (3.5 pages), not 12.5. Steps 2 and 4 open as bars only when nothing happened that day (0.2 and 0.1 page).
+What a person sees: at 9:00 the manager opens 06-1 on step 1 (2.5 pages); at closing time steps 3 and 5 (3.5 pages), not 12.5. Steps 2 and 4 open as bars only when nothing happened that day (0.2 and 0.1 page).
 
 ### 4.2 Field maps for the paper forms (every id kept; `*` = conditional field, unchanged rule)
 
 Table fields keep all their columns. All sections are placed (14-1: 11 of 11).
 
-**14-1 Daily showroom sheet** (5-step bar; summary in the action bar: counted total, short/over, category match; flags row always visible; blind-count and PIN boxes exactly as today)
+**06-1 Daily showroom sheet** (5-step bar; summary in the action bar: counted total, short/over, category match; flags row always visible; blind-count and PIN boxes exactly as today)
 
 | Step | Sections | Groups and fields |
 |---|---|---|
@@ -702,22 +702,22 @@ Table fields keep all their columns. All sections are placed (14-1: 11 of 11).
 | **4 Stock** (2 closed groups) | F, G | F: table `stock[kept,exp_qty,exp_amt,waste_qty,waste_reason,waste_by,ret_challan]`, `exp_apart own_use own_use_by staff_credit staff_adv_page sample sample_by`. G: table `demand[item,qty,note]` (min 5 rows), `box_bag direct_buy pr_no` |
 | **5 Close** | H, I, signatures, hub | H checklist `c1`..`c16` (all required, counter 0/16, **no tick-all**), `end_temp key_to shutter_time`; I Exceptions (closed, badge) table `incidents[what,urgency,why,owner,action,solved]`, `no_incident`; `second_sig*`; hub role: `hub_ledger hub_time hub_received` (others: More (3)) |
 
-**01-2 Monthly P&L and KPI sheet** (4 steps; head `month, scope, scope_name`)
+**20-1 Monthly P&L and KPI sheet** (4 steps; head `month, scope, scope_name`)
 Step 1 P&L: `sales open_stock purchases close_stock cogs gross x_staff_meal x_transport x_hospitality x_repair x_labour x_sourcing x_other expenses salary bank_charges net reinvest_pct reinvest` (calc rows read-only; Net and Gross copied to the bar). Step 2 Numbers: table `sales_by[name,amt]`, `headcount wastage discount cash_short gm_unexplained count_short payables receivables`, table `raw[name,p_start,p_end,chg]` (5 rows), `new_prod on_orders on_sales on_cpo emerg`. Step 3 KPIs: `days_text`, table `kpi[cur,prev,ly,dir]` (15 fixed rows as compact rows), `leak`. Step 4 Decide and sign: table `dec[what,who,deadline]`, `rec_sales rec_salary rec_leak*`, `prepared_by owner`, `checked_by` (checker block kept apart).
 
-**01-1 Weekly review note** (5 steps; head `week_from, week_to`)
+**40-1 Weekly review note** (5 steps; head `week_from, week_to`)
 1 Showrooms: `other_name`, table `show[sales,cash_so,gm_gap,days_cash,days_gm,wastage,complaints,discount,orders_taken,orders_given,online,outside_ok,jal_diff,jal_oil,jal_juice]` (one compact row per showroom). 2 Factory and hub: `f_other_name`, table `fac[yield_diff,chhana_short,supplier_due,receivable,open_adv]`, `owner_liab outside_debt split_seen split split_in_decisions*`. 3 Online: `on_msgs on_orders on_sales on_ads on_cpo on_complaints rev_good rev_bad level level_cond`. 4 Decisions: `prev_total prev_done prev_open prev_reason*`, table `dec[what,who,deadline,worklist]` (min 5). 5 Sign: `present1 present2 chair`.
 
-**14-2 Jalebi counter daily record** (5 steps; head `produced_slot prepared_slot roster measured_slot`)
+**14-1 Jalebi counter daily record** (5 steps; head `produced_slot prepared_slot roster measured_slot`)
 1 Measures: table `meas[t_open,open,t_close,close,unit]` (3 fixed rows), `measured_by scale scale_worklist* oil_changed oil_rule* old_oil* old_oil_fate* old_oil_amt* old_oil_line*`. 2 Receipts: table `slips[slip_no,i_flour,i_sugar,i_oil,i_syrup,i_other,source]` (5 rows), `tot_flour tot_sugar tot_oil tot_syrup`. 3 Working: `jalebi_item jalebi_sales c1 c2 c3 c4 c5 c6 unsold samples c9 c10 c10_state c11 c11k c12 c12k` (read-only calc cards; `c10_state c11k c12k` also in the bar because they drive flags). 4 Decide: `unsold_show decision daytag* wasted* decider_role decided_by`, exceptions `e_noslip e_nomeasure e_same e_roster e_syrup e_diff e_days*` (ticks, no tick-all). 5 Sign: `produced_by`, `checked_by`.
 
-**02-2 Monthly salary sheet** (4 steps; head `month, year, attendance_no`; the banner "No salary sheet without the Monthly Attendance Register" stays visible)
+**21-1 Monthly salary sheet** (4 steps; head `month, year, attendance_no`; the banner "No salary sheet without the Monthly Attendance Register" stays visible)
 1 List: both notes (under info), table `pay[name,salary,work_days,absent,leave,due,overtime,other,gross,adv_ded,other_ded,net,remark]` as one row per person that expands to 13 fields; find-person field; totals `t_salary t_due t_ot t_other t_gross t_adv t_other_ded t_net` (net and gross in the bar). 2 Payment: `pay_method pay_other* pay_date ledger_date ledger_line all_signed`. 3 Receipts: table `receipts[name,net,date,method,signed]`, `t_receipts`. 4 Check: `checked approved_by approved_date`. Amounts only for roles with the salary permission (server decides, unchanged).
 
-**03-1 Transfer challan** (4 steps; head `ttype from_loc to_loc shift vehicle driver out_time handover_point`)
+**39-1 Transfer challan** (4 steps; head `ttype from_loc to_loc shift vehicle driver out_time handover_point`)
 1 Dispatch: `as_demand demand_sheet_no outside outside_reason* cust_order order_no* prod_dates grades`. 2 Items: table `items[item,unit,grade,prod_date,tag,demand,sent,received,diff,remark]` (min 3; compact row `I-001 - KG - sent 20 / recv 20 - diff 0`; a non-zero `diff` shows a warning glyph). 3 Receive: `count_time in_time sender_counted receiver_counted dates_ok tag_ok damage_note liability` (kept together with `diff`; the transit state stays in the header). More (4 groups closed with badges, as collapsed today): Return to factory `returns[item,qty,reason,paper_no]`; Crates and trays `crates_sent crates_back crates_due trays_sent trays_back trays_due crates_match`; Posting `in_factory_sheet factory_sheet_no in_stock_ledger both_papers`; Customer or party delivery `order_invoice_no recv_name recv_phone pay cash_amount*`.
 
-**10-2 Expense voucher** (3 steps, or accordions when 3 sections or fewer; head `time sheet_no`)
+**11-1 Expense voucher** (3 steps, or accordions when 3 sections or fewer; head `time sheet_no`)
 1 Expenses: table `lines[head,to,receipt,amount]` (min 3 rows; compact row `Staff meals - paid to ... - receipt yes - Tk 120`; Enter flow adds the next row), `total` (in the bar). 2 Limit and receipts: `money_account_id* receipt_photos limit_text approved_by* no_receipt_reason* drawer_untouched`. 3 Imprest check: note as banner, `cash_morning cash_now receipts_total sum_cr* imprest_text*`. The three red or yellow imprest flags stay above the form and are counted in the bar. Paper block: More group, forced open on paper mode.
 
 ### 4.3 Settings and hub screens (every row kept)
@@ -732,9 +732,9 @@ Step 1 P&L: `sales open_stock purchases close_stock cogs gross x_staff_meal x_tr
 
 | Screen | Where the fields live |
 |---|---|
-| 02-7 Duty and backup card | Rules notes become a one-line banner + info. Sections A to D open, E to I closed with `n vacant - n partial` badges. Each slot is a compact row `Holder - Complete/Partial (n left) - signed`; expanding shows `name, vacant, start*, skill*, part_n*, holder_sig*, appr` (approver signature stays checker-only). `extra`, `history`, `key_where`, `owner_approved`, `owner_date`, head `last_update` stay in their sections. The pair checks stay in the flags box; a row that breaks a pair shows a warning glyph. |
-| 02-8 Skill checklist | Head `slot, initials, holder, place, start, end` in the header card. Section A (12 rows `na, done, date, verifier`) open; B to G (`done, date, verifier`) closed with `n/m done`. Result group `verified_n, all_done, posted*, rest_date, holder_signed` and approval `approved, approved_date` at the bottom. No tick-all; `all_done` is an explicit tick. |
-| 04-3 Stock count sheet | Head `start_time, end_time, counted_by, storekeeper, kind`; `movement` Yes/No, `movement_detail*`; table `rows[item,unit,count,book,var,reason]` (min 5) as compact rows; with blind count `book` and `var` stay masked until sealed; `witness*`, PIN signature box and the Seal button stay visible and in the bar. The "storekeeper must not count" rule stays a one-line banner. |
+| 09-1 Duty and backup card | Rules notes become a one-line banner + info. Sections A to D open, E to I closed with `n vacant - n partial` badges. Each slot is a compact row `Holder - Complete/Partial (n left) - signed`; expanding shows `name, vacant, start*, skill*, part_n*, holder_sig*, appr` (approver signature stays checker-only). `extra`, `history`, `key_where`, `owner_approved`, `owner_date`, head `last_update` stay in their sections. The pair checks stay in the flags box; a row that breaks a pair shows a warning glyph. |
+| 34-1 Skill checklist | Head `slot, initials, holder, place, start, end` in the header card. Section A (12 rows `na, done, date, verifier`) open; B to G (`done, date, verifier`) closed with `n/m done`. Result group `verified_n, all_done, posted*, rest_date, holder_signed` and approval `approved, approved_date` at the bottom. No tick-all; `all_done` is an explicit tick. |
+| 36-1 Stock count sheet | Head `start_time, end_time, counted_by, storekeeper, kind`; `movement` Yes/No, `movement_detail*`; table `rows[item,unit,count,book,var,reason]` (min 5) as compact rows; with blind count `book` and `var` stay masked until sealed; `witness*`, PIN signature box and the Seal button stay visible and in the bar. The "storekeeper must not count" rule stays a one-line banner. |
 | Location settings | Tabs A Cash and limits (14 settings), B Time and place (6), C Products and storage (6 + fridge family of 9 + day tags 7), F Purchase and count (3). Every `SETTING_DEFS` entry stays a row; the `Need data` chip stays and the tab label shows `! n need data`. Per-field Save appears only when changed; "Save n changes" runs the same per-key calls. Location picker and "Settings versions" link stay in a sticky strip. |
 | Access manager | The 12 grants `view_cost, view_profit, view_reports, export_data, salary_view, view_daybook, supplier_manage, settings_invoice, location_manage, head_management, settings_approve, list_manage` stay: granted ones are rows with scope chips, not granted ones sit in a closed group "Not granted (11)" as `+ Give` buttons; sensitive grants carry a "sensitive" marker; the give sheet is unchanged. |
 | Customer tiers | 7 tiers with Edit visible and Up, Down, Retire in the row menu (Retire keeps its reason); "New tier"; the five switches (pre-approved tier discount, move up automatically, refresh may also move down, loyalty points, customer gifts); five numbers (points per 100 taka, value of a point, minimum points, days around a birthday, days a gift stays valid); Preview (writes nothing); Gift rules; "This month by tier"; the disabled Retire of the default walk-in tier stays visible. |
@@ -836,7 +836,7 @@ python3 tools/check_ui_inventory.py --report             # counts per category, 
 # new tool, built in W3-M (does not exist yet)
 python3 tools/build_ui_map.py --baseline tests/ui_inventory/baseline.json --format md  > docs/UI_MAP.md
 python3 tools/build_ui_map.py --baseline tests/ui_inventory/baseline.json --format csv > docs/UI_MAP.csv
-python3 tools/build_ui_map.py --screen 14-1              # field map of one form: field id -> step, group
+python3 tools/build_ui_map.py --screen 06-1              # field map of one form: field id -> step, group
 python3 tools/build_ui_map.py --check                    # exit 1 if any baseline route, form or field has no new home
 ```
 
@@ -865,47 +865,47 @@ Form code, paper name and version stay exactly as in the `forms` table; the job 
 
 | Code | Area | Job (plain verb) | Ways |
 |---|---|---|---|
-| 14-1 | Sell | Count the drawer and close the day | Form-only (wrapped by the Close-day routine) |
-| 14-2 | Sell | Fill the jalebi counter record | Form-only |
-| 20-1 | Sell | Take an order | Twin (`onlineorders`, `inbox`) |
-| 20-2 | Sell | Approve a discount | Twin (POS discount sheet, `discounts`) |
-| 20-3 | Sell | Take a return or complaint | Twin (`salereturn`) |
-| 20-4 | Sell | Make a party invoice | Twin (POS wholesale) |
-| 20-5 | Sell | See a party ledger | Twin (`dues`, `customers`) |
-| 20-6 | Sell | Settle online and delivery money | Partial (`onlineorders`) |
-| 03-1 | Goods | Send stock to another place | Twin (`stock` Transfer; path `stock_transfer`) |
-| 04-1 | Goods | Receive goods | Twin (`purchase/new`; rule `grn_receipt_source`) |
-| 04-2 | Goods | Issue material | Twin (`stock` Issue; path `stock_issue`) |
-| 04-3 | Goods | Count stock | Twin (`stock` Count; path `stock_count`) |
-| 04-4 | Goods | Look at the store ledger | Twin (`stock` ledger) |
-| 08-1 | Goods | Ask for a repair | Partial (`assets`) |
-| 06-1 | Goods | Ask to buy | Form-only |
-| 06-2 | Goods | Compare supplier quotes | Form-only |
-| 06-3 | Goods | Order from a supplier | Form-only |
-| 06-4 | Goods | Check a bill and ask for payment | Partial (`purchase`, `payables`) |
-| 06-5 | Goods | See a supplier ledger | Twin (`payables`) |
-| 05-1 | Make | Fill the factory daily sheet | Twin (`recipes` run; path `production`) |
-| 05-2 | Make | Write a product spec | Form-only |
-| 05-3 | Make | Write or read a recipe card | Twin (`recipes`, `recipebook`) |
-| 05-4 | Make | Run a yield test | Form-only |
-| 05-5 | Make | Decide on a new product | Form-only |
-| 10-1 | Money | Hand cash to the hub | Twin (`cashmoves`) |
-| 10-2 | Money | Add an expense | Twin (`quickexp`, `daybook`; path `expense`) |
-| 10-3 | Money | Reconcile digital payments | Twin (`wallets`) |
-| 10-4 | Money | See the cash position | Partial (`daybook`, `accounts`) |
-| 10-5 | Money | Reconcile receivables and advances | Form-only |
-| 18-1 | Money | Record marketing spend | Form-only |
-| 01-1 | Reports | Write the weekly review | Form-only |
-| 01-2 | Reports | Fill the monthly P&L and KPI | Partial (`biz`) |
-| 02-1 | People | Mark attendance | Twin (`attendance`, `attend2`) |
-| 02-2 | People | Run payroll | Twin (`payroll`; path `payroll`) |
-| 02-3 | People | Give or recover a staff advance | Partial (`payroll`) |
-| 02-4 | People | Register an employee | Twin (`deeds`, `employees`) |
-| 02-5 | People | Apply for or decide leave | Twin (`leave`) |
-| 02-6 | People | Clear an employee who leaves | Form-only |
-| 02-7 | People | Plan duty and backup | Form-only |
-| 02-8 | People | Check skills | Form-only |
-| 11-1 | People | Hand over my shift | Form-only |
+| 06-1 | Sell | Count the drawer and close the day | Form-only (wrapped by the Close-day routine) |
+| 14-1 | Sell | Fill the jalebi counter record | Form-only |
+| 05-1 | Sell | Take an order | Twin (`onlineorders`, `inbox`) |
+| 08-1 | Sell | Approve a discount | Twin (POS discount sheet, `discounts`) |
+| 32-1 | Sell | Take a return or complaint | Twin (`salereturn`) |
+| 24-1 | Sell | Make a party invoice | Twin (POS wholesale) |
+| 25-1 | Sell | See a party ledger | Twin (`dues`, `customers`) |
+| 23-1 | Sell | Settle online and delivery money | Partial (`onlineorders`) |
+| 39-1 | Goods | Send stock to another place | Twin (`stock` Transfer; path `stock_transfer`) |
+| 13-1 | Goods | Receive goods | Twin (`purchase/new`; rule `grn_receipt_source`) |
+| 18-1 | Goods | Issue material | Twin (`stock` Issue; path `stock_issue`) |
+| 36-1 | Goods | Count stock | Twin (`stock` Count; path `stock_count`) |
+| 37-1 | Goods | Look at the store ledger | Twin (`stock` ledger) |
+| 16-1 | Goods | Ask for a repair | Partial (`assets`) |
+| 28-1 | Goods | Ask to buy | Form-only |
+| 29-1 | Goods | Compare supplier quotes | Form-only |
+| 27-1 | Goods | Order from a supplier | Form-only |
+| 02-1 | Goods | Check a bill and ask for payment | Partial (`purchase`, `payables`) |
+| 38-1 | Goods | See a supplier ledger | Twin (`payables`) |
+| 12-1 | Make | Fill the factory daily sheet | Twin (`recipes` run; path `production`) |
+| 26-1 | Make | Write a product spec | Form-only |
+| 31-1 | Make | Write or read a recipe card | Twin (`recipes`, `recipebook`) |
+| 41-1 | Make | Run a yield test | Form-only |
+| 22-1 | Make | Decide on a new product | Form-only |
+| 03-1 | Money | Hand cash to the hub | Twin (`cashmoves`) |
+| 11-1 | Money | Add an expense | Twin (`quickexp`, `daybook`; path `expense`) |
+| 07-1 | Money | Reconcile digital payments | Twin (`wallets`) |
+| 04-1 | Money | See the cash position | Partial (`daybook`, `accounts`) |
+| 30-1 | Money | Reconcile receivables and advances | Form-only |
+| 17-1 | Money | Record marketing spend | Form-only |
+| 40-1 | Reports | Write the weekly review | Form-only |
+| 20-1 | Reports | Fill the monthly P&L and KPI | Partial (`biz`) |
+| 19-1 | People | Mark attendance | Twin (`attendance`, `attend2`) |
+| 21-1 | People | Run payroll | Twin (`payroll`; path `payroll`) |
+| 35-1 | People | Give or recover a staff advance | Partial (`payroll`) |
+| 01-1 | People | Register an employee | Twin (`deeds`, `employees`) |
+| 15-1 | People | Apply for or decide leave | Twin (`leave`) |
+| 10-1 | People | Clear an employee who leaves | Form-only |
+| 09-1 | People | Plan duty and backup | Form-only |
+| 34-1 | People | Check skills | Form-only |
+| 33-1 | People | Hand over my shift | Form-only |
 | 0-1 | Setup | Set a location's limits | Twin (`locset`; the form page opens it) |
 
 Totals: 21 twin, 6 partial, 15 form-only = 42 (X). The three permission codes `ITEMS`, `ITEM_COST` and `POS` have no page; they stay in Setup > Access > By form. Each form appears on (a) its area page Forms strip, (b) Menu > Forms in paper-book order with today's status for my place (Done, Draft, To do, Paper), (c) Find by code, (d) its job card. `#/form/<code>` and `#/entry/*` are unchanged.
@@ -932,10 +932,10 @@ Old side from the baseline (alphabetical order of route id); the `group`, `drawe
 | # | Route | Old group | Old drawer | New area > section | Module | Also reached via |
 |--:|---|---|:-:|---|---|---|
 | 1 | `accounts` | acc | yes | Money > Accounts and books | Accounts | Find "ledger" |
-| 2 | `assets` | stock | yes | Goods > Equipment | Stock | job "Ask for a repair" (08-1) |
+| 2 | `assets` | stock | yes | Goods > Equipment | Stock | job "Ask for a repair" (16-1) |
 | 3 | `assistant` | reports | yes | Help (?) > Ask; also Reports | Reports | Help button on every screen |
 | 4 | `attend2` | people | yes | People > Attendance (Check in) | People | job "Check in" |
-| 5 | `attendance` | people | yes | People > Attendance (Board) | People | job "Mark attendance" (02-1); Grid G4 |
+| 5 | `attendance` | people | yes | People > Attendance (Board) | People | job "Mark attendance" (19-1); Grid G4 |
 | 6 | `backup` | settings | yes | Setup > Safety | Setup | checklist step 12 |
 | 7 | `balancecheck` | acc | yes | Checks > Audits | Controls | Money > Month and year |
 | 8 | `benefitsx` | people | yes | People > Pay > Benefits | People | tab |
@@ -943,7 +943,7 @@ Old side from the baseline (alphabetical order of route id); the `group`, `drawe
 | 10 | `biz` | reports | yes | Reports > Profit and business | Reports | Numbers block (owner) |
 | 11 | `brandpnl` | reports | yes | Reports > Profit and business > By brand | Reports | tab |
 | 12 | `bulkitems` | item | yes | Goods > Items and prices > Bulk edit | Items | Grid G5 |
-| 13 | `cashmoves` | acc | yes | Money > Cash today | Accounts | job "Move cash or bank money"; form 10-1 |
+| 13 | `cashmoves` | acc | yes | Money > Cash today | Accounts | job "Move cash or bank money"; form 03-1 |
 | 14 | `changes` | appr | yes | Checks > Inbox (filter Change) | Controls | Setup tile kept |
 | 15 | `control` | settings | yes | Setup > Setup home (title stays "Control Center") | Setup | Setup area; owner Needs you |
 | 16 | `costattrib` | factory | yes | Make > Costs (tab 3 of 3) | Production | Find "which showroom" |
@@ -953,11 +953,11 @@ Old side from the baseline (alphabetical order of route id); the `group`, `drawe
 | 20 | `daybook` | acc | yes | Money > Cash today | Accounts | job "Look at the day book" |
 | 21 | `deeds` | acc | yes | People > Employees > Deeds | People | tab |
 | 22 | `delegation` | settings | yes | Setup > Access > By person | Setup | Find "delegate" |
-| 23 | `discounts` | reports | yes | Reports > Sales reports | Reports | Sell (form 20-2) |
+| 23 | `discounts` | reports | yes | Reports > Sales reports | Reports | Sell (form 08-1) |
 | 24 | `dues` | cust | yes | Sell > Every day | Customers | job "Collect a due" |
 | 25 | `emergency` | appr | yes | Checks > Inbox (filter Emergency) | Controls | Needs you |
 | 26 | `employees` | acc | yes | People > Employees | People | record page Employee |
-| 27 | `employees/new` | acc | yes | People > Employees (button) | People | job "Register an employee" (02-4) |
+| 27 | `employees/new` | acc | yes | People > Employees (button) | People | job "Register an employee" (01-1) |
 | 28 | `eqcheck` | appr | yes | Checks > Audits | Controls | Find "re-check" |
 | 29 | `exceptions` | appr | yes | Checks > Inbox | Controls | Needs you; To do |
 | 30 | `finance2` | acc | yes | Money > Accounts and books > Bank, VAT, year-end | Accounts | Find "bank" (title "Finance 2" kept) |
@@ -966,10 +966,10 @@ Field examples (ids are the baseline ids and do not change; the new side is the 
 
 | Baseline id | Type | New home |
 |---|---|---|
-| `field:14-1:cash_count` | denoms (required) | 14-1 > step 3 Cash > Cash count pad (data-p paths `cash_count.n1000` to `n1`, `cash_count.coin` unchanged) |
-| `field:14-1:fridges.cold` | tick | 14-1 > step 1 Opening > fridges table, expanded row |
-| `field:14-1:c1` | tick (required) | 14-1 > step 5 Close > checklist `c1` to `c16`, counter 0/16 |
-| `option:14-1:day_type:busy` | option | 14-1 > header card `day_type` |
+| `field:14-1:cash_count` | denoms (required) | 06-1 > step 3 Cash > Cash count pad (data-p paths `cash_count.n1000` to `n1`, `cash_count.coin` unchanged) |
+| `field:14-1:fridges.cold` | tick | 06-1 > step 1 Opening > fridges table, expanded row |
+| `field:14-1:c1` | tick (required) | 06-1 > step 5 Close > checklist `c1` to `c16`, counter 0/16 |
+| `option:14-1:day_type:busy` | option | 06-1 > header card `day_type` |
 | `ctl:entry.js:button:e_count_save` | button | stays in `entry.js`; in the bar or the Cash step, same `data-act` |
 | `setting:rule:blind_count_on` | rule | Setup > Rules by purpose > "How do we protect cash and counts?"; Switchboard pinned Safety group |
 
@@ -983,10 +983,10 @@ Folding, tabs, steps and lazy panels make three existing weaknesses worse. They 
 
 | | |
 |---|---|
-| Where [code] | `web/entry.js`: `missingRequired()` (line 628) returns only label strings. Three call sites show them as plain notices and nothing else: Submit (about line 679), approve (about line 703), send change (about line 880). `E.openSecs` (lines 237, 625) remembers open sections only in memory. 14-1 already has 6 collapsed sections [D]. |
+| Where [code] | `web/entry.js`: `missingRequired()` (line 628) returns only label strings. Three call sites show them as plain notices and nothing else: Submit (about line 679), approve (about line 703), send change (about line 880). `E.openSecs` (lines 237, 625) remembers open sections only in memory. 06-1 already has 6 collapsed sections [D]. |
 | Risk | A required field sits in a closed section. The person is told "something is missing" and cannot find it. Compaction would hide far more. |
 | Fix | (1) `missingRequired()` returns objects `{label, path, sec, row}` and keeps a string view for old callers. (2) The sheet shows one button per item (`data-jump=<path>`). Tap: close the sheet, open the section (add it to `E.openSecs`), expand the table row, scroll the field to one third of the screen, focus it, flash it 1.2 s. (3) On Submit, every section holding a required empty field or a red flag is forced open, and the closed summary shows a text badge `! k required missing`, `k red`. (4) A red flag in the flags box gets "Go to field" when it names a field or a section. |
-| Tests | Audit D T3 (submit empty 14-1 and 10-2, click the first item: field in viewport, group open, focus set, also inside a closed group and inside a row) and T6 (red flag in a closed section: badge text present, flags box visible, Submit opens it). |
+| Tests | Audit D T3 (submit empty 06-1 and 11-1, click the first item: field in viewport, group open, focus set, also inside a closed group and inside a row) and T6 (red flag in a closed section: badge text present, flags box visible, Submit opens it). |
 | Effort | 1.5 days, owner: integrator (edits `entry.js`). |
 
 ### S-2 The `locations.js` submit guard reads the page, not the data
@@ -1113,7 +1113,7 @@ Every package: G1 to G3 of section 5.2 (inventory gate, switches-OFF hash, parit
 | W3-N | `arch_complete_test`, `arch_jobs_test`, `arch_off_test`; kits: every seeded role's job list equals the expected list from `role_form_perms`; no job shown that the role cannot enter | none |
 | W3-G | Audit D T4 (remembered state, corrupt, blocked), T7 (one fixed bottom bar, Confirm visible), T8 (overflow), T9 (keyboard); contrast test of tokens (edges 3:1 both themes); chrome budget on 8 templates; `lang` set per mode | T12 (switch to English and Large text), T16 (T2 at Extra) |
 | W3-A | Today layout 1.0 to 1.3 pages in bn; "All clear" only with zero unknown; request count and time (TB6); tap table for 10 jobs vs Audit C | T1, T2, T4, T11; TB2, TB8 |
-| W3-D | Find ranks label > keyword > route; finds `04-1`, "GRN", receipt number, serial, phone; opens the record; offline degrades; `glossary.py` prints 0; every record on its area page and in A-Z | T14, T19; TB1 |
+| W3-D | Find ranks label > keyword > route; finds `13-1`, "GRN", receipt number, serial, phone; opens the record; offline degrades; `glossary.py` prints 0; every record on its area page and in A-Z | T14, T19; TB1 |
 | W3-F | Both ways listed; locked way greyed not hidden; default order per D07; switch after input asks to keep a draft; status line wording; chip words only with a stored fact; merged list shows both stores | T5, T5b (TB9), T17 (TB7) |
 | W3-E | Inline decision only for kinds in `checks_inline_kinds`; money kinds open the record; decider is never the maker; old routes open the filtered list; four Access lenses show the same data | T7, T9 |
 | W3-Q | Board answers the 21:30 question; no state without a done-signal; entered-later uses original time; staff see only own record; 5 places = about 0.95 page | owner task: "which shops did not count the drawer" |
@@ -1129,13 +1129,13 @@ Every package: G1 to G3 of section 5.2 (inventory gate, switches-OFF hash, parit
 
 | Gate | Who | Pass condition |
 |---|---|---|
-| **A** owner phone only | Owner (`bos_ia_arch=on` on one phone, rule still off) | Owner uses Today for one full day; walks the 12 "See as role" views; completes one real 14-1 on the new layout; makes one Approve from the Checks inbox; the inventory check and parity are green |
-| **B** one shop, one week | One showroom, 5 daily forms (14-1, 10-1, 10-2, 04-3, 03-1) in Parallel for the new views | R0 comparison: no P0 task worse than R0; T1 to T6 at least 30% faster; 0 critical errors; Day board metrics read; TB2, TB6, TB7 results in |
+| **A** owner phone only | Owner (`bos_ia_arch=on` on one phone, rule still off) | Owner uses Today for one full day; walks the 12 "See as role" views; completes one real 06-1 on the new layout; makes one Approve from the Checks inbox; the inventory check and parity are green |
+| **B** one shop, one week | One showroom, 5 daily forms (06-1, 03-1, 11-1, 36-1, 39-1) in Parallel for the new views | R0 comparison: no P0 task worse than R0; T1 to T6 at least 30% faster; 0 critical errors; Day board metrics read; TB2, TB6, TB7 results in |
 | **C** everyone | `ia_arch_v1` on, each phone keeps its own off switch for the first month | TB1 decided PV-2; TB2 at least 90%; reach test green for 12 contexts; chrome within budget on 8 templates; owner signs the generated map |
 
 **Stop and roll back if**: a role cannot reach one of its seeded form rights in 3 taps (the test fails); more than a quarter of phones switch themselves to Classic in the first week; entered-later or rejected entries rise beyond what was agreed; any person reports a job they could do yesterday and cannot find today (log it, fix the kit, do not blame the user).
 
-Programme exit: all package tests green in both modes (switches OFF identical to today, ON parity); `check_ui_inventory.py` exit 0 with only the aliases of 5.4; `glossary.py` 0; `check_no_demo_leak.py` OK; baseline updated; `docs/IA_RULES.md`, `docs/DESIGN_SYSTEM.md` ("Sell first" becomes "primary job first"; tokens), `docs/IA_CONCEPT.md` (built versus planned), `docs/UI_NO_LOSS_RULE.md` and the `bos-organise` skill amended in the same change; one real 14-1 completed by the owner on the new layout.
+Programme exit: all package tests green in both modes (switches OFF identical to today, ON parity); `check_ui_inventory.py` exit 0 with only the aliases of 5.4; `glossary.py` 0; `check_no_demo_leak.py` OK; baseline updated; `docs/IA_RULES.md`, `docs/DESIGN_SYSTEM.md` ("Sell first" becomes "primary job first"; tokens), `docs/IA_CONCEPT.md` (built versus planned), `docs/UI_NO_LOSS_RULE.md` and the `bos-organise` skill amended in the same change; one real 06-1 completed by the owner on the new layout.
 
 ### 7.7 Reconciliation with Wave 3 (U-34 to U-45)
 
@@ -1172,7 +1172,7 @@ Staff learn three things: **Today, Find, Menu**. The owner learns five: shape, k
 | 0 to 1 | "This app is for two things: what you do now, and finding anything." Show Today and Find. Language button |
 | 1 to 3 | Tap the main job Sell, sell one item to the manager, show cancel. "You always come back with Today" |
 | 3 to 5 | Collect a due; take a return |
-| 5 to 7 | Take an order (20-1): the 3 fields that matter; show that "More options" exists |
+| 5 to 7 | Take an order (05-1): the 3 fields that matter; show that "More options" exists |
 | 7 to 9 | Airplane mode: sell, see "1 not sent", reconnect, see it send |
 | 9 to 10 | Teach-back: the trainee does Sell, Collect a due and Find "receipt" alone. Pass = no help. Hand over the printed card |
 
@@ -1262,21 +1262,21 @@ Storekeeper (10 min): Receive goods (both ways shown once), Issue, Send, Count, 
 
 ## Appendix A. Role start kits (derived from the seed `role_form_perms`; the owner can change any row)
 
-Job lists are computed, not typed: `jobs_for(person) = ALL_JOBS.filter(job has a way the person may open).sort(kit order, then time window, then undone first)`. A person with two roles gets the merge of both kits, ordered by the first role. "Accountant" is not a role in the `roles` table; it is a bundle of grants (`view_daybook`, `salary_view`, form 10-3) that unlocks the Money jobs. Corrections to Audit C's examples: a salesperson cannot enter 14-1 by default; a factory in-charge cannot enter 06-1 or 11-1; the approver jobs belong to management, cash controller and owner, not to the showroom manager [code, X].
+Job lists are computed, not typed: `jobs_for(person) = ALL_JOBS.filter(job has a way the person may open).sort(kit order, then time window, then undone first)`. A person with two roles gets the merge of both kits, ordered by the first role. "Accountant" is not a role in the `roles` table; it is a bundle of grants (`view_daybook`, `salary_view`, form 07-1) that unlocks the Money jobs. Corrections to Audit C's examples: a salesperson cannot enter 06-1 by default; a factory in-charge cannot enter 28-1 or 33-1; the approver jobs belong to management, cash controller and owner, not to the showroom manager [code, X].
 
 | Role (seed) | Orb (main job) | Typical cards | Areas shown |
 |---|---|---|---|
-| Owner | Needs you | Setup checklist until done; weekly review 01-1; month-end; Day board | all 8 |
-| Management (view and approve only) | Needs you | Approvals, exceptions, weekly 01-1, monthly 01-2, month-end checks | Checks, Reports, People, Goods, Sell (read) |
-| Cash controller | Hand cash to hub (10-1) | vouchers 10-2 to check; reconcile digital 10-3; cash position 10-4; receivables 10-5 | Money, Checks |
-| Showroom manager | Today's routine (Open shop, then Close day by time) | Count drawer 14-1; hand cash 10-1; expense 10-2; hand over shift 11-1; receive and send stock 03-1; count stock 04-3; discount slip 20-2; leave 02-5 | Sell, Goods, People, Checks |
-| Salesperson | Sell | Collect a due; take an order 20-1; take a return 20-3; jalebi counter 14-2; check in; send unsent | Sell |
-| Storekeeper | Receive goods (04-1) | Issue 04-2; send 03-1; count 04-3; store ledger 04-4; wastage; low stock | Goods |
-| Factory in-charge | Fill factory sheet (05-1) | Issue to production 04-2; send finished goods 03-1; yield test 05-4; recipe card 05-3; new product 05-5 | Make, Goods |
-| Purchasing | Ask to buy (06-1) | Compare quotes 06-2; orders 06-3; purchase bill; pay supplier (if granted) | Goods |
-| Party and wholesale coordinator | Take an order (20-1) | Discount approval 20-2; party invoice 20-4; party ledger 20-5; collect a due | Sell |
-| Carrier | Delivery ledger (20-6) | Transfers to carry (03-1 view); cash to hub (10-1 view) | Sell, Goods (read) |
-| HR | Mark attendance (02-1) | Leave 02-5; payroll 02-2; advances 02-3; appointment 02-4; exit 02-6; duty 02-7; skills 02-8; register employee | People |
+| Owner | Needs you | Setup checklist until done; weekly review 40-1; month-end; Day board | all 8 |
+| Management (view and approve only) | Needs you | Approvals, exceptions, weekly 40-1, monthly 20-1, month-end checks | Checks, Reports, People, Goods, Sell (read) |
+| Cash controller | Hand cash to hub (03-1) | vouchers 11-1 to check; reconcile digital 07-1; cash position 04-1; receivables 30-1 | Money, Checks |
+| Showroom manager | Today's routine (Open shop, then Close day by time) | Count drawer 06-1; hand cash 03-1; expense 11-1; hand over shift 33-1; receive and send stock 39-1; count stock 36-1; discount slip 08-1; leave 15-1 | Sell, Goods, People, Checks |
+| Salesperson | Sell | Collect a due; take an order 05-1; take a return 32-1; jalebi counter 14-1; check in; send unsent | Sell |
+| Storekeeper | Receive goods (13-1) | Issue 18-1; send 39-1; count 36-1; store ledger 37-1; wastage; low stock | Goods |
+| Factory in-charge | Fill factory sheet (12-1) | Issue to production 18-1; send finished goods 39-1; yield test 41-1; recipe card 31-1; new product 22-1 | Make, Goods |
+| Purchasing | Ask to buy (28-1) | Compare quotes 29-1; orders 27-1; purchase bill; pay supplier (if granted) | Goods |
+| Party and wholesale coordinator | Take an order (05-1) | Discount approval 08-1; party invoice 24-1; party ledger 25-1; collect a due | Sell |
+| Carrier | Delivery ledger (23-1) | Transfers to carry (39-1 view); cash to hub (03-1 view) | Sell, Goods (read) |
+| HR | Mark attendance (19-1) | Leave 15-1; payroll 21-1; advances 35-1; appointment 01-1; exit 10-1; duty 09-1; skills 34-1; register employee | People |
 | Grants-only accountant | Look at the day book | Month-end; reconcile digital; pay supplier; bank, VAT, year-end; other income | Money, Reports |
 
 ## Appendix B. Job record (data, optional overlay in `web/jobs.js`)
@@ -1285,10 +1285,10 @@ Job lists are computed, not typed: `jobs_for(person) = ALL_JOBS.filter(job has a
 { id:'receive_goods', verb:'Receive goods', icon:'box', area:'Goods',
   roles:['storekeeper','purchasing'],
   ways:[ { route:'purchase/new', kind:'screen', counts:'rule:grn_receipt_source=purchase' },
-         { form:'04-1',          kind:'form',   counts:'rule:grn_receipt_source=form' } ],
+         { form:'13-1',          kind:'form',   counts:'rule:grn_receipt_source=form' } ],
   open:'new',                         // 'new' or 'list'; per person per job override
   window:null,                        // owner-set time window, blank = none
-  done:{ kind:'entry', form:'04-1' }, // an existing flow.js check kind, or null (no state shown)
+  done:{ kind:'entry', form:'13-1' }, // an existing flow.js check kind, or null (no state shown)
   old:['GRN','goods received note'] } // search words; never shown as the name
 ```
 
@@ -1300,18 +1300,18 @@ A form-only job has one way and no Way strip. A record with no job is still on i
 |---|---|:-:|---:|---|
 | T1 | Sell 2 items for cash, one at an allowed discount | P0 | <= 45 s from Today | correct total, no help |
 | T2 | Collect 500 due from a named test customer | P0 | <= 40 s | right customer, 500 collected |
-| T3 | Fill step 1 (Opening) of 14-1 from a paper sheet | P0 | <= 4 min | all given values entered |
-| T4 | Close the day: Close-day routine, cash step of 14-1, 10-1 step | P0 | <= 8 min | every step ticked by the system |
+| T3 | Fill step 1 (Opening) of 06-1 from a paper sheet | P0 | <= 4 min | all given values entered |
+| T4 | Close the day: Close-day routine, cash step of 06-1, 03-1 step | P0 | <= 8 min | every step ticked by the system |
 | T5 | Record goods received from a challan, then say which way counts for stock | P0 | <= 3 min | saved and correct answer |
 | T6 | Pay a test supplier 2,000 | P0 | <= 60 s | right supplier |
 | T7 | Owner decides 2 waiting requests (approve one, reject one with reason) | P0 | <= 60 s | both decided, reason entered |
 | T8 | Turn blind count on for one location | P1 | <= 60 s | correct switch, impact line seen |
 | T9 | Give "See cost" to one person | P1 | <= 90 s | right person, confirm read |
-| T10 | Submit 10-2 with 2 required fields empty, then fix | P0 | recover <= 45 s | used Go to field |
+| T10 | Submit 11-1 with 2 required fields empty, then fix | P0 | recover <= 45 s | used Go to field |
 | T11 | Make a sale with no internet, find it in Not sent, send when online | P0 | <= 2 min | sent once, no duplicate |
 | T12 | Switch to English and Large text | P1 | <= 30 s | both set unaided |
-| T13 | Open the factory sheet 05-1 | P1 | <= 30 s to first field | form open |
-| T14 | Find form 20-3 by number, then by name | P0 | <= 20 s each | opens 20-3 |
+| T13 | Open the factory sheet 12-1 | P1 | <= 30 s to first field | form open |
+| T14 | Find form 32-1 by number, then by name | P0 | <= 20 s each | opens 32-1 |
 | T15 | Void a given sale | P0 | <= 60 s | reason entered; error if the wrong sale |
 | T16 | Do T2 at Extra text size | P1 | <= 60 s | no horizontal scroll |
 | T17 | Find yesterday's record of this job | P1 | <= 20 s | found |

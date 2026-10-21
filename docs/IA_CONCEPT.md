@@ -35,7 +35,7 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 |---|---|---|---|
 | 1 | Open shop checklist (cash float, fridge/stock look) | Guided flow "Open shop" -> `#/form/14-1` | 1 |
 | 2 | Approve staff entries/discounts/voids | `#/pending`, `#/exceptions` | 1-2 |
-| 3 | Cash count and day close (14-1 -> 10-1 -> deposit) | Guided flow "Close day" | 1 + steps |
+| 3 | Cash count and day close (06-1 -> 03-1 -> deposit) | Guided flow "Close day" | 1 + steps |
 | 4 | Receive goods / transfer in | `#/form/04-1`, `#/form/03-1` | 2 |
 | 5 | Stock count (blind) | `#/form/04-3` or `#/stock` | 2 |
 | 6 | Expenses / imprest | `#/form/10-2`, `#/form/18-1` | 2 |
@@ -96,7 +96,7 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 | 1 | Receive showroom cash (hub count) | `#/form/10-1` hub side | 2 |
 | 2 | Cash position vs purchase budget | `#/daybook` / cash report | 1-2 |
 | 3 | Supplier payment | `#/payables` | 2 |
-| 4 | Purchase order / quotation | `#/form/06-2?` `06-3?` | 2 |
+| 4 | Purchase order / quotation | `#/form/06-2?` `27-1?` | 2 |
 | 5 | Transfers overview (in transit) | `#/stock` | 1 |
 | 6 | Collect from wholesale dues | `#/dues` | 2 |
 | 7 | Staff attendance entry | `#/form/02-1` | 2 |
@@ -122,7 +122,7 @@ Home page job (one sentence): "Show me what needs me now and let me start my mos
 | Staff approval, item change requests | yes | no | no | no | no | no | no |
 | Entries awaiting MY approval (`#/pending`) | yes | own shop | no | no | factory sheets | bills | yes |
 | Red/yellow exceptions (`#/exceptions`) | yes | own shop | no | no | no | no | yes |
-| Drafts of mine / sheets to fill today (14-1, 05-1, 04-3...) | no | yes | yes (14-1) | yes | yes (05-1) | no | no |
+| Drafts of mine / sheets to fill today (06-1, 12-1, 04-3...) | no | yes | yes (06-1) | yes | yes (12-1) | no | no |
 | Rejected - needs my fix | no | yes | yes | yes | yes | yes | yes |
 | Not-sent offline queue (`#/outbox`) | yes | yes | yes | yes | yes | no | no |
 | Transfers in transit to my place | no | yes | no | yes | yes | no | yes |
@@ -152,12 +152,12 @@ Home page job (one sentence): "Show me what needs me now and let me start my mos
 
 ### 2.5 Quick actions defaults (editable; owner sets role default, person overrides)
 - Owner: Needs-you, Sales today, Dues, Items/prices, Reports, Control Center.
-- Manager: Sell (POS), Cash count 14-1, Receive goods 04-1, Stock count 04-3, Expense 10-2, Close day.
-- Cashier: Sell, Collect baki, Sale return, Cash count 14-1, Not-sent (if any).
-- Store: Receive goods, Issue 04-2, Transfer 03-1, Stock count, Wastage, Low stock.
-- Factory: Daily sheet 05-1, Production, Request material 06-1, Transfer 03-1, Handover 11-1.
-- Accountant: Day book, Payables, Purchase bills, Digital reconcile 10-3, Reports, Salary (if granted).
-- Hub: Hub cash 10-1, Payables, Day book, Transfers, Dues.
+- Manager: Sell (POS), Cash count 06-1, Receive goods 13-1, Stock count 36-1, Expense 11-1, Close day.
+- Cashier: Sell, Collect baki, Sale return, Cash count 06-1, Not-sent (if any).
+- Store: Receive goods, Issue 18-1, Transfer 39-1, Stock count, Wastage, Low stock.
+- Factory: Daily sheet 12-1, Production, Request material 28-1, Transfer 39-1, Handover 11-1.
+- Accountant: Day book, Payables, Purchase bills, Digital reconcile 07-1, Reports, Salary (if granted).
+- Hub: Hub cash 03-1, Payables, Day book, Transfers, Dues.
 A button shows only if `ok()` for that route (same function nav.js uses). If fewer than 4 qualify, fill from Recent.
 
 ### 2.6 Choosing the home variant
@@ -171,8 +171,8 @@ Rule table (first match): owner -> Owner home; role management -> Manager; has `
 |---|---|---|---|---|
 | Owner | Home | Needs-you (Control Center inbox, dot) | Reports | Me |
 | Manager | Home | Sell | Day (guided flows) | Menu |
-| Cashier | Sell | Dues | Day (14-1 / close) | Me |
-| Store | Home | Stock | Receive/Issue (hub of 04-x, 03-1) | Menu |
+| Cashier | Sell | Dues | Day (06-1 / close) | Me |
+| Store | Home | Stock | Receive/Issue (hub of 04-x, 39-1) | Menu |
 | Factory | Home | Today's sheets | Production | Menu |
 | Accountant | Home | Day book | Payables | Menu |
 | Hub | Home | Cash | Payables | Menu |
@@ -198,8 +198,8 @@ Verb table (bn / mix / en synonyms all match; Bangla typed in Latin phonetics is
 |---|---|---|
 | sell / বিক্রি | sell, sale, বিক্রি, pos | `#/pos` |
 | collect / বাকি আদায় | baki, due, collect | `#/dues` |
-| count cash / ক্যাশ গণনা | cash count, 14-1 | `#/form/14-1` |
-| count stock / স্টক গণনা | stock count, 04-3 | `#/form/04-3` |
+| count cash / ক্যাশ গণনা | cash count, 06-1 | `#/form/14-1` |
+| count stock / স্টক গণনা | stock count, 36-1 | `#/form/04-3` |
 | new item / নতুন আইটেম | new item, add product | `#/items/new` (or itemreq if no create grant) |
 | receive goods / মাল গ্রহণ | grn, receive | `#/form/04-1` |
 | new purchase bill | bill, purchase | `#/purchase/new` |
@@ -238,13 +238,13 @@ Page-job: "walk me through a recurring routine in order, and show what is alread
 Common behaviours: progress "3 of 7"; each step tap-to-open; status per step (todo / done / skipped with reason / blocked); resume from Home (the flow is a Now row "Close day: 2 of 5 left"); flows are editable lists in settings (owner can reorder, add a step linking any route, switch a step ON/OFF); a flow cannot be "completed" by tapping, only by the underlying checks or an explicit skip with a note (audit-logged).
 
 ### 4.1 Open shop (manager / cashier)
-1. Opening cash float count: `#/form/14-1` (blind count mode if on) - done when today's 14-1 exists for this shop.
+1. Opening cash float count: `#/form/14-1` (blind count mode if on) - done when today's 06-1 exists for this shop.
 2. Staff present: `#/form/02-1` attendance (if shop uses it).
 3. Stock/fridge quick look: `#/stock` low + expiry chips (view only, auto-done on view).
 4. Check yesterday's problems: `#/exceptions` (own shop) - done when none open.
 5. Open POS: `#/pos`.
 
-### 4.2 Close day (14-1 -> 10-1 -> deposit)
+### 4.2 Close day (06-1 -> 03-1 -> deposit)
 1. Count the drawer: `#/form/14-1` (blind; short/over vs `cash_tol`).
 2. If red control: ask owner/manager (release request) - blocked until decided.
 3. Hand over cash: `#/form/10-1` (hub count).
@@ -442,7 +442,7 @@ Acceptance tests:
 ### Increment B - "Guided days and the owner's inbox"
 Scope: `#/flow/<id>` generic stepper + 4 flows (data-driven); Needs-you rows (oldest first) in Control Center; Exceptions triage buckets; Delegation board (read-only first, then pause/resume).
 Acceptance tests:
-- B1 Close day flow: step 1 turns done only after a 14-1 for that shop/date exists; opening it and cancelling leaves it todo; a step the user lacks the grant for shows "needs <role>".
+- B1 Close day flow: step 1 turns done only after a 06-1 for that shop/date exists; opening it and cancelling leaves it todo; a step the user lacks the grant for shows "needs <role>".
 - B2 "Unknown" state: with the check query unavailable (phase not installed) the step shows "check manually", never a green tick.
 - B3 Skip needs a note and is audit-logged; flow cannot be marked complete by a tap.
 - B4 Needs-you: 10 mixed rows sorted by age; approve/reject writes via the same RPC as the source screen; rejecting without note is refused; money types have no bulk approve.

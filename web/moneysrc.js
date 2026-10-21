@@ -79,12 +79,12 @@ function rowSelect(event, i, selected, row) {
 }
 const taggedWallet = (macc, wallet) => (macc ? 'ma#' + macc + ';' : '') + (wallet || '');
 
-// ---- for the form engine (entry.js SEL field of the 10-2 voucher): the account id is stored inside the form data (money_account_id) ----
+// ---- for the form engine (entry.js SEL field of the 11-1 voucher): the account id is stored inside the form data (money_account_id) ----
 function hasAccounts(event) { const d = cached(event, ''); if (!d) { prefetch(event, ''); return false; } return (d.rows || []).length > 0; }
 const formOpts = (event) => () => { const d = cached(event, ''); if (!d) { prefetch(event, ''); return []; } return (d.rows || []).map((a) => [String(a.id), { bn: label(a), mix: label(a), en: label(a) }]); };
 
 B.moneySrc = { prefetch, cached, slot, fill, fillAll, setEvent, get, tag, rowSelect, taggedWallet, hasAccounts, formOpts, reset() { cache.clear(); } };
-// the 10-2 voucher form reads its accounts synchronously: warm the cache a moment after start and on each page change (one small call, cached for a minute)
+// the 11-1 voucher form reads its accounts synchronously: warm the cache a moment after start and on each page change (one small call, cached for a minute)
 const warm = () => { if (A.S && A.S.ctx) prefetch('expense_10_2', ''); };
 setTimeout(warm, 2500); window.addEventListener('hashchange', () => setTimeout(warm, 300));
 try {

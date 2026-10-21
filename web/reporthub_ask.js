@@ -29,7 +29,7 @@ const Y = {
   unlinked_h: L('কোনো ব্যক্তির সাথে যুক্ত নয়', 'Not linked to a person', 'Not linked to a person'), unlinked_t: L('এই খরচগুলো একই খাত/শব্দে মিলেছে কিন্তু কার জন্য তা লেখা নেই। আমি আন্দাজ করিনি।', 'These match the same head / words but the record does not say for whom. I did not guess.', 'এগুলো match করেছে কিন্তু কার জন্য লেখা নেই। আন্দাজ করিনি।'),
   missing_field: L('যে ঘর থাকলে সংযোগ করা যেত', 'Field that would make the link possible', 'Missing field'),
   mf_quick_expenses_person_id: L('দ্রুত খরচে কর্মীর আইডি (এখন শুধু "কাকে দেওয়া" লেখা)', 'a person id on quick expenses (today only a free-text "paid to")', 'quick expense-এ person id'),
-  mf_entries_10_2_lines_person_id: L('খরচ ভাউচারের প্রতি লাইনে কর্মীর আইডি (এখন শুধু "কার কাছে")', 'a person id on each 10-2 voucher line (today only a free-text "to")', '10-2 line-এ person id'),
+  mf_entries_10_2_lines_person_id: L('খরচ ভাউচারের প্রতি লাইনে কর্মীর আইডি (এখন শুধু "কার কাছে")', 'a person id on each 11-1 voucher line (today only a free-text "to")', '11-1 line-এ person id'),
   mf_cost_source_bills_person_id: L('ইউটিলিটি বিলে ব্যক্তির ঘর নেই', 'utility bills have no person field', 'utility bill-এ person field নেই'), mf_journal_lines_party_id: L('জার্নাল লাইনে পার্টি আইডি', 'a party id on the journal line', 'journal line-এ party id'),
   overlap: L('একই খরচ ভাউচারেও আছে হতে পারে (মোটে ধরা হয়নি)', 'may repeat an expense voucher (left out of the total)', 'voucher-এও থাকতে পারে (total-এ নেই)'),
   no_src: L('পেমেন্টের উৎস লেখা নেই বলে বাদ', 'left out: the payment source is not recorded', 'payment source নেই বলে বাদ'),

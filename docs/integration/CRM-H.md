@@ -12,7 +12,7 @@ Owner rules kept: every choice is a setting with a safe default and an English l
 | `crm_complaint_events` | table | Append only trail: created, assigned, status, note, contact, severity, link_return, sla_breach, repeat, food_safety, reopen. |
 | `crm_complaint_returns` | table | A finished `sale_returns` row linked to a complaint (one return belongs to one complaint). |
 | trigger `crm_complaints_guard` | trigger | The database refuses an illegal status move (`illegal_status_change`), locks a closed row (`complaint_locked`) and refuses a change of outlet, ticket number or author (`complaint_immutable`). Statuses: `open` -> `in_progress` / `resolved` / `closed_no_resolution`; `in_progress` -> `resolved` / `closed_no_resolution`; `resolved` -> `closed` or back to `in_progress` (reopen, reason needed). |
-| lists | `option_lists` | `crm_complaint_cats` (the nine causes of form 20-3), `crm_resolution_types`, `crm_close_reasons`. The owner adds or retires entries on the lists screen. |
+| lists | `option_lists` | `crm_complaint_cats` (the nine causes of form 32-1), `crm_resolution_types`, `crm_close_reasons`. The owner adds or retires entries on the lists screen. |
 | grants | `grant_defs` | `crm_complaint_log`, `crm_complaint_manage`, `crm_feedback_view`. Nobody holds them by default. |
 | `_crmh_complaint_save(p_client, p)` | API | Log a complaint. Outlet comes from the receipt or order. Idempotent on `p_client`. |
 | `_crmh_complaint_assign`, `_crmh_complaint_note`, `_crmh_complaint_move`, `_crmh_complaint_severity_set`, `_crmh_complaint_link_return` | API | Owner, notes and calls, status moves, severity change (the clock restarts from the logged time), link a finished return. |
@@ -107,7 +107,7 @@ The design mentions "rating chips after sale". It needs the exact success point 
 
 ## 6. Overlap with the unified plan (U-25)
 
-U-25 plans its own `complaints` table and a batch trace screen. These tables are named `crm_complaints` and do not clash. If U-25 is built later the owner picks one register: the recommended path is to keep `crm_complaints` for the clock, owner and report and let U-25 add the batch trace and hold-batch part, reading `crm_complaints.batch_ref`. `crm_complaints.sale_id`, `item_id` and `batch_ref` are the join keys. Nothing here reads or writes the paper form 20-3 and the `q3_complaints` report is untouched.
+U-25 plans its own `complaints` table and a batch trace screen. These tables are named `crm_complaints` and do not clash. If U-25 is built later the owner picks one register: the recommended path is to keep `crm_complaints` for the clock, owner and report and let U-25 add the batch trace and hold-batch part, reading `crm_complaints.batch_ref`. `crm_complaints.sale_id`, `item_id` and `batch_ref` are the join keys. Nothing here reads or writes the paper form 32-1 and the `q3_complaints` report is untouched.
 
 ## 7. Proof
 

@@ -426,7 +426,7 @@ function drawPhoto() {
 }
 async function pickPhoto(file) {
   if (!file) return; toast(T('upl'));
-  try { SH.photo = await uploadPhoto(file, ['STOCK', '04-1', '04-2', '04-4'], Number(($('#a_loc') || {}).value) || actLoc()); drawPhoto(); const h = $('#a_ph_h'); if (h) { h.textContent = ''; h.classList.remove('s2-need'); } } catch (e) { fail(e); }
+  try { SH.photo = await uploadPhoto(file, ['STOCK', '13-1', '18-1', '37-1'], Number(($('#a_loc') || {}).value) || actLoc()); drawPhoto(); const h = $('#a_ph_h'); if (h) { h.textContent = ''; h.classList.remove('s2-need'); } } catch (e) { fail(e); }
 }
 document.addEventListener('change', (e) => { if (e.target.id === 'a_file') pickPhoto(e.target.files && e.target.files[0]); });
 

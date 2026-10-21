@@ -130,7 +130,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   ok(await p.locator('[data-act=itemnew]').count() === 0 && await p.locator('.p2-row[data-act]').count() === 0, 'view-only: no add, rows not editable'); await p.close();
 
-  // ---------- supplier picker (goods received 04-1 / quotation 06-2) ----------
+  // ---------- supplier picker (goods received 13-1 / quotation 29-1) ----------
   p = await open({}, '#/entry/new/04-1/1');
   ok(await p.locator('input[data-sup]').count() >= 1, 'supplier field is a picker'); ok(await p.locator('#dl_sup option').count() === 2, 'datalist has 2 suppliers');
   const sup = p.locator('input[data-sup]').first(); await sup.fill('dudh ghor'); await sup.dispatchEvent('change'); await p.waitForTimeout(200); ok(/Listed supplier/.test(await p.textContent('.supwrap + .hint')), 'listed supplier hint');
@@ -146,7 +146,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await s2.fill('Random Shop'); await s2.dispatchEvent('change'); await p.waitForTimeout(150); ok(/Not in the list/.test(await p.textContent('.supwrap + .hint')), 'free text keeps working');
   await p.close();
   // without supplier_manage: no add button; unknown rpc: free text only
-  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"04-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/entry/new/04-1/1');
+  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"13-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/entry/new/04-1/1');
   ok(await p.locator('.supnew').count() === 0, 'no add-new without supplier_manage'); ok(await p.locator('input[data-sup]').count() >= 1, 'picker still shown');
   await p.close();
 

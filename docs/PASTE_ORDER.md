@@ -278,7 +278,7 @@ Columns: # = paste position (1 = the first file after the foundation), file, lin
 | 159 | `phase458.sql` | ours | RPT-C3 | Campaign master list, campaign or offer code on a sale, audited export (RPT-C3) |
 | 160 | `phase459.sql` | ours | RPT-C3 | Marketing reports: spend by campaign, spend vs sales, campaign revenue (RPT-C3) |
 | 161 | `phase460.sql` | ours | RPT-C3 | Marketing reports: coupon usage, acquisition cost, repeat purchase (RPT-C3) |
-| 162 | `phase461.sql` | ours | RPT-C3 | Post marketing spend of form 18-1 to the journal, setting OFF, no double count (RPT-C3) |
+| 162 | `phase461.sql` | ours | RPT-C3 | Post marketing spend of form 17-1 to the journal, setting OFF, no double count (RPT-C3) |
 | 163 | `phase462.sql` | ours | RPT-C3 | Audit and control: audit log pager, register of voided and reversed records (RPT-C3) |
 | 164 | `phase463.sql` | ours | RPT-C3 | Audit and control: approval delays, stock adjustment approval history (RPT-C3) |
 | 165 | `phase464.sql` | ours | RPT-C3 | Audit and control: price-override approver, unusual transactions list (RPT-C3) |
@@ -331,6 +331,7 @@ Columns: # = paste position (1 = the first file after the foundation), file, lin
 | 212 | `phase537.sql` | union | UNION-9 | same, third group |
 | 213 | `phase538.sql` | union | UNION-10 | same, last group |
 | 214 | `phase539.sql` | union | UNION-11 | drops the two stale overloads; adds `_union_audit()` (read-only report: merged / other / missing) |
+| 215 | `phase543.sql` | form | FORM-543 | printed form codes: the clean sequence (NN-1, A-Z by English short name, owner 21 Oct 2026). Migrates forms.code, form_code in 20 tables, code literals in functions, triggers, one policy, one check and the label text. Tag FORM-CODE-CLEAN-SEQUENCE-543. Paste ONCE (a second paste is a no-op). Test: `phase543_test.sql` (local only). |
 
 ## Old phase files: if you ever paste one again
 

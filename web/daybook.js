@@ -1,6 +1,6 @@
 /* Islamia BOS · Day book (#/daybook): cash / bank / mobile money in and out by day, per location or all together.
-   Built by the server (phase13.sql day_book) from real rows only: POS payments, due collections, expense vouchers 10-2, supplier / bill payments,
-   cash handover slips 10-1 and (for people who may see salaries) staff advances 02-3 and salary payments 02-2.
+   Built by the server (phase13.sql day_book) from real rows only: POS payments, due collections, expense vouchers 11-1, supplier / bill payments,
+   cash handover slips 03-1 and (for people who may see salaries) staff advances 35-1 and salary payments 02-2.
    Opening / closing = running total from the owner's start date; no start date = movements only ("Data needed").
    The screen only guides and formats; it never computes money the server did not return, except the per-mode view of a day (a filter). Loaded after purchase.js. */
 (() => {
@@ -32,7 +32,7 @@ const X = {
   notes: L('কী কীভাবে গোনা হয়', 'How this is counted', 'কী কীভাবে গোনা হয়'),
   n_card_as_bank: L('কার্ডের টাকা ব্যাংকে ধরা হয়', 'Card payments are counted as bank', 'Card-এর টাকা Bank-এ ধরা হয়'),
   n_imprest_in_cash: L('নগদ = সেলের নগদ + ইমপ্রেস্টের খরচ একসাথে (আলাদা ড্রয়ার/ইমপ্রেস্ট হিসাব নেই)', 'Cash = sales cash and imprest spending together (no separate drawer / imprest books)', 'Cash = sales cash + imprest খরচ একসাথে'),
-  n_bank_deposit_not_dated: L('ব্যাংকে জমা (10-3) ডেট ধরে নেই বলে এখানে আসেনি', 'Bank deposits (10-3) are not dated per day, so they are not included', 'Bank deposit (10-3) দিনের Dateে নেই, তাই আসেনি'),
+  n_bank_deposit_not_dated: L('ব্যাংকে জমা (07-1) ডেট ধরে নেই বলে এখানে আসেনি', 'Bank deposits (07-1) are not dated per day, so they are not included', 'Bank deposit (07-1) দিনের Dateে নেই, তাই আসেনি'),
   n_hub_receipt_not_recorded: L('হাবে ক্যাশ হ্যান্ডওভারের গ্রহণ কোন লোকেশনে — তা লেখা থাকে না; সব-জায়গা দেখলে হ্যান্ডওভার বাদ থাকে', 'The hub side of a cash handover has no location on record; the all-locations view leaves handovers out', 'Hub-এ handover কোন location-এ তা লেখা থাকে না; সব-location দেখলে handover বাদ'),
   n_drafts_excluded: L('খসড়া ও বাতিল ফর্ম ধরা হয় না; বাতিল পেমেন্টও না', 'Drafts, rejected forms and voided payments are not counted', 'Draft, rejected form, void payment ধরা হয় না'),
   menu: L('আরও', 'More', 'More'), csv: L('CSV এক্সপোর্ট', 'Export CSV', 'CSV Export'), print: L('প্রিন্ট / PDF', 'Print / PDF', 'Print / PDF'), settings: L('সেটিংস', 'Settings', 'Settings'),

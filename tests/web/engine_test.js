@@ -17,54 +17,54 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
     await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(700); return p;
   }
   const flagTxt = async (p) => (await p.locator('#flagsbox .flag').allTextContents()).map((s) => s.replace(/\s+/g, ' ').trim());
-  // ---- 10-2
+  // ---- 11-1
   let p = await open('#/entry/new/10-2/1');
   await p.fill('[data-p="lines.0.amount"]', '1500'); await p.selectOption('[data-p="lines.0.head"]', 'staff_meal'); await p.click('[data-act=pick][data-p="lines.0.receipt"][data-v=no]');
   await p.fill('[data-p="cash_now"]', '3000'); await p.fill('[data-p="receipts_total"]', '1500');
-  log('10-2 total:', await p.textContent('[data-calc=total]'), '| imprest text:', await p.textContent('[data-calc=imprest_text]'));
-  log('10-2 flags:', await flagTxt(p));
+  log('11-1 total:', await p.textContent('[data-calc=total]'), '| imprest text:', await p.textContent('[data-calc=imprest_text]'));
+  log('11-1 flags:', await flagTxt(p));
   await p.screenshot({ path: SP + '/e_10-2.png', fullPage: true });
-  await p.click('[data-act=e_submit]'); await p.waitForTimeout(500); log('10-2 submit sheet:', (await p.locator('.sheet').textContent()).replace(/\s+/g, ' ').slice(0, 160));
+  await p.click('[data-act=e_submit]'); await p.waitForTimeout(500); log('11-1 submit sheet:', (await p.locator('.sheet').textContent()).replace(/\s+/g, ' ').slice(0, 160));
   await p.screenshot({ path: SP + '/e_10-2_sheet.png' });
   await p.context().close();
-  // ---- 10-1
+  // ---- 03-1
   p = await open('#/entry/new/10-1/1');
   await p.fill('[data-p="count.n500"]', '4'); await p.fill('[data-p="count.n100"]', '12'); await p.fill('[data-p="count.coin"]', '150'); await p.fill('[data-p="leave_float"]', '1500');
-  log('10-1 counted:', await p.textContent('[data-calc=counted_total]'), 'handover:', await p.textContent('[data-calc=handover]'), '| flags:', await flagTxt(p));
+  log('03-1 counted:', await p.textContent('[data-calc=counted_total]'), 'handover:', await p.textContent('[data-calc=handover]'), '| flags:', await flagTxt(p));
   await p.context().close();
-  // ---- 03-1
+  // ---- 39-1
   p = await open('#/entry/new/03-1/1');
   await p.fill('[data-p="items.0.sent"]', '20'); await p.fill('[data-p="items.0.demand"]', '15'); await p.fill('[data-p="items.0.prod_date"]', '2026-10-12');
   await p.fill('[data-p="items.0.item"]', 'I-001 · সাদা মিষ্টি – কেজি'); await p.dispatchEvent('[data-p="items.0.item"]', 'change');
-  log('03-1 unit:', await p.textContent('[data-calc="rows.items.0.unit"]'), '| tag:', await p.textContent('[data-calc="rows.items.0.tag"]'), '| flags:', await flagTxt(p));
+  log('39-1 unit:', await p.textContent('[data-calc="rows.items.0.unit"]'), '| tag:', await p.textContent('[data-calc="rows.items.0.tag"]'), '| flags:', await flagTxt(p));
   await p.screenshot({ path: SP + '/e_03-1.png', fullPage: true }); await p.context().close();
-  // ---- 04-3 count-first
+  // ---- 36-1 count-first
   p = await open('#/entry/new/04-3/1');
-  log('04-3 book visible before count:', await p.locator('[data-p="rows.0.book"]').isVisible());
-  await p.fill('[data-p="rows.0.count"]', '9'); log('04-3 book visible after count:', await p.locator('[data-p="rows.0.book"]').isVisible());
+  log('36-1 book visible before count:', await p.locator('[data-p="rows.0.book"]').isVisible());
+  await p.fill('[data-p="rows.0.count"]', '9'); log('36-1 book visible after count:', await p.locator('[data-p="rows.0.book"]').isVisible());
   await p.fill('[data-p="rows.0.item"]', 'I-001'); await p.dispatchEvent('[data-p="rows.0.item"]', 'change'); await p.fill('[data-p="rows.0.book"]', '10');
-  log('04-3 var:', await p.textContent('[data-calc="rows.rows.0.var"]'), '| flags:', await flagTxt(p)); await p.context().close();
-  // ---- 14-1
+  log('36-1 var:', await p.textContent('[data-calc="rows.rows.0.var"]'), '| flags:', await flagTxt(p)); await p.context().close();
+  // ---- 06-1
   p = await open('#/entry/new/14-1/1');
   await p.fill('[data-p="open_counted"]', '1900'); await p.fill('[data-p="cat_sweet"]', '30000'); await p.fill('[data-p="cat_cake"]', '5000'); await p.fill('[data-p="total_entered"]', '35000');
   await p.fill('[data-p="d_bkash"]', '4000'); await p.fill('[data-p="d_nagad"]', '1000'); await p.fill('[data-p="party_cash"]', '2000'); await p.fill('[data-p="goods_based"]', '31000');
-  log('14-1 expected visible before count:', await p.locator('[data-calc=expected]').isVisible());
+  log('06-1 expected visible before count:', await p.locator('[data-calc=expected]').isVisible());
   await p.fill('[data-p="cash_count.n1000"]', '28'); await p.fill('[data-p="cash_count.n500"]', '2');
-  log('14-1 cat_sum:', await p.textContent('[data-calc=cat_sum]'), '| cat_match:', await p.textContent('[data-calc=cat_match]'), '| d_total:', await p.textContent('[data-calc=d_total]'), '| retail:', await p.textContent('[data-calc=retail]'));
-  log('14-1 counted:', await p.textContent('[data-calc=counted_total]'), '| expected:', await p.textContent('[data-calc=expected]'), '| short/over:', await p.textContent('[data-calc=short_over]'));
-  log('14-1 flags:', await flagTxt(p));
-  log('14-1 fridge name/temps:', await p.textContent('[data-calc="rows.fridges.0.name"]')); await p.fill('[data-p="fridges.0.temp"]', '12'); log('   temp ok text:', await p.textContent('[data-calc="rows.fridges.0.temp_ok"]'));
+  log('06-1 cat_sum:', await p.textContent('[data-calc=cat_sum]'), '| cat_match:', await p.textContent('[data-calc=cat_match]'), '| d_total:', await p.textContent('[data-calc=d_total]'), '| retail:', await p.textContent('[data-calc=retail]'));
+  log('06-1 counted:', await p.textContent('[data-calc=counted_total]'), '| expected:', await p.textContent('[data-calc=expected]'), '| short/over:', await p.textContent('[data-calc=short_over]'));
+  log('06-1 flags:', await flagTxt(p));
+  log('06-1 fridge name/temps:', await p.textContent('[data-calc="rows.fridges.0.name"]')); await p.fill('[data-p="fridges.0.temp"]', '12'); log('   temp ok text:', await p.textContent('[data-calc="rows.fridges.0.temp_ok"]'));
   await p.screenshot({ path: SP + '/e_14-1.png', fullPage: true });
   // save draft then reopen
-  await p.click('[data-act=e_save]'); await p.waitForTimeout(400); log('14-1 saved, hash:', await p.evaluate(() => location.hash)); 
+  await p.click('[data-act=e_save]'); await p.waitForTimeout(400); log('06-1 saved, hash:', await p.evaluate(() => location.hash)); 
   await p.context().close();
   // ---- lists/pages
   for (const [h, n] of [['#/form/14-1', 'list'], ['#/locset', 'locset'], ['#/exceptions', 'exceptions'], ['#/releases', 'releases'], ['#/home', 'home']]) { p = await open(h, 'mix'); await p.screenshot({ path: `${SP}/e_${n}.png` }); await p.context().close(); }
   log('JS errors:', errors.length ? errors : 'none'); await br.close(); srv.close();
   // assertions on the printed figures (the screens must keep computing these exact numbers)
   const all = OUT.join('\n'); let bad = 0; const ok = (c, m) => { if (!c) { bad++; console.log('FAIL:', m); } };
-  ok(/10-2 total: ৳ 1,500/.test(all), '10-2 total 1,500'); ok(/10-2 flags: .*সীমার উপরে/.test(all) && /রসিদ ছাড়া খরচ/.test(all) && /ইমপ্রেস্টের সমান নয়/.test(all), '10-2 flags (over limit, no receipt, imprest mismatch)');
-  ok(/10-1 counted: ৳ 3,350 handover: ৳ 1,850/.test(all), '10-1 counted and handover'); ok(/03-1 unit: কেজি/.test(all) && /চাহিদার চেয়ে বেশি পাঠানো/.test(all), '03-1 unit and over-dispatch flag');
-  ok(/04-3 book visible before count: false/.test(all), '04-3 book hidden before the count'); ok(errors.length === 0, 'no JS errors');
+  ok(/10-2 total: ৳ 1,500/.test(all), '11-1 total 1,500'); ok(/10-2 flags: .*সীমার উপরে/.test(all) && /রসিদ ছাড়া খরচ/.test(all) && /ইমপ্রেস্টের সমান নয়/.test(all), '11-1 flags (over limit, no receipt, imprest mismatch)');
+  ok(/10-1 counted: ৳ 3,350 handover: ৳ 1,850/.test(all), '03-1 counted and handover'); ok(/03-1 unit: কেজি/.test(all) && /চাহিদার চেয়ে বেশি পাঠানো/.test(all), '39-1 unit and over-dispatch flag');
+  ok(/04-3 book visible before count: false/.test(all), '36-1 book hidden before the count'); ok(errors.length === 0, 'no JS errors');
   console.log('assert failures:', bad); if (bad) process.exitCode = 1;
 })().catch((e) => { console.error('FAIL', e); process.exit(1); });

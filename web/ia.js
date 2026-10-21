@@ -82,7 +82,7 @@ const IA = [
   rec('daybook', 'acc', ['দিনের খাতা', 'Day book', 'Day book'], { icon: 'doc', ok: (c) => c.own || c.GF.view_daybook === true, home: { acc: 8 }, kw: ['day book', 'cash book', 'ledger', 'expense', 'দিনের খাতা', 'ক্যাশবুক', 'খরচ', 'হিসাব'] }),
   rec('finance2', 'acc', ['আর্থিক হিসাব ২ (ব্যাংক, বছর শেষ, ভ্যাট, সম্পদ, বাজেট)', 'Finance 2 (bank, year-end, VAT, assets, budgets)', 'Finance 2 (bank, year-end, VAT, assets, budget)'], { icon: 'doc', ok: (c) => c.own || c.GF.accounts_manage === true, kw: ['bank reconcile', 'bank statement', 'year end', 'closing', 'vat', 'fixed asset', 'depreciation', 'budget', 'ব্যাংক স্টেটমেন্ট', 'বছর শেষ', 'ভ্যাট', 'অবচয়', 'বাজেট'] }),
   rec('attend2', 'people', ['হাজিরা ২ (পাঞ্চ, লেখা, একবার গোনা)', 'Attendance 2 (punch, mark, counted once)', 'Attendance 2 (punch, mark, একবার গোনা)'], { icon: 'check', ok: (c) => true, kw: ['punch', 'check in', 'passkey', 'face', 'finger', 'gps', 'mark others', 'self punch', 'lock', 'হাজিরা', 'পাঞ্চ', 'আঙুল', 'মুখ'] }),
-  rec('eqcheck', 'appr', ['সার্ভারে হিসাব মেলানো', 'Server re-check of totals', 'Server-এ হিসাব মেলানো'], { icon: 'check', ok: (c) => c.own || c.anyApprove(), kw: ['equation', 'total', 'recompute', 'mismatch', '10-2', '02-2', 'হিসাব', 'মেলানো'] }),
+  rec('eqcheck', 'appr', ['সার্ভারে হিসাব মেলানো', 'Server re-check of totals', 'Server-এ হিসাব মেলানো'], { icon: 'check', ok: (c) => c.own || c.anyApprove(), kw: ['equation', 'total', 'recompute', 'mismatch', '11-1', '21-1', 'হিসাব', 'মেলানো'] }),
   rec('stockx', 'stock', ['স্টক রিপোর্ট ও কোয়ালিটি', 'Stock reports & quality', 'Stock report ও quality'], { icon: 'items', ok: locOk, kw: ['reorder', 'expiry', 'batch', 'fefo', 'wastage reason', 'quality', 'qc', 'রিঅর্ডার', 'মেয়াদ', 'ব্যাচ', 'নষ্টের কারণ', 'কোয়ালিটি'] }),
   rec('stockrep/ledger', 'stock', ['স্টক নড়াচড়ার খাতা', 'Stock movement ledger', 'Stock নড়াচড়ার খাতা'], { icon: 'doc', ok: locOk, drawer: true, also: ['reports'], kw: ['ledger', 'movement', 'running balance', 'opening', 'closing', 'খাতা', 'নড়াচড়া', 'ব্যালান্স'] }),
   rec('stockrep/recon', 'stock', ['সময়ের স্টক মিলান', 'Stock reconciliation for a period', 'সময়ের Stock মিলান'], { icon: 'doc', ok: locOk, drawer: false, also: ['reports','appr'], kw: ['reconcile', 'reconciliation', 'opening in out closing', 'in transit', 'short', 'মিলান', 'গরমিল', 'পথে'] }),
@@ -115,7 +115,7 @@ const IA = [
   rec('onlineorders', 'sale', ['অনলাইন অর্ডার', 'Online orders', 'Online অর্ডার'], { icon: 'doc', ok: pos, kw: ['online order', 'facebook', 'whatsapp', 'delivery', 'advance', 'অনলাইন', 'অর্ডার', 'ডেলিভারি'] }),
   rec('inbox', 'sale', ['বার্তা ইনবক্স', 'Message inbox', 'Message inbox'], { icon: 'doc', ok: pos, kw: ['inbox', 'message', 'facebook', 'messenger', 'instagram', 'whatsapp', 'web form', 'বার্তা', 'ইনবক্স', 'অর্ডার'] }),
   rec('website', 'sale', ['ওয়েবসাইট', 'Website', 'Website'], { icon: 'doc', ok: owner, mob: 3, kw: ['website', 'web', 'site', 'online shop', 'catalogue', 'publish', 'ওয়েবসাইট', 'ওয়েব', 'দোকান', 'অনলাইন শপ', 'ক্যাটালগ', 'পাবলিশ'], verbs: ['publish item', 'web orders', 'website settings'] }),
-  rec('saleforms', 'settings', ['ফর্ম 20-১/২/৪ ↔ বিক্রি', 'Forms 20-1/2/4 <-> sales', 'Form 20-1/2/4 ↔ sale'], { icon: 'doc', ok: owner, kw: ['20-1', '20-2', '20-4', 'link', 'shadow', 'order form', 'invoice', 'জোড়া'] }),
+  rec('saleforms', 'settings', ['ফর্ম 20-১/২/৪ ↔ বিক্রি', 'Forms 20-1/2/4 <-> sales', 'Form 20-1/2/4 ↔ sale'], { icon: 'doc', ok: owner, kw: ['05-1', '08-1', '24-1', 'link', 'shadow', 'order form', 'invoice', 'জোড়া'] }),
   rec('benefitsx', 'people', ['কর্মীর সুবিধা (রিপোর্ট)', 'Employee benefits (report)', 'Employee সুবিধা (report)'], { icon: 'users', ok: (c) => c.own || c.GF.employee_manage === true || c.GF.salary_view === true, kw: ['benefit', 'allowance', 'eligible', 'festival', 'সুবিধা', 'ভাতা'] }),
   rec('orderreports', 'sale', ['অর্ডার ও ডেলিভারি রিপোর্ট', 'Order and delivery reports', 'Order ও delivery report'], { icon: 'doc', ok: pos, also: ['factory'], kw: ['order register', 'cake order', 'delayed order', 'on time delivery', 'fulfilment', 'cancelled order', 'refund', 'delivery cost', 'order profit', 'advance balance', 'অর্ডার রিপোর্ট', 'ডেলিভারি', 'কেক অর্ডার', 'বাতিল অর্ডার'] }),
   rec('custinsight', 'cust', ['গ্রাহক বিশ্লেষণ', 'Customer insight', 'Customer insight'], { icon: 'users', ok: pos, kw: ['credit risk', 'overdue', 'lifetime value', 'customer returns', 'complaints', 'cake history', 'credit days', 'বাকির ঝুঁকি', 'মেয়াদোত্তীর্ণ', 'গ্রাহকের অভিযোগ'] }),
@@ -126,13 +126,13 @@ const IA = [
   rec('setupadvisor', 'settings', ['চালু করার গাইড', 'Setup advisor', 'চালু করার guide'], { icon: 'check', ok: (c) => c.own || c.GF.view_cost === true, kw: ['setup', 'advisor', 'recommended', 'guide', 'readiness', 'switch on', 'checklist', 'activation', 'গাইড', 'প্রস্তাবিত', 'চালু', 'সুইচ'] }),
   rec('restoredrill', 'settings', ['রিস্টোর ড্রিল', 'Restore drill', 'Restore drill'], { icon: 'settings', ok: owner, kw: ['restore', 'drill', 'backup test', 'recovery', 'রিস্টোর', 'ড্রিল', 'ব্যাকআপ যাচাই'] }),
   rec('twofa', 'settings', ['দুই-ধাপ যাচাই (2FA)', 'Two-factor sign-in (2FA)', 'Two-factor (2FA)'], { icon: 'settings', ok: () => true, kw: ['2fa', 'otp', 'authenticator', 'totp', 'security', 'দুই ধাপ', 'নিরাপত্তা', 'কোড'] }),
-  rec('quickexp', 'acc', ['দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'], { icon: 'money', ok: (c) => c.own || c.P('10-2', 'enter'), kw: ['quick expense', 'day book expense', 'expense', 'imprest', 'voucher', 'দ্রুত খরচ', 'খরচ', 'ভাউচার', 'ইমপ্রেস্ট'], verbs: ['add expense', 'খরচ লিখুন'] }),
+  rec('quickexp', 'acc', ['দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'], { icon: 'money', ok: (c) => c.own || c.P('11-1', 'enter'), kw: ['quick expense', 'day book expense', 'expense', 'imprest', 'voucher', 'দ্রুত খরচ', 'খরচ', 'ভাউচার', 'ইমপ্রেস্ট'], verbs: ['add expense', 'খরচ লিখুন'] }),
   rec('paths', 'settings', ['পথ সুইচ ও শ্যাডো কপি', 'Path switches & shadow copies', 'Path switch ও shadow copy'], { icon: 'settings', ok: owner, kw: ['shadow', 'duplicate', 'double count', 'lock', 'payroll mode', 'primary', 'শ্যাডো', 'ডুপ্লিকেট', 'দুবার গোনা', 'লক', 'সুইচ'] }),
   rec('guards', 'settings', ['স্টক গার্ড ও প্রস্তাবিত সেটিং', 'Stock guards & recommended settings', 'Stock guard ও recommended setting'], { icon: 'settings', ok: owner, kw: ['guard', 'recommended', 'grn', 'unit conversion', 'negative stock', 'void bill', 'stock guard', 'গার্ড', 'প্রস্তাবিত', 'ঋণাত্মক', 'বিল বাতিল'] }),
   rec('templates', 'cust', ['Template (print ও message)', 'Templates (print & messages)', 'Template (print ও message)'], { icon: 'doc', ok: owner, kw: ['template', 'receipt', 'invoice design', 'label', 'price tag', 'sticker', 'message', 'sms', 'whatsapp', 'thermal', 'a4', 'টেমপ্লেট', 'ডিজাইন', 'রসিদ', 'লেবেল', 'প্রাইস ট্যাগ', 'মেসেজ'] }),
   rec('cashmoves', 'acc', ['ক্যাশ ও ব্যাংকের লেনদেন', 'Cash & bank moves', 'Cash ও Bank লেনদেন'], { icon: 'money', ok: (c) => c.own || c.GF.cash_move === true, kw: ['bank deposit', 'deposit', 'owner', 'advance', 'top up', 'hub', 'ব্যাংক জমা', 'অগ্রিম', 'অ্যাডভান্স', 'মালিক', 'ক্যাশ'] }),
   rec('shortages', 'acc', ['কম / বেশি ও পথে কম মাল', 'Shortages', 'কম / বেশি ও পথে কম'], { icon: 'money', ok: (c) => c.own || c.GF.accounts_view === true || c.GF.accounts_manage === true, kw: ['short', 'over', 'cash short', 'cash over', 'transit', 'carrier', 'claim', 'write off', 'lost in transit', 'shortage', 'কম', 'বেশি', 'ক্যাশ কম', 'পথে কম', 'বাহক', 'ক্ষতি', 'দাবি'], verbs: ['approve cash short', 'claim from carrier', 'write off lost goods'] }),
-  rec('wallets', 'acc', ['মোবাইল ওয়ালেট (বিকাশ/নগদ/রকেট)', 'Mobile wallets', 'Mobile ওয়ালেট'], { icon: 'money', ok: (c) => c.own || c.P('10-3', 'view') || c.P('10-3', 'enter') || c.GF.accounts_view === true, kw: ['wallet', 'bkash', 'nagad', 'rocket', 'upay', 'mobile money', 'wallet fee', 'cash out', 'digital payment', '10-3', 'reconcile', 'বিকাশ', 'নগদ', 'রকেট', 'উপায়', 'ওয়ালেট', 'মোবাইল ব্যাংকিং', 'ডিজিটাল পেমেন্ট'], verbs: ['count wallet', 'add wallet fee', 'move wallet money'], aliases: ['bkash', 'nagad'] }),
+  rec('wallets', 'acc', ['মোবাইল ওয়ালেট (বিকাশ/নগদ/রকেট)', 'Mobile wallets', 'Mobile ওয়ালেট'], { icon: 'money', ok: (c) => c.own || c.P('07-1', 'view') || c.P('07-1', 'enter') || c.GF.accounts_view === true, kw: ['wallet', 'bkash', 'nagad', 'rocket', 'upay', 'mobile money', 'wallet fee', 'cash out', 'digital payment', '07-1', 'reconcile', 'বিকাশ', 'নগদ', 'রকেট', 'উপায়', 'ওয়ালেট', 'মোবাইল ব্যাংকিং', 'ডিজিটাল পেমেন্ট'], verbs: ['count wallet', 'add wallet fee', 'move wallet money'], aliases: ['bkash', 'nagad'] }),
   rec('ledgerlinks', 'acc', ['খাতায় পোস্ট (লিংক)', 'Ledger links', 'Ledger links'], { icon: 'doc', ok: owner, kw: ['ledger', 'post', 'journal', 'link', 'খাতা', 'পোস্ট', 'লেজার'] }),
   // Approvals & exceptions
   rec('exceptions', 'appr', 't:exceptions', { ok: approver, cnt: 'ex', tone: 'bad', mob: 1, mod: 9, kw: ['exception', 'problem', 'red', 'alert', 'গরমিল', 'সমস্যা', 'লাল'] }),
@@ -162,7 +162,7 @@ const IA = [
   rec('report', 'reports', ['রিপোর্ট', 'Reports', 'Report'], { icon: 'doc', drawer: false, status: 'hidden', alias: 'reports' }),
   // RPT-C3: marketing, audit and planning reports (reports stay open to the existing report grants; the server decides)
   rec('campaigns', 'reports', ['মার্কেটিং ক্যাম্পেইন ও রিপোর্ট', 'Marketing campaigns & reports', 'Marketing campaign ও report'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true || c.GF.report_marketing === true, also: ['acc'],
-    kw: ['campaign', 'marketing', 'spend', 'roi', 'cac', 'acquisition', 'promotion', 'offer', 'coupon', '18-1', 'ক্যাম্পেইন', 'মার্কেটিং', 'প্রচার', 'অফার'], verbs: ['see marketing spend by campaign', 'post marketing spend to the books'] }),
+    kw: ['campaign', 'marketing', 'spend', 'roi', 'cac', 'acquisition', 'promotion', 'offer', 'coupon', '17-1', 'ক্যাম্পেইন', 'মার্কেটিং', 'প্রচার', 'অফার'], verbs: ['see marketing spend by campaign', 'post marketing spend to the books'] }),
   rec('couponuse', 'reports', ['কুপন ও অফারের ব্যবহার', 'Coupon & offer usage', 'Coupon ও offer usage'], { icon: 'doc', ok: (c) => c.own || c.P('POS', 'approve') || c.GF.view_reports === true || c.GF.report_marketing === true, drawer: false, parent: 'campaigns',
     kw: ['coupon', 'voucher', 'offer code', 'কুপন', 'অফার কোড'] }),
   rec('auditreports', 'appr', ['অডিট ও নিয়ন্ত্রণ রিপোর্ট', 'Audit & control reports', 'Audit ও control report'], { icon: 'check', ok: (c) => c.own || c.anyApprove() || c.GF.view_reports === true || c.GF.report_control === true, also: ['item'],
@@ -252,9 +252,9 @@ const IA = [
   rec('logs', 'settings', 't:logs', { ok: owner, kw: ['log', 'audit trail', 'history', 'লগ', 'পরিবর্তন', 'ইতিহাস'] }),
   rec('backup', 'settings', 't:backup', { ok: owner, kw: ['backup', 'download', 'export all', 'ব্যাকআপ', 'ডাউনলোড'] }),
   // Step W (phase 72-84 screens): form vs screen, expense double count, transit shortage, sales channels, unknown cost, online order review, offline POS refused sales
-  rec('unmatched', 'appr', ['স্ক্রিন-রেকর্ডহীন ফর্ম', 'Forms with no screen record', 'Screen record ছাড়া form'], { icon: 'doc', ok: (c) => c.own || approver(c), kw: ['unmatched form', 'form vs screen', 'skipped form', '05-1', 'covered by screen', 'স্ক্রিন', 'ফর্ম', 'মেলেনি'], verbs: ['check unmatched forms'] }),
-  rec('formguard', 'appr', ['ফর্ম ও স্ক্রিনের নিয়ম', 'Form and screen rules', 'Form ও screen-এর rule'], { icon: 'doc', ok: owner, kw: ['form guard', 'form 05-1 mode', 'recommendation', 'transit alert', 'offline soft stock', 'নিয়ম', 'পরামর্শ', 'ফর্ম'], verbs: ['see recommended rules'] }),
-  rec('expenselink', 'appr', ['খরচ দুবার গোনা', 'Expense counted twice', 'Expense দুবার গোনা'], { icon: 'doc', ok: (c) => c.own || approver(c), kw: ['expense link', 'double count', 'quick expense', '10-2', 'voucher', 'খরচ', 'দুবার', 'ভাউচার'], verbs: ['link expense'] }),
+  rec('unmatched', 'appr', ['স্ক্রিন-রেকর্ডহীন ফর্ম', 'Forms with no screen record', 'Screen record ছাড়া form'], { icon: 'doc', ok: (c) => c.own || approver(c), kw: ['unmatched form', 'form vs screen', 'skipped form', '12-1', 'covered by screen', 'স্ক্রিন', 'ফর্ম', 'মেলেনি'], verbs: ['check unmatched forms'] }),
+  rec('formguard', 'appr', ['ফর্ম ও স্ক্রিনের নিয়ম', 'Form and screen rules', 'Form ও screen-এর rule'], { icon: 'doc', ok: owner, kw: ['form guard', 'form 12-1 mode', 'recommendation', 'transit alert', 'offline soft stock', 'নিয়ম', 'পরামর্শ', 'ফর্ম'], verbs: ['see recommended rules'] }),
+  rec('expenselink', 'appr', ['খরচ দুবার গোনা', 'Expense counted twice', 'Expense দুবার গোনা'], { icon: 'doc', ok: (c) => c.own || approver(c), kw: ['expense link', 'double count', 'quick expense', '11-1', 'voucher', 'খরচ', 'দুবার', 'ভাউচার'], verbs: ['link expense'] }),
   rec('transitshort', 'appr', ['ট্রানজিটে মাল ও ঘাটতি', 'Goods in transit and shortages', 'Transit-এ মাল ও ঘাটতি'], { icon: 'doc', ok: locOk, kw: ['transit', 'transfer short', 'shortage', 'in transit', 'loss', 'ট্রানজিট', 'ঘাটতি', 'কম পৌঁছেছে', 'হস্তান্তর'], verbs: ['resolve transfer shortage'] }),
   rec('saleschannels', 'sale', ['বিক্রির চ্যানেল', 'Sales channels', 'Sales channel'], { icon: 'doc', ok: owner, kw: ['sales channel', 'facebook', 'whatsapp', 'web form', 'channel', 'চ্যানেল', 'ফেসবুক', 'হোয়াটসঅ্যাপ'], verbs: ['add sales channel'] }),
   rec('costunknown', 'reports', ['অজানা খরচ', 'Unknown costs', 'অজানা cost'], { icon: 'doc', ok: (c) => c.own || c.P('ITEM_COST', 'view'), kw: ['unknown cost', 'cost missing', 'provisional profit', 'no cost', 'cost_missing', 'খরচ অজানা', 'সাময়িক', 'লাভ'], verbs: ['find unknown costs'] }),
@@ -323,7 +323,7 @@ IA.forEach((r) => {
 const byRoute = new Map(IA.map((r) => [r.route, r]));
 
 // ---------- Increment A: verbs (the "Do" part of search), quick actions per persona, bottom slots per persona. flow stays null (guided flows come later). ----------
-// form codes used below were checked against the forms table (schema.sql seed): 03-1 04-1 04-2 04-3 05-1 06-1 10-1 10-2 10-3 11-1 14-1 (05-3 / 05-4 / 06-2 / 06-3 exist too, form pages for them are reached from the category page, no verb bound).
+// form codes used below were checked against the forms table (schema.sql seed): 39-1 13-1 18-1 36-1 12-1 28-1 03-1 11-1 07-1 33-1 06-1 (31-1 / 41-1 / 29-1 / 27-1 exist too, form pages for them are reached from the category page, no verb bound).
 const FORM_I3 = { cashcount: 'money', stockcount: 'box', grn: 'download', issue: 'upload', expense: 'money', transfer: 'truck', daily: 'factory', reqmat: 'chef', handover: 'swap', digital: 'money', hubcash: 'money' };
 const FORM = (code) => (c) => c.P(code, 'enter') && c.formLive(code);
 const V = (route, verbs, aliases) => { const r = IA.find((x) => x.route === route); if (r) { r.verbs = verbs; r.aliases = aliases || []; } };
@@ -333,12 +333,12 @@ V('payables', ['pay supplier', 'payables', 'সরবরাহকারী প�
 V('pending', ['approve', 'approval', 'pending', 'অনুমোদন'], []); V('stock', ['wastage', 'waste', 'stock', 'নষ্ট', 'স্টক'], ['low stock']); V('exceptions', ['exception', 'red', 'গরমিল', 'ব্যতিক্রম'], []);
 // form-bound actions: id, form route, label, verbs
 const DOF = [
-  ['cashcount', 'form/14-1', ['ক্যাশ গণনা', 'Cash count', 'Cash count'], ['cash count', '14-1', 'ক্যাশ গণনা', 'ক্যাশ']], ['stockcount', 'form/04-3', ['স্টক গণনা', 'Stock count', 'Stock count'], ['count stock', 'stock count', '04-3', 'স্টক গণনা']],
-  ['grn', 'form/04-1', ['মাল গ্রহণ', 'Receive goods', 'মাল গ্রহণ (GRN)'], ['receive', 'grn', '04-1', 'মাল গ্রহণ']], ['issue', 'form/04-2', ['সরবরাহ দেওয়া', 'Issue material', 'Issue'], ['issue', '04-2', 'সরবরাহ']],
-  ['expense', 'form/10-2', ['খরচ', 'Expense', 'খরচ'], ['expense', 'খরচ', '10-2']], ['transfer', 'form/03-1', ['স্থানান্তর', 'Transfer', 'Transfer'], ['transfer', 'challan', '03-1', 'স্থানান্তর']],
-  ['daily', 'form/05-1', ['দৈনিক উৎপাদন শিট', 'Daily production sheet', 'Daily sheet'], ['daily sheet', '05-1', 'উৎপাদন']], ['reqmat', 'form/06-1', ['কাঁচামাল চাওয়া', 'Request material', 'Material request'], ['request material', '06-1']],
-  ['handover', 'form/11-1', ['হস্তান্তর', 'Handover', 'Handover'], ['handover', '11-1', 'হস্তান্তর']], ['digital', 'form/10-3', ['ডিজিটাল মেলানো', 'Digital reconcile', 'Digital reconcile'], ['reconcile', '10-3', 'digital']],
-  ['hubcash', 'form/10-1', ['হাব ক্যাশ', 'Hub cash', 'Hub cash'], ['hub cash', '10-1']],
+  ['cashcount', 'form/14-1', ['ক্যাশ গণনা', 'Cash count', 'Cash count'], ['cash count', '06-1', 'ক্যাশ গণনা', 'ক্যাশ']], ['stockcount', 'form/04-3', ['স্টক গণনা', 'Stock count', 'Stock count'], ['count stock', 'stock count', '36-1', 'স্টক গণনা']],
+  ['grn', 'form/04-1', ['মাল গ্রহণ', 'Receive goods', 'মাল গ্রহণ (GRN)'], ['receive', 'grn', '13-1', 'মাল গ্রহণ']], ['issue', 'form/04-2', ['সরবরাহ দেওয়া', 'Issue material', 'Issue'], ['issue', '18-1', 'সরবরাহ']],
+  ['expense', 'form/10-2', ['খরচ', 'Expense', 'খরচ'], ['expense', 'খরচ', '11-1']], ['transfer', 'form/03-1', ['স্থানান্তর', 'Transfer', 'Transfer'], ['transfer', 'challan', '39-1', 'স্থানান্তর']],
+  ['daily', 'form/05-1', ['দৈনিক উৎপাদন শিট', 'Daily production sheet', 'Daily sheet'], ['daily sheet', '12-1', 'উৎপাদন']], ['reqmat', 'form/06-1', ['কাঁচামাল চাওয়া', 'Request material', 'Material request'], ['request material', '28-1']],
+  ['handover', 'form/11-1', ['হস্তান্তর', 'Handover', 'Handover'], ['handover', '33-1', 'হস্তান্তর']], ['digital', 'form/10-3', ['ডিজিটাল মেলানো', 'Digital reconcile', 'Digital reconcile'], ['reconcile', '07-1', 'digital']],
+  ['hubcash', 'form/10-1', ['হাব ক্যাশ', 'Hub cash', 'Hub cash'], ['hub cash', '03-1']],
 ].map(([id, route, label, verbs]) => ({ id, route, label, verbs, aliases: [], icon: 'doc', i3: FORM_I3[id] || 'doc', ok: FORM(route.slice(5)), form: route.slice(5) }));
 const doRecs = () => IA.filter((r) => r.verbs.length && r.status === 'live').map((r) => ({ id: r.id, route: r.route, label: r.label, verbs: r.verbs, aliases: r.aliases, icon: r.icon, i3: r.i3, ok: r.ok, rec: r })).concat(DOF);
 const doLabel = (d) => (d.rec ? labelOf(d.rec) : lab(L(d.label[0], d.label[1], d.label[2])));
@@ -346,10 +346,10 @@ const doLabel = (d) => (d.rec ? labelOf(d.rec) : lab(L(d.label[0], d.label[1], d
 function persona(c) {
   if (c.own) return 'owner';
   if (c.roles && c.roles.includes('management')) return 'manager';
-  if (c.P('05-1', 'enter')) return 'factory';
-  if (c.P('04-1', 'enter') || c.P('04-2', 'enter')) return 'store';
-  if (c.GF.view_daybook || c.GF.salary_view || c.P('10-3', 'enter')) return 'accountant';
-  if (c.P('10-1', 'enter')) return 'hub';
+  if (c.P('12-1', 'enter')) return 'factory';
+  if (c.P('13-1', 'enter') || c.P('18-1', 'enter')) return 'store';
+  if (c.GF.view_daybook || c.GF.salary_view || c.P('07-1', 'enter')) return 'accountant';
+  if (c.P('03-1', 'enter')) return 'hub';
   return 'cashier';
 }
 // quick actions (2.5) and bottom slots (3.1) by persona; ids are DO ids / record routes. Unavailable ones are skipped and the next candidate fills in.

@@ -69,7 +69,7 @@ const X = {
   ty_appr: L('নতুন আইটেমে অ্যাপ্রুভ লাগবে', 'New items need approval', 'নতুন Item-এ approval লাগবে'), ty_fixed: L('স্থায়ী নিয়ম', 'fixed rule', 'fixed rule'), ty_rules: L('সব নিয়ম: নিয়ম ও অপশন', 'All rules: Rules & options', 'সব rule: Rules ও Option'),
   // assets
   as_title: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), as_add: L('সম্পদ যোগ', 'Add asset', 'Asset যোগ'), as_tag: L('ট্যাগ', 'Tag', 'Tag'), as_loc: L('লোকেশন', 'Location', 'Location'), as_cond: L('অবস্থা', 'Condition', 'Condition'),
-  as_status: L('স্ট্যাটাস', 'Status', 'Status'), as_bought: L('কেনার ডেট', 'Bought on', 'Bought on'), as_cost: L('কস্ট ৳', 'Cost ৳', 'Cost ৳'), as_note: L('নোট', 'Note', 'Note'), as_maint: L('মেইনটেন্যান্স রেকর্ড (08-1)', 'Maintenance record (08-1)', 'Maintenance record (08-1)'),
+  as_status: L('স্ট্যাটাস', 'Status', 'Status'), as_bought: L('কেনার ডেট', 'Bought on', 'Bought on'), as_cost: L('কস্ট ৳', 'Cost ৳', 'Cost ৳'), as_note: L('নোট', 'Note', 'Note'), as_maint: L('মেইনটেন্যান্স রেকর্ড (16-1)', 'Maintenance record (16-1)', 'Maintenance record (16-1)'),
   as_qty: L('কয়টি', 'How many', 'কয়টি'), as_item: L('সম্পদের আইটেম', 'Asset item', 'Asset item'), as_edit: L('বদলান', 'Edit', 'Edit'), as_retire: L('বন্ধ করুন (বিক্রি / হারানো / বাতিল)', 'Retire (sold / lost / scrapped)', 'Retire (sold / lost / scrapped)'),
   as_react: L('আবার চালু', 'Reactivate', 'Reactivate'), as_none: L('কোনো সম্পদ নেই', 'No assets', 'কোনো asset নেই'), as_all: L('সব', 'All', 'All'), as_retired: L('বন্ধগুলোও দেখান', 'Show retired too', 'Retired-ও দেখান'),
   as_noitem: L('আগে "সম্পদ" ধরনের আইটেম যোগ করুন', 'First add an item of type Asset', 'আগে "Asset" type-এর item যোগ করুন'), as_auto: L('ক্রয় বিল থেকে', 'from a purchase bill', 'purchase bill থেকে'),
@@ -485,7 +485,7 @@ function drawAssets() {
   const total = AS.canCost ? list.reduce((s, r) => s + (AS.costs.has(r.id) && AS.costs.get(r.id) !== null ? Number(AS.costs.get(r.id)) : 0), 0) : null;
   const row = (r) => { const it = byI.get(r.item_id) || {}, c = AS.costs.get(r.id);
     return `<div class="card p2-row mk ${r.active ? '' : 'bad'}"><div><div class="nm">${esc(nm(it) || it.code || '')}</div><div class="sub">${esc(r.tag)} · ${esc(it.code || '')} · ${esc(locName(r.location_id))}${r.bought_on ? ' · ' + esc(r.bought_on) : ''}</div>
-      <div class="tags"><span class="chip ${r.status === 'in_use' ? 'ok' : r.active ? 'info' : 'bad'}">${esc(lab(STATUS[r.status] || L(r.status, r.status)))}</span>${r.condition ? `<span class="chip">${esc(condLabel(r.condition))}</span>` : ''}${r.purchase_bill_id ? `<span class="chip">${esc(T('as_auto'))}</span>` : ''}${r.maintenance_ref ? '<span class="chip">08-1</span>' : ''}</div></div>
+      <div class="tags"><span class="chip ${r.status === 'in_use' ? 'ok' : r.active ? 'info' : 'bad'}">${esc(lab(STATUS[r.status] || L(r.status, r.status)))}</span>${r.condition ? `<span class="chip">${esc(condLabel(r.condition))}</span>` : ''}${r.purchase_bill_id ? `<span class="chip">${esc(T('as_auto'))}</span>` : ''}${r.maintenance_ref ? '<span class="chip">16-1</span>' : ''}</div></div>
       <div class="pr">${AS.canCost ? `<b>${c === undefined || c === null ? '—' : '৳ ' + esc(fmt(c))}</b>` : ''}<button class="mini im-dots" data-act="as_menu" data-v="${esc(r.id)}" aria-label="${esc(T('more'))}">⋮</button></div></div>`; };
   shell(T('as_title'), `<div class="p2-bar"><input id="as_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" value="${esc(AS.f.q)}">${canManage() ? `<button class="primary" data-act="as_add" aria-label="${esc(T('as_add'))}">＋</button>` : ''}</div>
     <div class="row wrap" style="margin:6px 0">${locs.length > 1 ? `<select id="as_loc"><option value="">${esc(T('as_all'))} · ${esc(T('as_loc'))}</option>${locs.map((l) => sopt(String(l.id), AS.f.loc, nm(l))).join('')}</select>` : ''}
@@ -511,7 +511,7 @@ async function assetForm(id) {
   const r = id ? AS.rows.find((x) => x.id === id) : null; const locs = (B.ENV && B.ENV.locs) || [];
   const conds = lists('asset_conditions');
   let maint = [];
-  if (r) { const q = await sb.from('entries').select('id,serial,entry_date').eq('form_code', '08-1').eq('location_id', r.location_id).order('entry_date', { ascending: false }).limit(40); maint = q.data || []; }
+  if (r) { const q = await sb.from('entries').select('id,serial,entry_date').eq('form_code', '16-1').eq('location_id', r.location_id).order('entry_date', { ascending: false }).limit(40); maint = q.data || []; }
   AS.edit = id;
   if (!r && !AS.items.length) return toast(T('as_noitem'));
   const cost = r ? AS.costs.get(r.id) : '';
@@ -523,7 +523,7 @@ async function assetForm(id) {
     ${r ? `<div><label for="af_st">${esc(T('as_status'))}</label><select id="af_st">${Object.keys(STATUS).filter((k) => !['lost', 'sold', 'retired'].includes(k) || r.status === k).map((k) => sopt(k, r.status, lab(STATUS[k]))).join('')}</select></div>` : ''}
     <div><label for="af_date">${esc(T('as_bought'))}</label><input id="af_date" type="date" value="${esc(r ? r.bought_on || '' : '')}"></div>
     ${isOwner() || ctxPerms().ITEM_COST ? `<div><label for="af_cost">${esc(T('as_cost'))}</label><input id="af_cost" inputmode="decimal" value="${esc(cost === undefined || cost === null ? '' : cost)}"></div>` : ''}
-    ${r ? `<div><label for="af_maint">${esc(T('as_maint'))}</label><select id="af_maint"><option value=""></option>${maint.map((m) => sopt(m.id, r.maintenance_ref, '#' + m.serial + ' · ' + m.entry_date)).join('')}${r.maintenance_ref && !maint.some((m) => m.id === r.maintenance_ref) ? sopt(r.maintenance_ref, r.maintenance_ref, '08-1') : ''}</select></div>` : ''}
+    ${r ? `<div><label for="af_maint">${esc(T('as_maint'))}</label><select id="af_maint"><option value=""></option>${maint.map((m) => sopt(m.id, r.maintenance_ref, '#' + m.serial + ' · ' + m.entry_date)).join('')}${r.maintenance_ref && !maint.some((m) => m.id === r.maintenance_ref) ? sopt(r.maintenance_ref, r.maintenance_ref, '16-1') : ''}</select></div>` : ''}
     <div><label for="af_note">${esc(T('as_note'))}</label><input id="af_note" value="${esc(r ? r.note || '' : '')}" autocomplete="off"></div>
     <div><label for="af_brand">${esc(lab(L('ব্র্যান্ড', 'Brand', 'Brand')))}</label><input id="af_brand" maxlength="80" autocomplete="off" value="${esc(r && r.brand ? r.brand : '')}"></div>
     <div><label for="af_serial">${esc(lab(L('সিরিয়াল / ট্যাগ নম্বর', 'Serial / tag number', 'Serial / tag no')))}</label><div class="p2-inl"><input id="af_serial" maxlength="80" autocomplete="off" value="${esc(r && r.serial_no ? r.serial_no : '')}"><button type="button" data-act="as_scan">▮▮ ${esc(lab(L('স্ক্যান', 'Scan', 'Scan')))}</button></div></div>

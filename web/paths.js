@@ -18,7 +18,7 @@ const X = {
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), run: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
   qtitle: L('দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'), head: L('খাত', 'Head', 'Head'), to2: L('কাকে / কী বাবদ', 'Paid to / for', 'Paid to / for'),
   amt: L('টাকা', 'Amount', 'Amount'), mode: L('মাধ্যম', 'Mode', 'Mode'), rcpt: L('রসিদ আছে', 'Receipt', 'Receipt'), add: L('যোগ করুন', 'Add', 'Add'),
-  close: L('দিন শেষ — ১০-২ ফর্ম বানান', 'Day end - make the 10-2 form', 'Day end - 10-2 form বানান'), void: L('ভয়েড', 'Void', 'Void'),
+  close: L('দিন শেষ — ১০-২ ফর্ম বানান', 'Day end - make the 11-1 form', 'Day end - 11-1 form বানান'), void: L('ভয়েড', 'Void', 'Void'),
   total: L('আজকের টোটাল', "Today's total", "Today's total"), owed: L('ফর্মে বাকি', 'Not yet in a form', 'ফর্মে বাকি'), place: L('লোকেশন', 'Place', 'Place'),
   made: L('ফর্ম তৈরি', 'Form made', 'Form তৈরি'), why: L('কারণ লিখুন', 'Write the reason', 'কারণ লিখুন'), alo: L('সব জায়গা', 'All places', 'All places'),
 };
@@ -91,7 +91,7 @@ function drawQx() {
       <label class="row"><input type="checkbox" id="qx_rc"> ${esc(T('rcpt'))}</label><button type="button" class="btn primary" data-act="qx_add">${esc(T('add'))}</button></div></div>
     <div class="card stack"><div class="row between"><b>${esc(T('total'))}: ৳ ${esc(String(d.total))}</b><span class="chip ${d.owed ? 'warn' : ''}">${esc(T('owed'))}: ${d.owed}</span></div>
       ${(d.rows || []).map((r) => `<div class="row between"${r.status === 'void' ? ' style="opacity:.5;text-decoration:line-through"' : ''}><span>${esc(r.head)} · ${esc(r.paid_to || '')} · ${esc(r.mode)}${r.receipt ? ' 🧾' : ''}</span><b>৳ ${esc(String(r.amount))}</b>
-        ${r.status === 'done' && !r.form ? `<button type="button" class="mini" data-act="qx_void" data-id="${esc(r.id)}">${esc(T('void'))}</button>` : r.form ? '<span class="chip">10-2</span>' : ''}</div>`).join('')}
+        ${r.status === 'done' && !r.form ? `<button type="button" class="mini" data-act="qx_void" data-id="${esc(r.id)}">${esc(T('void'))}</button>` : r.form ? '<span class="chip">11-1</span>' : ''}</div>`).join('')}
       ${d.owed ? `<button type="button" class="btn primary" data-act="qx_close">${esc(T('close'))}</button>` : ''}</div>`;
 }
 const refreshQx = async () => { await loadQx(); drawQx(); };

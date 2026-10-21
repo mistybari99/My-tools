@@ -56,7 +56,7 @@ const X = {
   st_on_time: L('সময়ে এসেছে', 'on time', 'on time'), st_late: L('দেরিতে এসেছে', 'late', 'late'), st_received_no_promised_date: L('এসেছে, কথা দেওয়া ডেট নেই', 'received, no promised date', 'received, promised date নেই'),
   st_partial: L('আংশিক এসেছে', 'partly received', 'partly received'), st_partial_overdue: L('আংশিক, সময় পেরিয়েছে', 'partly received, overdue', 'partial, overdue'), st_partial_no_promised_date: L('আংশিক, কথা দেওয়া ডেট নেই', 'partly received, no promised date', 'partial, promised date নেই'),
   st_open: L('খোলা', 'open', 'open'), st_overdue_open: L('সময় পেরিয়েছে', 'overdue', 'overdue'), st_open_no_promised_date: L('খোলা, কথা দেওয়া ডেট নেই', 'open, no promised date', 'open, promised date নেই'),
-  delBasis: L('কাগজের পিও (06-3) ও মাল গ্রহণ (04-1) মিলিয়ে। ক্রয় বিলে পিওর লিংক নেই, তাই সেগুলো এতে নেই।', 'From the paper purchase orders (06-3) and goods received notes (04-1). Purchase bills carry no PO link, so they are not in it.', 'Paper PO (06-3) ও GRN (04-1) থেকে। Purchase bill এ PO link নেই, তাই সেগুলো নেই।'),
+  delBasis: L('কাগজের পিও (27-1) ও মাল গ্রহণ (13-1) মিলিয়ে। ক্রয় বিলে পিওর লিংক নেই, তাই সেগুলো এতে নেই।', 'From the paper purchase orders (27-1) and goods received notes (13-1). Purchase bills carry no PO link, so they are not in it.', 'Paper PO (27-1) ও GRN (13-1) থেকে। Purchase bill এ PO link নেই, তাই সেগুলো নেই।'),
 };
 const T = (k) => lab(X[k]);
 const NC = (k) => `${T('nc')}: ${T(k)}`;

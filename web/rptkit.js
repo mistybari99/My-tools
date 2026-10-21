@@ -37,7 +37,7 @@ n('same_day_only', 'একই দিনের খরচ ও বিক্রি �
 n('sales_gross_of_returns', 'বিক্রির অঙ্ক ফেরত বাদ দেওয়ার আগের', 'Sales are before returns');
 n('tagged_sales_only', 'শুধু ক্যাম্পেইন-চিহ্নিত বিলের বিক্রি', 'Only bills tagged with the campaign');
 n('contribution_on_costed_part', 'লাভ ধরা হয়েছে শুধু যেসব পণ্যের খরচ জানা', 'Contribution is on the items whose cost price is known');
-n('spend_in_same_period', 'খরচ একই তারিখ-সীমার ১৮-১ লাইন', 'Spend = 18-1 lines in the same dates');
+n('spend_in_same_period', 'খরচ একই তারিখ-সীমার ১৮-১ লাইন', 'Spend = 17-1 lines in the same dates');
 n('cost_hidden', 'খরচের অঙ্ক দেখার অধিকার না থাকায় খরচ ও লাভ দেখানো হয়নি', 'Cost and profit are hidden because you may not see costs');
 n('compare_with_baseline_is_not_proof', 'ছাড়-ছাড়া বিলের সাথে তুলনা প্রমাণ নয়', 'Comparing with bills that had no discount is not proof');
 n('untagged_discounts_in_blank_row', 'ক্যাম্পেইন ছাড়া ছাড় ফাঁকা সারিতে', 'Discounts with no campaign are in the blank row');
@@ -56,9 +56,9 @@ n('window_days_not_set', 'কত দিন ধরা হবে তা লেখ�
 n('attributable_data_only', 'শুধু চিহ্নিত বিল ও ক্যাম্পেইন-বসানো খরচ ব্যবহার', 'Only tagged bills and campaign-assigned spend are used');
 n('unassigned_spend_not_in_roi', 'ক্যাম্পেইন-ছাড়া খরচ কোনো ROI-তে নেই', 'Unassigned spend is in no ROI');
 n('untagged_sales_not_counted_roi_may_be_understated', 'চিহ্নহীন বিক্রি গোনা হয়নি, তাই ROI কম দেখাতে পারে', 'Untagged sales are not counted, so ROI may look lower than it is');
-n('approved_sheets_only', 'শুধু অনুমোদিত ১৮-১ শিট', 'Only approved 18-1 sheets');
-n('imprest_never_posted_here', 'ইমপ্রেস্টের খরচ এখানে কখনো পোস্ট হয় না (১০-২ ভাউচারে আছে)', 'Imprest-paid lines are never posted here (the 10-2 voucher has them)');
-n('look_alikes_wait_for_a_decision', 'একই খরচ ১০-২ বা দ্রুত খরচে থাকলে সিদ্ধান্তের অপেক্ষায়', 'A line that looks like a 10-2 voucher or quick expense waits for a decision');
+n('approved_sheets_only', 'শুধু অনুমোদিত ১৮-১ শিট', 'Only approved 17-1 sheets');
+n('imprest_never_posted_here', 'ইমপ্রেস্টের খরচ এখানে কখনো পোস্ট হয় না (১০-২ ভাউচারে আছে)', 'Imprest-paid lines are never posted here (the 11-1 voucher has them)');
+n('look_alikes_wait_for_a_decision', 'একই খরচ ১০-২ বা দ্রুত খরচে থাকলে সিদ্ধান্তের অপেক্ষায়', 'A line that looks like a 11-1 voucher or quick expense waits for a decision');
 n('owner_money_not_posted', 'মালিকের নিজের টাকার লাইন পোস্ট হয় না (হিসাবের সিদ্ধান্ত বাকি)', 'Lines paid from the owner\'s own money are not posted (an accounting choice is open)');
 n('management_profit_view_unchanged', 'ব্যবস্থাপনা-লাভের হিসাব (L1) আগের মতোই', 'The management profit view (L1) is unchanged');
 n('owner_only', 'শুধু মালিক দেখতে পারেন', 'Only the owner can open this');

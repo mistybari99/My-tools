@@ -2,15 +2,15 @@
 Rule: real data comes after the software is complete. Every task = write → dry test (fake rows in local DB, rolled back) → one audit of ONLY that diff → push. Each new screen registered in web/ia.js. Every feature has an ON/OFF setting.
 
 ## A. Correctness first (wrong numbers if left)
-- [x] A1 GRN(04-1) vs purchase page both post purchase_in → one source of truth + cross-check + switch.
+- [x] A1 GRN(13-1) vs purchase page both post purchase_in → one source of truth + cross-check + switch.
 - [x] A2 Sales/due reports not net of sale returns / refund cash → subtract.
 - [x] A3 Hard-coded locations in forms_cash/forms_sales/forms_staff → read `locations`, hide paused/closed.
-- [x] A4 Day-book gaps: bank deposit (10-3), customer advance, owner top-up, hub-receipt side of 10-1.
+- [x] A4 Day-book gaps: bank deposit (07-1), customer advance, owner top-up, hub-receipt side of 10-1.
 - [x] A5 Production run void/undo (reverses ledger); packaging line on receipt.
 
 ## B. Rules / safety
 - [x] B1 owner_self_approve for wastage, supplier refund, sale return, settings approvals.
-- [x] B2 Blind count for 04-3 and 04-1; expected qty sealed server-side (browser must not compute it).
+- [x] B2 Blind count for 36-1 and 13-1; expected qty sealed server-side (browser must not compute it).
 - [x] B3 PIN signature on the other two-person forms (per-form table pin_sig_cfg).
 - [x] B4 Owner Switchboard page: ONE searchable page for every ON/OFF (ia_home_v2, ui_collapsed_controls, blind_count_cfg, pin_sig_cfg, all existing).
 
@@ -23,7 +23,7 @@ Rule: real data comes after the software is complete. Every task = write → dry
 
 ## D. Usability
 - [x] D1 ~50 plain selects → B.listctl.enhance (purchase unit/return reasons, sale-return reasons, stock unit, wallets, asset condition, itemmaster type/class, unit conversion).
-- [x] D2 Guided steppers: open shop, close day (14-1→10-1→deposit), factory day, month-end.
+- [x] D2 Guided steppers: open shop, close day (06-1→03-1→deposit), factory day, month-end.
 - [x] D3 Delegation board; templates/smart defaults.
 - [x] D4 Service worker (offline first-load).
 - [x] D5 Fix stale tests: pos_test.js (#cart_given), engine_test.js assertions, re-run tests/sql/p9.

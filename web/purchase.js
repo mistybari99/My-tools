@@ -548,7 +548,7 @@ document.addEventListener('change', (e) => {
   if (el.id === 'rf_mode') { const w = $('#rf_w'); if (w) w.hidden = el.value !== 'mobile'; }
   if (el.id === 'pe_loc' && F) { F.loc = Number(el.value) || F.loc; drawPreviews(); }
   if (el.id === 'py_loc') { PY.loc = el.value === '' ? null : Number(el.value); payables(); }
-  if (el.id === 'pe_file' && F) { const f = el.files && el.files[0]; if (f) { toast(T('upl')); U.uploadPhoto(f, ['PURCHASE', '06-4', '04-1', '06-3'], F.loc).then((p) => { F.photo = p; drawEdPhoto(); }, fail); } }
+  if (el.id === 'pe_file' && F) { const f = el.files && el.files[0]; if (f) { toast(T('upl')); U.uploadPhoto(f, ['PURCHASE', '02-1', '13-1', '27-1'], F.loc).then((p) => { F.photo = p; drawEdPhoto(); }, fail); } }
 });
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { purchase: view, payables });
 })();

@@ -14,7 +14,7 @@ Until hooks 1-3 are installed the accrual stays dormant (`_c_hooks_ok()` is fals
 The exact edits are executed by the `T2` block of `phase82_test.sql`; if the integrated body differs, re-run that test.
 
 `_p27_pl(d1,d2,locs)` (P&L salary column `o_sal`), optional but needed for the P&L to see app payroll:
-4. In CTE `sa`, add `and not public.is_shadow('entries', e.id::text)` to the 02-2 filter, and add the app-run salary from `public.c_salary_by_month(d1, d2, locs)` (returns `m, loc, amt` = net pay + advance recovery of approved/paid, non-shadow runs) to the monthly sum. Skip it if `_p27_pl` already reads the journal salary account.
+4. In CTE `sa`, add `and not public.is_shadow('entries', e.id::text)` to the 21-1 filter, and add the app-run salary from `public.c_salary_by_month(d1, d2, locs)` (returns `m, loc, amt` = net pay + advance recovery of approved/paid, non-shadow runs) to the monthly sum. Skip it if `_p27_pl` already reads the journal salary account.
 
 No hook is needed in `acct_post_pending`: it loops `_acct_docs`. `c_post_pending()` is a standalone poster for the same sources (owner / accounts_manage), used by the Monthly Close screen.
 Day book and `biz_daily`: no change. `biz_daily` (phase72) is sales and COGS only, so the daily profit never carried salary. `c_daily_profit()` is the daily view that keeps it out on purpose.

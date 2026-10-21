@@ -6,7 +6,7 @@
       "key": "crm_complaints_on",
       "label": "Record customer complaints and track them to a result",
       "what_it_does": "Lets staff log a complaint with the outlet, item, severity and owner, and move it through open, in progress, resolved and closed. Every step is kept in a history that cannot be edited.",
-      "why_it_matters": "Today a complaint is only a line on the paper register (form 20-3). With this on, the owner can see which outlet and which item keep producing complaints and which ones nobody has answered.",
+      "why_it_matters": "Today a complaint is only a line on the paper register (form 32-1). With this on, the owner can see which outlet and which item keep producing complaints and which ones nobody has answered.",
       "default": "OFF. Nothing changes and nobody can log a complaint here.",
       "if_switched": "ON: the Feedback and complaints screen accepts complaints. A complaint never posts any money; a refund is still made on the sale return screen and then linked. OFF again: new complaints are refused, old ones stay and can still be read.",
       "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
@@ -61,7 +61,7 @@
       "label": "Complaint categories that always count as food safety",
       "what_it_does": "A comma list of category codes. A complaint in one of these categories is marked food safety even if the staff member forgot to tick the box.",
       "why_it_matters": "A cashier under pressure may forget the tick box. The category already tells the story.",
-      "default": "sick (the same fell-ill cause that form 20-3 already flags).",
+      "default": "sick (the same fell-ill cause that form 32-1 already flags).",
       "if_switched": "Add more codes, for example sick,smell, to treat more categories as food safety. Set it to blank to let only the tick box decide. Complaints already logged are not changed.",
       "who_can_change": "Only the owner, in the Switchboard (the Rules page). Every change is written to the change log."
     },

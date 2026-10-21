@@ -2410,6 +2410,5076 @@
    "from": "Category অনুযায়ী রিপোর্ট",
    "to": "ক্যাটাগরি অনুযায়ী রিপোর্ট",
    "reason": "Owner word list (Category = ক্যাটাগরি in Bangla mode, Latin only in mix mode); same registry label fix as route:categories. Same route, same meaning. Found by catpick_pw_test."
+  },
+  {
+   "type": "rename",
+   "from": "ctl:forms_stock.js:button:lk_paper#04-4",
+   "to": "ctl:forms_stock.js:button:lk_paper#37-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "ctl:forms_stock.js:button:lk_paper#06-5",
+   "to": "ctl:forms_stock.js:button:lk_paper#38-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:01-1:",
+   "to": "field:40-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:01-2:",
+   "to": "field:20-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-1:",
+   "to": "field:19-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-2:",
+   "to": "field:21-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-3:",
+   "to": "field:35-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-4:",
+   "to": "field:01-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-5:",
+   "to": "field:15-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-6:",
+   "to": "field:10-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-7:",
+   "to": "field:09-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:02-8:",
+   "to": "field:34-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:03-1:",
+   "to": "field:39-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:04-1:",
+   "to": "field:13-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:04-2:",
+   "to": "field:18-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:04-3:",
+   "to": "field:36-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:04-4:",
+   "to": "field:37-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:05-1:",
+   "to": "field:12-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:05-2:",
+   "to": "field:26-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:05-3:",
+   "to": "field:31-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:05-4:",
+   "to": "field:41-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:05-5:",
+   "to": "field:22-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:06-1:",
+   "to": "field:28-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:06-2:",
+   "to": "field:29-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:06-3:",
+   "to": "field:27-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:06-4:",
+   "to": "field:02-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:06-5:",
+   "to": "field:38-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:08-1:",
+   "to": "field:16-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:10-1:",
+   "to": "field:03-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-1 -> 03-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:10-2:",
+   "to": "field:11-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:10-3:",
+   "to": "field:07-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:10-4:",
+   "to": "field:04-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:10-5:",
+   "to": "field:30-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:11-1:",
+   "to": "field:33-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:14-1:",
+   "to": "field:06-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:14-2:",
+   "to": "field:14-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:18-1:",
+   "to": "field:17-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:20-1:",
+   "to": "field:05-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:20-2:",
+   "to": "field:08-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:20-3:",
+   "to": "field:32-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:20-4:",
+   "to": "field:24-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:20-5:",
+   "to": "field:25-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "prefix",
+   "from": "field:20-6:",
+   "to": "field:23-1:",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:01-1",
+   "to": "form:40-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:01-2",
+   "to": "form:20-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-1",
+   "to": "form:19-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-2",
+   "to": "form:21-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-3",
+   "to": "form:35-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-4",
+   "to": "form:01-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-5",
+   "to": "form:15-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-6",
+   "to": "form:10-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-7",
+   "to": "form:09-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:02-8",
+   "to": "form:34-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:03-1",
+   "to": "form:39-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:04-1",
+   "to": "form:13-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:04-2",
+   "to": "form:18-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:04-3",
+   "to": "form:36-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:04-4",
+   "to": "form:37-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:05-1",
+   "to": "form:12-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:05-2",
+   "to": "form:26-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:05-3",
+   "to": "form:31-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:05-4",
+   "to": "form:41-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:05-5",
+   "to": "form:22-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:06-1",
+   "to": "form:28-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:06-2",
+   "to": "form:29-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:06-3",
+   "to": "form:27-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:06-4",
+   "to": "form:02-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:06-5",
+   "to": "form:38-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:08-1",
+   "to": "form:16-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:10-1",
+   "to": "form:03-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-1 -> 03-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:10-2",
+   "to": "form:11-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:10-3",
+   "to": "form:07-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:10-4",
+   "to": "form:04-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:10-5",
+   "to": "form:30-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:11-1",
+   "to": "form:33-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:14-1",
+   "to": "form:06-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:14-2",
+   "to": "form:14-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:18-1",
+   "to": "form:17-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:20-1",
+   "to": "form:05-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:20-2",
+   "to": "form:08-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:20-3",
+   "to": "form:32-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:20-4",
+   "to": "form:24-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:20-5",
+   "to": "form:25-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "form:20-6",
+   "to": "form:23-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:campaigns:18-1",
+   "to": "kw:campaigns:17-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:eqcheck:02-2",
+   "to": "kw:eqcheck:21-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:eqcheck:10-2",
+   "to": "kw:eqcheck:11-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:expenselink:10-2",
+   "to": "kw:expenselink:11-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:formguard:form 05-1 mode",
+   "to": "kw:formguard:form 12-1 mode",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:saleforms:20-1",
+   "to": "kw:saleforms:05-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:saleforms:20-2",
+   "to": "kw:saleforms:08-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:saleforms:20-4",
+   "to": "kw:saleforms:24-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:unmatched:05-1",
+   "to": "kw:unmatched:12-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "kw:wallets:10-3",
+   "to": "kw:wallets:07-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:01-1:04840fca",
+   "to": "note:40-1:04840fca",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:01-1:c24e2e2a",
+   "to": "note:40-1:c24e2e2a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:01-2:8827fa1c",
+   "to": "note:20-1:8827fa1c",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-1:057bb2fe",
+   "to": "note:19-1:057bb2fe",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-1:32bcfea2",
+   "to": "note:19-1:32bcfea2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-1:be7e587f",
+   "to": "note:19-1:be7e587f",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-2:03837bd6",
+   "to": "note:21-1:03837bd6",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-2:bf833aaa",
+   "to": "note:21-1:bf833aaa",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-2:c02ac036",
+   "to": "note:21-1:c02ac036",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-3:d7d1a861",
+   "to": "note:35-1:d7d1a861",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-3:fabca25e",
+   "to": "note:35-1:fabca25e",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-4:396604aa",
+   "to": "note:01-1:396604aa",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-4:d3fd9062",
+   "to": "note:01-1:d3fd9062",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-5:62ddda35",
+   "to": "note:15-1:62ddda35",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-6:32aa1565",
+   "to": "note:10-1:32aa1565",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-7:03ec3fd0",
+   "to": "note:09-1:03ec3fd0",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-7:234132b2",
+   "to": "note:09-1:234132b2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-7:3679af0c",
+   "to": "note:09-1:3679af0c",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-7:7613de13",
+   "to": "note:09-1:7613de13",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-8:143a0d55",
+   "to": "note:34-1:143a0d55",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:02-8:ad65d2c8",
+   "to": "note:34-1:ad65d2c8",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:03-1:6cfd457a",
+   "to": "note:39-1:6cfd457a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-1:0dd31066",
+   "to": "note:13-1:0dd31066",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-1:433ed5ed",
+   "to": "note:13-1:433ed5ed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-1:55d11d5a",
+   "to": "note:13-1:55d11d5a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-1:8cda3146",
+   "to": "note:13-1:8cda3146",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-2:40ee16fa",
+   "to": "note:18-1:40ee16fa",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-2:5222f067",
+   "to": "note:18-1:5222f067",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-3:8a289622",
+   "to": "note:36-1:8a289622",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:04-4:71cbc958",
+   "to": "note:37-1:71cbc958",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-1:0cd05820",
+   "to": "note:12-1:0cd05820",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-1:51287a53",
+   "to": "note:12-1:51287a53",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-1:521d505f",
+   "to": "note:12-1:521d505f",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-1:72b6b341",
+   "to": "note:12-1:72b6b341",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-1:d194e5a9",
+   "to": "note:12-1:d194e5a9",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-2:2e40590a",
+   "to": "note:26-1:2e40590a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-2:4a6de09e",
+   "to": "note:26-1:4a6de09e",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-2:57704768",
+   "to": "note:26-1:57704768",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-2:82ad7a21",
+   "to": "note:26-1:82ad7a21",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-2:c8f96375",
+   "to": "note:26-1:c8f96375",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-3:0db48bae",
+   "to": "note:31-1:0db48bae",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-4:70c8912a",
+   "to": "note:41-1:70c8912a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-4:9376d067",
+   "to": "note:41-1:9376d067",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-5:109c023e",
+   "to": "note:22-1:109c023e",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:05-5:979e9965",
+   "to": "note:22-1:979e9965",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-1:181fae28",
+   "to": "note:28-1:181fae28",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-1:f5cfd98c",
+   "to": "note:28-1:f5cfd98c",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-2:19cefb1a",
+   "to": "note:29-1:19cefb1a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-2:c47e7c4a",
+   "to": "note:29-1:c47e7c4a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-3:3ec59153",
+   "to": "note:27-1:3ec59153",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-3:88f101b6",
+   "to": "note:27-1:88f101b6",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-4:433ed5ed",
+   "to": "note:02-1:433ed5ed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-4:6df74f17",
+   "to": "note:02-1:6df74f17",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-4:ba2c54e0",
+   "to": "note:02-1:ba2c54e0",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-5:80aada19",
+   "to": "note:38-1:80aada19",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-5:988300df",
+   "to": "note:38-1:988300df",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:06-5:ed8baaa1",
+   "to": "note:38-1:ed8baaa1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:08-1:cbbffd05",
+   "to": "note:16-1:cbbffd05",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-1:c2f752c1",
+   "to": "note:03-1:c2f752c1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-1 -> 03-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-2:d76ce693",
+   "to": "note:11-1:d76ce693",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-3:a48dabca",
+   "to": "note:07-1:a48dabca",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-3:b5e048c1",
+   "to": "note:07-1:b5e048c1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-3:df569277",
+   "to": "note:07-1:df569277",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-4:139b394a",
+   "to": "note:04-1:139b394a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-4:61ff5603",
+   "to": "note:04-1:61ff5603",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-4:a946f250",
+   "to": "note:04-1:a946f250",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:10-5:74eb0c4a",
+   "to": "note:30-1:74eb0c4a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:11-1:30c3cfd2",
+   "to": "note:33-1:30c3cfd2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:14-1:e72f51d4",
+   "to": "note:06-1:e72f51d4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:14-2:601ca883",
+   "to": "note:14-1:601ca883",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:14-2:72d61f91",
+   "to": "note:14-1:72d61f91",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:14-2:909e2b67",
+   "to": "note:14-1:909e2b67",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:14-2:cd1ebb06",
+   "to": "note:14-1:cd1ebb06",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:18-1:16c8f4dc",
+   "to": "note:17-1:16c8f4dc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:18-1:39e6943e",
+   "to": "note:17-1:39e6943e",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-1:92747749",
+   "to": "note:05-1:92747749",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-1:caf7058d",
+   "to": "note:05-1:caf7058d",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-1:d907adae",
+   "to": "note:05-1:d907adae",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-2:321ae77e",
+   "to": "note:08-1:321ae77e",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-3:bdeffe35",
+   "to": "note:32-1:bdeffe35",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-3:dd78eebd",
+   "to": "note:32-1:dd78eebd",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-3:fa10a3fc",
+   "to": "note:32-1:fa10a3fc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-4:18167978",
+   "to": "note:24-1:18167978",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-4:2567edb8",
+   "to": "note:24-1:2567edb8",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-5:56a19371",
+   "to": "note:25-1:56a19371",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-5:92c32ef2",
+   "to": "note:25-1:92c32ef2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "note:20-6:6982772c",
+   "to": "note:23-1:6982772c",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level:0",
+   "to": "option:40-1:level:0",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level:1",
+   "to": "option:40-1:level:1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level:2",
+   "to": "option:40-1:level:2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level:3",
+   "to": "option:40-1:level:3",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level:4",
+   "to": "option:40-1:level:4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level_cond:no",
+   "to": "option:40-1:level_cond:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:level_cond:yes",
+   "to": "option:40-1:level_cond:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:split:no",
+   "to": "option:40-1:split:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-1:split:yes",
+   "to": "option:40-1:split:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-2:kpi.dir:bad",
+   "to": "option:20-1:kpi.dir:bad",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-2:kpi.dir:good",
+   "to": "option:20-1:kpi.dir:good",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-2:scope:all",
+   "to": "option:20-1:scope:all",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-2:scope:loc",
+   "to": "option:20-1:scope:loc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:01-2:scope:other",
+   "to": "option:20-1:scope:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:leave_informed:no",
+   "to": "option:19-1:leave_informed:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:leave_informed:yes",
+   "to": "option:19-1:leave_informed:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:1",
+   "to": "option:19-1:month:1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:10",
+   "to": "option:19-1:month:10",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:11",
+   "to": "option:19-1:month:11",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:12",
+   "to": "option:19-1:month:12",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:2",
+   "to": "option:19-1:month:2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:3",
+   "to": "option:19-1:month:3",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:4",
+   "to": "option:19-1:month:4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:5",
+   "to": "option:19-1:month:5",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:6",
+   "to": "option:19-1:month:6",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:7",
+   "to": "option:19-1:month:7",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:8",
+   "to": "option:19-1:month:8",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-1:month:9",
+   "to": "option:19-1:month:9",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:1",
+   "to": "option:21-1:month:1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:10",
+   "to": "option:21-1:month:10",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:11",
+   "to": "option:21-1:month:11",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:12",
+   "to": "option:21-1:month:12",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:2",
+   "to": "option:21-1:month:2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:3",
+   "to": "option:21-1:month:3",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:4",
+   "to": "option:21-1:month:4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:5",
+   "to": "option:21-1:month:5",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:6",
+   "to": "option:21-1:month:6",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:7",
+   "to": "option:21-1:month:7",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:8",
+   "to": "option:21-1:month:8",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:month:9",
+   "to": "option:21-1:month:9",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:pay_method:bank",
+   "to": "option:21-1:pay_method:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:pay_method:cash",
+   "to": "option:21-1:pay_method:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:pay_method:mobile",
+   "to": "option:21-1:pay_method:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:pay_method:other",
+   "to": "option:21-1:pay_method:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:pay_method:owner",
+   "to": "option:21-1:pay_method:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:receipts.method:bank",
+   "to": "option:21-1:receipts.method:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:receipts.method:cash",
+   "to": "option:21-1:receipts.method:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:receipts.method:mobile",
+   "to": "option:21-1:receipts.method:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:receipts.method:other",
+   "to": "option:21-1:receipts.method:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-2:receipts.method:owner",
+   "to": "option:21-1:receipts.method:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-3:adv.method:bank",
+   "to": "option:35-1:adv.method:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-3:adv.method:cash",
+   "to": "option:35-1:adv.method:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-3:adv.method:goods",
+   "to": "option:35-1:adv.method:goods",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-3:adv.method:mobile",
+   "to": "option:35-1:adv.method:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-3:adv.method:owner",
+   "to": "option:35-1:adv.method:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-4:keys:na",
+   "to": "option:01-1:keys:na",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-4:keys:yes",
+   "to": "option:01-1:keys:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-4:lodging:na",
+   "to": "option:01-1:lodging:na",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-4:lodging:yes",
+   "to": "option:01-1:lodging:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:decision:no",
+   "to": "option:15-1:decision:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:decision:part",
+   "to": "option:15-1:decision:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:decision:yes",
+   "to": "option:15-1:decision:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:type:annual",
+   "to": "option:15-1:type:annual",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:type:emergency",
+   "to": "option:15-1:type:emergency",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:type:sick",
+   "to": "option:15-1:type:sick",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:type:swap",
+   "to": "option:15-1:type:swap",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-5:type:unpaid",
+   "to": "option:15-1:type:unpaid",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:handover.status:done",
+   "to": "option:10-1:handover.status:done",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:handover.status:pending",
+   "to": "option:10-1:handover.status:pending",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:how:contract",
+   "to": "option:10-1:how:contract",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:how:other",
+   "to": "option:10-1:how:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:how:resign",
+   "to": "option:10-1:how:resign",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:how:terminate",
+   "to": "option:10-1:how:terminate",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:notice:no",
+   "to": "option:10-1:notice:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:notice:yes",
+   "to": "option:10-1:notice:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:pay_method:bank",
+   "to": "option:10-1:pay_method:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:pay_method:cash",
+   "to": "option:10-1:pay_method:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:pay_method:mobile",
+   "to": "option:10-1:pay_method:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:pay_method:other",
+   "to": "option:10-1:pay_method:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-6:pay_method:owner",
+   "to": "option:10-1:pay_method:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:extra.skill:full",
+   "to": "option:09-1:extra.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:extra.skill:part",
+   "to": "option:09-1:extra.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotA.skill:full",
+   "to": "option:09-1:slotA.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotA.skill:part",
+   "to": "option:09-1:slotA.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotB.skill:full",
+   "to": "option:09-1:slotB.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotB.skill:part",
+   "to": "option:09-1:slotB.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotC.skill:full",
+   "to": "option:09-1:slotC.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotC.skill:part",
+   "to": "option:09-1:slotC.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotE.skill:full",
+   "to": "option:09-1:slotE.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotE.skill:part",
+   "to": "option:09-1:slotE.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotF.skill:full",
+   "to": "option:09-1:slotF.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotF.skill:part",
+   "to": "option:09-1:slotF.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotG.skill:full",
+   "to": "option:09-1:slotG.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotG.skill:part",
+   "to": "option:09-1:slotG.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotH.skill:full",
+   "to": "option:09-1:slotH.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotH.skill:part",
+   "to": "option:09-1:slotH.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotI.skill:full",
+   "to": "option:09-1:slotI.skill:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:02-7:slotI.skill:part",
+   "to": "option:09-1:slotI.skill:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:cust_order:no",
+   "to": "option:39-1:cust_order:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:cust_order:yes",
+   "to": "option:39-1:cust_order:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:items.grade:g1",
+   "to": "option:39-1:items.grade:g1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:items.grade:g2",
+   "to": "option:39-1:items.grade:g2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:liability:factory",
+   "to": "option:39-1:liability:factory",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:liability:ok",
+   "to": "option:39-1:liability:ok",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:liability:transport",
+   "to": "option:39-1:liability:transport",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:outside:no",
+   "to": "option:39-1:outside:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:outside:yes",
+   "to": "option:39-1:outside:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:pay:adv",
+   "to": "option:39-1:pay:adv",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:pay:cash",
+   "to": "option:39-1:pay:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:pay:credit",
+   "to": "option:39-1:pay:credit",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:returns.reason:broken",
+   "to": "option:39-1:returns.reason:broken",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:returns.reason:expired",
+   "to": "option:39-1:returns.reason:expired",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:returns.reason:g2",
+   "to": "option:39-1:returns.reason:g2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:returns.reason:unsold",
+   "to": "option:39-1:returns.reason:unsold",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:shift:a",
+   "to": "option:39-1:shift:a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:shift:m",
+   "to": "option:39-1:shift:m",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:shift:n",
+   "to": "option:39-1:shift:n",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:cust",
+   "to": "option:39-1:ttype:cust",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:f2s",
+   "to": "option:39-1:ttype:f2s",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:g2l",
+   "to": "option:39-1:ttype:g2l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:other",
+   "to": "option:39-1:ttype:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:p2l",
+   "to": "option:39-1:ttype:p2l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:s2f",
+   "to": "option:39-1:ttype:s2f",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:03-1:ttype:s2s",
+   "to": "option:39-1:ttype:s2s",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:lines.quality:accept",
+   "to": "option:13-1:lines.quality:accept",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:lines.quality:hold",
+   "to": "option:13-1:lines.quality:hold",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:lines.quality:reduced",
+   "to": "option:13-1:lines.quality:reduced",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:lines.quality:return",
+   "to": "option:13-1:lines.quality:return",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:paper:direct",
+   "to": "option:13-1:paper:direct",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:paper:po",
+   "to": "option:13-1:paper:po",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:paper:pr",
+   "to": "option:13-1:paper:pr",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:pay:bank",
+   "to": "option:13-1:pay:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:pay:cash",
+   "to": "option:13-1:pay:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:pay:credit",
+   "to": "option:13-1:pay:credit",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:pay:mobile",
+   "to": "option:13-1:pay:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:pay:other",
+   "to": "option:13-1:pay:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-1:pay:owner",
+   "to": "option:13-1:pay:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:purpose:prod",
+   "to": "option:18-1:purpose:prod",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:purpose:sample",
+   "to": "option:18-1:purpose:sample",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:purpose:staff",
+   "to": "option:18-1:purpose:staff",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:purpose:trial",
+   "to": "option:18-1:purpose:trial",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:shift:a",
+   "to": "option:18-1:shift:a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:shift:m",
+   "to": "option:18-1:shift:m",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-2:shift:n",
+   "to": "option:18-1:shift:n",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-3:kind:regular",
+   "to": "option:36-1:kind:regular",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-3:kind:surprise",
+   "to": "option:36-1:kind:surprise",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-3:movement:no",
+   "to": "option:36-1:movement:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-3:movement:yes",
+   "to": "option:36-1:movement:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-4:lines.other_type:count_adj",
+   "to": "option:37-1:lines.other_type:count_adj",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-4:lines.other_type:other",
+   "to": "option:37-1:lines.other_type:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:04-4:lines.other_type:return",
+   "to": "option:37-1:lines.other_type:return",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:bd_product:checked",
+   "to": "option:12-1:bd_product:checked",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:bd_product:na",
+   "to": "option:12-1:bd_product:na",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:breakdown:no",
+   "to": "option:12-1:breakdown:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:breakdown:yes",
+   "to": "option:12-1:breakdown:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:machines.state:defect",
+   "to": "option:12-1:machines.state:defect",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:machines.state:ok",
+   "to": "option:12-1:machines.state:ok",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:raw_return:done",
+   "to": "option:12-1:raw_return:done",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:raw_return:na",
+   "to": "option:12-1:raw_return:na",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:safety:defect",
+   "to": "option:12-1:safety:defect",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:safety:ok",
+   "to": "option:12-1:safety:ok",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:scale:off",
+   "to": "option:12-1:scale:off",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:scale:ok",
+   "to": "option:12-1:scale:ok",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:shift:a",
+   "to": "option:12-1:shift:a",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:shift:m",
+   "to": "option:12-1:shift:m",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:shift:n",
+   "to": "option:12-1:shift:n",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:unplanned:no",
+   "to": "option:12-1:unplanned:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-1:unplanned:yes",
+   "to": "option:12-1:unplanned:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:cat:bakery",
+   "to": "option:26-1:cat:bakery",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:cat:cake",
+   "to": "option:26-1:cat:cake",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:cat:other",
+   "to": "option:26-1:cat:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:cat:sweet",
+   "to": "option:26-1:cat:sweet",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:shelf_cold_u:day",
+   "to": "option:26-1:shelf_cold_u:day",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:shelf_cold_u:hour",
+   "to": "option:26-1:shelf_cold_u:hour",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:shelf_normal_u:day",
+   "to": "option:26-1:shelf_normal_u:day",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:shelf_normal_u:hour",
+   "to": "option:26-1:shelf_normal_u:hour",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:storage:chiller",
+   "to": "option:26-1:storage:chiller",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:storage:fridge",
+   "to": "option:26-1:storage:fridge",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:storage:normal",
+   "to": "option:26-1:storage:normal",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-2:storage:other",
+   "to": "option:26-1:storage:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:a.unit:g",
+   "to": "option:31-1:a.unit:g",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:a.unit:kg",
+   "to": "option:31-1:a.unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:a.unit:l",
+   "to": "option:31-1:a.unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:a.unit:lb",
+   "to": "option:31-1:a.unit:lb",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:a.unit:pc",
+   "to": "option:31-1:a.unit:pc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:b.unit:g",
+   "to": "option:31-1:b.unit:g",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:b.unit:kg",
+   "to": "option:31-1:b.unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:b.unit:l",
+   "to": "option:31-1:b.unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:b.unit:lb",
+   "to": "option:31-1:b.unit:lb",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:b.unit:pc",
+   "to": "option:31-1:b.unit:pc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:base_unit:kg",
+   "to": "option:31-1:base_unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:base_unit:l",
+   "to": "option:31-1:base_unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:batch_unit:g",
+   "to": "option:31-1:batch_unit:g",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:batch_unit:kg",
+   "to": "option:31-1:batch_unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:batch_unit:l",
+   "to": "option:31-1:batch_unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:batch_unit:lb",
+   "to": "option:31-1:batch_unit:lb",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:batch_unit:other",
+   "to": "option:31-1:batch_unit:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:batch_unit:pc",
+   "to": "option:31-1:batch_unit:pc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:c.unit:g",
+   "to": "option:31-1:c.unit:g",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:c.unit:kg",
+   "to": "option:31-1:c.unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:c.unit:l",
+   "to": "option:31-1:c.unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:c.unit:lb",
+   "to": "option:31-1:c.unit:lb",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:c.unit:pc",
+   "to": "option:31-1:c.unit:pc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:family:cake",
+   "to": "option:31-1:family:cake",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:family:chana",
+   "to": "option:31-1:family:chana",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:family:doi",
+   "to": "option:31-1:family:doi",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:family:fried",
+   "to": "option:31-1:family:fried",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:family:khoa",
+   "to": "option:31-1:family:khoa",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-3:family:other",
+   "to": "option:31-1:family:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:family:cake",
+   "to": "option:41-1:family:cake",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:family:chana",
+   "to": "option:41-1:family:chana",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:family:doi",
+   "to": "option:41-1:family:doi",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:family:fried",
+   "to": "option:41-1:family:fried",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:family:khoa",
+   "to": "option:41-1:family:khoa",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:family:other",
+   "to": "option:41-1:family:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:in_unit:kg",
+   "to": "option:41-1:in_unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:in_unit:l",
+   "to": "option:41-1:in_unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:out_unit:kg",
+   "to": "option:41-1:out_unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-4:out_unit:pc",
+   "to": "option:41-1:out_unit:pc",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:brand:alcakes",
+   "to": "option:22-1:brand:alcakes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:brand:bari",
+   "to": "option:22-1:brand:bari",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:brand:islamia",
+   "to": "option:22-1:brand:islamia",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:brand:other",
+   "to": "option:22-1:brand:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:decision:change",
+   "to": "option:22-1:decision:change",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:decision:drop",
+   "to": "option:22-1:decision:drop",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:05-5:decision:keep",
+   "to": "option:22-1:decision:keep",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-1:cmp:outside",
+   "to": "option:28-1:cmp:outside",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-1:cmp:within",
+   "to": "option:28-1:cmp:within",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-1:decision:no",
+   "to": "option:28-1:decision:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-1:decision:yes",
+   "to": "option:28-1:decision:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-1:urgency:normal",
+   "to": "option:28-1:urgency:normal",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-1:urgency:urgent",
+   "to": "option:28-1:urgency:urgent",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-2:single:no",
+   "to": "option:29-1:single:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-2:single:yes",
+   "to": "option:29-1:single:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-3:pay:bank",
+   "to": "option:27-1:pay:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-3:pay:cash",
+   "to": "option:27-1:pay:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-3:pay:credit",
+   "to": "option:27-1:pay:credit",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-3:pay:mobile",
+   "to": "option:27-1:pay:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-3:pay:other",
+   "to": "option:27-1:pay:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-3:pay:owner",
+   "to": "option:27-1:pay:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:debit_reason:quality",
+   "to": "option:02-1:debit_reason:quality",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:debit_reason:return",
+   "to": "option:02-1:debit_reason:return",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:debit_reason:short",
+   "to": "option:02-1:debit_reason:short",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:mism_what:both",
+   "to": "option:02-1:mism_what:both",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:mism_what:qty",
+   "to": "option:02-1:mism_what:qty",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:mism_what:rate",
+   "to": "option:02-1:mism_what:rate",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:pay_way:bank",
+   "to": "option:02-1:pay_way:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:pay_way:cash",
+   "to": "option:02-1:pay_way:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:pay_way:cheque",
+   "to": "option:02-1:pay_way:cheque",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:pay_way:mobile",
+   "to": "option:02-1:pay_way:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:pay_way:other",
+   "to": "option:02-1:pay_way:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:pay_way:owner",
+   "to": "option:02-1:pay_way:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:returned:no",
+   "to": "option:02-1:returned:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:returned:yes",
+   "to": "option:02-1:returned:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:short:no",
+   "to": "option:02-1:short:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-4:short:yes",
+   "to": "option:02-1:short:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-5:kind:other",
+   "to": "option:38-1:kind:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-5:kind:outside",
+   "to": "option:38-1:kind:outside",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-5:kind:supplier",
+   "to": "option:38-1:kind:supplier",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-5:verify_how:call",
+   "to": "option:38-1:verify_how:call",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-5:verify_how:other",
+   "to": "option:38-1:verify_how:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:06-5:verify_how:paper",
+   "to": "option:38-1:verify_how:paper",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:assigned:own",
+   "to": "option:16-1:assigned:own",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:assigned:tech",
+   "to": "option:16-1:assigned:tech",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:cost_type:both",
+   "to": "option:16-1:cost_type:both",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:cost_type:labour",
+   "to": "option:16-1:cost_type:labour",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:cost_type:parts",
+   "to": "option:16-1:cost_type:parts",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:goods_state:checked",
+   "to": "option:16-1:goods_state:checked",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:goods_state:na",
+   "to": "option:16-1:goods_state:na",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:pay:bank",
+   "to": "option:16-1:pay:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:pay:hub",
+   "to": "option:16-1:pay:hub",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:pay:imprest",
+   "to": "option:16-1:pay:imprest",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:pay:mobile",
+   "to": "option:16-1:pay:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:pay:other",
+   "to": "option:16-1:pay:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:pay:owner",
+   "to": "option:16-1:pay:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:work_stopped:no",
+   "to": "option:16-1:work_stopped:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:08-1:work_stopped:yes",
+   "to": "option:16-1:work_stopped:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:hospitality",
+   "to": "option:11-1:lines.head:hospitality",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:labour",
+   "to": "option:11-1:lines.head:labour",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:other",
+   "to": "option:11-1:lines.head:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:repair",
+   "to": "option:11-1:lines.head:repair",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:sourcing",
+   "to": "option:11-1:lines.head:sourcing",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:staff_meal",
+   "to": "option:11-1:lines.head:staff_meal",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.head:transport",
+   "to": "option:11-1:lines.head:transport",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.receipt:no",
+   "to": "option:11-1:lines.receipt:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:lines.receipt:yes",
+   "to": "option:11-1:lines.receipt:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:pay_mode:bank",
+   "to": "option:11-1:pay_mode:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:pay_mode:card",
+   "to": "option:11-1:pay_mode:card",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:pay_mode:cash",
+   "to": "option:11-1:pay_mode:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-2:pay_mode:mobile",
+   "to": "option:11-1:pay_mode:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:personal:no",
+   "to": "option:07-1:personal:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:personal:yes",
+   "to": "option:07-1:personal:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:showroom.who:other",
+   "to": "option:07-1:showroom.who:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:showroom.who:s1",
+   "to": "option:07-1:showroom.who:s1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:showroom.who:s2",
+   "to": "option:07-1:showroom.who:s2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:showroom.who:s3",
+   "to": "option:07-1:showroom.who:s3",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-3:showroom.who:s4",
+   "to": "option:07-1:showroom.who:s4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-4:shortage:no",
+   "to": "option:04-1:shortage:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-4:shortage:yes",
+   "to": "option:04-1:shortage:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:adv.status:given",
+   "to": "option:30-1:adv.status:given",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:adv.status:pending",
+   "to": "option:30-1:adv.status:pending",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:adv.status:refunded",
+   "to": "option:30-1:adv.status:refunded",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:adv_match:no",
+   "to": "option:30-1:adv_match:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:adv_match:yes",
+   "to": "option:30-1:adv_match:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:over_credit:no",
+   "to": "option:30-1:over_credit:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:10-5:over_credit:yes",
+   "to": "option:30-1:over_credit:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:11-1:lines.display:match",
+   "to": "option:33-1:lines.display:match",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:11-1:lines.display:short",
+   "to": "option:33-1:lines.display:short",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:11-1:place:factory",
+   "to": "option:33-1:place:factory",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:11-1:place:shop",
+   "to": "option:33-1:place:shop",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:day_type:busy",
+   "to": "option:06-1:day_type:busy",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:day_type:normal",
+   "to": "option:06-1:day_type:normal",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:expired_shown:no",
+   "to": "option:06-1:expired_shown:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:expired_shown:yes",
+   "to": "option:06-1:expired_shown:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:incidents.urgency:routine",
+   "to": "option:06-1:incidents.urgency:routine",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:incidents.urgency:urgent",
+   "to": "option:06-1:incidents.urgency:urgent",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:receipts.from:branch",
+   "to": "option:06-1:receipts.from:branch",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:receipts.from:factory",
+   "to": "option:06-1:receipts.from:factory",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:receipts.from:godown",
+   "to": "option:06-1:receipts.from:godown",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:receipts.from:outside",
+   "to": "option:06-1:receipts.from:outside",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:receipts.from:supplier",
+   "to": "option:06-1:receipts.from:supplier",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:safety:no",
+   "to": "option:06-1:safety:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:safety:yes",
+   "to": "option:06-1:safety:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:shift:full",
+   "to": "option:06-1:shift:full",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:shift:s1",
+   "to": "option:06-1:shift:s1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:shift:s2",
+   "to": "option:06-1:shift:s2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:vouchers.v_rec:no",
+   "to": "option:06-1:vouchers.v_rec:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-1:vouchers.v_rec:yes",
+   "to": "option:06-1:vouchers.v_rec:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:decision:drop",
+   "to": "option:14-1:decision:drop",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:decision:keep",
+   "to": "option:14-1:decision:keep",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:meas.unit:kg",
+   "to": "option:14-1:meas.unit:kg",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:meas.unit:l",
+   "to": "option:14-1:meas.unit:l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:oil_changed:no",
+   "to": "option:14-1:oil_changed:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:oil_changed:yes",
+   "to": "option:14-1:oil_changed:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:old_oil_fate:destroyed",
+   "to": "option:14-1:old_oil_fate:destroyed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:old_oil_fate:sold",
+   "to": "option:14-1:old_oil_fate:sold",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:roster:no",
+   "to": "option:14-1:roster:no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:roster:yes",
+   "to": "option:14-1:roster:yes",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:scale:bad",
+   "to": "option:14-1:scale:bad",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:scale:ok",
+   "to": "option:14-1:scale:ok",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:slips.source:factory",
+   "to": "option:14-1:slips.source:factory",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:14-2:slips.source:godown",
+   "to": "option:14-1:slips.source:godown",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:brand:ak",
+   "to": "option:17-1:brand:ak",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:brand:all",
+   "to": "option:17-1:brand:all",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:brand:imh",
+   "to": "option:17-1:brand:imh",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:brand:mb",
+   "to": "option:17-1:brand:mb",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:brand:other",
+   "to": "option:17-1:brand:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:1",
+   "to": "option:17-1:lines.head:1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:10",
+   "to": "option:17-1:lines.head:10",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:2",
+   "to": "option:17-1:lines.head:2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:3",
+   "to": "option:17-1:lines.head:3",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:4",
+   "to": "option:17-1:lines.head:4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:5",
+   "to": "option:17-1:lines.head:5",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:6",
+   "to": "option:17-1:lines.head:6",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:7",
+   "to": "option:17-1:lines.head:7",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:8",
+   "to": "option:17-1:lines.head:8",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.head:9",
+   "to": "option:17-1:lines.head:9",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.source:bank",
+   "to": "option:17-1:lines.source:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.source:card",
+   "to": "option:17-1:lines.source:card",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.source:imprest",
+   "to": "option:17-1:lines.source:imprest",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.source:mobile",
+   "to": "option:17-1:lines.source:mobile",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:lines.source:owner",
+   "to": "option:17-1:lines.source:owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:1",
+   "to": "option:17-1:month:1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:10",
+   "to": "option:17-1:month:10",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:11",
+   "to": "option:17-1:month:11",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:12",
+   "to": "option:17-1:month:12",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:2",
+   "to": "option:17-1:month:2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:3",
+   "to": "option:17-1:month:3",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:4",
+   "to": "option:17-1:month:4",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:5",
+   "to": "option:17-1:month:5",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:6",
+   "to": "option:17-1:month:6",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:7",
+   "to": "option:17-1:month:7",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:8",
+   "to": "option:17-1:month:8",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:18-1:month:9",
+   "to": "option:17-1:month:9",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_fate:adjust",
+   "to": "option:05-1:adv_fate:adjust",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_fate:income",
+   "to": "option:05-1:adv_fate:income",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_fate:refund",
+   "to": "option:05-1:adv_fate:refund",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_mode:bkash",
+   "to": "option:05-1:adv_mode:bkash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_mode:card",
+   "to": "option:05-1:adv_mode:card",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_mode:cash",
+   "to": "option:05-1:adv_mode:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_mode:nagad",
+   "to": "option:05-1:adv_mode:nagad",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:adv_mode:other",
+   "to": "option:05-1:adv_mode:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:channel:counter",
+   "to": "option:05-1:channel:counter",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:channel:message",
+   "to": "option:05-1:channel:message",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:channel:other",
+   "to": "option:05-1:channel:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:channel:party",
+   "to": "option:05-1:channel:party",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:channel:phone",
+   "to": "option:05-1:channel:phone",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_by:courier",
+   "to": "option:05-1:deliv_by:courier",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_by:foodapp",
+   "to": "option:05-1:deliv_by:foodapp",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_by:other",
+   "to": "option:05-1:deliv_by:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_by:own",
+   "to": "option:05-1:deliv_by:own",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_by:pickup",
+   "to": "option:05-1:deliv_by:pickup",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_mode:home",
+   "to": "option:05-1:deliv_mode:home",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:deliv_mode:pickup",
+   "to": "option:05-1:deliv_mode:pickup",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:due_mode:cash",
+   "to": "option:05-1:due_mode:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:due_mode:digital",
+   "to": "option:05-1:due_mode:digital",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:goods_fate:display",
+   "to": "option:05-1:goods_fate:display",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:goods_fate:g2",
+   "to": "option:05-1:goods_fate:g2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:goods_fate:waste",
+   "to": "option:05-1:goods_fate:waste",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:online:fb",
+   "to": "option:05-1:online:fb",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:online:foodapp",
+   "to": "option:05-1:online:foodapp",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:online:ig",
+   "to": "option:05-1:online:ig",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:online:other",
+   "to": "option:05-1:online:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:online:tt",
+   "to": "option:05-1:online:tt",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:online:wa",
+   "to": "option:05-1:online:wa",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:order_type:custom",
+   "to": "option:05-1:order_type:custom",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:order_type:normal",
+   "to": "option:05-1:order_type:normal",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:received_by:rep",
+   "to": "option:05-1:received_by:rep",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-1:received_by:self",
+   "to": "option:05-1:received_by:self",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-2:reason:bulk",
+   "to": "option:08-1:reason:bulk",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-2:reason:cond",
+   "to": "option:08-1:reason:cond",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-2:reason:offer",
+   "to": "option:08-1:reason:offer",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-2:reason:old",
+   "to": "option:08-1:reason:old",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-2:reason:other",
+   "to": "option:08-1:reason:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-3:feedback:happy",
+   "to": "option:32-1:feedback:happy",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-3:feedback:unhappy",
+   "to": "option:32-1:feedback:unhappy",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-3:p_fate:factory",
+   "to": "option:32-1:p_fate:factory",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-3:p_fate:g2",
+   "to": "option:32-1:p_fate:g2",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-3:p_fate:nodisplay",
+   "to": "option:32-1:p_fate:nodisplay",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-3:p_fate:waste",
+   "to": "option:32-1:p_fate:waste",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:cash_mode:bank",
+   "to": "option:24-1:cash_mode:bank",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:cash_mode:bkash",
+   "to": "option:24-1:cash_mode:bkash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:cash_mode:cash",
+   "to": "option:24-1:cash_mode:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:cash_mode:other",
+   "to": "option:24-1:cash_mode:other",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:credit_ok:inside",
+   "to": "option:24-1:credit_ok:inside",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:credit_ok:outside",
+   "to": "option:24-1:credit_ok:outside",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:doc:invoice",
+   "to": "option:24-1:doc:invoice",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:doc:quote",
+   "to": "option:24-1:doc:quote",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:pay:cash",
+   "to": "option:24-1:pay:cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:pay:credit",
+   "to": "option:24-1:pay:credit",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-4:pay:part",
+   "to": "option:24-1:pay:part",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-5:rate_basis:list",
+   "to": "option:25-1:rate_basis:list",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-5:rate_basis:special",
+   "to": "option:25-1:rate_basis:special",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.delivery:courier",
+   "to": "option:23-1:lines.delivery:courier",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.delivery:foodapp",
+   "to": "option:23-1:lines.delivery:foodapp",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.delivery:own",
+   "to": "option:23-1:lines.delivery:own",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.delivery:shop",
+   "to": "option:23-1:lines.delivery:shop",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.outcome:handed",
+   "to": "option:23-1:lines.outcome:handed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.outcome:returned",
+   "to": "option:23-1:lines.outcome:returned",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.path:cod",
+   "to": "option:23-1:lines.path:cod",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.path:foodapp",
+   "to": "option:23-1:lines.path:foodapp",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "option:20-6:lines.path:merchant",
+   "to": "option:23-1:lines.path:merchant",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-1:a-all-showrooms-side-by-side",
+   "to": "section:40-1:a-all-showrooms-side-by-side",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-1:b-factory-hub",
+   "to": "section:40-1:b-factory-hub",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-1:c-online-marketing",
+   "to": "section:40-1:c-online-marketing",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-1:d-this-week-s-decisions",
+   "to": "section:40-1:d-this-week-s-decisions",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-1:last-week-s-decisions",
+   "to": "section:40-1:last-week-s-decisions",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-1:present-signatures",
+   "to": "section:40-1:present-signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-2:a-profit-loss-p-l",
+   "to": "section:20-1:a-profit-loss-p-l",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-2:b-the-15-kpis",
+   "to": "section:20-1:b-the-15-kpis",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-2:c-decisions",
+   "to": "section:20-1:c-decisions",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-2:check-someone-else-not-the-preparer",
+   "to": "section:20-1:check-someone-else-not-the-preparer",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-2:reconciliation-signatures",
+   "to": "section:20-1:reconciliation-signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:01-2:source-numbers-for-the-kpis-from-the-papers",
+   "to": "section:20-1:source-numbers-for-the-kpis-from-the-papers",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-2 -> 20-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-1:absence-cover",
+   "to": "section:19-1:absence-cover",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-1:check-management",
+   "to": "section:19-1:check-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-1:rules",
+   "to": "section:19-1:rules",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-1:sign-off-submission",
+   "to": "section:19-1:sign-off-submission",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-1:staff-attendance-one-card-per-person",
+   "to": "section:19-1:staff-attendance-one-card-per-person",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-1:temporary-workers-daily-wage",
+   "to": "section:19-1:temporary-workers-daily-wage",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-1 -> 19-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-2:check-approval",
+   "to": "section:21-1:check-approval",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-2:payment",
+   "to": "section:21-1:payment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-2:receipt-acknowledgement",
+   "to": "section:21-1:receipt-acknowledgement",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-2:rules",
+   "to": "section:21-1:rules",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-2:salary-list",
+   "to": "section:21-1:salary-list",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-2 -> 21-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-3:advance-lines",
+   "to": "section:35-1:advance-lines",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-3:check-management",
+   "to": "section:35-1:check-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-3:matching-exit",
+   "to": "section:35-1:matching-exit",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-3:rules",
+   "to": "section:35-1:rules",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-3 -> 35-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-4:approval-management",
+   "to": "section:01-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-4:rule",
+   "to": "section:01-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-4:section-a-terms-of-appointment",
+   "to": "section:01-1:section-a-terms-of-appointment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-4:section-b-duties-of-this-post",
+   "to": "section:01-1:section-b-duties-of-this-post",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-4:signatures",
+   "to": "section:01-1:signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-4 -> 01-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-5:application",
+   "to": "section:15-1:application",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-5:cover-during-leave",
+   "to": "section:15-1:cover-during-leave",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-5:decision-manager",
+   "to": "section:15-1:decision-manager",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-5 -> 15-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-6:approval-management",
+   "to": "section:10-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-6:end-of-employment",
+   "to": "section:10-1:end-of-employment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-6:final-settlement",
+   "to": "section:10-1:final-settlement",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-6:handover-list",
+   "to": "section:10-1:handover-list",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-6:left-without-notice-absconded",
+   "to": "section:10-1:left-without-notice-absconded",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-6:rule",
+   "to": "section:10-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-6 -> 10-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:approval-owner-head-management",
+   "to": "section:09-1:approval-owner-head-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:extra-slots-other-name-new-branch",
+   "to": "section:09-1:extra-slots-other-name-new-branch",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:rules",
+   "to": "section:09-1:rules",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-a-showroom-managers",
+   "to": "section:09-1:section-a-showroom-managers",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-b-branch-backup-managers",
+   "to": "section:09-1:section-b-branch-backup-managers",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-c-jalebi-batter-trained-backups",
+   "to": "section:09-1:section-c-jalebi-batter-trained-backups",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-d-change-history",
+   "to": "section:09-1:section-d-change-history",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-e-godown-stores-storekeepers-and-backups",
+   "to": "section:09-1:section-e-godown-stores-storekeepers-and-backups",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-f-factories",
+   "to": "section:09-1:section-f-factories",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-g-accounts-cash",
+   "to": "section:09-1:section-g-accounts-cash",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-h-independent-check-online-accounts",
+   "to": "section:09-1:section-h-independent-check-online-accounts",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-7:section-i-purchasing-duplicate-keys",
+   "to": "section:09-1:section-i-purchasing-duplicate-keys",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-7 -> 09-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:approval-management",
+   "to": "section:34-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:result",
+   "to": "section:34-1:result",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:rule",
+   "to": "section:34-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-a-showroom-manager-backup-manager-checker-",
+   "to": "section:34-1:section-a-showroom-manager-backup-manager-checker-",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-b-jalebi-batter-backup-checker-the-jalebi-",
+   "to": "section:34-1:section-b-jalebi-batter-backup-checker-the-jalebi-",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-c-godown-store-storekeepers-and-backups-ch",
+   "to": "section:34-1:section-c-godown-store-storekeepers-and-backups-ch",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-d-factory-in-charge-head-artisan-with-back",
+   "to": "section:34-1:section-d-factory-in-charge-head-artisan-with-back",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-e-daily-accounts-reconciliation-backup-che",
+   "to": "section:34-1:section-e-daily-accounts-reconciliation-backup-che",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-f-night-cash-receiver-checker-the-daily-re",
+   "to": "section:34-1:section-f-night-cash-receiver-checker-the-daily-re",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:02-8:section-g-online-marketing-checker-the-owner",
+   "to": "section:34-1:section-g-online-marketing-checker-the-owner",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 02-8 -> 34-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:before-dispatch",
+   "to": "section:39-1:before-dispatch",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:crates-trays",
+   "to": "section:39-1:crates-trays",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:customer-party-delivery-if-needed",
+   "to": "section:39-1:customer-party-delivery-if-needed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:handover-count-receiving-check-receiver",
+   "to": "section:39-1:handover-count-receiving-check-receiver",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:posting",
+   "to": "section:39-1:posting",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:product-description",
+   "to": "section:39-1:product-description",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:03-1:return-to-factory-if-needed",
+   "to": "section:39-1:return-to-factory-if-needed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-1:check-management-fills",
+   "to": "section:13-1:check-management-fills",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-1:goods-count-weight",
+   "to": "section:13-1:goods-count-weight",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-1:payment",
+   "to": "section:13-1:payment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-1:photos-signatures",
+   "to": "section:13-1:photos-signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-1:purchase-order-progress",
+   "to": "section:13-1:purchase-order-progress",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-1:quality-check-store-ledger",
+   "to": "section:13-1:quality-check-store-ledger",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-2:issue",
+   "to": "section:18-1:issue",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-2:link-to-production-ledger",
+   "to": "section:18-1:link-to-production-ledger",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-2:receipt-production-fills",
+   "to": "section:18-1:receipt-production-fills",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-2:same-day-return",
+   "to": "section:18-1:same-day-return",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-2 -> 18-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-3:count",
+   "to": "section:36-1:count",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-3 -> 36-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-4:entries",
+   "to": "section:37-1:entries",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-4:month-end",
+   "to": "section:37-1:month-end",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:04-4:monthly-check-approval-management",
+   "to": "section:37-1:monthly-check-approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-4 -> 37-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-1:checks-signatures",
+   "to": "section:12-1:checks-signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-1:finished-goods-made-optional-goes-to-the-stock-led",
+   "to": "section:12-1:finished-goods-made-optional-goes-to-the-stock-led",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-1:section-a-before-shift",
+   "to": "section:12-1:section-a-before-shift",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-1:section-b-during-shift",
+   "to": "section:12-1:section-b-during-shift",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-1:section-c-end-of-shift",
+   "to": "section:12-1:section-c-end-of-shift",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-1:section-d-exceptions-incidents",
+   "to": "section:12-1:section-d-exceptions-incidents",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-1 -> 12-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-2:1st-grade-the-correct-product",
+   "to": "section:26-1:1st-grade-the-correct-product",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-2:2nd-grade-not-rejected",
+   "to": "section:26-1:2nd-grade-not-rejected",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-2:approval-management",
+   "to": "section:26-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-2:note",
+   "to": "section:26-1:note",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-2:rejected-not-for-sale",
+   "to": "section:26-1:rejected-not-for-sale",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-2:shelf-life-storage",
+   "to": "section:26-1:shelf-life-storage",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-2 -> 26-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:approval-management",
+   "to": "section:31-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:family-batch",
+   "to": "section:31-1:family-batch",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:links-signatures",
+   "to": "section:31-1:links-signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:section-a-step-1-making-the-base-chhana-khoa-dough",
+   "to": "section:31-1:section-a-step-1-making-the-base-chhana-khoa-dough",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:section-b-step-2-making-the-product",
+   "to": "section:31-1:section-b-step-2-making-the-product",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:section-c-packaging-kept-apart-from-the-product-in",
+   "to": "section:31-1:section-c-packaging-kept-apart-from-the-product-in",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:section-d-method-steps",
+   "to": "section:31-1:section-d-method-steps",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-3:time-people-equipment",
+   "to": "section:31-1:time-people-equipment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-3 -> 31-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-4:check-approval",
+   "to": "section:41-1:check-approval",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-4:signatures",
+   "to": "section:41-1:signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-4:three-batch-average",
+   "to": "section:41-1:three-batch-average",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-4:three-batch-measurements",
+   "to": "section:41-1:three-batch-measurements",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-4 -> 41-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:decision-signatures-owner-and-chief-management",
+   "to": "section:22-1:decision-signatures-owner-and-chief-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:prepared-checked-by",
+   "to": "section:22-1:prepared-checked-by",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:section-a-idea",
+   "to": "section:22-1:section-a-idea",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:section-b-recipe-yield-quality-cost",
+   "to": "section:22-1:section-b-recipe-yield-quality-cost",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:section-c-trial-sample-cost",
+   "to": "section:22-1:section-c-trial-sample-cost",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:section-d-opinions",
+   "to": "section:22-1:section-d-opinions",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:05-5:section-e-sales-on-the-review-day",
+   "to": "section:22-1:section-e-sales-on-the-review-day",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 05-5 -> 22-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-1:approval-a-different-person",
+   "to": "section:28-1:approval-a-different-person",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-1:cash-advance-for-the-market-urgent-purchase",
+   "to": "section:28-1:cash-advance-for-the-market-urgent-purchase",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-1:if-urgent-fill-before-buying",
+   "to": "section:28-1:if-urgent-fill-before-buying",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-1:quotation-comparison",
+   "to": "section:28-1:quotation-comparison",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-1:what-is-needed",
+   "to": "section:28-1:what-is-needed",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-1 -> 28-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-2:approval-of-the-choice-management",
+   "to": "section:29-1:approval-of-the-choice-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-2:purchase-order",
+   "to": "section:29-1:purchase-order",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-2:quotes-side-by-side",
+   "to": "section:29-1:quotes-side-by-side",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-2:selected-supplier",
+   "to": "section:29-1:selected-supplier",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-2 -> 29-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-3:acceptance",
+   "to": "section:27-1:acceptance",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-3:approval-management",
+   "to": "section:27-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-3:cancellation",
+   "to": "section:27-1:cancellation",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-3:order-lines",
+   "to": "section:27-1:order-lines",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-3:terms",
+   "to": "section:27-1:terms",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-3 -> 27-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-4:approval-management",
+   "to": "section:02-1:approval-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-4:if-something-differs",
+   "to": "section:02-1:if-something-differs",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-4:payment-request",
+   "to": "section:02-1:payment-request",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-4:shortage-return-claim",
+   "to": "section:02-1:shortage-return-claim",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-4:three-papers-matched",
+   "to": "section:02-1:three-papers-matched",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-4 -> 02-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:account-details-check-before-the-first-payment",
+   "to": "section:38-1:account-details-check-before-the-first-payment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:check-management",
+   "to": "section:38-1:check-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:entries",
+   "to": "section:38-1:entries",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:if-account-details-change",
+   "to": "section:38-1:if-account-details-change",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:master-list-dues-at-month-end",
+   "to": "section:38-1:master-list-dues-at-month-end",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:this-month-s-performance",
+   "to": "section:38-1:this-month-s-performance",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:06-5:ways-of-payment",
+   "to": "section:38-1:ways-of-payment",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 06-5 -> 38-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:08-1:assignment-approval",
+   "to": "section:16-1:assignment-approval",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:08-1:problem",
+   "to": "section:16-1:problem",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:08-1:repair-finished",
+   "to": "section:16-1:repair-finished",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 08-1 -> 16-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-1:handover-showroom-fills",
+   "to": "section:03-1:handover-showroom-fills",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-1 -> 03-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-1:receipt-hub-fills",
+   "to": "section:03-1:receipt-hub-fills",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-1 -> 03-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-2:expenses-from-the-imprest",
+   "to": "section:11-1:expenses-from-the-imprest",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-2:imprest-petty-cash-check",
+   "to": "section:11-1:imprest-petty-cash-check",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-2:limit-receipts",
+   "to": "section:11-1:limit-receipts",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-3:check",
+   "to": "section:07-1:check",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-3:courier-cash-on-delivery-food-app-money-courier-fo",
+   "to": "section:07-1:courier-cash-on-delivery-food-app-money-courier-fo",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-3:exceptions-check",
+   "to": "section:07-1:exceptions-check",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-3:rule-statement-collection",
+   "to": "section:07-1:rule-statement-collection",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-3:showroom",
+   "to": "section:07-1:showroom",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-3 -> 07-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:cash-in-hand",
+   "to": "section:04-1:cash-in-hand",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:decision-approval-not-the-preparer",
+   "to": "section:04-1:decision-approval-not-the-preparer",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:if-money-is-short-who-is-paid-first-today",
+   "to": "section:04-1:if-money-is-short-who-is-paid-first-today",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:payable-in-7-days",
+   "to": "section:04-1:payable-in-7-days",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:purchase-budget",
+   "to": "section:04-1:purchase-budget",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:receivable-next-7-days",
+   "to": "section:04-1:receivable-next-7-days",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-4:shortage-risk",
+   "to": "section:04-1:shortage-risk",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-5:check",
+   "to": "section:30-1:check",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-5:checks",
+   "to": "section:30-1:checks",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-5:section-a-who-owes-how-much-receivable",
+   "to": "section:30-1:section-a-who-owes-how-much-receivable",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:10-5:section-b-open-advances-orders-whose-goods-have-no",
+   "to": "section:30-1:section-b-open-advances-orders-whose-goods-have-no",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-5 -> 30-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:11-1:check-management",
+   "to": "section:33-1:check-management",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:11-1:end-of-day",
+   "to": "section:33-1:end-of-day",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:11-1:handover-lines",
+   "to": "section:33-1:handover-lines",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:11-1:rule",
+   "to": "section:33-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 11-1 -> 33-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:a-opening",
+   "to": "section:06-1:a-opening",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:b-goods-receipt",
+   "to": "section:06-1:b-goods-receipt",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:c-mid-day",
+   "to": "section:06-1:c-mid-day",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:d-pending-orders-board",
+   "to": "section:06-1:d-pending-orders-board",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:e-sales-cash-closing",
+   "to": "section:06-1:e-sales-cash-closing",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:f-closing-stock",
+   "to": "section:06-1:f-closing-stock",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:g-demand-for-tomorrow",
+   "to": "section:06-1:g-demand-for-tomorrow",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:h-closing-checklist-16-steps-all-required",
+   "to": "section:06-1:h-closing-checklist-16-steps-all-required",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:i-exceptions-incidents-repairs",
+   "to": "section:06-1:i-exceptions-incidents-repairs",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:received-at-the-hub-hub-fills",
+   "to": "section:06-1:received-at-the-hub-hub-fills",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-1:signatures",
+   "to": "section:06-1:signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:check",
+   "to": "section:14-1:check",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:section-a-opening-closing-measures",
+   "to": "section:14-1:section-a-opening-closing-measures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:section-b-receipts-today-per-goods-issue-slips",
+   "to": "section:14-1:section-b-receipts-today-per-goods-issue-slips",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:section-c-the-day-s-working",
+   "to": "section:14-1:section-c-the-day-s-working",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:section-d-decision-on-unsold-jalebi",
+   "to": "section:14-1:section-d-decision-on-unsold-jalebi",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:section-e-exceptions-any-tick-must-be-added-to-the",
+   "to": "section:14-1:section-e-exceptions-any-tick-must-be-added-to-the",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:14-2:signatures",
+   "to": "section:14-1:signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-2 -> 14-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:18-1:check-approval",
+   "to": "section:17-1:check-approval",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:18-1:expense-lines",
+   "to": "section:17-1:expense-lines",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:18-1:month-end-reconciliation",
+   "to": "section:17-1:month-end-reconciliation",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:18-1:rule",
+   "to": "section:17-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 18-1 -> 17-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:5-not-collected-cancelled-order",
+   "to": "section:05-1:5-not-collected-cancelled-order",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:at-order-intake-factory",
+   "to": "section:05-1:at-order-intake-factory",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:customer-receipt-customer",
+   "to": "section:05-1:customer-receipt-customer",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:handover-of-goods-in-this-order",
+   "to": "section:05-1:handover-of-goods-in-this-order",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:money",
+   "to": "section:05-1:money",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:order-items",
+   "to": "section:05-1:order-items",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-1:signatures",
+   "to": "section:05-1:signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-1 -> 05-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-2:discounted-items",
+   "to": "section:08-1:discounted-items",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-2:reason-approval",
+   "to": "section:08-1:reason-approval",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-2 -> 08-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-3:complaint",
+   "to": "section:32-1:complaint",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-3:decision-1-for-the-customer",
+   "to": "section:32-1:decision-1-for-the-customer",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-3:decision-2-for-the-product",
+   "to": "section:32-1:decision-2-for-the-product",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-3:investigation-hub-fills",
+   "to": "section:32-1:investigation-hub-fills",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-3:item",
+   "to": "section:32-1:item",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-3:received",
+   "to": "section:32-1:received",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-3 -> 32-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-4:checks-posting",
+   "to": "section:24-1:checks-posting",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-4:goods",
+   "to": "section:24-1:goods",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-4:money",
+   "to": "section:24-1:money",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-4:payment-terms",
+   "to": "section:24-1:payment-terms",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-4:quotation",
+   "to": "section:24-1:quotation",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-4:signatures",
+   "to": "section:24-1:signatures",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-4 -> 24-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-5:age-of-dues-aging",
+   "to": "section:25-1:age-of-dues-aging",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-5:check",
+   "to": "section:25-1:check",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-5:ledger",
+   "to": "section:25-1:ledger",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-5:rule",
+   "to": "section:25-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-5:this-month-s-dealings",
+   "to": "section:25-1:this-month-s-dealings",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-5 -> 25-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-6:check-review",
+   "to": "section:23-1:check-review",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-6:end-of-week-reconciliation",
+   "to": "section:23-1:end-of-week-reconciliation",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-6:order-lines",
+   "to": "section:23-1:order-lines",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-6:rule",
+   "to": "section:23-1:rule",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "rename",
+   "from": "section:20-6:this-week",
+   "to": "section:23-1:this-week",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
   }
  ]
 }

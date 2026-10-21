@@ -1,4 +1,4 @@
-/* Islamia BOS · factory forms 05-1 to 05-5, taken field by field from the BOS Build Kit v1.39.
+/* Islamia BOS · factory forms 12-1 to 22-1, taken field by field from the BOS Build Kit v1.39.
    Recipes, quantities, yields and standard weights are the owner's data: they are entry fields only, nothing is pre-filled.
    Every limit comes from Location Settings; a missing setting is reported as "data needed". */
 (() => {
@@ -15,7 +15,7 @@ const addSetting = (def) => { if (!B.SETTING_DEFS.some((d) => d.key === def.key)
 addSetting({ key: 'scale_test', group: 'C', label: L('পাল্লা যাচাইয়ের জানা ওজনের বস্তু ও সীমা', 'Scale check: known-weight object and limit'), kind: 'text', unit: '' });
 addSetting({ key: 'newprod_review_days', group: 'C', label: L('নতুন প্রোডাক্ট চালুর কত দিন পর পর্যালোচনা', 'Days after launch to review a new product'), kind: 'number', unit: 'দিন' });
 
-/* ============ 05-1 · Factory daily sheet ============ */
+/* ============ 12-1 · Factory daily sheet ============ */
 const FR = [1, 2];
 const fridgeRows = FR.map((i) => L('ফ্রিজ / চিলার ' + i, 'Fridge / chiller ' + i));
 const fridgeCalc = (x, tid, flagPrefix, flags, needs) => {
@@ -33,7 +33,7 @@ const fridgeCalc = (x, tid, flagPrefix, flags, needs) => {
 };
 const tempCols = (n) => [CALC('name', L('ইউনিট', 'Unit'), 'text'), N('temp', n === 1 ? L('প্রথম পাঠ — তাপমাত্রা °C', 'First reading: temperature °C') : L('দ্বিতীয় পাঠ — তাপমাত্রা °C', 'Second reading: temperature °C'), { req: true }), CALC('temp_ok', L('নির্ধারিত সীমায়?', 'Within the set range?'), 'text')];
 
-B.forms['05-1'] = {
+B.forms['12-1'] = {
   title: L('কারখানা দৈনিক শিট', 'Factory daily sheet'),
   head: [CH('shift', L('শিফট', 'Shift'), [['m', L('সকাল', 'Morning')], ['a', L('বিকাল', 'Afternoon')], ['n', L('রাত', 'Night')]], { req: true }),
     ST('in_charge', L('দায়িত্বে (নাম)', 'In charge (name)'), { req: true }), T('handover_line', L('শিফট হ্যান্ডওভার রেজিস্টারের লাইন নং', 'Shift handover register line no.'))],
@@ -110,11 +110,11 @@ B.forms['05-1'] = {
   },
 };
 
-/* ============ 05-2 · Product spec card ============ */
+/* ============ 26-1 · Product spec card ============ */
 const WD_NAMES = [L('রবি', 'Sun'), L('সোম', 'Mon'), L('মঙ্গল', 'Tue'), L('বুধ', 'Wed'), L('বৃহঃ', 'Thu'), L('শুক্র', 'Fri'), L('শনি', 'Sat')];
 const SHELF_KEY = { sweet: 'shelf_sweet', cake: 'shelf_cake', bakery: 'shelf_bakery' };
 const HD = [['hour', L('ঘণ্টা', 'hours')], ['day', L('দিন', 'days')]];
-B.forms['05-2'] = {
+B.forms['26-1'] = {
   title: L('প্রোডাক্ট স্পেক কার্ড', 'Product spec card'),
   head: [ITEM('item', L('আইটেম কোড ও পণ্যের নাম', 'Item code & product name'), { req: true }), D('card_date', L('কার্ড তৈরির তারিখ', 'Card date'), { req: true }), T('version', L('সংস্করণ (Version) নং', 'Version no.'), { req: true }),
     CH('cat', L('ধরন', 'Category'), [['sweet', L('মিষ্টি', 'Sweets')], ['cake', L('কেক', 'Cake')], ['bakery', L('বেকারি', 'Bakery')], ['other', L('অন্য', 'Other')]]),
@@ -166,12 +166,12 @@ B.forms['05-2'] = {
   },
 };
 
-/* ============ 05-3 · Recipe card ============ */
+/* ============ 31-1 · Recipe card ============ */
 const FAMILIES = [['chana', L('ছানার মিষ্টি', 'Chhana sweets')], ['fried', L('ভাজা মিষ্টি ও জিলাপি', 'Fried sweets & jalebi')], ['doi', L('দই ও দুগ্ধ', 'Curd & dairy')], ['khoa', L('খোয়া / মাওয়া', 'Khoa / mawa')], ['cake', L('কেক ও বেকারি', 'Cake & bakery')], ['other', L('অন্য', 'Other')]];
 const RUNITS = [['kg', L('কেজি', 'KG')], ['l', L('লিটার', 'Litre')], ['pc', L('পিস', 'Piece')], ['lb', L('পাউন্ড', 'Pound')], ['g', L('গ্রাম', 'gram')]];
 const ingCols = () => [ITEM('item', L('কাঁচামালের নাম ও আইটেম কোড', 'Raw material name & item code'), { wide: true, req: (x) => !has(x.row.name) }),
   T('name', L('নাম (তালিকায় না থাকলে)', 'Name (if not in the list)'), { req: (x) => !has(x.row.item) }), N('qty', L('পরিমাণ', 'Quantity'), { req: true }), SEL('unit', L('একক', 'Unit'), RUNITS, { req: true })];
-B.forms['05-3'] = {
+B.forms['31-1'] = {
   title: L('রেসিপি কার্ড', 'Recipe card'),
   head: [ITEM('item', L('আইটেম কোড ও পণ্যের নাম', 'Item code & product name'), { req: true }), D('card_date', L('তারিখ', 'Date'), { req: true }), T('version', L('সংস্করণ (Version) নং', 'Version no.'), { req: true })],
   sections: [
@@ -201,7 +201,7 @@ B.forms['05-3'] = {
   calc(x) { return { v: {}, flags: [], needs: [] }; },
 };
 
-/* ============ 05-4 · Yield test sheet ============ */
+/* ============ 41-1 · Yield test sheet ============ */
 const BATCH_ROWS = [1, 2, 3].map((i) => L('ব্যাচ ' + i, 'Batch ' + i));
 const pct = (a, b) => (num(b) > 0 && has(a) ? Math.round(num(a) / num(b) * 10000) / 100 : undefined);
 const div = (a, b) => (num(b) > 0 && has(a) ? Math.round(num(a) / num(b) * 10000) / 10000 : undefined);
@@ -210,7 +210,7 @@ const AVG_KEYS = [['input', L('গড় — মূল উপকরণ', 'Averag
   ['good', L('গড় — ভালো পণ্য', 'Average: good product'), 'num'], ['second', L('গড় — ২য় গ্রেড', 'Average: 2nd grade'), 'num'], ['waste', L('গড় — নষ্ট', 'Average: wastage'), 'num'], ['total', L('গড় — মোট উৎপাদন', 'Average: total output'), 'num'],
   ['per_unit', L('গড় — মূল উপকরণের প্রতি ১ একক থেকে ভালো পণ্য', 'Average: good product per 1 unit of main input'), 'num'], ['second_pct', L('গড় — ২য় গ্রেড %', 'Average: 2nd grade %'), 'num'], ['waste_pct', L('গড় — নষ্ট %', 'Average: wastage %'), 'num'],
   ['headcount', L('গড় — কর্মী সংখ্যা', 'Average: headcount'), 'num'], ['minutes', L('গড় — মোট সময় (মিনিট)', 'Average: total time (minutes)'), 'num']];
-B.forms['05-4'] = {
+B.forms['41-1'] = {
   title: L('ফলন টেস্ট শিট', 'Yield test sheet'),
   head: [ITEM('item', L('আইটেম কোড ও পণ্যের নাম', 'Item code & product name'), { req: true }), SEL('family', L('পরিবার', 'Family'), FAMILIES), T('family_other', L('অন্য (লিখুন)', 'Other (write it)'), { show: (x) => x.d.family === 'other' }), T('recipe_no', L('রেসিপি কার্ড নং', 'Recipe card no.'), { req: true }), T('recipe_ver', L('রেসিপির সংস্করণ (Version)', 'Recipe version'), { req: true })],
   sections: [
@@ -255,12 +255,12 @@ B.forms['05-4'] = {
   },
 };
 
-/* ============ 05-5 · New product decision sheet ============ */
+/* ============ 22-1 · New product decision sheet ============ */
 // brands come from report_brand_map of the chosen business (B.biz.brandOpts); this list is only the fallback when the table gives nothing
 const BRANDS = [['islamia', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['bari', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['alcakes', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')]];
 const TRIAL_ROWS = [L('মালামাল ইস্যু স্লিপ — ট্রায়াল', 'Material issue slip: trial'), L('মালামাল ইস্যু স্লিপ — ট্রায়াল', 'Material issue slip: trial'), L('মার্কেটিং ব্যয় রেজিস্টার — স্যাম্পল', 'Marketing expense register: sample'), L('মার্কেটিং ব্যয় রেজিস্টার — স্যাম্পল', 'Marketing expense register: sample')];
 const isoAdd = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
-B.forms['05-5'] = {
+B.forms['22-1'] = {
   title: L('নতুন প্রোডাক্ট সিদ্ধান্ত শিট', 'New product decision sheet'),
   head: [SEL('brand', L('ব্র্যান্ড', 'Brand'), () => (B.biz ? B.biz.brandOpts(BRANDS, ['other']) : BRANDS), { req: true }), T('brand_other', L('অন্য ব্র্যান্ড (লিখুন)', 'Other brand (write it)'), { show: (x) => x.d.brand === 'other' }),
     T('product', L('পণ্যের নাম', 'Product name'), { req: true }), T('new_code', L('নতুন আইটেম কোড', 'New item code'), { req: true }),

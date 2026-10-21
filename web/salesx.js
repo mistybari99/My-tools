@@ -19,7 +19,7 @@ const locs = () => { const all = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) |
 const locSel = (id, val) => `<select id="${id}">${locs().map((l) => `<option value="${l.id}" ${String(l.id) === String(val) ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
 
 const X = {
-  oTitle: L('অনলাইন অর্ডার', 'Online orders', 'Online অর্ডার'), fTitle: L('ফর্ম 20-১/২/৪ ↔ সেল', 'Forms 20-1 / 2 / 4 ↔ sales', 'Form 20-1/2/4 ↔ sale'),
+  oTitle: L('অনলাইন অর্ডার', 'Online orders', 'Online অর্ডার'), fTitle: L('ফর্ম 20-১/২/৪ ↔ সেল', 'Forms 05-1 / 2 / 4 ↔ sales', 'Form 20-1/2/4 ↔ sale'),
   bTitle: L('কর্মচারীর সুবিধা (রিপোর্ট)', 'Employee benefits (report)', 'Employee সুবিধা (report)'), eTitle: L('BI এক্সপোর্ট', 'BI export', 'BI export'),
   place: L('জায়গা', 'Place', 'Place'), status: L('অবস্থা', 'Status', 'Status'), all: L('সব', 'All', 'All'), new_: L('নতুন অর্ডার', 'New order', 'নতুন Order'),
   confirm: L('নিশ্চিত', 'Confirm', 'Confirm'), pack: L('প্যাক হয়েছে', 'Packed', 'Packed'), deliver: L('ডেলিভারি দিন', 'Deliver', 'Deliver'), cancel: L('ক্যান্সেল', 'Cancel', 'Cancel'),

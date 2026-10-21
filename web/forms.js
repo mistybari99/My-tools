@@ -21,10 +21,10 @@ const cfShowC = (key) => (x) => !x.cf || has(x.c[key]);
 function tol(diff, limit) { if (diff === 0) return null; if (limit === null || limit === undefined) return 'red'; return Math.abs(diff) <= limit ? 'yellow' : 'red'; }
 const diffText = (d) => (d === 0 ? L('মিল আছে ✓', 'Matches ✓') : L('পার্থক্য ৳ ' + fm(d), 'Difference ৳ ' + fm(d)));
 
-/* ============ 10-2 · Expense voucher ============ */
+/* ============ 11-1 · Expense voucher ============ */
 const HEADS = [['staff_meal', L('স্টাফের খাবার / নাস্তা', 'Staff meals / snacks')], ['transport', L('যাতায়াত / পরিবহন', 'Transport')], ['hospitality', L('কাস্টমার আপ্যায়ন', 'Customer hospitality')],
   ['repair', L('মেরামত / ইউটিলিটি', 'Repairs / utilities')], ['labour', L('অস্থায়ী শ্রমিকের মজুরি', 'Temporary labour wages')], ['sourcing', L('বাইরের সোর্সিংয়ের মালামাল', 'Outside-sourced goods')], ['other', L('অন্যান্য (লিখুন)', 'Other (write it)')]];
-B.forms['10-2'] = {
+B.forms['11-1'] = {
   title: L('ব্যয় ভাউচার', 'Expense voucher'),
   head: [TM('time', L('সময়', 'Time')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
@@ -65,8 +65,8 @@ B.forms['10-2'] = {
   },
 };
 
-/* ============ 10-1 · Cash handover slip ============ */
-B.forms['10-1'] = {
+/* ============ 03-1 · Cash handover slip ============ */
+B.forms['03-1'] = {
   title: L('ক্যাশ হ্যান্ডওভার স্লিপ', 'Cash handover slip'),
   head: [T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.')), T('carrier', L('বহনকারী', 'Carrier'), { req: true }), T('seal_no', L('সিল / ব্যাগ নং', 'Seal / bag no.')), TM('send_time', L('পাঠানোর সময়', 'Time sent'))],
   sections: [
@@ -98,11 +98,11 @@ B.forms['10-1'] = {
   },
 };
 
-/* ============ 03-1 · Transfer challan (IBT) ============ */
+/* ============ 39-1 · Transfer challan (IBT) ============ */
 const TTYPES = [['f2s', L('কারখানা → শোরুম', 'Factory → showroom')], ['s2f', L('শোরুম → কারখানা (ফেরত)', 'Showroom → factory (return)')], ['cust', L('কাস্টমার / পার্টি', 'Customer / party')], ['s2s', L('শোরুম → শোরুম', 'Showroom → showroom')],
   ['g2l', L('গোডাউন → লোকেশন', 'Godown → location')], ['p2l', L('পার্টির ফেরত → লোকেশন', 'Party return → location')], ['other', L('অন্য', 'Other')]];
 const GRADES = [['g1', L('১ম', '1st')], ['g2', L('২য়', '2nd')]];
-B.forms['03-1'] = {
+B.forms['39-1'] = {
   title: L('ট্রান্সফার চালান (IBT)', 'Transfer challan (IBT)'),
   head: [SEL('ttype', L('ধরন', 'Type'), TTYPES, { req: true }), LOC('from_loc', L('প্রেরক লোকেশন (From)', 'Sender location (From)'), { req: true }), LOC('to_loc', L('প্রাপক লোকেশন (To)', 'Receiver location (To)'), { req: true }),
     CH('shift', L('শিফট', 'Shift'), [['m', L('সকাল', 'Morning')], ['a', L('বিকাল', 'Afternoon')], ['n', L('রাত', 'Night')]]), T('vehicle', L('গাড়ি / ভ্যান', 'Vehicle')), T('driver', L('ডেলিভারি ম্যান', 'Delivery man')),
@@ -156,8 +156,8 @@ B.forms['03-1'] = {
   },
 };
 
-/* ============ 04-3 · Stock count sheet ============ */
-B.forms['04-3'] = {
+/* ============ 36-1 · Stock count sheet ============ */
+B.forms['36-1'] = {
   title: L('স্টক কাউন্ট শিট', 'Stock count sheet'),
   head: [TM('start_time', L('শুরুর সময়', 'Start time')), TM('end_time', L('শেষ সময়', 'End time')),
     ST('counted_by', L('গণনাকারী (Counted by)', 'Counted by'), { req: true }), ST('storekeeper', L('স্টোরকিপার', 'Storekeeper'), { req: true }),
@@ -195,7 +195,7 @@ B.forms['04-3'] = {
   },
 };
 
-/* ============ 14-1 · Daily showroom sheet ============ */
+/* ============ 06-1 · Daily showroom sheet ============ */
 const CATS = [['sweet', L('মিষ্টি', 'Sweets')], ['cake', L('কেক', 'Cake')], ['jalebi', L('জিলাপি', 'Jalebi')], ['doi', L('দই', 'Curd')], ['bakery', L('বেকারি', 'Bakery')], ['ice', L('আইসক্রিম', 'Ice cream')], ['drink', L('পানীয়', 'Drinks')], ['other', L('অন্যান্য', 'Other')]];
 const FRIDGES = [1, 2, 3];
 const CLOSE_STEPS = [
@@ -209,7 +209,7 @@ const CLOSE_STEPS = [
   ['c15', L('গ্যাস, বিদ্যুৎ, আগুন — বন্ধ / নিরাপদ', 'Gas, power, fire — off / safe')], ['c16', L('ক্যাশ কখনো একা অরক্ষিত রাখা হয়নি', 'Cash was never left alone and unprotected')],
 ];
 const moneyFlds = (list) => list.map(([id, l, o]) => M(id, l, o || {}));
-B.forms['14-1'] = {
+B.forms['06-1'] = {
   title: L('দৈনিক শোরুম শিট', 'Daily showroom sheet'),
   head: [CH('day_type', L('দিনের ধরন', 'Day type'), [['normal', L('সাধারণ দিন', 'Normal day')], ['busy', L('ব্যস্ত দিন (Peak)', 'Busy day (Peak)')]], { req: true }),
     CH('shift', L('শিফট', 'Shift'), [['full', L('পুরো দিন', 'Full day')], ['s1', L('শিফট ১', 'Shift 1')], ['s2', L('শিফট ২', 'Shift 2')]]), ST('duty_manager', L('ডিউটি ম্যানেজার', 'Duty manager'), { req: true })],

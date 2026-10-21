@@ -11,7 +11,7 @@ const { fmt, tableHTML, tiles, rpc, makePage } = C;
 const $ = (s, el = document) => el.querySelector(s);
 const mk = (k, h, f, extra) => Object.assign({ k, h, f }, extra || {});
 const RISK = { ok: 'OK', watch: 'Watch', high: 'High risk', rule_not_set: 'Rule not set', no_terms: 'No credit terms' };
-const SRC = { app: 'App order', paper_20_1: 'Paper 20-1' };
+const SRC = { app: 'App order', paper_20_1: 'Paper 05-1' };
 const NL = { opening_not_counted: 'Opening dues entered but not counted in the dues lists (the opening-dues link is off)', sales_due_no_customer: 'Sales with an amount due but no customer', journal_receivable_no_customer: 'Receivable in the books with no customer' };
 const card = (id) => openCard(id);
 const locless = () => null;
@@ -30,13 +30,13 @@ const TABS = [
     render: (r) => { const s = r.summary || {}; return tiles([['Customers', fmt.int(s.customers)], ['Orders', fmt.int(s.orders)], ['Revenue', fmt.money(s.revenue)], ['Returns', fmt.money(s.returns)], ['Net revenue', fmt.money(s.net_revenue)], ['Sales with no customer', fmt.int(s.sales_without_customer)], ['…their revenue', fmt.money(s.revenue_without_customer)]])
       + tableHTML({ name: 'customer-ltv', rows: r.rows, drill: (x) => card(x.customer_id), cols: [mk('name', 'Customer', 'text'), mk('mobile', 'Mobile', 'text'), mk('orders', 'Orders', 'int'), mk('revenue', 'Revenue', 'money'), mk('returns', 'Returns', 'money'), mk('net_revenue', 'Net', 'money'), mk('avg_order', 'Average bill', 'money'),
         mk('first_sale', 'First sale', 'date'), mk('last_sale', 'Last sale', 'date'), mk('days_as_customer', 'Days as customer', 'int'), mk('days_since_last', 'Days since last', 'int'), mk('gross_margin', 'Gross margin', 'money'), mk('sales_with_known_cost', 'Sales with known cost', 'int')] }); } },
-  { id: 'returns', label: 'Returns and complaints', intro: '#140 · Sale returns per customer, and complaints written on the paper register 20-3 matched by the phone number on the sheet.', filters: ['range', 'search'],
+  { id: 'returns', label: 'Returns and complaints', intro: '#140 · Sale returns per customer, and complaints written on the paper register 32-1 matched by the phone number on the sheet.', filters: ['range', 'search'],
     run: (f) => rpc('c2_customer_returns', { p_from: f.from, p_to: f.to, p_search: f.search || null, p_customer: null }),
     render: (r) => { const s = r.summary || {}; return tiles([['Customers', fmt.int(s.customers)], ['Returns', fmt.int(s.returns)], ['Return value', fmt.money(s.return_amount)], ['Complaints linked', fmt.int(s.complaints_linked)], ['Complaint sheets', fmt.int(s.complaint_sheets_total)], ['Sheets with no phone', fmt.int(s.complaint_sheets_without_phone)],
         ['Phone not a customer', fmt.int(s.complaint_sheets_phone_not_a_customer)], ['Returns with no customer', fmt.int(s.returns_without_customer)]])
       + tableHTML({ name: 'customer-returns', rows: r.rows, drill: (x) => card(x.customer_id), cols: [mk('name', 'Customer', 'text'), mk('mobile', 'Mobile', 'text'), mk('returns', 'Returns', 'int'), mk('return_amount', 'Return value', 'money'), mk('last_return', 'Last return', 'date'), mk('top_reason', 'Top reason', 'text'), mk('complaints', 'Complaints', 'int'),
         mk('sick_cases', 'Fell ill', 'int'), mk('complaint_refunds', 'Refunds on sheets', 'money'), mk('last_complaint', 'Last complaint', 'date'), mk('causes', 'Causes', 'text', { get: (x) => Object.keys(x.causes || {}).map((k) => k + ' ' + x.causes[k]).join(', ') })] }); } },
-  { id: 'special', label: 'Special orders', intro: '#141 · Cake and custom order history per customer: app orders with a specification and paper 20-1 custom sheets, matched by mobile number.', filters: ['range', 'search'],
+  { id: 'special', label: 'Special orders', intro: '#141 · Cake and custom order history per customer: app orders with a specification and paper 05-1 custom sheets, matched by mobile number.', filters: ['range', 'search'],
     run: (f) => rpc('c2_customer_special_orders', { p_from: f.from, p_to: f.to, p_search: f.search || null, p_customer: null }),
     render: (r) => { const s = r.summary || {}; return tiles([['Order rows', fmt.int(s.special_order_rows)], ['Customers', fmt.int(s.customers)], ['Rows with no customer match', fmt.int(s.rows_without_a_customer_match)]])
       + tableHTML({ name: 'special-customers', title: 'By customer', rows: r.customers, drill: (x) => card(x.customer_id), cols: [mk('name', 'Customer', 'text'), mk('mobile', 'Mobile', 'text'), mk('special_orders', 'Special orders', 'int'), mk('last', 'Last', 'date'), mk('flavours', 'Flavours', 'text', { get: (x) => (x.flavours || []).join(', ') }),

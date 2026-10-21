@@ -160,7 +160,7 @@ const count = (e, fn) => e.calls.filter((c) => c[0] === fn).length;
   // duplicate warning + confirm
   e.resp.bill_pay_record = { ok: false, needs_confirm: true, warnings: ['form_10_2_matches', 'quick_expense_similar'], remaining: 1000 };
   e.set('opx_amt', '1000'); await e.act('opx_pay', {});
-  ck('needs_confirm shows both warnings in plain words and a confirm button, nothing recorded yet', e.last().includes('data-opx="warn"') && e.last().includes('A 10-2 voucher with the same place') && e.last().includes('A quick expense with the same place') && e.last().includes('data-confirm="1"'));
+  ck('needs_confirm shows both warnings in plain words and a confirm button, nothing recorded yet', e.last().includes('data-opx="warn"') && e.last().includes('A 11-1 voucher with the same place') && e.last().includes('A quick expense with the same place') && e.last().includes('data-confirm="1"'));
   e.resp.bill_pay_record = { ok: true, id: 3, amount: 1000, remaining: 0, counted: false };
   await e.act('opx_pay', { confirm: '1' });
   ck('confirm sends p_confirm_dup true with the same amount', e.calls.filter((c) => c[0] === 'bill_pay_record').pop()[1].p_confirm_dup === true && e.calls.filter((c) => c[0] === 'bill_pay_record').pop()[1].p_amount === 1000);

@@ -5,7 +5,7 @@
      mark   owner / holder of the grant attendance_mark_others marks ANOTHER person's day: status, in, closing time, rest minutes, source tag device/finger/face/manual
             (the tag is the marker's own word, not a proof). Every mark goes to an append-only log. A month locked by payroll is refused.
      staff  owner: lock / unlock self punch per person or per role, place coordinates for the soft GPS flag; manager: record "fingerprint enrolled on the device" flag.
-     count  staff attendance (path A) vs the monthly register 02-1 (path B): which one is counted, shadow copies, per-person differences.
+     count  staff attendance (path A) vs the monthly register 19-1 (path B): which one is counted, shadow copies, per-person differences.
    RPCs: attendance_self_punch, att_my_status, att_self_lock_set, att_site_geo_set, att_staff_overview, att_evidence_register / void, attendance_mark_others,
          att_others_board, attendance_count_once, attendance_form_link_run, entry_equation_check.
    B.rpcq (this file): a client-id outbox for RPC writes (IndexedDB + localStorage copy). A write that cannot reach the server waits here with its p_client key and is resent
@@ -124,15 +124,15 @@ const X = {
   master: L('মাস্টার সুইচ app_punch_on', 'Master switch app_punch_on', 'Master switch app_punch_on'), on: L('চালু', 'ON', 'ON'), off: L('বন্ধ', 'OFF', 'OFF'),
   k_webauthn: L('পাসকি', 'passkey', 'passkey'), k_face_photo: L('মুখের ছবি', 'face photo', 'face photo'), k_finger_device: L('আঙুল (মেশিনে)', 'finger (device)', 'finger (device)'),
   // count
-  counted: L('গোনা হচ্ছে', 'Counted', 'Counted'), c_attendance_record: L('হাজিরা রেকর্ড (পাঞ্চ/লেখা)', 'Attendance record (punch / marked)', 'Attendance record (punch/marked)'), c_form_02_1: L('ফর্ম 02-1', 'Form 02-1', 'Form 02-1'),
+  counted: L('গোনা হচ্ছে', 'Counted', 'Counted'), c_attendance_record: L('হাজিরা রেকর্ড (পাঞ্চ/লেখা)', 'Attendance record (punch / marked)', 'Attendance record (punch/marked)'), c_form_02_1: L('ফর্ম 19-1', 'Form 19-1', 'Form 19-1'),
   shadow: L('শ্যাডো কপি (লক)', 'Shadow copy (locked)', 'Shadow copy (lock)'), record: L('রেকর্ড', 'Record', 'Record'), a_has: L('পথ ক-এ এই মাসের তথ্য আছে', 'Path A holds this month', 'Path A-তে এই মাসের data আছে'),
-  linkNow: L('ফর্ম এখনই জোড়া লাগান', 'Link the forms now', 'Form এখনই link করুন'), linked: L('জোড়া হয়েছে', 'Linked', 'Linked'), dev: L('হাজিরা রেকর্ড', 'Record', 'Record'), frm: L('ফর্ম 02-1', 'Form 02-1', 'Form 02-1'),
+  linkNow: L('ফর্ম এখনই জোড়া লাগান', 'Link the forms now', 'Form এখনই link করুন'), linked: L('জোড়া হয়েছে', 'Linked', 'Linked'), dev: L('হাজিরা রেকর্ড', 'Record', 'Record'), frm: L('ফর্ম 19-1', 'Form 19-1', 'Form 19-1'),
   pres: L('উপস্থিত', 'present', 'present'), late: L('দেরি', 'late', 'late'), abs: L('অনুপস্থিত', 'absent', 'absent'), ot: L('ওভারটাইম ঘ.', 'OT h', 'OT h'), differ: L('মিলছে না', 'Differs', 'মিলছে না'), same: L('মিলছে', 'Matches', 'মিলছে'),
-  note14: L('ফর্ম 14-1 (দৈনিক শোরুম শিট) ক্যাশ ড্রয়ারের শিট — এই সুইচের আওতায় নয়।', 'Form 14-1 (daily showroom sheet) is the cash drawer sheet - it is not under this switch.', 'Form 14-1 (daily showroom sheet) cash drawer sheet — এই switch-এর বাইরে।'),
+  note14: L('ফর্ম 06-1 (দৈনিক শোরুম শিট) ক্যাশ ড্রয়ারের শিট — এই সুইচের আওতায় নয়।', 'Form 06-1 (daily showroom sheet) is the cash drawer sheet - it is not under this switch.', 'Form 06-1 (daily showroom sheet) cash drawer sheet — এই switch-এর বাইরে।'),
   nameMatch: L('নাম/কর্মচারী নম্বর মিলিয়ে ধরা হয়েছে — পার্থক্য দেখার ইঙ্গিত, রায় নয়।', 'People are matched by name / employee no.; a difference is a prompt to look, not a verdict.', 'নাম/employee no. মিলিয়ে — পার্থক্য দেখার ইঙ্গিত, রায় নয়।'),
   // eqcheck
-  eqTitle: L('সার্ভারে হিসাব মেলানো (10-2 / 02-2)', 'Server re-check of totals (10-2 / 02-2)', 'Server-এ হিসাব মেলানো (10-2 / 02-2)'),
-  eqIntro: L('ফোনে হওয়া হিসাব আর পতাকা সার্ভার আবার করে মেলায়। শুধু দেখা — কিছু বদলায় না। 14-1 এখনো নয়।', 'The server re-works the totals and compares them with the flags the phone stored. Read only - nothing is changed. 14-1 is not covered yet.', 'Phone-এর হিসাব/flag server আবার মেলায়। শুধু দেখা — কিছু বদলায় না। 14-1 এখনো নয়।'),
+  eqTitle: L('সার্ভারে হিসাব মেলানো (11-1 / 21-1)', 'Server re-check of totals (11-1 / 21-1)', 'Server-এ হিসাব মেলানো (11-1 / 21-1)'),
+  eqIntro: L('ফোনে হওয়া হিসাব আর পতাকা সার্ভার আবার করে মেলায়। শুধু দেখা — কিছু বদলায় না। 06-1 এখনো নয়।', 'The server re-works the totals and compares them with the flags the phone stored. Read only - nothing is changed. 06-1 is not covered yet.', 'Phone-এর হিসাব/flag server আবার মেলায়। শুধু দেখা — কিছু বদলায় না। 06-1 এখনো নয়।'),
   check: L('মেলান', 'Check', 'Check'), allOk: L('সব মিলেছে ✓', 'All match ✓', 'সব মিলেছে ✓'), recomputed: L('সার্ভারের হিসাব', 'Server figures', 'Server figures'), mism: L('অমিল', 'Differences', 'Differences'),
   k_flag_missing: L('ফোনে পতাকা পড়েনি', 'the phone raised no flag', 'phone-এ flag পড়েনি'), k_flag_extra: L('ফোনে লাল পতাকা ছিল কিন্তু হিসাবে মিলছে', 'the phone has a red flag but the figures agree', 'phone-এ red flag কিন্তু হিসাব মিলছে'), k_amount_differs: L('পতাকার অঙ্ক আলাদা', 'flag amount differs', 'flag-এর amount আলাদা'),
   obs: L('তথ্য', 'For information', 'For information'),
@@ -285,7 +285,7 @@ async function countHTML() {
   const pick = `<div class="a2-pick"><div><label for="a2_loc">${esc(T('place'))}</label>${locSel()}</div><div><label for="a2_month">${esc(T('month'))}</label><input id="a2_month" type="month" value="${esc(D.month)}" max="${esc(today().slice(0, 7))}"></div></div>`;
   const r = await sb.rpc('attendance_count_once', { p_loc: D.loc, p_month: D.month + '-01' }); if (r.error) return pick + `<p class="muted">${esc(eText(r.error))}</p>`;
   const d = D.count = r.data || {}; const nf = (o) => (o ? `${esc(String(o.present))} ${esc(T('pres'))} · ${esc(String(o.late))} ${esc(T('late'))} · ${esc(String(o.absent))} ${esc(T('abs'))} · ${esc(String(o.ot_hours))} ${esc(T('ot'))}` : '–');
-  const forms = (d.forms || []).map((f) => `<div class="a2-row"><span>02-1 #${esc(String(f.serial))} · ${esc(f.status)}</span><span class="chip ${f.is_shadow ? 'info' : 'ok'}">${esc(f.is_shadow ? T('shadow') : T('record'))}</span></div>`).join('');
+  const forms = (d.forms || []).map((f) => `<div class="a2-row"><span>19-1 #${esc(String(f.serial))} · ${esc(f.status)}</span><span class="chip ${f.is_shadow ? 'info' : 'ok'}">${esc(f.is_shadow ? T('shadow') : T('record'))}</span></div>`).join('');
   const rows = (d.rows || []).map((x) => `<div class="card stack ${x.mismatch ? 'a2-diff' : ''}"><div class="a2-row"><b class="nm">${esc(lab({ bn: x.name_bn, en: x.name_en || x.name_bn, mix: x.name_bn }))}</b><span class="chip ${x.mismatch ? 'bad' : 'ok'}">${esc(x.mismatch ? T('differ') : T('same'))}</span></div>
       <div class="a2-num muted">${esc(T('dev'))}: ${nf(x.device)}</div><div class="a2-num muted">${esc(T('frm'))}: ${nf(x.form)}</div></div>`).join('');
   return pick + `<div class="card stack"><div class="a2-row"><b>${esc(T('counted'))}</b><span class="chip ok">${esc(T('c_' + d.counted))}</span></div><div class="muted">${esc(T('a_has'))}: ${d.path_a_has_month ? '✓' : '✗'}</div>${forms}
@@ -328,7 +328,7 @@ async function eqView() {
   if (B.loadStatic) await B.loadStatic();
   shell(T('eqTitle'), `<p class="muted">${esc(T('eqIntro'))}</p><div id="eq_body"><p class="muted">…</p></div>`, true);
   try {
-    const r = await sb.from('entries').select('id,form_code,serial,entry_date,status,location_id').in('form_code', ['10-2', '02-2']).order('entry_date', { ascending: false }).limit(30);
+    const r = await sb.from('entries').select('id,form_code,serial,entry_date,status,location_id').in('form_code', ['11-1', '21-1']).order('entry_date', { ascending: false }).limit(30);
     if (r.error) throw r.error; EQ.rows = r.data || []; drawEq();
   } catch (e) { fail(e); }
 }

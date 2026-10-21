@@ -79,8 +79,8 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
   await p.click('.sw-row[data-key="pin_signature_on"] [data-act=sw_reset]'); await wait(p, 400);
   c = await calls(p, 'set_rule'); ok(c.length === 2 && c[1].p_value === null, 'back to default sends null');
   await p.evaluate(() => { document.querySelector('#sw_perform').open = true; }); await wait(p, 100);
-  await p.click('#sw_perform [data-act=sw_pin][data-f="04-3"]'); await wait(p, 400);
-  c = await calls(p, 'pin_sig_cfg_set'); ok(c.length === 1 && c[0].p_form === '04-3' && c[0].p_enabled === false, 'per-form PIN switch');
+  await p.click('#sw_perform [data-act=sw_pin][data-f="36-1"]'); await wait(p, 400);
+  c = await calls(p, 'pin_sig_cfg_set'); ok(c.length === 1 && c[0].p_form === '36-1' && c[0].p_enabled === false, 'per-form PIN switch');
   await noOverflow(p, 'switchboard'); await p.screenshot({ path: SP + '/ab_switch.png', fullPage: true });
   p = await open('#/switchboard'); await p.selectOption('#sw_mod', 'ui'); await wait(p, 150); ok(await p.locator('.sw-row').count() === 1, 'section filter');
 

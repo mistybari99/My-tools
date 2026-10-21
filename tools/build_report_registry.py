@@ -48,7 +48,7 @@ AREAS = {'exec': 'Executive', 'sales': 'Sales', 'product': 'Product profit', 'pr
 # status: I implemented, C incomplete, U unavailable, V unverified.   route: - = planned.   (short codes keep the table readable)
 SEED = r'''
 1|exec|C|owner|Executive dashboard|নির্বাহী ড্যাশবোর্ড|How is the whole business doing right now?|পুরো ব্যবসা এখন কেমন চলছে?|sales, stock, exceptions (owner board, home)|exec|owner,board,overview,home,সারসংক্ষেপ,মালিকের বোর্ড
-2|exec|C|report/pos_day_close|Daily business summary|দৈনিক ব্যবসার সারসংক্ষেপ|What happened in one shop on one day: sales, cash, short or over?|এক দিনে এক দোকানে কী হলো: বিক্রি, ক্যাশ, কম-বেশি?|sales, sale_payments, form 14-1|pos|day close,z report,daily,দিনশেষ,দৈনিক,ক্যাশ মেলানো
+2|exec|C|report/pos_day_close|Daily business summary|দৈনিক ব্যবসার সারসংক্ষেপ|What happened in one shop on one day: sales, cash, short or over?|এক দিনে এক দোকানে কী হলো: বিক্রি, ক্যাশ, কম-বেশি?|sales, sale_payments, form 06-1|pos|day close,z report,daily,দিনশেষ,দৈনিক,ক্যাশ মেলানো
 3|exec|C|report/l1_pnl|Monthly business summary|মাসিক ব্যবসার সারসংক্ষেপ|What was the month's sales, cost and profit?|মাসে বিক্রি, খরচ আর লাভ কত ছিল?|l1_pnl, month close|profit|month,monthly,p&l,মাস,মাসিক,লাভ
 4|exec|C|report/l1_pnl|Sales, gross profit and net profit|বিক্রি, মোট লাভ ও নিট লাভ|How much did we earn and keep after cost and expenses?|খরচ বাদ দিয়ে আসলে কত থাকল?|l1_pnl, l3_shop_pnl, profit check|profit|profit,gross,net,margin,লাভ,মুনাফা,নিট
 5|exec|I|report/l3_shop_pnl|Outlet comparison|শাখা তুলনা|Which shop does better than the others?|কোন দোকান অন্যদের চেয়ে ভালো করছে?|l3_shop_pnl, sales_combined|profit|outlet,branch,shop,compare,শাখা,দোকান,তুলনা
@@ -73,8 +73,8 @@ SEED = r'''
 24|sales|U|-|Sales target by outlet|শাখাভিত্তিক বিক্রির লক্ষ্য|Is each outlet on target?|প্রতিটি শাখা কি লক্ষ্যে আছে?|not captured (no targets)|sales|target,লক্ষ্য
 25|sales|I|report/item_sales|Top, low and declining products|সেরা, কম ও কমতি পণ্য|Which products rise, which fall?|কোন পণ্য বাড়ছে, কোনটা কমছে?|sales lines|sales|top,slow,declining,সেরা,ধীর,কমছে
 26|sales|I|report/x5_staff_trend|Sales by salesperson and cashier|বিক্রয়কর্মী ও ক্যাশিয়ার অনুযায়ী বিক্রি|Who sells how much?|কে কত বিক্রি করে?|sales|sales|staff,cashier,salesperson,কর্মী,ক্যাশিয়ার
-27|sales|C|report/s10_orders|Sales channel analysis|বিক্রির মাধ্যম বিশ্লেষণ|Where do orders come from: shop, online, phone?|অর্ডার কোথা থেকে আসে: দোকান, অনলাইন, ফোন?|paper form 20-1 (free-text channel)|ord|channel,online,order,অনলাইন,অর্ডার
-28|sales|I|report/q3_complaints|Return and refund reasons|ফেরত ও রিফান্ডের কারণ|Why do customers return things?|গ্রাহক কেন জিনিস ফেরত দেয়?|form 20-3, sale_returns|quality|complaint,return reason,অভিযোগ,কারণ
+27|sales|C|report/s10_orders|Sales channel analysis|বিক্রির মাধ্যম বিশ্লেষণ|Where do orders come from: shop, online, phone?|অর্ডার কোথা থেকে আসে: দোকান, অনলাইন, ফোন?|paper form 05-1 (free-text channel)|ord|channel,online,order,অনলাইন,অর্ডার
+28|sales|I|report/q3_complaints|Return and refund reasons|ফেরত ও রিফান্ডের কারণ|Why do customers return things?|গ্রাহক কেন জিনিস ফেরত দেয়?|form 32-1, sale_returns|quality|complaint,return reason,অভিযোগ,কারণ
 29|product|I|report/l2_margin|Gross profit and margin by item|আইটেম অনুযায়ী মোট লাভ ও মার্জিন|Which item earns what margin?|কোন আইটেমে কত মার্জিন?|l2_margin (stock-ledger cost)|cost|margin,gp,gross profit,মার্জিন,লাভ
 30|product|I|report/l2_margin|Profitability by category|ক্যাটাগরি অনুযায়ী লাভজনকতা|Which category makes money?|কোন ক্যাটাগরি লাভ দেয়?|l2_margin|cost|category,ক্যাটাগরি
 31|product|I|report/l3_shop_pnl|Profitability by outlet|শাখা অনুযায়ী লাভজনকতা|Which outlet makes money?|কোন শাখা লাভ দেয়?|l3_shop_pnl|profit|outlet,শাখা
@@ -91,11 +91,11 @@ SEED = r'''
 42|production|I|costing|Recipe and BOM costing|রেসিপি ও BOM খরচ|What does one batch cost?|এক ব্যাচের খরচ কত?|recipes, recipe_lines|cost|recipe,bom,রেসিপি
 43|production|C|costing|Standard versus actual manufacturing cost|স্ট্যান্ডার্ড বনাম প্রকৃত উৎপাদন খরচ|Is real cost above the recipe cost?|প্রকৃত খরচ কি রেসিপির খরচের চেয়ে বেশি?|production_runs|cost|standard,actual
 44|production|U|report/f3_raw_vs_recipe|Raw material use versus recipe|কাঁচামাল ব্যবহার বনাম রেসিপি|Did we use more milk or sugar than the recipe says?|রেসিপির চেয়ে বেশি দুধ বা চিনি লেগেছে?|not captured (real issue per batch)|stock|raw,recipe,variance,কাঁচামাল
-45|production|C|report/f2_yield|Yield versus standard|ফলন বনাম মান|Did a batch give the expected yield?|ব্যাচ কি প্রত্যাশিত ফলন দিল?|form 05-4 yield test|stock|yield,ফলন
+45|production|C|report/f2_yield|Yield versus standard|ফলন বনাম মান|Did a batch give the expected yield?|ব্যাচ কি প্রত্যাশিত ফলন দিল?|form 41-1 yield test|stock|yield,ফলন
 46|production|I|costing|Batch-wise production cost|ব্যাচভিত্তিক উৎপাদন খরচ|What did each batch cost?|প্রতিটি ব্যাচে কত খরচ?|production_runs|cost|batch cost
 47|production|C|costing|Labour and overhead cost|শ্রম ও ওভারহেড খরচ|How much labour and overhead goes into a batch?|এক ব্যাচে শ্রম ও ওভারহেড কত?|cost components|cost|labour,overhead,শ্রম,ওভারহেড
 48|production|U|-|Output per labour hour|শ্রমঘণ্টাপ্রতি উৎপাদন|How productive is the labour?|শ্রমিকরা কতটা উৎপাদনশীল?|not captured (no labour hours)|stock|labour hour,productivity
-49|production|C|report/f2_yield|Rejection, rework and production loss|বাতিল, পুনঃকাজ ও উৎপাদন ক্ষতি|How much was lost while making?|বানাতে গিয়ে কত নষ্ট হলো?|form 05-4|stock|reject,rework,loss,নষ্ট
+49|production|C|report/f2_yield|Rejection, rework and production loss|বাতিল, পুনঃকাজ ও উৎপাদন ক্ষতি|How much was lost while making?|বানাতে গিয়ে কত নষ্ট হলো?|form 41-1|stock|reject,rework,loss,নষ্ট
 50|production|I|report/wastage|Wastage by reason, product and batch|কারণ, পণ্য ও ব্যাচ অনুযায়ী অপচয়|What was wasted and why?|কী নষ্ট হলো আর কেন?|stock_wastage|stock|wastage,waste,অপচয়,নষ্ট
 51|production|U|-|Capacity utilization|ক্ষমতা ব্যবহার|How much of the capacity is used?|ক্ষমতার কত অংশ ব্যবহার হচ্ছে?|not captured (no rated capacity)|stock|capacity
 52|production|U|-|Production orders and pending orders|উৎপাদন অর্ডার ও বাকি অর্ডার|Which orders are waiting to be made?|কোন অর্ডার বানানোর অপেক্ষায়?|not captured|stock|order,pending
@@ -112,7 +112,7 @@ SEED = r'''
 63|stock|C|report/k3_store_ledger|Stock movement: opening, in, out, closing|মজুত চলাচল: শুরু, ঢোকা, বেরোনো, শেষ|What moved in and out of an item?|একটি আইটেমে কী ঢুকল আর বেরোল?|stock_ledger|stock|movement,ledger,চলাচল
 64|stock|C|report/transfers_gap|Transfer register|ট্রান্সফার তালিকা|What was sent between places?|জায়গায় জায়গায় কী পাঠানো হলো?|stock_transfers|stock|transfer,challan,ট্রান্সফার,চালান
 65|stock|C|shortages|Transfer receipt differences|ট্রান্সফার গ্রহণে পার্থক্য|What arrived short or damaged?|কী কম বা নষ্ট পৌঁছাল?|shortage_transit|stock|short,damaged,transit,কম,পথে
-66|stock|C|report/k2_count_variance|Stock count variance|স্টক গণনার পার্থক্য|Where did the count differ from the books?|গণনা কোথায় খাতার সাথে মেলেনি?|form 04-3, stock_count_adjust|stock|count,variance,গণনা
+66|stock|C|report/k2_count_variance|Stock count variance|স্টক গণনার পার্থক্য|Where did the count differ from the books?|গণনা কোথায় খাতার সাথে মেলেনি?|form 36-1, stock_count_adjust|stock|count,variance,গণনা
 67|stock|C|report/item_slow|Slow and dead stock|ধীর ও মৃত স্টক|What is not selling?|কী বিক্রি হচ্ছে না?|sales, stock|stock|slow,dead,ধীর
 68|stock|U|-|Stock ageing|স্টকের বয়স|How old is what we hold?|যা আছে তার বয়স কত?|not captured (no lot date on raw receipts)|stock|ageing,age,বয়স
 69|stock|C|report/expiry_soon|Expiry list|মেয়াদ তালিকা|What expires soon?|কী শিগগির মেয়াদ শেষ হবে?|stock_batches|stock|expiry,expire,মেয়াদ
@@ -124,7 +124,7 @@ SEED = r'''
 75|stock|C|report/stock_balance|Period stock reconciliation|সময়কালের স্টক মিলান|Opening plus in minus out equals closing?|শুরু + ঢোকা - বেরোনো = শেষ?|stock_ledger, stock_reconcile|stock|reconcile,মিলান
 76|quality|I|report/wastage|Wastage report|অপচয় রিপোর্ট|How much was written off?|কত বাদ দেওয়া হলো?|stock_wastage|stock|wastage,write off,অপচয়
 77|quality|C|report/wastage|Wastage as a share of stock or sales|মজুত বা বিক্রির তুলনায় অপচয়|Is wastage rising against sales?|বিক্রির তুলনায় অপচয় কি বাড়ছে?|stock_wastage, sales|stock|wastage percent,অপচয় শতাংশ
-78|quality|C|report/f2_yield|Production wastage and yield|উৎপাদনে অপচয় ও ফলন|How much is lost in making?|বানাতে কত নষ্ট হয়?|form 05-4, stock_wastage|stock|yield,production loss
+78|quality|C|report/f2_yield|Production wastage and yield|উৎপাদনে অপচয় ও ফলন|How much is lost in making?|বানাতে কত নষ্ট হয়?|form 41-1, stock_wastage|stock|yield,production loss
 79|quality|C|report/wastage|Unsold and expired goods|অবিক্রিত ও মেয়াদোত্তীর্ণ মাল|How much was thrown away unsold?|কত অবিক্রিত ফেলে দেওয়া হলো?|stock_wastage, returns|stock|unsold,expired,অবিক্রিত
 80|quality|C|-|Unsold finished goods by batch|ব্যাচ অনুযায়ী অবিক্রিত তৈরি মাল|Which batches are left unsold?|কোন ব্যাচ অবিক্রিত পড়ে আছে?|stock_batches|stock|unsold,batch
 81|quality|U|-|Shelf-life setup coverage|মেয়াদ নির্ধারণের কভারেজ|Which items have no shelf life set?|কোন আইটেমের মেয়াদ ঠিক করা নেই?|not captured (shelf_life_rules empty)|stock|shelf life,মেয়াদ
@@ -132,23 +132,23 @@ SEED = r'''
 83|quality|U|-|Batch traceability: supplier lot to sale|ব্যাচ ট্রেস: সরবরাহকারীর লট থেকে বিক্রি|Where did a batch come from and go to?|একটি ব্যাচ কোথা থেকে এসে কোথায় গেল?|not captured (supplier lot)|stock|trace,lot,ট্রেস
 84|quality|C|-|Finished goods distribution by outlet and batch|শাখা ও ব্যাচ অনুযায়ী তৈরি মাল বণ্টন|Which outlet got which batch?|কোন শাখা কোন ব্যাচ পেল?|stock_transfers, ledger|stock|distribution,বণ্টন
 85|quality|U|-|Recall report|রিকল রিপোর্ট|Which customers or shops got a bad batch?|খারাপ ব্যাচ কোন দোকান বা গ্রাহক পেয়েছে?|not captured (no recall record)|quality|recall,রিকল
-86|quality|I|report/q2_hygiene|Hygiene checklist report|পরিচ্ছন্নতা চেকলিস্ট রিপোর্ট|Were the hygiene checks done?|পরিচ্ছন্নতার চেক কি হয়েছে?|forms 14-1, 05-1|quality|hygiene,clean,পরিচ্ছন্নতা
+86|quality|I|report/q2_hygiene|Hygiene checklist report|পরিচ্ছন্নতা চেকলিস্ট রিপোর্ট|Were the hygiene checks done?|পরিচ্ছন্নতার চেক কি হয়েছে?|forms 06-1, 12-1|quality|hygiene,clean,পরিচ্ছন্নতা
 87|quality|I|report/q1_fridge_temp|Fridge temperature log|ফ্রিজের তাপমাত্রা লগ|Were the fridges in range?|ফ্রিজ কি সঠিক তাপমাত্রায় ছিল?|fridge sheet|quality|fridge,temperature,ফ্রিজ,তাপমাত্রা
-88|quality|I|report/q3_complaints|Customer complaints|গ্রাহকের অভিযোগ|What did customers complain about?|গ্রাহক কী নিয়ে অভিযোগ করেছে?|form 20-3|quality|complaint,অভিযোগ
+88|quality|I|report/q3_complaints|Customer complaints|গ্রাহকের অভিযোগ|What did customers complain about?|গ্রাহক কী নিয়ে অভিযোগ করেছে?|form 32-1|quality|complaint,অভিযোগ
 89|quality|C|stockx|Quality inspection and rejection|মান পরিদর্শন ও বাতিল|What was rejected at receipt?|গ্রহণের সময় কী বাতিল হলো?|qc_records|quality|qc,inspection,reject,মান
 90|purchase|I|report/purchases_by_supplier|Purchase summary|ক্রয়ের সারসংক্ষেপ|How much did we buy in total?|মোট কত কেনা হলো?|purchase_bills|purch|purchase,buy,ক্রয়,কেনা
 91|purchase|I|report/purchases_by_supplier|Purchases by supplier|সরবরাহকারী অনুযায়ী ক্রয়|Whom do we buy from, how much?|কার কাছ থেকে কত কিনি?|purchase_bills|purch|supplier,সরবরাহকারী
 92|purchase|C|report/p2_rate_trend|Purchase value by item|আইটেম অনুযায়ী ক্রয়মূল্য|What do we spend on each item?|প্রতিটি আইটেমে কত খরচ করি?|purchase_lines|purch|item,আইটেম
 93|purchase|I|report/p2_rate_trend|Purchase price trend|ক্রয়দামের ধারা|Which input got dearer?|কোন কাঁচামাল দামি হলো?|purchase_lines|purch|price trend,rate,দাম
-94|purchase|C|report/p4_supplier_score|Supplier scorecard|সরবরাহকারীর স্কোরকার্ড|Which supplier is reliable?|কোন সরবরাহকারী নির্ভরযোগ্য?|forms 06-3, 04-1, 06-4|purch|scorecard,reliable
-95|purchase|I|report/p5_po_match|Purchase orders and open POs|ক্রয় অর্ডার ও খোলা PO|Which POs are still open?|কোন PO এখনও খোলা?|form 06-3|purch|po,order,অর্ডার
-96|purchase|I|report/p5_po_match|PO, GRN and bill match|PO, GRN ও বিল মিল|Do order, receipt and bill agree?|অর্ডার, গ্রহণ আর বিল কি মেলে?|forms 06-3, 04-1, 06-4|purch|match,grn,মিল
-97|purchase|I|report/p5_po_match|PO delivery status|PO ডেলিভারির অবস্থা|Which deliveries are late?|কোন ডেলিভারি দেরি?|form 06-3|purch|late,delivery,দেরি
+94|purchase|C|report/p4_supplier_score|Supplier scorecard|সরবরাহকারীর স্কোরকার্ড|Which supplier is reliable?|কোন সরবরাহকারী নির্ভরযোগ্য?|forms 27-1, 13-1, 02-1|purch|scorecard,reliable
+95|purchase|I|report/p5_po_match|Purchase orders and open POs|ক্রয় অর্ডার ও খোলা PO|Which POs are still open?|কোন PO এখনও খোলা?|form 27-1|purch|po,order,অর্ডার
+96|purchase|I|report/p5_po_match|PO, GRN and bill match|PO, GRN ও বিল মিল|Do order, receipt and bill agree?|অর্ডার, গ্রহণ আর বিল কি মেলে?|forms 27-1, 13-1, 02-1|purch|match,grn,মিল
+97|purchase|I|report/p5_po_match|PO delivery status|PO ডেলিভারির অবস্থা|Which deliveries are late?|কোন ডেলিভারি দেরি?|form 27-1|purch|late,delivery,দেরি
 98|purchase|C|report/supplier_ageing|Supplier payables ageing|সরবরাহকারীর পাওনার বয়স|How much do we owe, since when?|কত পাওনা, কত দিন ধরে?|purchase_bills, supplier_payments|purch|payable,ageing,owe,পাওনা,বাকি
 99|purchase|I|payables|Supplier ledger|সরবরাহকারীর খাতা|What is the full account with one supplier?|এক সরবরাহকারীর পুরো হিসাব কী?|supplier_ledger|purch|ledger,খাতা
 100|purchase|C|report/purchases_by_supplier|Purchase returns|ক্রয় ফেরত|What did we send back?|কী ফেরত দিয়েছি?|purchase_bills (return)|purch|return,ফেরত
 101|purchase|C|report/p2_rate_trend|Price variance against the agreed price|চুক্তির দামের সাথে পার্থক্য|Did a supplier charge more than agreed?|সরবরাহকারী কি চুক্তির চেয়ে বেশি নিল?|not captured (no agreed price)|purch|variance,agreed
-102|purchase|I|report/p4_supplier_score|Supplier delivery performance|সরবরাহকারীর ডেলিভারি কর্মক্ষমতা|Who delivers late?|কে দেরিতে দেয়?|forms 06-3, 06-4|purch|delivery,performance
+102|purchase|I|report/p4_supplier_score|Supplier delivery performance|সরবরাহকারীর ডেলিভারি কর্মক্ষমতা|Who delivers late?|কে দেরিতে দেয়?|forms 27-1, 02-1|purch|delivery,performance
 103|purchase|C|report/p4_supplier_score|Supplier rejection rate|সরবরাহকারীর বাতিলের হার|How much of a supplier's goods is rejected?|সরবরাহকারীর কত মাল বাতিল হয়?|qc_records|purch|rejection,reject
 104|purchase|U|-|Preferred and alternative suppliers|পছন্দের ও বিকল্প সরবরাহকারী|Who else can supply this item?|এই আইটেম আর কে দিতে পারে?|not captured (no item_suppliers)|purch|alternative,preferred,বিকল্প
 '''

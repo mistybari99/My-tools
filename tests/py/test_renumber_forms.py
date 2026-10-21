@@ -63,7 +63,8 @@ chk('the fixed 0-1 is never changed', rn.transform('0-1 Location', {}, fm)[0] ==
 chk('a code inside a larger number is not a form code', rn.transform('x 10-12 2026-10-1 10-1-2026 v10-1 1.10-1', {}, fm)[0]
     == 'x 10-12 2026-10-1 10-1-2026 v10-1 1.10-1')
 chk('a code in quotes is changed', rn.transform("'10-2' and \"20-1\"", {}, fm)[0] == "'11-1' and \"05-1\"")
-chk('Bangla digits are never a form code', rn.transform('দিন (১৪-১)', {}, fm)[0] == 'দিন (১৪-১)')
+chk('a form code written with Bangla digits maps too, in Bangla digits', rn.transform('দিন (১৪-১)', {}, fm)[0] == 'দিন (০৬-১)')
+chk('a Bangla-digit number that is not a form code is not changed', rn.transform('১০-১২', {}, fm)[0] == '১০-১২')
 chk('internal ids with a code are not changed by the form mapping', rn.transform("f04_1 form_20_4", {}, fm)[0] == "f04_1 form_20_4")
 
 # 6. row guard: an unknown form-shaped code on a table or quoted row is flagged; known codes and non-form numbers are not

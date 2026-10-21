@@ -118,7 +118,7 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
   p = await open({}, '#/expenseregister');
   let c = await calls(p, 'expense_register'); ok(c.length === 1 && c[0].p_basis === 'all' && /^\d{4}-\d{2}-01$/.test(c[0].p_from) && c[0].p_loc === null && c[0].p_limit === 100, 'the register opens for the month so far, every line, all places');
   t = await text(p, '#er_res');
-  ok(/Expense report\s*৳ 790/.test(t.replace(/\n/g, ' ')) && /1,102/.test(t) && /837/.test(t) && /1,500/.test(t), 'the three totals and the 18-1 amount are shown');
+  ok(/Expense report\s*৳ 790/.test(t.replace(/\n/g, ' ')) && /1,102/.test(t) && /837/.test(t) && /1,500/.test(t), 'the three totals and the 17-1 amount are shown');
   ok(/The totals differ/.test(t) && /Why the totals differ/.test(t), 'the reconciliation is there and says the totals differ');
   ok(await p.locator('[data-act=exr_open]').count() === 3, 'three lines');
   ok(/Expense report ✓/.test(await text(p, '#er_res')) && /Expense report –/.test(await text(p, '#er_res')), 'each line shows which totals count it (tick and dash)');

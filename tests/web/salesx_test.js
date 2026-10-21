@@ -23,7 +23,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'online_order_deliver') { const o = SX.orders.find((x) => x.id === args.p_id); o.status = 'delivered'; return { data: { status: 'delivered', sale_id: 's9', receipt: 77 }, error: null }; }
   if (fn === 'online_order_link_sale') { SX.orders.find((x) => x.id === args.p_id).status = 'delivered'; return { data: { status: 'delivered' }, error: null }; }
   if (fn === 'unlinked_sale_forms') return { data: SX.forms, error: null };
-  if (fn === 'sale_form_link') { T.sale_form_links.push({ id: 5, sale_id: args.p_sale, entry_id: args.p_entry, form_code: '20-1', amount_diff: 0, location_id: 1, state: 'active', linked_at: 'x' }); SX.forms = SX.forms.filter((f) => f.entry_id !== args.p_entry); return { data: { id: 5, amount_diff: 0 }, error: null }; }
+  if (fn === 'sale_form_link') { T.sale_form_links.push({ id: 5, sale_id: args.p_sale, entry_id: args.p_entry, form_code: '05-1', amount_diff: 0, location_id: 1, state: 'active', linked_at: 'x' }); SX.forms = SX.forms.filter((f) => f.entry_id !== args.p_entry); return { data: { id: 5, amount_diff: 0 }, error: null }; }
   if (fn === 'sale_form_unlink') { T.sale_form_links.length = 0; return { data: { state: 'void' }, error: null }; }
   if (fn === 'benefits_report') return { data: { as_of: args.p_as_of, grants: SX.grants, missing: SX.missing, paid_in_payroll_monthly_visible: 0 }, error: null };
   if (fn === 'employee_benefit_grant') { SX.grants.push({ id: 9, employee_id: args.p_emp, employee_name: 'এমপ ১', type_code: args.p_type, from_date: args.p_from, eligible_from: args.p_from, to_date: null, state: 'eligible', paid_in_payroll: false, value_per_month: null }); return { data: { id: 9 }, error: null }; }
@@ -96,7 +96,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open('#/onlineorders', { lang: 'bn' }); ok(/অনলাইন অর্ডার/.test(await txt(p)), 'Bangla mode');
 
   // ---- forms <-> sales ----
-  p = await open('#/saleforms', { sx: { forms: [{ entry_id: 'en1', form_code: '20-1', serial: 4, entry_date: '2026-10-13', location_id: 1, customer: 'Rina', form_total: 330, candidate_sales: ['s1'] }, { entry_id: 'en2', form_code: '20-4', serial: 5, entry_date: '2026-10-13', location_id: 1, customer: 'Party A', form_total: null, candidate_sales: [] }] } });
+  p = await open('#/saleforms', { sx: { forms: [{ entry_id: 'en1', form_code: '05-1', serial: 4, entry_date: '2026-10-13', location_id: 1, customer: 'Rina', form_total: 330, candidate_sales: ['s1'] }, { entry_id: 'en2', form_code: '24-1', serial: 5, entry_date: '2026-10-13', location_id: 1, customer: 'Party A', form_total: null, candidate_sales: [] }] } });
   ok(/Not linked to a sale \(2\)/.test(await txt(p)) && /#12/.test(await txt(p)) && /Rina/.test(await txt(p)), 'unlinked forms with the candidate sale receipt');
   await noOverflow(p, 'saleforms'); await p.screenshot({ path: SP + '/sx_forms.png', fullPage: true });
   await p.evaluate(() => { window.__SX.fail.sale_form_link = 'path_locked: x'; }); await p.click('[data-act=sf_link]'); await wait(p, 500);

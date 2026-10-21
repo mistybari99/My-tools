@@ -3509,13 +3509,13 @@
   "c6f644a1d76dcef5": {
    "file": "forms_cash.js",
    "rule": "L-missing-mix(2 args)",
-   "sample": "দৈনিক শোরুম শিটের জিলাপি বিক্রি ৳ (14-1 থেকে)|Jalebi sales ৳",
+   "sample": "দৈনিক শোরুম শিটের জিলাপি বিক্রি ৳ (06-1 থেকে)|Jalebi sales ৳",
    "count": 1
   },
   "bcf5193274688bae": {
    "file": "forms_cash.js",
    "rule": "en-has-bangla",
-   "sample": "Jalebi sales ৳ from the daily showroom sheet (14-1)",
+   "sample": "Jalebi sales ৳ from the daily showroom sheet (06-1)",
    "count": 1
   },
   "8163137f7a80d45b": {

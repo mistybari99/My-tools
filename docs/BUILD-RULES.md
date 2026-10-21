@@ -4,7 +4,7 @@
 
 BUILD-RULES
 1. Paper first. This app is the digital version of the business's paper forms. Never remove an existing form, field, option, screen or permission. You may rearrange, group or search them. Removing needs the owner's written yes.
-2. Form codes are the paper's own, written as the app writes them: 0-1, 01-1, 08-1, 14-1. Never renumber, reuse or invent one. A retired form keeps its code and gets the status closed.
+2. Form codes are the paper's own, written as the app writes them: 0-1, 40-1, 16-1, 14-1. Never renumber, reuse or invent one. A retired form keeps its code and gets the status closed.
 3. Nothing is deleted. Records, list options, locations, forms and staff are retired or closed, never deleted. A code is never given to anything else.
 4. Every list has Add new and Other. There is no free-text box where a list exists. An entry stores the option's id, never its label, so renaming never breaks history.
 5. Who may add is a per-list rule: open (anyone; joins the list at once), approval (a request the owner approves; until then the person writes Other), owner (only the owner adds; others write Other). Enforce it on the server or database, not only by hiding buttons.

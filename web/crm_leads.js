@@ -117,7 +117,7 @@ function panelHTML(g) {
   if (p === 'convert') {
     const ch = D.channels || [];
     return `<div class="card stack" data-panel="convert"><b>Turn into an order or a form</b><div class="muted">This makes the normal record through the existing screens. Nothing is posted by the enquiry.</div>
-      <select id="cp_kind"><option value="online_order">Make an order (from the quote lines)</option><option value="form_20_4">Make a draft party invoice (form 20-4)</option><option value="form_20_1">Make a draft customer order form (form 20-1)</option><option value="link_order">Link an order that already exists</option><option value="link_form">Link a 20-1 or 20-4 form that already exists</option></select>
+      <select id="cp_kind"><option value="online_order">Make an order (from the quote lines)</option><option value="form_20_4">Make a draft party invoice (form 24-1)</option><option value="form_20_1">Make a draft customer order form (form 05-1)</option><option value="link_order">Link an order that already exists</option><option value="link_form">Link a 05-1 or 24-1 form that already exists</option></select>
       <div data-for="online_order"><label for="cp_ch">Sales channel</label><select id="cp_ch"><option value="">Choose</option>${ch.map((c) => `<option value="${esc(c.id)}">${esc(c.name_bn || c.code)}</option>`).join('')}</select>
         <label for="cp_dd">Delivery date</label><input id="cp_dd" type="date" value="${esc(l.event_date || '')}"><label for="cp_dm">Delivery</label><select id="cp_dm"><option value="pickup">Pick up from the shop</option><option value="home">Home delivery</option><option value="courier">Courier</option></select>
         <label for="cp_addr">Address (if delivered)</label><input id="cp_addr" maxlength="300"></div>

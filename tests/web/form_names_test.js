@@ -6,9 +6,9 @@ const fs = require('fs'), path = require('path');
 const { REPO_DIR, WEB_DIR } = _P;
 
 // baseline: the 42 printed codes in supabase/schema.sql (forms seed) at this commit
-const BASELINE = ['0-1', '01-1', '01-2', '02-1', '02-2', '02-3', '02-4', '02-5', '02-6', '02-7', '02-8', '03-1',
-  '04-1', '04-2', '04-3', '04-4', '05-1', '05-2', '05-3', '05-4', '05-5', '06-1', '06-2', '06-3', '06-4', '06-5',
-  '08-1', '10-1', '10-2', '10-3', '10-4', '10-5', '11-1', '14-1', '14-2', '18-1', '20-1', '20-2', '20-3', '20-4', '20-5', '20-6'];
+const BASELINE = ['0-1', '40-1', '20-1', '19-1', '21-1', '35-1', '01-1', '15-1', '10-1', '09-1', '34-1', '39-1',
+  '13-1', '18-1', '36-1', '37-1', '12-1', '26-1', '31-1', '41-1', '22-1', '28-1', '29-1', '27-1', '02-1', '38-1',
+  '16-1', '03-1', '11-1', '07-1', '04-1', '30-1', '33-1', '06-1', '14-1', '17-1', '05-1', '08-1', '32-1', '24-1', '25-1', '23-1'];
 const FIXED = '0-1';
 
 let fails = 0;
@@ -45,7 +45,7 @@ ok(rows.every((r, i) => r.no === i + 1), 'sort numbers run 1..41 in order');
 ok(rows.every((r, i) => i === 0 || rows[i - 1].en.toLowerCase() <= r.en.toLowerCase()), 'rows are in A-Z order by English short name');
 const oldSet = rows.map((r) => r.old).sort();
 ok(JSON.stringify(oldSet) === JSON.stringify(BASELINE.filter((c) => c !== FIXED).sort()), 'old codes in the table are exactly the 41 printed NN-N codes, each once');
-ok(rows.every((r, i) => r.neu === String(i + 1).padStart(2, '0') + '-1'), 'new codes are 01-1 .. 41-1 in row order');
+ok(rows.every((r, i) => r.neu === String(i + 1).padStart(2, '0') + '-1'), 'new codes are 40-1 .. 41-1 in row order');
 ok(new Set(rows.map((r) => r.neu)).size === rows.length, 'new codes are unique');
 ok(rows.every((r) => r.en && r.bn), 'every row has an English and a Bangla short name');
 

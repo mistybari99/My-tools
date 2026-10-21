@@ -14,9 +14,9 @@ const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f
     const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const day = new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 10);
 const CASH = [
-  { id: 'c1', entry_id: 'e1', form_code: '14-1', location_id: 1, location: 'Test place', case_date: day, amount: -200, kind: 'short', status: 'open', can_decide: true, posted: false },
-  { id: 'c2', entry_id: 'e2', form_code: '14-1', location_id: 1, location: 'Test place', case_date: day, amount: 50, kind: 'over', status: 'open', can_decide: true, posted: false },
-  { id: 'c3', entry_id: 'e3', form_code: '14-1', location_id: 1, location: 'Test place', case_date: day, amount: -30, kind: 'short', status: 'approved', can_decide: false, posted: true, decide_note: 'slip checked' }];
+  { id: 'c1', entry_id: 'e1', form_code: '06-1', location_id: 1, location: 'Test place', case_date: day, amount: -200, kind: 'short', status: 'open', can_decide: true, posted: false },
+  { id: 'c2', entry_id: 'e2', form_code: '06-1', location_id: 1, location: 'Test place', case_date: day, amount: 50, kind: 'over', status: 'open', can_decide: true, posted: false },
+  { id: 'c3', entry_id: 'e3', form_code: '06-1', location_id: 1, location: 'Test place', case_date: day, amount: -30, kind: 'short', status: 'approved', can_decide: false, posted: true, decide_note: 'slip checked' }];
 const TRANSIT = [
   { id: 's1', item_bn: 'test_item_a', item_en: 'test_item_a', from_name: 'Place A', to_name: 'Place B', qty_short: 1, value: 20, cost_missing: false, status: 'open', outstanding_claim: 0, received_on: day, can_decide: true },
   { id: 's2', item_bn: 'test_item_b', item_en: 'test_item_b', from_name: 'Place A', to_name: 'Place B', qty_short: 2, value: null, cost_missing: true, status: 'open', outstanding_claim: 0, received_on: day, can_decide: true },

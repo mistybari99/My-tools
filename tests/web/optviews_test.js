@@ -25,7 +25,7 @@ function mk(lang, owner = true) {
 }
 const html = (t) => t.shells.map((s) => s[1]).join('') + Object.values(t.els).map((e) => e.innerHTML || '').join('') + t.sheets.join('');
 const click = (t, act, ds) => t.handlers[act]({ dataset: ds || {} });
-const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'active' }, is_owner: false, roles: ['salesperson'], locations: [1], perms: { POS: { view: true, enter: true, approve: false }, '10-1': { view: true, enter: false, approve: false } },
+const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'active' }, is_owner: false, roles: ['salesperson'], locations: [1], perms: { POS: { view: true, enter: true, approve: false }, '03-1': { view: true, enter: false, approve: false } },
   grants: ['view_cost'], overrides: [], role_defaults: [], effective: [{ key: 'r:dues', mode: 'locked', src: 'role' }, { key: 'r:items', mode: 'hide', src: 'user' }] };
 
 (async () => {
@@ -94,7 +94,7 @@ const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'a
     const t = mk('en', true);
     t.impl.from.profiles = { data: [{ id: 'u-sales', staff_id: 's1', full_name: 'Sales One', status: 'active' }] };
     t.impl.from.roles = { data: [{ code: 'storekeeper', name_bn: 'স্টোর', name_en: 'Storekeeper' }] };
-    t.impl.from.forms = { data: [{ code: '10-1', area: 'cash', name_bn: 'ক্যাশ', name_en: 'Cash voucher', sort: 1, enabled: true }, { code: '03-1', area: 'stock', name_bn: 'স্টক', name_en: 'Stock form', sort: 2, enabled: true }] };
+    t.impl.from.forms = { data: [{ code: '03-1', area: 'cash', name_bn: 'ক্যাশ', name_en: 'Cash voucher', sort: 1, enabled: true }, { code: '39-1', area: 'stock', name_bn: 'স্টক', name_en: 'Stock form', sort: 2, enabled: true }] };
     t.impl.rpc = async (fn) => {
       if (fn === 'option_views_for_user') return { data: sales, error: null };
       if (fn === 'permission_recommendations') return { data: { is_owner: false,

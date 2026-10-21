@@ -230,7 +230,7 @@ function sectionHTML(sec, idx) {
   const ed = (f) => modeEditable(f);
   const sid = FIELD_ID(); if (sec.show) E.shows[sid] = sec.show;
   const checker = sec.who === 'checker';
-  if (blindPending() && E.code === '10-1' && !checker) return `<section class="card panel sec" data-sid="${sid}"><h3>${esc(lab(sec.title))}</h3><div class="notice warn" id="blind_hidden">${esc(lab(X18.hub_hidden))}</div></section>`;
+  if (blindPending() && E.code === '03-1' && !checker) return `<section class="card panel sec" data-sid="${sid}"><h3>${esc(lab(sec.title))}</h3><div class="notice warn" id="blind_hidden">${esc(lab(X18.hub_hidden))}</div></section>`;
   const inner = sec.fields.map((f) => fieldHTML(f, f.id, f.who === 'checker' ? 'c' : 'd', ed(f), wrap(f))).join('');
   const body = `<div class="secbody">${inner}${blindBoxHTML(sec)}</div>`;
   return `<section class="card panel sec ${checker ? 'checker' : ''}" data-sid="${sid}">
@@ -400,7 +400,7 @@ async function loadPendingChange() {
   try { const r = await sb.from('entry_change_requests').select('id').eq('entry_id', E.id).eq('status', 'pending').limit(1); E.chgPending = !!(r && !r.error && r.data && r.data.length); } catch (e) { /* ignore */ }
 }
 
-// ---------- W5b: server-side blind count (14-1 drawer, 10-1 hub) and PIN signatures (supabase/phase18.sql) ----------
+// ---------- W5b: server-side blind count (06-1 drawer, 03-1 hub) and PIN signatures (supabase/phase18.sql) ----------
 // Rule 9: the person counts first; the expected figure is hidden until the count is saved on the server (count_save) and only then shown.
 // Rule 10: a second signature is another login with its own PIN (web/pinsign.js signs that person in on a throw-away client).
 // Both are OFF until the owner switches them on (rules blind_count_on, pin_signature_on). If phase18 is not installed every RPC fails and the old screen stays.
@@ -440,13 +440,13 @@ const X18 = {
   e_pin_signature_off: L('পিন স্বাক্ষর এখন বন্ধ আছে', 'PIN signature is switched off', 'PIN signature এখন off'),
 };
 Object.assign(X17, X18);
-const BLIND_SEC = { '14-1': 'drawer', '10-1': 'hub' };
-const BLIND_FIELD = { '14-1': 'cash_count', '10-1': 'rcount' };
-const BLIND_HIDE = { '14-1': ['expected', 'short_over'], '10-1': ['counted_total', 'handover', 'diff'] };
-const BLIND_V = { '14-1': ['expected', 'short_over', 'so_nonzero'], '10-1': ['counted_total', 'handover', 'diff', 'diff_nonzero'] };
-const BLIND_FLAG = { '14-1': 'cash_short_over', '10-1': 'hub_diff' };
-const PIN_ROLES = { '14-1': ['witness', 'second_sig'], '10-1': ['hub_pair'], '04-3': ['witness'] };
-const blindStage = () => !!E && ((E.code === '14-1' && E.mode === 'edit') || (E.code === '10-1' && E.mode === 'check'));
+const BLIND_SEC = { '06-1': 'drawer', '03-1': 'hub' };
+const BLIND_FIELD = { '06-1': 'cash_count', '03-1': 'rcount' };
+const BLIND_HIDE = { '06-1': ['expected', 'short_over'], '03-1': ['counted_total', 'handover', 'diff'] };
+const BLIND_V = { '06-1': ['expected', 'short_over', 'so_nonzero'], '03-1': ['counted_total', 'handover', 'diff', 'diff_nonzero'] };
+const BLIND_FLAG = { '06-1': 'cash_short_over', '03-1': 'hub_diff' };
+const PIN_ROLES = { '06-1': ['witness', 'second_sig'], '03-1': ['hub_pair'], '36-1': ['witness'] };
+const blindStage = () => !!E && ((E.code === '06-1' && E.mode === 'edit') || (E.code === '03-1' && E.mode === 'check'));
 const blindRevealed = () => !!(E.blind.peeked || (E.blind.saved && E.blind.res && E.blind.res.expected !== undefined));    // the maker's own count_save answer carries no figures (server side blind)
 const blindPending = () => !!(E && E.blind && E.blind.on && blindStage() && !blindRevealed());
 function blindMask() {
@@ -454,8 +454,8 @@ function blindMask() {
   BLIND_V[E.code].forEach((k) => { delete E.calc.v[k]; });
   E.calc.flags = E.calc.flags.filter((f) => f.code !== BLIND_FLAG[E.code]);
 }
-// ---------- B2: blind stock count (04-3) and GRN (04-1): counted figures are sealed on the server first (supabase/phase23.sql) ----------
-const SB_FIELD = { '04-3': 'count', '04-1': 'counted' };
+// ---------- B2: blind stock count (36-1) and GRN (13-1): counted figures are sealed on the server first (supabase/phase23.sql) ----------
+const SB_FIELD = { '36-1': 'count', '13-1': 'counted' };
 async function loadSB() {
   E.sb = null; if (!SB_FIELD[E.code]) return;
   try {

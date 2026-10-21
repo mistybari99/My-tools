@@ -389,7 +389,7 @@ css.textContent = `#pt_body select,#pt_body input,#pt_body textarea,.sheet selec
 document.head.appendChild(css);
 
 // ---------------- handlers ----------------
-const photoPick = async (file, setter, hintSel) => { try { const loc = ((LOCS()[0]) || {}).id; const path = await U.uploadPhoto(file, ['STOCK', '04-1', '04-2'], loc); setter(path); const h = $(hintSel); if (h) h.textContent = '✓'; } catch (e) { fail(e); } };
+const photoPick = async (file, setter, hintSel) => { try { const loc = ((LOCS()[0]) || {}).id; const path = await U.uploadPhoto(file, ['STOCK', '13-1', '18-1'], loc); setter(path); const h = $(hintSel); if (h) h.textContent = '✓'; } catch (e) { fail(e); } };
 document.addEventListener('change', (e) => {
   const id = e.target.id;
   if (id === 'pt_tab') { D.tab = e.target.value; D.deed = null; D.calc = null; paint(); }

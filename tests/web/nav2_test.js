@@ -74,7 +74,7 @@ const EXTRA_NAV = `(function(){ const real = window.supabase.createClient; windo
   ok(await p.locator('#nav_body .dr-it[data-v=dues]').count() === 1 && /TestE Mistan/.test(await p.textContent('#nav_body')), 'customer hit by name');
   await p.fill('#nav_q', '0171100'); await wait(p, 900);
   ok(/TestF Store/.test(await p.textContent('#nav_body')) && !/TestE/.test(await p.textContent('#nav_body')), 'customer hit by mobile fragment');
-  await p.fill('#nav_q', '10-2'); await wait(p, 900);
+  await p.fill('#nav_q', '11-1'); await wait(p, 900);
   ok(await p.locator('#nav_body .dr-it[data-v="form/10-2"]').count() === 1, 'form hit by code');
   await p.fill('#nav_q', 'k'); await wait(p, 600);
   ok(!/Searching/.test(await p.textContent('#nav_body')) && await p.locator('#nav_body .dr-it[data-v=dues]').count() === 0, 'one letter searches the menu only (no customer / item fetch)');
@@ -120,15 +120,15 @@ const EXTRA_NAV = `(function(){ const real = window.supabase.createClient; windo
 
   // ---------- staff home: today's sheets ----------
   const E = (f, l, s) => ({ id: 'e_' + f + l + s, form_code: f, location_id: l, serial: 1, entry_date: td, status: s, data: {}, flags: [], created_by: 'u1' });
-  const stf = { owner: false, perms: { '14-1': { view: true, enter: true }, '10-2': { view: true, enter: true }, '03-1': { view: true, enter: true }, '10-1': { view: true, enter: false }, POS: { view: true, enter: true } },
-    m: { ctx: { roles: ['salesperson'], locations: [1], is_owner: false } }, entries: [E('14-1', 1, 'approved'), E('10-2', 1, 'draft'), E('04-1', 1, 'submitted')], rollout: [['03-1', 1, 'paper']] };
-  p = await open(Object.assign({}, stf, { rules: [{ key: 'home_daily_forms', module: 'settings', kind: 'text', value: '14-1, 10-2, 03-1, 10-1', default_value: null, label_bn: 'x', label_en: 'x', label_mix: 'x', sort: 1 }] }), '#/home');
+  const stf = { owner: false, perms: { '06-1': { view: true, enter: true }, '11-1': { view: true, enter: true }, '39-1': { view: true, enter: true }, '03-1': { view: true, enter: false }, POS: { view: true, enter: true } },
+    m: { ctx: { roles: ['salesperson'], locations: [1], is_owner: false } }, entries: [E('06-1', 1, 'approved'), E('11-1', 1, 'draft'), E('13-1', 1, 'submitted')], rollout: [['39-1', 1, 'paper']] };
+  p = await open(Object.assign({}, stf, { rules: [{ key: 'home_daily_forms', module: 'settings', kind: 'text', value: '06-1, 11-1, 39-1, 03-1', default_value: null, label_bn: 'x', label_en: 'x', label_mix: 'x', sort: 1 }] }), '#/home');
   const rows = await p.locator('#hv_sheets .hrow').allTextContents();
-  ok(rows.length === 3, 'only enterable forms from the rule (10-1 is view-only): ' + JSON.stringify(rows));
+  ok(rows.length === 3, 'only enterable forms from the rule (03-1 is view-only): ' + JSON.stringify(rows));
   const t = (code) => rows.find((r) => r.includes(code)) || '';
-  ok(/Done/.test(t('14-1')) && /Draft/.test(t('10-2')) && /On paper/.test(t('03-1')), 'states: submitted/approved = Done, draft = Draft, rollout paper = On paper');
+  ok(/Done/.test(t('06-1')) && /Draft/.test(t('11-1')) && /On paper/.test(t('39-1')), 'states: submitted/approved = Done, draft = Draft, rollout paper = On paper');
   ok(/1\/2 done/.test(await p.textContent('#hv_sheets .hsec')), 'summary counts only app sheets: ' + (await p.textContent('#hv_sheets .hsec')));
-  ok(/^(?!.*14-1)/.test(rows[0]) && /10-2/.test(rows[0]), 'unfinished (draft) comes before done');
+  ok(/^(?!.*06-1)/.test(rows[0]) && /10-2/.test(rows[0]), 'unfinished (draft) comes before done');
   await p.click('#hv_sheets .hrow'); await wait(p, 500);
   ok(/#\/form\/10-2/.test(await p.evaluate(() => location.hash)), 'a row opens the form');
   await p.close();

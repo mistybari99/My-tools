@@ -1,6 +1,6 @@
 /* Islamia BOS · Expense register (#/expenseregister): ONE list of every expense line, voucher by voucher, with the three totals side by side.
    The same period had three different expense totals (the expense report, the P&L and day book, the journal) and no screen listed the vouchers behind them. This one does:
-   expense vouchers 10-2 (every status), quick expenses, bank charges, mobile wallet fees, and the marketing register 18-1 (shown as "not in the books").
+   expense vouchers 11-1 (every status), quick expenses, bank charges, mobile wallet fees, and the marketing register 17-1 (shown as "not in the books").
    Every line says which of the three totals counts it. A basis selector (all lines / expense report / P&L and day book / journal) shows the lines behind one total. The reconciliation says why the totals differ.
    Server: supabase/phase442.sql (expense_register, read only), phase444.sql (c1_export_log for the CSV). The page only shows and sends; the server decides every right and every number.
    Nothing depends on a capture switch: the register is open to the people who may read the expense report (or the accounts). English labels only (owner rule for the report screens). */
@@ -19,7 +19,7 @@ const X = {
   intro: E('Every expense line in one list. The expense report, the P&L and the journal count expenses in three different ways, so their totals differ. Each line below shows which total counts it.'),
   from: E('From'), to: E('To'), place: E('Place'), allPlaces: E('All places'), basis: E('Show the lines that'), status: E('Status'), anyStatus: E('Any status'), show: E('Show'),
   bAll: E('Every line'), bReport: E('The expense report counts'), bPl: E('The P&L and day book count'), bJournal: E('The journal counts'),
-  kinds: E('Kinds'), kVoucher: E('Vouchers 10-2'), kQuick: E('Quick expenses'), kBank: E('Bank charges'), kWallet: E('Wallet fees'), kMkt: E('Marketing 18-1'),
+  kinds: E('Kinds'), kVoucher: E('Vouchers 11-1'), kQuick: E('Quick expenses'), kBank: E('Bank charges'), kWallet: E('Wallet fees'), kMkt: E('Marketing 17-1'),
   tReport: E('Expense report'), tPl: E('P&L'), tDay: E('Day book'), tJournal: E('Journal'), tNot: E('Not in the books'), tapTotal: E('Tap a total to list the lines it counts.'),
   agree: E('The totals agree'), differ: E('The totals differ'), recon: E('Why the totals differ'), line: E('Line'), diffPl: E('P&L - report'), diffJr: E('Journal - P&L'), why: E('Why'),
   waiting: E('Approved, not posted to the journal yet'), shown: E('Shown'), lines: E('lines'), more: E('Show more'), none: E('No expense line in this period and these places.'),
@@ -71,7 +71,7 @@ function totalsHTML(d) {
   const card = (b, label, v, extra) => `<button type="button" class="card stack er-tot ${D.basis === b ? 'on' : ''}" data-act="er_basis" data-b="${b}" aria-label="${esc(label + ' ' + num(v))}"><small class="muted">${esc(label)}</small><b>${esc(num(v))}</b>${extra || ''}</button>`;
   return `<div class="er-tots" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${card('report', T('tReport'), t.report)}${card('pl', T('tPl'), t.pl, `<small class="muted">${esc(T('tDay'))} ${esc(num(t.daybook))}</small>`)}
     ${card('journal', T('tJournal'), t.journal, Number(t.journal_posted) !== Number(t.journal) ? `<small class="muted">${esc(T('posted'))} ${esc(num(t.journal_posted))}</small>` : '')}
-    <div class="card stack"><small class="muted">${esc(T('tNot'))}</small><b>${esc(num(t.not_in_books))}</b><small class="muted">18-1</small></div></div>
+    <div class="card stack"><small class="muted">${esc(T('tNot'))}</small><b>${esc(num(t.not_in_books))}</b><small class="muted">17-1</small></div></div>
     <p class="muted">${esc(T('tapTotal'))} <span class="chip ${rec.agree ? 'ok' : 'warn'}">${esc(rec.agree ? T('agree') : T('differ'))}</span></p>`;
 }
 function reconHTML(d) {
@@ -149,7 +149,7 @@ async function exportCSV() {
     r.in_report ? 'yes' : 'no', r.in_pl ? 'yes' : 'no', r.in_journal ? 'yes' : 'no', r.in_journal ? (r.posted ? 'yes' : 'no') : '', r.no_receipt_amount, r.unreadable, (r.flags || []).join('; '), r.staff, r.source_id])));
   out.push('');
   C.metaLines(lab(X.title), [['Period', D.from + ' - ' + D.to], ['Place', D.loc === '' ? 'All places' : locName(D.loc)], ['Basis', D.basis], ['Total expense report', t.report], ['Total P&L', t.pl], ['Total day book', t.daybook], ['Total journal', t.journal],
-    ['Journal posted', t.journal_posted], ['Not in the books (18-1)', t.not_in_books], ['Totals agree', rec.agree ? 'yes' : 'no']]).forEach((m) => out.push(C.csvLine(m)));
+    ['Journal posted', t.journal_posted], ['Not in the books (17-1)', t.not_in_books], ['Totals agree', rec.agree ? 'yes' : 'no']]).forEach((m) => out.push(C.csvLine(m)));
   out.push(''); out.push(C.csvLine(['Why the totals differ', 'expense report', 'P&L', 'journal', 'why']));
   (rec.lines || []).forEach((l) => out.push(C.csvLine([l.label_en, l.report, l.pl, l.journal, l.why_en])));
   C.download(`expense-register-${D.from}_${D.to}.csv`, C.csvFile(out)); C.expDone();

@@ -1,4 +1,4 @@
-// RPT-C2 web: order and delivery reports (#/orderreports), customer insight (#/custinsight), staff reports (#/staffreports), the capture fields in the Online orders screen, the 14-1 cashier box, the production sheet fields.
+// RPT-C2 web: order and delivery reports (#/orderreports), customer insight (#/custinsight), staff reports (#/staffreports), the capture fields in the Online orders screen, the 06-1 cashier box, the production sheet fields.
 // Run: node tests/web/c2_test.js <abs tests/web dir>   (360 px phone, mocked RPCs; the real script tags are in web/index.html)
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
@@ -70,7 +70,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await noOverflow(p, 'orderreports start');
   await show(p);
   let t = await txt(p);
-  ok(/App order/.test(t) && /Paper 20-1/.test(t) && /Paper 20-6 line/.test(t), 'register shows the three sources apart');
+  ok(/App order/.test(t) && /Paper 20-1/.test(t) && /Paper 23-1 line/.test(t), 'register shows the three sources apart');
   ok(/never added together/.test(t), 'note: sources are not merged');
   ok(await p.locator('.c2-tbl tbody tr').count() === 4, 'register has 4 rows');
   ok(/Refund NOT recorded/.test(t) && /Paid into the sale/.test(t), 'advance states are shown in words');
@@ -114,7 +114,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---- staff reports ----
   p = await open('#/staffreports'); await show(p); t = await txt(p);
-  ok(/Paper 02-1 sheets \(not added\)/.test(t) && /test_emp_2/.test(t), 'attendance tab: paper sheets counted not added; a person with no record is listed');
+  ok(/Paper 19-1 sheets \(not added\)/.test(t) && /test_emp_2/.test(t), 'attendance tab: paper sheets counted not added; a person with no record is listed');
   await noOverflow(p, 'attendance at 360px');
   await p.click('[data-act=sr_tab][data-v=variance]'); await show(p); t = await txt(p);
   ok(/Days without a shift/.test(t) && /-3h 20m/.test(t), 'variance tab shows -200 minutes as -3h 20m');
@@ -143,9 +143,9 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(await p.locator('#c2_cw').count() === 0, 'without the server part the old order form is unchanged');
   await p.close();
 
-  // ---- 14-1 cashier box and the ia entries ----
+  // ---- 06-1 cashier box and the ia entries ----
   p = await open('#/home'); await wait(p, 400);
-  ok(await p.evaluate(() => (window.BOS.forms['14-1'].head || []).some((f) => f.id === 'cashier' && f.type === 'staff')) && await p.evaluate(() => (window.BOS.forms['14-1'].head || []).some((f) => f.id === 'shift')), 'form 14-1 has a Cashier box beside the existing shift box');
+  ok(await p.evaluate(() => (window.BOS.forms['06-1'].head || []).some((f) => f.id === 'cashier' && f.type === 'staff')) && await p.evaluate(() => (window.BOS.forms['06-1'].head || []).some((f) => f.id === 'shift')), 'form 06-1 has a Cashier box beside the existing shift box');
   ok(await p.evaluate(() => ['orderreports', 'custinsight', 'staffreports'].every((r) => window.BOS.IA.some((x) => x.route === r))), 'the three screens are registered once in ia.js');
   ok(await p.evaluate(() => ['c2_orders', 'c2_cust', 'c2_staff'].every((k) => (window.BOS.reportLinks || []).some((l) => l.key === k))), 'the three screens are linked from the Reports hub list');
   await p.close();

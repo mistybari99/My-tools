@@ -1,4 +1,4 @@
-// B2: blind stock count (04-3) and GRN (04-1) UI. The mock answers stock_blind_active / count_lines_state / count_lines_seal.
+// B2: blind stock count (36-1) and GRN (13-1) UI. The mock answers stock_blind_active / count_lines_state / count_lines_seal.
 // Run: node blindstock_test.js <abs tests/web dir>
 const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
@@ -32,9 +32,9 @@ const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.s
   const calls = (p, fn) => p.evaluate((f) => (window.__AC7 || []).filter((c) => c[0] === f).map((c) => c[1]), fn);
   const openAll = (p) => p.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); });
 
-  // 04-3 blind ON
+  // 36-1 blind ON
   let p = await open({ on: true, sealed: false }, '#/entry/new/04-3/1'); await openAll(p);
-  ok((await calls(p, 'stock_blind_active')).length === 1, '04-3 asks the server');
+  ok((await calls(p, 'stock_blind_active')).length === 1, '36-1 asks the server');
   ok(await p.locator('[data-p="rows.0.count"]').count() === 1, 'count field present');
   await p.fill('[data-p="rows.0.count"]', '7'); await wait(p, 200);
   ok(!(await p.locator('[data-p="rows.0.book"]').first().isVisible()), 'book field is not on the screen while blind');
@@ -48,12 +48,12 @@ const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.s
   ok(!(await p.locator('[data-p="rows.0.book"]').first().isVisible()), 'book still hidden after sealing (the system adds it at submit)');
   await p.screenshot({ path: SP + '/bs_043.png', fullPage: true });
 
-  // 04-3 blind OFF
+  // 36-1 blind OFF
   p = await open({ on: false }, '#/entry/new/04-3/1'); await openAll(p);
   await p.fill('[data-p="rows.0.count"]', '7'); await wait(p, 200);
   ok(await p.locator('[data-p="rows.0.book"]').first().isVisible() && await p.locator('[data-act=e_seal]').count() === 0, 'switch OFF: old behaviour (book field, no lock button)');
 
-  // 04-1 blind ON: memo hidden until counted are locked
+  // 13-1 blind ON: memo hidden until counted are locked
   p = await open({ on: true, sealed: false }, '#/entry/new/04-1/1'); await openAll(p);
   ok(await p.locator('[data-p="lines.0.counted"]').count() === 1 && !(await p.locator('[data-p="lines.0.memo"]').first().isVisible()), '04-1: memo hidden before the lock');
   await p.fill('[data-p="lines.0.counted"]', '10'); await p.click('[data-act=e_seal]'); await wait(p, 600);

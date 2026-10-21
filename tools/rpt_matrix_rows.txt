@@ -23,8 +23,8 @@
 2|Sales by payment method (cash / mobile / card / bank / due)|W|implemented|key:payment_modes,S1:rpt131_sales|sale_payments, sales.due_amount, sale_returns|received - refunded per mode, due on credit shown, collections apart|bank mode only via cheque clearing
 2|Sales by cashier / staff|W|incomplete|biz_staff,key:x5_staff_trend,S1:rpt131_sales|sales.created_staff|bills and value per staff|staff name is free text stamped at sale time
 2|Quick and unlisted sales|W|implemented|key:quick_unlisted|sales.quick|sales without item/cost|none
-2|Day close / shift (X/Z) report|W|incomplete|key:pos_day_close,S1:rpt131_cash_close|sales, sale_payments, entries 14-1|per shop-day tender totals vs sheet|counted cash comes from a typed paper form 14-1 (jsonb); no automatic day-end cash close (A4-G02)
-2|Cash short / over by outlet and day|W|incomplete|key:cash_short_over,S1:rpt131_cash_close|entries 14-1 flags, journal 5800|sum of flag amounts; S1 adds journal short account|depends on the daily sheet being submitted; empty = data needed
+2|Day close / shift (X/Z) report|W|incomplete|key:pos_day_close,S1:rpt131_cash_close|sales, sale_payments, entries 06-1|per shop-day tender totals vs sheet|counted cash comes from a typed paper form 06-1 (jsonb); no automatic day-end cash close (A4-G02)
+2|Cash short / over by outlet and day|W|incomplete|key:cash_short_over,S1:rpt131_cash_close|entries 06-1 flags, journal 5800|sum of flag amounts; S1 adds journal short account|depends on the daily sheet being submitted; empty = data needed
 2|Sales vs journal reconciliation (posted / unposted)|M|implemented|S1:rpt131_sales_recon|sales, journal_entries|per document status and amount tie-out|posting is batch (acct_post_pending); sales have no draft state
 2|Best customers / sales by customer|W|implemented|key:best_customers|sales.customer_id|top customers by value|customer must be linked to the sale
 2|Offline / late sales and re-dated sales|R|unavailable|record_sale2,pos_replay_log|sales.sold_at|-|A2-G10: sales older than 72 h are re-dated to now without a flag; no report exists
@@ -42,7 +42,7 @@
 3|Discount impact on margin|M|unavailable|discounts_report|-|-|not built
 3|Break-even and cost coverage|W|implemented|key:l5_breakeven|settings fixed_cost_month|sales needed to cover fixed cost|fixed cost setting must exist
 3|Contribution margin (fixed vs variable cost)|N|unavailable|profit_variable_heads|-|-|A3-G13 not supported
-4|Daily production and dispatch|W|unverified|key:f1_production,production_runs|entries 05-1 jsonb / production_runs|batches per product|jsonb extraction drift risk; no hand-number test found
+4|Daily production and dispatch|W|unverified|key:f1_production,production_runs|entries 12-1 jsonb / production_runs|batches per product|jsonb extraction drift risk; no hand-number test found
 4|Yield vs standard|W|unverified|key:f2_yield,production_variance116|production_runs|yield % vs recipe|packaging_on_actual_yield116 OFF by default
 4|Raw usage vs recipe|W|unverified|key:f3_raw_vs_recipe|entries 04-2/05-1|usage vs recipe qty|issue lines not structured (needs capture)
 4|Recipe book, versions and BOM listing|W|implemented|recipes,recipe_versions,recipe_lines,web:recipebook.js|recipe tables|versioned recipes|screen, not a report
@@ -58,7 +58,7 @@
 5|Stock balance and valuation per outlet|W|implemented|key:stock_balance,stock_valuation_by_category|stock_balance|qty x avg cost|cost only for cost-right users
 5|Stock reconciliation: opening + in - out = closing|W|implemented|stock_recon_statement,S1:rpt131_stock_recon,web:recon118.js|stock_ledger, stock_balance|per item and place with check and variance|A2-G1 PASS; S1 adds paging, search, issues-only and ledger drill
 5|Store ledger / stock movement by item|W|implemented|key:k3_store_ledger,stock_ledger_rows|stock_ledger|every movement|none
-5|Stock count variance|W|incomplete|key:k2_count_variance,stock_count_adjust|entries 04-3 + count_adjust ledger rows|book vs counted|04-3 count is not blind; counted values typed in jsonb
+5|Stock count variance|W|incomplete|key:k2_count_variance,stock_count_adjust|entries 36-1 + count_adjust ledger rows|book vs counted|36-1 count is not blind; counted values typed in jsonb
 5|Reorder and low stock|W|implemented|key:stock_low,reorder_report|items.min_stock|below minimum|needs min_stock set
 5|Dead / slow stock|W|implemented|key:item_slow|sales vs stock|no sales in window|none
 5|Transfers sent vs received|W|implemented|key:transfers_gap|stock_transfers|not received / short|none
@@ -79,7 +79,7 @@
 6|Wastage as % of production or sales|M|unavailable|S1:rpt131_wastage|-|derivable|no report
 6|Fridge temperature log|W|unverified|key:q1_fridge_temp|entries jsonb|out-of-range days|limits in location_settings; form data typed
 6|Hygiene and checklist compliance|W|unverified|key:q2_hygiene|entries jsonb|skipped steps|form data typed
-6|Complaints and return root causes|W|unverified|key:q3_complaints|entries 20-3|by cause|free-text causes
+6|Complaints and return root causes|W|unverified|key:q3_complaints|entries 32-1|by cause|free-text causes
 6|Batch traceability (batch to sale)|M|unavailable|stock_batches|batches|-|sale lines carry no batch id
 6|Freshness: made today vs sold today|N|unavailable|-|-|-|needs production date on finished goods
 6|Unsold leftover at close|N|unavailable|-|-|-|needs an end-of-day count of finished goods
@@ -87,10 +87,10 @@
 7|Purchases by supplier / item|W|unverified|key:purchases_by_supplier|purchase_bills + entries|per supplier|older sources partly jsonb
 7|Supplier payable ageing|W|incomplete|key:supplier_ageing,supplier_dues,S1:rpt131_ageing|_sup_open|age by bill date|bucket rule empty by default; S1 adds books tie
 7|Supplier ledger / statement|W|implemented|supplier_ledger,web:purchase.js|bills, payments|running balance|none
-7|Purchase rate trend per item|W|unverified|key:p2_rate_trend|entries 04-1 lines|rate over time|jsonb based
+7|Purchase rate trend per item|W|unverified|key:p2_rate_trend|entries 13-1 lines|rate over time|jsonb based
 7|Supplier scorecard|W|unverified|key:p4_supplier_score|entries|short/late|supplier is free text in older forms
 7|PO - GRN - bill match and open POs|W|unverified|key:p5_po_match,grn_pending_report|entries 06-3/04-1|match|GRN vs purchase both post purchase_in (double count risk)
-7|Purchases vs budget|W|unverified|key:p6_purchase_budget,budgets|budgets, entries 10-4|budget vs spend|budgets only for some heads
+7|Purchases vs budget|W|unverified|key:p6_purchase_budget,budgets|budgets, entries 04-1|budget vs spend|budgets only for some heads
 7|Bills without payment|W|implemented|bill_pay_record,web:purchase.js|purchase_bills|unpaid bills|none
 7|Landed cost on purchases|W|incomplete|landed_costs,landed_cost_lines|landed tables|freight/duty allocation|OFF by default
 7|Purchase returns and supplier refunds|M|unavailable|supplier_refunds,purchase_bills kind return|tables|-|no report
@@ -98,7 +98,7 @@
 7|Supplier payments register|M|unavailable|supplier_payments|table|-|no report
 8|Day book (cash / bank / wallet in and out)|W|incomplete|day_book,web:daybook.js|journal-like lines|opening + movements = closing|daybook_enabled rule and opening balances; internal transfers excluded
 8|Daily cash flow|W|unverified|key:w1_cash_flow|sales + entries jsonb|in - out|jsonb forms
-8|Handover vs hub count|W|unverified|key:w2_handover_vs_hub|entries 10-1|handover diff|typed form
+8|Handover vs hub count|W|unverified|key:w2_handover_vs_hub|entries 03-1|handover diff|typed form
 8|Digital wallet reconciliation|W|incomplete|key:wallet_recon,payment_recon|sale_payments|app vs statement|statement lines must be imported
 8|Bank reconciliation|W|implemented|bank_recon_report,bank_recon_match|bank_statement_lines|matched vs open|statement import is manual
 8|Trial balance|W|implemented|acct_trial_balance,web:accounts.js|journal|debit = credit|accounting_on
@@ -106,9 +106,9 @@
 8|Balance sheet|W|implemented|acct_balance_sheet|journal|assets = liabilities + equity|per-business books are Stage C2
 8|Account ledger / party ledger|W|implemented|acct_ledger,acct_party_ledger|journal|per account|none
 8|Day book vs journal|W|incomplete|daybook_vs_journal|day book vs journal|difference|A4-G05 PASS only with daybook_align_mode ON
-8|Cash book and day-close variance per outlet|M|implemented|S1:rpt131_cash_close|journal cash account, sales, sheets 14-1|opening + in - out = closing; register vs books; sheet short/over|counted cash needs the paper sheet; A4-G02 automatic close not built
+8|Cash book and day-close variance per outlet|M|implemented|S1:rpt131_cash_close|journal cash account, sales, sheets 06-1|opening + in - out = closing; register vs books; sheet short/over|counted cash needs the paper sheet; A4-G02 automatic close not built
 8|Card settlement vs card sales|R|unavailable|card_settlements|card_settlements|-|A4-G06 FAIL: not matched, over-settlement accepted
-8|Expenses by head|W|unverified|key:expense_by_head,key:e2_expense_trend|entries 10-2 jsonb|per head|jsonb; expense heads mapping A3-G14
+8|Expenses by head|W|unverified|key:expense_by_head,key:e2_expense_trend|entries 11-1 jsonb|per head|jsonb; expense heads mapping A3-G14
 8|VAT report|W|incomplete|vat_report|sales|VAT lines|VAT stays OFF pending adviser rate
 8|Fixed assets register and depreciation|W|implemented|fa_register,fa_schedule|fa_assets|NBV schedule|none
 9|Customer dues|W|implemented|customer_dues,web:dues.js|sales, payments|balance per customer|see A4-G03
@@ -124,7 +124,7 @@
 9|Tier usage|W|implemented|tier_usage_report|sale_tier_use|usage by tier|none
 10|Attendance summary|W|implemented|key:attendance_summary,web:attendance.js|attendance_days|present/absent|devices / punches
 10|Attendance and overtime|W|unverified|attendance_days|attendance|OT hours|forms
-10|Payroll and advances|W|incomplete|salary_report,payroll_runs,key:t3_payroll|payroll_lines|net pay|owner/salary_view only; sheet 02-2 vs app (A3-G2)
+10|Payroll and advances|W|incomplete|salary_report,payroll_runs,key:t3_payroll|payroll_lines|net pay|owner/salary_view only; sheet 21-1 vs app (A3-G2)
 10|Staff cost / sales %|W|unverified|key:t4_staff_cost_ratio|payroll + sales|ratio|salary secret: owner only
 10|Best employee / staff indicators|W|implemented|biz_staff,key:x5_staff_trend|sales|per staff|none
 10|Staff indicators over time|W|implemented|key:x5_staff_trend|sales|monthly|none
@@ -145,7 +145,7 @@
 11|Orders by channel|M|unavailable|sales_channels|sales_channels|-|no report
 11|Duplicate order flags|M|unavailable|order_dup_flags|flags|-|no report
 11|Pre-order production planning (bake list)|N|unavailable|-|-|-|needs orders with due dates
-12|Marketing spend vs monthly limit|W|unverified|key:e4_marketing_limit|entries 18-1|spend vs limit|jsonb
+12|Marketing spend vs monthly limit|W|unverified|key:e4_marketing_limit|entries 17-1|spend vs limit|jsonb
 12|Marketing spend vs sales|W|unverified|key:m2_marketing_vs_sales|entries + sales|same days|no causal claim
 12|Discounts given|W|implemented|key:discounts|sales|value|none
 12|Promotion / campaign performance|N|unavailable|-|-|-|no campaign table

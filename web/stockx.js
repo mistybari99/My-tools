@@ -182,7 +182,7 @@ async function exportCsv() {
 /* ---------- batch capture ---------- */
 async function addBatchSheet() {
   const l = loc();
-  const [bills, grns] = await Promise.all([sb.rpc('purchase_list', { p_loc: l, p_status: 'posted' }), sb.from('entries').select('id,entry_date,data,status').eq('form_code', '04-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).limit(30)]);
+  const [bills, grns] = await Promise.all([sb.rpc('purchase_list', { p_loc: l, p_status: 'posted' }), sb.from('entries').select('id,entry_date,data,status').eq('form_code', '13-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).limit(30)]);
   const opts = (bills.data || []).filter((b) => b.kind === 'bill').map((b) => `<option value="purchase:${esc(b.id)}">${esc(b.bill_no || '')} · ${esc(b.supplier_name || '')} · ${esc(b.bill_date)}</option>`)
     .concat((grns.data || []).map((g) => `<option value="grn:${esc(g.id)}">GRN ${esc(g.entry_date)} · ${esc((g.data && g.data.supplier) || '')}</option>`)).join('');
   openSheet(`<h3>${esc(T('addB'))}</h3><div class="stack"><label>${esc(T('src'))} <select id="sx_src" data-sx="srcpick"><option value="">${esc(T('pick'))}</option>${opts}</select></label>
@@ -204,7 +204,7 @@ async function pickSource(sel) {
 async function qcSheet() {
   const [cl, runs, bills, grns] = await Promise.all([sb.from('option_lists').select('value_code,label_bn,label_mix,label_en,sort').eq('list_code', 'qc_checks').eq('active', true).order('sort'),
     sb.from('production_runs').select('id,made_at,note').order('made_at', { ascending: false }).limit(20), sb.rpc('purchase_list', { p_loc: loc(), p_status: 'posted' }),
-    sb.from('entries').select('id,entry_date,data').eq('form_code', '04-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).limit(20)]);
+    sb.from('entries').select('id,entry_date,data').eq('form_code', '13-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).limit(20)]);
   const src = (D.qcKind === 'production' ? (runs.data || []).map((r) => `<option value="${esc(r.id)}">${esc(String(r.made_at).slice(0, 10))} ${esc(r.note || '')}</option>`)
     : (bills.data || []).filter((b) => b.kind === 'bill').map((b) => `<option value="${esc(b.id)}">${esc(b.bill_no || '')} · ${esc(b.supplier_name || '')}</option>`).concat((grns.data || []).map((g) => `<option value="${esc(g.id)}">GRN ${esc(g.entry_date)}</option>`))).join('');
   openSheet(`<h3>${esc(T('qcNew'))}</h3><div class="stack"><label>${esc(T('qcKind'))} <select id="sx_qk" data-sx="qkind"><option value="grn" ${D.qcKind === 'grn' ? 'selected' : ''}>${esc(T('kGrn'))}</option><option value="production" ${D.qcKind === 'production' ? 'selected' : ''}>${esc(T('kProd'))}</option></select></label>

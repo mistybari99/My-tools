@@ -9,7 +9,7 @@ No existing file was edited. Paste order: after phase87 and after every other Wa
 | Function | Marker | Phase | Change |
 |---|---|---|---|
 | `_p27_pl(date,date,int[])` | bos92 | 92 | one more `union all` in the expenses: `select x.m, x.loc, x.amt from public._w1d_pl_extra(d1, d2, locs) x` (zero rows while `profit_one_number_on` is off) |
-| `_p27_pl` | bos93 | 93 | 10-2 status test becomes `public._w1d_exp_status_ok(e.status, 'pl')`; salary: the 02-2 sheet is the fallback only where no counted run exists (setting `report_salary_source`), runs are read when accrual is on OR the source is `app_first` |
+| `_p27_pl` | bos93 | 93 | 11-1 status test becomes `public._w1d_exp_status_ok(e.status, 'pl')`; salary: the 21-1 sheet is the fallback only where no counted run exists (setting `report_salary_source`), runs are read when accrual is on OR the source is `app_first` |
 | `partner_calculate(bigint,date,date,jsonb)` | bos92 | 92 | variable `lj`; ledger source (only master ON + `profit_source = ledger`); returns `profit_basis` (stored in `partner_settlements.calc`) |
 | `c_partner_month_split(date)` | bos92 | 92 | the preview base uses the same management profit as the settlement while the master is ON and the source is management; basis text |
 | `report_run2_core(...)` | bos93 | 93 | `expense_by_head`: status rule, shadow vouchers out and quick expenses in while `report_expense_parity_on` |
@@ -30,12 +30,12 @@ select public._w1d_hooks_apply();   -- day book and journal use the same voucher
 
 | Function | Old text | New text |
 |---|---|---|
-| `_daybook_lines(int[],int[],date,date)` | `e.form_code = '10-2' and e.status in ('submitted', 'approved') and not public.is_shadow('entries', e.id::text) /* bos50 */ and e.location_id = any (p_locs)` | `e.form_code = '10-2' and public._w1d_exp_status_ok(e.status, 'daybook') /* bos93 */ and not public.is_shadow('entries', e.id::text) /* bos50 */ and e.location_id = any (p_locs)` |
-| `_acct_docs(date)` (two sites, both replaced) | `e.form_code = '10-2' and e.status = 'approved' and not public.is_shadow('entries', e.id::text) /* bos50 */` | `e.form_code = '10-2' and public._w1d_exp_status_ok(e.status, 'journal') /* bos93 */ and not public.is_shadow('entries', e.id::text) /* bos50 */` |
+| `_daybook_lines(int[],int[],date,date)` | `e.form_code = '11-1' and e.status in ('submitted', 'approved') and not public.is_shadow('entries', e.id::text) /* bos50 */ and e.location_id = any (p_locs)` | `e.form_code = '11-1' and public._w1d_exp_status_ok(e.status, 'daybook') /* bos93 */ and not public.is_shadow('entries', e.id::text) /* bos50 */ and e.location_id = any (p_locs)` |
+| `_acct_docs(date)` (two sites, both replaced) | `e.form_code = '11-1' and e.status = 'approved' and not public.is_shadow('entries', e.id::text) /* bos50 */` | `e.form_code = '11-1' and public._w1d_exp_status_ok(e.status, 'journal') /* bos93 */ and not public.is_shadow('entries', e.id::text) /* bos50 */` |
 
 At the default `expense_count_on = as_today` the function answers exactly what those two sites did before (day book: submitted + approved, journal: approved only), proved by `w1d_before_after.sh` (hooks applied, 21 snapshots identical).
 Without the hook, `expense_count_on = approved | submitted` changes only the P&L, E2, E3 and the expense report; the day book and the journal keep their own rule and `report_parity` shows the difference.
-Re-paste hazard: re-pasting phase 13, 23, 27, 44, 50, 52, 72, 79, 82, 85, 86 or 87 removes the markers: paste 92 and 93 again and call the hook again. If another phase rewrites the two 10-2 lines the hook stops with `bos93 patch site not found` (it never half-patches).
+Re-paste hazard: re-pasting phase 13, 23, 27, 44, 50, 52, 72, 79, 82, 85, 86 or 87 removes the markers: paste 92 and 93 again and call the hook again. If another phase rewrites the two 11-1 lines the hook stops with `bos93 patch site not found` (it never half-patches).
 
 ## 3. Web registration (web/ia.js and web/index.html are the integrator's)
 
@@ -86,7 +86,7 @@ wastage = stock-ledger cost of `wastage` rows (cost 0 or empty = unknown, not gu
 ## 8. Not done, not confirmed
 
 - UNTESTED: the real integrator re-patch phase (the hook was tested by calling `_w1d_hooks_apply()` on a database through 87, not inside a phase 99); the screen on a real phone and against the real server; `#/profitcheck` in `ia_test`, nav, nav2, control, favsync and settings2 (the `rec` line is not added by this package); behaviour with a salary run that has advance recovery in `report_parity` beyond the unit fixture (no recovery).
-- Not done: `salary_report` and `_r3q_t3_payroll` still read 02-2 sheets only; the brand filter of the report filters (`_r2_locs`) uses today's map; the ledger source feeds partner shares only (branch reports L1/L3 stay management); L1/L3 do not show the extra rows as separate lines (they are inside `expenses`; `profit_recon` and the screen show them by cause); count surplus is not valued; `profit_recon` needs the journal for the ledger side.
+- Not done: `salary_report` and `_r3q_t3_payroll` still read 21-1 sheets only; the brand filter of the report filters (`_r2_locs`) uses today's map; the ledger source feeds partner shares only (branch reports L1/L3 stay management); L1/L3 do not show the extra rows as separate lines (they are inside `expenses`; `profit_recon` and the screen show them by cause); count surplus is not valued; `profit_recon` needs the journal for the ledger side.
 - OD-8 (owner decision): when to switch `profit_one_number_on` ON, from which date (`profit_losses_from`), and when to choose `profit_source = ledger` (plan: after phase 98 posts daily and two clean months agree).
 
 ## 9. BUILD-LOG entry for the integrator to paste (rule 16)

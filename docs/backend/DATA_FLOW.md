@@ -33,10 +33,10 @@ sequenceDiagram
 * A purchase **return** posts stock out at the *current average cost* (`purchase_return`); the difference to the supplier-credit price goes to `purchase_variance` (rule `acct_purchase_variance`, phase 85).
 * Void of a posted bill is governed by `purchase_void_guard` off / warn / refuse and `purchase_void_payments` (phase 82).
 
-### 1.1 GRN (form 04-1) vs purchase page - count once
+### 1.1 GRN (form 13-1) vs purchase page - count once
 ```mermaid
 sequenceDiagram
-  participant F as form 04-1 (entries)
+  participant F as form 13-1 (entries)
   participant T as trigger entry_post_ledger (phase20)
   participant R as rule grn_receipt_source (phase23)
   participant SP as stock_post
@@ -75,7 +75,7 @@ sequenceDiagram
 * If any ingredient cost is unknown (NULL or 0, and not flagged free by `item_cost_free_set`) the finished good has **no cost** and the document waits as `cost_missing` (see TROUBLESHOOTING).
 * `production_void(run, note)` (phase 23) reverses the ingredient-out and finished-in ledger rows.
 * A direct "production in" without a recipe is `stock_production_in` (phase 10); its cost is typed, with a reason when `production_manual_needs_reason`; booking it is the switch `acct_manual_prod_in103` (default OFF).
-* Paper path: form 05-1 is a locked shadow of the run (domain `production`).
+* Paper path: form 12-1 is a locked shadow of the run (domain `production`).
 
 ## 3. Sale -> stock out -> COGS -> GL  (`record_sale2`, trigger `sales_stock_out`, `_sale_stock_out`)
 
@@ -144,7 +144,7 @@ sequenceDiagram
   C->>J: Dr bank / Dr bank charges / Cr card receivable   (one entry, unique source)
   U->>C: card_settle_void -> counter entry
 ```
-Sales paid by card sit in the card receivable (`pay_card`); nothing is auto-settled. Expense vouchers (10-2) can credit bank/mobile/card through `data.pay_mode` (no value = cash).
+Sales paid by card sit in the card receivable (`pay_card`); nothing is auto-settled. Expense vouchers (11-1) can credit bank/mobile/card through `data.pay_mode` (no value = cash).
 
 ## 7. Online order, inbox, Telegram intake  (`phase61`, `phase76`, `phase80`, `phase86`, `phase94`, `phase99`)
 

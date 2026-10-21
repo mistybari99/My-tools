@@ -25,7 +25,7 @@ const ERRS = [
   [/function .* does not exist|schema cache|Could not find the function|PGRST202/i, L('এই অংশের ডেটাবেস এখনও চালু হয়নি', 'The database part is not installed yet', 'Database অংশ এখনও চালু হয়নি')],
   [/not allowed for this location/i, L('এই জায়গার জন্য অনুমতি নেই', 'Not allowed for this place', 'এই place-এর জন্য permission নেই')],
   [/not_fully_covered/i, L('ভাউচারের কিছু লাইনের সাথে মিলে এমন quick খরচ নেই — লিংক হবে না', 'Some voucher lines have no matching quick expense - cannot link', 'Voucher-এর কিছু line-এর সাথে মিলে এমন quick expense নেই — link হবে না')],
-  [/not_a_voucher/i, L('এটা 10-2 ভাউচার নয়', 'This is not a 10-2 voucher', 'এটা 10-2 voucher নয়')],
+  [/not_a_voucher/i, L('এটা 11-1 ভাউচার নয়', 'This is not a 11-1 voucher', 'এটা 11-1 voucher নয়')],
   [/entry_is_a_primary/i, L('এই ভাউচার আগেই অন্য রেকর্ডের মূল — লিংক করা যায় না', 'This voucher is already the main record of another link', 'এই voucher আগেই অন্য record-এর primary — link করা যায় না')],
   [/bad_status/i, L('বর্তমান অবস্থায় এটা করা যায় না', 'Not possible in the current status', 'বর্তমান status-এ এটা করা যায় না')],
   [/note_needed|reason_required/i, L('কারণ লিখতে হবে (কমপক্ষে ৩ অক্ষর)', 'Write a reason (at least 3 letters)', 'কারণ লিখতে হবে (কমপক্ষে ৩ অক্ষর)')],

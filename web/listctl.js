@@ -7,7 +7,7 @@
    If phase15 is not installed (list_defs missing) every helper falls back to the plain old behaviour.
    API (window.BOS.listctl, plus B.listPick):
      B.listPick(code, opts)  -> { id, html, value(), other(), set(v) }   opts: id, cur, fallback, otherValue, otherBlank, ctx, onChange(value, info), cls
-     B.listctl.opts(code, fallback)  -> () => [[value,label]...] (+ the two special choices) for entry.js SEL fields (forms 10-2, 18-1 ...)
+     B.listctl.opts(code, fallback)  -> () => [[value,label]...] (+ the two special choices) for entry.js SEL fields (forms 11-1, 17-1 ...)
      B.listctl.enhance(selectOrSelector, code, cfg)  adds the special choices + behaviour to a <select> that a screen already drew
      B.listctl.pairs(code, pairs, cfg)  adds the special choices to an [[value,label]] array before it is turned into <option>s
    The special choices are the values "__add__:<code>" and "__other__:<code>"; one capturing change listener handles them for every select, so a screen only has

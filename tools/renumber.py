@@ -50,7 +50,11 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAP_PATH = os.path.join(ROOT, 'tools', 'numbering_map.json')
 MARKER_REL = 'tools/numbering_applied.json'
-SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json', MARKER_REL,
+BANGLA_MARKER_REL = 'tools/numbering_applied_bangla.json'
+BN_DIGITS = '০১২৩৪৫৬৭৮৯'   # Bangla digits 0-9
+BN_TO_ASCII = str.maketrans(BN_DIGITS, '0123456789')
+BN_FORM_RE = re.compile('(?<![0-9' + BN_DIGITS + 'A-Za-z_.:/-])([' + BN_DIGITS + ']{2}-[' + BN_DIGITS + '])(?![0-9' + BN_DIGITS + 'A-Za-z_.:/-])')
+SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json', MARKER_REL, BANGLA_MARKER_REL,
               'tests/py/test_renumber_forms.py'}   # the tool's own test keeps the old codes it asserts on
 FIRST_TOUCHED = 479          # phases below this number are never renamed or edited
 PHASE_RANGE = (479, 498)     # the sequence the map must land in
@@ -207,17 +211,27 @@ def phase_state(p):
     return 'collision', old_files, new_files
 
 
-def transform(body, phase_map, form_map=None):
-    """Returns (new_body, kinds). Every edit is computed on the original text and applied together."""
+def to_bangla(code):
+    return code.translate(str.maketrans('0123456789', BN_DIGITS))
+
+
+def transform(body, phase_map, form_map=None, digits='all'):
+    """Returns (new_body, kinds). Every edit is computed on the original text and applied together.
+    digits: 'all' (ASCII and Bangla-digit codes), 'bangla' (only Bangla-digit codes, for the second apply)."""
     edits = []
     for s, e, n in phase_spans(body):
-        if n in phase_map:
+        if n in phase_map and digits == 'all':
             edits.append((s, e, f'{phase_map[n]:03d}', 'phase'))
-    if form_map:
+    if form_map and digits == 'all':
         for m in FORM_RE.finditer(body):
             code = m.group(0)
             if code in form_map:
                 edits.append((m.start(), m.end(), form_map[code], 'form'))
+    if form_map:
+        for m in BN_FORM_RE.finditer(body):
+            code = m.group(1).translate(BN_TO_ASCII)
+            if code in form_map:
+                edits.append((m.start(1), m.end(1), to_bangla(form_map[code]), 'form'))
     if not edits:
         return body, []
     kinds = [k for *_, k in edits]
@@ -250,7 +264,7 @@ def unmapped_row_codes(lines, known):
     return bad
 
 
-def scan(phase_map, form_map):
+def scan(phase_map, form_map, digits='all'):
     """Returns (changes, texts, frozen, unmapped). One pass per file, so every edit is computed on the
     original text. changes: dicts with path, line, old, new, kinds, comment, blocked.
     frozen: (path, line, token) for form codes that would change in a frozen path (never changed).
@@ -274,10 +288,10 @@ def scan(phase_map, form_map):
         for i, raw in enumerate(raw_lines, 1):
             body = raw.rstrip('\r\n')
             phase_here = phase_map if kind and not (kind == 'info_src' and not SRC_RE.match(body)) else {}
-            if fstat == 'frozen':
+            if fstat == 'frozen' and digits == 'all':
                 frozen.extend((rel, i, m.group(0)) for m in FORM_RE.finditer(body) if m.group(0) in form_map)
             form_here = form_map if fstat == 'change' else None
-            new_body, kinds = transform(body, phase_here, form_here)
+            new_body, kinds = transform(body, phase_here, form_here, digits)
             if new_body == body:
                 continue
             is_comment = kind == 'sql' and body.lstrip().startswith('--')
@@ -309,14 +323,14 @@ def ambiguous_refs(ambig):
     return per_file
 
 
-def marker_problem(root=ROOT):
+def marker_problem(root=ROOT, rel=MARKER_REL):
     """A message when the applied marker exists (a second apply would shift the codes again), else None."""
-    path = os.path.join(root, MARKER_REL)
+    path = os.path.join(root, rel)
     if not os.path.exists(path):
         return None
     with open(path, encoding='utf-8') as fh:
         m = json.load(fh)
-    return (f"applied marker {MARKER_REL} exists (applied {m.get('applied_on', '?')}, "
+    return (f"applied marker {rel} exists (applied {m.get('applied_on', '?')}, "
             f"mapping {str(m.get('mapping_sha256', ''))[:12]}): the form codes are already renamed; "
             "a second apply would shift them again")
 
@@ -336,6 +350,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--apply', action='store_true', help='write the changes (default: dry run only)')
     ap.add_argument('--show-lines', action='store_true', help='print every changed line (default: per-file counts)')
+    ap.add_argument('--bangla-digits', action='store_true',
+                    help='second apply: only the form codes written with Bangla digits (run after the ASCII apply; own marker)')
     args = ap.parse_args()
 
     data, problems = load_map()
@@ -360,7 +376,14 @@ def main():
     form_map = form_map_of(data)
     DATA = data
     approved = bool(data.get('form_groups_approved', False))
-    marker = marker_problem()
+    digits = 'all'
+    if args.bangla_digits:
+        digits = 'bangla'
+        phase_map = {}
+        marker = marker_problem(ROOT, BANGLA_MARKER_REL) or (None if marker_problem() else
+                 'the ASCII form-code apply has not run (run it first: python3 tools/renumber.py --apply)')
+    else:
+        marker = marker_problem()
 
     print(f"renumber: map {os.path.relpath(MAP_PATH, ROOT)}  mode={'APPLY' if args.apply else 'DRY RUN'}")
     print('\nPhase files')
@@ -377,7 +400,7 @@ def main():
             print(f"  COLLISION {label}: old {', '.join(old_files)}, new {', '.join(new_files)}")
     print(f"  pending renames: {len(pending_renames)}")
 
-    changes, texts, frozen, unmapped = scan(phase_map, form_map)
+    changes, texts, frozen, unmapped = scan(phase_map, form_map, digits)
     phase_changes = [c for c in changes if 'phase' in c['kinds']]
     form_changes = [c for c in changes if 'form' in c['kinds']]
     blocked_phase = [c for c in phase_changes if c['blocked']]
@@ -482,8 +505,8 @@ def main():
                 os.rename(src, dst)
     if form_changes:
         marker_data = {'applied_on': datetime.date.today().isoformat(), 'mapping_sha256': mapping_sha(data),
-                       'form_code_lines': len(form_changes), 'files': len(texts)}
-        with open(os.path.join(ROOT, MARKER_REL), 'w', encoding='utf-8') as fh:
+                       'form_code_lines': len(form_changes), 'files': len(texts), 'digits': digits}
+        with open(os.path.join(ROOT, BANGLA_MARKER_REL if digits == 'bangla' else MARKER_REL), 'w', encoding='utf-8') as fh:
             json.dump(marker_data, fh, indent=2)
             fh.write('\n')
     print(f"\nAPPLIED: {len(texts)} files written, {len(pending_renames)} phase renames, "

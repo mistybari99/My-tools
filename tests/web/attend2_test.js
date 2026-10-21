@@ -50,7 +50,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const data = C.mk(base, {}); const T = data.tables;
     T.att_evidence_reg = [];
-    T.entries = [{ id: 'q1', form_code: '10-2', serial: 1, entry_date: '2026-10-12', status: 'submitted', location_id: 1, data: {}, flags: [] }, { id: 'w1', form_code: '02-2', serial: 4, entry_date: '2026-10-11', status: 'draft', location_id: 1, data: {}, flags: [] }];
+    T.entries = [{ id: 'q1', form_code: '11-1', serial: 1, entry_date: '2026-10-12', status: 'submitted', location_id: 1, data: {}, flags: [] }, { id: 'w1', form_code: '21-1', serial: 4, entry_date: '2026-10-11', status: 'draft', location_id: 1, data: {}, flags: [] }];
     const emp = (id, n, bn, en, st) => ({ employee_id: id, employee_no: n, name_bn: bn, name_en: en, status: st || 'absent', rest_minutes: null, mark_source: null, pending: false, is_me: false, person_locked: false, role: 'salesperson', evidence: [] });
     const A2 = {
       me: o.me || { employee: true, employee_id: 'e5', name_bn: 'সালমা', name_en: 'TestM', can_punch: true, state: 'ok', evidence: [], last_punch: null, geo_check_on: true },
@@ -60,8 +60,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
         forms: [{ entry_id: 'f1', serial: 1, status: 'submitted', is_shadow: true }, { entry_id: 'f2', serial: 2, status: 'submitted', is_shadow: false }],
         rows: [{ employee_id: 'e1', name_bn: 'করিম', name_en: 'TestF', employee_no: 'E01', mismatch: true, device: { present: 2, late: 0, absent: 1, ot_hours: 2 }, form: { present: 5, late: 0, absent: 0, ot_hours: 0 } },
                { employee_id: 'e5', name_bn: 'সালমা', name_en: 'TestM', employee_no: 'E05', mismatch: false, device: { present: 3, late: 1, absent: 0, ot_hours: 0 }, form: { present: 3, late: 1, absent: 0, ot_hours: 0 } }] },
-      eq: { q1: { form: '10-2', supported: true, ok: false, recomputed: { total: 500, imprest_diff: -200 }, mismatches: [{ code: 'imprest_mismatch', kind: 'flag_missing', recomputed: -200, stored: null }], observations: [] },
-            w1: { form: '02-2', supported: true, ok: true, recomputed: { t_net: 1600 }, mismatches: [], observations: [{ code: 'receipts_vs_net', receipts_total: 2100, sheet_net: 1600 }] } } };
+      eq: { q1: { form: '11-1', supported: true, ok: false, recomputed: { total: 500, imprest_diff: -200 }, mismatches: [{ code: 'imprest_mismatch', kind: 'flag_missing', recomputed: -200, stored: null }], observations: [] },
+            w1: { form: '21-1', supported: true, ok: true, recomputed: { t_net: 1600 }, mismatches: [], observations: [{ code: 'receipts_vs_net', receipts_total: 2100, sheet_net: 1600 }] } } };
     const m0 = o.staff ? { grants: [], ctx: { is_owner: false, roles: ['salesperson'], locations: [1] } } : {};
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__M0=${JSON.stringify(m0)};window.__OWNER=${o.staff ? 'false' : 'true'};window.__A20=${JSON.stringify(A2)};try{localStorage.setItem('bos_lang','en')}catch(e){}`);
     await p.goto(`http://localhost:${PORT}/` + hash); await p.waitForTimeout(1500); return p;
@@ -124,7 +124,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.evaluate(() => { window.__A2.calls.length = 0; window.BOS.rpcq.flush(); }); await wait(p, 300); ok((await calls(p, 'attendance_mark_others')).length === 0, 'refused items are not resent by themselves');
   await p.evaluate(() => { window.BOS.rpcq.discard('K-BAD'); });
   // saveEntry helper keeps the form client id in the meta
-  const se = await p.evaluate(() => { const id = window.BOS.rpcq.saveEntry({ p_id: null, p_form: '10-2', p_loc: 1, p_date: '2026-10-13', p_data: {}, p_flags: [] }, { client_id: 'C-1' }); const it = window.BOS.rpcq.list().find((x) => x.id === 'C-1'); const r = { id, fn: it && it.fn, cid: it && it.args.p_meta.client_id }; window.BOS.rpcq.discard('C-1'); return r; });
+  const se = await p.evaluate(() => { const id = window.BOS.rpcq.saveEntry({ p_id: null, p_form: '11-1', p_loc: 1, p_date: '2026-10-13', p_data: {}, p_flags: [] }, { client_id: 'C-1' }); const it = window.BOS.rpcq.list().find((x) => x.id === 'C-1'); const r = { id, fn: it && it.fn, cid: it && it.args.p_meta.client_id }; window.BOS.rpcq.discard('C-1'); return r; });
   ok(se.id === 'C-1' && se.fn === 'save_entry' && se.cid === 'C-1', 'saveEntry queues save_entry with its client_id meta');
   await p.evaluate(() => { window.__A2.err.attendance_mark_others = 'cannot_mark_self'; });
   await p.click('[data-act=a2_mark][data-v=e1]'); await wait(p, 300); await p.fill('#a2_r', 'again'); await p.click('[data-act=a2_marksave]'); await wait(p, 500);
@@ -150,7 +150,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---------- counted once ----------
   await p.click('[data-act=a2_tab][data-v=count]'); await wait(p, 600);
-  t = await text(p); ok(/Attendance record/.test(t) && /Shadow copy \(locked\)/.test(t) && /Differs/.test(t) && /Matches/.test(t) && /14-1/.test(t), 'counted source, shadow chip, per-person difference, 14-1 note');
+  t = await text(p); ok(/Attendance record/.test(t) && /Shadow copy \(locked\)/.test(t) && /Differs/.test(t) && /Matches/.test(t) && /14-1/.test(t), 'counted source, shadow chip, per-person difference, 06-1 note');
   await p.click('[data-act=a2_link]'); await wait(p, 500); c = await calls(p, 'attendance_form_link_run'); ok(c.length === 1 && c[0].p_month.endsWith('-01'), 'link now');
   await noOverflow(p, 'count');
 

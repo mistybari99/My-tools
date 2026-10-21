@@ -144,7 +144,7 @@
 |---|---|---|---|
 | 60 | Home খুলুন। | যে সংখ্যা 0-এর বেশি ও মেনুতে খোলা, শুধু সেই chip। ট্যাপে ওই পর্দা খোলে। | Home |
 | 61 | `#/setupadvisor` > History > "Undo this apply" (owner)। | sheet-এ "এখন -> ফিরবে"। নিশ্চিত করলে নিয়ম আগের মানে। অন্য ব্যবহারকারীর বোতামই নেই। | sheet |
-| 62 | `#/landed` > bill বাছার sheet > "Add from a GRN" > Show GRNs। | GRN তালিকা (04-1 submitted/approved)। টিক দিলে bill যোগ হয়। বাঁধা না থাকলে `grn_not_linked`। | sheet |
+| 62 | `#/landed` > bill বাছার sheet > "Add from a GRN" > Show GRNs। | GRN তালিকা (13-1 submitted/approved)। টিক দিলে bill যোগ হয়। বাঁধা না থাকলে `grn_not_linked`। | sheet |
 | 63 | একটা ক্রয় bill খুলে Print / Send চাপুন। | Print dialog বা Share/Download। বিলে বিক্রির দাম নেই। DRAFT/VOID হলে লাল পটি। | sheet |
 | 64 | ওই sheet-এ WhatsApp বা SMS চাপুন। | ফোনের অ্যাপ খোলে, লেখা বসানো। Send আপনি চাপবেন। অ্যাপ নিজে পাঠায় না। | অ্যাপ |
 
@@ -166,11 +166,11 @@ Use only test names and `01XXXXXXXXX` numbers. Turn one switch ON, run its check
 |---|---|---|---|
 | 65 | `[period_lock_late_warn]` ON. Ask the developer to make one test document dated in a closed period, then run auto posting (`#/books85`, Auto posting tab). | The document is not booked. A yellow warning `late_docs_locked` appears. | Warnings list |
 | 66 | `[period_lock_owner_mode]` = warn. As owner, change one test document dated in a closed period. Change it again the same day. | The change goes through. One yellow `closed_period_owner` warning for that date. No second warning the same day. | Warnings list |
-| 67 | `[daybook_align_mode]` ON. Record one test 10-2 voucher paid by bank. Open the day book. | The day book shows the voucher as bank, not cash. | Day book row |
+| 67 | `[daybook_align_mode]` ON. Record one test 11-1 voucher paid by bank. Open the day book. | The day book shows the voucher as bank, not cash. | Day book row |
 | 68 | `[cost_share_prorate_mode]` ON. Open the shop P&L for today only, then for the full month. | Today's shared bill is a part of the month's bill (about 1/30 for a 30-day month). The full-month figure does not change. | P&L for both ranges |
 | 69 | `[items_net_of_returns]` ON and `[reports_net_of_returns]` ON. Open the top items report for a day with one test return. | The returned item shows less quantity and money for that day. | Top items before and after |
 | 70 | `[profit_truth_mode]` = on. Open the shop P&L and the dashboard "Net profit" tile. | Both show the same net profit figure. If a sale has unknown cost, it is shown apart and the figure is marked provisional. | P&L and tile |
-| 71 | `[drawer_short_post]` ON. Submit a test cash count (form 14-1) that is 50 short. Open the day book. Then submit a count with no difference. | The day book has one "Cash short / over" row of 50. The no-difference count adds no row. `#/accounts` still balanced. | Day book and `#/accounts` strip |
+| 71 | `[drawer_short_post]` ON. Submit a test cash count (form 06-1) that is 50 short. Open the day book. Then submit a count with no difference. | The day book has one "Cash short / over" row of 50. The no-difference count adds no row. `#/accounts` still balanced. | Day book and `#/accounts` strip |
 | 72 | `[dues_net_advance]` ON. Use a test customer whose bill was paid from advance. Open the dues list, then try to collect that bill again. | The bill is not in the dues list. A collection above what is still due is refused. | Dues list and refusal message |
 | 73 | `[bank_stmt_post_on]` ON and `[bank_recon_on]` ON. In bank reconciliation, take one unmatched test line marked "fee". Use the one-step post. | One entry is created and the line is matched. `#/accounts` still balanced. | Line and `#/accounts` strip |
 | 74 | `[std_snapshot_auto116]` ON. Run one test production of a recipe for the first time at a place. | The production completes. The cost you see is the same as before the switch. | Production result |

@@ -6,7 +6,7 @@ const M = {
   grn_pending_report: { receipts_without_bill: [{ date: '2026-10-14', supplier: 'Dudh Ghor' }], bills_without_receipt: [] },
   production_recommendations: [rec('production_double_issue_guard', 'off', 'warn')],
   form_guard_recommendations: [rec('transit_short_mode', 'keep_in_transit', 'loss'), rec('form_051_mode', 'reference', 'reference'), rec('expense_link_mode', 'off', 'warn')],
-  unmatched_forms: { lines_checked: 5, lines_unmatched: 2, rows: [{ entry_id: 'e1', form_code: '05-1', serial: 7, location_id: 1, entry_date: '2026-10-01', line_no: 2, item_code: 'F-001', qty: 5, link_id: 9 }] },
+  unmatched_forms: { lines_checked: 5, lines_unmatched: 2, rows: [{ entry_id: 'e1', form_code: '12-1', serial: 7, location_id: 1, entry_date: '2026-10-01', line_no: 2, item_code: 'F-001', qty: 5, link_id: 9 }] },
   transit_open_list: { limit_hours: 2, rows: [{ transfer_id: 't1', code: 'F-1', name_en: 'Cake', name_bn: 'কেক', qty: 10, from_location_id: 1, to_location_id: 2, hours: 3.5, over_limit: true }] },
   transit_short_open: [{ transfer_id: 't9', code: 'F-2', name_en: 'Milk', name_bn: 'দুধ', sent: 10, received: 6, short: 4, value: 160, from_location_id: 1, to_location_id: 2, received_at: '2026-10-01T10:00:00Z' }],
   sales_channels_list: [{ id: 1, code: 'webform', kind: 'web_form', name_bn: 'ওয়েব ফর্ম', name_en: 'Web form', active: true }, { id: 2, code: 'o', kind: 'other', other_text: 'TikTok', name_bn: 'টিকটক', active: false }],

@@ -57,7 +57,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.context().close();
   p = await open(`window.__OWNER=false;window.__PERMS={POS:{view:true,enter:true,approve:false}};`, '#/home', 'dark');
   ok(await p.locator('.sellbig').count() === 1 && await centre(p) === '5|2' && await p.evaluate(() => document.querySelector('#hv_qgrid .qt button').dataset.quick) === 'pos', 'cashier: Sell first on Home, centre of bar, first quick action'); await p.context().close();
-  p = await open(`window.__OWNER=false;window.__PERMS={'04-1':{view:true,enter:true,approve:false}};`, '#/home', 'dark');
+  p = await open(`window.__OWNER=false;window.__PERMS={'13-1':{view:true,enter:true,approve:false}};`, '#/home', 'dark');
   ok(await p.locator('.sellbig').count() === 0 && await p.locator('#bnav .sell').count() === 0, 'role without POS: no Sell button, keeps own top job'); await p.context().close();
   // no horizontal overflow at 360 on 6 screens x 3 themes
   const screens = ['#/home', '#/pos', '#/items', '#/entry/new/10-2/1', '#/form/14-1', '#/reports'];

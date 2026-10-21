@@ -48,7 +48,7 @@ async function render() {
     anyApprove ? q(sb.from('entries').select('id,form_code,created_by').eq('status', 'submitted').limit(200)) : { data: [] },
     q(sb.from('entries').select('id', { count: 'exact', head: true }).eq('status', 'draft').eq('created_by', me)),
     canPos ? q(sb.rpc('sales_summary', { p_from: from })) : { data: [] },
-    (owner || (perms['14-1'] && perms['14-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '14-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
+    (owner || (perms['06-1'] && perms['06-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '06-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
     owner ? q(sb.from('location_settings').select('location_id,value')) : { data: null },
     anyApprove ? q(sb.rpc('number_audit_summary')) : { data: null },
     canPos ? q(sb.rpc('payments_summary', { p_from: td })) : { data: null },

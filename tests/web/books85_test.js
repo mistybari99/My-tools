@@ -1,4 +1,4 @@
-// Phase 85 web pieces: new strings follow the language rule (English text has no Bangla characters, every string has all modes) and the 10-2 form has the optional pay_mode field.
+// Phase 85 web pieces: new strings follow the language rule (English text has no Bangla characters, every string has all modes) and the 11-1 form has the optional pay_mode field.
 // Run: node tests/web/books85_test.js
 const _P = require('./_paths');
 const fs = require('fs'), path = require('path');
@@ -13,7 +13,7 @@ for (const k of ['stock_adjust', 'stock_opening', 'stock_issue', 'stock_transfer
   if (m) { ck(k + ' English has no Bangla', !BN.test(m[2])); ck(k + ' Bangla/mix texts are not empty', m[1].length > 0 && m[3].length > 0); }
 }
 const pm = frm.match(new RegExp("SEL\\('pay_mode', L\\(" + str + ',\\s*' + str + '\\)'));
-ck('forms.js 10-2 has the optional pay_mode select', !!pm);
+ck('forms.js 11-1 has the optional pay_mode select', !!pm);
 if (pm) ck('pay_mode English label has no Bangla', !BN.test(pm[2]));
 const opts = frm.match(/SEL\('pay_mode'[\s\S]*?\]\)\] \},/);
 ck('pay_mode offers cash, bank, mobile, card', !!opts && ['cash', 'bank', 'mobile', 'card'].every((o) => opts[0].includes("['" + o + "'")));

@@ -111,7 +111,7 @@
 - Approver বানাতে: Staff-এ role `recipe_approver` দিন (`#/delegation`)।
 - `production_requires_cost = refuse` দিলে বিনামূল্যের উপাদান (যেমন পানি) ব্যাচ আটকাবে। আগে `#/s1setup`-এ ওই আইটেম "cost শূন্য (free)" চিহ্নিত করুন (অংশ 11 দেখুন)।
 - Pool মোডে মিশ্র kg ও পিস product থাকলে পিসের product অসম্পূর্ণ দেখায় (`pool_unit_not_kg`)।
-- Paper form 05-3 আর app recipe আলাদা জিনিস। Section A/B/C, card-level সময়/লোক/যন্ত্র app-এ নেই। দুই জায়গায় একই তথ্য টাইপ করতে হতে পারে।
+- Paper form 31-1 আর app recipe আলাদা জিনিস। Section A/B/C, card-level সময়/লোক/যন্ত্র app-এ নেই। দুই জায়গায় একই তথ্য টাইপ করতে হতে পারে।
 - যা তৈরি হয়নি: production-এর পরে cost সংশোধন (`production_recost`), আর bill-level landed cost (freight ইত্যাদি ভাগ)। মালিকের সিদ্ধান্ত বাকি।
 
 **[যাচাই হয়নি]** লাইভ ডাটাবেসে, আসল ফোনে, Anek Bangla / Hind Siliguri ফন্টে (sandbox-এ system ফন্ট দিয়ে দেখা), আসল প্রিন্টারে। 5950 account ও `overhead_absorbed` mapping accountant-এর সঙ্গে মেলানো হয়নি।
@@ -150,8 +150,8 @@
 **সাবধান:**
 - **শতাংশ ১০০ না হলে সেভ হয় না** (`percent_not_100`)। ফাঁকা ঘর থাকলে শুধু খসড়া হয়, approve হয় না।
 - হাতে-লেখা অঙ্ক বিলের বেশি হলে নেয় না। কম হলে বাকিটা "অভাগিত" সারি।
-- **Cost bill মানে তথ্য, payment নয়।** কোনো cash/bank/payable এন্ট্রি হয় না। Payment আগের জায়গাতেই (supplier payment, 10-2) লিখতে হবে। তাই একই বিল দুবার (এখানে বিস্তারিত, ওখানে payment) লেখা হতে পারে।
-- 10-2 duplicate সতর্কতা শুধু একই জায়গা + মাস + head + অঙ্ক মিললে ধরে। Bill number দিয়ে না।
+- **Cost bill মানে তথ্য, payment নয়।** কোনো cash/bank/payable এন্ট্রি হয় না। Payment আগের জায়গাতেই (supplier payment, 11-1) লিখতে হবে। তাই একই বিল দুবার (এখানে বিস্তারিত, ওখানে payment) লেখা হতে পারে।
+- 11-1 duplicate সতর্কতা শুধু একই জায়গা + মাস + head + অঙ্ক মিললে ধরে। Bill number দিয়ে না।
 - Output-kg ভাগ শুধু kg-ভিত্তিক আইটেম গোনে। পিসের product হলে `no_output`।
 - **Branch P&L ও journal এখনো এই ভাগ পড়ে না** (অংশ 3 দেখুন)।
 - `cost_bill_creates_payment` এখন আছে (phase 99, অংশ 25)। ডিফল্ট `off`। Accountant-এর সঙ্গে ঠিক করে চালান।
@@ -185,7 +185,7 @@
 
 **সাবধান:**
 - `l4` মালিক-শিট, break-even (`l5`), partner profit এই ভাগ **দেখে না**, সুইচ চালু থাকলেও। ইচ্ছাকৃত। এগুলো দেখুক কিনা মালিকের সিদ্ধান্ত।
-- **দুবার গোনার ঝুঁকি:** একই বিল যদি 10-2 voucher-এও থাকে, P&L-এ দুবার আসতে পারে।
+- **দুবার গোনার ঝুঁকি:** একই বিল যদি 11-1 voucher-এও থাকে, P&L-এ দুবার আসতে পারে।
 - Journal/GL-এ কিছু post হয় না। এটা শুধু management রিপোর্ট।
 - Approval separation পরামর্শ: একই মানুষকে `recipe_manage` + `recipe_approve`, বা `cost_bill_entry` + `cost_rule_approve` দিলে `#/delegation`-এ হলুদ পরামর্শ আসে। আটকায় না।
 - P&L ON থাকলে মাসের পুরো ভাগ ধরা হয়। মাঝ-মাসের রিপোর্টে দিন-হিসাবে কাটা হয় না।
@@ -302,18 +302,18 @@
 
 ## 6. Form বনাম screen mode (phase 83)
 
-**এক লাইনে:** কাগজের ফর্ম (05-1 production, 10-2 খরচ) আর স্ক্রিন-এন্ট্রি একই জিনিস দুবার গুনলে তা ধরা বা ঠেকানো।
+**এক লাইনে:** কাগজের ফর্ম (12-1 production, 11-1 খরচ) আর স্ক্রিন-এন্ট্রি একই জিনিস দুবার গুনলে তা ধরা বা ঠেকানো।
 
 **কোথায়:**
 - `#/formguard` - চারটা সুইচ ও প্রস্তাব (মালিক)।
 - `#/unmatched` - স্ক্রিন-রেকর্ডহীন ফর্ম-লাইন।
-- `#/expenselink` - দ্রুত খরচ আর 10-2 voucher একসঙ্গে জোড়া।
+- `#/expenselink` - দ্রুত খরচ আর 11-1 voucher একসঙ্গে জোড়া।
 
 **সুইচ:**
 
 | সুইচ | অপশন ও মানে | ডিফল্ট | সিস্টেমের প্রস্তাব ও কেন |
 |---|---|---|---|
-| `form_051_mode` | `reference` = আজকের মতো (ফর্ম শুধু রেফারেন্স, আইটেম +, cost ফাঁকা, কাঁচামাল কাটে না। হলুদ `form051_cost_null`)। `post` = কাঁচামাল গড় দামে কাটে, তৈরি মাল cost সহ ঢোকে। recipe না থাকলে বা মাল কম হলে পুরো লাইন ব্যর্থ, কিছু অর্ধেক হয় না। `refuse` = লাইন skip (`form051_not_a_source`) | `reference` | `post`, যদি 05-1 ই আসল production রেকর্ড হয়। নইলে `reference` |
+| `form_051_mode` | `reference` = আজকের মতো (ফর্ম শুধু রেফারেন্স, আইটেম +, cost ফাঁকা, কাঁচামাল কাটে না। হলুদ `form051_cost_null`)। `post` = কাঁচামাল গড় দামে কাটে, তৈরি মাল cost সহ ঢোকে। recipe না থাকলে বা মাল কম হলে পুরো লাইন ব্যর্থ, কিছু অর্ধেক হয় না। `refuse` = লাইন skip (`form051_not_a_source`) | `reference` | `post`, যদি 12-1 ই আসল production রেকর্ড হয়। নইলে `reference` |
 
 **টেবিলের পরের তিনটা সুইচ `form_guard_recommendations()` দেখায়:** `transit_short_mode`, `transit_open_hours`, `offline_soft_stock` (পরের দুই অংশে)।
 
@@ -321,14 +321,14 @@
 - `dup_suspects`: একই দিন একই আইটেমে production run আর `stock_production_in` থাকলে সন্দেহ flag।
 - `expense_link_apply`: voucher-এর **প্রতিটি লাইন** দ্রুত খরচে মিললে তবেই জোড়া লাগে (day book একবার গোনে)। একটাও না মিললে `not_fully_covered`।
 
-**চালু করলে কী বদলায়:** `post` মোডে 05-1 অনুমোদনে স্টক ও cost সত্যি বদলায়। এটা বড় বদল।
+**চালু করলে কী বদলায়:** `post` মোডে 12-1 অনুমোদনে স্টক ও cost সত্যি বদলায়। এটা বড় বদল।
 
 **ডিফল্টে যা বদলায় না:** `reference` = আজকের আচরণ।
 
 **সাবধান:**
-- ফর্মের 05-3 / 10-2 আর app-এর recipe/cost একই তথ্য দুই জায়গায় রাখে। সব মিল মেলানো হয়নি।
+- ফর্মের 31-1 / 11-1 আর app-এর recipe/cost একই তথ্য দুই জায়গায় রাখে। সব মিল মেলানো হয়নি।
 - যে voucher আগেই auto-post হয়ে গেছে তা পরে shadow হলে GL-এ কী হয়, কোড পড়ে বোঝা। চালিয়ে দেখা হয়নি।
-- 10-2 অনুমোদনের সময় "জোড়া লাগান" প্রস্তাব ফর্মের ভেতরে বসানো হয়নি। আলাদা পর্দা `#/expenselink`।
+- 11-1 অনুমোদনের সময় "জোড়া লাগান" প্রস্তাব ফর্মের ভেতরে বসানো হয়নি। আলাদা পর্দা `#/expenselink`।
 
 **[যাচাই হয়নি]** আসল ফোন, লাইভ ডাটা, GL-এ shadow voucher-এর প্রভাব।
 
@@ -442,7 +442,7 @@
 | `acct_pending_alert_days` | এত দিনের পুরনো pending কাগজ alert | 1 | সংখ্যা প্রস্তাব নেই। 0 থেকে 365 |
 
 **Card settlement:** `card_settle(জায়গা, তারিখ, gross, fee, note, client_id, bank_mode)` = Dr bank (net) + Dr bank_charges (fee) / Cr card receivable (gross)। `card_settle_void` বাতিল, `card_settlement_list` অসমাপ্ত দেখায়। শুধু আপনার টাইপ করা অঙ্ক post হয়। `gross` অমীমাংসিতের বেশি হলে "over" ইঙ্গিত দেয়, আটকায় না।
-10-2 voucher-এ ঐচ্ছিক "কীভাবে দিলেন" (cash/bank/mobile)। ফাঁকা = cash (আগের মতো)।
+11-1 voucher-এ ঐচ্ছিক "কীভাবে দিলেন" (cash/bank/mobile)। ফাঁকা = cash (আগের মতো)।
 
 **চালু করলে কী বদলায়:**
 - সুইচ চালালে **আগের সব ঘটনা** হিসাব-শুরুর তারিখ (বা `acct_stock_moves_from`) পর্যন্ত পিছিয়ে মূল তারিখে post হয়। বন্ধ period-এর তারিখ আটকে থাকে (locked), শুধু মালিক জোর করে post করতে পারে।
@@ -993,7 +993,7 @@ Manage করতে পারে: owner, অথবা grant `item_create` / `ite
 
 **`ask` মোডে কী হয়:** সেভের পর পর্দায় sheet আসে (cash / bank / mobile / other; purchase-এ cash / bank / mobile / card)। অঙ্ক = যা বাকি, বদলানো যায়, আংশিক payment চলে। একই খরচ আগে লেখা থাকলে সতর্কতা ও confirm। Sheet বন্ধ করলে bill আটকায় না।
 
-**`auto_*` মোডে কী হয়:** system নিজে payment লেখে। **ব্যর্থ হলে bill আটকায় না**, হলুদ চিহ্ন থাকে। নিজে লেখে না যখন: পক্ষের credit-শর্ত আছে (সুইচ চালু না থাকলে), পোস্টের সময় নিজে কিছু দেওয়া হয়েছে, বা খরচটা আগের 10-2 voucher / quick expense-এর মতো। `auto_by_supplier_default`: পক্ষের নিজের পদ্ধতি; জানা না থাকলে `ask`-এর মতো।
+**`auto_*` মোডে কী হয়:** system নিজে payment লেখে। **ব্যর্থ হলে bill আটকায় না**, হলুদ চিহ্ন থাকে। নিজে লেখে না যখন: পক্ষের credit-শর্ত আছে (সুইচ চালু না থাকলে), পোস্টের সময় নিজে কিছু দেওয়া হয়েছে, বা খরচটা আগের 11-1 voucher / quick expense-এর মতো। `auto_by_supplier_default`: পক্ষের নিজের পদ্ধতি; জানা না থাকলে `ask`-এর মতো।
 
 **টাকা কোথায় যায় (একবারই গোনা হয়):**
 - Purchase bill: `supplier_payments` (bill-এর সঙ্গে বাঁধা), supplier balance, cash book, journal।

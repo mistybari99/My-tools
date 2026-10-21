@@ -72,7 +72,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   ok((await q(p)).length === 0 && await p.locator('#e_notsent').count() === 0, 'server refusal is shown, not queued'); await p.context().close();
 
   // ---------- at start: a waiting record is sent without any click ----------
-  const waitItem = { k: 'c:cc111111-1111-4111-8111-111111111111', kind: 'entry', cid: 'cc111111-1111-4111-8111-111111111111', id: null, code: '10-2', loc: 1, date: '2026-10-05', args: { p_id: null, p_form: '10-2', p_loc: 1, p_date: '2026-10-05', p_data: { lines: [{ amount: '77' }] }, p_flags: [], p_note: null }, meta: { client_id: 'cc111111-1111-4111-8111-111111111111' }, submit: false, at: '2026-10-05T09:00:00Z', state: 'wait', msg: '', ps: '' };
+  const waitItem = { k: 'c:cc111111-1111-4111-8111-111111111111', kind: 'entry', cid: 'cc111111-1111-4111-8111-111111111111', id: null, code: '11-1', loc: 1, date: '2026-10-05', args: { p_id: null, p_form: '11-1', p_loc: 1, p_date: '2026-10-05', p_data: { lines: [{ amount: '77' }] }, p_flags: [], p_note: null }, meta: { client_id: 'cc111111-1111-4111-8111-111111111111' }, submit: false, at: '2026-10-05T09:00:00Z', state: 'wait', msg: '', ps: '' };
   p = await open({ queue: [waitItem], settle: 3500 }, '#/home');
   c = await calls(p, 'save_entry'); ok(c.length === 1 && c[0].p_meta.client_id === waitItem.cid && c[0].p_data.lines[0].amount === '77', 'app start: the waiting record was sent automatically');
   ok((await q(p)).length === 0, 'and removed from the queue'); await p.context().close();

@@ -1,6 +1,6 @@
 /* Islamia BOS · stock and purchase forms (batch A), taken field by field from the BOS Build Kit v1.39.
-   04-1 Goods received note · 04-2 Material issue slip · 04-4 Store ledger · 06-1 Purchase requisition · 06-2 Quotation comparison
-   06-3 Purchase order · 06-4 Bill check & payment request · 06-5 Supplier ledger.
+   13-1 Goods received note · 18-1 Material issue slip · 37-1 Store ledger · 28-1 Purchase requisition · 29-1 Quotation comparison
+   27-1 Purchase order · 02-1 Bill check & payment request · 38-1 Supplier ledger.
    Every limit comes from Location Settings; nothing is invented. A missing setting is reported as "data needed". */
 (() => {
 'use strict';
@@ -25,9 +25,9 @@ const PAYS = [['cash', L('নগদ', 'Cash')], ['credit', L('বাকি', 'On
 const SHIFTS = [['m', L('সকাল', 'Morning')], ['a', L('বিকাল', 'Afternoon')], ['n', L('রাত', 'Night')]];
 const OWNER_NOTE = L('মালিকের ব্যক্তিগত টাকায় দিলে ক্যাশ ও ব্যাংক লেজারে একই দিনে দুই দিকে এন্ট্রি হবে।', "If paid from the owner's personal money, the cash & bank ledger gets both sides written on the same day.");
 
-/* ============ 04-1 · Goods received note (GRN) ============ */
+/* ============ 13-1 · Goods received note (GRN) ============ */
 const QUALITY = [['accept', L('গ্রহণ', 'Accept')], ['reduced', L('দর কমিয়ে গ্রহণ', 'Accept at a lower rate')], ['hold', L('আটক', 'Hold')], ['return', L('ফেরত', 'Return')]];
-B.forms['04-1'] = {
+B.forms['13-1'] = {
   title: L('মালামাল গ্রহণ রসিদ (GRN)', 'Goods received note (GRN)'),
   head: [TM('time', L('সময়', 'Time')), SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('memo_no', L('তাদের মেমো / চালান নং', 'Their memo / challan no.')),
     CH('paper', L('যে কাগজে ক্রয়', 'Purchase made on'), [['po', L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)')], ['pr', L('জরুরি ক্রয় — পারচেজ রিকুইজিশন (PR)', 'Urgent purchase — purchase requisition (PR)')], ['direct', L('শোরুমে সরাসরি ক্রয়', 'Direct purchase at the showroom')]], { req: true }),
@@ -91,9 +91,9 @@ B.forms['04-1'] = {
   },
 };
 
-/* ============ 04-2 · Material issue slip ============ */
+/* ============ 18-1 · Material issue slip ============ */
 const PURPOSE = [['prod', L('উৎপাদনের জন্য', 'For production')], ['staff', L('স্টাফ / ব্যক্তিগত ব্যবহারে', 'Staff / personal use')], ['sample', L('স্যাম্পল', 'Sample')], ['trial', L('ট্রায়াল (নতুন পণ্য)', 'Trial (new product)')]];
-B.forms['04-2'] = {
+B.forms['18-1'] = {
   title: L('মালামাল ইস্যু স্লিপ', 'Material issue slip'),
   head: [CH('shift', L('শিফট', 'Shift'), SHIFTS), T('batch_no', L('ব্যাচ / ক্রম নং', 'Batch / serial no.')), T('product', L('তৈরির পণ্য', 'Product being made')),
     CH('purpose', L('ইস্যুর উদ্দেশ্য', 'Purpose of the issue'), PURPOSE, { req: true })],
@@ -135,9 +135,9 @@ B.forms['04-2'] = {
   },
 };
 
-/* ============ 04-4 · Store ledger (one page per item) ============ */
+/* ============ 37-1 · Store ledger (one page per item) ============ */
 const OTHER_PAPERS = [['return', L('ফেরত', 'Return')], ['count_adj', L('কাউন্টের সমন্বয়', 'Count adjustment')], ['other', L('অন্য', 'Other')]];
-B.forms['04-4'] = {
+B.forms['37-1'] = {
   title: L('স্টোর লেজার', 'Store ledger'),
   head: [ITEM('item', L('আইটেম কোড / নাম', 'Item code / name'), { req: true, wide: true }), CALC('unit', L('একক (Unit)', 'Unit'), 'text'),
     T('bin', L('বিন লোকেশন (Bin Location — তাক / জায়গা)', 'Bin location (shelf / place)')), ST('storekeeper', L('স্টোরকিপার (ডিউটি স্লট)', 'Storekeeper (duty slot)'), { req: true }),
@@ -180,10 +180,10 @@ B.forms['04-4'] = {
   },
 };
 // the unit of the item chosen in the header is a plain calc outside a table: keep it in v
-{ const base = B.forms['04-4'].calc; B.forms['04-4'].calc = (x) => { const r = base(x); r.v.unit = unitOf(x, x.d.item); return r; }; }
+{ const base = B.forms['37-1'].calc; B.forms['37-1'].calc = (x) => { const r = base(x); r.v.unit = unitOf(x, x.d.item); return r; }; }
 
-/* ============ 06-1 · Purchase requisition (PR) ============ */
-B.forms['06-1'] = {
+/* ============ 28-1 · Purchase requisition (PR) ============ */
+B.forms['28-1'] = {
   title: L('পারচেজ রিকুইজিশন (PR)', 'Purchase requisition (PR)'),
   head: [ST('requester', L('অনুরোধকারী (নাম)', 'Requested by (name)'), { req: true }), D('required_date', L('প্রয়োজনের তারিখ (Required Date)', 'Required date'), { req: true }),
     CH('urgency', L('ধরন', 'Type'), [['normal', L('স্বাভাবিক', 'Normal')], ['urgent', L('জরুরি', 'Urgent')]], { req: true })],
@@ -242,8 +242,8 @@ B.forms['06-1'] = {
   },
 };
 
-/* ============ 06-2 · Quotation comparison & supplier choice (CS) ============ */
-B.forms['06-2'] = {
+/* ============ 29-1 · Quotation comparison & supplier choice (CS) ============ */
+B.forms['29-1'] = {
   title: L('কোটেশন তুলনা ও সাপ্লায়ার নির্বাচন (CS)', 'Quotation comparison & supplier choice (CS)'),
   head: [T('pr_no', L('সংশ্লিষ্ট পারচেজ রিকুইজিশন (PR) নং', 'Related purchase requisition (PR) no.')), T('what', L('প্রয়োজনীয় আইটেম', 'Item needed'), { req: true }),
     N('qty', L('পরিমাণ', 'Quantity'), { req: true }), ST('collector', L('দর সংগ্রহকারী (Rates Collected by)', 'Rates collected by'), { req: true })],
@@ -284,8 +284,8 @@ B.forms['06-2'] = {
   },
 };
 
-/* ============ 06-3 · Purchase order (PO) ============ */
-B.forms['06-3'] = {
+/* ============ 27-1 · Purchase order (PO) ============ */
+B.forms['27-1'] = {
   title: L('পারচেজ অর্ডার (PO)', 'Purchase order (PO)'),
   head: [T('cs_no', L('সংশ্লিষ্ট কোটেশন তুলনা (CS) নং', 'Related quotation comparison (CS) no.')), T('pr_no', L('পারচেজ রিকুইজিশন (PR) নং', 'Purchase Requisition (PR) no.')),
     SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: (x) => !x.d.cancel }), T('phone', L('ফোন', 'Phone')), D('delivery_date', L('ডেলিভারির তারিখ (Delivery Date)', 'Delivery date'), { req: (x) => !x.d.cancel }),
@@ -327,9 +327,9 @@ B.forms['06-3'] = {
   },
 };
 
-/* ============ 06-4 · Bill check & payment request ============ */
+/* ============ 02-1 · Bill check & payment request ============ */
 const BILLPAYS = [['cash', L('নগদ', 'Cash')], ['bank', L('ব্যাংক', 'Bank')], ['cheque', L('চেক', 'Cheque')], ['mobile', L('মোবাইল', 'Mobile')], ['owner', L('মালিকের ব্যক্তিগত', "Owner's personal money")], ['other', L('অন্য', 'Other')]];
-B.forms['06-4'] = {
+B.forms['02-1'] = {
   title: L('বিল যাচাই ও পেমেন্ট অনুরোধ', 'Bill check & payment request'),
   head: [SUP('supplier', L('সাপ্লায়ার', 'Supplier'), { req: true }), T('bill_no', L('সাপ্লায়ারের বিল নং', "Supplier's bill no."), { req: true }), D('bill_date', L('বিলের তারিখ', 'Bill date'), { req: true }), M('bill_amount', L('বিলের অঙ্ক ৳', 'Bill amount ৳'), { req: true })],
   sections: [
@@ -380,8 +380,8 @@ B.forms['06-4'] = {
   },
 };
 
-/* ============ 06-5 · Supplier ledger (one page per supplier) ============ */
-B.forms['06-5'] = {
+/* ============ 38-1 · Supplier ledger (one page per supplier) ============ */
+B.forms['38-1'] = {
   title: L('সাপ্লায়ার লেজার', 'Supplier ledger'),
   head: [T('page_no', L('পাতা নং', 'Page no.')), ST('keeper', L('হিসাবরক্ষক (Ledger Keeper)', 'Ledger keeper')), SUP('supplier', L('সাপ্লায়ারের নাম', 'Supplier name'), { req: true }), T('items', L('সরবরাহের আইটেম (Items Supplied)', 'Items supplied')),
     CH('kind', L('ধরন', 'Type'), [['supplier', L('সাপ্লায়ার', 'Supplier')], ['outside', L('বাইরের সোর্সিং', 'Outside sourcing')], ['other', L('অন্য', 'Other')]]),
@@ -430,8 +430,8 @@ B.forms['06-5'] = {
 };
 
 /* ============ Forms <-> stock ledger links (phase20) ============
-   Switch `forms_post_to_ledger` (default OFF) + one switch per form (forms_ledger_cfg). When it is on, an approved 04-1 / 04-2 / 04-3 / 03-1 / 05-1 posts to the stock ledger on the server
-   (entry_post_ledger, a trigger on entries): nothing is typed twice.  Then 04-4 (store ledger) and 06-5 (supplier ledger) open as READ views over stock_ledger_rows / supplier_ledger;
+   Switch `forms_post_to_ledger` (default OFF) + one switch per form (forms_ledger_cfg). When it is on, an approved 13-1 / 18-1 / 36-1 / 39-1 / 12-1 posts to the stock ledger on the server
+   (entry_post_ledger, a trigger on entries): nothing is typed twice.  Then 37-1 (store ledger) and 38-1 (supplier ledger) open as READ views over stock_ledger_rows / supplier_ledger;
    the old paper-form entry stays one tap away ("paper entries") and is the only screen while the switch is off. Page #/ledgerlinks: the switches and the "could not post" retry list. */
 {
 const A = window.BOS_APP, { sb, S, esc, toast, fail, shell, fmt } = A, lab = B.lab;
@@ -457,7 +457,7 @@ const X = {
 };
 const T = (k) => lab(X[k]);
 const money = (n) => (n === null || n === undefined ? '—' : '৳ ' + fmt(Math.round(Number(n) * 100) / 100));
-const FORMS5 = [['04-1', 'f04_1'], ['04-2', 'f04_2'], ['04-3', 'f04_3'], ['03-1', 'f03_1'], ['05-1', 'f05_1']];
+const FORMS5 = [['13-1', 'f04_1'], ['18-1', 'f04_2'], ['36-1', 'f04_3'], ['39-1', 'f03_1'], ['12-1', 'f05_1']];
 const LS = { master: false, cfg: {}, loaded: false };
 async function loadSwitches() {
   const [r, c] = await Promise.all([sb.from('rules').select('key,value,default_value').eq('key', 'forms_post_to_ledger'), sb.from('forms_ledger_cfg').select('form_code,is_on')]);
@@ -477,14 +477,14 @@ if (!document.getElementById('lk_css')) { const st = document.createElement('sty
 .lk-sw{display:flex;gap:6px} .lk-sw button{min-height:44px;padding:0 14px}
 .lk-note{font-size:.85rem;margin:6px 0 10px}`; document.head.appendChild(st); }
 
-/* ----- the read views for 04-4 and 06-5 ----- */
+/* ----- the read views for 37-1 and 38-1 ----- */
 async function viewStoreLedger() {
   shell(T('sl_title'), `<p class="muted center pad">${esc(T('loading'))}</p>`, true);
   const locs = LOCS(); if (!RS.loc || !locs.find((l) => l.id === RS.loc)) RS.loc = (locs[0] || {}).id;
   const nm = A.nm;
   const head = `<div class="notice ok lk-note">${esc(T('fromforms'))}</div>
     <div class="row wrap" style="margin-bottom:8px"><select id="lk_loc" aria-label="${esc(T('place'))}" style="flex:1">${locs.map((l) => `<option value="${l.id}" ${l.id === RS.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>
-    <button data-act="lk_stock">${esc(T('stockpage'))}</button><button data-act="lk_paper" data-v="04-4">${esc(T('paper'))}</button></div>`;
+    <button data-act="lk_stock">${esc(T('stockpage'))}</button><button data-act="lk_paper" data-v="37-1">${esc(T('paper'))}</button></div>`;
   if (RS.item) {
     const lv = await sb.rpc('stock_levels', { p_loc: RS.loc, p_filters: { item_ids: [RS.item.item_id], include_zero: true } });
     const lr = await sb.rpc('stock_ledger_rows', { p_loc: RS.loc, p_item: RS.item.item_id, p_from: null, p_to: null, p_limit: 100 });
@@ -510,7 +510,7 @@ async function viewSupplierLedger() {
   const nm = A.nm;
   const head = `<div class="notice ok lk-note">${esc(T('fromforms'))}</div>
     <div class="row wrap" style="margin-bottom:8px"><select id="lk_loc" aria-label="${esc(T('place'))}" style="flex:1">${all ? `<option value="" ${RS.loc === null ? 'selected' : ''}>${esc(T('allp'))}</option>` : ''}${locs.map((l) => `<option value="${l.id}" ${l.id === RS.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>
-    <button data-act="lk_purpage">${esc(T('purpage'))}</button><button data-act="lk_paper" data-v="06-5">${esc(T('paper'))}</button></div>`;
+    <button data-act="lk_purpage">${esc(T('purpage'))}</button><button data-act="lk_paper" data-v="38-1">${esc(T('paper'))}</button></div>`;
   if (RS.sup) {
     const r = await sb.rpc('supplier_ledger', { p_supplier: RS.sup.supplier_id, p_loc: RS.loc });
     if (r.error) return fail(r.error);
@@ -533,9 +533,9 @@ async function viewSupplierLedger() {
   window.addEventListener('hashchange', leaveWatch);
   if (orig) window.BOS_PAGES.form = async function () {
     const code = location.hash.replace(/^#\/?/, '').split('/')[1];
-    if ((code === '04-4' || code === '06-5') && RS.paper !== code) {
+    if ((code === '37-1' || code === '38-1') && RS.paper !== code) {
       try { await loadSwitches(); } catch (e) { LS.master = false; }
-      if (LS.master) { RS.item = null; RS.sup = null; return code === '04-4' ? viewStoreLedger() : viewSupplierLedger(); }
+      if (LS.master) { RS.item = null; RS.sup = null; return code === '37-1' ? viewStoreLedger() : viewSupplierLedger(); }
     }
     return orig.apply(this, arguments);
   };
@@ -558,7 +558,7 @@ async function viewLinks() {
 Object.assign(A.H, {
   lk_stock: () => { location.hash = '#/stock'; }, lk_purpage: () => { location.hash = '#/payables'; },
   lk_paper: (a) => { RS.paper = a.dataset.v; const r = (window.BOS_PAGES || {}).form; if (r) r(); },
-  lk_back: () => { RS.item = null; RS.sup = null; return location.hash.indexOf('06-5') >= 0 ? viewSupplierLedger() : viewStoreLedger(); },
+  lk_back: () => { RS.item = null; RS.sup = null; return location.hash.indexOf('38-1') >= 0 ? viewSupplierLedger() : viewStoreLedger(); },
   lk_item: (a) => { RS.item = (RS.levels || []).find((x) => x.item_id === a.dataset.v) || null; return viewStoreLedger(); },
   lk_sup: (a) => { RS.sup = (RS.dues || []).find((x) => x.supplier_id === a.dataset.v) || null; return viewSupplierLedger(); },
   lk_set: async (a) => {

@@ -3,7 +3,7 @@
 Status of the owner's scope (HANDOVER §4,§5,§8,§9). "Built" = code + local SQL/web tests + independent audit. Nothing is verified on real Supabase/phone except the owner's pasted SQL "Success".
 
 ## Built (waves W0–W7)
-W0 carry-over 1-20 · W1 hardening · W2 item master (1,312 imported by owner) + assets register · W3 list add-rules/Other queue/shared control (5 screens wired) · W4 locations + Control Center + settings sheet versions · W5a rollout Paper/Parallel/App, entered-later, change requests/revisions, offline form outbox, owner_self_approve switch · W5b blind count + PIN signatures (14-1, 10-1) · W6 recipes/BOM/packaging/production · W7 forms→ledger, discount approver, brand P&L, 12 new reports, nav leftovers, device checklist.
+W0 carry-over 1-20 · W1 hardening · W2 item master (1,312 imported by owner) + assets register · W3 list add-rules/Other queue/shared control (5 screens wired) · W4 locations + Control Center + settings sheet versions · W5a rollout Paper/Parallel/App, entered-later, change requests/revisions, offline form outbox, owner_self_approve switch · W5b blind count + PIN signatures (06-1, 03-1) · W6 recipes/BOM/packaging/production · W7 forms→ledger, discount approver, brand P&L, 12 new reports, nav leftovers, device checklist.
 
 ## STILL TO BUILD (priority order, by value for the owner)
 P1 (needed to actually use the 1,312 items) -- BUILT in phase22 (needs the owner to paste supabase/phase22.sql; not tried on real Supabase / phone)
@@ -15,12 +15,12 @@ P2 (rule 4 / consistency)
 4. ~50 pickers still plain selects (purchase unit/return reasons, sale-return reasons, stock unit, wallets, asset condition, itemmaster type/class, unit-conversion selects) → wire B.listctl.
 5. Hard-coded location lists in forms_cash.js / forms_sales.js (SHOWROOMS, brands), forms_staff.js duty slots; entry pickers still show paused/closed places (server refuses).
 6. Owner self-approval switch not yet applied to wastage, supplier refund, sale returns, location settings approvals (done for entries/releases/emergency/item changes).
-7. Blind count only 14-1 and 10-1; 04-3 stock count, 04-1 GRN not blind; browser still computes expected (hidden, not sealed). PIN signature only for 14-1/10-1 witness; other two-person forms (e.g. 11-1, 08-1) unchanged.
+7. Blind count only 06-1 and 03-1; 36-1 stock count, 13-1 GRN not blind; browser still computes expected (hidden, not sealed). PIN signature only for 14-1/10-1 witness; other two-person forms (e.g. 33-1, 16-1) unchanged.
 
 P3 (reports / accounting)
 8. 34 of 65 reports remain (list in BUILD-LOG W7: S10, P2, P4–P6, K2, K3, F1–F4, E2–E4, W1, W2, D5, T3, T4, L1–L5, X2–X5, G2, M1, M2, Q1–Q3). Parallel-mode comparison pairs/month-end pass-fail (Build cmd 7) and "Parallel" labels on reports not built.
-9. Day book gaps: bank deposits (10-3), customer order advances, owner top-ups, hub receiving side of 10-1.
-10. GRN (04-1) vs purchase page both post purchase_in → possible double count; GRN has no batch/expiry per line.
+9. Day book gaps: bank deposits (07-1), customer order advances, owner top-ups, hub receiving side of 10-1.
+10. GRN (13-1) vs purchase page both post purchase_in → possible double count; GRN has no batch/expiry per line.
 11. Production run void/undo; recipe/production reports; packaging line on receipt.
 12. Sales/due reports not yet net of sale returns and refund cash.
 

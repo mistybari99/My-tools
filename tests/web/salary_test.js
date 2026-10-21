@@ -40,7 +40,7 @@ const base = C.baseData(SP), srv = C.serve(PORT);
   // export: audit first, file after
   p = await open({}, '#/salary'); await p.click('#sa_menu'); await wait(p, 200);
   const dl = p.waitForEvent('download'); await p.click('[data-act=sa_csv]'); const d = await dl; const txt = fs.readFileSync(await d.path(), 'utf8');
-  ok(/sheet,location,name,monthly_salary/.test(txt) && /TestK cook,10000,26,3,0,10000,500,0,10500,1000,0,9500,9500,yes/.test(txt) && /TOTAL/.test(txt) && /advances \(02-3\)/.test(txt) && /attendance \(02-1\)/.test(txt), 'csv content');
+  ok(/sheet,location,name,monthly_salary/.test(txt) && /TestK cook,10000,26,3,0,10000,500,0,10500,1000,0,9500,9500,yes/.test(txt) && /TOTAL/.test(txt) && /advances \(35-1\)/.test(txt) && /attendance \(19-1\)/.test(txt), 'csv content');
   const lg = await calls(p, 'log_page_export'); ok(lg.length === 1 && lg[0].p_key === 'salary' && lg[0].p_rows === 2, 'export audited with key salary'); await p.close();
   p = await open({ db: { exportDenied: true } }, '#/salary'); await p.click('#sa_menu'); await wait(p, 200); let got = false; p.once('download', () => { got = true; });
   await p.click('[data-act=sa_csv]'); await wait(p, 400); ok(!got, 'no file when the server refuses'); ok(/not allowed/i.test(await p.textContent('#toast')), 'refusal toast'); await p.close();

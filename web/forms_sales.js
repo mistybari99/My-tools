@@ -1,6 +1,6 @@
 /* Islamia BOS · form definitions (batch C: sales & owner papers), taken field by field from the BOS Build Kit v1.39.
-   20-1 Customer order form · 20-2 Discount approval slip · 20-3 Return & complaint register · 20-4 Party & wholesale invoice
-   08-1 Maintenance request & record · 01-1 Weekly review note · 01-2 Monthly P&L and KPI sheet.
+   05-1 Customer order form · 08-1 Discount approval slip · 32-1 Return & complaint register · 24-1 Party & wholesale invoice
+   16-1 Maintenance request & record · 40-1 Weekly review note · 20-1 Monthly P&L and KPI sheet.
    Every limit comes from Location Settings; nothing is invented. A missing setting is reported as "data needed". */
 (() => {
 'use strict';
@@ -19,14 +19,14 @@ const NEED = L('তথ্য লাগবে', 'Data needed');
 const sv = (x, k) => (x.s[k] === undefined || x.s[k] === null ? null : x.s[k]);
 const money2 = (n) => '৳ ' + fm(n);
 
-/* ============ 20-1 · Customer order form ============ */
+/* ============ 05-1 · Customer order form ============ */
 const CHANNELS = [['counter', L('কাউন্টার', 'Counter')], ['phone', L('ফোন', 'Phone')], ['message', L('মেসেজ', 'Message')], ['party', L('পার্টি', 'Party')], ['other', L('অন্য', 'Other')]];
 const ONLINE = [['fb', L('ফেসবুক', 'Facebook')], ['ig', L('ইনস্টাগ্রাম', 'Instagram')], ['tt', L('টিকটক', 'TikTok')], ['wa', L('হোয়াটসঅ্যাপ', 'WhatsApp')], ['foodapp', L('ফুড অ্যাপ', 'Food app')], ['other', L('অন্য', 'Other')]];
 const DELIV = [['pickup', L('দোকান থেকে সংগ্রহ', 'Pick up from the shop')], ['own', L('নিজস্ব', 'Own delivery')], ['courier', L('কুরিয়ার', 'Courier')], ['foodapp', L('ফুড অ্যাপ', 'Food app')], ['other', L('অন্য', 'Other')]];
 const PAYMODES = [['cash', L('নগদ', 'Cash')], ['bkash', L('বিকাশ', 'bKash')], ['nagad', L('Nagad (নগদ)', 'Nagad', 'Nagad (নগদ)')], ['card', L('কার্ড', 'Card')], ['other', L('অন্য', 'Other')]];
 const notCol = (x) => x.d.not_collected;
 const handover = (x) => !x.d.not_collected;
-B.forms['20-1'] = {
+B.forms['05-1'] = {
   title: L('কাস্টমার অর্ডার ফরম', 'Customer order form'),
   head: [ST('taker', L('অর্ডার গ্রহণকারী (Order Taker)', 'Order taker'), { req: true }),
     CH('order_type', L('ধরন', 'Type'), [['normal', L('সাধারণ পণ্য', 'Normal goods')], ['custom', L('কাস্টম-মেইড', 'Custom-made')]], { req: true }),
@@ -85,7 +85,7 @@ B.forms['20-1'] = {
     const dl = sv(x, 'discount_limit');
     if (num(d.discount) > 0) {
       if (dl === null) needs.push('discount_limit');
-      if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (20-2) needed', num(d.discount)));
+      if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (08-1) needed', num(d.discount)));
     }
     if (d.order_type === 'custom' && d.adv_fate === 'refund') flags.push(flag('custom_refund', 'yellow', 'কাস্টম-মেইড অর্ডারের অ্যাডভান্স সাধারণত ফেরত নয়', 'Advance on a custom-made order is normally not refunded', num(d.advance)));
     const hd = sv(x, 'order_hold_days'); v.hold_text = hd === null ? NEED : L(fm(hd) + ' দিন', fm(hd) + ' days');
@@ -97,8 +97,8 @@ B.forms['20-1'] = {
   },
 };
 
-/* ============ 20-2 · Discount approval slip ============ */
-B.forms['20-2'] = {
+/* ============ 08-1 · Discount approval slip ============ */
+B.forms['08-1'] = {
   title: L('ডিসকাউন্ট অনুমোদন স্লিপ', 'Discount approval slip'),
   head: [TM('time', L('সময়', 'Time')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.')), T('memo_no', L('অর্ডার / মেমো নং (থাকলে)', 'Order / memo no. (if any)'))],
   sections: [
@@ -134,9 +134,9 @@ B.forms['20-2'] = {
   },
 };
 
-/* ============ 20-3 · Return & complaint register ============ */
+/* ============ 32-1 · Return & complaint register ============ */
 const COMPLAINTS = [['taste', L('স্বাদ', 'Taste')], ['smell', L('গন্ধ / নষ্ট', 'Smell / spoiled')], ['broken', L('ভাঙা / চেহারা', 'Broken / appearance')], ['short', L('পরিমাণে কম', 'Short quantity')], ['wrong', L('ভুল পণ্য', 'Wrong goods')], ['late', L('দেরি', 'Late')], ['staff', L('কর্মীর আচরণ', 'Staff behaviour')]];
-B.forms['20-3'] = {
+B.forms['32-1'] = {
   title: L('রিটার্ন ও অভিযোগ রেজিস্টার', 'Return & complaint register'),
   head: [TM('time', L('সময়', 'Time')), T('cust_name', L('কাস্টমারের নাম', "Customer's name"), { req: true }), T('cust_phone', L('ফোন', 'Phone')), T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))],
   sections: [
@@ -191,10 +191,10 @@ B.forms['20-3'] = {
   },
 };
 
-/* ============ 20-4 · Party & wholesale invoice ============ */
+/* ============ 24-1 · Party & wholesale invoice ============ */
 const isInv = (x) => x.d.doc === 'invoice';
 const isQuote = (x) => x.d.doc === 'quote';
-B.forms['20-4'] = {
+B.forms['24-1'] = {
   title: L('পার্টি ও পাইকারি ইনভয়েস', 'Party & wholesale invoice'),
   head: [CH('doc', L('কোটেশন না ইনভয়েস', 'Quotation or invoice'), [['quote', L('কোটেশন (Quotation)', 'Quotation')], ['invoice', L('ইনভয়েস (Invoice) — মালামাল যাচ্ছে', 'Invoice — goods are going')]], { req: true }),
     T('party', L('পার্টির নাম', 'Party name'), { req: true }), T('phone', L('ফোন', 'Phone')), T('order_no', L('অর্ডার নং (থাকলে)', 'Order no. (if any)'))],
@@ -241,16 +241,16 @@ B.forms['20-4'] = {
       if (d.credit_ok === 'inside' && has(d.party_limit) && v.all_due > num(d.party_limit)) flags.push(flag('credit_over_limit', 'red', 'মোট বকেয়া পার্টির ক্রেডিট সীমার উপরে, অথচ "সীমার ভেতরে" টিক', 'Total outstanding is over the party credit limit but "inside the limit" is ticked', r2(v.all_due - num(d.party_limit))));
       const dl = sv(x, 'discount_limit');
       if (num(d.discount) > 0) { if (dl === null) needs.push('discount_limit');
-        if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (20-2) needed', num(d.discount))); }
+        if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (08-1) needed', num(d.discount))); }
       if (has(d.approved_by) && d.approved_by === d.prepared_by) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও প্রস্তুতকারী একই জন', 'Approver and preparer are the same person'));
     }
     return { v, rows: { lines: out }, flags, needs };
   },
 };
 
-/* ============ 08-1 · Maintenance request & record ============ */
+/* ============ 16-1 · Maintenance request & record ============ */
 const PROBLEMS = [['p_stop', L('চলছে না', 'Not running')], ['p_cool', L('ঠান্ডা হচ্ছে না', 'Not cooling')], ['p_noise', L('শব্দ', 'Noise')], ['p_leak', L('লিক', 'Leak')], ['p_power', L('বিদ্যুৎ', 'Electrical')], ['p_other', L('অন্য', 'Other')]];
-B.forms['08-1'] = {
+B.forms['16-1'] = {
   title: L('মেইনটেন্যান্স অনুরোধ ও রেকর্ড', 'Maintenance request & record'),
   head: [T('machine', L('যন্ত্রের নাম', 'Machine name'), { req: true }), T('machine_id', L('যন্ত্রের নং / পরিচয়', 'Machine no. / ID'), { req: true }),
     D('found_date', L('সমস্যা শনাক্তের তারিখ', 'Date problem found'), { req: true }), TM('found_time', L('সময়', 'Time'), { req: true }), ST('reported_by', L('রিপোর্টকারী (Reported by)', 'Reported by'), { req: true }), ST('requested_by', L('অনুরোধকারী (Requested by)', 'Requested by'))],
@@ -293,12 +293,12 @@ B.forms['08-1'] = {
   },
 };
 
-/* ============ 01-1 · Weekly review note ============ */
+/* ============ 40-1 · Weekly review note ============ */
 // rows of the jalebi table = the live showrooms from the locations table (the old fixed list is only a fallback)
 const SHOWROOMS_FALLBACK = [L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch'), L('মিষ্টি বাড়ি', 'MISTY BARI'), L('AL-CAKIZ', 'AL-CAKIZ')];
 const SHOWROOMS = () => { const ls = ((B.ENV && B.ENV.locs) || []).filter((l) => l.kind === 'showroom' && l.is_active !== false && ['live', 'setting_up', null, undefined].includes(l.status));
   return [...(ls.length ? ls.map((l) => ({ bn: l.name_bn, en: l.name_en || l.name_bn, mix: l.name_mix || l.name_bn })) : SHOWROOMS_FALLBACK), L('অন্য', 'Other')]; };
-B.forms['01-1'] = {
+B.forms['40-1'] = {
   title: L('সাপ্তাহিক রিভিউ নোট', 'Weekly review note'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week — from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week — to'), { req: true })],
   sections: [
@@ -344,7 +344,7 @@ B.forms['01-1'] = {
   },
 };
 
-/* ============ 01-2 · Monthly P&L and KPI sheet ============ */
+/* ============ 20-1 · Monthly P&L and KPI sheet ============ */
 const XHEADS = [['staff_meal', L('স্টাফের খাবার / নাস্তা', 'Staff meals / snacks')], ['transport', L('যাতায়াত / পরিবহন', 'Transport')], ['hospitality', L('কাস্টমার আপ্যায়ন', 'Customer hospitality')],
   ['repair', L('মেরামত / ইউটিলিটি', 'Repairs / utilities')], ['labour', L('অস্থায়ী শ্রমিকের মজুরি', 'Temporary labour wages')], ['sourcing', L('বাইরের সোর্সিংয়ের মালামাল', 'Outside-sourced goods')], ['other', L('অন্যান্য', 'Other')]];
 const KPIS = [
@@ -355,7 +355,7 @@ const KPIS = [
   L('প্রাপ্য ও পাইকারির বাকি ৳', 'Receivables & wholesale credit ৳'), L('প্রধান ৫ কাঁচামালের দাম বদল', 'Price change of the top 5 raw materials'), L('নতুন পণ্যের বিক্রি', 'Sales of new products'),
   L('অনলাইন — অর্ডার · বিক্রি · প্রতি অর্ডারে খরচ', 'Online — orders · sales · cost per order'), L('জরুরি ক্রয়ের ভাগ % = জরুরি ক্রয় ÷ মোট ক্রয়', 'Emergency purchase share % = emergency purchases ÷ total purchases')];
 const daysInMonth = (m) => { const mm = /^(\d{4})-(\d{1,2})$/.exec(String(m || '').trim()); if (!mm) return null; return new Date(Number(mm[1]), Number(mm[2]), 0).getDate(); };
-B.forms['01-2'] = {
+B.forms['20-1'] = {
   title: L('মাসিক লাভ-ক্ষতি (P&L) ও KPI শিট', 'Monthly P&L and KPI sheet'),
   head: [T('month', L('মাস (বছর-মাস, যেমন 2026-10)', 'Month (year-month, e.g. 2026-10)'), { req: true }),
     CH('scope', L('পরিধি', 'Scope'), [['all', L('সব লোকেশন', 'All locations')], ['loc', L('একটি লোকেশন', 'One location')], ['other', L('অন্য', 'Other')]]), T('scope_name', L('লোকেশন / অন্য — নাম', 'Location / other — name'), { show: (x) => x.d.scope === 'loc' || x.d.scope === 'other' })],

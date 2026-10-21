@@ -36,7 +36,7 @@ const X = {
   from: E('Received from'), ref: E('Reference'), note: E('Note'), photo: E('Photo (optional)'), check: E('Check first'), save: E('Save'), recent: E('Recent entries'), none: E('Nothing yet'),
   void: E('Void'), voidWhy: E('Why is this voided?'), voided: E('Voided'), saved: E('Saved'), dry: E('Check passed - nothing was saved'), reason: E('Reason'), cancel: E('Cancel'),
   seeds: E('Seeded accounts'), seedsHint: E('Accounts and mapping keys added for you. Nothing existing was changed. You can rename them, use another code or switch them off.'),
-  eheads: E('Expense heads (the 10-2 form)'), eheadsHint: E('A new head is offered on the expense form only after you turn it on. Documents already posted never move.'),
+  eheads: E('Expense heads (the 11-1 form)'), eheadsHint: E('A new head is offered on the expense form only after you turn it on. Documents already posted never move.'),
   oheads: E('Other income heads'), rename: E('Rename'), newcode: E('Use another code'), choose: E('Choose account'), on: E('Switch on'), offb: E('Switch off'), retire: E('Retire'), turnon: E('Turn on'),
   addhead: E('Add a head'), editacc: E('Change account'), label: E('Name'), code: E('Code'), acc: E('Account'), effective: E('Effective from'), unposted: E('older documents not posted yet'),
   covOk: E('Every key points to an active account.'), covBad: E('These keys need an account:'),
@@ -350,7 +350,7 @@ document.addEventListener('change', (e) => {
   if (t.id === 'oi_file' && t.files && t.files[0]) {
     const f = t.files[0]; const up = B.s2 && B.s2.uploadPhoto;
     if (!up) return toast('Photo upload is not available.');
-    toast('…'); up(f, ['ACCOUNTS', 'STOCK', '10-2'], Number(val('oi_loc')) || (locs()[0] || {}).id).then((p) => { OI.photo = p; const el = $('#oi_ph'); if (el) el.textContent = '📎 ' + p; }).catch((er) => toast(er.message || 'error'));
+    toast('…'); up(f, ['ACCOUNTS', 'STOCK', '11-1'], Number(val('oi_loc')) || (locs()[0] || {}).id).then((p) => { OI.photo = p; const el = $('#oi_ph'); if (el) el.textContent = '📎 ' + p; }).catch((er) => toast(er.message || 'error'));
   }
 });
 

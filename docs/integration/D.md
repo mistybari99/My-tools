@@ -28,8 +28,8 @@ index.html, next to `cashmoves.js`:
 
 ia.js, one line next to the `cashmoves` record (group acc, per bos-organise: pick by the job, not the person):
 ```js
-rec('wallets', 'acc', ['মোবাইল ওয়ালেট (বিকাশ/নগদ/রকেট)', 'Mobile wallets', 'Mobile ওয়ালেট'], { icon: 'money', ok: (c) => c.own || c.P('10-3', 'view') || c.P('10-3', 'enter') || c.GF.accounts_view === true,
-  kw: ['wallet', 'bkash', 'nagad', 'rocket', 'upay', 'mobile money', 'wallet fee', 'cash out', 'digital payment', '10-3', 'reconcile', 'বিকাশ', 'নগদ', 'রকেট', 'উপায়', 'ওয়ালেট', 'মোবাইল ব্যাংকিং', 'ডিজিটাল পেমেন্ট'],
+rec('wallets', 'acc', ['মোবাইল ওয়ালেট (বিকাশ/নগদ/রকেট)', 'Mobile wallets', 'Mobile ওয়ালেট'], { icon: 'money', ok: (c) => c.own || c.P('07-1', 'view') || c.P('07-1', 'enter') || c.GF.accounts_view === true,
+  kw: ['wallet', 'bkash', 'nagad', 'rocket', 'upay', 'mobile money', 'wallet fee', 'cash out', 'digital payment', '07-1', 'reconcile', 'বিকাশ', 'নগদ', 'রকেট', 'উপায়', 'ওয়ালেট', 'মোবাইল ব্যাংকিং', 'ডিজিটাল পেমেন্ট'],
   verbs: ['count wallet', 'add wallet fee', 'move wallet money'], aliases: ['bkash', 'nagad'] }),
 ```
 Optional (not required): `home: { acc: <free slot> }` for a Home tile and `cc: 'rules'` is NOT used; the four settings of section 4 appear in the existing rules screen by themselves. Route `wallets` is new, no route renamed. Run `node tests/web/ia_test.js <abs tests/web>` plus nav, nav2, control, favsync, settings2 after adding it. The icon `money` already exists. The server decides permission (every RPC checks it); the `ok` line only hides the entry.
@@ -47,7 +47,7 @@ Journal sources (via `_d_acct_docs`, each entry balanced two-line, written only 
 
 Functions (API, all `security definer`, anon has no access): `d_wallet_add`, `d_wallet_update`, `d_wallet_opening_set`, `d_wallet_fee_add`, `d_wallet_fee_void`, `d_wallet_move_add`, `d_wallet_move_void`, `d_wallet_check_save`, `d_wallet_check_explain`, `d_wallet_balances`, `d_wallet_recon_report`, `d_wallet_statement`, `d_item_role_set`, `d_item_roles_import`, `d_product_req_set`, `d_fixed_price_set`, `d_material_unit_cost`, `d_recipe_material_check`, `d_recipe_cost_gaps`, `d_production_cost_breakdown`. Internal helpers `_d_*` are closed (only `_d_view_ok` and `_d_cash_ok` are executable because the table policies call them). Two triggers: `d_production_runs_gate` (before insert on `production_runs`) and `d_recipes_activate_gate` (before update of `active` on `recipes`); they are no-ops while the setting is `off`.
 
-Rules for the 10-3 reconcile (BUILD-RULE 9, blind count): the phone total is typed first (`d_wallet_check_save`); the book figure, the journal figure and the difference come back only after it is saved, and `d_wallet_balances` hides the book figure of an uncounted wallet from everybody except the owner and accounts managers. The difference is always written (also 0). A difference needs a reason once (`d_wallet_check_explain`), then it is closed.
+Rules for the 07-1 reconcile (BUILD-RULE 9, blind count): the phone total is typed first (`d_wallet_check_save`); the book figure, the journal figure and the difference come back only after it is saved, and `d_wallet_balances` hides the book figure of an uncounted wallet from everybody except the owner and accounts managers. The difference is always written (also 0). A difference needs a reason once (`d_wallet_check_explain`), then it is closed.
 What is NOT reached by the wallet register: money that carries no wallet name (owner top-up, salary or advance paid by mobile, quick expenses by mobile, sale refunds by mobile, supplier refunds). Those stay on 1130. Add a wallet column to those sources later if the owner wants them per wallet.
 Existing tables are not changed; free-text `wallet` columns of `sale_payments` / `supplier_payments` are matched by lower-case code, English name, Bangla name or alias. The sale and supplier-payment screens can keep sending 'bkash' / 'nagad' / 'rocket' / 'upay'. A supplier payment that would push a wallet below zero is not stopped (that code is existing); `d_wallet_balances` shows the negative book figure.
 
@@ -73,4 +73,4 @@ A blank or missing value never invents a number: with `fixed_price` and no price
 
 ## 6. BUILD-LOG entry for the integrator to paste (rule 16)
 
-"phase83 (builder D): G9 separate wallets with fee expense 5815 and 10-3 blind phone reconcile; G10 production material roles, required-material gate (setting, default off), cost-gap report, costing-method helper. New tables d_*; no existing function edited; hooks H1 to H3 needed in _acct_docs, _p27_pl, _daybook_lines. Not confirmed: real hooks, last_purchase method, phone check, live database (never touched)."
+"phase83 (builder D): G9 separate wallets with fee expense 5815 and 07-1 blind phone reconcile; G10 production material roles, required-material gate (setting, default off), cost-gap report, costing-method helper. New tables d_*; no existing function edited; hooks H1 to H3 needed in _acct_docs, _p27_pl, _daybook_lines. Not confirmed: real hooks, last_purchase method, phone check, live database (never touched)."

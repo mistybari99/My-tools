@@ -84,10 +84,10 @@ const KINDS = {
     const t0 = rows.filter((x) => x.entry_date === env.td), net = t0.reduce((s, x) => s + N(x.amount), 0), old = rows.filter((x) => x.status === 'open' && x.entry_date !== env.td).length;
     const red = t0.some((x) => x.status === 'open' && x.level === 'red'), open = t0.some((x) => x.status === 'open');
     return { value: t0.length ? (net > 0 ? '+' : net < 0 ? '−' : '') + money(Math.abs(net)) : '✓ ' + money(0), num: Math.abs(net), tone: red ? 'bad' : open || old ? 'warn' : 'ok', sub: `${t0.length} ${lab(L('টি আজ', 'today', 'today'))}${old ? ` · ${old} ${lab(L('পুরনো খোলা', 'older open', 'older open'))}` : ''}`, route: 'exceptions' }; } },
-  day_close: { g: 'cash', num: true, l: L('দিন শেষ — প্রতিটি শোরুম (১৪-১)', 'Day close per shop (14-1)', 'Day close — প্রতিটি shop (14-1)'), route: 'form/14-1', async load(env) {
+  day_close: { g: 'cash', num: true, l: L('দিন শেষ — প্রতিটি শোরুম (১৪-১)', 'Day close per shop (06-1)', 'Day close — প্রতিটি shop (06-1)'), route: 'form/14-1', async load(env) {
     let shops = locsNow().filter((l) => l.kind === 'showroom'); if (!shops.length) shops = locsNow();
-    const es = arr(await tbl(sb.from('entries').select('form_code,location_id,status').eq('entry_date', env.td).eq('form_code', '14-1').limit(500)));
-    let roll = []; try { roll = arr(await tbl(sb.from('form_rollout').select('form_code,location_id,mode').eq('form_code', '14-1'))); } catch (e) { roll = []; }
+    const es = arr(await tbl(sb.from('entries').select('form_code,location_id,status').eq('entry_date', env.td).eq('form_code', '06-1').limit(500)));
+    let roll = []; try { roll = arr(await tbl(sb.from('form_rollout').select('form_code,location_id,mode').eq('form_code', '06-1'))); } catch (e) { roll = []; }
     const paper = (id) => (roll.find((x) => x.location_id === id) || {}).mode === 'paper';
     const closed = (id) => es.some((x) => x.location_id === id && (x.status === 'submitted' || x.status === 'approved'));
     const need = shops.filter((l) => !paper(l.id)), miss = need.filter((l) => !closed(l.id)), done = need.length - miss.length;

@@ -134,7 +134,7 @@ bos92/98/104 invoice and template wiring, bos101 collapsible drawer footer (Navf
 
 ## 3. Shadow engine: one record + locked shadow copy, count once (phase 48..51, 54, 61)
 
-Problem: the same event can be entered on two paths (quick screen vs paper form; app payroll vs form 02-2). Rule: **one primary record counts; the other path gets a linked, locked shadow copy that is never counted.** Posting stays unique on `(source_type, source_id)`.
+Problem: the same event can be entered on two paths (quick screen vs paper form; app payroll vs form 21-1). Rule: **one primary record counts; the other path gets a linked, locked shadow copy that is never counted.** Posting stays unique on `(source_type, source_id)`.
 
 | Object (`supabase/phase48.sql`) | Role |
 |---|---|

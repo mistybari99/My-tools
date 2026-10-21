@@ -56,7 +56,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   const wait = (p, n = 300) => p.waitForTimeout(n);
   const opts = (p, sel) => p.$$eval(sel + ' option', (os) => os.map((o) => [o.value, o.textContent]));
 
-  // ---------- form 10-2 (open list): choices, Add new at once, similar warning, Other ----------
+  // ---------- form 11-1 (open list): choices, Add new at once, similar warning, Other ----------
   let p = await open({}, '#/entry/new/10-2/1');
   const S1 = 'select[data-p="lines.0.head"]';
   let o = await opts(p, S1);
@@ -92,7 +92,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.screenshot({ path: SP + '/lc_form.png' });
   await p.close();
 
-  // ---------- approval list (18-1): request wording, request is filed, nothing selected ----------
+  // ---------- approval list (17-1): request wording, request is filed, nothing selected ----------
   p = await open({ init: 'window.__OWNER=false;', x: { add: { status: 'requested', request_id: 'r1' } }, lang: 'bn' }, '#/entry/new/18-1/1');
   const S2 = 'select[data-p="lines.0.head"]';
   o = await opts(p, S2);
@@ -145,7 +145,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
 
   // ---------- lists admin: chips with badges, ⋮ menus ----------
   const counts = { requests: 1, other: 2, lists: { expense_heads: { requests: 1, other: 2 } } };
-  const other = [{ id: 'o1', list_code: 'expense_heads', text: 'ঠেলা ভাড়া', entered_by: 'u2', entered_at: '2026-10-10T05:00:00Z', form_code: '10-2', status: 'pending' }, { id: 'o2', list_code: 'expense_heads', text: 'Cart hire', entered_by: 'u2', entered_at: '2026-10-10T06:00:00Z', form_code: null, status: 'pending' }, { id: 'o3', list_code: 'expense_heads', text: 'old', entered_by: 'u2', entered_at: '2026-10-09T06:00:00Z', status: 'merged', resolved_option: 'transport' }];
+  const other = [{ id: 'o1', list_code: 'expense_heads', text: 'ঠেলা ভাড়া', entered_by: 'u2', entered_at: '2026-10-10T05:00:00Z', form_code: '11-1', status: 'pending' }, { id: 'o2', list_code: 'expense_heads', text: 'Cart hire', entered_by: 'u2', entered_at: '2026-10-10T06:00:00Z', form_code: null, status: 'pending' }, { id: 'o3', list_code: 'expense_heads', text: 'old', entered_by: 'u2', entered_at: '2026-10-09T06:00:00Z', status: 'merged', resolved_option: 'transport' }];
   const req = [{ id: 'q1', list_code: 'expense_heads', label_bn: 'ইন্টারনেট', label_en: 'Internet', status: 'pending', requested_by: 'u2', requested_at: '2026-10-10T07:00:00Z', similar_opts: [{ label_bn: 'ফোন' }] }];
   p = await open({ other, req, x: { counts } }, '#/lists');
   ok(await p.locator('[data-act=ls2_pick] .badge').count() === 1 && (await p.textContent('[data-act=ls2_pick][data-v=expense_heads] .badge')) === '3', 'list chip shows the waiting count');
@@ -241,7 +241,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   o = await opts(p, S1); ok(o.some((x) => x[0].startsWith('__add__')) && !(await p.evaluate(() => window.BOS.listctl.state.missing)), 'network error is not "missing": choices stay, state not missing');
   await p.close();
   ok(fs.readFileSync(ROOT + '/entry.js', 'utf8').includes("startsWith('other:')"), 'entry.js renders stored other:<text> choices');
-  ok(/startsWith\('other:'\) \? 'other'/.test(fs.readFileSync(ROOT + '/forms_cash.js', 'utf8')), '18-1 maps other:* to one Other bucket');
+  ok(/startsWith\('other:'\) \? 'other'/.test(fs.readFileSync(ROOT + '/forms_cash.js', 'utf8')), '17-1 maps other:* to one Other bucket');
   const bk = fs.readFileSync(ROOT + '/app.js', 'utf8'); const bt = bk.slice(bk.indexOf('const BACKUP_TABLES'), bk.indexOf('function viewBackup'));
   for (const tname of ['list_defs', 'option_requests', 'list_other_entries', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'assets', 'asset_costs']) ok(bt.includes("'" + tname + "'"), 'backup list has ' + tname);
   log('errors:', errors.length ? [...new Set(errors)] : 'none'); log('assert failures:', bad); await br.close(); srv.close();

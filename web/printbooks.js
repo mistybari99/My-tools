@@ -25,7 +25,7 @@ const D = { loc: null, form: null, forms: [], books: [], notes: [], check: null 
 const LOCS = () => (B.liveLocs ? B.liveLocs : (a) => a)((S.ctx.is_owner || (S.ctx.roles || []).includes('management')) ? ((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []).filter((l) => (S.ctx.locations || []).includes(l.id)));
 async function load() {
   if (!D.forms.length) { const f = await sb.from('forms').select('code').order('code'); D.forms = (f.data || []).map((x) => x.code); }
-  if (!D.form) D.form = D.forms.includes('14-1') ? '14-1' : D.forms[0];
+  if (!D.form) D.form = D.forms.includes('06-1') ? '06-1' : D.forms[0];
   const [b, n, c] = await Promise.all([sb.from('paper_books').select('*').eq('location_id', D.loc).eq('form_code', D.form).order('first_no'), sb.from('print_notes').select('*').eq('location_id', D.loc).order('created_at', { ascending: false }).limit(50), sb.rpc('paper_books_check', { p_form: D.form, p_loc: D.loc })]);
   D.books = b.data || []; D.notes = n.data || []; D.check = c.error ? null : c.data;
 }

@@ -1,7 +1,7 @@
 /* Islamia BOS · Step W: form-vs-screen screens for step E-b (supabase/phase83.sql). Four pages, no change to any existing file:
    #/unmatched    forms skipped because "the screen is the record" but with NO screen record (unmatched_forms, unmatched_forms_sync)
-   #/formguard    form 05-1 mode, transit shortage mode, transit alert hours, offline soft stock - each switch next to the system's recommendation (form_guard_recommendations, owner only)
-   #/expenselink  10-2 vouchers: does a quick expense already count this money? (suggest_expense_link, expense_link_apply)
+   #/formguard    form 12-1 mode, transit shortage mode, transit alert hours, offline soft stock - each switch next to the system's recommendation (form_guard_recommendations, owner only)
+   #/expenselink  11-1 vouchers: does a quick expense already count this money? (suggest_expense_link, expense_link_apply)
    #/transitshort transfers still on the way (transit_open_list) and short receipts not yet booked (transit_short_open, transit_short_resolve)
    Recommendations never block and never change anything by themselves. Handlers are prefixed wfg_. English mode has no Bangla letters. Loaded after stepw_common.js. */
 (() => {
@@ -28,7 +28,7 @@ const X = {
   form: L('ফর্ম', 'Form', 'Form'), line: L('লাইন', 'Line', 'Line'), qty: L('Qty', 'Qty', 'Qty'), linked: L('লিংক আছে', 'link exists', 'link আছে'),
   toRules: L('নিয়ম ও পরামর্শ', 'Rules and recommendations', 'Rule ও পরামর্শ'),
   fgIntro: L('প্রতিটি সুইচের পাশে সিস্টেমের পরামর্শ আছে। পরামর্শ মানা জরুরি নয়।', 'Each switch shows the system recommendation next to it. Following it is optional.', 'প্রতিটি switch-এর পাশে system-এর পরামর্শ আছে। মানা জরুরি নয়।'),
-  k_form_051_mode: L('ফর্ম 05-1 স্টকে গেলে', 'When form 05-1 posts to stock', 'Form 05-1 stock-এ গেলে'),
+  k_form_051_mode: L('ফর্ম 12-1 স্টকে গেলে', 'When form 12-1 posts to stock', 'Form 12-1 stock-এ গেলে'),
   k_expense_link_mode: L('খরচ দুবার গোনা ঠেকানোর নিয়ম', 'Rule against counting an expense twice', 'Expense দুবার গোনা ঠেকানোর rule'), /* bos108 */
   k_rule_other: L('আরেকটি নিয়ম', 'Another rule', 'আরেকটি rule'),
   k_transit_short_mode: L('কম পৌঁছানো মাল', 'Goods that arrive short', 'কম পৌঁছানো মাল'),
@@ -45,7 +45,7 @@ const X = {
   recLink: L('পরামর্শ: লিংক করুন — প্রতিটি লাইনের জন্য মিলে যাওয়া quick খরচ আছে।', 'Recommendation: link - every line has a matching quick expense.', 'পরামর্শ: link করুন — প্রতিটি line-এর জন্য matching quick expense আছে।'),
   recNo: L('পরামর্শ: লিংক করবেন না — কিছু লাইনের মিলে যাওয়া quick খরচ নেই (সার্ভার এটা মানবে না)।', 'Recommendation: do not link - some lines have no matching quick expense (the server will refuse).', 'পরামর্শ: link করবেন না — কিছু line-এর matching quick expense নেই (server মানবে না)।'),
   recDone: L('আগেই লিংক করা আছে — আর কিছু করার নেই।', 'Already linked - nothing more to do.', 'আগেই link করা আছে — আর কিছু করার নেই।'),
-  linkedOk: L('লিংক হয়েছে', 'Linked', 'Linked'), noVouchers: L('অপেক্ষমাণ কোনো 10-2 ভাউচার নেই', 'No 10-2 vouchers waiting', 'অপেক্ষমাণ কোনো 10-2 voucher নেই'),
+  linkedOk: L('লিংক হয়েছে', 'Linked', 'Linked'), noVouchers: L('অপেক্ষমাণ কোনো 11-1 ভাউচার নেই', 'No 11-1 vouchers waiting', 'অপেক্ষমাণ কোনো 11-1 voucher নেই'),
   trOpen: L('এখনও পথে', 'Still on the way', 'এখনও পথে'), trShort: L('কম পৌঁছেছে — এখনও খাতায় তোলা হয়নি', 'Received short - not booked yet', 'কম পৌঁছেছে — এখনও book হয়নি'),
   sent: L('পাঠানো', 'Sent', 'Sent'), recv: L('পেয়েছে', 'Received', 'Received'), short: L('কম', 'Short', 'Short'), value: L('মূল্য', 'Value', 'Value'), hrs: L('ঘণ্টা', 'Hours', 'Hours'),
   over: L('সীমা ছাড়িয়েছে', 'over the limit', 'সীমা ছাড়িয়েছে'), limit: L('সীমা', 'Limit', 'Limit'), noLimit: L('সীমা বসানো নেই — সতর্কতা বন্ধ', 'No limit set - no alert', 'Limit বসানো নেই — alert বন্ধ'),
@@ -113,10 +113,10 @@ async function viewLink() {
   shell(T('tEl'), `${nav()}<p class="muted">${esc(T('elIntro'))}</p><div id="wfg_body"><p class="muted">${esc(W.T('loading'))}</p></div>`, true);
   await W.locs();
   const el = $('#wfg_body'); if (!el) return;
-  const { data, error } = await sb.from('entries').select('id,serial,entry_date,location_id,status').eq('form_code', '10-2').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).limit(40);
+  const { data, error } = await sb.from('entries').select('id,serial,entry_date,location_id,status').eq('form_code', '11-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).limit(40);
   if (error) { el.innerHTML = WARN(W.errText(error) || error.message); return; }
   const rows = data || [];
-  el.innerHTML = rows.length ? rows.map((r) => `<div class="card"><div><b>10-2</b> #${esc(String(r.serial))} · ${esc(W.day(r.entry_date))} · ${esc(W.locName(r.location_id))} · <span class="muted">${esc(r.status)}</span></div>
+  el.innerHTML = rows.length ? rows.map((r) => `<div class="card"><div><b>11-1</b> #${esc(String(r.serial))} · ${esc(W.day(r.entry_date))} · ${esc(W.locName(r.location_id))} · <span class="muted">${esc(r.status)}</span></div>
     <button class="full" data-act="wfg_el_check" data-v="${esc(r.id)}">${esc(T('check'))}</button><div id="wfg_r_${esc(r.id)}"></div></div>`).join('') : `<p class="muted center pad">${esc(T('noVouchers'))}</p>`;
 }
 async function elCheck(id) {

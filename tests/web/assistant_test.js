@@ -28,10 +28,10 @@ const MOCK = '(' + (function () {
       if (fn === 'assistant_note_save') return { data: { id: 1 }, error: null };
       if (fn === 'log_report_export2') return { data: null, error: null };
       if (fn === 'has_grant') return { data: true, error: null };
-      if (fn === 'needs_you_oldest') return { data: [{ kind: 'entry', id: 'e1', label: '10-2 #9002', location_id: 1, since: new Date(Date.now() - 30 * 3600e3).toISOString(), route: 'entry/e1' }], error: null };
+      if (fn === 'needs_you_oldest') return { data: [{ kind: 'entry', id: 'e1', label: '11-1 #9002', location_id: 1, since: new Date(Date.now() - 30 * 3600e3).toISOString(), route: 'entry/e1' }], error: null };
       if (fn === 'day_book') return { data: M.noBal ? { balances: false, start: '2026-01-01', totals: { close: null } } : { balances: true, start: '2026-01-01', totals: { close: { cash: 1000, bank: 2000, mobile: 500, total: 3500 } } }, error: null };
       if (fn === 'supplier_dues') return { data: [{ supplier_id: 's1', name: 'Dudh Ghor', balance: 3000, overdue: 1000, oldest: '2026-09-01', credit_days: 15 }, { supplier_id: 's2', name: 'Chini Mill', balance: 1500.25, overdue: 0, oldest: '2026-10-01', credit_days: 30 }], error: null };
-      if (fn === 'number_audit_summary') return { data: [{ form_code: '14-1', location_id: 1, entered: 48, first_no: 1, last_no: 50, missing_count: 2 }], error: null };
+      if (fn === 'number_audit_summary') return { data: [{ form_code: '06-1', location_id: 1, entered: 48, first_no: 1, last_no: 50, missing_count: 2 }], error: null };
       if (fn === 'biz_staff') return { data: [{ staff_id: 'testf02', n: 10, revenue: 5000, discount_pct: 4, med_discount_pct: 1, void_pct: 0, med_void_pct: 0 }], error: null };
       if (fn === 'report_run') {
         const loc = (args.p_filters && args.p_filters.locations) || null;
@@ -59,7 +59,7 @@ const MOCK = '(' + (function () {
           expense_by_head: { columns: [col('head', '', 'id'), col('head_bn', 'Head', 'text'), col('head_en', 'Head', 'text'), col('lines', 'Lines', 'int'), col('amount', 'Amount', 'money')], rows: [{ head: 'rent', head_bn: 'ভাড়া', head_en: 'Rent', lines: 1, amount: 20000 }, { head: 'elec', head_bn: 'বিদ্যুৎ', head_en: 'Electricity', lines: 2, amount: 5200 }], totals: { amount: 25200, lines: 3 } },
           stock_balance: { columns: [col('item_name', 'Item', 'text'), col('value', 'Value', 'money')], rows: [{ item_name: 'চিনি', value: 30000 }], totals: { value: 45678.9, lines: 10, low_lines: 2 } },
           l1_pnl: { columns: [col('month', 'Month', 'text'), col('profit', 'Profit', 'money')], rows: [{ month: '2026-10', profit: 4321 }], totals: { net_sales: 12345.5, cogs: 6000, expenses: 2024.5, salary: 0, fixed: 0, profit: 4321 } },
-          exceptions_summary: { columns: [col('form', 'Form', 'text'), col('open', 'Open', 'int')], rows: [{ form: '14-1', open: 3 }], totals: { total: 5, open: 3, red: 1, yellow: 2 } },
+          exceptions_summary: { columns: [col('form', 'Form', 'text'), col('open', 'Open', 'int')], rows: [{ form: '06-1', open: 3 }], totals: { total: 5, open: 3, red: 1, yellow: 2 } },
           cash_short_over: { columns: [col('location_id', '', 'id'), col('location_bn', 'Place', 'text'), col('location_en', 'Place', 'text'), col('net', 'Net', 'money')], rows: [{ location_id: 1, location_bn: 'ইসলামিয়া মেইন', location_en: 'Islamia Main', net: -250 }], totals: { net: -250, short_amount: 250, over_amount: 0, short_sheets: 1, sheets: 20 } },
           k2_count_variance: { columns: [], rows: [], totals: { counts: 9, off_n: 2, short_n: 1, over_n: 1 } },
           wastage: { columns: [col('reason_bn', 'Reason', 'text'), col('value', 'Value', 'money')], rows: [{ reason_bn: 'নষ্ট', value: 300 }], totals: { value: 300, entries: 4 } },

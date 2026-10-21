@@ -47,9 +47,9 @@ Visibility: the owner and holders of `crm_lead_all` see every enquiry. Everyone 
 | `online_order` | the EXISTING `online_order_save2` (which calls `online_order_save`) with the quote lines (every line needs an item with a list price), channel, delivery mode and date, address; discount = list price total minus quote total (a quote above list price is refused `price_above_list`); advance 0 | the normal new order (`online_orders`); the inbox message, when the enquiry came from one, is marked converted by the same existing function |
 | `form_20_4` | the EXISTING `save_entry` | a **draft** party invoice (doc = invoice) filled from the quote; the person completes and submits it the usual way; nothing is posted by this call |
 | `form_20_1` | the EXISTING `save_entry` | a **draft** customer order form (custom, party channel) |
-| `link_order`, `link_form` | nothing is created | links an order or a 20-1 / 20-4 entry that exists, same outlet, not cancelled, not already linked to another enquiry |
+| `link_order`, `link_form` | nothing is created | links an order or a 05-1 / 24-1 entry that exists, same outlet, not cancelled, not already linked to another enquiry |
 
-If `crm_order_task_days` is set and tasks are on, a task for the assigned person is added before the delivery date; it ends by itself when the order is delivered or cancelled (the list hides it at once, `_crmg_tasks_sweep` makes it stick). The caller needs the existing rights of the function used (POS enter and the setting `online_orders_on` for an order; the form right for a form: a showroom manager needs the role that may enter 20-4, e.g. `party_coordinator`).
+If `crm_order_task_days` is set and tasks are on, a task for the assigned person is added before the delivery date; it ends by itself when the order is delivered or cancelled (the list hides it at once, `_crmg_tasks_sweep` makes it stick). The caller needs the existing rights of the function used (POS enter and the setting `online_orders_on` for an order; the form right for a form: a showroom manager needs the role that may enter 24-1, e.g. `party_coordinator`).
 
 ## 4. Local build recipe (throwaway Postgres on port 5575; live Supabase is never touched)
 
@@ -154,8 +154,8 @@ Negative tests present: illegal stage jump (won to enquiry, lost to won, lost to
 
 * A **won** enquiry cannot be reopened (final), as the design allows only lost ones; a won enquiry marked by mistake before conversion has no undo yet (owner decision).
 * No customer-facing message is sent by anything here (no SMS, no WhatsApp); the reminder is an in-app line to staff only. The campaign package owns customer messages.
-* A quote is a priced list on the enquiry. There is no printed quotation document here (the paper form 20-4 in Quotation mode remains the printed one; `quote_ref` can hold its number). The planned quote document of plan item U-23, if built, can be linked through `quote_ref`.
+* A quote is a priced list on the enquiry. There is no printed quotation document here (the paper form 24-1 in Quotation mode remains the printed one; `quote_ref` can hold its number). The planned quote document of plan item U-23, if built, can be linked through `quote_ref`.
 * `online_order_save` always uses today's list price; an order from a quote above the list price is therefore refused and the draft party invoice is the way (its rate is typed).
-* The conversion to a draft 20-1 or 20-4 uses `save_entry`, so the rollout mode of the form (paper, parallel, app) and the form switch apply; a refusal from those guards is shown as is.
+* The conversion to a draft 05-1 or 24-1 uses `save_entry`, so the rollout mode of the form (paper, parallel, app) and the form switch apply; a refusal from those guards is shown as is.
 * UNTESTED: the live Supabase project, a real phone, the real notify workflow run, pg_cron, the board with hundreds of enquiries (the board shows at most 60 cards per stage and the last 30 days of won and lost), the Bangla look (English only by decision), `_crmg_status().staff_here` lists active staff with their names to people who may assign (names are staff data, no phones).
 * Not run: the older SQL suites on a database with these phases were not repeated, except `phase99_test` (identical to without, apart from the one expected T1 difference in 5.6) and the before/after script; the packages add no change to any older function.

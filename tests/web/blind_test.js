@@ -1,4 +1,4 @@
-// W5b: server-side blind count UI (14-1 drawer, 10-1 hub). The mock server returns the expected figure only from count_save / count_peek.
+// W5b: server-side blind count UI (06-1 drawer, 03-1 hub). The mock server returns the expected figure only from count_save / count_peek.
 // Run: node blind_test.js <abs tests/web dir>
 const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
@@ -25,7 +25,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
     await p.fill('[data-p="cash_count.n1000"]', String(notes[0])); await p.fill('[data-p="cash_count.n100"]', String(notes[1])); await wait(p, 100); };
   const open14 = async (p) => { await p.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); }); };
 
-  // ---------- A: blind ON, 14-1 ----------
+  // ---------- A: blind ON, 06-1 ----------
   let p = await open({}, '#/entry/new/14-1/1');
   await fill14(p, [9, 3]);
   ok(await p.locator('#blindbox').count() === 1 && await p.locator('#blind_save').count() === 1, 'blind box with Save count');
@@ -81,8 +81,8 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
     ok(/Expected drawer balance/.test(await p.evaluate(() => document.body.innerText)), 'old screen shows the expected line');
   }
 
-  // ---------- D: hub 10-1 ----------
-  const hub = { id: 'h1', form_code: '10-1', location_id: 1, serial: 7, entry_date: '2026-10-12', status: 'submitted', data: { count: { n1000: '5' }, leave_float: '1000', carrier: 'Rafiq' }, check_data: {}, flags: [], created_by: 'u9', created_staff: 'maker9', rev_no: 1 };
+  // ---------- D: hub 03-1 ----------
+  const hub = { id: 'h1', form_code: '03-1', location_id: 1, serial: 7, entry_date: '2026-10-12', status: 'submitted', data: { count: { n1000: '5' }, leave_float: '1000', carrier: 'Rafiq' }, check_data: {}, flags: [], created_by: 'u9', created_staff: 'maker9', rev_no: 1 };
   p = await open({ entries: [hub] }, '#/entry/h1');
   ok(await p.locator('#blind_hidden').count() === 1, 'the hub person does not see the sender\'s count while blind');
   ok(!/4,000|5,000/.test(await p.evaluate(() => document.body.innerText)), 'neither handover (4,000) nor the sender total (5,000) on the page');
@@ -97,7 +97,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.screenshot({ path: SP + '/bl_hub.png', fullPage: true });
 
   // ---------- E: other forms untouched ----------
-  p = await open({}, '#/entry/new/10-2/1'); ok(await p.locator('#blindbox').count() === 0 && (await calls(p, 'blind_active')).length === 0, 'a form that is not 14-1 / 10-1 never asks');
+  p = await open({}, '#/entry/new/10-2/1'); ok(await p.locator('#blindbox').count() === 0 && (await calls(p, 'blind_active')).length === 0, 'a form that is not 06-1 / 03-1 never asks');
   const ov = await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1); ok(ov, 'no horizontal overflow');
 
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);

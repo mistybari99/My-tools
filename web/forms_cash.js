@@ -1,5 +1,5 @@
 /* Islamia BOS · forms batch B (cash, receivables, marketing, ledgers), taken field by field from the BOS Build Kit v1.39.
-   10-3 · 10-4 · 10-5 · 14-2 · 18-1 · 20-5 · 20-6. Every limit comes from Location Settings; nothing is invented. */
+   07-1 · 04-1 · 30-1 · 14-1 · 17-1 · 25-1 · 20-6. Every limit comes from Location Settings; nothing is invented. */
 (() => {
 'use strict';
 const B = window.BOS, L = B.L, YN = B.YN, num = B.num, has = B.has, sum = B.sum;
@@ -29,7 +29,7 @@ addDefs([
   ['online_order_limit', 'A', 'অনলাইন অর্ডার — দিনে সর্বোচ্চ সংখ্যা (এর উপরে অনুমোদন)', 'Online orders — maximum per day (approval needed above)', 'number', 'টি'],
 ]);
 
-/* ============ 10-3 · Digital payment reconciliation register ============ */
+/* ============ 07-1 · Digital payment reconciliation register ============ */
 // showrooms come from the locations table (paused / closed places are not offered); the old fixed list is only a fallback when the table could not be read
 const SHOWROOMS_FALLBACK = [['s1', L('ইসলামিয়া মিষ্টি ঘর — মেইন', 'ISLAMIYA MISTY GHAR — Main')], ['s2', L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা', 'ISLAMIYA MISTY GHAR — 2nd Branch')], ['s3', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['s4', L('AL-CAKIZ', 'AL-CAKIZ')]];
 const showroomLocs = () => ((B.ENV && B.ENV.locs) || []).filter((l) => l.kind === 'showroom' && l.is_active !== false && ['live', 'setting_up', null, undefined].includes(l.status));
@@ -45,7 +45,7 @@ function recCalc(rows, pre, v) {
   v[pre + 'd1'] = r2(v[pre + 'a'] - v[pre + 'b']); v[pre + 'd2'] = r2(v[pre + 'b'] - v[pre + 'chg'] - v[pre + 'c']);
   return { out, abs1: r2(sum(out.map((o) => Math.abs(o.d1 || 0)))), abs2: r2(sum(out.map((o) => Math.abs(o.d2 || 0)))), noB: rows.filter((r) => has(r.a) && !has(r.b)).length };
 }
-B.forms['10-3'] = {
+B.forms['07-1'] = {
   title: L('ডিজিটাল পেমেন্ট রিকনসিলিয়েশন রেজিস্টার', 'Digital payment reconciliation register'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
   init(x, data) { if (!data.showroom) data.showroom = (showroomLocs().length ? showroomLocs().slice(0, 4).map((l) => l.code) : ['s1', 's2', 's3', 's4']).map((c) => ({ who: c })); },
@@ -94,8 +94,8 @@ B.forms['10-3'] = {
   },
 };
 
-/* ============ 10-4 · Cash position & purchase budget ============ */
-B.forms['10-4'] = {
+/* ============ 04-1 · Cash position & purchase budget ============ */
+B.forms['04-1'] = {
   title: L('ক্যাশ পজিশন ও পারচেজ বাজেট', 'Cash position & purchase budget'),
   head: [],
   sections: [
@@ -145,9 +145,9 @@ B.forms['10-4'] = {
   },
 };
 
-/* ============ 10-5 · Receivable & advance reconciliation ============ */
+/* ============ 30-1 · Receivable & advance reconciliation ============ */
 const ADV_STATUS = [['pending', L('বাকি', 'Pending')], ['given', L('দেওয়া হয়েছে', 'Delivered')], ['refunded', L('ফেরত দেওয়া', 'Refunded')]];
-B.forms['10-5'] = {
+B.forms['30-1'] = {
   title: L('প্রাপ্য ও অ্যাডভান্স রিকনসিলিয়েশন', 'Receivable & advance reconciliation'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
   sections: [
@@ -185,9 +185,9 @@ B.forms['10-5'] = {
   },
 };
 
-/* ============ 14-2 · Jalebi counter daily record ============ */
+/* ============ 14-1 · Jalebi counter daily record ============ */
 const kgT = (n) => L(fm(n) + ' কেজি', fm(n) + ' kg');
-B.forms['14-2'] = {
+B.forms['14-1'] = {
   title: L('জিলাপি কাউন্টার দৈনিক রেকর্ড', 'Jalebi counter daily record'),
   head: [T('produced_slot', L('উৎপাদনকারী (Produced by) — পদ / ডিউটি স্লট', 'Produced by — role / duty slot')),
     T('prepared_slot', L('প্রস্তুতকারী (Prepared by) — খামির (পদ / ডিউটি স্লট)', 'Prepared by (dough) — role / duty slot')), CH('roster', L('রোস্টার অনুযায়ী', 'As per the roster'), YN),
@@ -217,7 +217,7 @@ B.forms['14-2'] = {
     { title: L('Section C · দিনের হিসাব', 'Section C · The day\'s working'), fields: [
       NOTE(L('বেস রূপান্তর % ও প্রতি কেজি ময়দায় জিলাপি: ফলন টেস্ট শিটের (জিলাপি) অনুমোদিত গড় · প্রতি কেজির দাম: মূল্য তালিকা · সীমা: লোকেশন সেটিংস শিট', 'Base conversion % and jalebi per kg of flour: approved average of the yield test sheet (jalebi) · price per kg: price list · limit: location settings'), 'ok'),
       ITEM('jalebi_item', L('জিলাপি (মূল্য তালিকা থেকে দাম নিতে)', 'Jalebi item (price taken from the price list)'), { req: true }),
-      M('jalebi_sales', L('দৈনিক শোরুম শিটের জিলাপি বিক্রি ৳ (14-1 থেকে)', 'Jalebi sales ৳ from the daily showroom sheet (14-1)'), { req: true }),
+      M('jalebi_sales', L('দৈনিক শোরুম শিটের জিলাপি বিক্রি ৳ (06-1 থেকে)', 'Jalebi sales ৳ from the daily showroom sheet (06-1)'), { req: true }),
       CALC('c1', L('1 · ইস্যু হওয়া ময়দা (Section B-র মোট)', '1 · Flour issued (Section B total)'), 'text'),
       CALC('c2', L('2 · খোলার খামির − বন্ধের খামির', '2 · Opening dough − closing dough'), 'text'),
       CALC('c3', L('3 · খামির থেকে ময়দার হিসাব = (2) × 100 ÷ বেস রূপান্তর %', '3 · Flour worked out from dough = (2) × 100 ÷ base conversion %'), 'text'),
@@ -288,14 +288,14 @@ B.forms['14-2'] = {
   },
 };
 
-/* ============ 18-1 · Marketing expense register ============ */
+/* ============ 17-1 · Marketing expense register ============ */
 const MKT_HEADS = [['1', L('1 · অনলাইন বিজ্ঞাপন ও বুস্ট (ভ্যাটসহ)', '1 · Online ads & boost (with VAT)')], ['2', L('2 · কনটেন্ট তৈরি', '2 · Content creation')], ['3', L('3 · ছাপা', '3 · Printing')], ['4', L('4 · স্যাম্পল ও ট্রায়াল', '4 · Samples & trials')],
   ['5', L('5 · অফার ও ছাড়ের ক্যাম্পেইন', '5 · Offer & discount campaigns')], ['6', L('6 · ডেলিভারি ভর্তুকি', '6 · Delivery subsidy')], ['7', L('7 · প্ল্যাটফর্ম কমিশন', '7 · Platform commission')], ['8', L('8 · উৎসব ও ইভেন্ট', '8 · Festivals & events')],
   ['9', L('9 · পার্টনার', '9 · Partners')], ['10', L('10 · অন্যান্য (লিখুন)', '10 · Other (write it)')]];
 const MKT_SRC = [['imprest', L('ইমপ্রেস্ট (খরচের বাক্স)', 'Imprest (petty cash)')], ['bank', L('ব্যাংক', 'Bank')], ['card', L('কার্ড', 'Card')], ['mobile', L('মোবাইল', 'Mobile')], ['owner', L('মালিকের ব্যক্তিগত (লেজারে দুই দিকে)', 'Owner personal (both sides in the ledger)')]];
 const MONTHS = ['জানুয়ারি:January', 'ফেব্রুয়ারি:February', 'মার্চ:March', 'এপ্রিল:April', 'মে:May', 'জুন:June', 'জুলাই:July', 'আগস্ট:August', 'সেপ্টেম্বর:September', 'অক্টোবর:October', 'নভেম্বর:November', 'ডিসেম্বর:December'].map((m, i) => [String(i + 1), L(m.split(':')[0], m.split(':')[1])]);
 const MKT_BRANDS = [['imh', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['mb', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['ak', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')], ['all', L('সব', 'All')]];
-B.forms['18-1'] = {
+B.forms['17-1'] = {
   title: L('মার্কেটিং ব্যয় রেজিস্টার', 'Marketing expense register'),
   head: [SEL('month', L('মাস', 'Month'), MONTHS),
     CH('brand', L('ব্র্যান্ড', 'Brand'), () => (B.biz ? B.biz.brandOpts(MKT_BRANDS, ['other', 'all']) : MKT_BRANDS)),   // report_brand_map of the chosen business; MKT_BRANDS is the fallback
@@ -348,8 +348,8 @@ B.forms['18-1'] = {
   },
 };
 
-/* ============ 20-5 · Party & wholesale ledger ============ */
-B.forms['20-5'] = {
+/* ============ 25-1 · Party & wholesale ledger ============ */
+B.forms['25-1'] = {
   title: L('পার্টি ও পাইকারি লেজার', 'Party & wholesale ledger'),
   head: [T('page_no', L('পাতা নং', 'Page no.')), T('party', L('পার্টির নাম', 'Party name'), { req: true }), T('firm', L('প্রতিষ্ঠান / দোকান', 'Firm / shop')), T('phone', L('ফোন', 'Phone')), T('address', L('ঠিকানা', 'Address')),
     CH('rate_basis', L('দরের ভিত্তি', 'Rate basis'), [['list', L('পাইকারি তালিকা', 'Wholesale list')], ['special', L('বিশেষ', 'Special')]]),
@@ -388,8 +388,8 @@ B.forms['20-5'] = {
   },
 };
 
-/* ============ 20-6 · Online & delivery ledger ============ */
-B.forms['20-6'] = {
+/* ============ 23-1 · Online & delivery ledger ============ */
+B.forms['23-1'] = {
   title: L('অনলাইন ও ডেলিভারি লেজার', 'Online & delivery ledger'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
   sections: [
@@ -433,6 +433,6 @@ B.forms['20-6'] = {
   },
 };
 B.SETTING_DEFS.forEach((d) => { if (/^mkt_limit_/.test(d.key)) { d.hidden = true; d.label = L('মার্কেটিং খাতের মাসিক সীমা (তালিকা পাতায় দিন)', 'Marketing head monthly limit (set it on the Lists page)'); } });
-// RPT-C2 (#150): a Cashier box in the head of the daily showroom sheet 14-1 (the shift box is already there). Added once; older sheets simply have no cashier. Paper form code: unchanged (the box is a digital entry).
-if (B.forms['14-1'] && B.forms['14-1'].head && !B.forms['14-1'].head.some((f) => f.id === 'cashier')) B.forms['14-1'].head.push(ST('cashier', L('ক্যাশিয়ার (Cashier)', 'Cashier')));
+// RPT-C2 (#150): a Cashier box in the head of the daily showroom sheet 06-1 (the shift box is already there). Added once; older sheets simply have no cashier. Paper form code: unchanged (the box is a digital entry).
+if (B.forms['06-1'] && B.forms['06-1'].head && !B.forms['06-1'].head.some((f) => f.id === 'cashier')) B.forms['06-1'].head.push(ST('cashier', L('ক্যাশিয়ার (Cashier)', 'Cashier')));
 })();

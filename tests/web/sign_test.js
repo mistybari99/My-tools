@@ -22,7 +22,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   const calls = (p, fn) => p.evaluate((f) => (window.__AC || []).filter((c) => c[0] === f), fn);
   const signSheet = async (p, role, staff, pin) => { await p.click(`#pinbox [data-act=e_pin_sign][data-v=${role}]`); await wait(p, 600); if (staff) await p.selectOption('#ps_staff', staff); await p.fill('#ps_pin', pin); await p.click('[data-act=ps_go]'); await wait(p, 700); };
 
-  // ---------- switch ON, 14-1 ----------
+  // ---------- switch ON, 06-1 ----------
   let p = await open({}, '#/entry/new/14-1/1');
   ok(await p.locator('#pinbox').count() === 1, 'PIN signature box is shown');
   ok(await p.locator('[data-p="witness"]:visible').count() === 0 && await p.locator('[data-p="second_sig"]:visible').count() === 0, 'the old name pickers are gone while PIN signature is on');
@@ -71,12 +71,12 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   p = await open({}, '#/entry/new/14-1/1'); await p.click('[data-act=e_submit]'); await wait(p, 700);
   ok(/Witness/.test(await p.evaluate(() => document.body.innerText)) && /Not signed yet/.test(await p.evaluate(() => document.body.innerText)), 'missing list names the missing PIN signatures');
 
-  // ---------- 10-1 pair ----------
+  // ---------- 03-1 pair ----------
   p = await open({}, '#/entry/new/10-1/1');
   ok(await p.locator('#pinbox [data-act=e_pin_sign][data-v=hub_pair]').count() === 1, '10-1: one pair signature');
   await signSheet(p, 'hub_pair', 'teste03', '5555');
-  se = await calls(p, 'sign_entry'); ok(se.length === 1 && se[0][1].p_role === 'hub_pair', '10-1 pair signed through sign_entry');
-  ok(/Signed by: TestE/.test(await p.textContent('#pinbox')), '10-1 shows the signer');
+  se = await calls(p, 'sign_entry'); ok(se.length === 1 && se[0][1].p_role === 'hub_pair', '03-1 pair signed through sign_entry');
+  ok(/Signed by: TestE/.test(await p.textContent('#pinbox')), '03-1 shows the signer');
 
   // ---------- switch OFF / phase18 missing: the old name picker ----------
   for (const w6 of [{ pin: false, blind: false }, { pin: 'missing', blind: 'missing' }]) {

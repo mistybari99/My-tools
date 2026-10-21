@@ -96,7 +96,7 @@ def digest_sections(d):
         state = bi('কাগজে', 'paper') if sh.get('mode') == 'paper' else (bi('জমা হয়েছে', 'closed') if sh.get('closed') else bi('জমা হয়নি', 'NOT closed'))
         dc.append((bi(sh.get('name_bn') or '', sh.get('name_en') or ''), state))
     if dc:
-        sec.append((bi('দিন-শেষ (১৪-১)', 'Day-close (14-1)'), dc))
+        sec.append((bi('দিন-শেষ (১৪-১)', 'Day-close (06-1)'), dc))
     b = g(d, 'backup', default={}) or {}
     if b:
         age = g(b, 'age_hours')

@@ -1,7 +1,7 @@
 /* Islamia BOS · Landed cost: GRN picker + shipment hint (step Q4, bos107). NEW file; landed.js only gets a slot (#q4_grn) in its bill picker sheet.
    Server (already there, supabase/phase97.sql): landed_resolve_docs(p_docs [{type:'grn', id}]) -> [{type, doc_id, bill_id}]. A GRN has no prices, so it is turned into the posted purchase bill it is linked to;
    the bill ids join the same ticked list as the bills (D.pick of landed.js) and the normal "Continue" opens the editor. Several bills / GRNs ticked together = one shipment (per_shipment mode).
-   GRN list = entries of form 04-1 (submitted / approved), read through the normal RLS. Nothing is guessed: a GRN with no linked bill says so. Handlers are prefixed q4_. Loaded after landed.js. */
+   GRN list = entries of form 13-1 (submitted / approved), read through the normal RLS. Nothing is guessed: a GRN with no linked bill says so. Handlers are prefixed q4_. Loaded after landed.js. */
 (() => {
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
@@ -44,7 +44,7 @@ async function loadList() {
   box.innerHTML = `<p class="muted center">${esc(T('loading'))}</p>`;
   let rows = [];
   try {
-    const r = await sb.from('entries').select('id,serial,entry_date,status,location_id').eq('form_code', '04-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
+    const r = await sb.from('entries').select('id,serial,entry_date,status,location_id').eq('form_code', '13-1').in('status', ['submitted', 'approved']).order('entry_date', { ascending: false }).order('serial', { ascending: false }).limit(60);
     if (r && r.error) throw r.error; rows = (r && r.data) || [];
   } catch (e) { box.innerHTML = `<div class="notice bad">${esc(errTxt(e))}</div>`; return; }
   box.innerHTML = rows.length ? `<div class="stack">${rows.map((g) => `<label class="row between lc-pk"><span class="row"><input type="checkbox" data-q4g="${esc(g.id)}"><span>GRN ${esc(g.serial == null ? '' : g.serial)}<span class="hint"> ${esc(g.entry_date || '')} · ${esc(T('status'))}: ${esc(g.status || '')}</span></span></span></label>`).join('')}</div>

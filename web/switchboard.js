@@ -28,7 +28,7 @@ const X = {
 const LAYOUT_KEYS = ['todo_on', 'shift_on', 'announce_on'];
 const T = (k) => lab(X[k]);
 const D = { rows: [], q: '', mod: '', onlyCh: false, blind: [], pin: [], locs: [] };
-const FORMS_BLIND = ['14-1', '10-1', '04-3', '04-1'], FORMS_PIN = ['14-1', '10-1', '04-3'];
+const FORMS_BLIND = ['06-1', '03-1', '36-1', '13-1'], FORMS_PIN = ['06-1', '03-1', '36-1'];
 const rl = (r) => ({ bn: r.label_bn || r.key, mix: r.label_mix || r.label_bn || r.key, en: r.label_en || r.label_bn || r.key });
 const rh = (r) => (r.hint_bn || r.hint_en) ? { bn: r.hint_bn || r.hint_en, mix: r.hint_mix || r.hint_bn || r.hint_en, en: r.hint_en || r.hint_bn } : null;
 const cur = (r) => (r.value !== null && r.value !== undefined ? r.value : r.default_value);

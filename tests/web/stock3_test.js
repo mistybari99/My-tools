@@ -70,7 +70,7 @@ const IT = base.tables.items;
   let up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^STOCK\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]), 'wastage photo goes to the STOCK prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
   p = await open({ photoAbove: 5, m: { levels, upFail: 'STOCK/' } }, '#/stock'); await p.click('[data-act=s2_actions]'); await wait(p, 300); await p.click('[data-act=s2_do][data-v=waste]'); await wait(p, 300);
   await p.setInputFiles('#a_file', SP + '/pic.png'); await wait(p, 700);
-  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^04-1\/1\//.test(up[0][0]), 'database without phase12: falls back to the old form prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
+  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^13-1\/1\//.test(up[0][0]), 'database without phase12: falls back to the old form prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
 
   // ---------- wastage above the owner limit: pending ----------
   p = await open({ m: { levels, pendingWaste: true, wa } }, '#/stock'); await p.click('[data-act=s2_actions]'); await wait(p, 300); await p.click('[data-act=s2_do][data-v=waste]'); await wait(p, 300);

@@ -1,7 +1,7 @@
 /* Islamia BOS · Order and delivery reports (#/orderreports) + the order capture helper (BOS.c2orders) used by the Online orders screen (salesx.js).
    Reports #153 register, #155 cake orders, #156 advance and balances, #159 delayed, #158 on-time, #163 fulfilment, #157 cancellations and refunds, #162 delivery cost, #160 order production cost, #161 order profit.
    Server: supabase/phase445.sql .. phase452.sql. Reads only, except the capture helpers (cake specification, promised slot, delivery cost, advance posting, refund, production link), which call server functions
-   that decide every right. A missing figure is shown as "not captured", never 0. The three sources (app order, paper 20-1, paper 20-6) are never added together. English labels (owner rule). */
+   that decide every right. A missing figure is shown as "not captured", never 0. The three sources (app order, paper 05-1, paper 23-1) are never added together. English labels (owner rule). */
 (() => {
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
@@ -10,7 +10,7 @@ if (!C) { console.warn('orderreports: c2rpt.js is not loaded'); return; }
 const { sb, esc, toast, fail, H, openSheet, closeSheet, S } = A;
 const { E, lab, today, addDays, fmt, tableHTML, tiles, rpc, makePage } = C;
 const $ = (s, el = document) => el.querySelector(s);
-const SRC = { app: 'App order', paper_20_1: 'Paper 20-1', paper_20_6: 'Paper 20-6 line' };
+const SRC = { app: 'App order', paper_20_1: 'Paper 05-1', paper_20_6: 'Paper 23-1 line' };
 const ST = { new: 'New', confirmed: 'Confirmed', packed: 'Packed', delivered: 'Delivered', cancelled: 'Cancelled', open: 'Open (paper)', handed: 'Handed over', not_collected: 'Not collected', returned: 'Returned', not_written: 'Not written' };
 const ADV = { none: 'No advance', held_in_books: 'Held, in the books', held_not_in_books: 'Held, NOT in the books', paid_into_sale: 'Paid into the sale', applied_to_sale: 'Applied to the sale', held_not_applied: 'Held, not applied yet', refunded: 'Refunded',
   refund_due: 'Refund due', refund_closed: 'Refund closed unpaid', refund_not_recorded: 'Refund NOT recorded', kept_as_customer_advance: 'Kept as customer advance', kept_for_adjustment: 'Kept for adjustment', taken_as_income: 'Taken as income', on_sheet: 'On the sheet', unknown: 'Not decided' };
@@ -28,7 +28,7 @@ const srcExtra = (withPaper6) => ({ html: (f) => sel('c2_src', 'Source', [['', '
 const sumTiles = (o) => tiles(Object.keys(o).map((k) => [k, o[k]]));
 
 const TABS = [
-  { id: 'register', label: 'Order register', intro: '#153 · Every order in one list with its source: app orders, paper 20-1 sheets and paper 20-6 ledger lines. Sources are never merged.', filters: ['range', 'loc'],
+  { id: 'register', label: 'Order register', intro: '#153 · Every order in one list with its source: app orders, paper 05-1 sheets and paper 23-1 ledger lines. Sources are never merged.', filters: ['range', 'loc'],
     extra: [srcExtra(true), { html: (f) => sel('c2_by', 'Dates are', [['order', 'the day the order was taken'], ['promised', 'the promised delivery day']], f.by), read: (f, g) => { f.by = g('c2_by'); } },
       { html: (f) => sel('c2_st', 'Status', [['', 'Any']].concat(Object.keys(ST).map((k) => [k, ST[k]])), f.status), read: (f, g) => { f.status = g('c2_st'); } }],
     run: (f) => rpc('c2_order_register', { p_from: f.from, p_to: f.to, p_loc: locArg(f), p_source: f.source || null, p_status: f.status || null, p_by: f.by || 'order', p_limit: 2000 }),
@@ -37,7 +37,7 @@ const TABS = [
       + tableHTML({ name: 'order-register', rows: r.rows, drill: drillOrder, cols: idCols.concat([mk('order_date', 'Taken', 'date'), mk('customer_name', 'Customer', 'text'), mk('customer_mobile', 'Mobile', 'text'), mk('channel', 'Channel', 'text'), mk('order_type', 'Type', 'text'),
         mk('status', 'Status', 'text', { words: ST }), mk('promised', 'Promised', 'text', { get: promised }), mk('total', 'Total', 'money'), mk('advance', 'Advance', 'money'), mk('balance', 'Balance', 'money'), mk('advance_state', 'Advance state', 'text', { words: ADV }),
         mk('delivery_cost', 'Delivery cost', 'money')]) }) + (r.truncated ? `<p class="muted">More rows exist than shown (limit 2000). Narrow the dates.</p>` : ''); } },
-  { id: 'cake', label: 'Cake orders', intro: '#155 · Cake and custom orders: the specification written on the app order, beside the paper 20-1 custom sheets.', filters: ['range', 'loc'], extra: [srcExtra(false)],
+  { id: 'cake', label: 'Cake orders', intro: '#155 · Cake and custom orders: the specification written on the app order, beside the paper 05-1 custom sheets.', filters: ['range', 'loc'], extra: [srcExtra(false)],
     run: (f) => rpc('c2_cake_register', { p_from: f.from, p_to: f.to, p_loc: locArg(f), p_source: f.source || null }),
     render: (r) => tiles([['Rows', fmt.int((r.rows || []).length)], ['App orders with no cake specification', fmt.int(r.app_orders_without_spec)]])
       + tableHTML({ name: 'cake-orders', rows: r.rows, drill: drillOrder, cols: [mk('source', 'Source', 'text', { words: SRC }), mk('ref', 'Ref', 'text'), mk('order_date', 'Taken', 'date'), mk('customer_name', 'Customer', 'text'), mk('promised', 'Promised', 'text', { get: promised }),
@@ -48,12 +48,12 @@ const TABS = [
     render: (r) => { const a = (r.summary || {}).app || {}, p = (r.summary || {}).paper_20_1 || {};
       return `<div class="card stack"><b>App orders</b>${tiles([['Advance held on open orders', fmt.money(a.advance_held_open_orders)], ['…of it NOT in the books', fmt.money(a.advance_not_in_books_open)], ['Balance to collect, open orders', fmt.money(a.balance_to_collect_open_orders)], ['Still owed after delivery', fmt.money(a.still_owed_after_delivery)],
         ['Advance to return, cancelled', fmt.money(a.advance_to_return_cancelled)], ['Posted advance not yet applied', fmt.money(a.advance_posted_not_applied)]])}</div>
-        <div class="card stack"><b>Paper 20-1</b>${tiles([['Advance, open sheets', fmt.money(p.advance_open_sheets)], ['Balance, open sheets', fmt.money(p.balance_open_sheets)], ['Open sheets with no total', fmt.int(p.open_sheets_without_total)], ['Handed over, due payment not written', fmt.int(p.handed_without_due_payment_written)]])}</div>`
+        <div class="card stack"><b>Paper 05-1</b>${tiles([['Advance, open sheets', fmt.money(p.advance_open_sheets)], ['Balance, open sheets', fmt.money(p.balance_open_sheets)], ['Open sheets with no total', fmt.int(p.open_sheets_without_total)], ['Handed over, due payment not written', fmt.int(p.handed_without_due_payment_written)]])}</div>`
       + tableHTML({ name: 'order-balances', rows: r.rows, drill: drillOrder, cols: idCols.concat([mk('order_date', 'Taken', 'date'), mk('customer_name', 'Customer', 'text'), mk('status', 'Status', 'text', { words: ST }), mk('total', 'Total', 'money'), mk('advance', 'Advance', 'money'), mk('balance', 'Balance', 'money'),
         mk('balance_basis', 'Basis', 'text', { words: BASIS }), mk('advance_state', 'Advance state', 'text', { words: ADV })]) }); } },
   { id: 'delayed', label: 'Delayed orders', intro: '#159 · Open orders whose promised time has passed. Orders with no promised date cannot be judged and are counted apart.', filters: ['loc'],
     run: (f) => rpc('c2_orders_delayed', { p_loc: locArg(f), p_as_of: null, p_from: null, p_to: null }),
-    render: (r) => { const s = r.summary || {}; return tiles([['Delayed', fmt.int(s.delayed)], ['App orders', fmt.int(s.delayed_app)], ['Paper 20-1', fmt.int(s.delayed_paper_20_1)], ['Oldest (days late)', fmt.int(s.oldest_days)], ['Judged by slot', fmt.int(s.judged_by_slot)], ['Judged by date only', fmt.int(s.judged_by_date_only)],
+    render: (r) => { const s = r.summary || {}; return tiles([['Delayed', fmt.int(s.delayed)], ['App orders', fmt.int(s.delayed_app)], ['Paper 05-1', fmt.int(s.delayed_paper_20_1)], ['Oldest (days late)', fmt.int(s.oldest_days)], ['Judged by slot', fmt.int(s.judged_by_slot)], ['Judged by date only', fmt.int(s.judged_by_date_only)],
         ['Open, no promised date', fmt.int(s.open_without_promised_date)], ['Open, not yet due', fmt.int(s.open_not_yet_due)]])
       + tableHTML({ name: 'delayed-orders', rows: r.rows, drill: drillOrder, cols: idCols.concat([mk('customer_name', 'Customer', 'text'), mk('status', 'Status', 'text', { words: ST }), mk('promised', 'Promised', 'text', { get: promised }), mk('overdue_hours', 'Hours late', 'num'), mk('overdue_days', 'Days late', 'int'),
         mk('basis', 'Judged by', 'text', { words: { slot: 'Time slot', date_only: 'Date only' } }), mk('advance', 'Advance', 'money'), mk('balance', 'Balance', 'money')]) }); } },
@@ -76,7 +76,7 @@ const TABS = [
       + tableHTML({ name: 'cancellations', rows: r.rows, drill: (x) => B.c2orders.detail(x.order_id), cols: [mk('ref', 'Ref', 'text'), mk('cancelled_at', 'Cancelled', 'ts'), mk('customer_name', 'Customer', 'text'), mk('reason', 'Reason', 'text'), mk('total', 'Total', 'money'), mk('advance', 'Advance', 'money'),
         mk('advance_state', 'Advance state', 'text', { words: ADV }), mk('refund_mode', 'Refund by', 'text')] })
       + tableHTML({ name: 'cancel-reasons', title: 'By reason', rows: r.by_reason, cols: [mk('reason', 'Reason', 'text'), mk('orders', 'Orders', 'int'), mk('advance', 'Advance', 'money')] })
-      + `<div class="card stack"><b>Paper 20-1 not collected</b>${tiles([['Sheets', fmt.int(pp.sheets_not_collected)], ['Advance', fmt.money(pp.advance)]])}</div>`
+      + `<div class="card stack"><b>Paper 05-1 not collected</b>${tiles([['Sheets', fmt.int(pp.sheets_not_collected)], ['Advance', fmt.money(pp.advance)]])}</div>`
       + (r.refunds ? tableHTML({ name: 'refunds', title: 'Refund records', rows: r.refunds.rows, drill: (x) => B.c2orders.detail(x.order_id), cols: [mk('order_no', 'Order', 'text', { get: (x) => '#' + x.order_no }), mk('customer_name', 'Customer', 'text'), mk('amount', 'Amount', 'money'), mk('refund_mode', 'By', 'text'), mk('state', 'State', 'text', { words: { due: 'Due', paid: 'Paid', void: 'Closed unpaid' } }), mk('paid_at', 'Paid', 'ts'), mk('found_at_refund', 'Advance recorded now', 'bool')] }) : ''); } },
   { id: 'dcost', label: 'Delivery cost', intro: '#162 · What the customer paid for delivery against the actual cost written at delivery. Orders with no cost written are counted apart, never treated as free.', filters: ['range', 'loc'],
     run: (f) => rpc('c2_delivery_cost_report', { p_from: f.from, p_to: f.to, p_loc: locArg(f) }),
@@ -86,7 +86,7 @@ const TABS = [
       + tableHTML({ name: 'delivery-cost', rows: r.rows, drill: (x) => B.c2orders.detail(x.order_id), cols: [mk('ref', 'Ref', 'text'), mk('order_date', 'Taken', 'date'), mk('customer_name', 'Customer', 'text'), mk('delivery_mode', 'Mode', 'text'), mk('delivery_by', 'Delivered by', 'text'), mk('status', 'Status', 'text', { words: ST }), mk('charge', 'Charge', 'money'), mk('cost', 'Cost', 'money'), mk('margin', 'Margin', 'money')] })
       + (r.by_kind ? tableHTML({ name: 'delivery-cost-kinds', title: 'Cost by kind', rows: Object.keys(r.by_kind).map((k) => Object.assign({ kind: k }, r.by_kind[k])), cols: [mk('kind', 'Kind', 'text'), mk('amount', 'Amount', 'money'), mk('rows', 'Entries', 'int')] }) : '')
       + (r.by_delivery_by ? tableHTML({ name: 'delivery-cost-by', title: 'By who delivered', rows: r.by_delivery_by, cols: [mk('delivery_by', 'Delivered by', 'text'), mk('orders', 'Orders', 'int'), mk('orders_with_cost', 'With cost', 'int'), mk('cost', 'Cost', 'money'), mk('charge', 'Charge', 'money')] }) : '')
-      + `<div class="card stack"><b>Paper 20-6 ledger</b>${tiles([['Lines', fmt.int(pp.lines)], ['Delivery charge', fmt.money(pp.delivery_charge)], ['Lines with no charge written', fmt.int(pp.lines_without_charge_written)]])}</div>`; } },
+      + `<div class="card stack"><b>Paper 23-1 ledger</b>${tiles([['Lines', fmt.int(pp.lines)], ['Delivery charge', fmt.money(pp.delivery_charge)], ['Lines with no charge written', fmt.int(pp.lines_without_charge_written)]])}</div>`; } },
   { id: 'prodcost', label: 'Order production cost', intro: '#160 · The cost of the production runs linked to an order. Needs the cost right.', filters: ['range', 'loc'],
     run: (f) => rpc('c2_order_production_cost', { p_from: f.from, p_to: f.to, p_loc: locArg(f), p_order: null }),
     render: (r) => tiles([['Cake orders with no linked run', fmt.int(r.cake_orders_without_a_linked_run)]])
@@ -203,5 +203,5 @@ const c2orders = {
 B.c2orders = c2orders;
 B.c2link && B.c2link('c2_orders', 'orderreports', 'Order and delivery reports', 'c2_orders_features', () => ({}));
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { orderreports: view });
-document.addEventListener('change', (e) => { if (e.target && e.target.id === 'c2_cfile') { const f = e.target.files && e.target.files[0]; const U = B.s2; if (f && U && U.uploadPhoto) { toast('…'); U.uploadPhoto(f, ['POS', 'STOCK', '20-1'], (S.ctx.locations || [1])[0] || 1).then((p) => { const el = $('#c2_cp'); if (el) el.value = p; }, (er) => toast(String((er && er.message) || er))); } } });
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'c2_cfile') { const f = e.target.files && e.target.files[0]; const U = B.s2; if (f && U && U.uploadPhoto) { toast('…'); U.uploadPhoto(f, ['POS', 'STOCK', '05-1'], (S.ctx.locations || [1])[0] || 1).then((p) => { const el = $('#c2_cp'); if (el) el.value = p; }, (er) => toast(String((er && er.message) || er))); } } });
 })();

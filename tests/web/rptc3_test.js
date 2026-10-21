@@ -1,4 +1,4 @@
-// RPT-C3 web screens: campaigns.js, couponuse.js, auditreports.js, forecast.js (rptkit.js), the till hooks in pos.js, the 18-1 campaign field, ia.js placement, the CSV rule, 360px layout.
+// RPT-C3 web screens: campaigns.js, couponuse.js, auditreports.js, forecast.js (rptkit.js), the till hooks in pos.js, the 17-1 campaign field, ia.js placement, the CSV rule, 360px layout.
 // Server answers are canned stand-ins in the shape the SQL returns (the SQL itself is tested in supabase/phase458..468_test.sql). Run: node rptc3_test.js <abs tests/web dir>
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
@@ -9,7 +9,7 @@ const WEB = process.env.BOS_WEB_ROOT || '/home/user/My-tools/web';
 const TD = new Date(Date.now() + 6 * 3600e3).toISOString().slice(0, 10);
 const R = {
   mkt_spend_by_campaign: { rows: [{ campaign_code: 'ca', name_en: 'Alpha promo', name_bn: 'অ্যালফা', spend: 300, lines: 1, budget: 1000, budget_used_pct: 30, nonpay_value: null, first_day: TD, last_day: TD }, { campaign_code: null, name_en: null, spend: 100, lines: 1, budget: null, budget_used_pct: null, nonpay_value: 80 }],
-    by_month: [{ month: TD.slice(0, 8) + '01', campaign_code: 'ca', spend: 300 }], totals: { spend: 400, nonpay_value: null, lines: 2 }, coverage: { pct: 50, spend_with_campaign_pct: 75 }, notes: ['spend_paid_only', 'no_such_code_zz'], basis: 'paid 18-1 lines' },
+    by_month: [{ month: TD.slice(0, 8) + '01', campaign_code: 'ca', spend: 300 }], totals: { spend: 400, nonpay_value: null, lines: 2 }, coverage: { pct: 50, spend_with_campaign_pct: 75 }, notes: ['spend_paid_only', 'no_such_code_zz'], basis: 'paid 17-1 lines' },
   mkt_spend_lines: { rows: [{ day: TD, head: '1', head_name: 'Online ads', amt: 300, source: 'bank', campaign_txt: null, receipt: 'R1', status: 'approved', in_books: false }] },
   mkt_campaign_performance: { rows: [{ campaign_code: 'ca', name_en: 'Alpha promo', tagged_bills: 2, revenue_net: 300, discount_given: 0, cogs: null, contribution_costed: null, cost_coverage_pct: null, spend: 300, after_spend_costed: null, identified_customers: 1 }], totals: { revenue_net: 300 }, coverage: { tagged_pct: 60, tagged_revenue_pct: 49 }, notes: ['cost_hidden', 'tagged_sales_only'], basis: 'b' },
   mkt_roi: { rows: [{ campaign_code: 'ca', name_en: 'Alpha promo', roi_pct_costed_part: null, why_no_roi: 'cost_hidden', revenue_per_taka: 1, revenue_net: 300, spend: 300 }], unassigned_spend_not_in_roi: 100, coverage: { tagged_pct: 60 }, notes: ['unassigned_spend_not_in_roi'] },
@@ -71,7 +71,7 @@ const EXTRA3 = `(function(){ const real = window.supabase.createClient; window.s
   await p.click('#cp_t0 .rp-row:nth-child(2)'); await p.click('[data-act=cp_drill]'); await wait(p, 300); ok((await calls(p, 'mkt_spend_lines')).pop().p_campaign === '__none', 'the unassigned row drills with __none');
   await p.click('.sheet [data-act=closesheet]'); await wait(p, 150);
   const dl = p.waitForEvent('download'); await p.click('#cp_csvb'); const d = await dl; const t = fs.readFileSync(await d.path(), 'utf8');
-  ok(/^﻿?campaign_code|^﻿?name/.test(t) || /Alpha promo/.test(t) || /spend/.test(t), 'csv has the table'); ok(/Marketing campaigns and reports/.test(t) && /paid 18-1 lines/.test(t) && /Asia\/Dhaka/.test(t), 'csv footer: title, basis, who/when');
+  ok(/^﻿?campaign_code|^﻿?name/.test(t) || /Alpha promo/.test(t) || /spend/.test(t), 'csv has the table'); ok(/Marketing campaigns and reports/.test(t) && /paid 17-1 lines/.test(t) && /Asia\/Dhaka/.test(t), 'csv footer: title, basis, who/when');
   const lg = await calls(p, 'rptc3_export_log'); ok(lg.length === 1 && lg[0].p_key === 'mkt_spend' && lg[0].p_kind === 'csv', 'export logged before the file (rptc3_export_log)');
   await p.close();
   // CSV refused by the server -> no file
@@ -96,7 +96,7 @@ const EXTRA3 = `(function(){ const real = window.supabase.createClient; window.s
 
   // ---------- 4. posting tab: dry run, decision ----------
   p = await open({ prompt: 'same as the voucher' }, '#/campaigns'); await p.click('[data-act=cp_tab][data-v=post]'); await wait(p, 500);
-  ok(/Looks like a 10-2 line/.test(await txt(p, '#cp_t0')) && /To post/.test(await txt(p, '#cp_t0')), 'line states shown in words');
+  ok(/Looks like a 11-1 line/.test(await txt(p, '#cp_t0')) && /To post/.test(await txt(p, '#cp_t0')), 'line states shown in words');
   await p.click('#cp_post_dry'); await wait(p, 400); const pr = await calls(p, 'mkt_post_run'); ok(pr.length === 1 && pr[0].p_dry === true, 'dry run asks for a dry run'); ok(/Dry run: 1/.test(await txt(p, '#cp_post_res')), 'dry result shown');
   await p.click('#cp_t0 .rp-row:first-child'); await wait(p, 200); await p.click('.sheet [data-act=cp_dec][data-v=skip]'); await wait(p, 400);
   const dc = await calls(p, 'mkt_post_decide'); ok(dc.length === 1 && dc[0].p_decision === 'skip' && dc[0].p_line === 1 && dc[0].p_reason === 'same as the voucher', 'decision sent with a reason');
@@ -157,7 +157,7 @@ const EXTRA3 = `(function(){ const real = window.supabase.createClient; window.s
   ok(/B\.mkt && B\.mkt\.posBox/.test(pos) && /B\.mkt\.afterSale\(data\.id\)/.test(pos) && /B\.mkt\.queued\(p\.p_client\)/.test(pos), 'pos.js has the three optional hooks');
   ok(['rptkit', 'campaigns', 'couponuse', 'auditreports', 'forecast'].every((s) => idx.includes(`<script src="${s}.js">`)) && idx.indexOf('rptkit.js') < idx.indexOf('campaigns.js'), 'scripts in index.html, kit first');
   ['campaigns', 'couponuse', 'auditreports', 'forecast'].forEach((r) => ok((ia.match(new RegExp(`rec\\('${r}'`, 'g')) || []).length === 1, 'ia.js registers ' + r + ' once'));
-  ok(/SEL\('campaign_id'/.test(fc) && /T\('campaign'/.test(fc), '18-1 keeps the free-text campaign field and gains the list field');
+  ok(/SEL\('campaign_id'/.test(fc) && /T\('campaign'/.test(fc), '17-1 keeps the free-text campaign field and gains the list field');
   const ff = fs.readFileSync(WEB + '/forms_cash.js', 'utf8'); ok(!/marketing_post_on/.test(ff), 'no setting logic hidden in a form');
   log('assertions:', n); log('errors:', errors.length ? errors.slice(0, 8).join(' | ') : 'none'); log('assert failures:', bad);
   await br.close(); srv.close(); process.exit(bad || errors.length ? 1 : 0);

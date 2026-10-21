@@ -96,8 +96,8 @@ const BRANDS_DB = [{ location_id: 1, brand_code: 'islamiya', brand_bn: 'ইস�
   ok(JSON.stringify(r1) === JSON.stringify(['islamia', 'hw_brand', 'other']) || JSON.stringify(r1) === JSON.stringify(['islamia', 'other']), 'DB brand keeps the old stored code when it is the same brand: ' + r1);
   p = await open('#/home', { rows: ORG({}), brands: false });
   const r2 = await p.evaluate((f) => window.BOS.biz.brandOpts(f, ['other']), fb); ok(JSON.stringify(r2) === JSON.stringify(fb), 'empty DB list = the old list exactly');
-  const f185 = await p.evaluate(() => { const f = window.BOS.forms['05-5'].head.find((x) => x.id === 'brand' || x.key === 'brand'); const o = f && (typeof f.options === 'function' ? f.options() : f.options); return o ? o.map((x) => x[0]) : null; });
-  ok(JSON.stringify(f185) === JSON.stringify(['islamia', 'bari', 'alcakes', 'other']), 'form 05-5 brand select unchanged when the DB list is empty: ' + f185);
+  const f185 = await p.evaluate(() => { const f = window.BOS.forms['22-1'].head.find((x) => x.id === 'brand' || x.key === 'brand'); const o = f && (typeof f.options === 'function' ? f.options() : f.options); return o ? o.map((x) => x[0]) : null; });
+  ok(JSON.stringify(f185) === JSON.stringify(['islamia', 'bari', 'alcakes', 'other']), 'form 22-1 brand select unchanged when the DB list is empty: ' + f185);
   p = await open('#/home', { rows: ORG({ two: true }) });
   const r3 = await p.evaluate((f) => window.BOS.biz.brandOpts(f, ['other']).map((x) => x[0]), fb); ok(JSON.stringify(r3) === JSON.stringify(['islamia', 'other']), 'brand list cut to the chosen business: ' + r3);
   await p.evaluate(() => window.BOS.biz.setCur(20));

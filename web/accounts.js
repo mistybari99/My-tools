@@ -665,7 +665,7 @@ document.addEventListener('change', async (e) => {
   if (t.dataset && t.dataset.op !== undefined) { const e2 = D.op.rows[t.dataset.op]; if (e2 && e2.parts[Number(t.dataset.i)]) { e2.parts[Number(t.dataset.i)][t.dataset.k] = t.value; if (t.dataset.k === 'amt') { await draw(); } opTotals(); } return; }
   if (t.id === 'ac_file') {
     const f = t.files && t.files[0]; if (!f) return;
-    try { const U = B.s2; if (!U || !U.uploadPhoto) throw new Error('photo'); toast('…'); D.jphoto = await U.uploadPhoto(f, ['ACCOUNTS', 'STOCK', '10-2'], Number(($('#ac_jloc') || {}).value) || ((locs()[0] || {}).id)); const el = $('#ac_ph'); if (el) el.textContent = '📎 ' + D.jphoto; } catch (er) { toast(eText(er)); }
+    try { const U = B.s2; if (!U || !U.uploadPhoto) throw new Error('photo'); toast('…'); D.jphoto = await U.uploadPhoto(f, ['ACCOUNTS', 'STOCK', '11-1'], Number(($('#ac_jloc') || {}).value) || ((locs()[0] || {}).id)); const el = $('#ac_ph'); if (el) el.textContent = '📎 ' + D.jphoto; } catch (er) { toast(eText(er)); }
   }
 });
 document.addEventListener('input', (e) => {

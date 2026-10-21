@@ -74,21 +74,21 @@ const click = (t, act, ds) => t.handlers[act]({ dataset: ds || {} });
   // ---- 4. E5: form guard + unmatched ----
   {
     const t = mk('en', true);
-    const recs = [{ key: 'form_051_mode', current: 'reference', recommended: 'post', reason_bn: 'ক', reason_mix: 'm', reason_en: 'Post because 05-1 is the record' },
+    const recs = [{ key: 'form_051_mode', current: 'reference', recommended: 'post', reason_bn: 'ক', reason_mix: 'm', reason_en: 'Post because 12-1 is the record' },
       { key: 'transit_short_mode', current: 'keep_in_transit', recommended: 'loss', reason_bn: 'ক', reason_mix: 'm', reason_en: 'Book the loss' },
       { key: 'transit_open_hours', current: null, recommended: null, reason_bn: 'ক', reason_mix: 'm', reason_en: 'Enter a little more than normal' },
       { key: 'offline_soft_stock', current: false, recommended: true, reason_bn: 'ক', reason_mix: 'm', reason_en: 'Goods already handed over' }];
     t.impl.rpc = async (fn) => (fn === 'form_guard_recommendations' ? { data: recs, error: null } : { data: null, error: null });
     await t.pages.formguard(); const h = html(t);
     chk('guard page: 4 cards, each with the server recommendation text, English only', (h.match(/data-rule=/g) || []).length === 4 && /Post because 05-1/.test(h) && /Goods already handed over/.test(h) && !BN.test(h));
-    chk('guard page: form 05-1 has reference/post/refuse buttons, switch has On/Off', /wx_set" data-k="form_051_mode" data-v="refuse"/.test(h) && /data-k="offline_soft_stock" data-v="true"/.test(h));
+    chk('guard page: form 12-1 has reference/post/refuse buttons, switch has On/Off', /wx_set" data-k="form_051_mode" data-v="refuse"/.test(h) && /data-k="offline_soft_stock" data-v="true"/.test(h));
     const tb = mk('bn', true); tb.impl.rpc = async () => ({ data: recs, error: null }); await tb.pages.formguard();
     chk('Bangla mode picks reason_bn', /ক/.test(html(tb)));
     const no = mk('en', false); await no.pages.formguard();
     chk('non-owner: no recommendation call, owner-only note', !no.calls.some((c) => c[0] === 'form_guard_recommendations') && /Owner only/.test(html(no)));
 
     const u = mk('en', true);
-    u.impl.rpc = async (fn, a) => (fn === 'unmatched_forms' ? { data: { lines_checked: 5, lines_unmatched: 2, rows: [{ entry_id: 'e1', form_code: '05-1', serial: 7, location_id: 1, entry_date: '2026-10-01', line_no: 2, item_code: 'F-001', qty: 5, link_id: 9 }] }, error: null } : { data: { confirmed: 3 }, error: null });
+    u.impl.rpc = async (fn, a) => (fn === 'unmatched_forms' ? { data: { lines_checked: 5, lines_unmatched: 2, rows: [{ entry_id: 'e1', form_code: '12-1', serial: 7, location_id: 1, entry_date: '2026-10-01', line_no: 2, item_code: 'F-001', qty: 5, link_id: 9 }] }, error: null } : { data: { confirmed: 3 }, error: null });
     await u.pages.unmatched(); await new Promise((r) => setTimeout(r, 0)); const uh = html(u);
     chk('unmatched: rpc args default last 30 days, no place', u.calls[0][0] === 'unmatched_forms' && /^\d{4}-\d\d-\d\d$/.test(u.calls[0][1].p_from) && u.calls[0][1].p_loc === null);
     chk('unmatched: row, counts, link flag, note, English only', /05-1/.test(uh) && /Unmatched: 2/.test(uh) && /F-001/.test(uh) && /link exists/.test(uh) && /count slip/.test(uh) && !BN.test(uh));
@@ -102,7 +102,7 @@ const click = (t, act, ds) => t.handlers[act]({ dataset: ds || {} });
     const t = mk('en', true);
     t.impl.from.entries = { data: [{ id: 'v1', serial: 11, entry_date: '2026-10-02', location_id: 1, status: 'submitted' }] };
     await t.pages.expenselink(); await new Promise((r) => setTimeout(r, 0));
-    chk('voucher list shows 10-2 with a Check button', /#11/.test(html(t)) && /wfg_el_check/.test(html(t)));
+    chk('voucher list shows 11-1 with a Check button', /#11/.test(html(t)) && /wfg_el_check/.test(html(t)));
     t.impl.rpc = async () => ({ data: { fully_covered: true, is_shadow: false, matched: 2, lines: [{ n: 1, head: 'gas', amount: 100, quick_id: 'q1' }, { n: 2, head: 'tea', amount: 20, quick_id: 'q2' }] }, error: null });
     await click(t, 'wfg_el_check', { v: 'v1' });
     let box = t.els['#wfg_r_v1'].innerHTML;

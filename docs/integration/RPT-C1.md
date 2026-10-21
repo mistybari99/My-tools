@@ -25,7 +25,7 @@ Owner rules kept: reports stay open (no capture switch is needed to read); "data
 | `report_run3(text,jsonb,text,text,integer)` | bos440 | a total over a column in which no row has a value is null (not captured), not 0 |
 | `_r3q_l1_pnl`, `_r3q_l3_shop_pnl` | bos440 | new key `profit_complete`; profit null when a part is missing only while `report_profit_blank_on` is ON (default OFF = today) |
 | `_r3q_m1_rfm`, `_r3q_d5_lapsed` | bos441 | the built-in 3 / 30 / 60 / 180 become settings; blank = the built-in number |
-| `report_run2_core(...)` | bos441a, bos441b | `attendance_summary` reads `attendance_days` plus paper 02-1 in separate rows (column `source`); `cash_short_over` can follow the shortage case status (setting, default OFF) |
+| `report_run2_core(...)` | bos441a, bos441b | `attendance_summary` reads `attendance_days` plus paper 19-1 in separate rows (column `source`); `cash_short_over` can follow the shortage case status (setting, default OFF) |
 | `_r3q_x4_compliance(date,date,integer[],jsonb)` | (replaced as a whole) | rollout start date + closed days; the paste STOPS if the live function is neither the original nor already this version |
 
 Re-paste hazard: re-pasting phase 21, 24, 25, 26, 27, 72, 76 to 79 (or W1-D 92 / 93) removes the markers: paste 440 and 441 again. `report_run2_core` is also patched by W1-D (bos93) and may be by other packages; 441 patches its own sites only and stops if one is missing.
@@ -62,6 +62,6 @@ New table: `coa_report_class` (RLS on, select for the statement readers, no hard
 ## 7. Not done / decisions left to the owner
 
 - Loans and VAT are not part of the statements (owner instruction). Working capital by class stays "not captured" until accounts are classed.
-- Marketing (18-1) is listed as "not in the books" in the expense register; posting it to the journal is a separate owner decision (audit F8).
+- Marketing (17-1) is listed as "not in the books" in the expense register; posting it to the journal is a separate owner decision (audit F8).
 - The reads that are still gated by a capture switch (`day_book` for non-owners, `vat_report`, bank import, online orders; audit F11) are not changed here; the new screens do not depend on any.
 - Screen labels of the new screens are English only, following the Profit check precedent (English labels only on report screens; confirm with the owner); the notices from the server come in Bangla and English.
