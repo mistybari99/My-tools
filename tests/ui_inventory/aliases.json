@@ -2394,6 +2394,22 @@
    "from": "অনুমোদন বাকি",
    "to": "অ্যাপ্রুভ বাকি",
    "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "route:categories",
+   "lang": "bn",
+   "from": "Category ও Sub-category",
+   "to": "ক্যাটাগরি ও সাব-ক্যাটাগরি",
+   "reason": "Owner word list (Category = ক্যাটাগরি in Bangla mode, Latin only in mix mode); the registry label in ia.js missed the word-list pass that catpick.js already had. Same route, same meaning. Found by catpick_pw_test."
+  },
+  {
+   "type": "label",
+   "id": "route:catreport",
+   "lang": "bn",
+   "from": "Category অনুযায়ী রিপোর্ট",
+   "to": "ক্যাটাগরি অনুযায়ী রিপোর্ট",
+   "reason": "Owner word list (Category = ক্যাটাগরি in Bangla mode, Latin only in mix mode); same registry label fix as route:categories. Same route, same meaning. Found by catpick_pw_test."
   }
  ]
 }

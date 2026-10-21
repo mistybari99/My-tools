@@ -37,7 +37,8 @@ function mk(lang, opt) {
     const t = mk('en'), X = t.S.X, keys = Object.keys(X);
     chk('all ' + keys.length + ' strings have bn, en and mix', keys.every((k) => X[k].bn && X[k].en && X[k].mix));
     chk('English text has no Bangla letters (all strings, incl. the taka sign)', keys.every((k) => !BN.test(X[k].en)));
-    chk('Bangla text really is Bangla', keys.filter((k) => !BN.test(X[k].bn)).length === 0);
+    // Owner word list: Qty stays Latin in every mode (docs/i18n/BANGLA_REVIEW.md). Only this explicit exception is allowed; every other bn string must contain Bangla letters.
+    chk('Bangla text really is Bangla', keys.filter((k) => !BN.test(X[k].bn) && !(k === 'qty' && X[k].bn === 'Qty')).length === 0);
     chk('mix text has Bangla and English together for the main labels', ['title', 'confirm', 'save', 'd_map', 'supplier'].every((k) => BN.test(X[k].mix) || /[A-Za-z]/.test(X[k].mix)));
     chk('English mode shows English', t.S.T('confirm') === 'Confirm' && /^Scan a bill/.test(t.S.T('title')));
     chk('Bangla mode shows Bangla', BN.test(mk('bn').S.T('save')));
@@ -52,7 +53,9 @@ function mk(lang, opt) {
     chk('every data-act used is a handler defined in scan.js', [...mine].every((a) => keys.includes(a)));
     chk('all handler names are prefixed scan_ (' + keys.length + ')', keys.length >= 15 && keys.every((k) => k.startsWith('scan_')));
     const others = fs.readdirSync(WEB).filter((f) => f.endsWith('.js') && f !== 'scan.js').map((f) => [f, fs.readFileSync(path.join(WEB, f), 'utf8')]);
-    const clash = keys.filter((k) => others.some(([f, s]) => new RegExp('\\b' + k + '\\b').test(s)));
+    // itemimg.js only READS scan_itempick as a CSS selector '[data-act="scan_itempick"]' to put item pictures on the chips; that is not a second handler, so selector mentions and comments are removed before the check.
+    const noSel = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\[data-act="?[a-z_0-9]+"?\]\[?[^\]]*\]?/g, '');
+    const clash = keys.filter((k) => others.some(([f, s]) => new RegExp('\\b' + k + '\\b').test(noSel(s))));
     chk('no handler / data-act name used by any other web file', clash.length === 0);
     const idx = fs.readFileSync(path.join(WEB, 'index.html'), 'utf8');
     chk('index.html loads scan.js once, after the existing scripts (after twofa.js, after stock2.js)', (idx.match(/<script src="scan\.js"><\/script>/g) || []).length === 1 && idx.indexOf('scan.js') > idx.indexOf('twofa.js') && idx.indexOf('scan.js') > idx.indexOf('stock2.js'));

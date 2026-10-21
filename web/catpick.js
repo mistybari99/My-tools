@@ -43,7 +43,7 @@ const X = {
   more: L('আরও', 'More', 'আরও'),
   ruleTitle: L('ক্যাটাগরি লাগবে কি?', 'Is a Category needed?', 'Category লাগবে কি?'),
   r_off: L('বন্ধ — আগের মতো', 'Off - as before', 'Off — আগের মতো'), r_warn: L('সতর্কতা — তালিকা দেখায়, আটকায় না (প্রস্তাবিত)', 'Warn - lists the items, never blocks (recommended)', 'Warn — তালিকা দেখায়, আটকায় না (recommended)'),
-  r_required: L('জরুরি — নতুন Item Category ছাড়া সেভ হবে না', 'Required - a new item cannot be saved without one', 'Required — নতুন Item Category ছাড়া save হবে না'),
+  r_required: L('জরুরি — নতুন আইটেম ক্যাটাগরি ছাড়া সেভ হবে না', 'Required - a new item cannot be saved without one', 'Required — নতুন Item Category ছাড়া save হবে না'),
   ruleOwner: L('শুধু মালিক বদলাতে পারেন', 'Only the owner can change this', 'শুধু owner বদলাতে পারেন'),
   missing: L('ক্যাটাগরি ছাড়া আইটেম', 'Items without a Category', 'Category ছাড়া Item'), missingNone: L('সব আইটেমের ক্যাটাগরি আছে ✓', 'Every item has a Category ✓', 'সব Item-এর Category আছে ✓'),
   missSub: L('সাব-ক্যাটাগরি ছাড়া আইটেম', 'Items without a Sub-category', 'Sub-category ছাড়া Item'),

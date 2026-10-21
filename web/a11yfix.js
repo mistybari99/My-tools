@@ -202,7 +202,7 @@
   // ---------- 6. toggle state ----------
   var TOG = 'button.tog[data-act],button.chip[data-act="cdr_set"]';
   function pressed(b) { return b.classList.contains('on') || b.classList.contains('warn') || b.getAttribute('aria-current') === 'true'; }
-  function tog(b) { if (b.hasAttribute('role') && b.getAttribute('role') !== 'button') return; b.setAttribute('aria-pressed', pressed(b) ? 'true' : 'false'); }
+  function tog(b) { if (b.hasAttribute('role') && b.getAttribute('role') !== 'button') return; var v = pressed(b) ? 'true' : 'false'; if (b.getAttribute('aria-pressed') !== v) b.setAttribute('aria-pressed', v); }   // only on a real change: a same-value write is still a mutation record and re-fired the observers (controls.js re-enhance loop)
 
   // ---------- 7. skip link + main ----------
   var skip = null;
@@ -213,7 +213,7 @@
   }
   function mountSkip() {
     var a = doc.getElementById('app'); if (a && !a.hasAttribute('role')) a.setAttribute('role', 'main');
-    if (skip && skip.isConnected) { skip.textContent = T('মূল অংশে যান', 'Skip to content', 'Content-এ যান'); return; }
+    if (skip && skip.isConnected) { var st = T('মূল অংশে যান', 'Skip to content', 'Content-এ যান'); if (skip.textContent !== st) skip.textContent = st; return; }
     skip = doc.createElement('a'); skip.className = 'a11y-skip'; skip.href = '#app'; skip.setAttribute('data-a11y-skip', '');
     skip.textContent = T('মূল অংশে যান', 'Skip to content', 'Content-এ যান');
     skip.addEventListener('click', function (e) {

@@ -16,7 +16,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'set_rule') { const t = window.__DATA.tables.rules; const r = t.find((x) => x.key === args.p_key); if (r) r.value = args.p_value; else t.push({ key: args.p_key, value: args.p_value }); return { data: null, error: null }; }
   return rpc(fn, args); };
  c.storage = { from: () => ({ createSignedUrls: async (paths) => { const I = window.__IMG || {}; window.__SIGN.push(paths.slice()); if (I.failSign) throw new Error('offline');
-    return { data: paths.map((p) => { const isT = /\\.t\\.jpg$/.test(p), base = p.replace(/\\.t\\.jpg$/, ''); const ok = isT ? (I.thumbs || []).includes(base) : true; return ok ? { path: p, signedUrl: 'https://mock.local/' + p + '?t=1', error: null } : { path: p, signedUrl: null, error: 'Object not found' }; }), error: null }; },
+    return { data: paths.map((p) => { const isT = /\\.t\\.jpg$/.test(p), base = p.replace(/\\.t\\.jpg$/, ''); const ok = isT ? (I.thumbs || []).includes(base) : true; return ok ? { path: p, signedUrl: 'https://mock.supabase.co/' + p + '?t=1', error: null } : { path: p, signedUrl: null, error: 'Object not found' }; }), error: null }; },
    upload: async (p) => { (window.__UP = window.__UP || []).push(p); return { data: { path: p }, error: null }; } }) };
  return c; }; })();`;
 (async () => {
@@ -30,7 +30,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|ERR_/.test(m.text())) errors.push('console: ' + m.text()); });
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
-    await p.route('https://mock.local/**', (r) => r.fulfill({ contentType: 'image/png', body: PNG }));
+    await p.route('https://mock.supabase.co/**', (r) => r.fulfill({ contentType: 'image/png', body: PNG }));
     const map = {}; withImg.forEach((i, k) => { map[i.id] = 'ITEMS/1/p' + k + '.jpg'; });
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__IMG=${JSON.stringify({ map, thumbs: [map[withImg[0].id]] })};try{localStorage.setItem('bos_lang','en');}catch(e){}` + (pre || ''));
     await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1300);
@@ -48,7 +48,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(s.ls && !('u' in s.ls) && !/signedUrl|token=|mock\.local/.test(JSON.stringify(s.ls)), 'M4: no signed link is persisted in localStorage');
   ok(s.ls && typeof s.ls.uid === 'string' && s.ls.uid.length > 0, 'M4: the stored paths carry the user id (' + (s.ls && s.ls.uid) + ')');
   ok(s.keys.length >= 1 && s.keys.every((k) => k.includes('/__itemimg/' + encodeURIComponent(s.ls.uid) + '/')), 'M4: the picture cache key contains the user id (' + s.keys.length + ' keys)');
-  ok(s.cb === 1, 'M4: itemimg listens to the sign-in state (callbacks ' + s.cb + ')');
+  // app.js (bos112) registers its own sign-out listener for the response cache, so there are now 2 callbacks; itemimg's own listener is proven by the SIGNED_OUT / user-switch checks below.
+  ok(s.cb >= 1, 'M4: itemimg listens to the sign-in state (callbacks ' + s.cb + ')');
   // 2. a reload of the same user still shows pictures from the stored paths + bytes with no network call
   await p.reload(); await p.waitForTimeout(1300); c = await cnt(p);
   ok(c.sign === 0 && c.rpc === 0 && c.imgs === 3, 'same user after reload: pictures from the cache, no rpc / sign call (rpc ' + c.rpc + ', sign ' + c.sign + ', imgs ' + c.imgs + ')');

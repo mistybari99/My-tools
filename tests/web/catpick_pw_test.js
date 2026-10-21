@@ -118,7 +118,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.close();
 
   // Bangla and Bng/Eng mix
-  for (const lang of ['bn', 'mix']) { p = await open({ lang }, '#/categories'); const t = await p.textContent('body'); ok(/Category/.test(t) && /Sub-category/.test(t) && !/ক্যাটাগরি/.test(t.replace(/মিষ্টি/g, '')), lang + ': keeps Category / Sub-category in English'); ok(/প্রতিটি/.test(t), lang + ': Bangla sentence'); await noOverflow(p, lang); await p.screenshot({ path: SP + '/cat_' + lang + '.png' }); await p.close(); }
+  // Owner word list (fcc7a4a): bn writes the common words in Bangla letters (ক্যাটাগরি / সাব-ক্যাটাগরি), mix keeps them in Latin.
+  for (const lang of ['bn', 'mix']) { p = await open({ lang }, '#/categories'); const t = await p.textContent('body'); ok(lang === 'bn' ? (/ক্যাটাগরি/.test(t) && /সাব-ক্যাটাগরি/.test(t) && !/Category|Sub-category/.test(t)) : (/Category/.test(t) && /Sub-category/.test(t) && !/ক্যাটাগরি/.test(t.replace(/মিষ্টি/g, ''))), lang + ': Category / Sub-category follow the owner word list (bn Bangla letters, mix Latin)'); ok(/প্রতিটি/.test(t), lang + ': Bangla sentence'); await noOverflow(p, lang); await p.screenshot({ path: SP + '/cat_' + lang + '.png' }); await p.close(); }
 
   // ---------- #/catreport ----------
   p = await open({}, '#/catreport'); await p.click('[data-act=cat_rpt_go]'); await wait(p, 400);

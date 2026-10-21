@@ -48,9 +48,11 @@ function load(lang, o = {}) {
   chk('every error has bn, en and mix; English has no Bangla', Object.keys(ERR).every((k) => ERR[k].bn && ERR[k].en && ERR[k].mix && !BN.test(ERR[k].en)));
   chk('Bangla strings contain Bangla (except short technical ones)', keys.filter((k) => !BN.test(X[k].bn) && X[k].bn.length > 14).length === 0);
   chk('mix: every long sentence has Bangla', keys.filter((k) => !BN.test(X[k].mix) && X[k].mix.length > 45).length === 0);
-  chk('Bangla and mix keep the common words in English (Category, Sub-category, Item), never ক্যাটাগরি / আইটেম', keys.concat(Object.keys(ERR)).every((k) => { const o = X[k] || ERR[k]; return !/ক্যাটাগরি|সাব-ক্যাটাগরি|আইটেম/.test(o.bn + o.mix); }));
-  chk('title follows the language', en.B.catpick.T('title') === 'Categories and sub-categories' && /Category/.test(bn.B.catpick.T('title')) && BN.test(mix.B.catpick.T('title')));
-  chk('the three words Category / Sub-category / Item are the same in all three languages', ['cat', 'sub', 'item'].every((k) => X[k].bn === X[k].en && X[k].en === X[k].mix));
+  // Owner word list (fcc7a4a): in Bangla mode the common words are the English word written in Bangla letters (ক্যাটাগরি, সাব-ক্যাটাগরি, আইটেম); in mix mode they stay in Latin letters.
+  chk('Bangla uses the owner-list Bangla-letter forms (ক্যাটাগরি / সাব-ক্যাটাগরি / আইটেম), never the Latin words', keys.concat(Object.keys(ERR)).every((k) => { const o = X[k] || ERR[k]; return !/\b(Category|Sub-category|Item)s?\b/i.test(o.bn); }));
+  chk('mix keeps the common words in Latin letters (Category, Sub-category, Item), never ক্যাটাগরি / আইটেম', keys.concat(Object.keys(ERR)).every((k) => { const o = X[k] || ERR[k]; return !/ক্যাটাগরি|সাব-ক্যাটাগরি|আইটেম/.test(o.mix); }));
+  chk('title follows the language', en.B.catpick.T('title') === 'Categories and sub-categories' && /ক্যাটাগরি/.test(bn.B.catpick.T('title')) && /Category/.test(mix.B.catpick.T('title')) && BN.test(mix.B.catpick.T('title')));
+  chk('the three words Category / Sub-category / Item: en and mix are identical (Latin), bn is the owner-list Bangla-letter form', ['cat', 'sub', 'item'].every((k) => X[k].en === X[k].mix) && X.cat.bn === 'ক্যাটাগরি' && X.sub.bn === 'সাব-ক্যাটাগরি' && X.item.bn === 'আইটেম');
   // ----- structure -----
   const acts = [...src.matchAll(/data-act="([a-z_]+)"/g)].map((m) => m[1]);
   const actsDyn = [...src.matchAll(/data-act="\$\{[^}]*'(cat_[a-z_]+)'[^}]*\}"/g)].map((m) => m[1]);
