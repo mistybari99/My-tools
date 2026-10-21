@@ -94,7 +94,7 @@ class BridgeTest(unittest.TestCase):
         self.assertEqual(rows[1]["dir"], "1")
 
     def test_parse_csv_with_header_and_custom_columns(self):
-        rows, bad = fb.parse_csv("AC-No.,Name,Time,State\n101,Karim,01/09/2026 08:55:00,C/In\n102,Rahim,bad,C/Out\n")
+        rows, bad = fb.parse_csv("AC-No.,Name,Time,State\n101,TestF,01/09/2026 08:55:00,C/In\n102,TestK,bad,C/Out\n")
         self.assertEqual((len(rows), bad), (1, 1))
         self.assertEqual(rows[0], {"user_id": "101", "ts": "2026-09-01 08:55:00", "dir": "C/In"})
         rows, bad = fb.parse_csv("code,when\n7,2026-09-02 09:00\n", col_user="code", col_ts="when")

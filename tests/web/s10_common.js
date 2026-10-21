@@ -1,6 +1,7 @@
 // Shared mock for stock2_test.js / purchase_test.js: in-page RPC stand-ins for the phase10 API (the Supabase stub returns null for unknown RPCs).
+const _P = require('./_paths');
 const fs = require('fs'), path = require('path'), http = require('http');
-const ROOT = '/home/user/My-tools/web';
+const ROOT = _P.WEB_DIR;
 function baseData(SP) {
   const src = fs.readFileSync(SP + '/smoke.js', 'utf8');
   return new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);
@@ -33,7 +34,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ledger: [{ id: 3, item_id: 'i0', location_id: 1, qty_delta: -1.5, unit_cost: 210, reason: 'sale_out', made_at: '2026-10-10T09:00:00Z', note: null }, { id: 2, item_id: 'i0', location_id: 1, qty_delta: 5, unit_cost: 210, reason: 'opening', made_at: '2026-10-09T09:00:00Z', note: 'start' }],
   exp: [{ batch_id: 11, item_id: 'i0', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', location_id: 1, made_at: '2026-10-10T02:00:00Z', expires_at: '2026-10-11T20:00:00Z', qty_remaining: 2, hours_left: 5.5, expired: false },
         { batch_id: 12, item_id: 'i2', code: 'I-003', name_bn: 'রসমালাই', name_en: 'Rasmalai', location_id: 1, made_at: '2026-10-09T02:00:00Z', expires_at: '2026-10-10T20:00:00Z', qty_remaining: 12, hours_left: -3, expired: true }],
-  tr: [{ id: 't1', item_id: 'i0', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', from_location_id: 2, to_location_id: 1, qty: 10, sent_at: '2026-10-10T08:00:00Z', sent_staff: 'karim02', note: 'van' },
+  tr: [{ id: 't1', item_id: 'i0', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', from_location_id: 2, to_location_id: 1, qty: 10, sent_at: '2026-10-10T08:00:00Z', sent_staff: 'testf02', note: 'van' },
         { id: 't2', item_id: 'i2', code: 'I-003', name_bn: 'রসমালাই', name_en: 'Rasmalai', from_location_id: 1, to_location_id: 2, qty: 20, sent_at: '2026-10-10T08:30:00Z', sent_staff: 'owner1', note: null }],
   recon: [],
   list: [
@@ -71,6 +72,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'stock_opening' || fn === 'stock_wastage' || fn === 'stock_issue' || fn === 'stock_production_in' || fn === 'stock_transfer' || fn === 'stock_expire_batch' || fn === 'stock_receive_transfer' || fn === 'stock_cancel_transfer') return { data: { ledger_id: 99, id: 'x', qty: 1 }, error: null };
   if (fn === 'stock_count_adjust') return { data: { ledger_id: 98, delta: -1.5, qty: 2 }, error: null };
   if (fn === 'stock_reconcile') return { data: clone(M.recon), error: null };
+  if (fn === 'stock_reconcile_fix') return { data: { fixed: (M.recon || []).length }, error: null };
   if (fn === 'purchase_list') { let r = M.list.filter((x) => (!args.p_supplier || x.supplier_id === args.p_supplier) && (!args.p_status || x.status === args.p_status) && (!args.p_from || x.bill_date >= args.p_from) && (!args.p_to || x.bill_date <= args.p_to)); return { data: clone(r), error: null }; }
   if (fn === 'purchase_get') { const l = M.list.find((x) => x.id === args.p_id) || M.list[0]; const d = M.detail && M.detail[args.p_id]; return { data: Object.assign({}, l, { subtotal: l.total + l.discount, note: null, void_note: null, reason_code: null, ref_bill_id: null, lines: [{ line_no: 1, item_id: 'i0', description: null, qty: 4, unit: 'kg', unit_cost: 250, amount: 1000 }, { line_no: 2, item_id: null, description: 'Gas cylinder', qty: 1, unit: null, unit_cost: 0, amount: 0 }], payments: [{ id: 5, mode: 'cash', wallet: null, ref: null, amount: 400, paid_at: '2026-10-08T05:00:00Z', voided: false }] }, d || {}), error: null }; }
   if (fn === 'save_purchase') return { data: { id: 'b9', status: 'draft', total: 525, lines: 2 }, error: null };

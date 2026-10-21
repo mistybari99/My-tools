@@ -1,13 +1,15 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8083);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc;
  c.rpc = async (fn, args) => {
   if (fn === 'biz_daily') return { data: [{ sale_date: '2026-10-10', location_id: 1, n: 9, revenue: 21000, discount: 500, void_n: 1, void_amt: 300, costed_rev: 18000, cogs: 16200 }, { sale_date: '2026-10-11', location_id: 1, n: 7, revenue: 19000, discount: 0, void_n: 0, void_amt: 0, costed_rev: 16000, cogs: 14400 }], error: null };
   if (fn === 'biz_items') return { data: [{ item_id: 'a', code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White', unit: 'kg', qty: 30, revenue: 12000, cogs: 10000, share_pct: 40, cum_pct: 40, abc: 'A' }, { item_id: 'b', code: 'I-002', name_bn: 'রসমালাই', unit: 'kg', qty: 5, revenue: 3000, share_pct: 10, cum_pct: 98, abc: 'C' }, { item_id: 'c', code: 'I-003', name_bn: 'কেক', unit: 'pc', qty: 0, revenue: 0, share_pct: 0, cum_pct: 100, abc: '-' }], error: null };
-  if (fn === 'biz_staff') return { data: [{ staff_id: 'karim02', n: 40, revenue: 30000, discount_pct: 6, void_pct: 1, override_pct: 9, quick_pct: 30, due_pct: 5, med_discount_pct: 2, med_void_pct: 1, med_override_pct: 2, med_quick_pct: 30, med_due_pct: 5, peers: 4 }, { staff_id: 'jamal03', n: 30, revenue: 20000, discount_pct: 1, void_pct: 1, override_pct: 1, quick_pct: 28, due_pct: 4, med_discount_pct: 2, med_void_pct: 1, med_override_pct: 2, med_quick_pct: 30, med_due_pct: 5, peers: 4 }], error: null };
+  if (fn === 'biz_staff') return { data: [{ staff_id: 'testf02', n: 40, revenue: 30000, discount_pct: 6, void_pct: 1, override_pct: 9, quick_pct: 30, due_pct: 5, med_discount_pct: 2, med_void_pct: 1, med_override_pct: 2, med_quick_pct: 30, med_due_pct: 5, peers: 4 }, { staff_id: 'teste03', n: 30, revenue: 20000, discount_pct: 1, void_pct: 1, override_pct: 1, quick_pct: 28, due_pct: 4, med_discount_pct: 2, med_void_pct: 1, med_override_pct: 2, med_quick_pct: 30, med_due_pct: 5, peers: 4 }], error: null };
   if (fn === 'biz_outlook') return { data: { trading_days: 21, enough: true, expected_revenue: 140000, cost_ratio: 0.9, est_purchase_low: 100000, est_purchase_high: 126000 }, error: null };
   if (fn === 'biz_suggest') return { data: { expense: { n: 24, p90: 250, median: 235, max: 250 }, daily_total: { days: 12, p90: 459, median: 415, max: 470 }, current_expense_max: null, current_imprest: 400 }, error: null };
   return rpc(fn, args); }; return c; }; })();`;
@@ -19,7 +21,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
   data.tables.location_settings = [{ location_id: 1, key: 'fixed_cost_month', value: 300000 }, { location_id: 1, key: 'anomaly_ratio', value: 2 }];
   await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
-  await p.goto('http://localhost:8083/#/home'); await p.waitForTimeout(700);
+  await p.goto('http://localhost:' + PORT + '/#/home'); await p.waitForTimeout(700);
   console.log('tile:', await p.locator('.tile', { hasText: 'ব্যবসার হিসাব' }).count());
   await p.click('.tile >> text=ব্যবসার হিসাব'); await p.waitForTimeout(500);
   await p.selectOption('#bz_loc', '1'); await p.waitForTimeout(800);

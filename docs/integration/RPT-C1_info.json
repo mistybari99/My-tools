@@ -1,0 +1,187 @@
+{
+ "package": "RPT-C1",
+ "title": "Reports honesty, expense register and statements - info sheet entries",
+ "language": "English",
+ "entries": [
+  {
+   "key": "report_profit_blank_on",
+   "kind": "setting",
+   "title": "Profit shows 'not captured' when a part of it is missing",
+   "what_it_does": "On the Profit and loss reports (management view), a row whose expenses, salary, fixed cost or cost of goods were never captured shows 'not captured' in the profit column instead of a number.",
+   "why_it_matters": "A profit that quietly leaves a missing cost out looks better than the truth.",
+   "default": "OFF. The profit number is exactly what it is today.",
+   "what_changes_if_switched": "Rows with a missing part show 'not captured' in the profit and profit % columns. The extra column profit_complete always says whether the row is complete. Nothing stored changes.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_compliance_from",
+   "kind": "setting",
+   "title": "Forms are required from this date (rollout start)",
+   "what_it_does": "The compliance report counts a form as missing only for days from this date.",
+   "why_it_matters": "Without a start date every calendar day since the beginning counts as a missing form, which overstates the gap.",
+   "default": "Blank. The report counts every calendar day as before and says so.",
+   "what_changes_if_switched": "Only days from the date count; holidays and the weekly closed days are left out.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_compliance_closed_days",
+   "kind": "setting",
+   "title": "Weekly closed days for the compliance report",
+   "what_it_does": "Weekly days on which a place is closed (for example fri or fri,sat).",
+   "why_it_matters": "A closed day is not a missing form.",
+   "default": "Blank. No weekly closed day (the holidays list is always used once a start date is set).",
+   "what_changes_if_switched": "Those weekdays are left out of the missing-form count. Acts only when the start date above is set.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_rfm_min_orders",
+   "kind": "setting",
+   "title": "Best customer: at least this many orders",
+   "what_it_does": "The number of orders that makes a customer a best customer (Champion) in the customer segment report.",
+   "why_it_matters": "The number was written into the report; it is a business decision.",
+   "default": "Blank. The report uses the number it always used (3) and says it was not set by the owner.",
+   "what_changes_if_switched": "The segment changes for customers near the line.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_rfm_recent_days",
+   "kind": "setting",
+   "title": "Best customer: last purchase within this many days",
+   "what_it_does": "How recent the last purchase must be for a best customer.",
+   "why_it_matters": "Same reason: an owner decision, not a code constant.",
+   "default": "Blank. The built-in 30 days is used and the report says so.",
+   "what_changes_if_switched": "The segment changes for customers near the line.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_rfm_atrisk_days",
+   "kind": "setting",
+   "title": "At-risk customer: no purchase for more than this many days",
+   "what_it_does": "How long without a purchase makes a customer at risk.",
+   "why_it_matters": "Same reason.",
+   "default": "Blank. The built-in 60 days is used and the report says so.",
+   "what_changes_if_switched": "The at-risk group changes.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_lapsed_days",
+   "kind": "setting",
+   "title": "Lapsed customers: look back this many days",
+   "what_it_does": "A customer who bought within this many days before the period but not in it is lapsed.",
+   "why_it_matters": "Customers silent for longer than the number are not listed at all.",
+   "default": "Blank. The built-in 180 days is used and the report says so.",
+   "what_changes_if_switched": "The lapsed list gets longer or shorter.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_cash_short_by_case_on",
+   "kind": "setting",
+   "title": "Cash short/over report follows the shortage case",
+   "what_it_does": "The cash short and over report leaves out sheets whose shortage case was rejected or voided, and shows how many cases are open, approved, rejected and void.",
+   "why_it_matters": "The owner's decision on a shortage case should be visible in the report.",
+   "default": "OFF. The report counts the flag of every daily sheet (06-1) as today.",
+   "what_changes_if_switched": "Rejected and voided cases no longer add to the figures.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_cf_opening_through",
+   "kind": "setting",
+   "title": "Cash-flow statement: journals up to this date are opening balances",
+   "what_it_does": "Journals dated on or before this date are shown as opening balances, not as cash inflows.",
+   "why_it_matters": "If the opening balances were typed as an ordinary manual journal, they would otherwise look like a big cash inflow.",
+   "default": "Blank. Only journals of the kind 'opening balances' are left out.",
+   "what_changes_if_switched": "Those journals move to the 'opening balances in the period' line. The closing cash does not change.",
+   "who_can_change": "The owner (Settings)."
+  },
+  {
+   "key": "report_notices",
+   "kind": "feature",
+   "title": "Basis lines under the hub reports",
+   "what_it_does": "Under a hub report the screen shows short notices: the profit reports say they are the management view (with a link to Profit check) and what is missing; the sales reports show a returns line; the expense reports say which of the three expense totals they are; the staff, compliance, customer segment, lapsed and cash short reports say where their numbers come from.",
+   "why_it_matters": "The same word 'profit', 'expenses' or 'sales' meant different things in different reports.",
+   "default": "Shown automatically when the database has phase 440; nothing shown otherwise.",
+   "what_changes_if_switched": "Nothing changes in a figure. The notices are also at the end of every CSV of that report. Totals that have no value at all show 'Not captured' instead of 0.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "attendance_sources",
+   "kind": "feature",
+   "title": "Attendance summary reads both sources",
+   "what_it_does": "The staff attendance summary shows the attendance marked in the app and the paper register 19-1 in separate rows, with a column saying which is which.",
+   "why_it_matters": "The report used to show only the paper register and was empty while the app held the attendance.",
+   "default": "Shown automatically.",
+   "what_changes_if_switched": "Nothing is added together by name; the two sources stay apart.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "expense_register",
+   "kind": "feature",
+   "title": "Expense register",
+   "what_it_does": "One list of every expense line (vouchers 11-1 in every status, quick expenses, bank charges, wallet fees, and the marketing register 17-1 marked 'not in the books'), with the expense report, P&L, day book and journal totals side by side, a reconciliation that says why they differ, a basis selector and a CSV.",
+   "why_it_matters": "The same period gave three different expense totals and no screen listed the vouchers behind them.",
+   "default": "Open to the owner and to people with the expense report right or accounts rights. Nothing to switch on.",
+   "what_changes_if_switched": "Read only. Nothing is posted. The existing settings (expense_count_on, report_expense_parity_on, d_wallet_fee_treatment) decide which total counts what.",
+   "who_can_change": "Anyone with the expense report right; the CSV also needs the export right."
+  },
+  {
+   "key": "pl_by_month_outlet",
+   "kind": "feature",
+   "title": "P&L by month and outlet (from the journal)",
+   "what_it_does": "Income, cost of goods, other expenses, gross and net profit from the books, with a column for each month and a row for each outlet; tap a cell for the accounts and entries behind it.",
+   "why_it_matters": "The books showed one period and one place at a time, and the management profit report is a different calculation.",
+   "default": "Open to the owner, accounts view or manage, and the profit report right. Needs the accounting start date, otherwise it says 'accounting module not switched on - no data captured'.",
+   "what_changes_if_switched": "Read only. Year-end closing journals are left out. Lines with no outlet have their own row.",
+   "who_can_change": "Anyone with the profit report right or accounts rights; the CSV also needs the export right."
+  },
+  {
+   "key": "cash_flow_statement",
+   "kind": "feature",
+   "title": "Cash-flow statement",
+   "what_it_does": "Cash movements from the journal grouped as operating, investing and financing by the class of the other account of each entry; opening balances and moves between your own cash accounts are not flows. Closing cash equals the Cash flow tab of Accounts.",
+   "why_it_matters": "The old tab only listed movements by source, so an opening balance looked like a big inflow and a bank deposit like an inflow and an outflow.",
+   "default": "Needs the accounting start date. Every account has no class until the owner gives one, so everything starts as 'unclassified'.",
+   "what_changes_if_switched": "Read only. Give the accounts a class in the Classes tab (or fill the blanks with the usual practice there).",
+   "who_can_change": "Anyone with the profit report right or accounts rights; the CSV also needs the export right."
+  },
+  {
+   "key": "working_capital",
+   "kind": "feature",
+   "title": "Working capital",
+   "what_it_does": "Current assets minus current liabilities by the class the owner gave each account, and the plain formula cash + customer receivables + inventory - supplier payables.",
+   "why_it_matters": "There was no working capital figure. Loans and VAT are not part of it.",
+   "default": "If no account is classed current, the class figure says 'Not captured' and never 0; the formula still shows.",
+   "what_changes_if_switched": "Read only.",
+   "who_can_change": "Anyone with the profit report right or accounts rights."
+  },
+  {
+   "key": "account_classes",
+   "kind": "feature",
+   "title": "Account classes",
+   "what_it_does": "For each chart account an optional cash-flow class (operating, investing, financing) and balance class (current, non-current). Blank means unclassified. A button fills only the blanks with the usual practice, after a preview and with a reason.",
+   "why_it_matters": "The owner, not the software, decides which class an account belongs to. Nothing is guessed.",
+   "default": "All blank.",
+   "what_changes_if_switched": "Changes the cash-flow statement and working capital only. Every change is in the audit log; a class is cleared by blanking it, never deleted.",
+   "who_can_change": "The owner or an accounts manager."
+  },
+  {
+   "key": "recipe_cost_gaps",
+   "kind": "feature",
+   "title": "Materials with no cost (Costing screen)",
+   "what_it_does": "A list on the Costing screen of ingredients and packaging used by active recipes that have no cost under the chosen cost method, with a CSV.",
+   "why_it_matters": "A recipe cost with a missing material is incomplete, not zero.",
+   "default": "Shown automatically to people who may see costs of the place.",
+   "what_changes_if_switched": "Read only.",
+   "who_can_change": "Anyone with the cost right of the place; the CSV also needs the export right."
+  },
+  {
+   "key": "balance_widget",
+   "kind": "feature",
+   "title": "Balance sheet check on the owner board",
+   "what_it_does": "The Balance sheet check tile now reads the books (acct_balance_sheet). It used to call a function that does not exist and was always empty.",
+   "why_it_matters": "A tile that is always empty looks like a healthy empty state.",
+   "default": "Shown automatically on the owner board.",
+   "what_changes_if_switched": "Green when assets equal liabilities plus equity; empty when the accounting module is not switched on.",
+   "who_can_change": "The owner."
+  }
+ ]
+}

@@ -1,8 +1,9 @@
 // Item master (W2): ⋮ menu + flags, add-by-category, import page (preview/apply/resume), needs-decision list, type defaults, asset register, purchase asset button, POS picker filter.
-// Run: node itemmaster_test.js /home/user/My-tools/tests/web
+// Run: node itemmaster_test.js tests/web
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web', PORT = 8341;
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR, PORT = _P.freePort();
 const C = require(SP + '/s10_common.js');
 const base = C.baseData(SP);
 const TYPES = [['finished_good', 'তৈরি পণ্য', 'Finished good', true, true], ['resale', 'কিনে বিক্রি', 'Resale', true, true], ['raw_material', 'কাঁচামাল', 'Raw material', true, false], ['packaging', 'প্যাকেজিং', 'Packaging', true, false],
@@ -47,6 +48,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'stock_levels') return { data: [], error: null };
   if (fn === 'items_with_cost') return { data: [], error: null };
   if (fn === 'item_apply') { const it = T.items.find((x) => x.id === args.p_item); if (window.__OWNER === false && !window.__GRANT) return { data: { status: 'pending', id: 5 }, error: null }; Object.assign(it, args.p_patch); if ('is_active' in args.p_patch && !args.p_patch.is_active) it.retired_at = 'now'; return { data: { status: 'applied', item_id: it.id }, error: null }; }
+  if (fn === 'item_new2') { fn = 'item_new'; }   // X5: the quick sheet calls item_new2 (client id + duplicate check) before item_new
   if (fn === 'item_new') { const code = args.p_patch.category === 'c14' ? '14-200' : args.p_patch.item_type === 'asset' ? '01-002' : 'I-100'; const n = Object.assign({ id: 'n' + T.items.length, code, is_active: true, count_in_business: true, sellable: true, tracked: false, images: [], sell_units: [] }, args.p_patch); T.items.push(n); return { data: { status: 'created', item_id: n.id, code }, error: null }; }
   if (fn === 'item_next_code') return { data: args.p_category === 'c14' ? '14-201' : args.p_category === 'c01' ? '01-002' : null, error: null };
   if (fn === 'item_dup_check') return { data: args.p_name_bn === 'কালো মিষ্টি – কেজি' ? [{ id: 'x', code: 'I-099', name_bn: 'কালো মিষ্টি – কেজি', name_en: null, why: 'same_name_bn' }] : [], error: null };
@@ -124,7 +126,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await noOverflow(p, 'list'); await p.close();
 
   // ---------- non-owner: requests, no lock ----------
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   await p.click('.p2-row:has-text("I-001") .im-dots'); await wait(p, 250);
   ok(!(await menuHas(p, 'im_lock')) && await menuHas(p, 'im_hide'), 'staff: no Lock, but Hide');
   await p.click('.sheet [data-act=im_hide]'); await wait(p, 300); ok(/approval/i.test(await p.textContent('#toast')), 'staff change = sent for approval: ' + await p.textContent('#toast')); await p.close();
@@ -146,7 +148,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.selectOption('#im_type', 'raw_material'); await wait(p, 100); ok(await p.locator('#im_sell_f.on').count() === 0 && (await p.getAttribute('#im_sell_f', 'disabled')) !== null, 'raw material: for-sale off and fixed');
   await noOverflow(p, 'form'); await p.close();
   // edit a locked item as staff -> notice
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items/edit/' + base.tables.items[2].id);
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items/edit/' + base.tables.items[2].id);
   ok(/locked/i.test(await p.textContent('#im_form')), 'locked item: the form says it is locked'); await p.close();
 
   // ---------- import page ----------
@@ -234,7 +236,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await pp.click('[data-act=pu_newitem]'); await pp.waitForTimeout(300); ok((await pp.inputValue('#ni_type')) === 'asset', 'the new-item sheet starts as type Asset');
   await pp.fill('#ni_bn', 'নতুন ফ্রিজ'); await pp.selectOption('#ni_cat', 'c01'); await pp.waitForTimeout(250); ok(/01-002/.test(await pp.textContent('#ni_code')), 'sheet shows the next code: ' + await pp.textContent('#ni_code'));
   await pp.click('#ni_go'); await pp.waitForTimeout(900);
-  const nc = await pp.evaluate(() => window.__CALLS.filter((c) => c[0] === 'item_new').map((c) => c[1]));
+  const nc = await pp.evaluate(() => window.__CALLS.filter((c) => c[0] === 'item_new' || c[0] === 'item_new2').map((c) => c[1]));
   ok(nc.length === 1 && nc[0].p_patch.item_type === 'asset' && nc[0].p_patch.category === 'c01', 'item_new asked with type asset + category');
   ok(/01-002/.test(await pp.inputValue('[data-ln="0.item"]')), 'the new item is on the bill line: ' + await pp.inputValue('[data-ln="0.item"]'));
   ok(/asset register/i.test(await pp.textContent('#pe_lines')), 'line hint: goes to the asset register, not to stock'); await pp.close();

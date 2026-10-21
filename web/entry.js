@@ -169,7 +169,7 @@ function optsHTML(options, cur, code) { if (cur && String(cur).startsWith('other
 
 const SUPX = { ph: L('সাপ্লায়ার বাছুন বা লিখুন', 'Pick or type a supplier', 'Supplier বাছুন বা লিখুন'), add: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'),
   listed: L('তালিকার সাপ্লায়ার ✓', 'Listed supplier ✓', 'তালিকার Supplier ✓'), free: L('তালিকায় নেই — লেখা নামই থাকবে', 'Not in the list — the typed name is kept', 'তালিকায় নেই — typed নামই থাকবে'),
-  title: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'), name: L('নাম', 'Name', 'নাম'), mobile: L('মোবাইল (ঐচ্ছিক)', 'Mobile (optional)', 'Mobile (ঐচ্ছিক)'), save: L('সংরক্ষণ', 'Save', 'Save'), need: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
+  title: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'), name: L('নাম', 'Name', 'নাম'), mobile: L('মোবাইল (ঐচ্ছিক)', 'Mobile (optional)', 'Mobile (ঐচ্ছিক)'), save: L('সেভ', 'Save', 'Save'), need: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
 function inputHTML(fd, path, w, ed) {
   const val = curVal(fd, path, w), a = `data-w="${w}" data-p="${esc(path)}" ${ed ? '' : 'disabled'}`;
   switch (fd.type) {
@@ -230,7 +230,7 @@ function sectionHTML(sec, idx) {
   const ed = (f) => modeEditable(f);
   const sid = FIELD_ID(); if (sec.show) E.shows[sid] = sec.show;
   const checker = sec.who === 'checker';
-  if (blindPending() && E.code === '10-1' && !checker) return `<section class="card panel sec" data-sid="${sid}"><h3>${esc(lab(sec.title))}</h3><div class="notice warn" id="blind_hidden">${esc(lab(X18.hub_hidden))}</div></section>`;
+  if (blindPending() && E.code === '03-1' && !checker) return `<section class="card panel sec" data-sid="${sid}"><h3>${esc(lab(sec.title))}</h3><div class="notice warn" id="blind_hidden">${esc(lab(X18.hub_hidden))}</div></section>`;
   const inner = sec.fields.map((f) => fieldHTML(f, f.id, f.who === 'checker' ? 'c' : 'd', ed(f), wrap(f))).join('');
   const body = `<div class="secbody">${inner}${blindBoxHTML(sec)}</div>`;
   return `<section class="card panel sec ${checker ? 'checker' : ''}" data-sid="${sid}">
@@ -267,9 +267,9 @@ const PAPER_NO = { id: 'paper_no', type: 'text', label: L('ছাপা নম�
 // ---------- W5: entered later from paper · rollout chips · change requests · form offline queue (supabase/phase17.sql) ----------
 const X17 = {
   later_on: L('কাগজ থেকে পরে তোলা হচ্ছে', 'Entered later from paper', 'কাগজ থেকে পরে তোলা (Entered later)'),
-  later_ps: L('কাগজের ছাপা নম্বর (আবশ্যক)', 'Paper serial (required)', 'কাগজের ছাপা Number (আবশ্যক)'),
-  later_at: L('কাগজে লেখার আসল তারিখ ও সময় (আবশ্যক)', 'Original date and time on the paper (required)', 'কাগজে লেখার আসল Date ও Time (আবশ্যক)'),
-  later_hint: L('বাইরে কাজ করে কাগজে লিখেছিলেন? এখানে তুলুন — কাগজের নম্বর অ্যাপের নম্বর থেকে আলাদা, আর অনুমোদনে যাবে।', 'Worked outside and filled the paper? Enter it here — the paper number is separate from the app number and it goes to approval.', 'বাইরে কাজ করে paper-এ লিখেছিলেন? এখানে তুলুন — paper number app number থেকে আলাদা, approval-এ যাবে।'),
+  later_ps: L('কাগজের ছাপা নম্বর (লাগবেই)', 'Paper serial (required)', 'কাগজের ছাপা Number (লাগবেই)'),
+  later_at: L('কাগজে লেখার আসল ডেট ও সময় (লাগবেই)', 'Original date and time on the paper (required)', 'কাগজে লেখার আসল Date ও Time (লাগবেই)'),
+  later_hint: L('বাইরে কাজ করে কাগজে লিখেছিলেন? এখানে তুলুন — কাগজের নম্বর অ্যাপের নম্বর থেকে আলাদা, আর অ্যাপ্রুভে যাবে।', 'Worked outside and filled the paper? Enter it here — the paper number is separate from the app number and it goes to approval.', 'বাইরে কাজ করে paper-এ লিখেছিলেন? এখানে তুলুন — paper number app number থেকে আলাদা, approval-এ যাবে।'),
   chip_later: L('পরে তোলা (কাগজ)', 'Entered later (paper)', 'পরে তোলা (Paper)'), chip_notsent: L('এখনও পাঠানো হয়নি', 'Not sent yet', 'এখনও পাঠানো হয়নি'),
   chip_paper: L('কাগজ', 'Paper', 'Paper'), chip_parallel: L('পাশাপাশি', 'Parallel', 'Parallel'), chip_rev: L('সংস্করণ', 'Rev', 'Rev'), chip_chg: L('বদলের অনুরোধ অপেক্ষায়', 'Change requested', 'Change request অপেক্ষায়'),
   banner_parallel: L('এই মাসে কাগজই আসল রেকর্ড — অ্যাপের এন্ট্রি পাশাপাশি মিলিয়ে দেখার জন্য', 'Paper is the record this month — the app entry runs beside it', 'এই মাসে paper-ই record — app entry পাশাপাশি'),
@@ -277,19 +277,19 @@ const X17 = {
   need_later: L('কাগজের নম্বর ও আসল সময় দিন', 'Enter the paper serial and the original time', 'Paper number ও আসল time দিন'),
   queued: L('নেট নেই — এই ফোনে রাখা আছে (এখনও পাঠানো হয়নি), নেট এলে নিজে থেকে যাবে', 'No network — kept on this phone (Not sent yet), it will be sent automatically', 'Net নেই — এই phone-এ আছে (Not sent yet), net এলে নিজে যাবে'),
   queue_fail_t: L('ফোনে রাখা গেল না', 'Could not keep it on this phone', 'Phone-এ রাখা গেল না'),
-  queue_fail: L('নেট নেই আর ফোনের মেমরিতেও লেখা গেল না (জায়গা নেই বা প্রাইভেট মোড)। এন্ট্রি এই পাতায় আছে — পাতা বন্ধ করবেন না; নেট এলে আবার “সংরক্ষণ” চাপুন, না হলে সংখ্যাগুলো কাগজে লিখে রাখুন।', 'No network, and this phone would not store it either (storage full or private mode). The entry is still on this page — do not close it; press Save again when you are online, or write the figures down on paper.', 'Net নেই, phone-এও save করা গেল না (storage full বা private mode)। Entry এই page-এ আছে — page বন্ধ করবেন না; online হলে আবার Save চাপুন, না হলে কাগজে লিখে রাখুন।'),
+  queue_fail: L('নেট নেই আর ফোনের মেমরিতেও লেখা গেল না (জায়গা নেই বা প্রাইভেট মোড)। এন্ট্রি এই পাতায় আছে — পাতা বন্ধ করবেন না; নেট এলে আবার “সেভ” চাপুন, না হলে সংখ্যাগুলো কাগজে লিখে রাখুন।', 'No network, and this phone would not store it either (storage full or private mode). The entry is still on this page — do not close it; press Save again when you are online, or write the figures down on paper.', 'Net নেই, phone-এও save করা গেল না (storage full বা private mode)। Entry এই page-এ আছে — page বন্ধ করবেন না; online হলে আবার Save চাপুন, না হলে কাগজে লিখে রাখুন।'),
   queued_submit: L('জমা দেওয়ার অনুরোধ ফোনে রাখা আছে — নেট এলে যাবে', 'Submit kept on this phone — it goes when you are online', 'Submit phone-এ আছে — online হলে যাবে'),
   sent_ok: L('পাঠানো হয়েছে', 'Sent', 'পাঠানো হয়েছে'),
   menu_title: L('এই এন্ট্রি', 'This entry', 'এই Entry'), m_chg: L('বদলের অনুরোধ', 'Request change', 'Change request'), m_rev: L('সংস্করণের ইতিহাস', 'Revision history', 'Revision history'), m_reopen: L('আবার খুলুন (মালিক)', 'Reopen (owner)', 'আবার খুলুন (Owner)'), m_outbox: L('ফোনে জমা (পাঠানো হয়নি)', 'Waiting on this phone', 'Phone-এ জমা'),
-  chg_send: L('বদলের অনুরোধ পাঠান', 'Send change request', 'Change request পাঠান'), chg_why: L('কেন বদলাতে চান?', 'Why do you want the change?', 'কেন বদলাতে চান?'), chg_sent: L('অনুরোধ পাঠানো হয়েছে — অনুমোদন পেলে নতুন সংস্করণ হবে', 'Request sent — approval makes a new revision', 'Request গেছে — approve হলে নতুন revision'),
-  chg_hint: L('অনুমোদিত এন্ট্রি বদলানো যায় না। যা বদলাতে চান লিখুন, তারপর অনুরোধ পাঠান; মালিক বা অনুমতিপ্রাপ্ত কেউ অনুমোদন করলে পুরনোটা সংস্করণ হিসেবে থাকবে।', 'An approved entry cannot be edited. Change what is wrong, then send the request; when the owner or a delegate approves, the old version stays as a revision.', 'Approved entry বদলানো যায় না। যা বদলাতে চান লিখুন, request পাঠান; approve হলে পুরনোটা revision হিসেবে থাকবে।'),
+  chg_send: L('বদলের অনুরোধ পাঠান', 'Send change request', 'Change request পাঠান'), chg_why: L('কেন বদলাতে চান?', 'Why do you want the change?', 'কেন বদলাতে চান?'), chg_sent: L('অনুরোধ পাঠানো হয়েছে — অ্যাপ্রুভ পেলে নতুন সংস্করণ হবে', 'Request sent — approval makes a new revision', 'Request গেছে — approve হলে নতুন revision'),
+  chg_hint: L('অ্যাপ্রুভড এন্ট্রি বদলানো যায় না। যা বদলাতে চান লিখুন, তারপর অনুরোধ পাঠান; মালিক বা অনুমতি-পাওয়া কেউ অ্যাপ্রুভ করলে পুরনোটা সংস্করণ হিসেবে থাকবে।', 'An approved entry cannot be edited. Change what is wrong, then send the request; when the owner or a delegate approves, the old version stays as a revision.', 'Approved entry বদলানো যায় না। যা বদলাতে চান লিখুন, request পাঠান; approve হলে পুরনোটা revision হিসেবে থাকবে।'),
   e_rollout_paper: L('এই ফর্ম এখানে কাগজে চলছে — “কাগজ থেকে পরে তোলা” দিয়ে তুলুন', 'This form is on paper here — use “entered later from paper”', 'এই form এখানে paper-এ — “paper থেকে পরে তোলা” দিয়ে তুলুন'),
   e_paper_serial_in_use: L('এই কাগজের নম্বর আগেই নেওয়া হয়েছে', 'This paper serial was already entered', 'এই paper number আগেই নেওয়া হয়েছে'), e_paper_serial_required: L('কাগজের নম্বর লাগবে', 'The paper serial is required', 'Paper number লাগবে'),
   e_paper_time_required: L('আসল সময় লাগবে', 'The original time is required', 'আসল time লাগবে'), e_paper_time_future: L('আসল সময় ভবিষ্যতের হতে পারে না', 'The original time cannot be in the future', 'আসল time future-এর হতে পারে না'),
   e_entered_later_off: L('“পরে তোলা” এখন বন্ধ আছে', '“Entered later” is switched off', '“পরে তোলা” এখন off'), e_change_pending: L('এই এন্ট্রির একটি অনুরোধ আগেই অপেক্ষায় আছে', 'A change request is already waiting for this entry', 'এই entry-র একটি request আগেই আছে'),
   e_change_requests_off: L('বদলের অনুরোধ এখন বন্ধ আছে', 'Change requests are switched off', 'Change request এখন off'), e_stale_request: L('এন্ট্রি এর মধ্যে বদলে গেছে — নতুন অনুরোধ করুন', 'The entry changed meanwhile — ask again', 'Entry বদলে গেছে — নতুন request করুন'),
-  e_self_approval: L('নিজের অনুরোধ নিজে অনুমোদন করা যায় না', 'You cannot approve your own request', 'নিজের request নিজে approve করা যায় না'), e_not_locked: L('অনুমোদিত এন্ট্রির জন্য শুধু', 'Only for approved entries', 'শুধু approved entry-র জন্য'),
-  e_entered_later_too_old: L('কাগজের তারিখ সীমার চেয়ে পুরনো — শুধু মালিক তুলতে পারবেন', 'The paper date is older than the limit - only the owner may enter it', 'Paper-এর date limit-এর চেয়ে পুরনো — শুধু owner তুলতে পারবেন'),
+  e_self_approval: L('নিজের অনুরোধ নিজে অ্যাপ্রুভ করা যায় না', 'You cannot approve your own request', 'নিজের request নিজে approve করা যায় না'), e_not_locked: L('অ্যাপ্রুভড এন্ট্রির জন্য শুধু', 'Only for approved entries', 'শুধু approved entry-র জন্য'),
+  e_entered_later_too_old: L('কাগজের ডেট সীমার চেয়ে পুরনো — শুধু মালিক তুলতে পারবেন', 'The paper date is older than the limit - only the owner may enter it', 'Paper-এর date limit-এর চেয়ে পুরনো — শুধু owner তুলতে পারবেন'),
   e_client_id_mismatch: L('এই পাঠানোর আইডি অন্য ফর্মের', 'That send id belongs to another form', 'এই send id অন্য form-এর'),
   e_client_id_in_use: L('এই পাঠানোর আইডি অন্যের', 'That send id belongs to someone else', 'এই send id অন্যের'),
 };
@@ -400,53 +400,53 @@ async function loadPendingChange() {
   try { const r = await sb.from('entry_change_requests').select('id').eq('entry_id', E.id).eq('status', 'pending').limit(1); E.chgPending = !!(r && !r.error && r.data && r.data.length); } catch (e) { /* ignore */ }
 }
 
-// ---------- W5b: server-side blind count (14-1 drawer, 10-1 hub) and PIN signatures (supabase/phase18.sql) ----------
+// ---------- W5b: server-side blind count (06-1 drawer, 03-1 hub) and PIN signatures (supabase/phase18.sql) ----------
 // Rule 9: the person counts first; the expected figure is hidden until the count is saved on the server (count_save) and only then shown.
 // Rule 10: a second signature is another login with its own PIN (web/pinsign.js signs that person in on a throw-away client).
 // Both are OFF until the owner switches them on (rules blind_count_on, pin_signature_on). If phase18 is not installed every RPC fails and the old screen stays.
 const X18 = {
   blind_t: L('গণনা — আগে গুনুন, তারপর সেভ', 'Count first, then save', 'Count — আগে গুনুন, তারপর save'),
-  blind_hint: L('গণনা সেভ করার পরেই প্রত্যাশিত অঙ্ক ও কম/বেশি দেখা যাবে। সেভ করলে গণনা আর বদলানো যায় না।', 'The expected figure and the short/over appear only after you save the count. A saved count cannot be changed.', 'Count save করার পরেই expected ও কম/বেশি দেখা যাবে। Save করলে count আর বদলানো যায় না।'),
-  save_count: L('গণনা সেভ করুন', 'Save count', 'Count save করুন'), peek: L('আগে প্রত্যাশিত দেখুন (লগ হবে)', 'Show expected first (logged)', 'আগে expected দেখুন (log হবে)'),
+  blind_hint: L('গণনা সেভ করার পরেই ধরা অঙ্ক ও কম/বেশি দেখা যাবে। সেভ করলে গণনা আর বদলানো যায় না।', 'The expected figure and the short/over appear only after you save the count. A saved count cannot be changed.', 'Count save করার পরেই expected ও কম/বেশি দেখা যাবে। Save করলে count আর বদলানো যায় না।'),
+  save_count: L('গণনা সেভ করুন', 'Save count', 'Count save করুন'), peek: L('আগে ধরা দেখুন (লগ হবে)', 'Show expected first (logged)', 'আগে expected দেখুন (log হবে)'),
   need_count: L('আগে নোট ধরে গণনা লিখুন', 'Enter the count by notes first', 'আগে note ধরে count লিখুন'), need_net: L('গণনা সেভ করতে নেট লাগবে', 'Saving the count needs a connection', 'Count save করতে net লাগবে'),
-  later: L('প্রত্যাশিত অঙ্ক ও কম/বেশি জমা দেওয়ার পর যাচাইকারীর কাছে দেখা যাবে', 'The expected figure and the short/over are shown to the approver after you submit', 'Expected ও কম/বেশি submit করার পর approver দেখবেন'),
-  saved_t: L('গণনা সেভ হয়েছে', 'Count saved', 'Count save হয়েছে'), counted: L('গণনায় প্রাপ্ত', 'Counted', 'Count'), expected: L('প্রত্যাশিত', 'Expected', 'Expected'),
-  so: L('কম / বেশি', 'Short / over', 'কম / বেশি'), matches: L('মিলেছে', 'matches', 'মিলেছে'), seen_early: L('প্রত্যাশিত অঙ্ক গণনার আগে দেখা হয়েছিল', 'The expected figure was seen before the count', 'Expected count-এর আগে দেখা হয়েছিল'),
-  hub_hidden: L('লেখকের গণনা ও হ্যান্ডওভার অঙ্ক আপনার গণনা সেভ হওয়া পর্যন্ত লুকানো', "The sender's count and handover amount stay hidden until your count is saved", 'Sender-এর count ও handover আপনার count save হওয়া পর্যন্ত লুকানো'),
+  later: L('ধরা অঙ্ক ও কম/বেশি জমা দেওয়ার পর যাচাইকারীর কাছে দেখা যাবে', 'The expected figure and the short/over are shown to the approver after you submit', 'Expected ও কম/বেশি submit করার পর approver দেখবেন'),
+  saved_t: L('গণনা সেভ হয়েছে', 'Count saved', 'Count save হয়েছে'), counted: L('গণনায় প্রাপ্ত', 'Counted', 'Count'), expected: L('ধরা', 'Expected', 'Expected'),
+  so: L('কম / বেশি', 'Short / over', 'কম / বেশি'), matches: L('মিলেছে', 'matches', 'মিলেছে'), seen_early: L('ধরা অঙ্ক গণনার আগে দেখা হয়েছিল', 'The expected figure was seen before the count', 'Expected count-এর আগে দেখা হয়েছিল'),
+  hub_hidden: L('এন্ট্রিদাতার গণনা ও হ্যান্ডওভার অঙ্ক আপনার গণনা সেভ হওয়া পর্যন্ত লুকানো', "The sender's count and handover amount stay hidden until your count is saved", 'Sender-এর count ও handover আপনার count save হওয়া পর্যন্ত লুকানো'),
   pin_t: L('স্বাক্ষর — অন্য লগইন, নিজের পিন', 'Signatures - another login, own PIN', 'Signature — অন্য login, নিজের PIN'),
-  pin_hint: L('দ্বিতীয় স্বাক্ষরকারী এই ফোনেই নিজের স্টাফ আইডি ও পিন দিয়ে স্বাক্ষর করবেন। লেখক নিজে স্বাক্ষর করতে পারবেন না।', 'The second person signs on this phone with their own staff ID and PIN. The writer cannot sign.', 'দ্বিতীয় signer এই phone-এই নিজের staff ID ও PIN দিয়ে sign করবেন। লেখক নিজে sign করতে পারবেন না।'),
+  pin_hint: L('দ্বিতীয় স্বাক্ষরকারী এই ফোনেই নিজের স্টাফ আইডি ও পিন দিয়ে স্বাক্ষর করবেন। এন্ট্রিদাতা নিজে স্বাক্ষর করতে পারবেন না।', 'The second person signs on this phone with their own staff ID and PIN. The writer cannot sign.', 'দ্বিতীয় signer এই phone-এই নিজের staff ID ও PIN দিয়ে sign করবেন। লেখক নিজে sign করতে পারবেন না।'),
   r_witness: L('সাক্ষী (দ্বিতীয়বার গণনা)', 'Witness (second count)', 'Witness (দ্বিতীয়বার count)'), r_second_sig: L('দ্বিতীয় স্বাক্ষর', 'Second signature', 'দ্বিতীয় signature'), r_hub_pair: L('হাব জোড়া — দ্বিতীয় জন', 'Hub pair - second person', 'Hub pair — দ্বিতীয় জন'),
   sign: L('পিন দিয়ে স্বাক্ষর', 'Sign with PIN', 'PIN দিয়ে sign'), signed_by: L('স্বাক্ষর করেছেন', 'Signed by', 'Sign করেছেন'), notsigned: L('এখনও স্বাক্ষর হয়নি', 'Not signed yet', 'এখনও sign হয়নি'),
   e_count_already_saved: L('এই গণনা আগেই সেভ হয়েছে — বদলানো যায় না', 'This count is already saved - it cannot change', 'এই count আগেই save হয়েছে — বদলানো যায় না'),
-  copy_last: L('আগেরটা থেকে নিন', 'Start from my last one', 'আগেরটা থেকে নিন'), copy_none: L('আগের কোনো এন্ট্রি নেই', 'No earlier entry to copy', 'আগের কোনো entry নেই'), copy_done: L('আইটেম/সরবরাহকারী/পছন্দ নেওয়া হয়েছে — পরিমাণ নিজে লিখুন', 'Items, suppliers and choices copied - write the quantities yourself', 'Item/supplier/choice নেওয়া হয়েছে - পরিমাণ নিজে লিখুন'),
+  copy_last: L('আগেরটা থেকে নিন', 'Start from my last one', 'আগেরটা থেকে নিন'), copy_none: L('আগের কোনো এন্ট্রি নেই', 'No earlier entry to copy', 'আগের কোনো entry নেই'), copy_done: L('আইটেম/সাপ্লায়ার/পছন্দ নেওয়া হয়েছে — Qty নিজে লিখুন', 'Items, suppliers and choices copied - write the quantities yourself', 'Item/supplier/choice নেওয়া হয়েছে - Qty নিজে লিখুন'),
   sb_lock: L('গণনা সেভ ও লক করুন', 'Lock the counts', 'Count lock করুন'), sb_done: L('গণনা লক হয়েছে', 'Counts locked', 'Count lock হয়েছে'),
-  sb_hint04_3: L('অন্ধ গণনা: আগে সব আইটেম গুনে লক করুন। লেজারের হিসাব জমা দেওয়ার পরে সিস্টেম নিজে বসাবে।', 'Blind count: count every item and lock. The book balance is added by the system when you submit.', 'Blind count: আগে সব item গুনে lock করুন। Book balance submit-এর পরে system বসাবে।'),
-  sb_hint04_1: L('অন্ধ গ্রহণ: আগে গুনে লক করুন, তারপর মেমোর অঙ্ক লিখুন।', 'Blind receiving: count and lock first, then write the memo figure.', 'Blind receiving: আগে গুনে lock করুন, তারপর memo-র অঙ্ক লিখুন।'),
+  sb_hint04_3: L('ব্লাইন্ড গণনা: আগে সব আইটেম গুনে লক করুন। লেজারের হিসাব জমা দেওয়ার পরে সিস্টেম নিজে বসাবে।', 'Blind count: count every item and lock. The book balance is added by the system when you submit.', 'Blind count: আগে সব item গুনে lock করুন। Book balance submit-এর পরে system বসাবে।'),
+  sb_hint04_1: L('ব্লাইন্ড গ্রহণ: আগে গুনে লক করুন, তারপর মেমোর অঙ্ক লিখুন।', 'Blind receiving: count and lock first, then write the memo figure.', 'Blind receiving: আগে গুনে lock করুন, তারপর memo-র অঙ্ক লিখুন।'),
   e_count_not_sealed: L('নতুন বা বদলানো লাইন — আবার "গণনা লক করুন" চাপুন', 'A new line - press "Lock the counts" again', 'নতুন line - আবার "Count lock করুন" চাপুন'),
   e_count_locked: L('সেভ করা গণনা এন্ট্রিতে বদলানো যায় না', 'The saved count cannot be changed in the entry', 'Save করা count entry-তে বদলানো যায় না'),
   e_count_mismatch: L('লেখা গণনা আর সেভ করা গণনা মিলছে না', 'The typed count differs from the count being saved', 'লেখা count আর save করা count মিলছে না'),
   e_count_not_open: L('এখন এই গণনা নেওয়ার সময় নয়', 'This count cannot be taken at this stage', 'এখন এই count নেওয়ার সময় নয়'),
   e_bad_count: L('গণনার অঙ্ক ঠিক নয়', 'The count figures are not valid', 'Count-এর অঙ্ক ঠিক নয়'),
-  e_signer_is_maker: L('লেখক নিজে স্বাক্ষর করতে পারবেন না', 'The writer cannot sign', 'লেখক নিজে sign করতে পারবেন না'),
+  e_signer_is_maker: L('এন্ট্রিদাতা নিজে স্বাক্ষর করতে পারবেন না', 'The writer cannot sign', 'লেখক নিজে sign করতে পারবেন না'),
   e_signer_already_signed: L('এই লগইন এই ফর্মে আগেই স্বাক্ষর করেছে', 'This login already signed this form', 'এই login এই form-এ আগেই sign করেছে'),
   e_role_already_signed: L('এই স্বাক্ষর আগেই হয়ে গেছে', 'This signature is already done', 'এই signature আগেই হয়ে গেছে'),
-  e_signer_locked: L('এই লগইন ভুল পিনে তালাবদ্ধ — কিছুক্ষণ পরে', 'This login is locked after wrong PINs - try later', 'এই login ভুল PIN-এ locked — কিছুক্ষণ পরে'),
+  e_signer_locked: L('এই লগইন ভুল পিনে লক — কিছুক্ষণ পরে', 'This login is locked after wrong PINs - try later', 'এই login ভুল PIN-এ locked — কিছুক্ষণ পরে'),
   e_pin_signature_required: L('পিন স্বাক্ষর বাকি আছে', 'A PIN signature is still missing', 'PIN signature বাকি আছে'),
   e_signature_mismatch: L('ফর্মের নাম আর স্বাক্ষরকারী মিলছে না', 'The name on the form does not match the signer', 'Form-এর নাম আর signer মিলছে না'),
   e_count_missing: L('আগে নোট ধরে গণনা এন্ট্রিতে লিখে সেভ করুন', 'Type the count in the sheet and save it first', 'আগে count sheet-এ লিখে save করুন'),
-  e_count_draft_limit: L('আজ এই লোকেশনে আপনার একটি গণনা-করা খসড়া আগেই আছে — সেটা জমা দিন', 'You already have a counted draft here today - submit it first', 'আজ এই location-এ আপনার একটি counted draft আছে — আগে সেটা submit করুন'),
+  e_count_draft_limit: L('আজ এই লোকেশনে আপনার একটি গণনা-করা ড্রাফট আগেই আছে — সেটা জমা দিন', 'You already have a counted draft here today - submit it first', 'আজ এই location-এ আপনার একটি counted draft আছে — আগে সেটা submit করুন'),
   e_login_not_fresh: L('স্বাক্ষরকারীকে এখনই আবার পিন দিয়ে ঢুকতে হবে', 'The signer must sign in again just now', 'Signer-কে এখনই আবার PIN দিয়ে ঢুকতে হবে'),
   e_pin_signature_stale: L('স্বাক্ষরের পর শিট বদলেছে — আবার স্বাক্ষর করান', 'The sheet changed after the signature - sign again', 'Signature-এর পর sheet বদলেছে — আবার sign করান'),
   e_pin_signature_off: L('পিন স্বাক্ষর এখন বন্ধ আছে', 'PIN signature is switched off', 'PIN signature এখন off'),
 };
 Object.assign(X17, X18);
-const BLIND_SEC = { '14-1': 'drawer', '10-1': 'hub' };
-const BLIND_FIELD = { '14-1': 'cash_count', '10-1': 'rcount' };
-const BLIND_HIDE = { '14-1': ['expected', 'short_over'], '10-1': ['counted_total', 'handover', 'diff'] };
-const BLIND_V = { '14-1': ['expected', 'short_over', 'so_nonzero'], '10-1': ['counted_total', 'handover', 'diff', 'diff_nonzero'] };
-const BLIND_FLAG = { '14-1': 'cash_short_over', '10-1': 'hub_diff' };
-const PIN_ROLES = { '14-1': ['witness', 'second_sig'], '10-1': ['hub_pair'], '04-3': ['witness'] };
-const blindStage = () => !!E && ((E.code === '14-1' && E.mode === 'edit') || (E.code === '10-1' && E.mode === 'check'));
+const BLIND_SEC = { '06-1': 'drawer', '03-1': 'hub' };
+const BLIND_FIELD = { '06-1': 'cash_count', '03-1': 'rcount' };
+const BLIND_HIDE = { '06-1': ['expected', 'short_over'], '03-1': ['counted_total', 'handover', 'diff'] };
+const BLIND_V = { '06-1': ['expected', 'short_over', 'so_nonzero'], '03-1': ['counted_total', 'handover', 'diff', 'diff_nonzero'] };
+const BLIND_FLAG = { '06-1': 'cash_short_over', '03-1': 'hub_diff' };
+const PIN_ROLES = { '06-1': ['witness', 'second_sig'], '03-1': ['hub_pair'], '36-1': ['witness'] };
+const blindStage = () => !!E && ((E.code === '06-1' && E.mode === 'edit') || (E.code === '03-1' && E.mode === 'check'));
 const blindRevealed = () => !!(E.blind.peeked || (E.blind.saved && E.blind.res && E.blind.res.expected !== undefined));    // the maker's own count_save answer carries no figures (server side blind)
 const blindPending = () => !!(E && E.blind && E.blind.on && blindStage() && !blindRevealed());
 function blindMask() {
@@ -454,8 +454,8 @@ function blindMask() {
   BLIND_V[E.code].forEach((k) => { delete E.calc.v[k]; });
   E.calc.flags = E.calc.flags.filter((f) => f.code !== BLIND_FLAG[E.code]);
 }
-// ---------- B2: blind stock count (04-3) and GRN (04-1): counted figures are sealed on the server first (supabase/phase23.sql) ----------
-const SB_FIELD = { '04-3': 'count', '04-1': 'counted' };
+// ---------- B2: blind stock count (36-1) and GRN (13-1): counted figures are sealed on the server first (supabase/phase23.sql) ----------
+const SB_FIELD = { '36-1': 'count', '13-1': 'counted' };
 async function loadSB() {
   E.sb = null; if (!SB_FIELD[E.code]) return;
   try {
@@ -580,12 +580,7 @@ function refresh() {
 // ---------- editing events ----------
 const norm = (s) => String(s).replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d));
 // ---------- photos (Supabase Storage bucket "photos") ----------
-function shrink(file, max = 1280, q = 0.72) {
-  return new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file);
-    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob((b) => (b ? res(b) : rej(new Error('image'))), 'image/jpeg', q); };
-    img.onerror = () => rej(new Error('image')); img.src = u; });
-}
+function shrink(file, max = 1280, q = 0.72) { return window.BOS.photo.shrink(file, { max: max, q: q }); }   // shared helper: web/photo.js (EXIF, type and size checks)
 const rid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
 async function addPhoto(el) {
   const f = el.files && el.files[0]; if (!f) return;

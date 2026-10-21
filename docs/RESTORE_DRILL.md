@@ -19,10 +19,10 @@ Optional Google Drive copy works the same: download the folder that holds `manif
 ## Step 2 - build an empty scratch database with the app schema / খালি scratch ডাটাবেস
 The backup holds data only; the schema comes from the repo's phase files (the same files you pasted into Supabase). With Postgres reachable by `psql -h /tmp -p 5544 -U postgres` run, from the code clone:
 ```
-ORDER="phase8 phase9 phase10 phase11 phase12 phase13 phase14 phase15 phase16 phase17 phase18 phase19 phase20 phase21 phase22 phase23 phase24 phase25 phase26 phase27 phase28 phase40 phase41 phase42 phase43 phase44 phase45 phase46 phase47 phase48 phase49 phase50 phase51 phase52 phase53 phase54 phase60 phase61 phase62 phase70" \
+ORDER="$(grep -v '^#' tests/sql/ORDER.txt)" \
   bash tests/sql/build_fresh_db.sh bos_scratch
 ```
-(`tests/sql/build_fresh_db.sh` uses socket `/tmp`, port `5544`; edit its `P=` line for another server. Add any later phase files that exist in `supabase/` and that you ran on Supabase, in order. The database **must** be named with `scratch`.)
+(`tests/sql/build_fresh_db.sh` uses socket `/tmp`, port `5544`; edit its `P=` line for another server. `tests/sql/ORDER.txt` lists every phase file in the owner paste order up to phase 99 (the same as `ORDER=all`); drop the names you have not pasted on Supabase. The database **must** be named with `scratch`.)
 
 ## Step 3 - run the drill / ড্রিল চালান
 ```

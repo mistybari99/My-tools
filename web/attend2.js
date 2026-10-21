@@ -5,7 +5,7 @@
      mark   owner / holder of the grant attendance_mark_others marks ANOTHER person's day: status, in, closing time, rest minutes, source tag device/finger/face/manual
             (the tag is the marker's own word, not a proof). Every mark goes to an append-only log. A month locked by payroll is refused.
      staff  owner: lock / unlock self punch per person or per role, place coordinates for the soft GPS flag; manager: record "fingerprint enrolled on the device" flag.
-     count  staff attendance (path A) vs the monthly register 02-1 (path B): which one is counted, shadow copies, per-person differences.
+     count  staff attendance (path A) vs the monthly register 19-1 (path B): which one is counted, shadow copies, per-person differences.
    RPCs: attendance_self_punch, att_my_status, att_self_lock_set, att_site_geo_set, att_staff_overview, att_evidence_register / void, attendance_mark_others,
          att_others_board, attendance_count_once, attendance_form_link_run, entry_equation_check.
    B.rpcq (this file): a client-id outbox for RPC writes (IndexedDB + localStorage copy). A write that cannot reach the server waits here with its p_client key and is resent
@@ -89,17 +89,17 @@ B.rpcq = Q;
 /* ================= texts ================= */
 const X = {
   title: L('হাজিরা ২ — পাঞ্চ, লেখা, একবার গোনা', 'Attendance 2 - punch, mark, counted once', 'Attendance 2 — punch, mark, একবার গোনা'),
-  tMe: L('আমার পাঞ্চ', 'My punch', 'আমার punch'), tMark: L('অন্যের হাজিরা লিখুন', 'Mark others', 'অন্যের হাজিরা'), tStaff: L('কর্মী ও লক', 'Staff & locks', 'Staff ও lock'), tCount: L('একবার গোনা', 'Counted once', 'একবার গোনা'),
-  place: L('জায়গা', 'Place', 'Place'), date: L('তারিখ', 'Date', 'Date'), month: L('মাস', 'Month', 'Month'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
+  tMe: L('আমার পাঞ্চ', 'My punch', 'আমার punch'), tMark: L('অন্যের হাজিরা লিখুন', 'Mark others', 'অন্যের হাজিরা'), tStaff: L('স্টাফ ও লক', 'Staff & locks', 'Staff ও lock'), tCount: L('একবার গোনা', 'Counted once', 'একবার গোনা'),
+  place: L('জায়গা', 'Place', 'Place'), date: L('ডেট', 'Date', 'Date'), month: L('মাস', 'Month', 'Month'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
   limitsT: L('সীমাবদ্ধতা — সৎ কথা', 'Honest limits', 'Honest limits'),
   limits: L('এখানে আঙুল/মুখ/পাসকি শুধু প্রমাণের রেফারেন্স (evidence)। সার্ভার পাসকি বা মুখ যাচাই করতে পারে না — তাই কেউ নিজে সেই ফোন ধরেছে তার প্রমাণ নয়। আঙুলের ছাপ শুধু আলাদা ফিঙ্গারপ্রিন্ট মেশিন-ব্রিজ দিয়ে আসে। জিপিএস শুধু নরম পতাকা — ভুল বা নকল হতে পারে, পাঞ্চ আটকায় না। "সোর্স ট্যাগ" লেখকের নিজের ঘোষণা।',
     'Fingerprint, face and passkey here are EVIDENCE references only. The server cannot verify a passkey or a face, so none of them proves who is holding the phone. A fingerprint only arrives through the separate device bridge. GPS is a soft flag - it can be wrong or faked and never blocks a punch. The "source tag" is the marker\'s own declaration.',
     'Finger/face/passkey এখানে শুধু evidence reference। Server passkey বা মুখ verify করতে পারে না — তাই ফোন কার হাতে তার প্রমাণ নয়। Fingerprint শুধু আলাদা device bridge দিয়ে আসে। GPS শুধু soft flag — ভুল/নকল হতে পারে, punch আটকায় না। "Source tag" লেখকের নিজের ঘোষণা।'),
   state: L('অবস্থা', 'State', 'State'), canPunch: L('আপনি এখন পাঞ্চ করতে পারেন', 'You can punch now', 'এখন punch করতে পারেন'),
   s_app_punch_off: L('অ্যাপ থেকে পাঞ্চ বন্ধ (সুইচবোর্ডে app_punch_on)', 'Self punch is OFF (Switchboard: app_punch_on)', 'App punch বন্ধ (app_punch_on)'),
-  s_self_punch_locked: L('মালিক আপনার (বা আপনার ভূমিকার) স্ব-পাঞ্চ লক করেছেন', 'The owner has locked self punch for you or your role', 'Owner আপনার/role-এর self punch lock করেছেন'),
+  s_self_punch_locked: L('মালিক আপনার (বা আপনার রোলের) স্ব-পাঞ্চ লক করেছেন', 'The owner has locked self punch for you or your role', 'Owner আপনার/role-এর self punch lock করেছেন'),
   s_path_locked: L('এই জায়গায় হাজিরা পথ (ক) লক', 'Attendance path A is locked here', 'এখানে attendance path A lock'),
-  s_attendance_off: L('হাজিরা বন্ধ', 'Attendance is off', 'Attendance বন্ধ'), s_no_employee_record: L('আপনার লগইন কর্মী-তথ্যের সাথে জোড়া নেই', 'Your login is not linked to an employee record', 'Login employee record-এর সাথে জোড়া নেই'),
+  s_attendance_off: L('হাজিরা বন্ধ', 'Attendance is off', 'Attendance বন্ধ'), s_no_employee_record: L('আপনার লগইন কর্মচারী-তথ্যের সাথে জোড়া নেই', 'Your login is not linked to an employee record', 'Login employee record-এর সাথে জোড়া নেই'),
   inB: L('চেক ইন', 'Check in', 'Check in'), outB: L('চেক আউট', 'Check out', 'Check out'), evid: L('প্রমাণ (evidence) সংযুক্ত করুন', 'Attach evidence', 'Evidence যোগ করুন'),
   ev_none: L('কিছু না', 'None', 'None'), ev_pass: L('ব্রাউজার পাসকি', 'Browser passkey', 'Browser passkey'), ev_face: L('মুখের ছবি', 'Face photo', 'Face photo'),
   geo: L('আমার অবস্থান পাঠান (নরম পতাকা)', 'Send my location (soft flag)', 'আমার location পাঠান (soft flag)'), punched: L('পাঞ্চ হয়েছে', 'Punch recorded', 'Punch হয়েছে'),
@@ -113,26 +113,26 @@ const X = {
   inT: L('ঢোকার সময়', 'In time', 'In time'), outT: L('বন্ধ/বের হওয়ার সময়', 'Closing / out time', 'Closing/out time'), rest: L('বিরতি (মিনিট)', 'Rest time (minutes)', 'Rest (minutes)'),
   src: L('সোর্স ট্যাগ', 'Source tag', 'Source tag'), src_device: L('মেশিন (device)', 'Device', 'Device'), src_finger: L('আঙুল (finger)', 'Finger', 'Finger'), src_face: L('মুখ (face)', 'Face', 'Face'), src_manual: L('হাতে (manual)', 'Manual', 'Manual'),
   srcHint: L('ট্যাগ আপনার নিজের ঘোষণা হিসেবে লগে থাকবে — প্রমাণ নয়।', 'The tag is stored in the log as YOUR declaration - not a proof.', 'Tag log-এ আপনার ঘোষণা হিসেবে থাকবে — proof নয়।'),
-  reason: L('কারণ (জরুরি)', 'Reason (required)', 'কারণ (জরুরি)'), note: L('নোট', 'Note', 'Note'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), markB: L('লিখুন', 'Mark', 'Mark'),
+  reason: L('কারণ (জরুরি)', 'Reason (required)', 'কারণ (জরুরি)'), note: L('নোট', 'Note', 'Note'), save: L('সেভ', 'Save', 'Save'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), markB: L('লিখুন', 'Mark', 'Mark'),
   waits: L('পাঠানো হয়নি — নেট এলে নিজে যাবে', 'Not sent yet - goes by itself when the net is back', 'Send হয়নি — net এলে নিজে যাবে'), queued: L('ফোনে রাখা হয়েছে, নেট এলে যাবে', 'Kept on the phone, will go when the net is back', 'Phone-এ রাখা হয়েছে, net এলে যাবে'),
-  sendNow: L('এখনই পাঠান', 'Send now', 'এখনই send'), discard: L('ফেলে দিন', 'Discard', 'Discard'), refused: L('সার্ভার নিল না', 'Refused by the server', 'Server নেয়নি'), pending: L('অনুমোদন বাকি', 'Waiting approval', 'Approval বাকি'),
+  sendNow: L('এখনই পাঠান', 'Send now', 'এখনই send'), discard: L('ফেলে দিন', 'Discard', 'Discard'), refused: L('সার্ভার নিল না', 'Refused by the server', 'Server নেয়নি'), pending: L('অ্যাপ্রুভ অপেক্ষায়', 'Waiting approval', 'Approval অপেক্ষায়'),
   me2: L('নিজে', 'you', 'নিজে'), selfNo: L('নিজের হাজিরা নিজে লেখা যায় না', 'You cannot mark yourself', 'নিজের হাজিরা নিজে লেখা যায় না'), needGrant: L('এই কাজের অনুমতি (attendance_mark_others) মালিক দেন।', 'The owner gives this right (attendance_mark_others).', 'Owner এই right (attendance_mark_others) দেন।'),
   // staff
-  lockP: L('স্ব-পাঞ্চ লক', 'Self-punch lock', 'Self-punch lock'), locked: L('লক', 'Locked', 'Locked'), open: L('খোলা', 'Open', 'Open'), roles: L('ভূমিকা অনুযায়ী লক', 'Lock by role', 'Role অনুযায়ী lock'),
+  lockP: L('স্ব-পাঞ্চ লক', 'Self-punch lock', 'Self-punch lock'), locked: L('লক', 'Locked', 'Locked'), open: L('খোলা', 'Open', 'Open'), roles: L('রোল অনুযায়ী লক', 'Lock by role', 'Role অনুযায়ী lock'),
   geoSet: L('এই জায়গার অবস্থান = আমার এখনকার অবস্থান', 'Set this place = my location now', 'এই জায়গা = আমার এখনকার location'), geoSaved: L('জায়গার অবস্থান রাখা হয়েছে', 'Place location saved', 'Place location রাখা হয়েছে'),
   fingerFlag: L('আঙুল মেশিনে তোলা আছে (ডিভাইস আইডি)', 'Fingerprint enrolled on the device (device user id)', 'Finger device-এ তোলা আছে (device user id)'), add: L('যোগ', 'Add', 'Add'),
   master: L('মাস্টার সুইচ app_punch_on', 'Master switch app_punch_on', 'Master switch app_punch_on'), on: L('চালু', 'ON', 'ON'), off: L('বন্ধ', 'OFF', 'OFF'),
   k_webauthn: L('পাসকি', 'passkey', 'passkey'), k_face_photo: L('মুখের ছবি', 'face photo', 'face photo'), k_finger_device: L('আঙুল (মেশিনে)', 'finger (device)', 'finger (device)'),
   // count
-  counted: L('গোনা হচ্ছে', 'Counted', 'Counted'), c_attendance_record: L('হাজিরা রেকর্ড (পাঞ্চ/লেখা)', 'Attendance record (punch / marked)', 'Attendance record (punch/marked)'), c_form_02_1: L('ফর্ম 02-1', 'Form 02-1', 'Form 02-1'),
+  counted: L('গোনা হচ্ছে', 'Counted', 'Counted'), c_attendance_record: L('হাজিরা রেকর্ড (পাঞ্চ/লেখা)', 'Attendance record (punch / marked)', 'Attendance record (punch/marked)'), c_form_02_1: L('ফর্ম 19-1', 'Form 19-1', 'Form 19-1'),
   shadow: L('শ্যাডো কপি (লক)', 'Shadow copy (locked)', 'Shadow copy (lock)'), record: L('রেকর্ড', 'Record', 'Record'), a_has: L('পথ ক-এ এই মাসের তথ্য আছে', 'Path A holds this month', 'Path A-তে এই মাসের data আছে'),
-  linkNow: L('ফর্ম এখনই জোড়া লাগান', 'Link the forms now', 'Form এখনই link করুন'), linked: L('জোড়া হয়েছে', 'Linked', 'Linked'), dev: L('হাজিরা রেকর্ড', 'Record', 'Record'), frm: L('ফর্ম 02-1', 'Form 02-1', 'Form 02-1'),
+  linkNow: L('ফর্ম এখনই জোড়া লাগান', 'Link the forms now', 'Form এখনই link করুন'), linked: L('জোড়া হয়েছে', 'Linked', 'Linked'), dev: L('হাজিরা রেকর্ড', 'Record', 'Record'), frm: L('ফর্ম 19-1', 'Form 19-1', 'Form 19-1'),
   pres: L('উপস্থিত', 'present', 'present'), late: L('দেরি', 'late', 'late'), abs: L('অনুপস্থিত', 'absent', 'absent'), ot: L('ওভারটাইম ঘ.', 'OT h', 'OT h'), differ: L('মিলছে না', 'Differs', 'মিলছে না'), same: L('মিলছে', 'Matches', 'মিলছে'),
-  note14: L('ফর্ম 14-1 (দৈনিক শোরুম শিট) ক্যাশ ড্রয়ারের শিট — এই সুইচের আওতায় নয়।', 'Form 14-1 (daily showroom sheet) is the cash drawer sheet - it is not under this switch.', 'Form 14-1 (daily showroom sheet) cash drawer sheet — এই switch-এর বাইরে।'),
-  nameMatch: L('নাম/কর্মী নম্বর মিলিয়ে ধরা হয়েছে — পার্থক্য দেখার ইঙ্গিত, রায় নয়।', 'People are matched by name / employee no.; a difference is a prompt to look, not a verdict.', 'নাম/employee no. মিলিয়ে — পার্থক্য দেখার ইঙ্গিত, রায় নয়।'),
+  note14: L('ফর্ম 06-1 (দৈনিক শোরুম শিট) ক্যাশ ড্রয়ারের শিট — এই সুইচের আওতায় নয়।', 'Form 06-1 (daily showroom sheet) is the cash drawer sheet - it is not under this switch.', 'Form 06-1 (daily showroom sheet) cash drawer sheet — এই switch-এর বাইরে।'),
+  nameMatch: L('নাম/কর্মচারী নম্বর মিলিয়ে ধরা হয়েছে — পার্থক্য দেখার ইঙ্গিত, রায় নয়।', 'People are matched by name / employee no.; a difference is a prompt to look, not a verdict.', 'নাম/employee no. মিলিয়ে — পার্থক্য দেখার ইঙ্গিত, রায় নয়।'),
   // eqcheck
-  eqTitle: L('সার্ভারে হিসাব মেলানো (10-2 / 02-2)', 'Server re-check of totals (10-2 / 02-2)', 'Server-এ হিসাব মেলানো (10-2 / 02-2)'),
-  eqIntro: L('ফোনে হওয়া হিসাব আর পতাকা সার্ভার আবার করে মেলায়। শুধু দেখা — কিছু বদলায় না। 14-1 এখনো নয়।', 'The server re-works the totals and compares them with the flags the phone stored. Read only - nothing is changed. 14-1 is not covered yet.', 'Phone-এর হিসাব/flag server আবার মেলায়। শুধু দেখা — কিছু বদলায় না। 14-1 এখনো নয়।'),
+  eqTitle: L('সার্ভারে হিসাব মেলানো (11-1 / 21-1)', 'Server re-check of totals (11-1 / 21-1)', 'Server-এ হিসাব মেলানো (11-1 / 21-1)'),
+  eqIntro: L('ফোনে হওয়া হিসাব আর পতাকা সার্ভার আবার করে মেলায়। শুধু দেখা — কিছু বদলায় না। 06-1 এখনো নয়।', 'The server re-works the totals and compares them with the flags the phone stored. Read only - nothing is changed. 06-1 is not covered yet.', 'Phone-এর হিসাব/flag server আবার মেলায়। শুধু দেখা — কিছু বদলায় না। 06-1 এখনো নয়।'),
   check: L('মেলান', 'Check', 'Check'), allOk: L('সব মিলেছে ✓', 'All match ✓', 'সব মিলেছে ✓'), recomputed: L('সার্ভারের হিসাব', 'Server figures', 'Server figures'), mism: L('অমিল', 'Differences', 'Differences'),
   k_flag_missing: L('ফোনে পতাকা পড়েনি', 'the phone raised no flag', 'phone-এ flag পড়েনি'), k_flag_extra: L('ফোনে লাল পতাকা ছিল কিন্তু হিসাবে মিলছে', 'the phone has a red flag but the figures agree', 'phone-এ red flag কিন্তু হিসাব মিলছে'), k_amount_differs: L('পতাকার অঙ্ক আলাদা', 'flag amount differs', 'flag-এর amount আলাদা'),
   obs: L('তথ্য', 'For information', 'For information'),
@@ -141,8 +141,8 @@ const T = (k) => lab(X[k]);
 const ERR = {
   app_punch_off: X.s_app_punch_off, self_punch_locked: X.s_self_punch_locked, path_locked: X.s_path_locked, attendance_off: X.s_attendance_off, no_employee_record: X.s_no_employee_record,
   too_soon: L('এক মিনিটের মধ্যে আবার নয়', 'Not twice within a minute', 'এক মিনিটের মধ্যে আবার নয়'), bad_geo: L('অবস্থান ঠিক নয়', 'Bad location', 'Location ঠিক নয়'), bad_evidence: L('প্রমাণের তথ্য ঠিক নয়', 'Bad evidence', 'Evidence ঠিক নয়'),
-  cannot_mark_self: X.selfNo, month_locked: L('এই মাসের বেতন অনুমোদিত — হাজিরা বন্ধ', 'Payroll is approved for this month - attendance is locked', 'Payroll approved — month lock'),
-  reason_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন (৩+ অক্ষর)'), bad_date: L('তারিখ ঠিক নয় (আজ থেকে ৬২ দিনের মধ্যে)', 'Date not valid (within 62 days)', 'Date ঠিক নয় (৬২ দিনের মধ্যে)'),
+  cannot_mark_self: X.selfNo, month_locked: L('এই মাসের বেতন অ্যাপ্রুভড — হাজিরা বন্ধ', 'Payroll is approved for this month - attendance is locked', 'Payroll approved — month lock'),
+  reason_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন (৩+ অক্ষর)'), bad_date: L('ডেট ঠিক নয় (আজ থেকে ৬২ দিনের মধ্যে)', 'Date not valid (within 62 days)', 'Date ঠিক নয় (৬২ দিনের মধ্যে)'),
   bad_source: L('সোর্স ট্যাগ বাছুন', 'Choose the source tag', 'Source tag বাছুন'), bad_rest: L('বিরতি ০–৭২০ মিনিট', 'Rest must be 0-720 minutes', 'Rest ০–৭২০ min'), bad_time: L('সময় ঠিক নয়', 'Time is not valid', 'Time ঠিক নয়'), bad_status: L('অবস্থা বাছুন', 'Choose a status', 'Status বাছুন'),
   client_id_in_use: L('এই ক্লায়েন্ট কী অন্যের', 'This client key belongs to someone else', 'Client key অন্যের'), not_found: L('পাওয়া যায়নি', 'Not found', 'পাওয়া যায়নি'), too_many: L('সর্বোচ্চ ১০টি নিবন্ধন', 'At most 10 registrations', 'সর্বোচ্চ ১০টি'),
   'not allowed': L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
@@ -158,7 +158,7 @@ if (!document.getElementById('a2css')) document.head.appendChild(css);
 
 const D = { tab: 'me', loc: null, day: today(), month: today().slice(0, 7), me: null, board: null, staff: null, count: null, can: {}, ev: null, geo: false };
 const tabsHTML = (list) => `<div class="ptabs" role="tablist">${list.map(([k, l]) => `<button role="tab" data-act="a2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}</button>`).join('')}</div>`;
-const locSel = () => `<select id="a2_loc" aria-label="${esc(T('place'))}">${LOCS().map((l) => `<option value="${l.id}" ${l.id === D.loc ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+const locSel = () => `<select id="a2_loc" aria-label="${esc(T('place'))}">${B.locGroups.optionsHTML(LOCS(), D.loc, nm)}</select>`;
 const limitsBox = () => `<details data-ctl="off" class="card"><summary>${esc(T('limitsT'))}</summary><p class="a2-lim">${esc(T('limits'))}</p></details>`;
 async function grant(code) {
   if (S.ctx.is_owner) return true; const k = code + '|' + D.loc; if (k in D.can) return D.can[k];
@@ -285,7 +285,7 @@ async function countHTML() {
   const pick = `<div class="a2-pick"><div><label for="a2_loc">${esc(T('place'))}</label>${locSel()}</div><div><label for="a2_month">${esc(T('month'))}</label><input id="a2_month" type="month" value="${esc(D.month)}" max="${esc(today().slice(0, 7))}"></div></div>`;
   const r = await sb.rpc('attendance_count_once', { p_loc: D.loc, p_month: D.month + '-01' }); if (r.error) return pick + `<p class="muted">${esc(eText(r.error))}</p>`;
   const d = D.count = r.data || {}; const nf = (o) => (o ? `${esc(String(o.present))} ${esc(T('pres'))} · ${esc(String(o.late))} ${esc(T('late'))} · ${esc(String(o.absent))} ${esc(T('abs'))} · ${esc(String(o.ot_hours))} ${esc(T('ot'))}` : '–');
-  const forms = (d.forms || []).map((f) => `<div class="a2-row"><span>02-1 #${esc(String(f.serial))} · ${esc(f.status)}</span><span class="chip ${f.is_shadow ? 'info' : 'ok'}">${esc(f.is_shadow ? T('shadow') : T('record'))}</span></div>`).join('');
+  const forms = (d.forms || []).map((f) => `<div class="a2-row"><span>19-1 #${esc(String(f.serial))} · ${esc(f.status)}</span><span class="chip ${f.is_shadow ? 'info' : 'ok'}">${esc(f.is_shadow ? T('shadow') : T('record'))}</span></div>`).join('');
   const rows = (d.rows || []).map((x) => `<div class="card stack ${x.mismatch ? 'a2-diff' : ''}"><div class="a2-row"><b class="nm">${esc(lab({ bn: x.name_bn, en: x.name_en || x.name_bn, mix: x.name_bn }))}</b><span class="chip ${x.mismatch ? 'bad' : 'ok'}">${esc(x.mismatch ? T('differ') : T('same'))}</span></div>
       <div class="a2-num muted">${esc(T('dev'))}: ${nf(x.device)}</div><div class="a2-num muted">${esc(T('frm'))}: ${nf(x.form)}</div></div>`).join('');
   return pick + `<div class="card stack"><div class="a2-row"><b>${esc(T('counted'))}</b><span class="chip ok">${esc(T('c_' + d.counted))}</span></div><div class="muted">${esc(T('a_has'))}: ${d.path_a_has_month ? '✓' : '✗'}</div>${forms}
@@ -328,7 +328,7 @@ async function eqView() {
   if (B.loadStatic) await B.loadStatic();
   shell(T('eqTitle'), `<p class="muted">${esc(T('eqIntro'))}</p><div id="eq_body"><p class="muted">…</p></div>`, true);
   try {
-    const r = await sb.from('entries').select('id,form_code,serial,entry_date,status,location_id').in('form_code', ['10-2', '02-2']).order('entry_date', { ascending: false }).limit(30);
+    const r = await sb.from('entries').select('id,form_code,serial,entry_date,status,location_id').in('form_code', ['11-1', '21-1']).order('entry_date', { ascending: false }).limit(30);
     if (r.error) throw r.error; EQ.rows = r.data || []; drawEq();
   } catch (e) { fail(e); }
 }

@@ -1,10 +1,11 @@
 // W6: recipes / BOM page (#/recipes), editor, production sheet (+ stock hub button), can-make view, packaging rules, cost gating.
 // Run: node recipes_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8362, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 function mk(o = {}) {
   const data = C.mkData(base, o); const T = data.tables; const it = T.items;
   Object.assign(it[0], { item_type: 'finished_good', unit: 'kg', base_unit: 'kg', tracked: true, is_active: true });

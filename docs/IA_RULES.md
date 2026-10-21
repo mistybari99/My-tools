@@ -13,6 +13,11 @@ Single source of truth: `web/ia.js` (`BOS.IA`). Drawer, Home tiles/modules, bott
 3. Never rename or remove a route: old URLs and favourites (`r:<route>`) must keep working. Aliases use `alias` + `status:'hidden'`.
 4. Run `node tests/web/ia_test.js <abs tests/web>` plus nav, nav2, control, favsync, settings2.
 
+## Visibility rules (owner decisions, 21 Oct 2026)
+- A main feature is visible at its proper place even when its inner switch is OFF. Never gate a menu entry on a switch alone: give it `ok: (c) => c.own || <grant> || ruleOn('x_on')`-style access so the owner and the grant holder always see it, and let the screen say "Off: turn on in Settings". (announce, todo, shifts follow this rule; no other entry is hidden by a switch.)
+- Screens of other trades (variants, cheques, schemes, tinting, impexp) are gated by the business template: `otherTrade()` in `web/ia.js`, backed by `B.biz.otherTrade()` / `B.biz.hasTemplate(...)` in `web/bizctx.js`. The sweets business (template `food_manufacturing`, or no template) does not see them; routes stay registered and open by link. Gate a new other-trade screen the same way; add no other-business data or details.
+- The location block in the drawer has explicit move higher / lower buttons (`loc_up`, `loc_dn` in `web/nav.js`), position kept per person on the device (`bos_locpos_<id>`), and the drawer footer opens expanded by default when the person has 2 or more places.
+
 ## Row actions
 Essential actions are never only in a three-dot menu. Primary button visible; at most 2 secondary visible; ⋮ holds edit details, history, print, duplicate, void, inactivate (destructive last, with reason). Same verbs, same order in row and record menus.
 

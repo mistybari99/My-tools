@@ -26,7 +26,7 @@ Context words that legitimately differ (e.g. "বাকি" = Due on a sale, Rem
 - Dates are ISO inside the app (2026-10-11); the day name is shown next to it.
 
 ## 5. Numbering that must match the paper forms
-- **Form number** (14-1, 10-2 ...) is the kit's number and never changes.
+- **Form number** (06-1, 11-1 ...) is the kit's number and never changes.
 - **App serial** `FORM-LOCATION-n` (example `10-2-main-5`) counts entries per form and location, never skips or repeats.
 - **Printed paper no.** — every form has a field for the serial printed in the numbered paper book. The same printed number can be
   entered only once per form and location (the database refuses a duplicate). The *Number gap audit* page lists printed numbers

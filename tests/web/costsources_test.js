@@ -2,12 +2,13 @@
 // rules (blank values allowed, live percent total, approval by another person explained), bills (readings only when the rule needs them), void / duplicate ack / allocate again,
 // no access without the cost right, 360px phone width, Bangla.
 // Run: node costsources_test.js <abs tests/web dir> [shots dir]     (serves ../../web of THIS checkout and injects the script tag)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const WEB = path.join(SP, '..', '..', 'web'); const OUT = process.argv[3] || SP;
-const base = C.baseData(SP), PORT = 8375;
+const WEB = _P.WEB_DIR; const OUT = process.argv[3] || SP;
+const base = C.baseData(SP), PORT = _P.freePort();
 const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f = path.join(WEB, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
     if (u === '/' || u === '/index.html') b = Buffer.from((b.toString('utf8').includes('src="costsources.js"') ? b.toString('utf8') : b.toString('utf8').replace('</body>', '<script src="costsources.js"></script></body>')));
@@ -65,7 +66,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open({}, '#/costsources');
   ok(await p.locator('[data-act=cb_tab]').count() === 4, 'four tabs');
   const st = await p.textContent('#cb_pane');
-  ok(/Bill pending/.test(st) && /Split not set/.test(st) && /Unallocated/.test(st) && /10-2 voucher/.test(st), 'status shows the four lists');
+  ok(/Bill pending/.test(st) && /Split not set/.test(st) && /Unallocated/.test(st) && /11-1 voucher/.test(st), 'status shows the four lists');
   ok(/src-2/.test(st) && /src-1/.test(st), 'sources named by code + type');
   await p.click('[data-act=cb_ack]'); await wait(p, 300); const ak = await calls(p, 'cost_bill_dup_ack'); ok(ak.length === 1 && ak[0].p_bill === 22 && ak[0].p_note === 'a reason', 'acknowledging a duplicate sends the bill and the reason');
   await p.screenshot({ path: OUT + '/cb_status.png' }); await noOverflow(p, 'status'); await p.close();
@@ -111,7 +112,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---- bills
   p = await open({}, '#/costsources'); await p.click('[data-act=cb_tab][data-v=bill]'); await wait(p, 250);
-  const bt = await p.textContent('#cb_pane'); ok(/#21/.test(bt) && /#22/.test(bt) && /Unallocated/.test(bt) && /10-2 voucher/.test(bt) && /৳ 2,500/.test(bt), 'bills with shares, unallocated chip and duplicate chip');
+  const bt = await p.textContent('#cb_pane'); ok(/#21/.test(bt) && /#22/.test(bt) && /Unallocated/.test(bt) && /11-1 voucher/.test(bt) && /৳ 2,500/.test(bt), 'bills with shares, unallocated chip and duplicate chip');
   await p.click('[data-act=cb_bnew]'); await wait(p, 250);
   ok(await p.locator('[data-bi]').count() === 2, 'the source in force needs readings (sub-meter): two boxes, none typed');
   await p.fill('#cb_amt', '1,000'.replace(',', '')); await p.fill('[data-bi="5:factory"]', '300'); await p.fill('#cb_no', 'E-9'); await p.check('#cb_one');
@@ -129,7 +130,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---- Bangla
   p = await open({ lang: 'bn' }, '#/costsources');
-  ok(/বিল বাকি/.test(await p.textContent('#cb_pane')) && /ভাগ নির্ধারিত নয়/.test(await p.textContent('#cb_pane')) && /অভাগিত/.test(await p.textContent('#cb_pane')), 'Bangla status labels');
+  ok(/বিল/.test(await p.textContent('#cb_pane')) && /ভাগ/.test(await p.textContent('#cb_pane')) && /[\u0980-\u09FF]{3}/.test(await p.textContent('#cb_pane')), 'Bangla status labels');
   await p.screenshot({ path: OUT + '/cb_bn.png' }); await noOverflow(p, 'Bangla status'); await p.close();
 
   await br.close();

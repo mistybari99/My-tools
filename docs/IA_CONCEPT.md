@@ -1,6 +1,6 @@
 # IA CONCEPT — task-based structure and behaviour for ISLAMIYA MISTY GHAR
 
-Scope: STRUCTURE and BEHAVIOUR only. No colours, fonts, or business-rule changes. Complements web/ia.js (screen registry, 13 categories) and docs/IA_AUDIT.md (route inventory); this file does not repeat that inventory. Routes below are hash routes as used in web/nav.js ROUTES (`#/pos`, `#/form/14-1`...). Form codes come from MODULE_MAP (verify any code marked `?` against the forms table before building).
+Scope: STRUCTURE and BEHAVIOUR only. No colours, fonts, or business-rule changes. Complements web/ia.js (screen registry, 13 categories) and docs/IA_AUDIT.md (route inventory); this file does not repeat that inventory. Routes below are hash routes as used in web/nav.js ROUTES (`#/pos`, `#/form/06-1`...). Form codes come from MODULE_MAP (verify any code marked `?` against the forms table before building).
 
 ## 0. Executive summary (10 lines)
 1. Thesis: the app should open on "what needs me now", not on a menu. Home = Now strip + 4-6 quick actions + Pinned + Recent, per person.
@@ -33,12 +33,12 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 ### 1.2 Showroom manager
 | # | Job | Screen | Taps |
 |---|---|---|---|
-| 1 | Open shop checklist (cash float, fridge/stock look) | Guided flow "Open shop" -> `#/form/14-1` | 1 |
+| 1 | Open shop checklist (cash float, fridge/stock look) | Guided flow "Open shop" -> `#/form/06-1` | 1 |
 | 2 | Approve staff entries/discounts/voids | `#/pending`, `#/exceptions` | 1-2 |
-| 3 | Cash count and day close (14-1 -> 10-1 -> deposit) | Guided flow "Close day" | 1 + steps |
-| 4 | Receive goods / transfer in | `#/form/04-1`, `#/form/03-1` | 2 |
-| 5 | Stock count (blind) | `#/form/04-3` or `#/stock` | 2 |
-| 6 | Expenses / imprest | `#/form/10-2`, `#/form/18-1` | 2 |
+| 3 | Cash count and day close (06-1 -> 03-1 -> deposit) | Guided flow "Close day" | 1 + steps |
+| 4 | Receive goods / transfer in | `#/form/13-1`, `#/form/39-1` | 2 |
+| 5 | Stock count (blind) | `#/form/36-1` or `#/stock` | 2 |
+| 6 | Expenses / imprest | `#/form/11-1`, `#/form/17-1` | 2 |
 | 7 | Dues collection follow-up | `#/dues` | 1 |
 | 8 | Sale return / wastage | `#/salereturn`, `#/stock` (wastage) | 2 |
 
@@ -50,17 +50,17 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 | 3 | Collect baki | `#/dues` -> customer -> Collect | 3 |
 | 4 | Sale return | `#/salereturn` | 2 |
 | 5 | Ask for a blocked action (emergency request) | inline from the block message | 1 |
-| 6 | Count drawer at shift end | `#/form/14-1` | 2 |
+| 6 | Count drawer at shift end | `#/form/06-1` | 2 |
 | 7 | Send offline sales | `#/outbox` (badge shows only if non-empty) | 1 |
 | 8 | Look up price | search verb "price" -> `#/items` | 2 |
 
 ### 1.4 Store keeper / godown
 | # | Job | Screen | Taps |
 |---|---|---|---|
-| 1 | Goods received (GRN) | `#/form/04-1` or `#/purchase/new` | 2 |
-| 2 | Issue material to factory/shop | `#/form/04-2` | 2 |
-| 3 | Transfer out (challan) | `#/form/03-1` | 2 |
-| 4 | Stock count | `#/form/04-3` | 2 |
+| 1 | Goods received (GRN) | `#/form/13-1` or `#/purchase/new` | 2 |
+| 2 | Issue material to factory/shop | `#/form/18-1` | 2 |
+| 3 | Transfer out (challan) | `#/form/39-1` | 2 |
+| 4 | Stock count | `#/form/36-1` | 2 |
 | 5 | Low stock / expiring look | `#/stock` (low, expiry chips) | 1 |
 | 6 | Wastage entry | `#/stock` -> wastage | 3 |
 | 7 | Receive transfer (confirm) | Now strip row "transfer in transit" | 2 |
@@ -69,14 +69,14 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 ### 1.5 Factory head / operator
 | # | Job | Screen | Taps |
 |---|---|---|---|
-| 1 | Daily factory sheet (fridge, scale) | `#/form/05-1` via Factory-day flow | 1 |
+| 1 | Daily factory sheet (fridge, scale) | `#/form/12-1` via Factory-day flow | 1 |
 | 2 | Production run (consume raw, make goods) | `#/recipes` | 2 |
-| 3 | Request material | `#/form/06-1` | 2 |
-| 4 | Receive issued material | `#/form/04-1` / `#/stock` | 2 |
-| 5 | Yield test / recipe card | `#/form/05-4?`, `#/form/05-3?` | 2 |
-| 6 | Dispatch to showrooms (transfer) | `#/form/03-1` | 2 |
-| 7 | Maintenance request (machine) | `#/form/08-1` | 2 |
-| 8 | Shift handover | `#/form/11-1` | 2 |
+| 3 | Request material | `#/form/28-1` | 2 |
+| 4 | Receive issued material | `#/form/13-1` / `#/stock` | 2 |
+| 5 | Yield test / recipe card | `#/form/41-1?`, `#/form/31-1?` | 2 |
+| 6 | Dispatch to showrooms (transfer) | `#/form/39-1` | 2 |
+| 7 | Maintenance request (machine) | `#/form/16-1` | 2 |
+| 8 | Shift handover | `#/form/33-1` | 2 |
 
 ### 1.6 Accountant
 | # | Job | Screen | Taps |
@@ -84,7 +84,7 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 | 1 | Day book | `#/daybook` | 1 |
 | 2 | Supplier payables, pay | `#/payables` | 2 |
 | 3 | Purchase bills check (3-way match) | `#/purchase` | 2 |
-| 4 | Digital reconcile (bKash/card) | `#/form/10-3` | 2 |
+| 4 | Digital reconcile (bKash/card) | `#/form/07-1` | 2 |
 | 5 | Salary sheet (if granted) | `#/salary` | 1-2 |
 | 6 | Expense review | report hub -> expense by head | 3 |
 | 7 | P&L / reports / CSV | `#/reports`, `#/biz` | 2-3 |
@@ -93,13 +93,13 @@ Tap count = taps from app open (already logged in) to the first useful input. "H
 ### 1.7 Hub person
 | # | Job | Screen | Taps |
 |---|---|---|---|
-| 1 | Receive showroom cash (hub count) | `#/form/10-1` hub side | 2 |
+| 1 | Receive showroom cash (hub count) | `#/form/03-1` hub side | 2 |
 | 2 | Cash position vs purchase budget | `#/daybook` / cash report | 1-2 |
 | 3 | Supplier payment | `#/payables` | 2 |
-| 4 | Purchase order / quotation | `#/form/06-2?` `06-3?` | 2 |
+| 4 | Purchase order / quotation | `#/form/29-1?` `27-1?` | 2 |
 | 5 | Transfers overview (in transit) | `#/stock` | 1 |
 | 6 | Collect from wholesale dues | `#/dues` | 2 |
-| 7 | Staff attendance entry | `#/form/02-1` | 2 |
+| 7 | Staff attendance entry | `#/form/19-1` | 2 |
 | 8 | Reports to owner | `#/reports` | 2 |
 
 Honest note: persona = role + grants, not a fixed role. The server gives `S.ctx.roles`, `perms`, grants (`GF`). The persona home is chosen by a rule table (section 2.6), and the owner can override per person.
@@ -122,7 +122,7 @@ Home page job (one sentence): "Show me what needs me now and let me start my mos
 | Staff approval, item change requests | yes | no | no | no | no | no | no |
 | Entries awaiting MY approval (`#/pending`) | yes | own shop | no | no | factory sheets | bills | yes |
 | Red/yellow exceptions (`#/exceptions`) | yes | own shop | no | no | no | no | yes |
-| Drafts of mine / sheets to fill today (14-1, 05-1, 04-3...) | no | yes | yes (14-1) | yes | yes (05-1) | no | no |
+| Drafts of mine / sheets to fill today (06-1, 12-1, 36-1...) | no | yes | yes (06-1) | yes | yes (12-1) | no | no |
 | Rejected - needs my fix | no | yes | yes | yes | yes | yes | yes |
 | Not-sent offline queue (`#/outbox`) | yes | yes | yes | yes | yes | no | no |
 | Transfers in transit to my place | no | yes | no | yes | yes | no | yes |
@@ -152,12 +152,12 @@ Home page job (one sentence): "Show me what needs me now and let me start my mos
 
 ### 2.5 Quick actions defaults (editable; owner sets role default, person overrides)
 - Owner: Needs-you, Sales today, Dues, Items/prices, Reports, Control Center.
-- Manager: Sell (POS), Cash count 14-1, Receive goods 04-1, Stock count 04-3, Expense 10-2, Close day.
-- Cashier: Sell, Collect baki, Sale return, Cash count 14-1, Not-sent (if any).
-- Store: Receive goods, Issue 04-2, Transfer 03-1, Stock count, Wastage, Low stock.
-- Factory: Daily sheet 05-1, Production, Request material 06-1, Transfer 03-1, Handover 11-1.
-- Accountant: Day book, Payables, Purchase bills, Digital reconcile 10-3, Reports, Salary (if granted).
-- Hub: Hub cash 10-1, Payables, Day book, Transfers, Dues.
+- Manager: Sell (POS), Cash count 06-1, Receive goods 13-1, Stock count 36-1, Expense 11-1, Close day.
+- Cashier: Sell, Collect baki, Sale return, Cash count 06-1, Not-sent (if any).
+- Store: Receive goods, Issue 18-1, Transfer 39-1, Stock count, Wastage, Low stock.
+- Factory: Daily sheet 12-1, Production, Request material 28-1, Transfer 39-1, Handover 33-1.
+- Accountant: Day book, Payables, Purchase bills, Digital reconcile 07-1, Reports, Salary (if granted).
+- Hub: Hub cash 03-1, Payables, Day book, Transfers, Dues.
 A button shows only if `ok()` for that route (same function nav.js uses). If fewer than 4 qualify, fill from Recent.
 
 ### 2.6 Choosing the home variant
@@ -171,8 +171,8 @@ Rule table (first match): owner -> Owner home; role management -> Manager; has `
 |---|---|---|---|---|
 | Owner | Home | Needs-you (Control Center inbox, dot) | Reports | Me |
 | Manager | Home | Sell | Day (guided flows) | Menu |
-| Cashier | Sell | Dues | Day (14-1 / close) | Me |
-| Store | Home | Stock | Receive/Issue (hub of 04-x, 03-1) | Menu |
+| Cashier | Sell | Dues | Day (06-1 / close) | Me |
+| Store | Home | Stock | Receive/Issue (hub of 04-x, 39-1) | Menu |
 | Factory | Home | Today's sheets | Production | Menu |
 | Accountant | Home | Day book | Payables | Menu |
 | Hub | Home | Cash | Payables | Menu |
@@ -198,14 +198,14 @@ Verb table (bn / mix / en synonyms all match; Bangla typed in Latin phonetics is
 |---|---|---|
 | sell / বিক্রি | sell, sale, বিক্রি, pos | `#/pos` |
 | collect / বাকি আদায় | baki, due, collect | `#/dues` |
-| count cash / ক্যাশ গণনা | cash count, 14-1 | `#/form/14-1` |
-| count stock / স্টক গণনা | stock count, 04-3 | `#/form/04-3` |
+| count cash / ক্যাশ গণনা | cash count, 06-1 | `#/form/06-1` |
+| count stock / স্টক গণনা | stock count, 36-1 | `#/form/36-1` |
 | new item / নতুন আইটেম | new item, add product | `#/items/new` (or itemreq if no create grant) |
-| receive goods / মাল গ্রহণ | grn, receive | `#/form/04-1` |
+| receive goods / মাল গ্রহণ | grn, receive | `#/form/13-1` |
 | new purchase bill | bill, purchase | `#/purchase/new` |
 | pay supplier / সাপ্লায়ার পেমেন্ট | pay supplier, payables | `#/payables` |
-| expense / খরচ | expense | `#/form/10-2` |
-| transfer | challan | `#/form/03-1` |
+| expense / খরচ | expense | `#/form/11-1` |
+| transfer | challan | `#/form/39-1` |
 | wastage | waste, নষ্ট | `#/stock` wastage action |
 | return | sale return | `#/salereturn` |
 | close day / দিন শেষ | close | Guided flow Close day |
@@ -238,37 +238,37 @@ Page-job: "walk me through a recurring routine in order, and show what is alread
 Common behaviours: progress "3 of 7"; each step tap-to-open; status per step (todo / done / skipped with reason / blocked); resume from Home (the flow is a Now row "Close day: 2 of 5 left"); flows are editable lists in settings (owner can reorder, add a step linking any route, switch a step ON/OFF); a flow cannot be "completed" by tapping, only by the underlying checks or an explicit skip with a note (audit-logged).
 
 ### 4.1 Open shop (manager / cashier)
-1. Opening cash float count: `#/form/14-1` (blind count mode if on) - done when today's 14-1 exists for this shop.
-2. Staff present: `#/form/02-1` attendance (if shop uses it).
+1. Opening cash float count: `#/form/06-1` (blind count mode if on) - done when today's 06-1 exists for this shop.
+2. Staff present: `#/form/19-1` attendance (if shop uses it).
 3. Stock/fridge quick look: `#/stock` low + expiry chips (view only, auto-done on view).
 4. Check yesterday's problems: `#/exceptions` (own shop) - done when none open.
 5. Open POS: `#/pos`.
 
-### 4.2 Close day (14-1 -> 10-1 -> deposit)
-1. Count the drawer: `#/form/14-1` (blind; short/over vs `cash_tol`).
+### 4.2 Close day (06-1 -> 03-1 -> deposit)
+1. Count the drawer: `#/form/06-1` (blind; short/over vs `cash_tol`).
 2. If red control: ask owner/manager (release request) - blocked until decided.
-3. Hand over cash: `#/form/10-1` (hub count).
-4. Digital reconcile: `#/form/10-3` (bKash/card vs sales).
+3. Hand over cash: `#/form/03-1` (hub count).
+4. Digital reconcile: `#/form/07-1` (bKash/card vs sales).
 5. Bank deposit: record per existing screen (day book "bank deposit" is a known gap in REMAINING P3-9; until then this step is "paper / mark done with note").
-6. Expenses and imprest for the day: `#/form/10-2`, `#/form/18-1`.
+6. Expenses and imprest for the day: `#/form/11-1`, `#/form/17-1`.
 7. Not-sent offline sales: `#/outbox` must be empty.
 8. Done: summary line (sales, cash, short/over, dues) linking to `#/daybook`.
 
 ### 4.3 Factory day
-1. Daily sheet (fridge limits, scale): `#/form/05-1`.
-2. Material received/issued today: `#/form/04-1`, `#/form/04-2`.
+1. Daily sheet (fridge limits, scale): `#/form/12-1`.
+2. Material received/issued today: `#/form/13-1`, `#/form/18-1`.
 3. Production runs: `#/recipes`.
 4. Yield test (if scheduled): form 05-x.
 5. Wastage: `#/stock`.
-6. Dispatch to shops: `#/form/03-1`.
-7. Shift handover: `#/form/11-1`.
+6. Dispatch to shops: `#/form/39-1`.
+7. Shift handover: `#/form/33-1`.
 
 ### 4.4 Month-end (accountant / owner)
-1. Every shop's days closed (list of days missing 14-1/10-1).
+1. Every shop's days closed (list of days missing 06-1/03-1).
 2. Open exceptions and pending approvals = 0 or acknowledged.
-3. Stock count done per location: `#/form/04-3`.
+3. Stock count done per location: `#/form/36-1`.
 4. Supplier payables check: `#/payables`; purchase bills matched `#/purchase`.
-5. Salary sheet: `#/salary`, 02-2/02-3.
+5. Salary sheet: `#/salary`, 21-1/35-1.
 6. P&L and reports: `#/biz`, report hub; export CSV.
 7. Set "books closed until": rule `period_closed_until` (owner only) - this one is a deliberate separate, owner-confirmed step.
 Risk note: steps 1-2 show server-derived status; if a query is missing, show "unknown, check manually" instead of a green tick (never fake done).
@@ -280,7 +280,7 @@ Tabs/sections: **Needs you | Exceptions | Delegation | Switchboard** (top segmen
 
 ### 5.1 Needs-you inbox
 - One merged list across NEEDS (exceptions, releases, emergency, item requests, staff pending, wastage, location setup, settings drafts, change requests). Current screen shows counts only (REMAINING P4-14); the target shows rows.
-- Row: edge marker (tone), type icon, 1-line summary ("Rahim - discount 12% - Mirpur"), who/where, age, amount if any, chevron.
+- Row: edge marker (tone), type icon, 1-line summary ("Staff A - discount 12% - Place 1"), who/where, age, amount if any, chevron.
 - Sort: oldest first, overdue (SLA) first. Filters: type chips, location, person. Group toggle: by type / by place.
 - Inline: Approve / Reject (primary + a ⋮ with "Ask question", "Defer", "Open full record"). Reject requires a note; approve of money-affecting items opens the record for one glance (no blind bulk-approve of money items).
 - Bulk: only for low-risk types (e.g. staff pending, list "Other" queue). Money/stock types: single decisions only.
@@ -442,7 +442,7 @@ Acceptance tests:
 ### Increment B - "Guided days and the owner's inbox"
 Scope: `#/flow/<id>` generic stepper + 4 flows (data-driven); Needs-you rows (oldest first) in Control Center; Exceptions triage buckets; Delegation board (read-only first, then pause/resume).
 Acceptance tests:
-- B1 Close day flow: step 1 turns done only after a 14-1 for that shop/date exists; opening it and cancelling leaves it todo; a step the user lacks the grant for shows "needs <role>".
+- B1 Close day flow: step 1 turns done only after a 06-1 for that shop/date exists; opening it and cancelling leaves it todo; a step the user lacks the grant for shows "needs <role>".
 - B2 "Unknown" state: with the check query unavailable (phase not installed) the step shows "check manually", never a green tick.
 - B3 Skip needs a note and is audit-logged; flow cannot be marked complete by a tap.
 - B4 Needs-you: 10 mixed rows sorted by age; approve/reject writes via the same RPC as the source screen; rejecting without note is refused; money types have no bulk approve.

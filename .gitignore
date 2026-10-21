@@ -1,2 +1,12 @@
 __pycache__/
 *.pyc
+.claude/worktrees/
+
+# demo / fictional material must never be committed (see CLAUDE.md)
+docs/demo/
+DEMO_*
+*IMAGINED_*
+FINAL_DEMO_*
+REAL_LIFE_STORY_*
+REAL_LIFE_DAILY_*
+dist/

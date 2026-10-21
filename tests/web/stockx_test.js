@@ -1,10 +1,11 @@
 // P3a: stock extras page (#/stockx via BOS_PAGES.stockx): reorder, near-expiry + batch capture + FEFO, wastage by reason, QC.
 // Run: node stockx_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8373, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const i0 = base.tables.items[0].id;
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const M = window.__M; const X = M.x = Object.assign({ err: {}, qcOn: false, qc: [{ id: 'q1', source_type: 'grn', source_id: 'g1', location_id: 1, status: 'hold', checks: [], note: 'smells off', created_at: '2026-10-12T05:00:00Z', created_staff: 's', history_n: 2 }] }, window.__X || {});
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
@@ -15,6 +16,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'reorder_report') return { data: [{ item_id: 'i0', code: 'R-1', name_bn: 'ময়দা', name_en: 'Flour', location_id: 1, base_unit: 'kg', on_hand: 20, min_stock: 50, avg_daily: 3, days_left: 6.7, lead_days: 3, suggest_qty: 30, why: 'below_min' }, { item_id: 'i1', code: 'R-2', name_bn: 'চিনি', name_en: 'Sugar', location_id: 1, base_unit: 'kg', on_hand: 9, min_stock: null, avg_daily: 2, days_left: 4.5, lead_days: 3, suggest_qty: 11, why: 'cover' }], error: null };
   if (fn === 'near_expiry_report') return { data: [{ batch_id: 1, batch_no: 'LOT-A', item_id: 'i0', code: 'R-1', name_bn: 'ময়দা', name_en: 'Flour', location_id: 1, expires_at: '2026-10-15T17:59:00Z', qty_remaining: 23, days_left: 2.1, expired: false, qc_blocked: true }], error: null };
   if (fn === 'fefo_hint') return { data: [{ rank: 1, batch_id: 1, batch_no: 'LOT-A', expires_at: '2026-10-15T17:59:00Z', qty_remaining: 23, expired: false, qc_blocked: true }], error: null };
+  if (fn === 'wastage_by_reason2') return { data: [{ reason_code: 'spillage', label_bn: 'ছিটকে', label_mix: 'ছিটকে', label_en: 'Spillage', entries: 2, items: 2, qty: 3, unit: 'kg', mixed_units: false, units: [{ unit: 'kg', qty: 3, entries: 2 }] }], error: null };
   if (fn === 'wastage_by_reason') return { data: [{ reason_code: 'spillage', label_bn: 'ছিটকে', label_mix: 'ছিটকে', label_en: 'Spillage', entries: 2, items: 2, qty: 3 }], error: null };
   if (fn === 'qc_gate') return { data: { status: null, switch_on: X.qcOn, blocked: false }, error: null };
   if (fn === 'qc_list') return { data: clone(X.qc), error: null };
@@ -28,13 +30,13 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; let bad = 0; const log = (...a) => console.log(...a); const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
   async function open(o = {}) {
-    const ctx = await br.newContext({ viewport: { width: 360, height: 780 } }); const p = await ctx.newPage();
+    const ctx = await br.newContext({ bypassCSP: true, viewport: { width: 360, height: 780 } }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); }); p.on('dialog', (d) => d.accept());
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(C.mkData(base, {}))};window.__X=${JSON.stringify(o.x || {})};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
     await p.goto(`http://localhost:${PORT}/#/home`); await p.waitForTimeout(1100);
-    await p.addScriptTag({ path: '/home/user/My-tools/web/stockx.js' });
+    await p.addScriptTag({ path: _P.WEB_DIR + '/stockx.js' });
     await p.evaluate(() => window.BOS_PAGES.stockx()); await p.waitForTimeout(500); return p;
   }
   const wait = (p, n = 300) => p.waitForTimeout(n);
@@ -66,8 +68,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('.sheet [data-act=sx_bsave]'); await wait(p, 400); ok(/already exists/.test(await toastTxt(p)), 'friendly error for duplicate batch no');
   // wastage
   await p.evaluate(() => document.querySelector('.sheet-x') && document.querySelector('.sheet-x').click()); await wait(p, 150);
-  await p.click('[data-act=sx_tab][data-v=wa]'); await wait(p, 400); t = await p.textContent('#sx_out'); ok(/Spillage/.test(t) && (await p.locator('#sx_out tbody tr td:nth-child(4)').textContent()).trim() === '3', 'wastage by reason'); await noOverflow(p, 'wastage');
-  c = await calls(p, 'wastage_by_reason'); ok(c.length && /^\d{4}-\d\d-\d\d$/.test(c[0].p_from), 'date range sent');
+  await p.click('[data-act=sx_tab][data-v=wa]'); await wait(p, 400); t = await p.textContent('#sx_out'); ok(/Spillage/.test(t) && (await p.locator('#sx_out tbody tr td:nth-child(4)').textContent()).trim() === '3 kg', 'wastage by reason (per unit)'); await noOverflow(p, 'wastage');
+  c = await calls(p, 'wastage_by_reason2'); ok(c.length && /^\d{4}-\d\d-\d\d$/.test(c[0].p_from), 'date range sent');
   // qc
   await p.click('[data-act=sx_tab][data-v=qc]'); await wait(p, 400); t = await p.textContent('#sx_out');
   ok(/Hold/.test(t) && /smells off/.test(t) && /nothing is blocked/i.test(t), 'QC list with record-only note (switch off)');

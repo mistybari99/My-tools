@@ -1,9 +1,11 @@
 // Salary report (salary.js). Run: node salary_test.js <dir holding smoke.js stub>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/p13_common.js');
-const base = C.baseData(SP), srv = C.serve(8302);
+const base = C.baseData(SP), srv = C.serve(PORT);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -13,14 +15,14 @@ const base = C.baseData(SP), srv = C.serve(8302);
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA2 }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(C.mkData(base, o))};window.__M0=${JSON.stringify(o.m || {})};window.__DB0=${JSON.stringify(o.db || {})};${o.owner === false ? 'window.__OWNER=false;' : ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8302/' + hash); await p.waitForTimeout(1100); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1100); return p;
   }
   const wait = (p, n = 300) => p.waitForTimeout(n);
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
   const calls = (p, fn) => p.evaluate((f) => window.__M.calls.filter((c) => c[0] === f).map((c) => c[1]), fn);
 
   let p = await open({}, '#/salary');
-  ok(await p.locator('#sa_rows .sa-row').count() === 2, 'two people'); ok(/Rahim cook/.test(await p.textContent('#sa_rows')), 'name');
+  ok(await p.locator('#sa_rows .sa-row').count() === 2, 'two people'); ok(/TestK cook/.test(await p.textContent('#sa_rows')), 'name');
   ok(/18,600/.test(await p.textContent('#sa_sum')) && /1,050/.test(await p.textContent('#sa_sum')) && /17,550/.test(await p.textContent('#sa_sum')), 'gross / deductions / net totals from the server');
   ok(/10,500/.test(await p.textContent('#sa_rows .sa-row')) && /9,500/.test(await p.textContent('#sa_rows .sa-row')), 'row gross and net');
   const sc = await calls(p, 'salary_report'); ok(sc.length >= 1 && sc[0].p_loc === null && /^\d{4}-\d{2}-01$/.test(sc[0].p_month), 'month sent as first of month, owner all locations');
@@ -38,7 +40,7 @@ const base = C.baseData(SP), srv = C.serve(8302);
   // export: audit first, file after
   p = await open({}, '#/salary'); await p.click('#sa_menu'); await wait(p, 200);
   const dl = p.waitForEvent('download'); await p.click('[data-act=sa_csv]'); const d = await dl; const txt = fs.readFileSync(await d.path(), 'utf8');
-  ok(/sheet,location,name,monthly_salary/.test(txt) && /Rahim cook,10000,26,3,0,10000,500,0,10500,1000,0,9500,9500,yes/.test(txt) && /TOTAL/.test(txt) && /advances \(02-3\)/.test(txt) && /attendance \(02-1\)/.test(txt), 'csv content');
+  ok(/sheet,location,name,monthly_salary/.test(txt) && /TestK cook,10000,26,3,0,10000,500,0,10500,1000,0,9500,9500,yes/.test(txt) && /TOTAL/.test(txt) && /advances \(35-1\)/.test(txt) && /attendance \(19-1\)/.test(txt), 'csv content');
   const lg = await calls(p, 'log_page_export'); ok(lg.length === 1 && lg[0].p_key === 'salary' && lg[0].p_rows === 2, 'export audited with key salary'); await p.close();
   p = await open({ db: { exportDenied: true } }, '#/salary'); await p.click('#sa_menu'); await wait(p, 200); let got = false; p.once('download', () => { got = true; });
   await p.click('[data-act=sa_csv]'); await wait(p, 400); ok(!got, 'no file when the server refuses'); ok(/not allowed/i.test(await p.textContent('#toast')), 'refusal toast'); await p.close();

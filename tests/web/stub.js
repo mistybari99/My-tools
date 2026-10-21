@@ -1,7 +1,7 @@
 // Test-only stand-in for supabase-js: in-memory tables, owner session.
 (function () {
   const D = window.__DATA;
-  const OWNER = { id: 'u1', staff_id: 'owner1', full_name: 'Rahim Uddin', status: 'active', lang: 'bn' };
+  const OWNER = { id: 'u1', staff_id: 'owner1', full_name: 'TestK Uddin', status: 'active', lang: 'bn' };
   let session = window.__SESSION === false ? null : { user: { id: 'u1' } };
   const tables = D.tables;
   function builder(name) {
@@ -37,7 +37,7 @@
       signOut: async () => { session = null; },
     },
     rpc: async (fn, args) => {
-      if (fn === 'staff_directory') return { data: [{ staff_id: 'owner1', full_name: 'Rahim Uddin' }, { staff_id: 'karim02', full_name: 'Karim' }, { staff_id: 'jamal03', full_name: 'Jamal' }], error: null };
+      if (fn === 'staff_directory') return { data: [{ staff_id: 'owner1', full_name: 'TestK Uddin' }, { staff_id: 'testf02', full_name: 'TestF' }, { staff_id: 'teste03', full_name: 'TestE' }], error: null };
       if (fn === 'save_entry') { const E = tables.entries; let e = args.p_id && E.find((x) => x.id === args.p_id);
         if (!e) { e = { id: 'e' + (E.length + 1), serial: E.length + 1, form_code: args.p_form, location_id: args.p_loc, status: 'draft', created_by: 'u1', created_staff: 'owner1', check_data: {} }; E.push(e); }
         Object.assign(e, { data: args.p_data, flags: args.p_flags, entry_date: args.p_date }); window.__SAVED = JSON.parse(JSON.stringify(e)); return { data: { id: e.id, serial: e.serial }, error: null }; }

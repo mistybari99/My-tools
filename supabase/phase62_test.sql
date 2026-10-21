@@ -28,7 +28,7 @@ insert into auth.users (id,email,raw_user_meta_data) values
 update profiles set status='active';
 insert into user_roles values (:'o','owner'),(:'m','management'),(:'s','showroom_manager'),(:'a','showroom_manager'),(:'c','salesperson'),(:'b','salesperson') on conflict do nothing;
 insert into user_locations values (:'s',1),(:'a',1),(:'c',1),(:'b',1) on conflict do nothing;
-insert into customers (mobile, name) values ('01712345678','Rahim'), ('01898765432','Karim');
+insert into customers (mobile, name) values ('01712345678','TestK'), ('01898765432','TestF');
 select id as c1 from customers where mobile='01712345678' \gset
 select id as c2 from customers where mobile='01898765432' \gset
 
@@ -56,7 +56,7 @@ select tt.err('T1 unknown template refused', format($$select notify_enqueue(gen_
 select tt.err('T1 channel mismatch refused', format($$select notify_enqueue(gen_random_uuid(), %L::uuid,'whatsapp','due_reminder','{}')$$, :'c1'), 'template_channel_mismatch');
 select gen_random_uuid() as k1 \gset
 select notify_enqueue(:'k1'::uuid, :'c1'::uuid,'sms','due_reminder','{"amount":"1500","shop":"Islamia","bad key":"x"}','en','sale','S-1') as e1 \gset
-select tt.chk('T1 queued with rendered body and +880 phone', (select body from notify_outbox where client_id=:'k1'::uuid)='Dear Rahim, your balance due is 1500 Taka. Thank you. - Islamia'
+select tt.chk('T1 queued with rendered body and +880 phone', (select body from notify_outbox where client_id=:'k1'::uuid)='Dear TestK, your balance due is 1500 Taka. Thank you. - Islamia'
   and (select to_phone from notify_outbox where client_id=:'k1'::uuid)='+8801712345678' and (select status from notify_outbox where client_id=:'k1'::uuid)='queued');
 select tt.chk('T1 same client key = same row (idempotent)', (notify_enqueue(:'k1'::uuid, :'c1'::uuid,'sms','due_reminder','{}') ->> 'duplicate')::boolean and tt.sx('select count(*) from notify_outbox')='1');
 select tt.chk('T1 same source+template with a new key = duplicate, still one row', (notify_enqueue(gen_random_uuid(), :'c1'::uuid,'sms','due_reminder','{}','bn','sale','S-1') ->> 'duplicate')::boolean and tt.sx('select count(*) from notify_outbox')='1');

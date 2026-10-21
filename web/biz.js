@@ -18,6 +18,11 @@ B.SETTING_DEFS.push(
 
 const X = {
   title: L('ব্যবসার হিসাব', 'Business analysis', 'ব্যবসার Analysis'), period: L('সময়কাল', 'Period', 'Period'), fy: L('অর্থবছর (এ পর্যন্ত)', 'Fiscal year to date', 'Fiscal year (এ পর্যন্ত)'), days: L('দিন', 'days', 'days'),
+  cbasisL: L('খরচের উৎস: স্টক-হিসাব আগে, না পেলে লেখা তালিকা (সেটিং: Report cost basis)', 'Cost basis: stock ledger first, the typed price list only where the ledger has none (setting: Report cost basis)', 'Cost basis: stock ledger আগে, না পেলে typed price list (setting: Report cost basis)'),
+  cbasisP: L('খরচের উৎস: শুধু আইটেম মাস্টারে লেখা খরচ (সেটিং: Report cost basis)', 'Cost basis: only the cost typed in the item master (setting: Report cost basis)', 'Cost basis: শুধু item master-এ typed cost (setting: Report cost basis)'),
+  cunk: L('খরচ জানা নেই', 'Cost unknown for', 'Cost জানা নেই'), cfb: L('লেখা তালিকা থেকে অনুমান', 'estimated from the price list', 'price list থেকে অনুমান'),
+  chint: L('স্টক-হিসাবে খরচ আছে এমন বিক্রি, যার খরচ আইটেম মাস্টারে নেই', 'Sales whose cost the stock ledger knows but the item master does not', 'Stock-এ cost আছে কিন্তু item master-এ নেই'),
+  csvb: L('CSV', 'CSV', 'CSV'), csvd: L('ফাইল তৈরি', 'File ready', 'File তৈরি'), ncap: L('ধরা হয়নি', 'not captured', 'ধরা হয়নি / not captured'),
   all: L('সব লোকেশন', 'All locations', 'All Location'), rev: L('বিক্রি (নিট)', 'Sales (net)', 'Sales (Net)'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('বাতিল সেল', 'Voided sales', 'Void Sale'),
   avg: L('দৈনিক গড় বিক্রি', 'Average daily sales', 'Daily গড় Sales'), cogs: L('পণ্যের ক্রয়মূল্য (COGS)', 'Cost of goods (COGS)', 'COGS (ক্রয়মূল্য)'), gp: L('মোট মুনাফা', 'Gross profit', 'Gross Profit'),
   gm: L('গ্রস মার্জিন', 'Gross margin', 'Gross Margin'), mk: L('মার্কআপ', 'Markup', 'Markup'),
@@ -67,8 +72,10 @@ async function draw() {
     <div id="bz_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   const td = dhaka(), from = P.days === 'fy' ? (B.fyStart ? B.fyStart(td) : td.slice(0, 4) + '-01-01') : addDays(td, -(P.days - 1)), loc = P.loc ? Number(P.loc) : null;
   const q = (p) => p.then((r) => r, (e) => ({ data: null, error: e }));
-  const [dly, itm, stf] = await Promise.all([
-    q(sb.rpc('biz_daily', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_items', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_staff', { p_from: from, p_to: td, p_loc: loc }))]);
+  const hasCost0 = !!(S.ctx.is_owner || (S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view));
+  const [dly, itm, stf, cst] = await Promise.all([
+    q(sb.rpc('biz_daily', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_items', { p_from: from, p_to: td, p_loc: loc })), q(sb.rpc('biz_staff', { p_from: from, p_to: td, p_loc: loc })),
+    hasCost0 ? q(sb.rpc('biz_cost_status', { p_from: from, p_to: td, p_loc: loc })) : Promise.resolve({ data: null })]);
   if (tok !== drawTok) return;
   if (dly.error) return fail(dly.error);
   const rows = dly.data || [];
@@ -84,6 +91,11 @@ async function draw() {
     ${card(T('voids'), String(rows.reduce((s, r) => s + Number(r.void_n || 0), 0)), money(sum('void_amt')))}
     ${hasCost ? card(T('gp'), money(gp), `${T('gm')} ${pct(gmRatio === null ? null : 100 * gmRatio)} · ${T('mk')} ${pct(cogs > 0 ? 100 * (costed - cogs) / cogs : null)}`) : card(T('gp'), '—', T('nocost'))}</div>`;
   if (hasCost) h += `<div class="notice ok">${esc(T('costnote'))}${rev > 0 ? ` · ${esc(T('uncosted'))}: ${pct(100 * (1 - costed / rev))}` : ''}</div>`;
+  const cs = cst && !cst.error ? cst.data : null;
+  if (hasCost && cs) {
+    const unk = Number(cs.unknown_rev || 0), fb = Number(cs.price_list_rev || 0), could = Number(cs.ledger_could_cost_rev || 0);
+    h += `<div class="notice ${unk > 0 ? 'warn' : 'ok'}" id="bz_cstat">${esc(T(cs.basis === 'ledger_first' ? 'cbasisL' : 'cbasisP'))}${unk > 0 ? ` · ${esc(T('cunk'))}: ${money(unk)} (${pct(cs.unknown_pct)})` : ''}${cs.basis === 'ledger_first' && fb > 0 ? ` · ${esc(T('cfb'))}: ${money(fb)}` : ''}${cs.basis !== 'ledger_first' && could > 0 ? ` · ${esc(T('chint'))}: ${money(could)}` : ''}</div>`;
+  }
   if (saleDays < 7) h += `<div class="notice warn">${esc(T('fewdays'))}</div>`;
 
   // break-even + outlook + suggestions need one location
@@ -119,6 +131,8 @@ async function draw() {
       ${top.map((i) => `<div class="row between perm"><span><span class="chip ${i.abc === 'A' ? 'ok' : i.abc === 'B' ? 'warn' : ''}">${i.abc}</span> ${esc(nm(i))}</span><span style="text-align:right"><b>${money(i.revenue)}</b><div class="muted" style="font-size:.78rem">${T('qty')} ${fmt(i.qty)} · ${pct(i.share_pct)}</div></span></div>`).join('') || `<div class="muted">${esc(T('none'))}</div>`}
       ${unsold.length ? `<details style="margin-top:8px"><summary>${esc(T('unsold'))}: <b>${unsold.length}</b></summary><div class="muted" style="font-size:.9rem">${unsold.map((i) => esc(nm(i))).join(' · ')}</div></details>` : ''}</div>`;
   }
+  P.csv = { from, to: td, loc, rows: itm.data || [], status: cs, daily: rows, hasCost };
+  if (itm.data && itm.data.length) h += `<div class="row" style="margin:8px 0"><button type="button" data-act="bz_csv" id="bz_csvb">${esc(T('csvb'))}</button></div>`;
   // staff
   if (loc && !stf.error && stf.data && stf.data.length) {
     const ratio = P.cache && P.cache.st ? num(P.cache.st.anomaly_ratio) : 0;
@@ -148,6 +162,17 @@ function sugHTML(s) {
 }
 
 Object.assign(A.H, {
+  bz_csv: () => {
+    const c = P.csv; if (!c || !c.rows.length) return;
+    const cell = (v) => { if (v === null || v === undefined) return ''; let t = String(v); if (/^[=+@\t\r]/.test(t)) t = "'" + t; return /[",\r\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+    const nc = T('ncap'), head = ['code', 'item', 'class', 'qty', 'revenue', 'share %', 'cumulative %'].concat(c.hasCost ? ['cost of goods'] : []);
+    const lines = [head].concat(c.rows.map((i) => [i.code, i.name_en || i.name_bn, i.abc, i.qty, i.revenue, i.share_pct, i.cum_pct].concat(c.hasCost ? [i.cogs === null || i.cogs === undefined ? (Number(i.revenue) > 0 ? nc : '') : Math.round(Number(i.cogs) * 100) / 100] : [])));
+    lines.push([]); lines.push(['period', c.from + ' - ' + c.to]);
+    if (c.status) { lines.push(['cost basis', c.status.basis]); lines.push(['revenue', c.status.revenue]); lines.push(['cost from ledger (revenue)', c.status.ledger_rev]); lines.push(['cost from price list (revenue)', c.status.price_list_rev]); lines.push(['cost unknown (revenue)', c.status.unknown_rev]); }
+    const txt = '\ufeff' + lines.map((l) => l.map(cell).join(',')).join('\r\n') + '\r\n';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })); a.download = `business-items-${c.from}_${c.to}.csv`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); toast(T('csvd'));
+  },
   bz_days: (a) => { P.days = a.dataset.v === 'fy' ? 'fy' : Number(a.dataset.v); draw(); },
   bz_apply: async (a) => {
     const loc = Number(P.loc); if (!loc) return;

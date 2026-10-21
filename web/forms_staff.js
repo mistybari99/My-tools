@@ -1,6 +1,6 @@
 /* Islamia BOS · staff & people forms (batch E), taken from the BOS Build Kit v1.39:
-   02-1 Monthly Attendance Register, 02-2 Monthly Salary Sheet, 02-3 Staff Advance Register, 02-4 Appointment Letter,
-   02-5 Leave Application, 02-6 Exit Clearance, 02-7 Duty & Backup Card, 02-8 Skill Checklist, 11-1 Shift Handover Register.
+   19-1 Monthly Attendance Register, 21-1 Monthly Salary Sheet, 35-1 Staff Advance Register, 01-1 Appointment Letter,
+   15-1 Leave Application, 10-1 Exit Clearance, 09-1 Duty & Backup Card, 34-1 Skill Checklist, 33-1 Shift Handover Register.
    Salary figures and rates are the owner's data: entry fields only, nothing is calculated from an invented rate. */
 (() => {
 'use strict';
@@ -21,16 +21,16 @@ const monthDays = (x) => { let m = num(x.d.month), y = num(x.d.year); if (!m || 
 const monthHead = () => [SEL('month', L('মাস', 'Month'), MONTHS, { req: true }), N('year', L('বছর', 'Year'), { req: true })];
 const dayDiff = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000) + 1;
 
-/* ============ 02-1 · Monthly attendance register ============ */
-B.forms['02-1'] = {
-  title: L('মাসিক হাজিরা রেজিস্টার', 'Monthly attendance register'),
+/* ============ 19-1 · Monthly attendance register ============ */
+B.forms['19-1'] = {
+  title: L('মাসিক হাজিরা', 'Monthly Attendance'),
   head: monthHead(),
   init: monthInit,
   sections: [
     { title: L('নিয়ম', 'Rules'), fields: [
       NOTE(L('হাজিরা প্রতিদিন লেখা হবে — মাস শেষে মনে করে নয়। বেতন ও অনুপস্থিতির হিসাব এই রেজিস্টার থেকেই আসবে; অন্য কোনো উৎস থেকে নয়।', 'Attendance is written every day — not from memory at month end. Salary and absence figures come from this register and nowhere else.'), 'warn'),
-      NOTE(L('চিহ্ন: উ = উপস্থিত · অ = অনুপস্থিত · ছ = ছুটি (বিনা বেতনের) · স = সবেতন ছুটি · দ = দেরিতে উপস্থিত · শ 1 / শ 2 = কোন শিফট · ও = ওভারটাইম (ঘণ্টা) · ল = অন্য লোকেশনে কাজ। ছুটির চিহ্ন আসে ছুটির আবেদন ফরম (02-5) থেকে। নিচে প্রতিটি চিহ্নের দিন-সংখ্যা লিখুন।',
-        'Marks: P = present · A = absent · U = unpaid leave · PL = paid leave · Late = present but late · S1 / S2 = shift · OT = overtime (hours) · OL = worked at another location. Leave marks come from the Leave Application (02-5). Enter the number of days for each mark below.'), 'ok'),
+      NOTE(L('চিহ্ন: উ = উপস্থিত · অ = অনুপস্থিত · ছ = ছুটি (বিনা বেতনের) · স = সবেতন ছুটি · দ = দেরিতে উপস্থিত · শ 1 / শ 2 = কোন শিফট · ও = ওভারটাইম (ঘণ্টা) · ল = অন্য লোকেশনে কাজ। ছুটির চিহ্ন আসে ছুটির আবেদন ফরম (15-1) থেকে। নিচে প্রতিটি চিহ্নের দিন-সংখ্যা লিখুন।',
+        'Marks: P = present · A = absent · U = unpaid leave · PL = paid leave · Late = present but late · S1 / S2 = shift · OT = overtime (hours) · OL = worked at another location. Leave marks come from the Leave Application (15-1). Enter the number of days for each mark below.'), 'ok'),
       NOTE(L('অনুপস্থিতি, ওভারটাইম বা অন্য লোকেশনে কাজ থাকলে কোন কোন তারিখে — তা অবশ্যই লিখুন; দিন-সংখ্যা একা প্রমাণ নয়। অনুপস্থিতি বা ছুটি থাকলে দায়িত্বধারী (Delegate) লিখতে হবে।', 'If there is absence, overtime or other-location work, the dates must be written — day counts alone are not evidence. If there is absence or leave, a delegate must be named.'), 'warn'),
       NOTE(L('উপস্থিত + অনুপস্থিত + ছুটি = মোট দিন = মাসের দিন সংখ্যা', 'Present + Absent + Leave = Total days = number of days in the month'), 'warn')] },
     { title: L('কর্মীদের হাজিরা (প্রতি কর্মীর জন্য একটি কার্ড)', 'Staff attendance (one card per person)'), fields: [
@@ -77,9 +77,9 @@ B.forms['02-1'] = {
   },
 };
 
-/* ============ 02-2 · Monthly salary sheet ============ */
-B.forms['02-2'] = {
-  title: L('মাসিক বেতন শিট', 'Monthly salary sheet'),
+/* ============ 21-1 · Monthly salary sheet ============ */
+B.forms['21-1'] = {
+  title: L('মাসিক বেতন', 'Monthly Salary'),
   head: [...monthHead(), T('attendance_no', L('মাসিক হাজিরা রেজিস্টার নং', 'Monthly attendance register no.'))],
   init: monthInit,
   sections: [
@@ -129,9 +129,9 @@ B.forms['02-2'] = {
   },
 };
 
-/* ============ 02-3 · Staff advance register ============ */
-B.forms['02-3'] = {
-  title: L('স্টাফ অ্যাডভান্স রেজিস্টার', 'Staff advance register'),
+/* ============ 35-1 · Staff advance register ============ */
+B.forms['35-1'] = {
+  title: L('স্টাফ অ্যাডভান্স', 'Staff Advance'),
   head: [T('page_no', L('পাতা নং', 'Page no.')), ST('staff', L('কর্মীর নাম', 'Employee'), { req: true }), T('post', L('পদ', 'Post'), { req: true }), LOC('staff_loc', L('লোকেশন', 'Location')), M('salary', L('মাসিক বেতন ৳', 'Monthly salary ৳'), { req: true })],
   sections: [
     { title: L('নিয়ম', 'Rules'), fields: [
@@ -149,7 +149,7 @@ B.forms['02-3'] = {
       CALC('outstanding', L('মোট বকেয়া অ্যাডভান্স (Total Outstanding)', 'Total outstanding advance'), 'money', { big: true })] },
     { title: L('মিল ও সমাপ্তি', 'Matching & exit'), fields: [
       CK('match_payroll', L('এই পাতার বাকি অ্যাডভান্স মাসিক বেতন শিটের কর্তনের সাথে মিল আছে', 'The balance on this page matches the deduction on the Monthly Salary Sheet'), { req: true }),
-      NOTE(L('পদত্যাগ / চাকরির অবসানের সময় বাকি অ্যাডভান্স ছাড়পত্রে (02-6) লিখতে হবে ও শেষ বেতন থেকে কাটতে হবে। অ্যাডভান্স বাকি থাকলে ছাড়পত্র দেওয়া যাবে না।', 'On resignation / termination the outstanding advance must be written on the Exit Clearance (02-6) and deducted from the final pay. No clearance while an advance is outstanding.'), 'warn'),
+      NOTE(L('পদত্যাগ / চাকরির অবসানের সময় বাকি অ্যাডভান্স ছাড়পত্রে (10-1) লিখতে হবে ও শেষ বেতন থেকে কাটতে হবে। অ্যাডভান্স বাকি থাকলে ছাড়পত্র দেওয়া যাবে না।', 'On resignation / termination the outstanding advance must be written on the Exit Clearance (10-1) and deducted from the final pay. No clearance while an advance is outstanding.'), 'warn'),
       M('exit_balance', L('পদত্যাগ / অবসানের সময় বাকি অ্যাডভান্স ৳', 'Outstanding advance at resignation / termination ৳')),
       CK('exit_deducted', L('শেষ বেতন থেকে কর্তন করা হয়েছে', 'Deducted from the final pay'), { show: (x) => num(x.d.exit_balance) > 0 }),
       CK('exit_clearance', L('ছাড়পত্রে (এক্সিট ক্লিয়ারেন্স) লেখা হয়েছে', 'Written on the Exit Clearance'), { show: (x) => num(x.d.exit_balance) > 0, req: (x) => num(x.d.exit_balance) > 0 })] },
@@ -167,9 +167,9 @@ B.forms['02-3'] = {
   },
 };
 
-/* ============ 02-4 · Appointment letter — terms & duties ============ */
-B.forms['02-4'] = {
-  title: L('নিয়োগপত্র — শর্ত ও দায়িত্ব', 'Appointment letter — terms & duties'),
+/* ============ 01-1 · Appointment letter — terms & duties ============ */
+B.forms['01-1'] = {
+  title: L('নিয়োগপত্র', 'Appointment Letter'),
   head: [T('reg_no', L('কর্মী রেজিস্ট্রেশন ফরম নং', 'Employee registration form no.')), ST('staff', L('কর্মীর নাম', 'Employee'), { req: true }), T('post', L('পদ', 'Post'), { req: true }),
     LOC('staff_loc', L('লোকেশন', 'Location'), { req: true }), D('join_date', L('যোগদানের তারিখ', 'Joining date'), { req: true })],
   sections: [
@@ -216,9 +216,9 @@ B.forms['02-4'] = {
   },
 };
 
-/* ============ 02-5 · Leave application ============ */
-B.forms['02-5'] = {
-  title: L('ছুটির আবেদন ফরম', 'Leave application'),
+/* ============ 15-1 · Leave application ============ */
+B.forms['15-1'] = {
+  title: L('ছুটির আবেদন', 'Leave Application'),
   head: [ST('applicant', L('কর্মীর নাম (আবেদনকারী)', 'Employee (applicant)'), { req: true }), T('post', L('পদ', 'Post'), { req: true }), D('apply_date', L('আবেদনের তারিখ', 'Application date'), { req: true }), N('taken_year', L('এ বছরে নেওয়া ছুটি (দিন)', 'Leave taken this year (days)'))],
   init(x, d) { if (!has(d.apply_date)) d.apply_date = x.date; },
   sections: [
@@ -254,7 +254,7 @@ B.forms['02-5'] = {
   },
 };
 
-/* ============ 02-6 · Exit clearance ============ */
+/* ============ 10-1 · Exit clearance ============ */
 const HAND = [
   ['adv', L('বাকি অ্যাডভান্স (স্টাফ অ্যাডভান্স রেজিস্টার দেখে)', 'Outstanding advance (from the Staff Advance Register)'), L('পরিমাণ ৳', 'Amount ৳')],
   ['keys', L('চাবি (শাটার · ড্রয়ার · স্টক-কক্ষ)', 'Keys (shutter · drawer · stock room)'), L('কয়টি', 'How many')],
@@ -264,8 +264,8 @@ const HAND = [
   ['assets', L('প্রতিষ্ঠানের সম্পদ (ইউনিফর্ম · যন্ত্র · ফোন · ল্যাপটপ)', 'Business assets (uniform · tools · phone · laptop)'), L('বিবরণ', 'Details')],
   ['online', L('অনলাইন অ্যাকাউন্ট ও পাসওয়ার্ড — অধিকার বন্ধ', 'Online accounts and passwords — access closed'), L('কোনগুলো', 'Which ones')],
 ];
-B.forms['02-6'] = {
-  title: L('ছাড়পত্র (এক্সিট ক্লিয়ারেন্স)', 'Exit clearance'),
+B.forms['10-1'] = {
+  title: L('এক্সিট ক্লিয়ারেন্স', 'Exit Clearance'),
   head: [T('reg_no', L('কর্মী রেজিস্ট্রেশন ফরম নং', 'Employee registration form no.')), ST('staff', L('কর্মীর নাম', 'Employee'), { req: true }), T('post', L('পদ', 'Post'), { req: true }), D('join_date', L('যোগদান', 'Joined')), D('last_day', L('শেষ কর্মদিবস', 'Last working day'), { req: true })],
   sections: [
     { title: L('চাকরির সমাপ্তি', 'End of employment'), fields: [
@@ -312,7 +312,7 @@ B.forms['02-6'] = {
   },
 };
 
-/* ============ 02-7 · Duty & backup card ============ */
+/* ============ 09-1 · Duty & backup card ============ */
 // sections A and B follow the live showrooms of the locations table (the old fixed names are only a fallback)
 const SLOT_A_FALLBACK = [L('ইসলামিয়া মিষ্টি ঘর — মেইন — ম্যানেজার', 'ISLAMIYA MISTY GHAR — Main — manager'), L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ম্যানেজার', 'ISLAMIYA MISTY GHAR — 2nd Branch — manager'), L('মিষ্টি বাড়ি — ম্যানেজার', 'MISTY BARI — manager'), L('AL-CAKIZ — ম্যানেজার', 'AL-CAKIZ — manager')];
 const SLOT_B_FALLBACK = [L('ইসলামিয়া মিষ্টি ঘর — ২য় শাখা — ব্যাকআপ', 'ISLAMIYA MISTY GHAR — 2nd Branch — backup'), L('মিষ্টি বাড়ি — ব্যাকআপ', 'MISTY BARI — backup'), L('AL-CAKIZ — ব্যাকআপ', 'AL-CAKIZ — backup')];
@@ -338,8 +338,8 @@ const slotCols = () => [
   CK('holder_sig', L('দায়িত্বধারীর স্বাক্ষর', "Holder's signature"), { show: (x) => !x.row.vacant }), CK('appr', L('অনুমোদনকারীর স্বাক্ষর', "Approver's signature"), { who: 'checker', show: (x) => !x.row.vacant })];
 const slotTable = (id, labels) => TABLE(id, null, slotCols(), { rows: labels });
 const SLOT_TABLES = [['slotA', SLOT_A], ['slotB', SLOT_B], ['slotC', SLOT_C], ['slotE', SLOT_E], ['slotF', SLOT_F], ['slotG', SLOT_G], ['slotH', SLOT_H], ['slotI', SLOT_I]];
-B.forms['02-7'] = {
-  title: L('ডিউটি ও ব্যাকআপ কার্ড', 'Duty & backup card'),
+B.forms['09-1'] = {
+  title: L('ডিউটি ও ব্যাকআপ কার্ড', 'Duty and Backup Card'),
   head: [D('last_update', L('সর্বশেষ হালনাগাদ', 'Last updated'), { req: true })],
   init(x, d) { if (!has(d.last_update)) d.last_update = x.date; },
   sections: [
@@ -398,7 +398,7 @@ B.forms['02-7'] = {
   },
 };
 
-/* ============ 02-8 · Skill checklist ============ */
+/* ============ 34-1 · Skill checklist ============ */
 const SK = {
   A: [
     [L('দিনের ক্যাশ বন্ধ — নোট গণনা করে লেখা; আসল ঘরে প্রত্যাশিত সংখ্যা নয়; ঘাটতি বা বাড়তি শূন্য হলেও লেখা', 'Day cash close — notes counted and written; never the expected figure in the real box; short/over written even when zero')],
@@ -468,8 +468,8 @@ const SK_TITLES = {
 };
 const skTable = (k) => TABLE('sk' + k, null, [...(k === 'A' ? [CK('na', L('প্রযোজ্য নয় (শুধু ১২ নম্বর — যেখানে জিলাপি কাউন্টার নেই)', 'Not applicable (task 12 only — where there is no jalebi counter)'))] : []), CK('done', L('নিজে সম্পাদিত', 'Done by the holder personally'), { show: (x) => !x.row.na }), D('date', L('তারিখ', 'Date'), { req: (x) => !!x.row.done, show: (x) => !x.row.na }),
   ST('verifier', L('যাচাইকারীর স্বাক্ষর', "Checker's signature"), { req: (x) => !!x.row.done, show: (x) => !x.row.na })], { rows: SK[k].map((r) => r[0]) });
-B.forms['02-8'] = {
-  title: L('স্কিল চেকলিস্ট', 'Skill checklist'),
+B.forms['34-1'] = {
+  title: L('স্কিল চেকলিস্ট', 'Skill Checklist'),
   head: [T('slot', L('ডিউটি স্লট', 'Duty slot'), { req: true }), T('initials', L('ব্যক্তির নামের আদ্যক্ষর (Initials)', "Person's initials"), { req: true }), ST('holder', L('স্লটের দায়িত্বধারী', 'Slot holder'), { req: true }),
     LOC('place', L('লোকেশন', 'Location')), D('start', L('শুরুর তারিখ', 'Start date')), D('end', L('শেষের তারিখ', 'End date'))],
   sections: [
@@ -498,9 +498,9 @@ B.forms['02-8'] = {
   },
 };
 
-/* ============ 11-1 · Shift handover register ============ */
-B.forms['11-1'] = {
-  title: L('শিফট হ্যান্ডওভার রেজিস্টার', 'Shift handover register'),
+/* ============ 33-1 · Shift handover register ============ */
+B.forms['33-1'] = {
+  title: L('শিফট হ্যান্ডওভার', 'Shift Handover'),
   head: [T('page_no', L('পৃষ্ঠা নং', 'Page no.'))],
   sections: [
     { title: L('নিয়ম', 'Rule'), fields: [

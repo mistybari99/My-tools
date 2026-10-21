@@ -115,8 +115,8 @@ select set_config('request.jwt.claim.sub',:'k',false);
 select tt.err('T3 role grant removed -> refused again', $$insert into invoice_templates (name,kind) values ('again','a4')$$, 'row-level security');
 -- supplier_manage
 select set_config('request.jwt.claim.sub',:'o',false);
-select save_supplier(null,'{"name":"Rahim Dairy","mobile":"01711-000000","type_code":"milk","credit_days":7}') as sup \gset
-select tt.chk('T3 owner saved supplier', (select count(*) from suppliers where name='Rahim Dairy' and mobile='01711000000')=1);
+select save_supplier(null,'{"name":"TestK Dairy","mobile":"01711-000000","type_code":"milk","credit_days":7}') as sup \gset
+select tt.chk('T3 owner saved supplier', (select count(*) from suppliers where name='TestK Dairy' and mobile='01711000000')=1);
 select tt.err('T3 negative credit days refused', format($$select save_supplier(%L,'{"credit_days":-1}')$$, :'sup'), 'check');
 select set_user_grant(:'k','supplier_manage');
 select set_config('request.jwt.claim.sub',:'k',false);

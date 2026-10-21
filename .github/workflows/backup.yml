@@ -27,6 +27,8 @@ jobs:
       SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
       BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      BACKUP_KDF_SALT: ${{ secrets.BACKUP_KDF_SALT }}
       HAS_DRIVE: ${{ secrets.GDRIVE_FOLDER_ID != '' && (secrets.GDRIVE_SERVICE_ACCOUNT_JSON != '' || secrets.GDRIVE_OAUTH_TOKEN != '') }}
     steps:
       - name: Refuse to run in a public repository
@@ -84,10 +86,10 @@ jobs:
           DAY=$(TZ=Asia/Dhaka date +%Y/%m/%d)
           mkdir -p data/latest "data/$DAY"
           # latest/ = exactly this run's dump (photos/ inside latest/ is kept: files are only added)
-          find data/latest -maxdepth 1 -type f \( -name '*.ndjson.gz' -o -name 'manifest.json' \) -delete
-          cp out/*.ndjson.gz out/manifest.json data/latest/
+          find data/latest -maxdepth 1 -type f \( -name '*.ndjson.gz' -o -name '*.ndjson.gz.enc' -o -name 'manifest.json' \) -delete
+          cp out/*.ndjson.gz* out/manifest.json data/latest/
           rm -rf "data/$DAY" && mkdir -p "data/$DAY"
-          cp out/*.ndjson.gz out/manifest.json "data/$DAY/"
+          cp out/*.ndjson.gz* out/manifest.json "data/$DAY/"
           cp data/latest/photos_manifest.json "data/$DAY/" 2>/dev/null || true
           echo "DAY=$DAY" >> "$GITHUB_ENV"
 
@@ -116,7 +118,7 @@ jobs:
           RCLONE_CONFIG_GD_TOKEN: ${{ secrets.GDRIVE_OAUTH_TOKEN }}
           RCLONE_CONFIG_GD_TEAM_DRIVE: ${{ secrets.GDRIVE_SHARED_DRIVE_ID }}
         run: |
-          rclone copy data/latest "gd:latest" --include '*.ndjson.gz' --include 'manifest.json' --include 'photos_manifest.json'
+          rclone copy data/latest "gd:latest" --include '*.ndjson.gz' --include '*.ndjson.gz.enc' --include 'manifest.json' --include 'photos_manifest.json'
           rclone copy "data/${DAY}" "gd:${DAY}"
           if [ -d data/latest/photos ] && [ "$(du -sm data/latest/photos | cut -f1)" -lt 1024 ]; then rclone copy data/latest/photos gd:photos; fi
           if [ -d drive_extra/photos ]; then rclone copy drive_extra/photos gd:photos; fi

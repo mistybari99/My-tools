@@ -1,7 +1,9 @@
-// Bulk item editor (#/bulkitems) + old-item decision page (#/itemmap) + unpriced chip. Run: node bulkitems_test.js /home/user/My-tools/tests/web
+// Bulk item editor (#/bulkitems) + old-item decision page (#/itemmap) + unpriced chip. Run: node bulkitems_test.js tests/web
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const base = dataFn(fs);
 const R = (key, kind, def, extra = {}) => ({ key, module: 'settings', kind, value: null, default_value: def, label_bn: key, label_en: key, label_mix: key, sort: 1, ...extra });
 function mkData() {
@@ -45,7 +47,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'item_map_accept_confident') { return { data: { dry: args.p_dry, accepted: 2, skipped: 0, codes: ['I-001', 'I-002'] }, error: null }; }
   return rpc(fn, args); };
  return c; }; })();`;
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8231);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -55,7 +57,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(mkData())};${o.init || ''};try{localStorage.setItem('bos_lang','en');}catch(e){}`);
-    await p.goto('http://localhost:8231/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__CALLS.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal page overflow ' + m);
@@ -122,14 +124,14 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.close();
 
   // ---------- non-owner without a grant: requests ----------
-  p = await open({ init: 'window.__OWNER=false;window.__GRANT=false;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/bulkitems');
+  p = await open({ init: 'window.__OWNER=false;window.__GRANT=false;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/bulkitems');
   ok(await p.locator('#bk_grid tbody tr').count() === 50, 'ITEMS-enter user sees the grid'); ok(await p.locator('[data-act=bk_export]').count() === 0, 'no export for non-owner'); ok(await p.locator('#bk_cost').count() === 0, 'no cost toggle for non-owner');
   await p.locator('#bk_grid tbody tr').nth(10).locator('[data-f=sell_price]').fill('55'); await p.locator('.bk-sel').nth(2).check(); ok(await p.locator('[data-act=bk_hide_sel]').count() === 0, 'no bulk hide without the direct right');
   await p.click('[data-act=bk_preview]'); await p.waitForTimeout(400); ok(/become requests|request/i.test(await p.textContent('.sheet')) && /1 will become requests/.test(await p.textContent('.sheet')), 'preview says requests for approval'); await p.close();
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};window.__GRANT=false;' }, '#/bulkitems');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};window.__GRANT=false;' }, '#/bulkitems');
   ok(/do not have access/.test(await p.textContent('#app')), 'view-only user has no access'); await p.close();
 
-  p = await open({ init: 'window.__OWNER=false;window.__GRANT=true;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};window.__DATA.tables.item_mapping_review[0].status="replaced";' }, '#/itemmap');
+  p = await open({ init: 'window.__OWNER=false;window.__GRANT=true;window.__PERMS={ITEMS:{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};window.__DATA.tables.item_mapping_review[0].status="replaced";' }, '#/itemmap');
   await p.click('[data-act=mp_tab][data-v=repl]'); await p.waitForTimeout(200);
   ok(await p.locator('.mp2').count() === 1 && await p.locator('[data-act=mp_undo]').count() === 0, 'non-owner sees a replaced row but no Undo button');
   await p.click('.mp2 .im-dots'); await p.waitForTimeout(200); ok(await p.locator('.sheet [data-act=mp_undo]').count() === 0, 'and no Undo in the menu'); await p.close();

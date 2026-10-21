@@ -1,0 +1,25 @@
+# Step Dscr - fix/phase-Dscr: web screens for phase85 (books85)
+
+Branch fix/phase-Dscr (from integration/p72-p79). New files only: web/books85.js, tests/web/dscr_test.js. Appended: one rec line at the end of the IA array in web/ia.js (route `books85`, group acc) and one script tag at the end of the script list in web/index.html. accounts.js, forms.js, pos.js, nav.js and all SQL are untouched. Open at `#/books85` (Accounts group; shown to the owner and to people with accounts view / manage).
+
+## What the screen does (3 tabs, phone width)
+* Card settlement: place picker, unsettled card money (card_settlement_list), form (date, gross, fee, bank/mobile, note) calling card_settle with a client id that is kept until success (retry or double tap cannot record twice), `over` hint shown after saving (not a block), history with void (note required) calling card_settle_void. Managers can settle/void, viewers see the list only.
+* Auto posting: pending/locked alert (acct_pending_alert85: old count, oldest date, locked list, waiting-for-cost count, scheduler on/last run), Run now (acct_autopost_tick, owner), cron text + enable / disable scheduler (owner), run history.
+* Books switches: acct_count_adjust, acct_stock_opening, acct_issue_out, acct_transfer_mode, acct_transit_loss, acct_transit_loss_at, acct_purchase_variance, acct_stock_moves_from. Each shows Now and Recommended (never blocks). Turning ON opens a WARNING sheet first (backlog posts back to the accounting start / from-date at the original dates, closed-period dates held except for the owner; for opening stock: keep OFF if opening stock is already in acct_opening or it is counted twice; also transit-loss clearing, purchase-variance limit, cost-missing wait, transfer pair notes). Turning OFF is immediate. Owner only (read-only for others). Writes go through set_rule.
+* Errors map to readable 3-language labels (not_allowed / "not allowed", bad_amount, bad_fee, bad_mode, bad_date, bad_cron, period_closed, data_needed, client_id_taken, pg_cron_missing, phase85 missing, network). Language rule: English mode has no Bangla, Bangla mode keeps common words English, mix mode.
+
+# যাচাই হয়েছে
+* node tests/web/dscr_test.js: 351 checks, 0 failed (mocked rpc and table layer, tiny fake DOM, no browser, no DB): language rule on every B.L string, unique dg_ data-act names each with a handler, ia.js rec and index.html tag present, accounts/forms/pos/nav not touched, every phase85 rpc called with the right argument names, card settle validation / idempotent client id on retry / over hint / dup / void needs a note / place change / viewer has no form, autopost tick counts / skipped / data_needed / pg_cron_missing / non-owner has no buttons / unreadable run table message, switch cards (8) with Now + Recommended, WARNING sheet before ON and no write until confirmed, OFF immediate, transfer-mode confirm, from-date validation, refused write shown as "Not allowed", non-owner read-only, bn / mix render, load failure shows error + retry.
+* Existing tests unchanged: lang_en_test 83 strings 0 Bangla; books85_test 38/0; ia_test, nav_test, nav2_test, accounts_test: errors none, assert failures 0 (the Playwright ones were run from a scratch copy of the tests pointed at this worktree's web, because they hard-code /home/user/My-tools/web; ports changed to avoid a clash with other agents; repo test files not edited).
+
+# পড়ে বোঝা
+* acct_autopost_runs85 has no grant for signed-in users (phase85 revokes it) and no list RPC exists, so the run history tries a table read and, when refused, shows a readable note plus the last run time from acct_pending_alert85. A list RPC would need SQL (not allowed in this step).
+* The "system recommendation" is computed on the screen (no phase85 recommendation RPC exists): count_adjust / issue_out / purchase_variance On; opening stock Off (check acct_opening first); transfer mode location_tagged when more than one place else Off; transit loss follows the transfer mode; transit loss at receiver; from-date blank. These are my judgement, not confirmed by the owner or accountant.
+* set_rule accepting a text value for acct_stock_moves_from and string values for the two choice rules is assumed from the rules table kinds (text / choice); read from phase85.sql only.
+* The scheduler needs pg_cron on the server; the screen says so and reports pg_cron_missing.
+
+# যাচাই হয়নি
+* Nothing ran against a live Supabase or a real phone browser; no screenshot at 360px width, no manual look at the layout (only existing CSS classes used: card, stack, row, chip, notice, mini, tog, primary, full).
+* How the app's click dispatcher treats a `<select>` is not exercised: the place picker uses a Show button (like accounts.js) instead of a change event.
+* The new route was not added to the Home / drawer ordering tests beyond ia_test passing; icon falls back to `money`.
+* Real card settlement flow with a real period lock (lock_check text is matched by "period_closed" / "locked" only; an unexpected server message is shown as is).

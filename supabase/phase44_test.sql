@@ -302,7 +302,7 @@ insert into sales (client_id,location_id,receipt,sale_date,sold_at,lines,subtota
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
  ('10-2',1,9811,'2026-01-12','approved','{"lines":[{"head":"transport","amount":100},{"head":"transport","amount":50}]}','[]',:'s','st'),
  ('10-2',1,9812,'2026-01-12','draft','{"lines":[{"head":"transport","amount":5000}]}','[]',:'s','st'),
- ('02-2',1,9821,'2026-01-30','approved','{"pay":[{"name":"Rahim - Cook","due":200}]}','[]',:'s','st');
+ ('02-2',1,9821,'2026-01-30','approved','{"pay":[{"name":"TestK - Cook","due":200}]}','[]',:'s','st');
 set role authenticated; select tt.as(:'o');
 select tt.mk(:v2, 'Books B1 gross profit', '2026-01-01', format('[{"p":%s,"r":"owner"},{"p":%s,"r":"franchisee"}]', :pa, :pd)::jsonb,
   '[{"n":"Base gross profit","k":"base","c":{"base":"gross_profit"}},{"n":"40/60","k":"split","c":{"shares":[{"role":"owner","percent":40},{"role":"franchisee","percent":60}]}}]'::jsonb) as agb1 \gset

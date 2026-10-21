@@ -38,7 +38,7 @@ select tt.chk('T0 day-book/journal/P&L functions kept their signatures; bos50 bl
 select tt.as(:'o');
 select date_trunc('month', tt.today())::date as m0, extract(month from tt.today())::int as mm, extract(year from tt.today())::int as yy \gset
 with x as (insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
-  ('02-2',1,9201,tt.today(),'submitted',format('{"month":"%s","year":"%s","receipts":[{"name":"Rahim","net":5000,"method":"cash","date":"%s"}],"pay":[]}',:'mm',:'yy',tt.today())::jsonb,'[]',:'s','st') returning id) select id as e22 from x \gset
+  ('02-2',1,9201,tt.today(),'submitted',format('{"month":"%s","year":"%s","receipts":[{"name":"TestK","net":5000,"method":"cash","date":"%s"}],"pay":[]}',:'mm',:'yy',tt.today())::jsonb,'[]',:'s','st') returning id) select id as e22 from x \gset
 select tt.chk('T1 before any run the 02-2 salary line is counted in the day book', (select count(*) from _daybook_lines(array[1], array[1], tt.today(), tt.today()) where typ='salary')=1);
 select tt.chk('T1 no link yet', not is_shadow('entries', :'e22'));
 with x as (insert into payroll_runs (month, location_id, status) values (:'m0', 1, 'draft') returning id) select id as run1 from x \gset

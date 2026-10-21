@@ -1,9 +1,11 @@
 // Day book (daybook.js) + nav tile + reports-hub link. Run: node daybook_test.js <dir holding smoke.js stub>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/p13_common.js');
-const base = C.baseData(SP), srv = C.serve(8301);
+const base = C.baseData(SP), srv = C.serve(PORT);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -14,7 +16,7 @@ const base = C.baseData(SP), srv = C.serve(8301);
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const data = C.mkData(base, o); data.tables.locations = data.tables.locations || [];
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__M0=${JSON.stringify(o.m || {})};window.__DB0=${JSON.stringify(o.db || {})};${o.owner === false ? 'window.__OWNER=false;' : ''}${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8301/' + hash); await p.waitForTimeout(1100); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1100); return p;
   }
   const wait = (p, n = 300) => p.waitForTimeout(n);
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
@@ -41,7 +43,7 @@ const base = C.baseData(SP), srv = C.serve(8301);
   await p.click('.sheet .db-line:nth-child(3) [data-act=db_lmenu]'); await wait(p, 100);
   ok(await p.locator('.sheet .db-line:nth-child(3) .db-lm button:not([disabled])').count() === 2, 'line menu: open source + copy enabled for a bill');
   await p.click('.sheet .db-line:nth-child(3) [data-act=db_src]'); await wait(p, 300); ok((await p.evaluate(() => location.hash)) === '#/purchase/b1', 'open source -> purchase bill');
-  await p.goto('http://localhost:8301/#/daybook'); await wait(p, 900); await p.close();
+  await p.goto('http://localhost:' + PORT + '/#/daybook'); await wait(p, 900); await p.close();
 
   // ---------- start date: opening/closing ----------
   p = await open({ db: { start: '2026-10-01' } }, '#/daybook');
@@ -102,7 +104,7 @@ const base = C.baseData(SP), srv = C.serve(8301);
   p = await open({ db: { hidden: true } }, '#/daybook'); ok(await p.locator('#db_salhid').count() === 1, 'salary-hidden notice'); await p.close();
 
   // ---------- Bangla mode ----------
-  p = await open({ lang: 'bn' }, '#/daybook'); ok(/দিনের খাতা/.test(await p.textContent('header.top h1')), 'Bangla title'); ok(/শুরুর তারিখ/.test(await p.textContent('#db_needstart')), 'Bangla Data-needed note'); await p.screenshot({ path: SP + '/db_bn.png' }); await noOverflow(p, 'bn'); await p.close();
+  p = await open({ lang: 'bn' }, '#/daybook'); ok(/দিনের খাতা/.test(await p.textContent('header.top h1')), 'Bangla title'); ok(/শুরুর ডেট/.test(await p.textContent('#db_needstart')), 'Bangla Data-needed note'); await p.screenshot({ path: SP + '/db_bn.png' }); await noOverflow(p, 'bn'); await p.close();
 
   // ---------- home tile + drawer + hub link ----------
   p = await open({}, '#/home'); await p.click('[data-act=hv_mode][data-v=acc]'); await wait(p, 300);

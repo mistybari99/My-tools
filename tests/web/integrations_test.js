@@ -1,7 +1,8 @@
 // web/integrations.js - stub-DOM test (no browser): renders each tab from mocked RPCs, friendly errors, CSV download, no secrets in markup.
 // Run: node tests/web/integrations_test.js
+const _P = require('./_paths');
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'web', 'integrations.js'), 'utf8');
+const src = fs.readFileSync(path.join(_P.WEB_DIR, 'integrations.js'), 'utf8');
 let pass = 0, fail = 0; const ok = (n, c) => { if (c) pass++; else { fail++; console.log('FAIL ' + n); } };
 const body = { innerHTML: '' }, acts = {}, toasts = [], dl = [], calls = [];
 let MODE = 'en', RPC = {};

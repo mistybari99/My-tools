@@ -11,13 +11,14 @@ const store = {
 };
 // the brand name is fixed in every language: never translated, never re-spelled
 const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };
-window.BOS = Object.assign(window.BOS || {}, { BRAND: { hub: { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' }, bari: { bn: 'মিষ্টি বাড়ি', en: 'MISTY BARI' }, cakiz: { bn: 'AL-CAKIZ', en: 'AL-CAKIZ' } } });
-const S = { ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
+window.BOS = Object.assign(window.BOS || {}, {});   // bos B2: the old BRAND {hub,bari,cakiz} constant (unused) is gone; brands come from report_brand_map via B.biz.brandOpts
+const S = { offline: false, csNeeds: false, ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const t = (k) => (T[k] && (T[k][S.lang] || T[k].bn)) || k;
 const nm = (o) => !o ? '' : (S.lang === 'en' ? (o.name_en || o.name_bn) : S.lang === 'mix' ? (o.name_mix || o.name_bn) : o.name_bn);
-const fmt = (n) => (n === null || n === undefined) ? '—' : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const NF_IN = (() => { try { return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }); } catch (e) { return null; } })();   // bos114: one formatter (toLocaleString built a new one on every call: 1369 POS cards = 200 ms on a phone)
+const fmt = (n) => (n === null || n === undefined) ? '—' : (NF_IN ? NF_IN.format(Number(n)) : Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }));
 const AREAS = ['master', 'showroom', 'cash', 'stock', 'purchase', 'factory', 'sales', 'staff', 'assets', 'owner', 'settings'];
 const CAT = {
   sweet_kg: { bn: 'মিষ্টি (কেজি)', mix: 'মিষ্টি (KG)', en: 'Sweets (KG)' },
@@ -54,9 +55,20 @@ function shell(title, body, back) {
   const pg = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
   const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>`
     : (nav && pg !== 'home' ? `<button data-act="goback" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">');
-  const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
-  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
+  // "main" jumps to the nearest top-level screen of the chain (navstack.js); shown next to the back arrow on every deep screen
+  const mainBtn = nav && pg !== 'home' && window.BOS_NAVSTACK ? `<button type="button" class="navmain" data-act="navmain" aria-label="${esc(t('mainscr'))}">${esc(t('mainscr'))}</button>` : '';
+  // back 2 / back 3 steps: shown only when the chain is deep enough (BOS_NAVSTACK.depth() counts the current screen)
+  const depth = nav && pg !== 'home' && window.BOS_NAVSTACK ? window.BOS_NAVSTACK.depth() : 0;
+  const backN = [2, 3].filter((n) => depth > n).map((n) => `<button type="button" class="navback" data-act="goback" data-n="${n}" aria-label="${esc(t('back' + n))}">${esc(t('back' + n))}</button>`).join('');
+  const bnd = (window.BOS.biz && window.BOS.biz.brand()) || BRAND;   // bizctx: the chosen business name when the owner set one, else the legacy name
+  const h1 = title === t('app') ? `<span class="bn">${esc(bnd.bn)}</span><span class="lat">${esc(bnd.en)}</span>` : esc(title);
+  $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}${mainBtn}${backN}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
+
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
+  // desktop page pattern (docs/DESKTOP_LAYOUT.md 3.1): ia.js gives each screen a pat; desktop.css reads body[data-pat] on PCs (>= 1024px) only
+  const hp = location.hash.replace(/^#\/?/, '').split('/')[0];
+  const pr = hp === 'form' ? { pat: 'form' } : ((window.BOS && window.BOS.ia && window.BOS.ia.resolve(location.hash)) || {});
+  if (pr.pat) document.body.dataset.pat = pr.pat; else delete document.body.dataset.pat;
 }
 function openSheet(html) {
   closeSheet();
@@ -64,6 +76,7 @@ function openSheet(html) {
   d.innerHTML = `<div class="sheet"><button type="button" class="sheet-x" data-act="closesheet" aria-label="${S.lang === 'en' ? 'Close' : 'বন্ধ করুন'}">✕</button>${html}</div>`;
   d.addEventListener('click', (e) => { if (e.target === d) closeSheet(); });
   document.body.appendChild(d);
+  if (window.BOS_KBD) window.BOS_KBD.sheet(d); // bos102: sticky action bar + keyboard-aware sizing
 }
 function closeSheet() { const d = $('#sheet'); if (d) d.remove(); }
 const tog = (on, act, attrs = '', label) => `<button class="tog ${on ? 'on' : ''}" data-act="${act}" ${attrs}>${esc(label || (on ? t('on') : t('off')))}</button>`;
@@ -125,9 +138,11 @@ async function doLogin() {
   const sid = val('#a_sid'), pin = val('#a_pin');
   if (!SID_RE.test(sid)) return authErr(t('err_staff_id'));
   if (!PIN_RE.test(pin)) return authErr(t('err_pin'));
+  if (navigator.onLine === false && CS()) return authErr(CS().T('first'));   // bos112: no internet = say so, do not count a wrong PIN
   const pre = await sb.rpc('login_precheck', { p_staff: sid });
   if (pre.data && pre.data.locked) return authErr(t('err_locked'));
   const { error } = await sb.auth.signInWithPassword({ email: emailOf(sid), password: pwOf(pin) });
+  if (error && CS() && CS().isNet(error)) return authErr(CS().T('first'));   // bos112: the server was not reached: not a wrong PIN
   if (error) { await sb.rpc('login_failed', { p_staff: sid }); return authErr(t('err_login')); }
   await sb.rpc('login_success');
   await start();
@@ -142,20 +157,73 @@ async function doRegister() {
   if (!data.session) return authErr(t('err_confirm'));
   await start();
 }
-async function logout() { await sb.auth.signOut(); S.ctx = null; location.hash = ''; viewAuth(); }
+async function logout() {
+  if (CS()) CS().clear();   // bos112: sign-out forgets the saved offline context
+  S.offline = false; csStop(); if (CS()) CS().paint();
+  try { await sb.auth.signOut(); if (CS() && CS().storedUid()) await sb.auth.signOut({ scope: 'local' }); } catch (e) { /* offline: the saved session is dropped on this phone below */ try { await sb.auth.signOut({ scope: 'local' }); } catch (e2) { /* ignore */ } }
+  S.ctx = null; location.hash = ''; viewAuth();
+}
 
 async function loadCtx() {
   const { data, error } = await sb.rpc('my_context');
   if (error) throw error;
-  S.ctx = data;
+  S.ctx = data; if (data && CS()) CS().save(data);   // bos112: remember the last good sign-in (active profiles only) for an offline cold start
   if (data && data.profile && !store.get('bos_lang')) S.lang = data.profile.lang || 'bn';
 }
+// bos112: offline cold start. See coldstart.js for what is kept and why.
+const CS = () => window.BOS_CS;
+let csTimer = null, csBusy = false;
+function csStop() { if (csTimer) clearInterval(csTimer); csTimer = null; }
+function offlineBoot(uid) {
+  const c = CS() ? CS().load(uid) : { refused: 'none' };
+  if (!c.ctx) { viewAuth('login', CS() ? CS().T(c.refused === 'old' ? 'old' : 'first') : ''); return false; }
+  S.ctx = c.ctx; S.offline = true;
+  if (c.ctx.profile && !store.get('bos_lang')) S.lang = c.ctx.profile.lang || 'bn';
+  CS().envApply(); CS().paint();
+  if (!csTimer) csTimer = setInterval(csRecheck, 30000);
+  route(); return true;
+}
+async function csLockout(msg) {
+  CS().clear(); S.ctx = null; S.offline = false; csStop(); CS().paint();
+  try { await sb.auth.signOut(); } catch (e) { /* offline again: the cache is already gone */ }
+  const had = location.hash; location.hash = ''; if (had) await new Promise((r) => setTimeout(r, 60));   // let the hashchange render finish, then show the message
+  viewAuth('login', msg);
+}
+async function csRecheck() {   // background retry: every 30 s and on 'online'. Never reloads the page; a removed / inactive user is signed out here.
+  if (!S.offline || csBusy) return; csBusy = true;
+  try {
+    let r; try { r = await sb.auth.getSession(); } catch (e) { r = { data: {}, error: e }; }
+    const session = r && r.data && r.data.session;
+    if (!session) { if ((r && r.error && CS().isNet(r.error)) || navigator.onLine === false) return; return await csLockout(CS().T('out')); }
+    const { data, error } = await sb.rpc('my_context');
+    if (error) { if (CS().isNet(error)) return; return await csLockout(CS().T('out')); }
+    if (!data || !data.profile || data.profile.status !== 'active') return await csLockout(t('err_disabled'));
+    S.ctx = data; CS().save(data); S.offline = false; csStop(); CS().paint();
+    window.dispatchEvent(new Event('online'));   // the queues (POS sales, outbox) resend now; every resend carries its client id, so nothing is written twice
+    if (S.csNeeds) route();
+  } catch (e) { /* still offline */ } finally { csBusy = false; }
+}
+window.addEventListener('online', () => { if (S.offline) csRecheck(); });
 async function start() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return viewAuth();
-  try { await loadCtx(); } catch (e) { fail(e); return viewAuth(); }
+  let session = null;
+  try { const r = await sb.auth.getSession(); session = r && r.data && r.data.session; } catch (e) { session = null; }
+  if (!session) {
+    const u = CS() && CS().storedUid();   // bos112: supabase-js gives no session when the token is expired and cannot refresh offline; the stored sign-in is still there
+    if (u) { offlineBoot(u); return; }
+    return viewAuth('login', navigator.onLine === false && CS() ? CS().T('first') : '');
+  }
+  try { await loadCtx(); } catch (e) { if (CS() && CS().isNet(e)) { offlineBoot(session.user.id); return; } fail(e); return viewAuth(); }
   if (!S.ctx) { await sb.auth.signOut(); return viewAuth(); }
   route();
+  if (CS()) setTimeout(() => { try { csWarm(); } catch (e) { /* convenience only */ } }, 4000);
+}
+// keep the offline snapshot of locations / rules / items for POS users (once a day at most; reads what POS reads anyway)
+async function csWarm() {
+  const B = window.BOS, c = S.ctx, p = c && c.perms && c.perms.POS;
+  if (S.offline || !B || !B.loadStatic || !(c.is_owner || (p && (p.view || p.enter)))) return;
+  let last = 0; try { last = Number(store.get('bos_cs_warm_' + c.profile.id) || 0); } catch (e) { /* ignore */ }
+  if (Date.now() - last < 86400000) return;
+  await B.loadStatic(); store.set('bos_cs_warm_' + c.profile.id, String(Date.now()));
 }
 
 // ---------- routing ----------
@@ -187,11 +255,14 @@ async function hasAnyGrant(codes) {
   return false;
 }
 function route() {
+  S.lzTok = (S.lzTok || 0) + 1;   // bos114: a screen script that arrives late for an older route must not draw
   if (!S.ctx) return viewAuth();
+  S.csNeeds = false; if (CS()) CS().paint();   // bos112
   const st = S.ctx.profile.status;
   if (st === 'pending') return viewPending();
-  if (st === 'disabled') { sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
+  if (st === 'disabled') { if (CS()) CS().clear(); sb.auth.signOut(); S.ctx = null; return viewAuth('login', t('err_disabled')); }
   const page = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
+  if (S.offline && CS() && !CS().allowed(page)) return CS().needsNet(page);   // bos112: server-only screens say "Needs internet" instead of failing
   if (OWNER_ONLY.has(page) && !S.ctx.is_owner) {
     const gs = ROUTE_GRANTS[page];
     if (!gs) return viewHome();
@@ -205,9 +276,13 @@ function dispatch(page) {
   const extra = window.BOS_PAGES || {};
   if (page === 'exceptions' && !S.ctx.is_owner && !Object.values(S.ctx.perms).some((p) => p.approve)) return viewHome();
   if (page === 'items' && extra.items) return extra.items();           // products v2 (items2.js) takes over #/items; the old screen stays as the fallback
-  (local[page] || extra[page] || viewHome)();
+  const Z = window.BOS_LAZY;   // bos114: lazy.js - fetch the screen's script first when the build made it lazy; loading bar / "slow connection" notice for every screen that waits
+  const draw = () => { const r = (local[page] || extra[page] || viewHome)(); if (Z) Z.track(r, page); };
+  if (Z) { Z.first(); if (Z.need(page)) { const tok = (S.lzTok = (S.lzTok || 0) + 1); return Z.track(Z.load(page).then(() => { if (tok === S.lzTok && (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === page) dispatch(page); }, () => { if (tok === S.lzTok) Z.fail(page); }), page); } }
+  draw();
 }
 window.__navCount = 1; window.addEventListener('hashchange', () => { window.__navCount = (window.__navCount || 1) + 1; route(); });
+try { if (sb.auth.onAuthStateChange) sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT' && window.BOS_CS) window.BOS_CS.clear(); }); } catch (e) { /* bos112: stub or old client */ }
 window.BOS_APP = { hasAnyGrant, sb, S, t, esc, toast, fail, shell, openSheet, closeSheet, nm, fmt, store, ICON, langBar, go, H: null };
 
 function viewPending() {
@@ -452,9 +527,24 @@ async function viewSettings() {
   shell(t('settings'), `<div id="st_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   const { data, error } = await sb.from('settings').select('*').order('key'); if (error) return fail(error);
   const label = (s) => (S.lang === 'en' ? s.label_en : S.lang === 'mix' ? s.label_mix : s.label_bn) || s.label_bn || s.key;
-  $('#st_body').innerHTML = data.map((s) => `<div class="card stack"><div class="row between"><b>${esc(label(s))}</b>${s.value === null ? `<span class="chip warn">${esc(t('need_data'))}</span>` : ''}</div>
+  $('#st_body').innerHTML = layoutRow() + data.map((s) => `<div class="card stack"><div class="row between"><b>${esc(label(s))}</b>${s.value === null ? `<span class="chip warn">${esc(t('need_data'))}</span>` : ''}</div>
     <div class="row"><input id="sv_${esc(s.key)}" value="${esc(s.value === null ? '' : (typeof s.value === 'string' ? s.value : JSON.stringify(s.value)))}">
     <button class="primary" data-act="setsave" data-v="${esc(s.key)}">${esc(t('save'))}</button></div></div>`).join('');
+}
+// screen layout choice (docs/DESKTOP_LAYOUT.md 4.2): stored on this device only (localStorage bos_layout = 'phone' | 'desktop'; absent = automatic by width). Never in the database.
+function layoutChoice() { try { const v = localStorage.getItem('bos_layout'); return v === 'phone' || v === 'desktop' ? v : 'auto'; } catch (e) { return 'auto'; } }
+function layoutRow() {
+  const cur = layoutChoice();
+  return `<div class="card stack" id="lay_row"><div class="row between"><b data-info="feature:layout_choice">${esc(t('layout_title'))}</b></div>
+    <div class="row wrap" role="group" aria-label="${esc(t('layout_title'))}" style="gap:8px">${['auto', 'phone', 'desktop'].map((v) => `<button type="button" class="tog ${cur === v ? 'on' : ''}" aria-pressed="${cur === v}" data-act="layout_set" data-v="${v}">${esc(t('layout_' + v))}</button>`).join('')}</div>
+    <div class="muted" style="font-size:.9rem">${esc(t('layout_hint'))}</div></div>`;
+}
+function setLayoutChoice(v) {
+  const on = v === 'phone' || v === 'desktop';
+  try { if (on) localStorage.setItem('bos_layout', v); else localStorage.removeItem('bos_layout'); } catch (e) { /* storage blocked: the choice applies to this visit only */ }
+  if (on) document.documentElement.setAttribute('data-layout', v); else document.documentElement.removeAttribute('data-layout');   // nav.js and desktop.css follow at once, no reload
+  document.querySelectorAll('#lay_row [data-act="layout_set"]').forEach((b) => { const sel = b.dataset.v === (on ? v : 'auto'); b.classList.toggle('on', sel); b.setAttribute('aria-pressed', String(sel)); });
+  toast(t('layout_saved'));
 }
 async function saveSetting(key) {
   let raw = val('#sv_' + key), v;
@@ -489,10 +579,25 @@ const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_loc
   'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
   'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns',
   'location_setup_steps', 'settings_sheets', 'settings_values', 'list_defs', 'option_requests', 'list_other_entries', 'list_managers', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'item_bulk_batches', 'item_map_actions', 'assets', 'asset_costs', 'form_rollout', 'entry_change_requests', 'entry_revisions', 'entry_counts', 'entry_count_peeks', 'entry_signatures', 'blind_count_cfg', 'pin_sig_cfg', 'recipes', 'recipe_lines', 'product_packaging', 'production_runs', 'forms_ledger_cfg', 'entry_ledger_posts'];
+// Backup state lives here, not in the DOM, so a redraw (progress, error, retry) never loses it.
+// busy: one run at a time (a tap during a run does nothing); file: the last JSON, kept in memory for "save again" (a new tap = a new user gesture);
+// err: the run failed (Bengali message + retry); partial: tables that could not be read (file saved without them, retry offered).
+const BK = { busy: false, done: 0, total: 0, file: null, err: '', partial: [] };
 function viewBackup() {
-  shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p>
-    <button class="primary full" data-act="bk_all">${esc(t('backup_all'))}</button>
-    <button class="full" data-act="bk_items">${esc(t('backup_items'))}</button></div>`, true);
+  shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p><div id="bk_box" class="stack" role="status" aria-live="polite"></div></div>`, true);
+  drawBackup();
+}
+function drawBackup() {
+  const box = document.getElementById('bk_box'); if (!box) return;   // the person left the screen: the run still finishes, the next visit draws the result
+  const busy = BK.busy, dis = busy ? ' disabled' : '';
+  const prog = busy ? `<p class="muted">${esc(t('backup_busy'))} · <b>${BK.done} / ${BK.total}</b></p>` : '';
+  const err = (!busy && BK.err) ? `<div class="notice bad"><p><b>${esc(t('backup_fail'))}</b></p><p class="muted">${esc(BK.err.slice(0, 120))}</p><button class="primary full" data-act="bk_all">${esc(t('backup_retry'))}</button></div>` : '';
+  const warn = (!busy && !BK.err && BK.partial.length) ? `<div class="notice warn"><p>${esc(t('backup_partial'))} <b>${esc(BK.partial.join(', '))}</b></p><button class="full" data-act="bk_all">${esc(t('backup_retry'))}</button></div>` : '';
+  const ok = (!busy && !BK.err && BK.file && !BK.partial.length) ? `<p class="muted">${esc(t('backup_ok'))}</p>` : '';
+  box.innerHTML = `${prog}${err}${warn}${ok}
+    <button class="primary full" data-act="bk_all"${dis}>${esc(t('backup_all'))}</button>
+    <button class="full" data-act="bk_items"${dis}>${esc(t('backup_items'))}</button>
+    ${BK.file && !busy ? `<button class="full" data-act="bk_again">${esc(t('backup_again'))}</button>` : ''}`;
 }
 async function fetchAll(table) {
   // the two stock tables hold cost columns that are not granted: the owner reads them through definer RPCs (phase12)
@@ -503,29 +608,42 @@ async function fetchAll(table) {
     out.push(...data); if (data.length < 1000) break; }
   return out;
 }
-// one table failing (missing, no read right) never stops the backup: it is recorded in o.errors and the rest continues
-async function backupTables(o, tables) {
+// one table failing (missing, no read right) never stops the backup: it is recorded in o.errors and the rest continues.
+// Four tables are read at a time (one by one, a phone on mobile data waited for every table in turn); the file keeps the table order.
+async function backupTables(o, tables, onProgress) {
   o.errors = o.errors || {}; o.row_counts = o.row_counts || {};
-  for (const tb of tables) {
-    try { o.tables[tb] = await fetchAll(tb); o.row_counts[tb] = o.tables[tb].length; }
-    catch (e) { o.errors[tb] = String((e && e.message) || e); o.row_counts[tb] = null; }
-  }
+  const got = {}; let next = 0, n = 0;
+  const worker = async () => { while (next < tables.length) { const tb = tables[next++];
+    try { got[tb] = await fetchAll(tb); } catch (e) { o.errors[tb] = String((e && e.message) || e); }
+    n++; if (onProgress) onProgress(n); } };
+  await Promise.all(Array.from({ length: Math.min(4, tables.length) }, worker));
+  for (const tb of tables) { if (tb in got) { o.tables[tb] = got[tb]; o.row_counts[tb] = got[tb].length; } else o.row_counts[tb] = null; }
   return o;
 }
+// the object URL is kept for a minute: a browser that starts the save late still finds the file
 function download(name, text, type) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
 }
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 async function backupAll() {
+  if (BK.busy) return;   // a second tap during a run does nothing: no second run, no duplicate file
+  Object.assign(BK, { busy: true, done: 0, total: BACKUP_TABLES.length, file: null, err: '', partial: [] }); drawBackup();
   try { const o = { exported_at: new Date().toISOString(), note: 'row_counts = rows saved per table; errors = tables that could not be read (not included)', tables: {} };
-    await backupTables(o, BACKUP_TABLES);
-    download(`bos-backup-${today()}.json`, JSON.stringify(o, null, 1), 'application/json'); toast(t('done'));
-  } catch (e) { fail(e); }
+    await backupTables(o, BACKUP_TABLES, (k) => { BK.done = k; drawBackup(); });
+    const bad = Object.keys(o.errors || {});
+    if (bad.length === BACKUP_TABLES.length) throw new Error('every table failed: ' + bad.slice(0, 2).map((k) => k + ' ' + o.errors[k]).join('; '));
+    const name = `bos-backup-${today()}.json`, text = JSON.stringify(o, null, 1);
+    BK.file = { name, text }; BK.partial = bad;
+    download(name, text, 'application/json'); toast(t('done'));
+  } catch (e) { console.error(e); BK.file = null; BK.err = String((e && e.message) || e) || 'error'; }
+  finally { BK.busy = false; drawBackup(); }
 }
+// "save again" is its own tap, so the browser sees a user gesture; the file is the one already made (no new read of the data)
+function backupAgain() { if (BK.file) download(BK.file.name, BK.file.text, 'application/json'); }
 async function backupItems() {
   try { const rows = await fetchAll('items'); const cols = ['code', 'name_bn', 'name_en', 'name_mix', 'category', 'unit', 'sell_price', 'cost_price', 'is_active'];
-    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const q = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return '"' + s.replace(/"/g, '""') + '"'; };
     download(`bos-items-${today()}.csv`, '﻿' + [cols.join(','), ...rows.map((r) => cols.map((c) => q(r[c])).join(','))].join('\n'), 'text/csv'); toast(t('done'));
   } catch (e) { fail(e); }
 }
@@ -543,7 +661,8 @@ const H = {
   dologin: doLogin, doregister: doRegister, logout,
   recheck: async () => { await loadCtx(); route(); },
   closesheet: closeSheet,
-  goback: () => { if ((window.__navCount || 1) > 1) { window.__navCount -= 2; history.back(); } else go('home'); },
+  goback: (a) => { const n = Math.max(1, Number(a && a.dataset && a.dataset.n) || 1); if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.back(n); else if ((window.__navCount || 1) > 1) { window.__navCount -= 2; history.back(); } else go('home'); },
+  navmain: () => { if (window.BOS_NAVSTACK) window.BOS_NAVSTACK.main(); else go('home'); },
   sheettog: (a) => a.classList.toggle('on'),
   itemcat: (a) => { S.itemCat = a.dataset.v; drawItems(); },
   itemnew: () => itemSheet(null),
@@ -567,7 +686,8 @@ const H = {
   perm: (a) => togglePerm(a.dataset.f, a.dataset.k),
   rule: (a) => toggleRule(a.dataset.f, a.dataset.k),
   setsave: (a) => saveSetting(a.dataset.v),
-  bk_all: backupAll, bk_items: backupItems,
+  layout_set: (a) => setLayoutChoice(a.dataset.v),
+  bk_all: backupAll, bk_again: backupAgain, bk_items: backupItems,
 };
 window.BOS_APP.H = H;
 document.addEventListener('click', (e) => {

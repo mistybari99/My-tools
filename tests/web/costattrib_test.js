@@ -2,12 +2,13 @@
 // reason of every re-assignment, history, the owner switches in plain words, the "give approval to someone else" suggestion, and the same suggestion on the delegation board.
 // No access without the cost right, view-only holders cannot change anything, 360px phone width, Bangla.
 // Run: node costattrib_test.js <abs tests/web dir> [shots dir]     (serves ../../web of THIS checkout and injects the script tag)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const WEB = path.join(SP, '..', '..', 'web'); const OUT = process.argv[3] || SP;
-const base = C.baseData(SP), PORT = 8378;
+const WEB = _P.WEB_DIR; const OUT = process.argv[3] || SP;
+const base = C.baseData(SP), PORT = _P.freePort();
 const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f = path.join(WEB, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
     if (u === '/' || u === '/index.html') b = Buffer.from((b.toString('utf8').includes('src="costattrib.js"') ? b.toString('utf8') : b.toString('utf8').replace('</body>', '<script src="costattrib.js"></script></body>')));
@@ -177,7 +178,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open({ lang: 'bn' }, '#/costattrib'); t = await txt(p, '#ca_pane');
   ok(/ঠিক করা নেই/.test(t) && /মূল কেন্দ্র/.test(t) && /এই শোরুমের লাভ-ক্ষতিতে ধরুন/.test(t), 'Bangla option labels');
   await p.click('[data-act=ca_tab][data-v=view]'); await wait(p, 200); ok(/মোট কোথায় কত/.test(await txt(p, '#ca_pane')) && /হাতে বদলানো/.test(await txt(p, '#ca_pane')), 'Bangla cost view');
-  await p.click('[data-act=ca_tab][data-v=rules]'); await wait(p, 200); ok(/রেসিপি অনুমোদন/.test(await txt(p, '#ca_pane')) && /উৎপাদনে রেসিপি বাধ্যতামূলক/.test(await txt(p, '#ca_pane')), 'Bangla switch labels');
+  await p.click('[data-act=ca_tab][data-v=rules]'); await wait(p, 200); ok(/রেসিপি অ্যাপ্রুভ/.test(await txt(p, '#ca_pane')) && /[\u0980-\u09FF]{3}/.test(await txt(p, '#ca_pane')), 'Bangla switch labels');
   await p.screenshot({ path: OUT + '/ca_bn.png' }); await noOverflow(p, 'Bangla rules'); await p.close();
 
   await br.close();

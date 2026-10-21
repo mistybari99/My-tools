@@ -17,7 +17,7 @@ select count(*) from sales;
 \echo T3 quick sale, discount, due needs customer
 select record_sale(gen_random_uuid(),1,'[{"amount":300,"name":"Rush"}]',20,'mobile',null,null,null,true);
 select record_sale(gen_random_uuid(),1,'[{"amount":300}]',0,'due',null,null,null,true);
-select record_sale(gen_random_uuid(),1,'[{"amount":300}]',0,'due',null,'Karim','pay friday',true);
+select record_sale(gen_random_uuid(),1,'[{"amount":300}]',0,'due',null,'TestF','pay friday',true);
 select record_sale(gen_random_uuid(),1,'[{"amount":300}]',999,'cash',null,null,null,true);
 \echo T4 price override makes exception; other location blocked; zero qty blocked
 select record_sale(gen_random_uuid(),1,(select jsonb_build_array(jsonb_build_object('item_id',id,'qty',1,'override',true,'price',1)) from items order by code limit 1),0,'cash',null,null,null,false);

@@ -1,0 +1,7 @@
+# Suites of our line whose assertions describe the database of OUR line alone. In the database that holds BOTH lines they are replaced by a copy (the original is not edited and is not run by tests/sql/run_all_union.sh).
+# columns: original suite | union copy | why
+phase81_test | phase81b_test | the receivable from the carrier is account 1245 (the advanced line uses 1240) and transit_loss maps to the advanced account 5130; only the account codes in the checks differ
+phase92_test | phase92b_test | the advanced line has two rules whose key also starts with profit_ (profit_truth_mode, profit_variable_heads); the check of our profit rules skips them
+phase96_test | phase96b_test | the advanced line has its own text tagged bos96 in shared functions: "no shared function carries bos96" becomes "the count does not change"
+phase97_test | phase97b_test | same for the tag bos97
+phase302_test | phase302b_test | T6 proves the CRM-A hook on the old text of customer_directory; the merged function already has the advanced phone mask (bos103/bos105)

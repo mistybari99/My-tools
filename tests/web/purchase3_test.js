@@ -1,10 +1,12 @@
 // Purchase carry-over (phase12): barcode scan on a bill line, per-line stock-effect preview, ⋮ menus, supplier refund, photo prefix.
 // Run: node purchase3_test.js <dir with smoke.js, stub.js>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), srv = C.serve(8312);
+const base = C.baseData(SP), srv = C.serve(PORT);
 const IT = base.tables.items;
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
@@ -15,7 +17,7 @@ const IT = base.tables.items;
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(C.mkData(base, o))};window.__M0=${JSON.stringify(o.m || {})};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8312/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__M.calls.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const toastTxt = async (p) => { await p.waitForTimeout(150); return p.textContent('#toast'); };
@@ -70,7 +72,7 @@ const IT = base.tables.items;
   p = await open({ m: { levels } }, '#/purchase/new'); await p.setInputFiles('#pe_file', SP + '/pic.png'); await wait(p, 700);
   let up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^PURCHASE\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]), 'bill photo goes to the PURCHASE prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
   p = await open({ m: { levels, upFail: 'PURCHASE/' } }, '#/purchase/new'); await p.setInputFiles('#pe_file', SP + '/pic.png'); await wait(p, 700);
-  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^06-4\/1\//.test(up[0][0]), 'database without phase12: falls back to 06-4: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
+  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^02-1\/1\//.test(up[0][0]), 'database without phase12: falls back to 02-1: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
 
   // ---------- ⋮ menu on the bills list ----------
   p = await open({ m: { levels, credits: [] } }, '#/purchase');
@@ -102,7 +104,7 @@ const IT = base.tables.items;
   await p.click('[data-act=py_voidref]'); await wait(p, 300); await p.click('[data-act=py_voidrefgo]'); await wait(p, 150); ok(/Write the reason/.test(await toastTxt(p)), 'void needs a reason'); await p.fill('#vn_note', 'typo'); await p.click('[data-act=py_voidrefgo]'); await wait(p, 400);
   const vr = await calls(p, 'void_supplier_refund'); ok(vr.length === 1 && vr[0].p_id === 9 && vr[0].p_note === 'typo', 'void_supplier_refund call'); await p.close();
   // no permission: lock row instead of a button
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
   p = await open({ init: NO, m: { levels, credits, sled, grants: ['purchase_entry'], ctx: { locations: [1], roles: ['management'] }, summary: { total_payable: 0, suppliers_owed: 0, overdue: 0, overdue_suppliers: 0, oldest: null, credit_total: 500 }, dues: [] } }, '#/payables');
   await p.click('#py_credits .card'); await wait(p, 500); ok(await p.locator('[data-act=py_refund_open]').count() === 0 && await p.locator('.sheet .s2-lockrow').count() >= 1, 'refund locked without supplier_pay'); await p.close();
   // detail bar
