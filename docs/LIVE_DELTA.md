@@ -270,3 +270,10 @@ Every replaced text is in `public._union_fn_backup` (`def` = the full `create or
 - **Retired numbers:** phases 540 to 542 are old numbers (renamed to 491 to 493); phase 543 is the next free number. Do not paste any old phase file after phase 543: an old file carries the old codes (`docs/FORM_SEQUENCE.md` section 3).
 - **Steps:** 1. backup (Home > Backup). 2. paste `supabase/phase543.sql` in one run (the file has its own `begin` and `commit`). 3. run `select * from public._i2_state() where not present;` (must return no rows). 4. run `select * from public.form_code_migration_543;` (one row, tag `FORM-CODE-CLEAN-SEQUENCE-543`). 5. check a printed form in the app (for example the expense voucher is now `11-1`).
 - **Rollback:** the phase is one transaction; a failure undoes all of it. After a successful paste, a rollback means restoring the backup from step 1.
+
+## Phase 545 (21 Oct 2026): freight in the purchase price check (switch OFF)
+
+- **What it adds:** one rule row (`price_check_include_freight`, switch, default OFF), one check function (`purchase_price_check_freight545`), one helper, and one trigger on `landed_costs` (after status becomes posted). No existing function is redefined.
+- **Effect today:** none. With the switch OFF the trigger returns at once; the local fingerprint of the scenario is the same with and without phase 545.
+- **Steps (owner):** 1. backup (Home > Backup). 2. paste `supabase/phase545.sql` once in the SQL editor (it is paste-twice safe). 3. run `select * from public._i2_state() where not present;` (must return no rows). 4. leave the switch OFF, or switch it on in Rules after your own test.
+- **Rollback:** `drop trigger landed_costs_price_freight545 on public.landed_costs;` and `delete from public.rules where key = 'price_check_include_freight';` (no data is changed by the phase itself).
