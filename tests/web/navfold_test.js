@@ -10,6 +10,7 @@ data.tables.option_lists = [
  { list_code: 'expense_heads', value_code: 'transport', label_bn: 'যাতায়াত', label_en: 'Transport', sort: 1, active: true, extra: {} },
  { list_code: 'expense_heads', value_code: 'fuel', label_bn: 'জ্বালানি', label_en: 'Fuel', sort: 2, active: true, extra: {} }];
 data.tables.location_settings = [];
+const ALLLOCS = data.tables.locations.slice(); data.tables.locations = ALLLOCS.slice(0, 1);   // main flow: ONE place -> the footer is collapsed by default; the 2-places flow is at the end
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
@@ -57,6 +58,40 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.reload(); await sleep(1200); await openDr();
   chk('collapsed persists after reload', await p.locator('#nav_foot.open').count() === 0);
   await p.click('.dr-ftog'); await sleep(400);
+  // ---- 2 or more places: the footer opens expanded by default; the location block has move higher / lower buttons, remembered per person ----
+  {
+    const d2 = JSON.parse(JSON.stringify(data)); d2.tables.locations = ALLLOCS;
+    const c2 = await br.newContext({ viewport: { width: 360, height: 740 }, deviceScaleFactor: 2 }); const q = await c2.newPage();
+    q.on('pageerror', (e) => errors.push(e.message)); q.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+    await q.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') }));
+    await q.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
+    await q.addInitScript(`window.__DATA=${JSON.stringify(d2)};try{if(!sessionStorage.getItem('nf_seed')){localStorage.setItem('bos_lang','en');sessionStorage.setItem('nf_seed','1')}}catch(e){}`);
+    const open2 = async () => { await q.click('header.top [data-act=nav_open]'); await sleep(500); };
+    const where = () => q.evaluate(() => { const b = document.querySelector('#nav_locbox'); if (!b) return 'none'; return b.closest('.dr-foot') ? 'foot' : 'top'; });
+    const order = () => q.evaluate(() => [...document.querySelectorAll('#nav_fxi > *, .dr-fxi > *')].map((e) => e.id === 'nav_locbox' ? 'loc' : e.classList.contains('me-lang') ? 'lang' : e.querySelector('#nav_theme') || e.id === 'nav_theme' ? 'theme' : 'other').join(','));
+    await q.goto('http://localhost:' + PORT + '/#/home'); await sleep(1200); await open2();
+    chk('2+ places: footer open by default', await q.locator('#nav_foot.open').count() === 1 && (await q.getAttribute('.dr-ftog', 'aria-expanded')) === 'true' && (await q.getAttribute('.dr-fxi', 'inert')) === null);
+    chk('2+ places: location block in the footer, first', (await where()) === 'foot' && (await order()).startsWith('loc,lang,theme'));
+    chk('up/down buttons exist, up enabled, down enabled', await q.locator('[data-act=loc_up]:not([disabled])').count() === 1 && await q.locator('[data-act=loc_dn]:not([disabled])').count() === 1);
+    const bb = await q.locator('[data-act=loc_dn]').boundingBox(); chk('move buttons tap target >= 40', bb.width >= 40 && bb.height >= 40);
+    chk('move buttons have words (aria-label)', /higher/.test(await q.getAttribute('[data-act=loc_up]', 'aria-label')) && /lower/.test(await q.getAttribute('[data-act=loc_dn]', 'aria-label')));
+    await q.click('[data-act=loc_dn]'); await sleep(400);
+    chk('move lower: location block after language', (await order()).startsWith('lang,loc,theme') && await q.locator('#nav_foot.open').count() === 1);
+    await q.click('[data-act=loc_dn]'); await sleep(400);
+    chk('move lower again: location block last, down disabled', (await order()).startsWith('lang,theme,loc') && await q.locator('[data-act=loc_dn][disabled]').count() === 1);
+    chk('stored per person', await q.evaluate(() => Object.keys(localStorage).some((k) => /^bos_locpos_/.test(k) && localStorage.getItem(k) === '3')));
+    await q.reload(); await sleep(1200); await open2();
+    chk('order persists after reload', (await order()).startsWith('lang,theme,loc'));
+    for (let i = 0; i < 3; i++) { await q.click('[data-act=loc_up]'); await sleep(350); }
+    chk('move higher x3: location block at the top of the drawer (outside the footer), up disabled', (await where()) === 'top' && await q.locator('[data-act=loc_up][disabled]').count() === 1);
+    chk('top position: choice still works', await q.locator('#nav_loc option').count() === 3);
+    chk('top position: no horizontal overflow', await q.evaluate(() => document.documentElement.scrollWidth <= innerWidth && document.querySelector('#navDrawer').scrollWidth <= document.querySelector('#navDrawer').clientWidth));
+    await q.click('.dr-ftog'); await sleep(400); chk('person own toggle wins over the default (collapsed stays collapsed after reload)', (await q.evaluate(() => localStorage.getItem('bos_navfoot'))) === '0');
+    await q.reload(); await sleep(1200); await open2();
+    chk('collapsed by choice persists with 2+ places', await q.locator('#nav_foot.open').count() === 0 && (await where()) === 'top');
+    await q.click('[data-act=loc_dn]'); await sleep(400); chk('move lower from the top: back in the footer', (await where()) === 'foot');
+    await c2.close();
+  }
   await p.click('.dr-foot .lo'); await sleep(1000);
   chk('logout works (drawer gone or login shown)', await p.evaluate(() => !document.querySelector('#navDrawer.on') || !!document.querySelector('[data-act=login],#email,input[type=password]')));
   chk('no page errors', errors.length === 0); if (errors.length) console.log(errors.join('\n'));

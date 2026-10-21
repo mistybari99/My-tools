@@ -339,6 +339,12 @@ body[data-ui="calm"] header.top .hbtn { border: 0; }
 .dr-foot .dr-fbar .on-s { margin-inline-end: 8px; }
 .dr-foot.open .dr-fbar .on-s { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .dr-fx, .dr-ftog .cv { transition: none !important; } }
+/* location block: explicit move higher / lower buttons (nav.js locMove), 44px tap targets, never wider than the drawer */
+.loc-hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.loc-mvs { display: inline-flex; gap: 6px; flex: none; }
+.loc-mv { min-width: 44px; min-height: 44px; border: 1px solid var(--hair); border-radius: 10px; background: transparent; color: var(--ink); font-size: .95rem; line-height: 1; }
+.loc-mv[disabled] { opacity: .35; }
+.dr-loctop { padding: 4px 12px 8px; min-width: 0; }
 .bnav { position: fixed; inset-inline: 0; bottom: 0; z-index: 9; display: none; max-width: 640px; margin: 0 auto; background: var(--bg); border-top: 1px solid var(--hair); padding-bottom: env(safe-area-inset-bottom); }
 body.has-bnav .bnav { display: flex; } body.has-bnav #toast { bottom: 84px; }
 body .bnav button { flex: 1; position: relative; min-height: 58px; border: 0; background: transparent; border-radius: 0; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px; font: 600 .78rem/1.25 var(--text-font); color: var(--muted); }

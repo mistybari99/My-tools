@@ -39,6 +39,7 @@ const X = {
   sheets: L('আজ যে শিটগুলো পূরণ করতে হবে', "Today's sheets to fill", 'আজ যে Sheet পূরণ করতে হবে'), sheets_none: L('আপনার জন্য কোনো শিট নেই', 'No sheets for you here', 'আপনার জন্য কোনো Sheet নেই'),
   st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('অপেক্ষায়', 'Pending', 'Pending'), st_draft: L('ড্রাফট', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
   sheets_of: L('জমা', 'done', 'done'), sheets_hint: L('মালিক চাইলে সেটিংসে "হোমে দৈনিক শিট" নিয়মে শুধু দৈনিক শিটগুলো বেছে দিতে পারেন', 'The owner can narrow this to the daily sheets with the rule "Daily sheets on home"', 'Owner চাইলে rule-এ শুধু দৈনিক Sheet বেছে দিতে পারেন'),
+  loc_up: L('লোকেশন ব্লক আরও উপরে নিন', 'Move the location block higher', 'Location block আরও উপরে নিন'), loc_dn: L('লোকেশন ব্লক আরও নিচে নিন', 'Move the location block lower', 'Location block আরও নিচে নিন'),
   locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
   s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('কাস্টমার', 'Customers', 'Customer'), s_more: L('আইটেম ও কাস্টমার খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
@@ -248,11 +249,17 @@ function setCurLoc(id) {
   if (id !== null && id !== undefined) { try { store.set('bos_pos_loc', String(id)); } catch (e) { /* ignore */ } }   // the POS reads its own remembered place
   try { window.dispatchEvent(new CustomEvent('bos:loc', { detail: { id: id === undefined ? null : id } })); } catch (e) { /* old browser */ }
 }
+// position of the location block in the drawer, one choice per person (kept on this device under the person's own key; there is no generic per-user preference table, favourites use their own RPCs):
+// 0 = top of the drawer (always visible, under the search box), 1 / 2 / 3 = first / second / last block inside the collapsible footer (1 = how it always was)
+const LOCPOS_MAX = 3;
+const locPos = () => { let v = 1; try { v = parseInt(store.get('bos_locpos_' + uid()), 10); } catch (e) { v = 1; } return Number.isInteger(v) && v >= 0 && v <= LOCPOS_MAX ? v : 1; };
+const setLocPos = (n) => { try { store.set('bos_locpos_' + uid(), String(Math.max(0, Math.min(LOCPOS_MAX, n)))); } catch (e) { /* private window: lasts until reload */ } };
 function drawLocBox() {
   const box = $('#nav_locbox'); if (!box) return;
   const ch = locChoices(); if (ch.length < 2) { box.innerHTML = ''; return; }
   const cur = curLoc();
-  box.innerHTML = `<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label>
+  const pos = locPos(), mv = (act, lbl, dis, ch2) => `<button type="button" class="loc-mv" data-act="${act}" aria-label="${esc(T(lbl))}" title="${esc(T(lbl))}" ${dis ? 'disabled' : ''}>${ch2}</button>`;
+  box.innerHTML = `<div class="loc-hd"><label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label><span class="loc-mvs">${mv('loc_up', 'loc_up', pos <= 0, '&#9650;')}${mv('loc_dn', 'loc_dn', pos >= LOCPOS_MAX, '&#9660;')}</span></div>
     <select id="nav_loc" aria-label="${esc(T('locsw'))}" style="width:100%;min-height:44px"><option value="all" ${cur === null ? 'selected' : ''}>${esc(T('all_loc'))}</option>${ch.map((l) => `<option value="${l.id}" ${cur === l.id ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
 }
 // business switch (bizctx): the drawer is redrawn, the open screen draws again with the new business' places
@@ -329,19 +336,30 @@ function renderDrawer() {
   dr_shell();
   dr_body();
 }
+function fxBlocks() {   // footer blocks in the person's order: the location block sits at its position (1..3) among language and theme; position 0 draws it at the top of the drawer instead
+  const bl = [`<div class="me-lang">${A.langBar()}</div>`, themeSel('nav_theme')], pos = locPos();
+  if (pos >= 1) bl.splice(Math.min(pos - 1, bl.length), 0, '<div id="nav_locbox"></div>');
+  return bl.join('');
+}
 function dr_shell() {
-  const bz = B.biz ? B.biz.sig() : ''; const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : '') + '|' + bz; if (s === sig && el.drawer.firstChild) return; sig = s;
+  const bz = B.biz ? B.biz.sig() : ''; const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : '') + '|' + bz + '|' + locPos(); if (s === sig && el.drawer.firstChild) return; sig = s;
   el.drawer.setAttribute('aria-label', T('menu'));
   el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(((B.biz && B.biz.brand()) || BRAND).bn)}</b><i>${esc(((B.biz && B.biz.brand()) || BRAND).en)}</i></div>
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
     ${B.biz ? B.biz.switcherHTML() : ''}
+    ${locPos() === 0 ? '<div class="dr-loctop" id="nav_locbox"></div>' : ''}
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
-    <div class="dr-foot${footOpen() ? ' open' : ''}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${footOpen()}" aria-controls="nav_fx" aria-label="${esc(T('foot_t'))}" title="${esc(T('foot_t'))}">${IC.cv.replace('<svg', '<svg class="cv"')}</button><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${footOpen() ? '' : ' inert'}><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+    <div class="dr-foot${footOpen() ? ' open' : ''}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${footOpen()}" aria-controls="nav_fx" aria-label="${esc(T('foot_t'))}" title="${esc(T('foot_t'))}">${IC.cv.replace('<svg', '<svg class="cv"')}</button><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${footOpen() ? '' : ' inert'}>${fxBlocks()}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
       <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div></div></div>`;
 }
 // bos101: collapsible drawer footer (default collapsed, remembered per device)
-const footOpen = () => { try { return localStorage.getItem('bos_navfoot') === '1'; } catch (e) { return false; } };
+// default: collapsed, except when the person has 2 or more places (then the location choice is the first thing in the footer, so it opens expanded); the person's own toggle (1 / 0) always wins
+const footOpen = () => {
+  let v = null; try { v = localStorage.getItem('bos_navfoot'); } catch (e) { v = null; }
+  if (v === '1') return true; if (v === '0') return false;
+  try { return !!S.ctx && locChoices().length >= 2; } catch (e) { return false; }
+};
 document.addEventListener('click', (ev) => {
   const b = ev.target && ev.target.closest && ev.target.closest('[data-act=foot_tog]'); if (!b) return;
   const f = b.closest('.dr-foot'); if (!f) return; const on = !f.classList.contains('open');
@@ -349,6 +367,11 @@ document.addEventListener('click', (ev) => {
   const fi = f.querySelector('.dr-fxi'); if (fi) { if (on) fi.removeAttribute('inert'); else fi.setAttribute('inert', ''); }
   try { localStorage.setItem('bos_navfoot', on ? '1' : '0'); } catch (e) { /* private mode */ }
 });
+function locMove(d) {
+  const to = Math.max(0, Math.min(LOCPOS_MAX, locPos() + d)); if (to === locPos()) return;
+  setLocPos(to); sig = ''; renderDrawer(); try { dr_body(); } catch (e) { /* drawn on the next open */ }
+  const b = $(d < 0 ? '[data-act=loc_up]' : '[data-act=loc_dn]', el.drawer) || $('[data-act=loc_up],[data-act=loc_dn]', el.drawer); if (b && !b.disabled) b.focus(); else { const o = $('#nav_loc', el.drawer); if (o) o.focus(); }
+}
 const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
 function dr_body() {
   const body = $('#nav_body'); if (!body) return;
@@ -839,6 +862,8 @@ window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { group: viewGroup });
 Object.assign(H, {
   nav_open: () => openDrawer(),
   nav_close: () => closeDrawer(),
+  loc_up: () => locMove(-1),
+  loc_dn: () => locMove(1),
   nav_go: (a) => {
     const r = a.dataset.v;
     if (history.state && history.state.bosNav) { pendingRoute = r; closeDrawer(); } else { setDrawer(false); location.hash = '#/' + r; }
