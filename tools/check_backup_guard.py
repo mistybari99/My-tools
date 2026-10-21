@@ -9,7 +9,9 @@ Checks
   2. That guard fails closed: it exits 1 unless the repository reports private == "true" (an empty answer also refuses).
   3. Only backup.yml pushes to git (`git push`). Another workflow must not publish data.
   4. No workflow uploads a data artifact (dumps, the backups branch, out/ or data/). The website build is public by design and is allowed.
-  5. No workflow or tool writes a dump (.ndjson, .ndjson.gz, .enc, manifest.json) to a path outside the backup folders.
+  5. notify.yml, automation.yml and owner_summary.yml (they read the live database with a bot login and mail or queue private figures) carry the SAME guard
+     step as the FIRST step of their job, failing closed (checked by the same rules as 1 and 2).
+  6. No workflow or tool writes a dump (.ndjson, .ndjson.gz, .enc, manifest.json) to a path outside the backup folders.
      (A check on names only: it looks for these names in the upload and push steps.)
 
 usage: python3 tools/check_backup_guard.py
@@ -22,6 +24,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WF_DIR = os.path.join(ROOT, '.github', 'workflows')
 BACKUP = os.path.join(WF_DIR, 'backup.yml')
+GUARDED = ['notify.yml', 'automation.yml', 'owner_summary.yml']   # same guard as backup.yml, first step of the job
 GUARD_NAME = 'Refuse to run in a public repository'
 DUMP_STEP = 'Dump the database'
 DUMP_NAMES = re.compile(r'\.ndjson(\.gz)?(\.enc)?\b|manifest\.json')
@@ -70,7 +73,26 @@ def main():
         else:
             notes.append('guard reads visibility from the API and refuses otherwise')
 
-    # 3, 4, 5 across every workflow file
+    # 5. the other jobs that read private figures: the same guard, first, fail closed
+    for wf in GUARDED:
+        wp = os.path.join(WF_DIR, wf)
+        if not os.path.exists(wp):
+            fails.append('%s is missing (it must carry the public-repository guard)' % wf)
+            continue
+        st = step_blocks(read(wp))
+        nm = [n for n, _ in st]
+        if GUARD_NAME not in nm:
+            fails.append('%s has no step named "%s"' % (wf, GUARD_NAME))
+            continue
+        if nm.index(GUARD_NAME) != 0 or not re.search(r'(?m)^\s*steps:\s*\n\s*-\s+name:\s*' + re.escape(GUARD_NAME), read(wp)):
+            fails.append('%s: the guard is not the first step of the job' % wf)
+        gb = dict(st)[GUARD_NAME]
+        if 'if [ "$private" != "true" ]' not in gb or 'exit 1' not in gb or 'gh api' not in gb or '.private' not in gb:
+            fails.append('%s: the guard does not refuse unless private == "true" (fail closed)' % wf)
+        else:
+            notes.append('%s: guard first, fails closed' % wf)
+
+    # 3, 4, 6 across every workflow file
     for path in sorted(glob.glob(os.path.join(WF_DIR, '*.yml'))):
         rel = os.path.relpath(path, ROOT)
         body = read(path)
@@ -93,7 +115,7 @@ def main():
         return 1
     for n in notes:
         print('[note] ' + n)
-    print('OK: backup guard first, fails closed, no data artifact upload, only backup.yml pushes or moves dumps.')
+    print('OK: backup guard first, fails closed (also notify, automation, owner_summary), no data artifact upload, only backup.yml pushes or moves dumps.')
     print('RESULT: PASS')
     return 0
 
