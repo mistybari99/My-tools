@@ -17,7 +17,7 @@ const X = {
   ref: L('ট্রানজেকশন নম্বর', 'Transaction ID', 'Transaction ID'), note: L('নোট', 'Note', 'Note'), save: L('সেভ', 'Save', 'Save'),
   bal: L('ওয়ালেটের জের', 'Wallet balances', 'Wallet জের'), book: L('খাতায় জের', 'Book balance', 'খাতায় জের'), jr: L('খতিয়ানে', 'In the ledger', 'Ledger-এ'),
   hidden: L('গোনার পর দেখা যাবে', 'Shown after you count', 'গোনার পর দেখা যাবে'), counted: L('গোনা হয়েছে', 'Counted', 'গোনা হয়েছে'),
-  count: L('ফোনের জের মেলান (১০-৩)', 'Reconcile the phone balance (07-1)', 'Phone-এর জের মেলান (07-1)'),
+  count: L('ফোনের জের মেলান (০৭-১)', 'Reconcile the phone balance (07-1)', 'Phone-এর জের মেলান (07-1)'),
   countHint: L('আগে ফোনে যে টাকা দেখাচ্ছে সেটা লিখুন। খাতার অঙ্ক সেভের পরে দেখা যাবে।', 'Type the balance shown on the phone first. The book figure is shown after you save.', 'আগে phone-এর balance লিখুন। Book figure save-এর পরে দেখা যাবে।'),
   phone: L('ফোনে দেখাচ্ছে', 'Balance on the phone', 'Phone-এ দেখাচ্ছে'), diff: L('পার্থক্য', 'Difference', 'পার্থক্য'), matched: L('মিলেছে', 'Matched', 'মিলেছে'),
   mismatch: L('মেলেনি — কারণ লিখুন', 'Does not match - write the reason', 'মেলেনি — কারণ লিখুন'), reason: L('কারণ', 'Reason', 'কারণ'), explained: L('কারণ লেখা হয়েছে', 'Reason written', 'কারণ লেখা হয়েছে'),

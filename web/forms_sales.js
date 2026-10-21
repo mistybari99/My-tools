@@ -85,7 +85,7 @@ B.forms['05-1'] = {
     const dl = sv(x, 'discount_limit');
     if (num(d.discount) > 0) {
       if (dl === null) needs.push('discount_limit');
-      if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (08-1) needed', num(d.discount)));
+      if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (০৮-১) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (08-1) needed', num(d.discount)));
     }
     if (d.order_type === 'custom' && d.adv_fate === 'refund') flags.push(flag('custom_refund', 'yellow', 'কাস্টম-মেইড অর্ডারের অ্যাডভান্স সাধারণত ফেরত নয়', 'Advance on a custom-made order is normally not refunded', num(d.advance)));
     const hd = sv(x, 'order_hold_days'); v.hold_text = hd === null ? NEED : L(fm(hd) + ' দিন', fm(hd) + ' days');
@@ -241,7 +241,7 @@ B.forms['24-1'] = {
       if (d.credit_ok === 'inside' && has(d.party_limit) && v.all_due > num(d.party_limit)) flags.push(flag('credit_over_limit', 'red', 'মোট বকেয়া পার্টির ক্রেডিট সীমার উপরে, অথচ "সীমার ভেতরে" টিক', 'Total outstanding is over the party credit limit but "inside the limit" is ticked', r2(v.all_due - num(d.party_limit))));
       const dl = sv(x, 'discount_limit');
       if (num(d.discount) > 0) { if (dl === null) needs.push('discount_limit');
-        if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (২০-২) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (08-1) needed', num(d.discount))); }
+        if (dl === null || r2(num(d.discount)) > dl) flags.push(flag('discount_over', has(d.disc_slip) ? 'yellow' : 'red', has(d.disc_slip) ? 'ডিসকাউন্ট সীমার উপরে — স্লিপ আছে' : 'ডিসকাউন্ট সীমার উপরে — অনুমোদন স্লিপ (০৮-১) লাগবে', has(d.disc_slip) ? 'Discount above the limit — slip given' : 'Discount above the limit — approval slip (08-1) needed', num(d.discount))); }
       if (has(d.approved_by) && d.approved_by === d.prepared_by) flags.push(flag('approver_is_maker', 'red', 'অনুমোদনকারী ও প্রস্তুতকারী একই জন', 'Approver and preparer are the same person'));
     }
     return { v, rows: { lines: out }, flags, needs };

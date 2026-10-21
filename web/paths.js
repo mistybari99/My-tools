@@ -18,7 +18,7 @@ const X = {
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), run: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
   qtitle: L('দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'), head: L('খাত', 'Head', 'Head'), to2: L('কাকে / কী বাবদ', 'Paid to / for', 'Paid to / for'),
   amt: L('টাকা', 'Amount', 'Amount'), mode: L('মাধ্যম', 'Mode', 'Mode'), rcpt: L('রসিদ আছে', 'Receipt', 'Receipt'), add: L('যোগ করুন', 'Add', 'Add'),
-  close: L('দিন শেষ — ১০-২ ফর্ম বানান', 'Day end - make the 11-1 form', 'Day end - 11-1 form বানান'), void: L('ভয়েড', 'Void', 'Void'),
+  close: L('দিন শেষ — ১১-১ ফর্ম বানান', 'Day end - make the 11-1 form', 'Day end - 11-1 form বানান'), void: L('ভয়েড', 'Void', 'Void'),
   total: L('আজকের টোটাল', "Today's total", "Today's total"), owed: L('ফর্মে বাকি', 'Not yet in a form', 'ফর্মে বাকি'), place: L('লোকেশন', 'Place', 'Place'),
   made: L('ফর্ম তৈরি', 'Form made', 'Form তৈরি'), why: L('কারণ লিখুন', 'Write the reason', 'কারণ লিখুন'), alo: L('সব জায়গা', 'All places', 'All places'),
 };

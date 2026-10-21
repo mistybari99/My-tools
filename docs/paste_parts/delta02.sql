@@ -4153,18 +4153,22 @@ language sql immutable as $$
   ) as v(old_code, new_code, sort_no, name_en)
 $$;
 
--- one-pass remap of the printed codes in a text: every code is replaced by a placeholder first, then the placeholders
--- are replaced by the new codes, so 02-4 -> 01-1 never continues to 40-1.
+-- one-pass remap of the printed codes in a text (ASCII digits and Bangla digits): every code is replaced by a
+-- placeholder first, then the placeholders are replaced by the new codes, so 02-4 -> 01-1 never continues to 40-1.
 create or replace function public._f543_remap(t text) returns text
 language plpgsql set search_path = public as $f$
-declare p record; s text := t;
+declare p record; s text := t; a text; b text;
 begin
-  if t is null or t !~ '(?<![0-9A-Za-z_.:/-])[0-9][0-9]-[0-9](?![0-9A-Za-z_.:/-])' then return t; end if;
+  if t is null or t !~ '(?<![0-9০-৯A-Za-z_.:/-])[0-9০-৯]{2}-[0-9০-৯](?![0-9০-৯A-Za-z_.:/-])' then return t; end if;
   for p in select old_code, row_number() over (order by old_code) as k from public._f543_pairs() loop
-    s := regexp_replace(s, '(?<![0-9A-Za-z_.:/-])' || p.old_code || '(?![0-9A-Za-z_.:/-])', chr(1) || p.k || chr(2), 'g');
+    a := p.old_code;
+    b := translate(p.old_code, '0123456789', '০১২৩৪৫৬৭৮৯');
+    s := regexp_replace(s, '(?<![0-9০-৯A-Za-z_.:/-])' || a || '(?![0-9০-৯A-Za-z_.:/-])', chr(1) || p.k || chr(2), 'g');
+    s := regexp_replace(s, '(?<![0-9০-৯A-Za-z_.:/-])' || b || '(?![0-9০-৯A-Za-z_.:/-])', chr(3) || p.k || chr(4), 'g');
   end loop;
   for p in select new_code, row_number() over (order by old_code) as k from public._f543_pairs() loop
     s := replace(s, chr(1) || p.k || chr(2), p.new_code);
+    s := replace(s, chr(3) || p.k || chr(4), translate(p.new_code, '0123456789', '০১২৩৪৫৬৭৮৯'));
   end loop;
   return s;
 end $f$;
@@ -4175,7 +4179,7 @@ declare
   tbls text[] := array['blind_count_cfg', 'comparison_days', 'comparison_pairs', 'corrections', 'entries', 'entry_count_seals',
     'entry_ledger_posts', 'exceptions', 'form_rollout', 'forms_ledger_cfg', 'list_other_entries', 'paper_books', 'parallel_months',
     'pin_sig_cfg', 'print_notes', 'role_form_overrides133', 'role_form_perms', 'sale_form_links', 'serials', 'shortage_cash_cases'];
-  re text := '(?<![0-9A-Za-z_.:/-])[0-9][0-9]-[0-9](?![0-9A-Za-z_.:/-])';
+  re text := '(?<![0-9০-৯A-Za-z_.:/-])[0-9০-৯]{2}-[0-9০-৯](?![0-9০-৯A-Za-z_.:/-])';
   r record; r2 record; n int; bad text; kind text;
   n_forms int := 0; n_rows int := 0; n_labels int := 0; n_funcs int := 0; n_trg int := 0; n_pol int := 0; n_chk int := 0;
 begin
@@ -4333,6 +4337,8 @@ end $run$;
 
 select public._f543_run();
 drop function if exists public._f543_run();
+drop function if exists public._f543_remap(text);
+drop function if exists public._f543_pairs();
 
 commit;
 
