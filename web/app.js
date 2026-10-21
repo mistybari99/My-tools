@@ -579,10 +579,25 @@ const BACKUP_TABLES = ['profiles', 'roles', 'user_roles', 'locations', 'user_loc
   'option_lists', 'customers', 'suppliers', 'sales', 'sale_payments', 'stock_ledger', 'stock_balance', 'stock_batches', 'stock_transfers', 'stock_wastage', 'purchase_bills', 'purchase_lines',
   'supplier_payments', 'unit_conversions', 'shelf_life_rules', 'invoice_templates', 'print_profiles', 'report_brand_map', 'role_favourites', 'login_failures', 'login_attempts', 'wastage_requests', 'supplier_refunds', 'sale_returns',
   'location_setup_steps', 'settings_sheets', 'settings_values', 'list_defs', 'option_requests', 'list_other_entries', 'list_managers', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'item_bulk_batches', 'item_map_actions', 'assets', 'asset_costs', 'form_rollout', 'entry_change_requests', 'entry_revisions', 'entry_counts', 'entry_count_peeks', 'entry_signatures', 'blind_count_cfg', 'pin_sig_cfg', 'recipes', 'recipe_lines', 'product_packaging', 'production_runs', 'forms_ledger_cfg', 'entry_ledger_posts'];
+// Backup state lives here, not in the DOM, so a redraw (progress, error, retry) never loses it.
+// busy: one run at a time (a tap during a run does nothing); file: the last JSON, kept in memory for "save again" (a new tap = a new user gesture);
+// err: the run failed (Bengali message + retry); partial: tables that could not be read (file saved without them, retry offered).
+const BK = { busy: false, done: 0, total: 0, file: null, err: '', partial: [] };
 function viewBackup() {
-  shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p>
-    <button class="primary full" data-act="bk_all">${esc(t('backup_all'))}</button>
-    <button class="full" data-act="bk_items">${esc(t('backup_items'))}</button></div>`, true);
+  shell(t('backup'), `<div class="card stack"><p>${esc(t('backup_text'))}</p><div id="bk_box" class="stack" role="status" aria-live="polite"></div></div>`, true);
+  drawBackup();
+}
+function drawBackup() {
+  const box = document.getElementById('bk_box'); if (!box) return;   // the person left the screen: the run still finishes, the next visit draws the result
+  const busy = BK.busy, dis = busy ? ' disabled' : '';
+  const prog = busy ? `<p class="muted">${esc(t('backup_busy'))} · <b>${BK.done} / ${BK.total}</b></p>` : '';
+  const err = (!busy && BK.err) ? `<div class="notice bad"><p><b>${esc(t('backup_fail'))}</b></p><p class="muted">${esc(BK.err.slice(0, 120))}</p><button class="primary full" data-act="bk_all">${esc(t('backup_retry'))}</button></div>` : '';
+  const warn = (!busy && !BK.err && BK.partial.length) ? `<div class="notice warn"><p>${esc(t('backup_partial'))} <b>${esc(BK.partial.join(', '))}</b></p><button class="full" data-act="bk_all">${esc(t('backup_retry'))}</button></div>` : '';
+  const ok = (!busy && !BK.err && BK.file && !BK.partial.length) ? `<p class="muted">${esc(t('backup_ok'))}</p>` : '';
+  box.innerHTML = `${prog}${err}${warn}${ok}
+    <button class="primary full" data-act="bk_all"${dis}>${esc(t('backup_all'))}</button>
+    <button class="full" data-act="bk_items"${dis}>${esc(t('backup_items'))}</button>
+    ${BK.file && !busy ? `<button class="full" data-act="bk_again">${esc(t('backup_again'))}</button>` : ''}`;
 }
 async function fetchAll(table) {
   // the two stock tables hold cost columns that are not granted: the owner reads them through definer RPCs (phase12)
@@ -593,26 +608,39 @@ async function fetchAll(table) {
     out.push(...data); if (data.length < 1000) break; }
   return out;
 }
-// one table failing (missing, no read right) never stops the backup: it is recorded in o.errors and the rest continues
-async function backupTables(o, tables) {
+// one table failing (missing, no read right) never stops the backup: it is recorded in o.errors and the rest continues.
+// Four tables are read at a time (one by one, a phone on mobile data waited for every table in turn); the file keeps the table order.
+async function backupTables(o, tables, onProgress) {
   o.errors = o.errors || {}; o.row_counts = o.row_counts || {};
-  for (const tb of tables) {
-    try { o.tables[tb] = await fetchAll(tb); o.row_counts[tb] = o.tables[tb].length; }
-    catch (e) { o.errors[tb] = String((e && e.message) || e); o.row_counts[tb] = null; }
-  }
+  const got = {}; let next = 0, n = 0;
+  const worker = async () => { while (next < tables.length) { const tb = tables[next++];
+    try { got[tb] = await fetchAll(tb); } catch (e) { o.errors[tb] = String((e && e.message) || e); }
+    n++; if (onProgress) onProgress(n); } };
+  await Promise.all(Array.from({ length: Math.min(4, tables.length) }, worker));
+  for (const tb of tables) { if (tb in got) { o.tables[tb] = got[tb]; o.row_counts[tb] = got[tb].length; } else o.row_counts[tb] = null; }
   return o;
 }
+// the object URL is kept for a minute: a browser that starts the save late still finds the file
 function download(name, text, type) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
 }
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 async function backupAll() {
+  if (BK.busy) return;   // a second tap during a run does nothing: no second run, no duplicate file
+  Object.assign(BK, { busy: true, done: 0, total: BACKUP_TABLES.length, file: null, err: '', partial: [] }); drawBackup();
   try { const o = { exported_at: new Date().toISOString(), note: 'row_counts = rows saved per table; errors = tables that could not be read (not included)', tables: {} };
-    await backupTables(o, BACKUP_TABLES);
-    download(`bos-backup-${today()}.json`, JSON.stringify(o, null, 1), 'application/json'); toast(t('done'));
-  } catch (e) { fail(e); }
+    await backupTables(o, BACKUP_TABLES, (k) => { BK.done = k; drawBackup(); });
+    const bad = Object.keys(o.errors || {});
+    if (bad.length === BACKUP_TABLES.length) throw new Error('every table failed: ' + bad.slice(0, 2).map((k) => k + ' ' + o.errors[k]).join('; '));
+    const name = `bos-backup-${today()}.json`, text = JSON.stringify(o, null, 1);
+    BK.file = { name, text }; BK.partial = bad;
+    download(name, text, 'application/json'); toast(t('done'));
+  } catch (e) { console.error(e); BK.file = null; BK.err = String((e && e.message) || e) || 'error'; }
+  finally { BK.busy = false; drawBackup(); }
 }
+// "save again" is its own tap, so the browser sees a user gesture; the file is the one already made (no new read of the data)
+function backupAgain() { if (BK.file) download(BK.file.name, BK.file.text, 'application/json'); }
 async function backupItems() {
   try { const rows = await fetchAll('items'); const cols = ['code', 'name_bn', 'name_en', 'name_mix', 'category', 'unit', 'sell_price', 'cost_price', 'is_active'];
     const q = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return '"' + s.replace(/"/g, '""') + '"'; };
@@ -659,7 +687,7 @@ const H = {
   rule: (a) => toggleRule(a.dataset.f, a.dataset.k),
   setsave: (a) => saveSetting(a.dataset.v),
   layout_set: (a) => setLayoutChoice(a.dataset.v),
-  bk_all: backupAll, bk_items: backupItems,
+  bk_all: backupAll, bk_again: backupAgain, bk_items: backupItems,
 };
 window.BOS_APP.H = H;
 document.addEventListener('click', (e) => {
