@@ -46,7 +46,7 @@ function recCalc(rows, pre, v) {
   return { out, abs1: r2(sum(out.map((o) => Math.abs(o.d1 || 0)))), abs2: r2(sum(out.map((o) => Math.abs(o.d2 || 0)))), noB: rows.filter((r) => has(r.a) && !has(r.b)).length };
 }
 B.forms['07-1'] = {
-  title: L('ডিজিটাল পেমেন্ট রিকনসিলিয়েশন রেজিস্টার', 'Digital payment reconciliation register'),
+  title: L('ডিজিটাল পেমেন্ট রিকনসিলিয়েশন', 'Digital Payment Reconciliation'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
   init(x, data) { if (!data.showroom) data.showroom = (showroomLocs().length ? showroomLocs().slice(0, 4).map((l) => l.code) : ['s1', 's2', 's3', 's4']).map((c) => ({ who: c })); },
   sections: [
@@ -96,7 +96,7 @@ B.forms['07-1'] = {
 
 /* ============ 04-1 · Cash position & purchase budget ============ */
 B.forms['04-1'] = {
-  title: L('ক্যাশ পজিশন ও পারচেজ বাজেট', 'Cash position & purchase budget'),
+  title: L('ক্যাশ পজিশন ও বাজেট', 'Cash Position and Budget'),
   head: [],
   sections: [
     { title: L('হাতে যা আছে', 'Cash in hand'), fields: [
@@ -148,7 +148,7 @@ B.forms['04-1'] = {
 /* ============ 30-1 · Receivable & advance reconciliation ============ */
 const ADV_STATUS = [['pending', L('বাকি', 'Pending')], ['given', L('দেওয়া হয়েছে', 'Delivered')], ['refunded', L('ফেরত দেওয়া', 'Refunded')]];
 B.forms['30-1'] = {
-  title: L('প্রাপ্য ও অ্যাডভান্স রিকনসিলিয়েশন', 'Receivable & advance reconciliation'),
+  title: L('প্রাপ্য ও অ্যাডভান্স', 'Receivable and Advance'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
   sections: [
     { title: L('Section A · কার কাছে কত প্রাপ্য (Receivable)', 'Section A · Who owes how much (Receivable)'), fields: [
@@ -188,7 +188,7 @@ B.forms['30-1'] = {
 /* ============ 14-1 · Jalebi counter daily record ============ */
 const kgT = (n) => L(fm(n) + ' কেজি', fm(n) + ' kg');
 B.forms['14-1'] = {
-  title: L('জিলাপি কাউন্টার দৈনিক রেকর্ড', 'Jalebi counter daily record'),
+  title: L('জিলাপি কাউন্টার দৈনিক', 'Jalebi Counter Daily'),
   head: [T('produced_slot', L('উৎপাদনকারী (Produced by) — পদ / ডিউটি স্লট', 'Produced by — role / duty slot')),
     T('prepared_slot', L('প্রস্তুতকারী (Prepared by) — খামির (পদ / ডিউটি স্লট)', 'Prepared by (dough) — role / duty slot')), CH('roster', L('রোস্টার অনুযায়ী', 'As per the roster'), YN),
     T('measured_slot', L('পরিমাপকারী (Measured by) — পদ / ডিউটি স্লট', 'Measured by — role / duty slot'), { req: true })],
@@ -296,7 +296,7 @@ const MKT_SRC = [['imprest', L('ইমপ্রেস্ট (খরচের ব
 const MONTHS = ['জানুয়ারি:January', 'ফেব্রুয়ারি:February', 'মার্চ:March', 'এপ্রিল:April', 'মে:May', 'জুন:June', 'জুলাই:July', 'আগস্ট:August', 'সেপ্টেম্বর:September', 'অক্টোবর:October', 'নভেম্বর:November', 'ডিসেম্বর:December'].map((m, i) => [String(i + 1), L(m.split(':')[0], m.split(':')[1])]);
 const MKT_BRANDS = [['imh', L('ইসলামিয়া মিষ্টি ঘর', 'ISLAMIYA MISTY GHAR')], ['mb', L('মিষ্টি বাড়ি', 'MISTY BARI')], ['ak', L('AL-CAKIZ', 'AL-CAKIZ')], ['other', L('অন্য', 'Other')], ['all', L('সব', 'All')]];
 B.forms['17-1'] = {
-  title: L('মার্কেটিং ব্যয় রেজিস্টার', 'Marketing expense register'),
+  title: L('মার্কেটিং ব্যয়', 'Marketing Expense'),
   head: [SEL('month', L('মাস', 'Month'), MONTHS),
     CH('brand', L('ব্র্যান্ড', 'Brand'), () => (B.biz ? B.biz.brandOpts(MKT_BRANDS, ['other', 'all']) : MKT_BRANDS)),   // report_brand_map of the chosen business; MKT_BRANDS is the fallback
 
@@ -350,7 +350,7 @@ B.forms['17-1'] = {
 
 /* ============ 25-1 · Party & wholesale ledger ============ */
 B.forms['25-1'] = {
-  title: L('পার্টি ও পাইকারি লেজার', 'Party & wholesale ledger'),
+  title: L('পার্টি ও পাইকারি লেজার', 'Party and Wholesale Ledger'),
   head: [T('page_no', L('পাতা নং', 'Page no.')), T('party', L('পার্টির নাম', 'Party name'), { req: true }), T('firm', L('প্রতিষ্ঠান / দোকান', 'Firm / shop')), T('phone', L('ফোন', 'Phone')), T('address', L('ঠিকানা', 'Address')),
     CH('rate_basis', L('দরের ভিত্তি', 'Rate basis'), [['list', L('পাইকারি তালিকা', 'Wholesale list')], ['special', L('বিশেষ', 'Special')]]),
     M('credit_limit', L('ক্রেডিট সীমা (Credit Limit) ৳', 'Credit limit ৳'), { req: true }), N('credit_days', L('বাকির সময় (দিন)', 'Credit period (days)')), ST('approved_by', L('অনুমোদনকারী (Approved by)', 'Approved by'))],
@@ -390,7 +390,7 @@ B.forms['25-1'] = {
 
 /* ============ 23-1 · Online & delivery ledger ============ */
 B.forms['23-1'] = {
-  title: L('অনলাইন ও ডেলিভারি লেজার', 'Online & delivery ledger'),
+  title: L('অনলাইন ও ডেলিভারি লেজার', 'Online and Delivery Ledger'),
   head: [D('week_from', L('সপ্তাহ — থেকে', 'Week from'), { req: true }), D('week_to', L('সপ্তাহ — পর্যন্ত', 'Week to'), { req: true })],
   sections: [
     { title: L('নিয়ম', 'Rule'), fields: [NOTE(L('প্রতিটি অনলাইন অর্ডার আগে কাস্টমার অর্ডার ফরমে, তারপর এই লেজারে এক লাইন। অ্যাডভান্স শুধু ব্যবসার মার্চেন্ট নম্বরে — কর্মীর নম্বরে কখনো নয়।', 'Every online order goes first on the customer order form, then one line in this ledger. Advance only on the business merchant number, never on a staff number.'), 'warn')] },

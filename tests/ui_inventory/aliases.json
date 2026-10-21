@@ -7599,6 +7599,574 @@
   },
   {
    "type": "label",
+   "id": "form:01-1",
+   "lang": "spec_bn",
+   "from": "সাপ্তাহিক রিভিউ নোট",
+   "to": "সাপ্তাহিক রিভিউ",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:01-1",
+   "lang": "spec_en",
+   "from": "Weekly review note",
+   "to": "Weekly Review",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:01-2",
+   "lang": "spec_bn",
+   "from": "মাসিক লাভ-ক্ষতি (P&L) ও KPI শিট",
+   "to": "মাসিক P&L ও KPI",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:01-2",
+   "lang": "spec_en",
+   "from": "Monthly P&L and KPI sheet",
+   "to": "Monthly P&L and KPI",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-1",
+   "lang": "spec_bn",
+   "from": "মাসিক হাজিরা রেজিস্টার",
+   "to": "মাসিক হাজিরা",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-1",
+   "lang": "spec_en",
+   "from": "Monthly attendance register",
+   "to": "Monthly Attendance",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-2",
+   "lang": "spec_bn",
+   "from": "মাসিক বেতন শিট",
+   "to": "মাসিক বেতন",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-2",
+   "lang": "spec_en",
+   "from": "Monthly salary sheet",
+   "to": "Monthly Salary",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-3",
+   "lang": "spec_bn",
+   "from": "স্টাফ অ্যাডভান্স রেজিস্টার",
+   "to": "স্টাফ অ্যাডভান্স",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-3",
+   "lang": "spec_en",
+   "from": "Staff advance register",
+   "to": "Staff Advance",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-4",
+   "lang": "spec_bn",
+   "from": "নিয়োগপত্র — শর্ত ও দায়িত্ব",
+   "to": "নিয়োগপত্র",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-4",
+   "lang": "spec_en",
+   "from": "Appointment letter — terms & duties",
+   "to": "Appointment Letter",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-5",
+   "lang": "spec_bn",
+   "from": "ছুটির আবেদন ফরম",
+   "to": "ছুটির আবেদন",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-5",
+   "lang": "spec_en",
+   "from": "Leave application",
+   "to": "Leave Application",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-6",
+   "lang": "spec_bn",
+   "from": "ছাড়পত্র (এক্সিট ক্লিয়ারেন্স)",
+   "to": "এক্সিট ক্লিয়ারেন্স",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-6",
+   "lang": "spec_en",
+   "from": "Exit clearance",
+   "to": "Exit Clearance",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-7",
+   "lang": "spec_en",
+   "from": "Duty & backup card",
+   "to": "Duty and Backup Card",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:02-8",
+   "lang": "spec_en",
+   "from": "Skill checklist",
+   "to": "Skill Checklist",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:03-1",
+   "lang": "spec_bn",
+   "from": "ট্রান্সফার চালান (IBT)",
+   "to": "ট্রান্সফার চালান",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:03-1",
+   "lang": "spec_en",
+   "from": "Transfer challan (IBT)",
+   "to": "Transfer Challan",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-1",
+   "lang": "spec_bn",
+   "from": "মালামাল গ্রহণ রসিদ (GRN)",
+   "to": "মালামাল গ্রহণ (GRN)",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-1",
+   "lang": "spec_en",
+   "from": "Goods received note (GRN)",
+   "to": "Goods Received (GRN)",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-2",
+   "lang": "spec_bn",
+   "from": "মালামাল ইস্যু স্লিপ",
+   "to": "মালামাল ইস্যু",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-2",
+   "lang": "spec_en",
+   "from": "Material issue slip",
+   "to": "Material Issue",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-3",
+   "lang": "spec_bn",
+   "from": "স্টক কাউন্ট শিট",
+   "to": "স্টক কাউন্ট",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-3",
+   "lang": "spec_en",
+   "from": "Stock count sheet",
+   "to": "Stock Count",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:04-4",
+   "lang": "spec_en",
+   "from": "Store ledger",
+   "to": "Store Ledger",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-1",
+   "lang": "spec_bn",
+   "from": "কারখানা দৈনিক শিট",
+   "to": "কারখানা দৈনিক",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-1",
+   "lang": "spec_en",
+   "from": "Factory daily sheet",
+   "to": "Factory Daily",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-2",
+   "lang": "spec_en",
+   "from": "Product spec card",
+   "to": "Product Spec Card",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-3",
+   "lang": "spec_en",
+   "from": "Recipe card",
+   "to": "Recipe Card",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-4",
+   "lang": "spec_bn",
+   "from": "ফলন টেস্ট শিট",
+   "to": "ফলন টেস্ট",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-4",
+   "lang": "spec_en",
+   "from": "Yield test sheet",
+   "to": "Yield Test",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-5",
+   "lang": "spec_bn",
+   "from": "নতুন প্রোডাক্ট সিদ্ধান্ত শিট",
+   "to": "নতুন প্রোডাক্ট সিদ্ধান্ত",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:05-5",
+   "lang": "spec_en",
+   "from": "New product decision sheet",
+   "to": "New Product Decision",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-1",
+   "lang": "spec_bn",
+   "from": "পারচেজ রিকুইজিশন (PR)",
+   "to": "পারচেজ রিকুইজিশন",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-1",
+   "lang": "spec_en",
+   "from": "Purchase requisition (PR)",
+   "to": "Purchase Requisition",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-2",
+   "lang": "spec_bn",
+   "from": "কোটেশন তুলনা ও সাপ্লায়ার নির্বাচন (CS)",
+   "to": "কোটেশন তুলনা",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-2",
+   "lang": "spec_en",
+   "from": "Quotation comparison & supplier choice (CS)",
+   "to": "Quotation Comparison",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-3",
+   "lang": "spec_bn",
+   "from": "পারচেজ অর্ডার (PO)",
+   "to": "পারচেজ অর্ডার",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-3",
+   "lang": "spec_en",
+   "from": "Purchase order (PO)",
+   "to": "Purchase Order",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-4",
+   "lang": "spec_bn",
+   "from": "বিল যাচাই ও পেমেন্ট অনুরোধ",
+   "to": "বিল যাচাই ও পেমেন্ট",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-4",
+   "lang": "spec_en",
+   "from": "Bill check & payment request",
+   "to": "Bill Check and Payment",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:06-5",
+   "lang": "spec_en",
+   "from": "Supplier ledger",
+   "to": "Supplier Ledger",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:08-1",
+   "lang": "spec_bn",
+   "from": "মেইনটেন্যান্স অনুরোধ ও রেকর্ড",
+   "to": "মেইনটেন্যান্স অনুরোধ",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:08-1",
+   "lang": "spec_en",
+   "from": "Maintenance request & record",
+   "to": "Maintenance Request",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-1",
+   "lang": "spec_bn",
+   "from": "ক্যাশ হ্যান্ডওভার স্লিপ",
+   "to": "ক্যাশ হ্যান্ডওভার",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-1",
+   "lang": "spec_en",
+   "from": "Cash handover slip",
+   "to": "Cash Handover",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-2",
+   "lang": "spec_en",
+   "from": "Expense voucher",
+   "to": "Expense Voucher",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-3",
+   "lang": "spec_bn",
+   "from": "ডিজিটাল পেমেন্ট রিকনসিলিয়েশন রেজিস্টার",
+   "to": "ডিজিটাল পেমেন্ট রিকনসিলিয়েশন",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-3",
+   "lang": "spec_en",
+   "from": "Digital payment reconciliation register",
+   "to": "Digital Payment Reconciliation",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-4",
+   "lang": "spec_bn",
+   "from": "ক্যাশ পজিশন ও পারচেজ বাজেট",
+   "to": "ক্যাশ পজিশন ও বাজেট",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-4",
+   "lang": "spec_en",
+   "from": "Cash position & purchase budget",
+   "to": "Cash Position and Budget",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-5",
+   "lang": "spec_bn",
+   "from": "প্রাপ্য ও অ্যাডভান্স রিকনসিলিয়েশন",
+   "to": "প্রাপ্য ও অ্যাডভান্স",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:10-5",
+   "lang": "spec_en",
+   "from": "Receivable & advance reconciliation",
+   "to": "Receivable and Advance",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:11-1",
+   "lang": "spec_bn",
+   "from": "শিফট হ্যান্ডওভার রেজিস্টার",
+   "to": "শিফট হ্যান্ডওভার",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:11-1",
+   "lang": "spec_en",
+   "from": "Shift handover register",
+   "to": "Shift Handover",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:14-1",
+   "lang": "spec_en",
+   "from": "Daily showroom sheet",
+   "to": "Daily Showroom Sheet",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:14-2",
+   "lang": "spec_bn",
+   "from": "জিলাপি কাউন্টার দৈনিক রেকর্ড",
+   "to": "জিলাপি কাউন্টার দৈনিক",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:14-2",
+   "lang": "spec_en",
+   "from": "Jalebi counter daily record",
+   "to": "Jalebi Counter Daily",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:18-1",
+   "lang": "spec_bn",
+   "from": "মার্কেটিং ব্যয় রেজিস্টার",
+   "to": "মার্কেটিং ব্যয়",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:18-1",
+   "lang": "spec_en",
+   "from": "Marketing expense register",
+   "to": "Marketing Expense",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-1",
+   "lang": "spec_bn",
+   "from": "কাস্টমার অর্ডার ফরম",
+   "to": "কাস্টমার অর্ডার",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-1",
+   "lang": "spec_en",
+   "from": "Customer order form",
+   "to": "Customer Order",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-2",
+   "lang": "spec_bn",
+   "from": "ডিসকাউন্ট অনুমোদন স্লিপ",
+   "to": "ডিসকাউন্ট অনুমোদন",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-2",
+   "lang": "spec_en",
+   "from": "Discount approval slip",
+   "to": "Discount Approval",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-3",
+   "lang": "spec_bn",
+   "from": "রিটার্ন ও অভিযোগ রেজিস্টার",
+   "to": "রিটার্ন ও অভিযোগ",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-3",
+   "lang": "spec_en",
+   "from": "Return & complaint register",
+   "to": "Return and Complaint",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-4",
+   "lang": "spec_en",
+   "from": "Party & wholesale invoice",
+   "to": "Party and Wholesale Invoice",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-5",
+   "lang": "spec_en",
+   "from": "Party & wholesale ledger",
+   "to": "Party and Wholesale Ledger",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
+   "id": "form:20-6",
+   "lang": "spec_en",
+   "from": "Online & delivery ledger",
+   "to": "Online and Delivery Ledger",
+   "reason": "short name applied to the form title (FORM_SEQUENCE section 4, Bangla and English short names, to review by the owner)"
+  },
+  {
+   "type": "label",
    "id": "kw:campaigns:18-1",
    "lang": "text",
    "from": "18-1",
