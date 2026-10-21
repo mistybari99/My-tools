@@ -1,13 +1,12 @@
 // Desktop layout suite (docs/DESKTOP_LAYOUT.md section 5). Mocked Supabase stub only, no live backend, no demo data.
 // desktop.css is not linked from index.html yet (plan step 5), so the test injects web/desktop.css itself.
-// PENDING checks need nav.js / index.html changes from the fix agent; they print "PEND" and are not failures.
-// Set DESK_LINKED=1 once index.html links desktop.css and nav.js adds body.desk-sb: the pending checks then run for real.
+// PENDING checks (only when index.html does not link desktop.css) print "PEND" and are not failures.
 const _P = require('./_paths');
 const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
 const SP = process.argv[2] || _P.TESTS_DIR, ROOT = process.env.WEBROOT || _P.WEB_DIR;
-const LINKED = process.env.DESK_LINKED === '1';
+const LINKED = process.env.DESK_LINKED ? process.env.DESK_LINKED === '1' : fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').includes('href="desktop.css"');   // linked in index.html (plan step 5): the pending checks run for real
 const CSS = fs.readFileSync(path.join(ROOT, 'desktop.css'), 'utf8');
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
@@ -85,6 +84,34 @@ const snapshot = (p) => p.evaluate(([keys, props]) => { const o = {}; for (const
     pending(w + ': hamburger hidden', !(await vis(p, 'header.top [data-act=nav_open]')), NAVJS);
     pending(w + ': #app starts after the sidebar', await p.evaluate(() => { const d = document.querySelector('.drawer'), a = document.querySelector('#app'); return !!d && a.getBoundingClientRect().left >= d.getBoundingClientRect().right - 1; }), NAVJS);
     pending(w + ': desktop.css is linked in index.html', await p.evaluate(() => !!document.querySelector('link[href$="desktop.css"]')), LINK);
+    await ctx.close();
+  }
+  // 4. per-pattern desktop assertions (docs/DESKTOP_LAYOUT.md 2.5, 3.1): body[data-pat] from ia.js; no overflow; table full width with a sticky header;
+  //    form and list widths; dashboard four-column grid; POS items left and a sticky pay panel right. Test rows are injected, the mocked data may be empty.
+  const PATS = [['pos', 'pos'], ['daybook', 'table'], ['items/new', 'form'], ['customers', 'list'], ['home', 'dash'], ['settings', 'set']];
+  for (const w of [1024, 1440]) for (const [route, pat] of PATS) {
+    const { p, ctx } = await open(w, 900, true, route);
+    const tag = w + ' ' + route + ': ';
+    chk(tag + 'body[data-pat] is ' + pat, await p.evaluate((x) => document.body.dataset.pat === x, pat));
+    chk(tag + 'no horizontal overflow', await noOverflow(p));
+    const lim = { form: w === 1024 ? 760 : 880, list: 960, set: w === 1024 ? 880 : 1040 }[pat];
+    if (lim) chk(tag + 'content blocks at most ' + lim + 'px wide', await p.evaluate((l) => [...document.querySelectorAll('#app > :not(header.top):not(nav.crumb)')].every((e) => e.getBoundingClientRect().width <= l + 1), lim));
+    if (pat === 'table') {
+      await p.evaluate(() => { const t = document.createElement('table'); t.className = 'bz'; t.id = 't_tbl'; t.innerHTML = '<thead><tr><th>test_h1</th><th>test_h2</th></tr></thead><tbody><tr><td>test_c1</td><td>test_c2</td></tr></tbody>'; document.querySelector('#app').appendChild(t); });
+      chk(tag + 'bare table fills the content area (same gutters, no overflow)', await p.evaluate(() => { const t = document.querySelector('#t_tbl').getBoundingClientRect(), a = document.querySelector('#app').getBoundingClientRect(); return Math.abs((t.left - a.left) - 32) <= 2 && Math.abs(a.right - t.right - 32) <= 2; }));
+      chk(tag + 'bare table does not overflow the page', await noOverflow(p));
+      chk(tag + 'table header cells are sticky', await p.evaluate(() => getComputedStyle(document.querySelector('#t_tbl th')).position === 'sticky'));
+      await p.evaluate(() => { const d = document.createElement('div'); d.id = 't_wrap'; d.innerHTML = '<table class="bz"><tbody><tr><td>test_w</td></tr></tbody></table>'; document.querySelector('#app').appendChild(d); });
+      chk(tag + 'table.bz inside a wrapper fills the wrapper', await p.evaluate(() => { const t = document.querySelector('#t_wrap table').getBoundingClientRect(), d = document.querySelector('#t_wrap').getBoundingClientRect(); return Math.abs(t.width - d.width) <= 1; }));
+    }
+    if (pat === 'dash') {
+      await p.evaluate(() => { const d = document.createElement('div'); d.className = 'stats'; d.id = 't_stats'; d.innerHTML = '<div>a</div><div>b</div><div>c</div><div>d</div>'; document.querySelector('#app').appendChild(d); });
+      chk(tag + 'stat tiles four to a row', await p.evaluate(() => getComputedStyle(document.querySelector('#t_stats')).gridTemplateColumns.split(' ').length === 4));
+    }
+    if (pat === 'pos') {
+      chk(tag + 'POS pay panel sits in a second column beside the items', await p.evaluate(() => { const bar = document.querySelector('#pos_bar'), g = document.querySelector('#pos_items'); if (!bar || !g) return false; return bar.getBoundingClientRect().left >= g.getBoundingClientRect().right - 1 && getComputedStyle(bar).position === 'sticky'; }));
+      chk(tag + 'POS pay panel is not viewport-fixed', await p.evaluate(() => getComputedStyle(document.querySelector('#pos_bar')).position !== 'fixed'));
+    }
     await ctx.close();
   }
   chk('no page errors', errors.length === 0); if (errors.length) console.log(errors.slice(0, 5));

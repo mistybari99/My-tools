@@ -65,6 +65,10 @@ function shell(title, body, back) {
   $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}${mainBtn}${backN}<h1 class="${title === t('app') ? 'brandh' : ''}"${pg && pg !== 'home' && /^[a-z0-9_]+$/.test(pg) ? ` data-info="screen:${pg}"` : ''}>${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
 
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
+  // desktop page pattern (docs/DESKTOP_LAYOUT.md 3.1): ia.js gives each screen a pat; desktop.css reads body[data-pat] on PCs (>= 1024px) only
+  const hp = location.hash.replace(/^#\/?/, '').split('/')[0];
+  const pr = hp === 'form' ? { pat: 'form' } : ((window.BOS && window.BOS.ia && window.BOS.ia.resolve(location.hash)) || {});
+  if (pr.pat) document.body.dataset.pat = pr.pat; else delete document.body.dataset.pat;
 }
 function openSheet(html) {
   closeSheet();
@@ -523,9 +527,24 @@ async function viewSettings() {
   shell(t('settings'), `<div id="st_body"><p class="muted">${esc(t('loading'))}</p></div>`, true);
   const { data, error } = await sb.from('settings').select('*').order('key'); if (error) return fail(error);
   const label = (s) => (S.lang === 'en' ? s.label_en : S.lang === 'mix' ? s.label_mix : s.label_bn) || s.label_bn || s.key;
-  $('#st_body').innerHTML = data.map((s) => `<div class="card stack"><div class="row between"><b>${esc(label(s))}</b>${s.value === null ? `<span class="chip warn">${esc(t('need_data'))}</span>` : ''}</div>
+  $('#st_body').innerHTML = layoutRow() + data.map((s) => `<div class="card stack"><div class="row between"><b>${esc(label(s))}</b>${s.value === null ? `<span class="chip warn">${esc(t('need_data'))}</span>` : ''}</div>
     <div class="row"><input id="sv_${esc(s.key)}" value="${esc(s.value === null ? '' : (typeof s.value === 'string' ? s.value : JSON.stringify(s.value)))}">
     <button class="primary" data-act="setsave" data-v="${esc(s.key)}">${esc(t('save'))}</button></div></div>`).join('');
+}
+// screen layout choice (docs/DESKTOP_LAYOUT.md 4.2): stored on this device only (localStorage bos_layout = 'phone' | 'desktop'; absent = automatic by width). Never in the database.
+function layoutChoice() { try { const v = localStorage.getItem('bos_layout'); return v === 'phone' || v === 'desktop' ? v : 'auto'; } catch (e) { return 'auto'; } }
+function layoutRow() {
+  const cur = layoutChoice();
+  return `<div class="card stack" id="lay_row"><div class="row between"><b data-info="feature:layout_choice">${esc(t('layout_title'))}</b></div>
+    <div class="row wrap" role="group" aria-label="${esc(t('layout_title'))}" style="gap:8px">${['auto', 'phone', 'desktop'].map((v) => `<button type="button" class="tog ${cur === v ? 'on' : ''}" aria-pressed="${cur === v}" data-act="layout_set" data-v="${v}">${esc(t('layout_' + v))}</button>`).join('')}</div>
+    <div class="muted" style="font-size:.9rem">${esc(t('layout_hint'))}</div></div>`;
+}
+function setLayoutChoice(v) {
+  const on = v === 'phone' || v === 'desktop';
+  try { if (on) localStorage.setItem('bos_layout', v); else localStorage.removeItem('bos_layout'); } catch (e) { /* storage blocked: the choice applies to this visit only */ }
+  if (on) document.documentElement.setAttribute('data-layout', v); else document.documentElement.removeAttribute('data-layout');   // nav.js and desktop.css follow at once, no reload
+  document.querySelectorAll('#lay_row [data-act="layout_set"]').forEach((b) => { const sel = b.dataset.v === (on ? v : 'auto'); b.classList.toggle('on', sel); b.setAttribute('aria-pressed', String(sel)); });
+  toast(t('layout_saved'));
 }
 async function saveSetting(key) {
   let raw = val('#sv_' + key), v;
@@ -639,6 +658,7 @@ const H = {
   perm: (a) => togglePerm(a.dataset.f, a.dataset.k),
   rule: (a) => toggleRule(a.dataset.f, a.dataset.k),
   setsave: (a) => saveSetting(a.dataset.v),
+  layout_set: (a) => setLayoutChoice(a.dataset.v),
   bk_all: backupAll, bk_items: backupItems,
 };
 window.BOS_APP.H = H;

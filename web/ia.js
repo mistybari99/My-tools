@@ -304,6 +304,22 @@ const I3 = { items: 'bag', 'items/new': 'plus', lists: 'list', 'settings2/units'
   emergency: 'alert', changes: 'edit', numaudit: 'hash', outbox: 'upload', reports: 'chart', biz: 'pie', brandpnl: 'pie', discounts: 'tag', campaigns: 'chart', couponuse: 'tag', auditreports: 'history', forecast: 'pie', staff: 'users', matrix: 'matrix', salary: 'money', locations: 'pin', locset: 'pinset', locsheet: 'pinset',
   rollout: 'sliders', control: 'sliders', rulehub: 'shield', owner: 'sliders', rules: 'rules', settings: 'gear', settings2: 'sliders', logs: 'history', backup: 'download', home: 'home' };
 IA.forEach((r) => { r.i3 = I3[r.route] || (r.route.startsWith('settings2/') ? 'gear' : r.icon); });
+// desktop page pattern (docs/DESKTOP_LAYOUT.md 3.1 and 3.2): app.js shell() copies r.pat to body[data-pat]; web/desktop.css reads it on PCs (>= 1024px) only.
+// Exact route ids first; a trailing '*' matches every route that starts with the rest. Screens not listed keep the default width (phone unchanged).
+const PAT = {
+  pos: ['pos', 'cashdrawer', 'salereturn', 'flow'],
+  form: ['items/new', 'itemimport', 'purchase/new', 'purchase/return', 'purchaseprint', 'scan', 'quickexp', 'otherincome', 'employees/new', 'deeds', 'payrequest'],
+  list: ['items', 'bulkitems', 'categories', 'products', 'itemmap', 'itemtypes', 'lists', 'settings2/units', 'settings2/suppliers', 'assets', 'tinting', 'purchase', 'payables', 'billpay', 'partyrequest', 'landed', 'schemes', 'recipes', 'recipebook', 'costing', 'costsources', 'capacity', 'prodplan', 'invoiceview', 'onlineorders', 'inbox', 'saleschannels', 'discounts', 'customers', 'dues', 'tiers', 'crmlists', 'crmleads', 'crmtasks', 'crmcoupons', 'crmloyalty', 'crmfeedback', 'crmconsent', 'crmdupes', 'cakejobs', 'riders', 'templates', 'packflags', 'invoice', 'bankreceipt', 'crm360', 'inboxpii', 'employees', 'moneyaccounts', 'wallets', 'openparties', 'paycapture', 'exceptions', 'pending', 'emergency', 'releases', 'changes', 'itemreq', 'payapprovals', 'posfailed', 'outbox', 'notifications', 'unmatched', 'transitshort', 'staff', 'attendance', 'attend2', 'leave', 'shifts', 'todo', 'announce', 'salary', 'benefitsx', 'staffreports', 'locations', 'locset', 'locsheet', 'rollout'],
+  table: ['stock', 'stockx', 'stockout', 'variants', 'report/*', 'batchrep/*', 'stockrep/ledger', 'stockrep/recon', 'stockrecon', 'branchstmt', 'xcunsold', 'trace', 'recall', 'purchrep', 'cost116*', 'costattrib', 'prodreports', 'orderreports', 'crmvalue', 'custinsight', 'daybook', 'ledgerlinks', 'books85', 'books96', 'cashmoves', 'shortages', 'profitcheck', 'balancecheck', 'freshness', 'finance2', 'accounts', 'cheques', 'monthclose', 'auditreports', 'numaudit', 'eqcheck', 'expenselink', 'formguard', 'report', 'reports', 'reports131', 'netprofit', 'statements', 'expenseregister', 'costunknown', 'couponuse', 'campaigns', 'catreport', 'forecast', 'market', 'biexport', 'matrix', 'payroll', 'logs'],
+  dash: ['home', 'owner', 'dashx', 'biz', 'brandpnl', 'targets', 'x1health', 'reports/hub', 'reports/map'],
+  set: ['settings', 'settings2', 'rules', 'rulehub', 'switchboard', 'control', 'delegation', 'organization', 'profile', 'integrations', 'connect', 'backup', 'restoredrill', 'guards', 'paths', 'parallel', 'optionsx', 'optviews', 'returnrules', 'payreqsettings', 'setupadvisor', 'twofa', 'printbooks', 'saleforms', 'partners', 'camrec', 'itemimg', 'impexp', 'xcsummary', 'website', 's1setup', 'periodlock', 'moneycontrols'],
+};
+const PAT_EXACT = new Map(), PAT_PREFIX = [];
+Object.keys(PAT).forEach((p) => PAT[p].forEach((k) => (k.endsWith('*') ? PAT_PREFIX.push([k.slice(0, -1), p]) : PAT_EXACT.set(k, p))));
+IA.forEach((r) => {
+  const p = PAT_EXACT.get(r.route) || ((PAT_PREFIX.find(([pre]) => r.route.startsWith(pre)) || [])[1]);
+  if (p) r.pat = p;
+});
 const byRoute = new Map(IA.map((r) => [r.route, r]));
 
 // ---------- Increment A: verbs (the "Do" part of search), quick actions per persona, bottom slots per persona. flow stays null (guided flows come later). ----------
