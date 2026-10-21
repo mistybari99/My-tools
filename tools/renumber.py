@@ -50,7 +50,8 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAP_PATH = os.path.join(ROOT, 'tools', 'numbering_map.json')
 MARKER_REL = 'tools/numbering_applied.json'
-SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json', MARKER_REL}
+SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json', MARKER_REL,
+              'tests/py/test_renumber_forms.py'}   # the tool's own test keeps the old codes it asserts on
 FIRST_TOUCHED = 479          # phases below this number are never renamed or edited
 PHASE_RANGE = (479, 498)     # the sequence the map must land in
 TEXT_EXT = ('.sql', '.sh', '.txt', '.py', '.js', '.json', '.md')
