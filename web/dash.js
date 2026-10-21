@@ -71,7 +71,7 @@ async function render() {
   const rows = [
     [reds, 'bad', T('red'), 'exceptions'], [yel, 'warn', T('yellow'), 'exceptions'], [rel.count, 'bad', T('release'), 'releases'], [mineToApprove, 'warn', T('pending'), 'pending'],
     [stf.count, 'warn', T('staff'), 'staff'], [itm.count, 'warn', T('itemreq'), 'itemreq'], [voids, 'warn', T('void'), 'pos'],
-    [noSheet.length, 'warn', T('nosheet') + (noSheet.length ? ': ' + noSheet.map((l) => nm(l)).join(', ') : ''), 'form/14-1'],
+    [noSheet.length, 'warn', T('nosheet') + (noSheet.length ? ': ' + noSheet.map((l) => nm(l)).join(', ') : ''), 'form/06-1'],
     [(gaps.data || []).reduce((s, g) => s + Number(g.missing_count || 0), 0), 'warn', T('gaps'), 'numaudit'],
     [emp.count, 'bad', T('emreq'), 'emergency'],
     [(mine.data || []).filter((x) => x.status === 'approved').length, 'info', T('emok'), null],

@@ -66,9 +66,9 @@ const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'a
   // ---- 3. keys and the locked click ----
   {
     const t = mk('en');
-    t.impl.rpc = async () => ({ data: [{ key: 'r:dues', mode: 'locked', src: 'user' }, { key: 'f:10-1', mode: 'locked', src: 'user' }], error: null });
+    t.impl.rpc = async () => ({ data: [{ key: 'r:dues', mode: 'locked', src: 'user' }, { key: 'f:03-1', mode: 'locked', src: 'user' }], error: null });
     await t.O.load();
-    chk('route -> key: page, two-segment route, form, entry', t.O.keyOfRoute('dues') === 'r:dues' && t.O.keyOfRoute('#/settings2/units') === 'r:settings2/units' && t.O.keyOfRoute('form/10-1') === 'f:10-1' && t.O.keyOfRoute('entry/new/10-1') === 'f:10-1' && t.O.keyOfRoute('') === null);
+    chk('route -> key: page, two-segment route, form, entry', t.O.keyOfRoute('dues') === 'r:dues' && t.O.keyOfRoute('#/settings2/units') === 'r:settings2/units' && t.O.keyOfRoute('form/03-1') === 'f:03-1' && t.O.keyOfRoute('entry/new/03-1') === 'f:03-1' && t.O.keyOfRoute('') === null);
     const cap = t.capture[0];
     const ev = (v, act) => { const e = { prevented: false, stopped: false, target: { closest: () => ({ dataset: { act: act || 'nav_go', v } }) }, preventDefault() { e.prevented = true; }, stopPropagation() { e.stopped = true; }, stopImmediatePropagation() { e.stopped = true; } }; return e; };
     const e1 = ev('dues'); cap(e1);
@@ -76,7 +76,7 @@ const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'a
     chk('the sheet names the option and has a close button', /Dues/.test(t.sheets[0]) && /closesheet/.test(t.sheets[0]));
     const e2 = ev('items'); cap(e2);
     chk('a normal entry is not touched', !e2.prevented && !e2.stopped && t.sheets.length === 1);
-    const e3 = ev('form/10-1', 'go'); cap(e3);
+    const e3 = ev('form/03-1', 'go'); cap(e3);
     chk('a locked form (go) is caught too', e3.prevented && t.sheets.length === 2);
     const e4 = { target: { closest: () => { throw new Error('boom'); } }, preventDefault() { throw new Error('x'); } };
     let thrown = false; try { cap(e4); } catch (e) { thrown = true; }
@@ -100,7 +100,7 @@ const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'a
       if (fn === 'permission_recommendations') return { data: { is_owner: false,
         recommended_missing: [{ item: 'miss:report_sales', grant: 'report_sales', label: { bn: 'বিক্রির রিপোর্ট', mix: 'Sales report', en: 'Reports: Sales' }, reason: { bn: 'দরকার', mix: 'দরকার', en: 'Usually needed by this role' }, ignored: false }],
         not_recommended_combo: [{ item: 'combo:purchase_entry|supplier_pay', a: 'purchase_entry', b: 'supplier_pay', reason: { bn: 'ঝুঁকি', mix: 'ঝুঁকি', en: 'Enter and pay should be two people' }, ignored: false }, { item: 'combo:view_cost|price_override', a: 'view_cost', b: 'price_override', reason: { bn: 'ঝুঁকি', mix: 'ঝুঁকি', en: 'Cost and price' }, ignored: true }],
-        unused: [{ item: 'unused:f:03-1', key: 'f:03-1', suggest: 'hide', reason: { bn: 'অনুমতি নেই', mix: 'অনুমতি নেই', en: 'No permission for this form; hide it if never needed' }, ignored: false }], ignored: [] }, error: null };
+        unused: [{ item: 'unused:f:39-1', key: 'f:39-1', suggest: 'hide', reason: { bn: 'অনুমতি নেই', mix: 'অনুমতি নেই', en: 'No permission for this form; hide it if never needed' }, ignored: false }], ignored: [] }, error: null };
       return { data: { changed: 1 }, error: null };
     };
     await t.pages.optviews();
@@ -115,9 +115,9 @@ const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'a
     const rowPos = rowOf('r:pos').split('class="ov-row"')[0], rowItems = rowOf('r:items').split('class="ov-row"')[0], rowDues = rowOf('r:dues').split('class="ov-row"')[0];
     chk('permission status: POS granted, items not granted (from the chosen person, not the owner)', /Granted/.test(rowPos) && /Not granted/.test(rowItems));
     chk('current mode marks: items = Hide (user), dues = Locked (from role)', /data-m="hide"[^>]*>|aria-pressed="true"[^>]*data-m="hide"/.test(rowItems) && /class="mini on primary" data-act="ov_set" data-k="r:items" data-m="hide"/.test(rowItems) && /class="mini on primary" data-act="ov_set" data-k="r:dues" data-m="locked"/.test(rowDues) && /from role/.test(rowDues));
-    chk('forms are listed too (cash form granted from perms, stock form not)', /f:10-1/.test(lst) && /f:03-1/.test(lst) && /Granted/.test(rowOf('f:10-1').split('class="ov-row"')[0]) && /Not granted/.test(rowOf('f:03-1').split('class="ov-row"')[0]));
+    chk('forms are listed too (cash form granted from perms, stock form not)', /f:03-1/.test(lst) && /f:39-1/.test(lst) && /Granted/.test(rowOf('f:03-1').split('class="ov-row"')[0]) && /Not granted/.test(rowOf('f:39-1').split('class="ov-row"')[0]));
     chk('home is not an option row; optviews row cannot be hidden or locked (buttons disabled)', !/data-k="r:home"/.test(lst) && /data-m="hide" aria-pressed="false" disabled/.test(rowOf('r:optviews')) && /data-m="locked" aria-pressed="false" disabled/.test(rowOf('r:optviews')));
-    chk('hint next to the chips for a never-needed form, with a one-tap apply', /Suggest: Hide/.test(rowOf('f:03-1')) && /ov_reco_apply" data-i="unused:f:03-1"/.test(rowOf('f:03-1')));
+    chk('hint next to the chips for a never-needed form, with a one-tap apply', /Suggest: Hide/.test(rowOf('f:39-1')) && /ov_reco_apply" data-i="unused:f:39-1"/.test(rowOf('f:39-1')));
     chk('bulk buttons present', ['hide_ng', 'show_all', 'locked_ng', 'reset'].every((m) => new RegExp('data-act="ov_bulk" data-m="' + m + '"').test(t.els['#ov_bulk'].innerHTML)));
     const rec = t.els['#ov_reco'].innerHTML;
     chk('advice panel: says advice only, 3 sections, grant label, combo with both grants and reason', /advice only/.test(rec) && /Usually needed, not given/.test(rec) && /Reports: Sales/.test(rec) && /purchase_entry \+ supplier_pay/.test(rec) && /Enter and pay should be two people/.test(rec) && /Hide if never needed/.test(rec));
@@ -130,8 +130,8 @@ const sales = { user: { id: 'u-sales', staff_id: 's1', name: 'Sales', status: 'a
     // bulk
     const ids = (kind) => t.O.bulkItems(kind);
     const hng = ids('hide_ng'), lng = ids('locked_ng'), sa = ids('show_all'), rs = ids('reset');
-    chk('hide-all-not-granted: only not-granted, never protected, not the ones already hidden', hng.length > 3 && hng.every((x) => x.mode === 'hide') && !hng.some((x) => x.key === 'r:pos' || x.key === 'r:items' || x.key === 'r:optviews' || x.key === 'r:home') && hng.some((x) => x.key === 'f:03-1'));
-    chk('locked-for-not-granted: includes items (hidden now) and not-granted forms, not granted ones', lng.some((x) => x.key === 'r:items') && lng.every((x) => x.mode === 'locked') && !lng.some((x) => x.key === 'r:pos' || x.key === 'f:10-1'));
+    chk('hide-all-not-granted: only not-granted, never protected, not the ones already hidden', hng.length > 3 && hng.every((x) => x.mode === 'hide') && !hng.some((x) => x.key === 'r:pos' || x.key === 'r:items' || x.key === 'r:optviews' || x.key === 'r:home') && hng.some((x) => x.key === 'f:39-1'));
+    chk('locked-for-not-granted: includes items (hidden now) and not-granted forms, not granted ones', lng.some((x) => x.key === 'r:items') && lng.every((x) => x.mode === 'locked') && !lng.some((x) => x.key === 'r:pos' || x.key === 'f:03-1'));
     chk('show-all: only entries that are not Show now (items, dues)', sa.length === 2 && sa.every((x) => x.mode === 'show') && sa.some((x) => x.key === 'r:items') && sa.some((x) => x.key === 'r:dues'));
     chk('reset: removes only existing choices with mode default', rs.length === 2 && rs.every((x) => x.mode === 'default'));
     t.calls.length = 0; await click(t, 'ov_bulk', { m: 'hide_ng' });

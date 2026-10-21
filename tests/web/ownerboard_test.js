@@ -157,7 +157,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(/5,000/.test(await wt('sales_vs')) && /\+25%/.test(await wt('sales_vs')) && /\+11%/.test(await wt('sales_vs')), 'sales vs yesterday / last week: ' + (await wt('sales_vs')).replace(/\s+/g, ' '));
   ok(/700/.test(await wt('cash_short')) && (await W('cash_short').getAttribute('class')).includes('bad'), 'cash short today is red: ' + (await wt('cash_short')).replace(/\s+/g, ' '));
   ok(/1\/1/.test(await wt('day_close')), 'day close: shop 2 is on paper, shop 1 closed -> 1/1: ' + (await wt('day_close')).replace(/\s+/g, ' '));
-  ok(/1/.test(await wt('needs_you')) && /10-2 #9002/.test(await wt('needs_you')), 'needs you shows the oldest: ' + (await wt('needs_you')).replace(/\s+/g, ' '));
+  ok(/1/.test(await wt('needs_you')) && /11-1 #9002/.test(await wt('needs_you')), 'needs you shows the oldest: ' + (await wt('needs_you')).replace(/\s+/g, ' '));
   ok(/Open red[\s\S]*1/.test(await wt('exceptions')), 'open exceptions: ' + (await wt('exceptions')).replace(/\s+/g, ' '));
   ok(/2,000/.test(await wt('cust_dues')) && /1,500/.test(await wt('cust_dues')), 'customer dues total + overdue: ' + (await wt('cust_dues')).replace(/\s+/g, ' '));
   ok(/9,000/.test(await wt('supp_dues')) && /2,500/.test(await wt('supp_dues')), 'supplier dues: ' + (await wt('supp_dues')).replace(/\s+/g, ' '));

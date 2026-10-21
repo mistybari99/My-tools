@@ -1,6 +1,6 @@
 /* Islamia BOS · Day book (#/daybook): cash / bank / mobile money in and out by day, per location or all together.
    Built by the server (phase13.sql day_book) from real rows only: POS payments, due collections, expense vouchers 11-1, supplier / bill payments,
-   cash handover slips 03-1 and (for people who may see salaries) staff advances 35-1 and salary payments 02-2.
+   cash handover slips 03-1 and (for people who may see salaries) staff advances 35-1 and salary payments 21-1.
    Opening / closing = running total from the owner's start date; no start date = movements only ("Data needed").
    The screen only guides and formats; it never computes money the server did not return, except the per-mode view of a day (a filter). Loaded after purchase.js. */
 (() => {

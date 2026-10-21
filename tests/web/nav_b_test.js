@@ -54,11 +54,11 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.click('#navScrim', { position: { x: 345, y: 300 } }); await sleep(400);
   console.log('closed by scrim:', await p.locator('#navDrawer.on').count());
   // form page and POS: bnav hidden
-  await p.goto('http://localhost:' + PORT + '/#/entry/new/10-2/1'); await sleep(1000);
+  await p.goto('http://localhost:' + PORT + '/#/entry/new/11-1/1'); await sleep(1000);
   console.log('bnav in entry:', await p.locator('#bnav').isVisible()); await p.screenshot({ path: SP + '/n_form.png' });
   await p.goto('http://localhost:' + PORT + '/#/pos'); await sleep(1200);
   console.log('bnav in pos:', await p.locator('#bnav').isVisible()); await p.screenshot({ path: SP + '/n_pos.png' });
-  await p.goto('http://localhost:' + PORT + '/#/form/10-1'); await sleep(900);
+  await p.goto('http://localhost:' + PORT + '/#/form/03-1'); await sleep(900);
   console.log('bnav in formlist:', await p.locator('#bnav').isVisible(), '| header dots', await p.locator('#hd_dots').count(), '| stars', await p.locator('.st[aria-pressed]').count());
   // non-owner, hide mode vs lock mode
   await p.addInitScript(`window.__OWNER=false;window.__PERMS={POS:{view:true,enter:true,approve:false}};`);

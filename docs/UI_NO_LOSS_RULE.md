@@ -42,7 +42,7 @@ Edit `tests/ui_inventory/aliases.json`. Every entry needs a non-empty `reason`; 
   "aliases": [
     { "type": "rename",    "from": "route:bulkitems", "to": "route:bulk_items", "reason": "route renamed to match the new menu wording" },
     { "type": "prefix",    "from": "ctl:old.js:", "to": "ctl:new.js:", "reason": "screen code moved from old.js to new.js" },
-    { "type": "label",     "id": "field:10-2:sheet_no", "lang": "en", "from": "Daily showroom sheet no.", "to": "Sheet no.", "reason": "shorter label, same meaning" },
+    { "type": "label",     "id": "field:11-1:sheet_no", "lang": "en", "from": "Daily showroom sheet no.", "to": "Sheet no.", "reason": "shorter label, same meaning" },
     { "type": "label",     "id": "ctl:dues.js:button:du_limit", "lang": "texts", "from": "L:সংরক্ষণ|Save|Save", "to": "L:সংরক্ষণ|Store|Store", "reason": "wording decided with the owner" },
     { "type": "placement", "id": "route:lists", "attr": "drawer", "reason": "moved from the drawer to the Control Center" }
   ]

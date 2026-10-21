@@ -76,7 +76,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   p = await open({ owner: false, m: { grants: ['rollout_manage'] } }, '#/rollout'); ok(await p.locator('#ro_list .card').count() === nForms && await p.locator('#ro_sw').count() === 0, 'delegate with rollout_manage sees the board, no owner switches'); await p.context().close();
 
   // ---------- entered later in a real form (11-1) ----------
-  p = await open({ cells: [['11-1', 1, 'parallel']] }, '#/entry/new/10-2/1');
+  p = await open({ cells: [['11-1', 1, 'parallel']] }, '#/entry/new/11-1/1');
   ok(/Paper is the record this month/.test(await p.textContent('#entry')) && /Parallel/.test(await p.textContent('#entry')), 'parallel banner + chip');
   ok(await p.locator('#el_on').count() === 1 && await p.locator('[data-p="paper_no"]').count() === 1, 'toggle is there; the old printed-number field is there while off');
   await p.check('#el_on'); await wait(p, 200);
@@ -98,14 +98,14 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   ok(await p.locator('#e_later_chip').count() === 1 && (await p.inputValue('#el_ps')) === 'A-0150' && (await p.inputValue('#el_at')) === '2026-10-03T22:30', 'reopened from the server: still entered-later with its serial and original time');
   await p.context().close();
   // Paper mode: opens with the toggle on, banner says so
-  p = await open({ cells: [['11-1', 1, 'paper']] }, '#/entry/new/10-2/1');
+  p = await open({ cells: [['11-1', 1, 'paper']] }, '#/entry/new/11-1/1');
   ok(await p.locator('#el_on:checked').count() === 1 && /on paper here/.test(await p.textContent('#entry')), 'Paper: entered-later is on by default with the banner');
   await p.context().close();
   // switched off: no toggle on a normal form
-  p = await open({ laterOff: true }, '#/entry/new/10-2/1');
+  p = await open({ laterOff: true }, '#/entry/new/11-1/1');
   ok(await p.locator('#el_on').count() === 0, 'entered_later_on OFF: no toggle'); await p.context().close();
   // a normal app entry sends no entered_later
-  p = await open({}, '#/entry/new/10-2/1'); await p.fill('[data-p="lines.0.amount"]', '50'); await p.click('[data-act=e_save]'); await wait(p, 300);
+  p = await open({}, '#/entry/new/11-1/1'); await p.fill('[data-p="lines.0.amount"]', '50'); await p.click('[data-act=e_save]'); await wait(p, 300);
   c = await calls(p, 'save_entry'); ok(c.length === 1 && c[0].p_meta && !('entered_later' in c[0].p_meta) && c[0].p_meta.client_id, 'plain entry: only a client id in the meta'); await p.context().close();
 
   // ---------- locked entry: request change + revision history ----------

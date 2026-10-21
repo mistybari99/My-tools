@@ -526,7 +526,7 @@ async function viewSupplierLedger() {
   }
 }
 
-/* ----- take over #/form/04-4 and #/form/06-5 only while the master switch is on ----- */
+/* ----- take over #/form/37-1 and #/form/38-1 only while the master switch is on ----- */
 {
   const orig = (window.BOS_PAGES || {}).form;
   const leaveWatch = () => { if (RS.paper && !new RegExp('^#/?form/' + RS.paper + '(/|$)').test(location.hash)) RS.paper = null; };
@@ -571,7 +571,7 @@ Object.assign(A.H, {
   lk_retry: async (a) => { const r = await sb.rpc('entry_post_ledger_retry', { p_entry: a.dataset.v }); if (r.error) return fail(r.error); toast(T('retried')); return viewLinks(); },
 });
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'lk_loc') { RS.loc = e.target.value === '' ? null : Number(e.target.value); RS.item = null; RS.sup = null;
-  if (/form\/06-5/.test(location.hash)) viewSupplierLedger(); else if (/form\/04-4/.test(location.hash)) viewStoreLedger(); } });
+  if (/form\/38-1/.test(location.hash)) viewSupplierLedger(); else if (/form\/37-1/.test(location.hash)) viewStoreLedger(); } });
 document.addEventListener('input', (e) => { if (e.target && e.target.id === 'lk_q') { RS.q = e.target.value; clearTimeout(RS.tm); RS.tm = setTimeout(viewStoreLedger, 300); } });
 
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { ledgerlinks: viewLinks });

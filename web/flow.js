@@ -29,10 +29,10 @@ const X = {
 const T = (k) => lab(X[k]);
 // step kinds: entry:<code> (today, this place) | month_entry:<code> | none_open (exceptions) | outbox | link (unknown) | days_closed | no_pending | lock
 const FLOWS = {
-  open: [['drawer', 'entry:14-1', 'form/14-1'], ['attend', 'link', 'form/02-1'], ['stock', 'link', 'stock'], ['exc', 'none_open', 'exceptions'], ['pos', 'link', 'pos']],
-  close: [['drawer', 'entry:14-1', 'form/14-1'], ['release', 'none_red', 'releases'], ['hub', 'entry:10-1', 'form/10-1'], ['dig', 'entry:10-3', 'form/10-3'], ['deposit', 'link', 'cashmoves'], ['exp', 'entry:10-2', 'form/10-2'], ['outbox', 'outbox', 'outbox'], ['summary', 'link', 'daybook']],
-  factory: [['daily', 'entry:05-1', 'form/05-1'], ['grn', 'entry:04-1', 'form/04-1'], ['issue', 'entry:04-2', 'form/04-2'], ['prod', 'link', 'recipes'], ['wastage', 'link', 'stock'], ['dispatch', 'entry:03-1', 'form/03-1']],
-  month: [['days', 'days_closed', 'daybook'], ['pending', 'no_pending', 'pending'], ['count', 'month_entry:04-3', 'form/04-3'], ['pay', 'link', 'payables'], ['salary', 'link', 'salary'], ['reports', 'link', 'reports'], ['lock', 'lock', 'settings']],
+  open: [['drawer', 'entry:06-1', 'form/06-1'], ['attend', 'link', 'form/19-1'], ['stock', 'link', 'stock'], ['exc', 'none_open', 'exceptions'], ['pos', 'link', 'pos']],
+  close: [['drawer', 'entry:06-1', 'form/06-1'], ['release', 'none_red', 'releases'], ['hub', 'entry:03-1', 'form/03-1'], ['dig', 'entry:07-1', 'form/07-1'], ['deposit', 'link', 'cashmoves'], ['exp', 'entry:11-1', 'form/11-1'], ['outbox', 'outbox', 'outbox'], ['summary', 'link', 'daybook']],
+  factory: [['daily', 'entry:12-1', 'form/12-1'], ['grn', 'entry:13-1', 'form/13-1'], ['issue', 'entry:18-1', 'form/18-1'], ['prod', 'link', 'recipes'], ['wastage', 'link', 'stock'], ['dispatch', 'entry:39-1', 'form/39-1']],
+  month: [['days', 'days_closed', 'daybook'], ['pending', 'no_pending', 'pending'], ['count', 'month_entry:36-1', 'form/36-1'], ['pay', 'link', 'payables'], ['salary', 'link', 'salary'], ['reports', 'link', 'reports'], ['lock', 'lock', 'settings']],
 };
 const D = { loc: null, skips: [], res: {} };
 const LOCS = () => (B.liveLocs || ((a) => a))((S.ctx.is_owner || (S.ctx.roles || []).includes('management')) ? ((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []).filter((l) => (S.ctx.locations || []).includes(l.id)));

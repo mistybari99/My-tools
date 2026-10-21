@@ -57,7 +57,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   const opts = (p, sel) => p.$$eval(sel + ' option', (os) => os.map((o) => [o.value, o.textContent]));
 
   // ---------- form 11-1 (open list): choices, Add new at once, similar warning, Other ----------
-  let p = await open({}, '#/entry/new/10-2/1');
+  let p = await open({}, '#/entry/new/11-1/1');
   const S1 = 'select[data-p="lines.0.head"]';
   let o = await opts(p, S1);
   ok(o.some((x) => x[0] === '__add__:expense_heads' && /Add new/.test(x[1])), 'open list offers + Add new');
@@ -93,7 +93,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---------- approval list (17-1): request wording, request is filed, nothing selected ----------
-  p = await open({ init: 'window.__OWNER=false;', x: { add: { status: 'requested', request_id: 'r1' } }, lang: 'bn' }, '#/entry/new/18-1/1');
+  p = await open({ init: 'window.__OWNER=false;', x: { add: { status: 'requested', request_id: 'r1' } }, lang: 'bn' }, '#/entry/new/17-1/1');
   const S2 = 'select[data-p="lines.0.head"]';
   o = await opts(p, S2);
   ok(o.some((x) => x[0] === '__add__:marketing_heads' && /অনুরোধ/.test(x[1])), 'approval list says request');
@@ -105,7 +105,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---------- owner-only list as a non-owner: message, no write ----------
-  p = await open({ init: 'window.__OWNER=false;', defs: { expense_heads: { add_rule: 'owner' } } }, '#/entry/new/10-2/1');
+  p = await open({ init: 'window.__OWNER=false;', defs: { expense_heads: { add_rule: 'owner' } } }, '#/entry/new/11-1/1');
   o = await opts(p, S1);
   ok(o.some((x) => x[0] === '__add__:expense_heads' && /owner only/.test(x[1])), 'owner-only list shows the (owner only) wording to others');
   await p.selectOption(S1, '__add__:expense_heads'); await wait(p, 400);
@@ -114,13 +114,13 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---------- Other switched off for a list / list locked ----------
-  p = await open({ defs: { expense_heads: { allow_other: false, locked: true } } }, '#/entry/new/10-2/1');
+  p = await open({ defs: { expense_heads: { allow_other: false, locked: true } } }, '#/entry/new/11-1/1');
   o = await opts(p, S1);
   ok(!o.some((x) => x[0].startsWith('__other__')) && !o.some((x) => x[0].startsWith('__add__')), 'Other off and locked list: no special choices');
   await p.close();
 
   // ---------- offline Other is kept on the phone ----------
-  p = await open({ x: { fail: { option_other_log: 'Failed to fetch' } } }, '#/entry/new/10-2/1');
+  p = await open({ x: { fail: { option_other_log: 'Failed to fetch' } } }, '#/entry/new/11-1/1');
   await p.selectOption(S1, '__other__:expense_heads'); await wait(p, 200);
   await p.fill('.lp-pn input', 'অফলাইন খরচ'); await p.click('[data-lp-ok]'); await wait(p, 500);
   ok((await p.inputValue(S1)) === 'other:অফলাইন খরচ', 'offline: value still kept');
@@ -187,7 +187,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   c = await calls(p, 'option_add'); ok(c.length === 1 && c[0].p_bn === 'বিবিধ', 'owner add uses option_add');
   // Other queue
   await p.click('[data-act=ls2_lmenu]'); await wait(p, 200); await p.click('.sheet [data-act=ls2_view][data-v=other]'); await wait(p, 400);
-  ok(await p.locator('[data-act=ls2_qmenu]').count() === 2, 'two pending Other entries have ⋮'); ok(/TestF/.test(await p.textContent('body')) && /10-2/.test(await p.textContent('body')), 'who and form code shown');
+  ok(await p.locator('[data-act=ls2_qmenu]').count() === 2, 'two pending Other entries have ⋮'); ok(/TestF/.test(await p.textContent('body')) && /11-1/.test(await p.textContent('body')), 'who and form code shown');
   await p.click('[data-act=ls2_qmenu][data-id=o1]'); await wait(p, 200);
   const qm = await p.textContent('.sheet'); ok(/Add as a new option/.test(qm) && /Merge into an existing option/.test(qm) && /Reject/.test(qm), 'queue menu: approve as new / merge / reject');
   await p.click('[data-act=ls2_qadd]'); await wait(p, 200); await p.click('[data-act=ls2_qadd_go]'); await wait(p, 400);
@@ -217,7 +217,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   ok(await p.locator('[data-act=ls2_lmenu]').count() === 0 && /not installed/.test(await p.textContent('body')), 'no phase15: notice, no list menu');
   ok(await p.locator('[data-act=ls2_omenu]').count() === 11, 'no phase15: option menus still there');
   await p.close();
-  p = await open({ init: 'window.__NOP15=1;' }, '#/entry/new/10-2/1'); await wait(p, 500);
+  p = await open({ init: 'window.__NOP15=1;' }, '#/entry/new/11-1/1'); await wait(p, 500);
   o = await opts(p, S1); ok(!o.some((x) => x[0].startsWith('__')), 'no phase15: the form shows the plain list only');
   await p.close();
 
@@ -237,7 +237,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.click('[data-act=p2_save]'); await wait(p, 400);
   ok(/Other/.test(await p.textContent('#toast')) && (await calls(p, 'submit_item_change')).length === 0, 'new item with an empty picker after Other is not saved');
   await p.close();
-  p = await open({ init: 'window.__NOP15=2;' }, '#/entry/new/10-2/1'); await wait(p, 600);
+  p = await open({ init: 'window.__NOP15=2;' }, '#/entry/new/11-1/1'); await wait(p, 600);
   o = await opts(p, S1); ok(o.some((x) => x[0].startsWith('__add__')) && !(await p.evaluate(() => window.BOS.listctl.state.missing)), 'network error is not "missing": choices stay, state not missing');
   await p.close();
   ok(fs.readFileSync(ROOT + '/entry.js', 'utf8').includes("startsWith('other:')"), 'entry.js renders stored other:<text> choices');

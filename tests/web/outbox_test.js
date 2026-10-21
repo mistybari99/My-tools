@@ -26,7 +26,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
     await p.fill('[data-p="cash_now"]', '3000'); await p.fill('[data-p="receipts_total"]', '120'); await p.check('[data-p="drawer_untouched"]'); };
 
   // ---------- save offline -> Not sent yet -> online -> sent once ----------
-  let p = await open({}, '#/entry/new/10-2/1');
+  let p = await open({}, '#/entry/new/11-1/1');
   await fillOk(p); await net(p, true);
   await p.click('[data-act=e_save]'); await wait(p, 400);
   let items = await q(p);
@@ -49,7 +49,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.context().close();
 
   // ---------- submit offline ----------
-  p = await open({}, '#/entry/new/10-2/1'); await fillOk(p); await net(p, true);
+  p = await open({}, '#/entry/new/11-1/1'); await fillOk(p); await net(p, true);
   await p.click('[data-act=e_submit]'); await wait(p, 500);
   items = await q(p); ok(items.length === 1 && items[0].submit === true && items[0].kind === 'entry', 'submit while offline is queued with the entry');
   ok(await p.locator('#e_notsent').count() === 1, 'Not sent yet while waiting');
@@ -59,7 +59,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.context().close();
 
   // ---------- submit of an already saved draft fails on the network ----------
-  p = await open({}, '#/entry/new/10-2/1'); await fillOk(p); await p.click('[data-act=e_save]'); await wait(p, 400);
+  p = await open({}, '#/entry/new/11-1/1'); await fillOk(p); await p.click('[data-act=e_save]'); await wait(p, 400);
   ok((await q(p)).length === 0, 'online save leaves nothing in the queue');
   await net(p, true); await p.click('[data-act=e_submit]'); await wait(p, 500);
   items = await q(p); ok(items.length === 1 && items[0].kind === 'submit' && items[0].id === 'e1', 'only the submit waits');
@@ -68,7 +68,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.context().close();
 
   // ---------- a business error is NOT a network error ----------
-  p = await open({ w: { err: { save_entry: 'paper_serial_in_use' } } }, '#/entry/new/10-2/1'); await fillOk(p); await p.click('[data-act=e_save]'); await wait(p, 500);
+  p = await open({ w: { err: { save_entry: 'paper_serial_in_use' } } }, '#/entry/new/11-1/1'); await fillOk(p); await p.click('[data-act=e_save]'); await wait(p, 500);
   ok((await q(p)).length === 0 && await p.locator('#e_notsent').count() === 0, 'server refusal is shown, not queued'); await p.context().close();
 
   // ---------- at start: a waiting record is sent without any click ----------
@@ -79,14 +79,14 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 
   // ---------- outbox page ----------
   const refused = { ...waitItem, k: 'c:dd222222-2222-4222-8222-222222222222', cid: 'dd222222-2222-4222-8222-222222222222', meta: { client_id: 'dd222222-2222-4222-8222-222222222222', entered_later: true, paper_serial: 'A-9', paper_at: '2026-10-04T10:00:00+06:00' }, state: 'refused', msg: 'paper_serial_in_use', ps: 'A-9', args: { ...waitItem.args, p_data: { lines: [{ amount: '5' }], paper_no: 'A-9' } } };
-  p = await open({ queue: [{ ...waitItem, state: 'refused', msg: 'rollout_paper:10-2' }, refused], w: { net: true } }, '#/outbox');
+  p = await open({ queue: [{ ...waitItem, state: 'refused', msg: 'rollout_paper:11-1' }, refused], w: { net: true } }, '#/outbox');
   ok(await p.locator('#ob_list [data-k]').count() === 2, 'two waiting lines');
   ok(/Refused by the server/.test(await p.textContent('#ob_list')) && /rollout_paper/.test(await p.textContent('#ob_list')) && /A-9/.test(await p.textContent('#ob_list')), 'refused lines show why and the paper serial');
   await p.screenshot({ path: SP + '/ob_page.png' });
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow');
   // open a line that never reached the server: the editor is restored with the same client id
   await p.click(`[data-k="${refused.k}"] [data-act=ob_open]`); await wait(p, 900);
-  ok(/#\/entry\/new\/10-2\/1/.test(await p.evaluate(() => location.hash)) && (await p.inputValue('[data-p="lines.0.amount"]')) === '5' && (await p.inputValue('#el_ps')) === 'A-9', 'open restores the data, the paper serial and the original time');
+  ok(/#\/entry\/new\/11-1\/1/.test(await p.evaluate(() => location.hash)) && (await p.inputValue('[data-p="lines.0.amount"]')) === '5' && (await p.inputValue('#el_ps')) === 'A-9', 'open restores the data, the paper serial and the original time');
   ok(await p.locator('#e_notsent').count() === 1, 'still marked Not sent yet');
   await p.evaluate(() => { location.hash = '#/outbox'; }); await wait(p, 600);
   // retry while still offline keeps it
@@ -106,7 +106,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.context().close();
 
   // ---------- a server refusal during auto-send keeps the line (never lost) ----------
-  p = await open({ queue: [waitItem], w: { err: { save_entry: 'rollout_paper:10-2' } }, settle: 3500 }, '#/home');
+  p = await open({ queue: [waitItem], w: { err: { save_entry: 'rollout_paper:11-1' } }, settle: 3500 }, '#/home');
   items = await q(p); ok(items.length === 1 && items[0].state === 'refused' && /rollout_paper/.test(items[0].msg), 'refused by the server: kept, marked, with the reason');
   await p.context().close();
 
@@ -115,7 +115,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   ok(await p.evaluate(() => window.BOS.outbox.count()) === 1 && (await p.evaluate(() => window.BOS_NAV.entries().some((e) => e.route === 'outbox'))), 'outbox count and drawer entry');
   await p.context().close();
   // ---------- the phone cannot store it: no false “kept on this phone” ----------
-  p = await open({}, '#/entry/new/10-2/1'); await fillOk(p); await net(p, true);
+  p = await open({}, '#/entry/new/11-1/1'); await fillOk(p); await net(p, true);
   await p.evaluate(() => { const o = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { if (String(k).startsWith('bos_eq_')) throw new Error('QuotaExceeded'); return o.call(this, k, v); }; });
   await p.click('[data-act=e_save]'); await wait(p, 500);
   ok(/Could not keep it on this phone/.test(await p.textContent('.sheet')) && await p.locator('#e_notsent').count() === 0, 'storage failure: clear error, no Not-sent-yet claim');

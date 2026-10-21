@@ -16,7 +16,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
   await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
   await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
-  await p.goto('http://localhost:' + PORT + '/#/entry/new/10-2/1'); await p.waitForTimeout(700);
+  await p.goto('http://localhost:' + PORT + '/#/entry/new/11-1/1'); await p.waitForTimeout(700);
   // 1x1 PNG
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
   await p.setInputFiles('input[data-photo]', { name: 'a.png', mimeType: 'image/png', buffer: png }); await p.waitForTimeout(700);

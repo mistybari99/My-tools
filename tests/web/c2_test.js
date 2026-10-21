@@ -11,8 +11,8 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
  const regRows = [
   { source: 'app', ref: '#1', order_id: 'o1', entry_id: null, order_date: '2026-10-16', customer_name: 'test_customer_a', customer_mobile: null, channel: 'phone', order_type: 'cake', status: 'delivered', promised_date: '2026-10-16', promised_from: '10:00:00', promised_to: '12:00:00', total: 230, advance: 50, balance: 0, advance_state: 'paid_into_sale', delivery_cost: null },
   { source: 'app', ref: '#2', order_id: 'o2', entry_id: null, order_date: '2026-10-16', customer_name: 'test_customer_b', customer_mobile: null, channel: 'phone', order_type: 'normal', status: 'cancelled', promised_date: null, promised_from: null, promised_to: null, total: 100, advance: 60, balance: 0, advance_state: 'refund_not_recorded', delivery_cost: null },
-  { source: 'paper_20_1', ref: '20-1/9001', order_id: null, entry_id: 'e1', order_date: '2026-10-16', customer_name: 'test_paper_a', customer_mobile: null, channel: 'phone', order_type: 'cake', status: 'handed', promised_date: '2026-10-15', promised_from: '11:00:00', promised_to: null, total: 300, advance: 100, balance: null, advance_state: 'on_sheet', delivery_cost: null },
-  { source: 'paper_20_6', ref: '20-6/9004/1', order_id: null, entry_id: 'e2', order_date: '2026-10-16', customer_name: null, customer_mobile: null, channel: 'test_platform', order_type: 'normal', status: 'handed', promised_date: null, promised_from: null, promised_to: null, total: 120, advance: null, balance: null, advance_state: 'none', delivery_cost: null }];
+  { source: 'paper_20_1', ref: '05-1/9001', order_id: null, entry_id: 'e1', order_date: '2026-10-16', customer_name: 'test_paper_a', customer_mobile: null, channel: 'phone', order_type: 'cake', status: 'handed', promised_date: '2026-10-15', promised_from: '11:00:00', promised_to: null, total: 300, advance: 100, balance: null, advance_state: 'on_sheet', delivery_cost: null },
+  { source: 'paper_20_6', ref: '23-1/9004/1', order_id: null, entry_id: 'e2', order_date: '2026-10-16', customer_name: null, customer_mobile: null, channel: 'test_platform', order_type: 'normal', status: 'handed', promised_date: null, promised_from: null, promised_to: null, total: 120, advance: null, balance: null, advance_state: 'none', delivery_cost: null }];
  const e = (m) => ({ data: null, error: { message: m, code: 'P0001' } });
  c.rpc = async (fn, args) => {
   (window.__AC = window.__AC || []).push([fn, clone(args || {})]);
@@ -70,7 +70,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await noOverflow(p, 'orderreports start');
   await show(p);
   let t = await txt(p);
-  ok(/App order/.test(t) && /Paper 20-1/.test(t) && /Paper 23-1 line/.test(t), 'register shows the three sources apart');
+  ok(/App order/.test(t) && /Paper 05-1/.test(t) && /Paper 23-1 line/.test(t), 'register shows the three sources apart');
   ok(/never added together/.test(t), 'note: sources are not merged');
   ok(await p.locator('.c2-tbl tbody tr').count() === 4, 'register has 4 rows');
   ok(/Refund NOT recorded/.test(t) && /Paid into the sale/.test(t), 'advance states are shown in words');
@@ -83,7 +83,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('[data-act=c2_csv]'); await wait(p, 200);
   const csv = await p.evaluate(() => window.__c2csv);
   ok(csv && /^Source,Ref,Taken/.test(csv.text) && csv.text.split('\r\n').length === 5, 'CSV has the header and 4 rows');
-  ok(/20-1\/9001[^\r\n]*,,/.test(csv.text), 'CSV leaves a missing balance empty, not 0');
+  ok(/05-1\/9001[^\r\n]*,,/.test(csv.text), 'CSV leaves a missing balance empty, not 0');
   await p.selectOption('#c2_src', 'app'); await show(p);
   const rc = await calls(p, 'c2_order_register'); ok(rc[rc.length - 1].p_source === 'app', 'the source filter is sent');
   await p.click('[data-act=or_tab][data-v=delayed]'); await show(p); t = await txt(p);

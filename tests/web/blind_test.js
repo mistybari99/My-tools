@@ -26,7 +26,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   const open14 = async (p) => { await p.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); }); };
 
   // ---------- A: blind ON, 06-1 ----------
-  let p = await open({}, '#/entry/new/14-1/1');
+  let p = await open({}, '#/entry/new/06-1/1');
   await fill14(p, [9, 3]);
   ok(await p.locator('#blindbox').count() === 1 && await p.locator('#blind_save').count() === 1, 'blind box with Save count');
   ok(await p.locator('#blind_peek').count() === 1, 'owner may peek (logged)');
@@ -48,35 +48,35 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   // already saved -> server refusal shows a friendly text
   await p.evaluate(() => { window.__W6S.err.count_save = 'count_already_saved'; });
   // short drawer on a second sheet
-  p = await open({}, '#/entry/new/14-1/1'); await fill14(p, [8, 3]); await p.click('#blind_save'); await wait(p, 500);
+  p = await open({}, '#/entry/new/06-1/1'); await fill14(p, [8, 3]); await p.click('#blind_save'); await wait(p, 500);
   ok(/Short \/ over: ৳ -1,000/.test(await p.textContent('#blind_diff')) || /-1,000/.test(await p.textContent('#blind_diff')), 'short by 1,000 shown after the save');
   ok((await p.locator('#flagsbox').textContent()).length > 0, 'the usual flags work after the reveal');
   // nothing typed -> asks for the count
-  p = await open({}, '#/entry/new/14-1/1'); await p.click('#blind_save'); await wait(p, 200);
+  p = await open({}, '#/entry/new/06-1/1'); await p.click('#blind_save'); await wait(p, 200);
   ok((await calls(p, 'count_save')).length === 0, 'an empty count is not saved');
   // server refuses a second different count
-  p = await open({ w6: {} }, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.evaluate(() => { window.__W6S.err.count_save = 'count_already_saved'; }); await p.click('#blind_save'); await wait(p, 400);
+  p = await open({ w6: {} }, '#/entry/new/06-1/1'); await fill14(p, [9, 3]); await p.evaluate(() => { window.__W6S.err.count_save = 'count_already_saved'; }); await p.click('#blind_save'); await wait(p, 400);
   ok(/already saved/i.test(await p.evaluate(() => document.body.innerText)), 'count_already_saved gets a clear message'); ok(await p.locator('#blind_save').count() === 1, 'and the page stays blind');
 
   // ---------- A2: server hides expected / diff from the maker of a draft ----------
-  p = await open({ w6: { hide: true } }, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.click('#blind_save'); await wait(p, 500);
+  p = await open({ w6: { hide: true } }, '#/entry/new/06-1/1'); await fill14(p, [9, 3]); await p.click('#blind_save'); await wait(p, 500);
   ok(/Count saved/.test(await p.textContent('#blindbox')) && await p.locator('#blind_later').count() === 1, 'maker: count saved, expected / diff come after submit');
   ok(!/Expected: |Short \/ over/.test(await p.textContent('#blindbox')) && await hiddenCalc(p, 'expected') && await hiddenCalc(p, 'short_over'), 'maker never sees expected or short/over after the save');
   ok(await p.locator('[data-p="cash_count.n1000"][disabled]').count() === 1, 'count read-only after the save');
 
   // ---------- B: peek (logged) ----------
-  p = await open({}, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.click('#blind_peek'); await wait(p, 500);
+  p = await open({}, '#/entry/new/06-1/1'); await fill14(p, [9, 3]); await p.click('#blind_peek'); await wait(p, 500);
   ok((await calls(p, 'count_peek')).length === 1 && /Expected: ৳ 9,300/.test(await p.textContent('#blindbox')), 'peek returns the expected figure');
   ok(/seen before the count/i.test(await p.textContent('#blindbox')), 'the screen says it was seen early');
   await p.click('#blind_save'); await wait(p, 500);
   ok(/seen before the count/i.test(await p.textContent('#blindbox')), 'seen-early note stays on the saved result');
   // peek refused by the server
-  p = await open({ w6: { noPeek: true } }, '#/entry/new/14-1/1'); await fill14(p, [9, 3]); await p.click('#blind_peek'); await wait(p, 400);
+  p = await open({ w6: { noPeek: true } }, '#/entry/new/06-1/1'); await fill14(p, [9, 3]); await p.click('#blind_peek'); await wait(p, 400);
   ok(await hiddenCalc(p, 'expected'), 'peek refused: still blind');
 
   // ---------- C: switch OFF / phase18 missing: the old screen ----------
   for (const w6 of [{ blind: false }, { blind: 'missing', pin: 'missing' }]) {
-    p = await open({ w6 }, '#/entry/new/14-1/1'); await fill14(p, [9, 3]);
+    p = await open({ w6 }, '#/entry/new/06-1/1'); await fill14(p, [9, 3]);
     ok(await p.locator('#blindbox').count() === 0 && !(await hiddenCalc(p, 'expected')), 'blind off (' + JSON.stringify(w6) + '): expected shown at once as before');
     ok(/Expected drawer balance/.test(await p.evaluate(() => document.body.innerText)), 'old screen shows the expected line');
   }
@@ -97,7 +97,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.screenshot({ path: SP + '/bl_hub.png', fullPage: true });
 
   // ---------- E: other forms untouched ----------
-  p = await open({}, '#/entry/new/10-2/1'); ok(await p.locator('#blindbox').count() === 0 && (await calls(p, 'blind_active')).length === 0, 'a form that is not 06-1 / 03-1 never asks');
+  p = await open({}, '#/entry/new/11-1/1'); ok(await p.locator('#blindbox').count() === 0 && (await calls(p, 'blind_active')).length === 0, 'a form that is not 06-1 / 03-1 never asks');
   const ov = await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1); ok(ov, 'no horizontal overflow');
 
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);

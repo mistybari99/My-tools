@@ -477,6 +477,26 @@ def pseudo_option(v):
     return isinstance(v, str) and v.startswith('__')
 
 
+def seed_code_of(code):
+    """The database seed (supabase/*.sql, frozen) still carries the OLD printed code of a form. After the clean
+    sequence (docs/FORM_SEQUENCE.md) a new code NN-1 names the same form as the old code that maps to it, so its seed
+    row is the old code's row. Codes that did not change map to themselves."""
+    return _NEW_TO_OLD.get(code, code)
+
+
+def _load_new_to_old():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'numbering_map.json')
+    try:
+        with open(path, encoding='utf-8') as fh:
+            rows = json.load(fh).get('form_codes', [])
+    except (OSError, ValueError):
+        return {}
+    return {r['new']: r['old'] for r in rows if r.get('old') != r.get('new')}
+
+
+_NEW_TO_OLD = _load_new_to_old()
+
+
 def forms_from_runtime(rt, rows, items, stats):
     i18n = rt['i18n']
     seed = {}
@@ -487,8 +507,8 @@ def forms_from_runtime(rt, rows, items, stats):
     specs = rt['forms']
     for code in sorted(set(seed) | set(specs)):
         labels, attrs = {}, {}
-        if code in seed:
-            r, src = seed[code]
+        if seed_code_of(code) in seed:
+            r, src = seed[seed_code_of(code)]
             for k in LANGS:
                 v = r.get('name_' + k)
                 if isinstance(v, str) and v:

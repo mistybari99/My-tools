@@ -118,12 +118,12 @@ def main():
         # (ii) a form field removed
         r = make_tree(tmp)
         edit(r, 'web/forms.js', replace_once(", T('sheet_no', L('দৈনিক শোরুম শিট নং', 'Daily showroom sheet no.'))", ''))
-        case('(ii) form field removed -> fails', 1, r, ['MISSING', 'field:10-2:sheet_no'])
+        case('(ii) form field removed -> fails', 1, r, ['MISSING', 'field:11-1:sheet_no'])
 
         # (iii) a form option removed
         r = make_tree(tmp)
         edit(r, 'web/forms.js', replace_once("['hospitality', L('কাস্টমার আপ্যায়ন', 'Customer hospitality')],", ''))
-        case('(iii) form option removed -> fails', 1, r, ['MISSING', 'option:10-2:lines.head:hospitality'])
+        case('(iii) form option removed -> fails', 1, r, ['MISSING', 'option:11-1:lines.head:hospitality'])
 
         # (iv) button label removed / button removed / label changed
         r = make_tree(tmp)
@@ -162,7 +162,7 @@ def main():
         old = {i['id']: i for i in json.load(open(BASELINE, encoding='utf-8'))['items']}
         new = {i['id']: i for i in json.load(open(bcopy, encoding='utf-8'))['items']}
         ok = rc == 0 and set(old) < set(new) and all(new[k] == v for k, v in old.items()) \
-            and {'route:zz_new_screen', 'ctl:dues.js:button:zz_new_btn', 'option:10-2:lines.head:zz_new_head'} <= set(new)
+            and {'route:zz_new_screen', 'ctl:dues.js:button:zz_new_btn', 'option:11-1:lines.head:zz_new_head'} <= set(new)
         results.append(ok)
         print('%s  --update-baseline adds %d new items and leaves every old item untouched' % ('PASS' if ok else 'FAIL', len(new) - len(old)))
         # a removed item stays in the baseline even after --update-baseline on a tree that lost it

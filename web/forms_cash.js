@@ -1,5 +1,5 @@
 /* Islamia BOS · forms batch B (cash, receivables, marketing, ledgers), taken field by field from the BOS Build Kit v1.39.
-   07-1 · 04-1 · 30-1 · 14-1 · 17-1 · 25-1 · 20-6. Every limit comes from Location Settings; nothing is invented. */
+   07-1 · 04-1 · 30-1 · 14-1 · 17-1 · 25-1 · 23-1. Every limit comes from Location Settings; nothing is invented. */
 (() => {
 'use strict';
 const B = window.BOS, L = B.L, YN = B.YN, num = B.num, has = B.has, sum = B.sum;

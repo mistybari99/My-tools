@@ -22,9 +22,9 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.click('[data-act=ls2_pick][data-v=marketing_heads]'); await p.waitForTimeout(400);
   console.log('lists cards:', await p.locator('.card.stack').count()); await p.screenshot({ path: SP + '/l_lists.png' });
   // 11-1 uses the edited expense heads; 17-1 uses marketing heads
-  await p.goto('http://localhost:' + PORT + '/#/entry/new/10-2/1'); await p.waitForTimeout(800);
+  await p.goto('http://localhost:' + PORT + '/#/entry/new/11-1/1'); await p.waitForTimeout(800);
   console.log('11-1 head options:', (await p.locator('select[data-p="lines.0.head"] option').allTextContents()).join(' | '));
-  await p.goto('http://localhost:' + PORT + '/#/entry/new/18-1/1'); await p.waitForTimeout(800);
+  await p.goto('http://localhost:' + PORT + '/#/entry/new/17-1/1'); await p.waitForTimeout(800);
   console.log('17-1 head options:', (await p.locator('select[data-p="lines.0.head"] option').allTextContents()).join(' | '));
   await p.goto('http://localhost:' + PORT + '/#/locset'); await p.waitForTimeout(800);
   console.log('locset h2:', await p.locator('#ls_body h2').allTextContents());

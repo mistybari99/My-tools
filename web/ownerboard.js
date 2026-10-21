@@ -84,14 +84,14 @@ const KINDS = {
     const t0 = rows.filter((x) => x.entry_date === env.td), net = t0.reduce((s, x) => s + N(x.amount), 0), old = rows.filter((x) => x.status === 'open' && x.entry_date !== env.td).length;
     const red = t0.some((x) => x.status === 'open' && x.level === 'red'), open = t0.some((x) => x.status === 'open');
     return { value: t0.length ? (net > 0 ? '+' : net < 0 ? '−' : '') + money(Math.abs(net)) : '✓ ' + money(0), num: Math.abs(net), tone: red ? 'bad' : open || old ? 'warn' : 'ok', sub: `${t0.length} ${lab(L('টি আজ', 'today', 'today'))}${old ? ` · ${old} ${lab(L('পুরনো খোলা', 'older open', 'older open'))}` : ''}`, route: 'exceptions' }; } },
-  day_close: { g: 'cash', num: true, l: L('দিন শেষ — প্রতিটি শোরুম (০৬-১)', 'Day close per shop (06-1)', 'Day close — প্রতিটি shop (06-1)'), route: 'form/14-1', async load(env) {
+  day_close: { g: 'cash', num: true, l: L('দিন শেষ — প্রতিটি শোরুম (০৬-১)', 'Day close per shop (06-1)', 'Day close — প্রতিটি shop (06-1)'), route: 'form/06-1', async load(env) {
     let shops = locsNow().filter((l) => l.kind === 'showroom'); if (!shops.length) shops = locsNow();
     const es = arr(await tbl(sb.from('entries').select('form_code,location_id,status').eq('entry_date', env.td).eq('form_code', '06-1').limit(500)));
     let roll = []; try { roll = arr(await tbl(sb.from('form_rollout').select('form_code,location_id,mode').eq('form_code', '06-1'))); } catch (e) { roll = []; }
     const paper = (id) => (roll.find((x) => x.location_id === id) || {}).mode === 'paper';
     const closed = (id) => es.some((x) => x.location_id === id && (x.status === 'submitted' || x.status === 'approved'));
     const need = shops.filter((l) => !paper(l.id)), miss = need.filter((l) => !closed(l.id)), done = need.length - miss.length;
-    return { value: `${done}/${need.length}`, num: miss.length, tone: !miss.length ? 'ok' : dhakaHour() >= 18 ? 'warn' : 'info', sub: miss.length ? miss.slice(0, 3).map(locName).join(', ') + (miss.length > 3 ? ' +' + (miss.length - 3) : '') : T('clear'), route: 'form/14-1' }; } },
+    return { value: `${done}/${need.length}`, num: miss.length, tone: !miss.length ? 'ok' : dhakaHour() >= 18 ? 'warn' : 'info', sub: miss.length ? miss.slice(0, 3).map(locName).join(', ') + (miss.length > 3 ? ' +' + (miss.length - 3) : '') : T('clear'), route: 'form/06-1' }; } },
   needs_you: { g: 'appr', num: true, l: L('আপনার সিদ্ধান্ত দরকার (পুরনো আগে)', 'Needs you (oldest first)', 'Decision দরকার (পুরনো আগে)'), route: 'pending', async load() {
     const d = arr(await rpc('needs_you_oldest', { p_limit: 5 }));
     if (!d.length) return { value: '✓ 0', num: 0, tone: 'ok', sub: T('clear'), route: 'pending' };

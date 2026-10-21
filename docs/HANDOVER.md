@@ -32,7 +32,7 @@ W1 hardening (docs BUILD-RULES/BUILD-LOG, backup list, audit_log append-only, co
 W2 item master (phase11: item_type, control class, flags, asset register, import 1312 via dry-run first, edit/add-by-category/retire, ⋮ menu, purchase classifies asset).
 W3 list add-rules (open|approval|owner) + Other queue + shared list control (search, Add new, Other) form by form; ⋮ menus.
 W4 locations (kind/model/status/hub, add showroom + 17 setup steps, pause/close), Control Center shell (12 tiles, head-management tier, merged Needs-you), settings sheet 0-1 versions + getLimit.
-W5 server rules (blind count + see-expected grant, PIN signature switch, lock/revision/change requests, form offline queue, entered-later + paper serial, Paper/Parallel/App switch, owner-self-approval switch). Start with 06-1 and 10-1.
+W5 server rules (blind count + see-expected grant, PIN signature switch, lock/revision/change requests, form offline queue, entered-later + paper serial, Paper/Parallel/App switch, owner-self-approval switch). Start with 06-1 and 03-1.
 W6 recipes/BOM + packaging rule + production consumes raw material.
 W7 per-form paper check (docs/forms/*), remaining reports, form↔stock links.
 Defaults to ask nothing about: use judgment; mention choices in the reply.
@@ -56,12 +56,12 @@ Items:
 5. Barcode scan on the purchase-bill item field (barcode.js) and on stock actions.
 6. Home Accounting "Day book" tile (currently "coming soon") — build the day book (cash in/out by day from sales, collections, expenses 11-1, supplier payments). **[DONE - phase13 + web/daybook.js, see BUILD-LOG]**
 7. Per-line stock-effect preview in the purchase bill editor.
-8. Photos for stock/purchase: dedicated STOCK / PURCHASE storage prefixes or grant-based photo_ok (today they borrow form codes 04-1/06-4).
+8. Photos for stock/purchase: dedicated STOCK / PURCHASE storage prefixes or grant-based photo_ok (today they borrow form codes 13-1/02-1).
 9. Emergency-rule keys for stock_count_adjust, stock_transfer, stock_issue, stock_production (so the owner can allow emergency windows).
 10. Wastage: manager approval above an owner-set limit (maker-checker), not only the photo rule.
 11. Supplier refund (cash back from a supplier) alongside credits from returns; sale_return flow (defined in ledger, unused).
 12. Expired batches: optional setting to block selling expired stock (today red exception 'sold_expired' only).
-13. Salary view: export_data/salary_view grants exist with no consumer — build salary report page (owner/grantees) from 02-2/02-3 data; wire export grant server-side. **[DONE - phase13 + web/salary.js, see BUILD-LOG]**
+13. Salary view: export_data/salary_view grants exist with no consumer — build salary report page (owner/grantees) from 21-1/35-1 data; wire export grant server-side. **[DONE - phase13 + web/salary.js, see BUILD-LOG]**
 14. stock_ledger.ref_id column grant leaks purchase bill ids to location users reading the table directly — revoke column or null via view.
 15. Forms ↔ stock/purchase links: 13-1 GRN, 18-1 issue, 36-1 count, 39-1 transfer, 12-1 factory sheet should post to the ledger when approved (switchable setting, default off); 37-1 store ledger and 38-1 supplier ledger become views over the new data (never a second typing place); 38-1 master-list name column uses supplier_pick.
 16. Discount approver stored on sales (for the discounts report); brand-level P&L; remaining 46 of 65 reports (docs/plan_v2/REPORTS.md catalogue).

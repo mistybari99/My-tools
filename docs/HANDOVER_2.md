@@ -25,7 +25,7 @@ W0 carry-over (items.details, view_cost RPC, low-stock, barcode on purchase/stoc
 3. ~50 pickers still plain selects/arrays (purchase unit + return reasons, sale-return reasons, stock unit, wallets, asset condition, itemmaster type/class, unit-conversion selects) → wire `B.listctl.enhance`.
 4. Hard-coded location lists in forms_cash.js / forms_sales.js (SHOWROOMS, brands) and forms_staff.js duty slots → read `locations` (entry pickers still list paused/closed places; server refuses).
 5. owner_self_approve switch not applied to wastage, supplier refund, sale returns, settings-sheet approvals (done for entries, releases, emergency, item changes).
-6. Blind count only 06-1 & 03-1 (36-1 stock count, 13-1 GRN not blind; browser still computes expected, hidden not sealed). PIN signature only 14-1/10-1 witness; other two-person forms unchanged; PIN second-client sign-in unverified on real Supabase.
+6. Blind count only 06-1 & 03-1 (36-1 stock count, 13-1 GRN not blind; browser still computes expected, hidden not sealed). PIN signature only 06-1/03-1 witness; other two-person forms unchanged; PIN second-client sign-in unverified on real Supabase.
 7. `rules` row/UI for `ia_home_v2` (owner-side switch) and `ui_collapsed_controls`; UI for per-form tables `blind_count_cfg`, `pin_sig_cfg`.
 **P3 — reports/accounting:**
 8. 34 of 65 reports remain (BUILD-LOG W7 list: S10, P2, P4–P6, K2, K3, F1–F4, E2–E4, W1, W2, D5, T3, T4, L1–L5, X2–X5, G2, M1, M2, Q1–Q3); Parallel-mode comparison pairs / month-end pass-fail (Build cmd 7); sales/due reports not net of sale returns/refund cash.

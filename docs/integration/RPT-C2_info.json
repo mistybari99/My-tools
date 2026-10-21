@@ -139,9 +139,9 @@
       "label": "Cashier on the daily showroom sheet 06-1",
       "what_it_does": "The person who handled the till for that sheet (the shift box already exists).",
       "why_it_matters": "Cash short and over could only be tied to the person who wrote the sheet.",
-      "default": "Optional box on form 14-1.",
+      "default": "Optional box on form 06-1.",
       "if_switched": "Cashier-wise variance fills in from new sheets. Older sheets show as 'cashier not written'.",
-      "who_can_change": "Anyone who fills form 14-1."
+      "who_can_change": "Anyone who fills form 06-1."
     },
     {
       "key": "production_crew",

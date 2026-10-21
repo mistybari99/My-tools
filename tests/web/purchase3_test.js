@@ -72,7 +72,7 @@ const IT = base.tables.items;
   p = await open({ m: { levels } }, '#/purchase/new'); await p.setInputFiles('#pe_file', SP + '/pic.png'); await wait(p, 700);
   let up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^PURCHASE\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]), 'bill photo goes to the PURCHASE prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
   p = await open({ m: { levels, upFail: 'PURCHASE/' } }, '#/purchase/new'); await p.setInputFiles('#pe_file', SP + '/pic.png'); await wait(p, 700);
-  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^02-1\/1\//.test(up[0][0]), 'database without phase12: falls back to 06-4: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
+  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^02-1\/1\//.test(up[0][0]), 'database without phase12: falls back to 02-1: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
 
   // ---------- ⋮ menu on the bills list ----------
   p = await open({ m: { levels, credits: [] } }, '#/purchase');

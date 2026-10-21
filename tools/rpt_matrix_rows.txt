@@ -44,7 +44,7 @@
 3|Contribution margin (fixed vs variable cost)|N|unavailable|profit_variable_heads|-|-|A3-G13 not supported
 4|Daily production and dispatch|W|unverified|key:f1_production,production_runs|entries 12-1 jsonb / production_runs|batches per product|jsonb extraction drift risk; no hand-number test found
 4|Yield vs standard|W|unverified|key:f2_yield,production_variance116|production_runs|yield % vs recipe|packaging_on_actual_yield116 OFF by default
-4|Raw usage vs recipe|W|unverified|key:f3_raw_vs_recipe|entries 04-2/05-1|usage vs recipe qty|issue lines not structured (needs capture)
+4|Raw usage vs recipe|W|unverified|key:f3_raw_vs_recipe|entries 18-1/12-1|usage vs recipe qty|issue lines not structured (needs capture)
 4|Recipe book, versions and BOM listing|W|implemented|recipes,recipe_versions,recipe_lines,web:recipebook.js|recipe tables|versioned recipes|screen, not a report
 4|Recipe cost breakdown (materials, labour, overhead)|W|implemented|recipe_cost_components_get,web:cost116.js|recipe_cost_components|component costs|unknown ingredient cost shows unknown
 4|Batch costing (actual cost per run)|W|incomplete|production_cost_queue116,production_runs,cost_wait_list96|ledger|run cost from issue_out rows|runs before the month pool exists book conversion 0 (A1-G4)
@@ -89,7 +89,7 @@
 7|Supplier ledger / statement|W|implemented|supplier_ledger,web:purchase.js|bills, payments|running balance|none
 7|Purchase rate trend per item|W|unverified|key:p2_rate_trend|entries 13-1 lines|rate over time|jsonb based
 7|Supplier scorecard|W|unverified|key:p4_supplier_score|entries|short/late|supplier is free text in older forms
-7|PO - GRN - bill match and open POs|W|unverified|key:p5_po_match,grn_pending_report|entries 06-3/04-1|match|GRN vs purchase both post purchase_in (double count risk)
+7|PO - GRN - bill match and open POs|W|unverified|key:p5_po_match,grn_pending_report|entries 27-1/13-1|match|GRN vs purchase both post purchase_in (double count risk)
 7|Purchases vs budget|W|unverified|key:p6_purchase_budget,budgets|budgets, entries 04-1|budget vs spend|budgets only for some heads
 7|Bills without payment|W|implemented|bill_pay_record,web:purchase.js|purchase_bills|unpaid bills|none
 7|Landed cost on purchases|W|incomplete|landed_costs,landed_cost_lines|landed tables|freight/duty allocation|OFF by default
@@ -134,7 +134,7 @@
 10|Overtime cost|M|unavailable|payroll_lines|-|-|no report
 10|Shift roster vs attendance|M|unavailable|shifts,employee_shift_assignments|tables|-|no report
 10|Sales per labour hour|N|unavailable|-|-|-|needs hours worked per day linked to sales
-11|Orders, online and delivery summary|W|unverified|key:s10_orders,online_orders|entries 20-1/20-6 + online_orders|by status|jsonb; two sources
+11|Orders, online and delivery summary|W|unverified|key:s10_orders,online_orders|entries 05-1/23-1 + online_orders|by status|jsonb; two sources
 11|Online order register and status|W|incomplete|online_orders,online_order_events,web:inbox.js|online_orders|status timeline|web-order edge function needed
 11|Custom cake orders (advance, flavour, message, date)|N|unavailable|-|-|-|no cake-order table; owner decision on fields
 11|Order advances and balance due|N|unavailable|cash_moves|-|-|no advance-on-order capture

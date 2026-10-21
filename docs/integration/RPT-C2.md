@@ -44,7 +44,7 @@ Web hook sites:
 | `web/custinsight.js` (new) | route `custinsight` (credit, lifetime value, returns and complaints, special orders, customer card with credit days). |
 | `web/staffreports.js` (new) | route `staffreports` (attendance, variance, sales per hour, output per hour, cashier variance, salary basis) and `BOS.c2prod` (crew and order fields of the production sheet). |
 | `web/salesx.js` | additive guarded lines: `B.c2orders` init/attach on load, cake and slot fields in the order form, refund-mode box and `c2_order_cancel` on cancel, delivery cost box and `c2_order_deliver` on deliver, a Details button, a second balance line for closed orders. |
-| `web/forms_cash.js` | one block at the end: Cashier box added to the head of form 14-1. |
+| `web/forms_cash.js` | one block at the end: Cashier box added to the head of form 06-1. |
 | `web/recipes.js` | production sheet: `#pr_c2` placeholder filled by `B.c2prod`, crew and order saved after `production_post` returns a `run_id`. |
 | `web/ia.js` | three `rec(...)` lines (before `biexport`): `orderreports` (group `sale`, also `factory`), `custinsight` (group `cust`), `staffreports` (group `people`, also `acc`). No Home tile, no bottom-bar slot, no route removed. |
 | `web/index.html` | four script tags after `salesx.js`. |

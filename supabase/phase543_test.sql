@@ -2,7 +2,7 @@
 -- This file pastes phase543.sql itself (T1 onwards), then pastes it again (T9: paste-twice is a no-op). Never paste this file into the live project.
 -- Build the old-state database first (the order = FOUNDATION + NEW without phase543), e.g.:
 --   ORD=$(. tests/sql/paste_order.env; echo -n "$FOUNDATION $NEW" | tr ' ' '\n' | grep -v '^phase543$' | tr '\n' ' '); PGPORT=5544 bash tests/sql/final_build.sh form_t543 "$ORD"
---   psql -h /tmp -p 5544 -U postgres -d form_t543 -f supabase/phase543_test.sql      (expect: 32 checks, 0 failures)
+--   psql -h /tmp -p 5544 -U postgres -d form_t543 -f supabase/phase543_test.sql      (expect: 33 checks, 0 failures)
 -- Fixtures use neutral test_* ids and the seeded owner role and locations 1..n only. Prints PASS / FAIL per check.
 \set ON_ERROR_STOP off
 create schema if not exists t543;
@@ -19,7 +19,7 @@ insert into serials (form_code, location_id, last) values ('10-2', 1, 7) on conf
 insert into pin_sig_cfg (form_code, enabled) values ('14-1', true) on conflict do nothing;
 insert into forms_ledger_cfg (form_code, is_on) values ('04-1', true) on conflict do nothing;
 insert into blind_count_cfg (form_code, location_id, enabled) values ('14-1', 1, true) on conflict do nothing;
-update rules set label_en = 'test: form 14-1 and 10-2 note', label_bn = 'টেস্ট ফর্ম ১৪-১ ও ১০-২' where key = 'pos_customer_on_due';
+update rules set label_en = 'test: form 14-1 and 10-2 note', label_bn = 'টেস্ট ফর্ম ১৪-১ ও ১০-২', label_mix = 'field:10-2:x and #/entry/new/14-1/1' where key = 'pos_customer_on_due';
 alter table entries disable trigger user;
 insert into entries (id, form_code, location_id, serial, entry_date, status, data, created_by, created_at, updated_at)
   values ('00000000-0000-0000-0000-00000000f543', '02-2', 1, 1, '2026-10-01', 'draft', '{"test": "t543"}', '00000000-0000-0000-0000-00000000a543', now(), now());
@@ -53,6 +53,7 @@ select t543.chk('T3h no table still holds a temporary code', (select count(*) fr
 
 \echo == T4 labels, functions, triggers, policies, checks, constraints
 select t543.chk('T4a the label names the new codes (14-1 -> 06-1, 10-2 -> 11-1)', (select label_en from rules where key = 'pos_customer_on_due') = 'test: form 06-1 and 11-1 note');
+select t543.chk('T4a3 a code next to a colon or a slash is changed too (field:10-2:x, #/entry/new/14-1/1)', (select label_mix from rules where key = 'pos_customer_on_due') = 'field:11-1:x and #/entry/new/06-1/1');
 select t543.chk('T4a2 the Bangla-digit label names the new codes (১৪-১ -> ০৬-১, ১০-২ -> ১১-১)', (select label_bn from rules where key = 'pos_customer_on_due') = 'টেস্ট ফর্ম ০৬-১ ও ১১-১');
 select t543.chk('T4b a stored function names the new codes, not the old ones',
   (select count(*) from pg_proc where proname = '_acct_docs' and pg_get_functiondef(oid) like '%11-1%') >= 1

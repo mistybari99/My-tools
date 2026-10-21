@@ -150,7 +150,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---------- counted once ----------
   await p.click('[data-act=a2_tab][data-v=count]'); await wait(p, 600);
-  t = await text(p); ok(/Attendance record/.test(t) && /Shadow copy \(locked\)/.test(t) && /Differs/.test(t) && /Matches/.test(t) && /14-1/.test(t), 'counted source, shadow chip, per-person difference, 06-1 note');
+  t = await text(p); ok(/Attendance record/.test(t) && /Shadow copy \(locked\)/.test(t) && /Differs/.test(t) && /Matches/.test(t) && /06-1/.test(t), 'counted source, shadow chip, per-person difference, 06-1 note');
   await p.click('[data-act=a2_link]'); await wait(p, 500); c = await calls(p, 'attendance_form_link_run'); ok(c.length === 1 && c[0].p_month.endsWith('-01'), 'link now');
   await noOverflow(p, 'count');
 

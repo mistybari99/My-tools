@@ -689,7 +689,7 @@ What a person sees: at 9:00 the manager opens 06-1 on step 1 (2.5 pages); at clo
 
 ### 4.2 Field maps for the paper forms (every id kept; `*` = conditional field, unchanged rule)
 
-Table fields keep all their columns. All sections are placed (14-1: 11 of 11).
+Table fields keep all their columns. All sections are placed (06-1: 11 of 11).
 
 **06-1 Daily showroom sheet** (5-step bar; summary in the action bar: counted total, short/over, category match; flags row always visible; blind-count and PIN boxes exactly as today)
 
@@ -966,10 +966,10 @@ Field examples (ids are the baseline ids and do not change; the new side is the 
 
 | Baseline id | Type | New home |
 |---|---|---|
-| `field:14-1:cash_count` | denoms (required) | 06-1 > step 3 Cash > Cash count pad (data-p paths `cash_count.n1000` to `n1`, `cash_count.coin` unchanged) |
-| `field:14-1:fridges.cold` | tick | 06-1 > step 1 Opening > fridges table, expanded row |
-| `field:14-1:c1` | tick (required) | 06-1 > step 5 Close > checklist `c1` to `c16`, counter 0/16 |
-| `option:14-1:day_type:busy` | option | 06-1 > header card `day_type` |
+| `field:06-1:cash_count` | denoms (required) | 06-1 > step 3 Cash > Cash count pad (data-p paths `cash_count.n1000` to `n1`, `cash_count.coin` unchanged) |
+| `field:06-1:fridges.cold` | tick | 06-1 > step 1 Opening > fridges table, expanded row |
+| `field:06-1:c1` | tick (required) | 06-1 > step 5 Close > checklist `c1` to `c16`, counter 0/16 |
+| `option:06-1:day_type:busy` | option | 06-1 > header card `day_type` |
 | `ctl:entry.js:button:e_count_save` | button | stays in `entry.js`; in the bar or the Cash step, same `data-act` |
 | `setting:rule:blind_count_on` | rule | Setup > Rules by purpose > "How do we protect cash and counts?"; Switchboard pinned Safety group |
 

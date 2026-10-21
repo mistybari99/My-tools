@@ -23,7 +23,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   const signSheet = async (p, role, staff, pin) => { await p.click(`#pinbox [data-act=e_pin_sign][data-v=${role}]`); await wait(p, 600); if (staff) await p.selectOption('#ps_staff', staff); await p.fill('#ps_pin', pin); await p.click('[data-act=ps_go]'); await wait(p, 700); };
 
   // ---------- switch ON, 06-1 ----------
-  let p = await open({}, '#/entry/new/14-1/1');
+  let p = await open({}, '#/entry/new/06-1/1');
   ok(await p.locator('#pinbox').count() === 1, 'PIN signature box is shown');
   ok(await p.locator('[data-p="witness"]:visible').count() === 0 && await p.locator('[data-p="second_sig"]:visible').count() === 0, 'the old name pickers are gone while PIN signature is on');
   ok(await p.locator('#pinbox [data-act=e_pin_sign]').count() === 2, 'two Sign with PIN buttons (witness, second signature)');
@@ -55,7 +55,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   await p.selectOption('#ps_staff', 'teste03'); await p.fill('#ps_pin', '5555'); await p.click('[data-act=ps_go]'); await wait(p, 800);
   ok(/Signed by: TestE/.test(await p.textContent('#pinbox')) && await p.locator('#pinbox [data-act=e_pin_sign]').count() === 0, 'both signed');
   // server refusal text
-  p = await open({}, '#/entry/new/14-1/1'); await p.click('#pinbox [data-act=e_pin_sign][data-v=witness]'); await wait(p, 600);
+  p = await open({}, '#/entry/new/06-1/1'); await p.click('#pinbox [data-act=e_pin_sign][data-v=witness]'); await wait(p, 600);
   await p.evaluate(() => { window.__W6S.err.sign_entry = 'signer_already_signed'; });
   await p.selectOption('#ps_staff', 'testf02'); await p.fill('#ps_pin', '4321'); await p.click('[data-act=ps_go]'); await wait(p, 700);
   ok(/already signed/i.test(await p.textContent('#ps_err')), 'server refusal gets a clear message (sheet stays open)');
@@ -68,22 +68,22 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   ok(r2.x.code === 'locked' && r2.n === 0, 'a locked login is refused without trying the PIN');
 
   // ---------- submit needs the signatures ----------
-  p = await open({}, '#/entry/new/14-1/1'); await p.click('[data-act=e_submit]'); await wait(p, 700);
+  p = await open({}, '#/entry/new/06-1/1'); await p.click('[data-act=e_submit]'); await wait(p, 700);
   ok(/Witness/.test(await p.evaluate(() => document.body.innerText)) && /Not signed yet/.test(await p.evaluate(() => document.body.innerText)), 'missing list names the missing PIN signatures');
 
   // ---------- 03-1 pair ----------
-  p = await open({}, '#/entry/new/10-1/1');
-  ok(await p.locator('#pinbox [data-act=e_pin_sign][data-v=hub_pair]').count() === 1, '10-1: one pair signature');
+  p = await open({}, '#/entry/new/03-1/1');
+  ok(await p.locator('#pinbox [data-act=e_pin_sign][data-v=hub_pair]').count() === 1, '03-1: one pair signature');
   await signSheet(p, 'hub_pair', 'teste03', '5555');
   se = await calls(p, 'sign_entry'); ok(se.length === 1 && se[0][1].p_role === 'hub_pair', '03-1 pair signed through sign_entry');
   ok(/Signed by: TestE/.test(await p.textContent('#pinbox')), '03-1 shows the signer');
 
   // ---------- switch OFF / phase18 missing: the old name picker ----------
   for (const w6 of [{ pin: false, blind: false }, { pin: 'missing', blind: 'missing' }]) {
-    p = await open({ w6 }, '#/entry/new/14-1/1');
+    p = await open({ w6 }, '#/entry/new/06-1/1');
     ok(await p.locator('#pinbox').count() === 0 && await p.locator('[data-p="witness"]:visible').count() === 1 && await p.locator('[data-p="second_sig"]:visible').count() === 1, 'PIN signature off ' + JSON.stringify(w6) + ': name pickers as before');
   }
-  p = await open({}, '#/entry/new/10-2/1'); ok(await p.locator('#pinbox').count() === 0 && (await calls(p, 'pin_sig_active')).length === 0, 'other forms never ask');
+  p = await open({}, '#/entry/new/11-1/1'); ok(await p.locator('#pinbox').count() === 0 && (await calls(p, 'pin_sig_active')).length === 0, 'other forms never ask');
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow');
 
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);

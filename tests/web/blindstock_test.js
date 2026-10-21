@@ -33,7 +33,7 @@ const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.s
   const openAll = (p) => p.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); });
 
   // 36-1 blind ON
-  let p = await open({ on: true, sealed: false }, '#/entry/new/04-3/1'); await openAll(p);
+  let p = await open({ on: true, sealed: false }, '#/entry/new/36-1/1'); await openAll(p);
   ok((await calls(p, 'stock_blind_active')).length === 1, '36-1 asks the server');
   ok(await p.locator('[data-p="rows.0.count"]').count() === 1, 'count field present');
   await p.fill('[data-p="rows.0.count"]', '7'); await wait(p, 200);
@@ -49,22 +49,22 @@ const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.s
   await p.screenshot({ path: SP + '/bs_043.png', fullPage: true });
 
   // 36-1 blind OFF
-  p = await open({ on: false }, '#/entry/new/04-3/1'); await openAll(p);
+  p = await open({ on: false }, '#/entry/new/36-1/1'); await openAll(p);
   await p.fill('[data-p="rows.0.count"]', '7'); await wait(p, 200);
   ok(await p.locator('[data-p="rows.0.book"]').first().isVisible() && await p.locator('[data-act=e_seal]').count() === 0, 'switch OFF: old behaviour (book field, no lock button)');
 
   // 13-1 blind ON: memo hidden until counted are locked
-  p = await open({ on: true, sealed: false }, '#/entry/new/04-1/1'); await openAll(p);
-  ok(await p.locator('[data-p="lines.0.counted"]').count() === 1 && !(await p.locator('[data-p="lines.0.memo"]').first().isVisible()), '04-1: memo hidden before the lock');
+  p = await open({ on: true, sealed: false }, '#/entry/new/13-1/1'); await openAll(p);
+  ok(await p.locator('[data-p="lines.0.counted"]').count() === 1 && !(await p.locator('[data-p="lines.0.memo"]').first().isVisible()), '13-1: memo hidden before the lock');
   await p.fill('[data-p="lines.0.counted"]', '10'); await p.click('[data-act=e_seal]'); await wait(p, 600);
-  ok(await p.locator('[data-p="lines.0.memo"]').first().isVisible(), '04-1: memo appears after the lock');
-  ok(await p.locator('[data-p="lines.0.counted"][disabled]').count() === 1, '04-1: counted read-only after the lock');
+  ok(await p.locator('[data-p="lines.0.memo"]').first().isVisible(), '13-1: memo appears after the lock');
+  ok(await p.locator('[data-p="lines.0.counted"][disabled]').count() === 1, '13-1: counted read-only after the lock');
   // error text
-  p = await open({ on: true, sealed: false, err: 'count_missing' }, '#/entry/new/04-1/1'); await openAll(p);
+  p = await open({ on: true, sealed: false, err: 'count_missing' }, '#/entry/new/13-1/1'); await openAll(p);
   await p.fill('[data-p="lines.0.counted"]', '10'); await p.click('[data-act=e_seal]'); await wait(p, 600);
   const bt = await p.evaluate(() => document.body.innerText); ok(/Type the count/.test(bt), 'friendly text for count_missing ' + bt.slice(-200).replace(/\n/g,' '));
   // other forms never ask
-  p = await open({ on: true }, '#/entry/new/10-2/1'); ok((await calls(p, 'stock_blind_active')).length === 0, 'other forms do not ask');
+  p = await open({ on: true }, '#/entry/new/11-1/1'); ok((await calls(p, 'stock_blind_active')).length === 0, 'other forms do not ask');
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow');
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);
   await br.close();

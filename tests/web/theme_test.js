@@ -60,7 +60,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   p = await open(`window.__OWNER=false;window.__PERMS={'13-1':{view:true,enter:true,approve:false}};`, '#/home', 'dark');
   ok(await p.locator('.sellbig').count() === 0 && await p.locator('#bnav .sell').count() === 0, 'role without POS: no Sell button, keeps own top job'); await p.context().close();
   // no horizontal overflow at 360 on 6 screens x 3 themes
-  const screens = ['#/home', '#/pos', '#/items', '#/entry/new/10-2/1', '#/form/14-1', '#/reports'];
+  const screens = ['#/home', '#/pos', '#/items', '#/entry/new/11-1/1', '#/form/06-1', '#/reports'];
   for (const t of ['dark', 'light', 'classic']) for (const h of screens) { p = await open('', h, t); const o = await ovf(p); ok(o <= 0, `no horizontal overflow ${t} ${h} (${o})`); await p.context().close(); }
   // drawer open overflow + tap targets
   p = await open('', '#/home', 'dark'); await p.click('header.top [data-act=nav_open]'); await p.waitForTimeout(400); ok(await ovf(p) <= 0, 'no overflow with drawer open');

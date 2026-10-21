@@ -457,7 +457,7 @@
 - `acct_transit_loss_at = receiver` হলে clearing account নিষ্পত্তি না হওয়া পর্যন্ত sender +V ও receiver −V দেখায়।
 - Account 5110 থেকে 5140 ও owner capital (3100) ডিফল্ট। আপনি `acct_mapping_set` দিয়ে বদলাতে পারেন। accountant-এর সঙ্গে মেলানো হয়নি।
 - **পুরনো `phase40.sql` / `ALL_NEW10.sql` phase 85 এর পরে আবার paste করবেন না।** এতে `acct_journal_post`-এর পুরনো রূপ ফিরে ambiguity হয়।
-- Form-path (04-2/05-1) থেকে আসা count gain/transfer-in-এর cost ledger-এ NULL থাকলে `cost_missing` হয়ে অপেক্ষায় থাকে। D2 (opening stock সাহায্যকারী) ও D3 (cost-অপেক্ষা তালিকা) phase 96-এ বানানো হয়েছে (অংশ 21)।
+- Form-path (18-1/12-1) থেকে আসা count gain/transfer-in-এর cost ledger-এ NULL থাকলে `cost_missing` হয়ে অপেক্ষায় থাকে। D2 (opening stock সাহায্যকারী) ও D3 (cost-অপেক্ষা তালিকা) phase 96-এ বানানো হয়েছে (অংশ 21)।
 - `purchase_variance` শুধু purchase-এর item-type key ধরে। `purch_consumable`-এ বুক হওয়া stock-tracked item বাদ।
 
 **[যাচাই হয়নি]** আসল Supabase, আসল pg_cron (শুধু ছদ্ম schema), card/bank আসল অঙ্ক, concurrent poster, `#/books85`-এর ফোনের চেহারা (360px দেখা হয়নি, শুধু নকল DOM-এ 351 চেক), `<select>` ট্যাপ।

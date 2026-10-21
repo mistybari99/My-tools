@@ -75,7 +75,7 @@ const EXTRA_NAV = `(function(){ const real = window.supabase.createClient; windo
   await p.fill('#nav_q', '0171100'); await wait(p, 900);
   ok(/TestF Store/.test(await p.textContent('#nav_body')) && !/TestE/.test(await p.textContent('#nav_body')), 'customer hit by mobile fragment');
   await p.fill('#nav_q', '11-1'); await wait(p, 900);
-  ok(await p.locator('#nav_body .dr-it[data-v="form/10-2"]').count() === 1, 'form hit by code');
+  ok(await p.locator('#nav_body .dr-it[data-v="form/11-1"]').count() === 1, 'form hit by code');
   await p.fill('#nav_q', 'k'); await wait(p, 600);
   ok(!/Searching/.test(await p.textContent('#nav_body')) && await p.locator('#nav_body .dr-it[data-v=dues]').count() === 0, 'one letter searches the menu only (no customer / item fetch)');
   const cq = await p.evaluate(() => window.__R.length);
@@ -128,9 +128,9 @@ const EXTRA_NAV = `(function(){ const real = window.supabase.createClient; windo
   const t = (code) => rows.find((r) => r.includes(code)) || '';
   ok(/Done/.test(t('06-1')) && /Draft/.test(t('11-1')) && /On paper/.test(t('39-1')), 'states: submitted/approved = Done, draft = Draft, rollout paper = On paper');
   ok(/1\/2 done/.test(await p.textContent('#hv_sheets .hsec')), 'summary counts only app sheets: ' + (await p.textContent('#hv_sheets .hsec')));
-  ok(/^(?!.*06-1)/.test(rows[0]) && /10-2/.test(rows[0]), 'unfinished (draft) comes before done');
+  ok(/^(?!.*06-1)/.test(rows[0]) && /11-1/.test(rows[0]), 'unfinished (draft) comes before done');
   await p.click('#hv_sheets .hrow'); await wait(p, 500);
-  ok(/#\/form\/10-2/.test(await p.evaluate(() => location.hash)), 'a row opens the form');
+  ok(/#\/form\/11-1/.test(await p.evaluate(() => location.hash)), 'a row opens the form');
   await p.close();
   p = await open(stf, '#/home');   // rule empty: every enterable form of this person that exists in the app
   const all = await p.locator('#hv_sheets .hrow').count(); ok(all >= 3, 'rule empty -> all my enterable sheets (' + all + ')');

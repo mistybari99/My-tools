@@ -47,15 +47,15 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
 
   // ---- switch OFF: the old paper form list stays ----
-  let p = await open({}, '#/form/04-4');
+  let p = await open({}, '#/form/37-1');
   ok(await p.locator('#lk_loc').count() === 0 && await p.locator('[data-act=newentry]').count() === 1, 'switch off: 37-1 is the normal paper-form list with a new-entry button');
   await p.close();
-  p = await open({}, '#/form/06-5');
+  p = await open({}, '#/form/38-1');
   ok(await p.locator('#lk_loc').count() === 0 && await p.locator('[data-act=newentry]').count() === 1, 'switch off: 38-1 is the normal list');
   await p.close();
 
   // ---- switch ON: 37-1 read view ----
-  p = await open({ on: true }, '#/form/04-4');
+  p = await open({ on: true }, '#/form/37-1');
   ok(await p.locator('#lk_loc').count() === 1 && await p.locator('[data-act=newentry]').count() === 0, 'switch on: read view, no new-entry button');
   ok(await p.locator('.lk-row').count() === 3, 'three items listed from stock_levels');
   let lv = await calls(p, 'stock_levels'); ok(lv.length >= 1, 'stock_levels called'); await p.screenshot({ path: SP + '/fl_store.png' }); await noOverflow(p, 'store list');
@@ -69,7 +69,7 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---- 38-1 read view ----
-  p = await open({ on: true }, '#/form/06-5');
+  p = await open({ on: true }, '#/form/38-1');
   ok(await p.locator('[data-act=lk_sup]').count() === 2, 'suppliers with dues listed'); ok(/Dudh Ghor/.test(await p.textContent('#app')) && /600/.test(await p.textContent('#app')), 'balance shown'); await noOverflow(p, 'supplier list');
   await p.click('[data-act=lk_sup] >> nth=0'); await wait(p, 500);
   const sl = await calls(p, 'supplier_ledger'); ok(sl.length === 1 && sl[0].p_supplier === 'sp1', 'supplier_ledger requested for the picked supplier');
@@ -77,19 +77,19 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---- 38-1 paper form: master list name column is the supplier picker ----
-  p = await open({}, '#/form/06-5'); await p.click('[data-act=newentry]'); await wait(p, 700);
+  p = await open({}, '#/form/38-1'); await p.click('[data-act=newentry]'); await wait(p, 700);
   ok(await p.locator('input[data-sup]').count() >= 2, 'supplier pickers on the head and in the master list rows'); const mi = p.locator('[data-p^="master."][data-sup]'); ok(await mi.count() >= 1, 'master-list name cells use the supplier picker');
   await p.close();
 
-  // ---- 05-1: optional finished-goods table ----
-  p = await open({}, '#/form/05-1'); await p.click('[data-act=newentry]'); await wait(p, 700);
+  // ---- 12-1: optional finished-goods table ----
+  p = await open({}, '#/form/12-1'); await p.click('[data-act=newentry]'); await wait(p, 700);
   ok(await p.locator('[data-p^="output."][data-item]').count() >= 1, '12-1 has the optional finished-goods item rows'); await p.close();
 
   // ---- #/ledgerlinks ----
   p = await open({ on: true }, '#/ledgerlinks');
   ok(await p.locator('[data-act=lk_set]').count() === 12, 'master + 5 forms, on/off each'); ok(await p.locator('[data-act=lk_set][data-v="master:1"].on').count() === 1, 'master shows On');
   ok(await p.locator('[data-act=lk_retry]').count() === 1 && /2 failed/.test(await p.textContent('#app')) && /1 skipped/.test(await p.textContent('#app')), 'retry list with counts'); await p.screenshot({ path: SP + '/fl_links.png' }); await noOverflow(p, 'links');
-  await p.click('[data-act=lk_set][data-v="04-2:0"]'); await wait(p, 400); let cf = await calls(p, 'forms_ledger_cfg_set'); ok(cf.length === 1 && cf[0].p_form === '18-1' && cf[0].p_on === false, 'per-form switch sent');
+  await p.click('[data-act=lk_set][data-v="18-1:0"]'); await wait(p, 400); let cf = await calls(p, 'forms_ledger_cfg_set'); ok(cf.length === 1 && cf[0].p_form === '18-1' && cf[0].p_on === false, 'per-form switch sent');
   await p.click('[data-act=lk_set][data-v="master:0"]'); await wait(p, 400); let sr = await calls(p, 'set_rule'); ok(sr.length === 1 && sr[0].p_key === 'forms_post_to_ledger' && sr[0].p_value === false, 'master switch sent as a rule');
   await p.click('[data-act=lk_retry]'); await wait(p, 400); const rt = await calls(p, 'entry_post_ledger_retry'); ok(rt.length === 1 && rt[0].p_entry === 'e1', 'retry sent for the entry'); ok(await p.locator('[data-act=lk_retry]').count() === 0 && /No problems/.test(await p.textContent('#app')), 'list refreshed');
   await p.close();

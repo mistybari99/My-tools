@@ -66,7 +66,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open({}, '#/costsources');
   ok(await p.locator('[data-act=cb_tab]').count() === 4, 'four tabs');
   const st = await p.textContent('#cb_pane');
-  ok(/Bill pending/.test(st) && /Split not set/.test(st) && /Unallocated/.test(st) && /10-2 voucher/.test(st), 'status shows the four lists');
+  ok(/Bill pending/.test(st) && /Split not set/.test(st) && /Unallocated/.test(st) && /11-1 voucher/.test(st), 'status shows the four lists');
   ok(/src-2/.test(st) && /src-1/.test(st), 'sources named by code + type');
   await p.click('[data-act=cb_ack]'); await wait(p, 300); const ak = await calls(p, 'cost_bill_dup_ack'); ok(ak.length === 1 && ak[0].p_bill === 22 && ak[0].p_note === 'a reason', 'acknowledging a duplicate sends the bill and the reason');
   await p.screenshot({ path: OUT + '/cb_status.png' }); await noOverflow(p, 'status'); await p.close();
@@ -112,7 +112,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 
   // ---- bills
   p = await open({}, '#/costsources'); await p.click('[data-act=cb_tab][data-v=bill]'); await wait(p, 250);
-  const bt = await p.textContent('#cb_pane'); ok(/#21/.test(bt) && /#22/.test(bt) && /Unallocated/.test(bt) && /10-2 voucher/.test(bt) && /৳ 2,500/.test(bt), 'bills with shares, unallocated chip and duplicate chip');
+  const bt = await p.textContent('#cb_pane'); ok(/#21/.test(bt) && /#22/.test(bt) && /Unallocated/.test(bt) && /11-1 voucher/.test(bt) && /৳ 2,500/.test(bt), 'bills with shares, unallocated chip and duplicate chip');
   await p.click('[data-act=cb_bnew]'); await wait(p, 250);
   ok(await p.locator('[data-bi]').count() === 2, 'the source in force needs readings (sub-meter): two boxes, none typed');
   await p.fill('#cb_amt', '1,000'.replace(',', '')); await p.fill('[data-bi="5:factory"]', '300'); await p.fill('#cb_no', 'E-9'); await p.check('#cb_one');

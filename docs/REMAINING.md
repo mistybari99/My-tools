@@ -15,11 +15,11 @@ P2 (rule 4 / consistency)
 4. ~50 pickers still plain selects (purchase unit/return reasons, sale-return reasons, stock unit, wallets, asset condition, itemmaster type/class, unit-conversion selects) → wire B.listctl.
 5. Hard-coded location lists in forms_cash.js / forms_sales.js (SHOWROOMS, brands), forms_staff.js duty slots; entry pickers still show paused/closed places (server refuses).
 6. Owner self-approval switch not yet applied to wastage, supplier refund, sale returns, location settings approvals (done for entries/releases/emergency/item changes).
-7. Blind count only 06-1 and 03-1; 36-1 stock count, 13-1 GRN not blind; browser still computes expected (hidden, not sealed). PIN signature only for 14-1/10-1 witness; other two-person forms (e.g. 33-1, 16-1) unchanged.
+7. Blind count only 06-1 and 03-1; 36-1 stock count, 13-1 GRN not blind; browser still computes expected (hidden, not sealed). PIN signature only for 06-1/03-1 witness; other two-person forms (e.g. 33-1, 16-1) unchanged.
 
 P3 (reports / accounting)
 8. 34 of 65 reports remain (list in BUILD-LOG W7: S10, P2, P4–P6, K2, K3, F1–F4, E2–E4, W1, W2, D5, T3, T4, L1–L5, X2–X5, G2, M1, M2, Q1–Q3). Parallel-mode comparison pairs/month-end pass-fail (Build cmd 7) and "Parallel" labels on reports not built.
-9. Day book gaps: bank deposits (07-1), customer order advances, owner top-ups, hub receiving side of 10-1.
+9. Day book gaps: bank deposits (07-1), customer order advances, owner top-ups, hub receiving side of 03-1.
 10. GRN (13-1) vs purchase page both post purchase_in → possible double count; GRN has no batch/expiry per line.
 11. Production run void/undo; recipe/production reports; packaging line on receipt.
 12. Sales/due reports not yet net of sale returns and refund cash.

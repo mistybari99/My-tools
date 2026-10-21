@@ -6151,6 +6151,42 @@
   },
   {
    "type": "rename",
+   "from": "place:home:acc:f:10-1",
+   "to": "place:home:acc:f:03-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-1 -> 03-1"
+  },
+  {
+   "type": "rename",
+   "from": "place:home:acc:f:10-2",
+   "to": "place:home:acc:f:11-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-2 -> 11-1"
+  },
+  {
+   "type": "rename",
+   "from": "place:home:acc:f:10-4",
+   "to": "place:home:acc:f:04-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 10-4 -> 04-1"
+  },
+  {
+   "type": "rename",
+   "from": "place:home:biz:f:03-1",
+   "to": "place:home:biz:f:39-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 03-1 -> 39-1"
+  },
+  {
+   "type": "rename",
+   "from": "place:home:biz:f:04-1",
+   "to": "place:home:biz:f:13-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 04-1 -> 13-1"
+  },
+  {
+   "type": "rename",
+   "from": "place:home:biz:f:14-1",
+   "to": "place:home:biz:f:06-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 14-1 -> 06-1"
+  },
+  {
+   "type": "rename",
    "from": "section:01-1:a-all-showrooms-side-by-side",
    "to": "section:40-1:a-all-showrooms-side-by-side",
    "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 01-1 -> 40-1"
@@ -7480,6 +7516,190 @@
    "from": "section:20-6:this-week",
    "to": "section:23-1:this-week",
    "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): 20-6 -> 23-1"
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:input:cb_vref",
+   "lang": "texts",
+   "from": "L:১০-২ নং (শুধু নম্বর)|10-2 no. (number only)|10-2 no.",
+   "to": "L:১১-১ নং (শুধু নম্বর)|11-1 no. (number only)|11-1 no.",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_leads.js:option:cp_kind:form_20_1",
+   "lang": "texts",
+   "from": "Make a draft customer order form (form 20-1)",
+   "to": "Make a draft customer order form (form 05-1)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_leads.js:option:cp_kind:form_20_4",
+   "lang": "texts",
+   "from": "Make a draft party invoice (form 20-4)",
+   "to": "Make a draft party invoice (form 24-1)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_leads.js:option:cp_kind:link_form",
+   "lang": "texts",
+   "from": "Link a 20-1 or 20-4 form that already exists",
+   "to": "Link a 05-1 or 24-1 form that already exists",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:select:af_maint",
+   "lang": "texts",
+   "from": "L:মেইনটেন্যান্স রেকর্ড (08-1)|Maintenance record (08-1)|Maintenance record (08-1)",
+   "to": "L:মেইনটেন্যান্স রেকর্ড (16-1)|Maintenance record (16-1)|Maintenance record (16-1)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:paths.js:button:qx_close",
+   "lang": "texts",
+   "from": "L:দিন শেষ — ১০-২ ফর্ম বানান|Day end - make the 10-2 form|Day end - 10-2 form বানান",
+   "to": "L:দিন শেষ — ১১-১ ফর্ম বানান|Day end - make the 11-1 form|Day end - 11-1 form বানান",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:payroll.js:option:av_m:none",
+   "lang": "texts",
+   "from": "L:টাকা আগে দেওয়া (০২-৩ ফর্মে লেখা)|Already paid out (written on form 02-3)|আগে দেওয়া (০২-৩)",
+   "to": "L:টাকা আগে দেওয়া (৩৫-১ ফর্মে লেখা)|Already paid out (written on form 35-1)|আগে দেওয়া (৩৫-১)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "ctl:salary.js:button:sa_openform",
+   "lang": "texts",
+   "from": "L:ফর্ম খুলুন|Open the form|Form খুলুন (02-2 # {...} )",
+   "to": "L:ফর্ম খুলুন|Open the form|Form খুলুন (21-1 # {...} )",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "field:14-2:jalebi_sales",
+   "lang": "bn",
+   "from": "দৈনিক শোরুম শিটের জিলাপি বিক্রি ৳ (14-1 থেকে)",
+   "to": "দৈনিক শোরুম শিটের জিলাপি বিক্রি ৳ (06-1 থেকে)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "field:14-2:jalebi_sales",
+   "lang": "en",
+   "from": "Jalebi sales ৳ from the daily showroom sheet (14-1)",
+   "to": "Jalebi sales ৳ from the daily showroom sheet (06-1)",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:campaigns:18-1",
+   "lang": "text",
+   "from": "18-1",
+   "to": "17-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:eqcheck:02-2",
+   "lang": "text",
+   "from": "02-2",
+   "to": "21-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:eqcheck:10-2",
+   "lang": "text",
+   "from": "10-2",
+   "to": "11-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:expenselink:10-2",
+   "lang": "text",
+   "from": "10-2",
+   "to": "11-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:formguard:form 05-1 mode",
+   "lang": "text",
+   "from": "form 05-1 mode",
+   "to": "form 12-1 mode",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:saleforms:20-1",
+   "lang": "text",
+   "from": "20-1",
+   "to": "05-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:saleforms:20-2",
+   "lang": "text",
+   "from": "20-2",
+   "to": "08-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:saleforms:20-4",
+   "lang": "text",
+   "from": "20-4",
+   "to": "24-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:unmatched:05-1",
+   "lang": "text",
+   "from": "05-1",
+   "to": "12-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "kw:wallets:10-3",
+   "lang": "text",
+   "from": "10-3",
+   "to": "07-1",
+   "reason": "printed form code renamed by owner decision (21 Oct 2026, docs/FORM_SEQUENCE.md section 4): label text names a renamed printed code"
+  },
+  {
+   "type": "label",
+   "id": "route:saleforms",
+   "lang": "bn",
+   "from": "ফর্ম 20-১/২/৪ ↔ বিক্রি",
+   "to": "ফর্ম ০৫-১, ০৮-১, ২৪-১ ↔ বিক্রি",
+   "reason": "wording (to review by the owner): the shorthand 20-1/2/4 is written out as its renamed codes 05-1, 08-1, 24-1 (docs/FORM_SEQUENCE.md)"
+  },
+  {
+   "type": "label",
+   "id": "route:saleforms",
+   "lang": "en",
+   "from": "Forms 20-1/2/4 <-> sales",
+   "to": "Forms 05-1, 08-1, 24-1 <-> sales",
+   "reason": "wording (to review by the owner): the shorthand 20-1/2/4 is written out as its renamed codes 05-1, 08-1, 24-1 (docs/FORM_SEQUENCE.md)"
+  },
+  {
+   "type": "label",
+   "id": "route:saleforms",
+   "lang": "mix",
+   "from": "Form 20-1/2/4 ↔ sale",
+   "to": "Form 05-1, 08-1, 24-1 ↔ sale",
+   "reason": "wording (to review by the owner): the shorthand 20-1/2/4 is written out as its renamed codes 05-1, 08-1, 24-1 (docs/FORM_SEQUENCE.md)"
   }
  ]
 }

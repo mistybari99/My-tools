@@ -51,7 +51,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const WARN_HIGH = { key: 'forms_post_to_ledger', known: true, mode: 'warn', show: true, confirm: false, on_now: false, new_value: true, severity: 'high', locks: 4, unlocks: 0,
     actions: [{ domain: 'stock_issue', screen: 'Stock screen issue', form: 'Form 18-1 (issue slip)', places: [{ location_id: 0, from: 'a', to: 'b' }] }, { domain: 'production', screen: 'Recipe production run', form: 'Form 12-1 (factory daily sheet)', places: [{ location_id: 0, from: 'a', to: 'b' }] }],
-    text: 'Turning this ON makes the paper form the only record for: Stock screen issue -> Form 04-2. The matching stock screens REFUSE new records ("path_locked").', fix: 'First set its owner switch on #/paths to "Screen" (path a).' };
+    text: 'Turning this ON makes the paper form the only record for: Stock screen issue -> Form 18-1. The matching stock screens REFUSE new records ("path_locked").', fix: 'First set its owner switch on #/paths to "Screen" (path a).' };
   const base0 = { calls: [], fresh: FRESH, ready: READY, dry: { dry: true, ran: false, posted: 0, reversed: 0, by_type: {} }, warn: WARN_HIGH, missing: false, deny: false };
 
   // 1. owner, fresh

@@ -130,7 +130,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   ok(await p.locator('[data-act=itemnew]').count() === 0 && await p.locator('.p2-row[data-act]').count() === 0, 'view-only: no add, rows not editable'); await p.close();
 
   // ---------- supplier picker (goods received 13-1 / quotation 29-1) ----------
-  p = await open({}, '#/entry/new/04-1/1');
+  p = await open({}, '#/entry/new/13-1/1');
   ok(await p.locator('input[data-sup]').count() >= 1, 'supplier field is a picker'); ok(await p.locator('#dl_sup option').count() === 2, 'datalist has 2 suppliers');
   const sup = p.locator('input[data-sup]').first(); await sup.fill('dudh ghor'); await sup.dispatchEvent('change'); await p.waitForTimeout(200); ok(/Listed supplier/.test(await p.textContent('.supwrap + .hint')), 'listed supplier hint');
   await p.screenshot({ path: SP + '/it_supplier.png' }); await noOverflow(p, 'supplier form');
@@ -139,13 +139,13 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   const ss = await calls(p, 'save_supplier'); ok(ss.length === 1 && ss[0].p_id === null && ss[0].p_patch.name === 'Nobo Supplier' && ss[0].p_patch.mobile === '01712345678', 'save_supplier called'); ok((await p.locator('input[data-sup]').first().inputValue()) === 'Nobo Supplier', 'new supplier filled in');
   const saveBtn = p.locator('[data-act=savedraft], [data-act=save]').first(); log('save btn count', await p.locator('[data-act=savedraft], [data-act=save]').count());
   await p.close();
-  p = await open({}, '#/entry/new/04-1/1'); const s2 = p.locator('input[data-sup]').first(); await s2.fill('Dudh Ghor'); await s2.dispatchEvent('change');
+  p = await open({}, '#/entry/new/13-1/1'); const s2 = p.locator('input[data-sup]').first(); await s2.fill('Dudh Ghor'); await s2.dispatchEvent('change');
   const acts = await p.locator('[data-act]').evaluateAll((els) => [...new Set(els.map((e) => e.dataset.act))].filter((x) => /save|draft|submit/i.test(x))); log('entry actions:', acts.join(','));
   if (acts.length) { await p.click(`[data-act=${acts[0]}]`); await p.waitForTimeout(500); const sv = await p.evaluate(() => window.__SAVED); log('saved supplier:', sv && JSON.stringify([sv.data.supplier, sv.data.supplier_id])); ok(sv && sv.data.supplier === 'Dudh Ghor' && sv.data.supplier_id === 'sp1', 'stored name + supplier_id'); }
   await s2.fill('Random Shop'); await s2.dispatchEvent('change'); await p.waitForTimeout(150); ok(/Not in the list/.test(await p.textContent('.supwrap + .hint')), 'free text keeps working');
   await p.close();
   // without supplier_manage: no add button; unknown rpc: free text only
-  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"13-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"test_user_a02",full_name:"test_user_a",status:"active",lang:"en"};' }, '#/entry/new/04-1/1');
+  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"13-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"test_user_a02",full_name:"test_user_a",status:"active",lang:"en"};' }, '#/entry/new/13-1/1');
   ok(await p.locator('.supnew').count() === 0, 'no add-new without supplier_manage'); ok(await p.locator('input[data-sup]').count() >= 1, 'picker still shown');
   await p.close();
 

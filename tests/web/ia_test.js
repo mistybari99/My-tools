@@ -62,7 +62,7 @@ const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
   const sr = (q) => p.evaluate((x) => { const c = { own: true, roles: [], P: () => true, GF: {}, locOk: () => true, canPos: () => true, anyApprove: () => true, ctlOk: () => true, formLive: () => true }; const s = window.BOS.ia.searchSections(x, c); return { do: s.do.map((d) => d.route), go: s.go.map((r) => r.route), set: s.settings.map((r) => r.route) }; }, q);
   ok((await sr('দাম')).go.includes('items'), 'Bangla keyword দাম finds items'); ok((await sr('price')).go.includes('items'), 'English keyword price finds items');
   ok((await sr('বেতন')).go.includes('salary') && (await sr('payroll')).go.includes('salary'), 'salary by Bangla and English');
-  ok((await sr('sell')).do.includes('pos') && (await sr('বিক্রি')).do.includes('pos'), 'verb sell / বিক্রি -> POS (Do)'); ok((await sr('stock count')).do.includes('form/04-3'), 'stock count -> form 36-1');
+  ok((await sr('sell')).do.includes('pos') && (await sr('বিক্রি')).do.includes('pos'), 'verb sell / বিক্রি -> POS (Do)'); ok((await sr('stock count')).do.includes('form/36-1'), 'stock count -> form 36-1');
   ok((await sr('fiscal')).set.includes('settings2/fiscal'), 'Settings section finds fiscal'); ok((await sr('pay supplier')).do.includes('payables'), 'pay supplier -> payables');
   await p.fill('#nav_q', 'bulk'); await wait(p, 400);
   ok(await p.locator('#nav_body .dr-it[data-v=bulkitems]').count() === 1 && /Items & Master Data/.test(await p.textContent('#nav_body')), 'search result shows its category line');

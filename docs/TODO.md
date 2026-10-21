@@ -5,7 +5,7 @@ Rule: real data comes after the software is complete. Every task = write → dry
 - [x] A1 GRN(13-1) vs purchase page both post purchase_in → one source of truth + cross-check + switch.
 - [x] A2 Sales/due reports not net of sale returns / refund cash → subtract.
 - [x] A3 Hard-coded locations in forms_cash/forms_sales/forms_staff → read `locations`, hide paused/closed.
-- [x] A4 Day-book gaps: bank deposit (07-1), customer advance, owner top-up, hub-receipt side of 10-1.
+- [x] A4 Day-book gaps: bank deposit (07-1), customer advance, owner top-up, hub-receipt side of 03-1.
 - [x] A5 Production run void/undo (reverses ledger); packaging line on receipt.
 
 ## B. Rules / safety

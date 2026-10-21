@@ -70,7 +70,7 @@ const over = (top, a, bot) => top.map((v, i) => v * a + bot[i] * (1 - a));
   const KEYS = ['header.top', '.bnav', '.bnav button', '.card', 'button.primary', 'button.mini', '.chip', 'input', '.qt > .qm', 'h2'];
   const PROPS = ['color', 'backgroundColor', 'backgroundImage', 'borderTopColor', 'borderTopWidth', 'borderRadius', 'boxShadow', 'fontSize', 'fontWeight', 'padding', 'backdropFilter', 'opacity', 'filter', 'outlineStyle'];
   const snap = (p, route) => p.evaluate(({ KEYS, PROPS }) => KEYS.map((k) => { const e = document.querySelector(k); if (!e) return null; const b = e.getBoundingClientRect(), cs = getComputedStyle(e); const o = { x: Math.round(b.x * 10) / 10, y: Math.round(b.y * 10) / 10, w: Math.round(b.width * 10) / 10, h: Math.round(b.height * 10) / 10 }; PROPS.forEach((q) => { o[q] = cs[q]; }); return o; }), { KEYS, PROPS });
-  for (const th of ['dark', 'light', 'classic']) for (const route of ['pos', 'form/04-4']) {
+  for (const th of ['dark', 'light', 'classic']) for (const route of ['pos', 'form/37-1']) {
     const A = await open(br, PORT, { theme: th }), B = await open(br, BASE_PORT, { theme: th });
     await start(A, route); await start(B, route);
     const sa = await snap(A), sb = await snap(B);
@@ -81,11 +81,11 @@ const over = (top, a, bot) => top.map((v, i) => v * a + bot[i] * (1 - a));
   }
 
   // 3. per glass theme: no overflow 320-412, no errors, routes render, screenshots
-  const SHOTS = [['home', 'home'], ['pos', 'pos'], ['form/04-4', 'form'], ['dash', 'dash']];
+  const SHOTS = [['home', 'home'], ['pos', 'pos'], ['form/37-1', 'form'], ['dash', 'dash']];
   for (const th of ['glass-light', 'glass-dark']) {
     for (const w of [320, 360, 412]) {
       const p = await open(br, PORT, { theme: th, w }); await start(p);
-      for (const r of ['home', 'pos', 'form/04-4', 'inbox']) {
+      for (const r of ['home', 'pos', 'form/37-1', 'inbox']) {
         await go(p, r);
         const ov = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, bsw: document.body.scrollWidth }));
         ok(ov.sw <= ov.cw && ov.bsw <= ov.cw, `${th} ${w}px #/${r}: no horizontal overflow (${ov.sw}/${ov.bsw} > ${ov.cw})`);

@@ -280,9 +280,9 @@
    "title": "Cashier on the daily showroom sheet 06-1",
    "does": "The person who handled the till for that sheet (the shift box already exists).",
    "why": "Cash short and over could only be tied to the person who wrote the sheet.",
-   "default": "Optional box on form 14-1.",
+   "default": "Optional box on form 06-1.",
    "change": "Cashier-wise variance fills in from new sheets. Older sheets show as 'cashier not written'.",
-   "who": "Anyone who fills form 14-1.",
+   "who": "Anyone who fills form 06-1.",
    "verified": true,
    "src": "RPT-C2 (docs/integration/RPT-C2_info.json)"
   },
@@ -787,7 +787,7 @@
   "feature:mkt_post": {
    "title": "Post 17-1 to the books",
    "does": "Shows each approved 17-1 line and what would happen to it before anything is posted.",
-   "why": "Prevents counting the same spend twice with form 10-2.",
+   "why": "Prevents counting the same spend twice with form 11-1.",
    "default": "Preview always available; posting only when the setting is ON.",
    "change": "See the setting marketing_post_on.",
    "who": "The accounts manager runs it; the owner winds it down.",
@@ -6577,7 +6577,7 @@
   },
   "rule:recipe_approval_required": {
    "title": "Cost and production before a recipe is approved: off, yellow warning, or refuse",
-   "does": "off = today's behaviour (no approval needed). warn = yellow line for the owner. on = recipe_cost and production_post refuse an unapproved recipe (form 05-3: no costing before approval).",
+   "does": "off = today's behaviour (no approval needed). warn = yellow line for the owner. on = recipe_cost and production_post refuse an unapproved recipe (form 31-1: no costing before approval).",
    "why": "An owner decision kept as a setting with a safe default (BUILD-RULES: every owner decision is a setting).",
    "default": "off (the value that applies until the owner sets another).",
    "change": "Pick another choice in Settings. The change applies the next time the function that reads it runs.",

@@ -115,7 +115,7 @@ const IA = [
   rec('onlineorders', 'sale', ['অনলাইন অর্ডার', 'Online orders', 'Online অর্ডার'], { icon: 'doc', ok: pos, kw: ['online order', 'facebook', 'whatsapp', 'delivery', 'advance', 'অনলাইন', 'অর্ডার', 'ডেলিভারি'] }),
   rec('inbox', 'sale', ['বার্তা ইনবক্স', 'Message inbox', 'Message inbox'], { icon: 'doc', ok: pos, kw: ['inbox', 'message', 'facebook', 'messenger', 'instagram', 'whatsapp', 'web form', 'বার্তা', 'ইনবক্স', 'অর্ডার'] }),
   rec('website', 'sale', ['ওয়েবসাইট', 'Website', 'Website'], { icon: 'doc', ok: owner, mob: 3, kw: ['website', 'web', 'site', 'online shop', 'catalogue', 'publish', 'ওয়েবসাইট', 'ওয়েব', 'দোকান', 'অনলাইন শপ', 'ক্যাটালগ', 'পাবলিশ'], verbs: ['publish item', 'web orders', 'website settings'] }),
-  rec('saleforms', 'settings', ['ফর্ম 20-১/২/৪ ↔ বিক্রি', 'Forms 20-1/2/4 <-> sales', 'Form 20-1/2/4 ↔ sale'], { icon: 'doc', ok: owner, kw: ['05-1', '08-1', '24-1', 'link', 'shadow', 'order form', 'invoice', 'জোড়া'] }),
+  rec('saleforms', 'settings', ['ফর্ম ০৫-১, ০৮-১, ২৪-১ ↔ বিক্রি', 'Forms 05-1, 08-1, 24-1 <-> sales', 'Form 05-1, 08-1, 24-1 ↔ sale'], { icon: 'doc', ok: owner, kw: ['05-1', '08-1', '24-1', 'link', 'shadow', 'order form', 'invoice', 'জোড়া'] }),
   rec('benefitsx', 'people', ['কর্মীর সুবিধা (রিপোর্ট)', 'Employee benefits (report)', 'Employee সুবিধা (report)'], { icon: 'users', ok: (c) => c.own || c.GF.employee_manage === true || c.GF.salary_view === true, kw: ['benefit', 'allowance', 'eligible', 'festival', 'সুবিধা', 'ভাতা'] }),
   rec('orderreports', 'sale', ['অর্ডার ও ডেলিভারি রিপোর্ট', 'Order and delivery reports', 'Order ও delivery report'], { icon: 'doc', ok: pos, also: ['factory'], kw: ['order register', 'cake order', 'delayed order', 'on time delivery', 'fulfilment', 'cancelled order', 'refund', 'delivery cost', 'order profit', 'advance balance', 'অর্ডার রিপোর্ট', 'ডেলিভারি', 'কেক অর্ডার', 'বাতিল অর্ডার'] }),
   rec('custinsight', 'cust', ['গ্রাহক বিশ্লেষণ', 'Customer insight', 'Customer insight'], { icon: 'users', ok: pos, kw: ['credit risk', 'overdue', 'lifetime value', 'customer returns', 'complaints', 'cake history', 'credit days', 'বাকির ঝুঁকি', 'মেয়াদোত্তীর্ণ', 'গ্রাহকের অভিযোগ'] }),
@@ -333,12 +333,12 @@ V('payables', ['pay supplier', 'payables', 'সরবরাহকারী প�
 V('pending', ['approve', 'approval', 'pending', 'অনুমোদন'], []); V('stock', ['wastage', 'waste', 'stock', 'নষ্ট', 'স্টক'], ['low stock']); V('exceptions', ['exception', 'red', 'গরমিল', 'ব্যতিক্রম'], []);
 // form-bound actions: id, form route, label, verbs
 const DOF = [
-  ['cashcount', 'form/14-1', ['ক্যাশ গণনা', 'Cash count', 'Cash count'], ['cash count', '06-1', 'ক্যাশ গণনা', 'ক্যাশ']], ['stockcount', 'form/04-3', ['স্টক গণনা', 'Stock count', 'Stock count'], ['count stock', 'stock count', '36-1', 'স্টক গণনা']],
-  ['grn', 'form/04-1', ['মাল গ্রহণ', 'Receive goods', 'মাল গ্রহণ (GRN)'], ['receive', 'grn', '13-1', 'মাল গ্রহণ']], ['issue', 'form/04-2', ['সরবরাহ দেওয়া', 'Issue material', 'Issue'], ['issue', '18-1', 'সরবরাহ']],
-  ['expense', 'form/10-2', ['খরচ', 'Expense', 'খরচ'], ['expense', 'খরচ', '11-1']], ['transfer', 'form/03-1', ['স্থানান্তর', 'Transfer', 'Transfer'], ['transfer', 'challan', '39-1', 'স্থানান্তর']],
-  ['daily', 'form/05-1', ['দৈনিক উৎপাদন শিট', 'Daily production sheet', 'Daily sheet'], ['daily sheet', '12-1', 'উৎপাদন']], ['reqmat', 'form/06-1', ['কাঁচামাল চাওয়া', 'Request material', 'Material request'], ['request material', '28-1']],
-  ['handover', 'form/11-1', ['হস্তান্তর', 'Handover', 'Handover'], ['handover', '33-1', 'হস্তান্তর']], ['digital', 'form/10-3', ['ডিজিটাল মেলানো', 'Digital reconcile', 'Digital reconcile'], ['reconcile', '07-1', 'digital']],
-  ['hubcash', 'form/10-1', ['হাব ক্যাশ', 'Hub cash', 'Hub cash'], ['hub cash', '03-1']],
+  ['cashcount', 'form/06-1', ['ক্যাশ গণনা', 'Cash count', 'Cash count'], ['cash count', '06-1', 'ক্যাশ গণনা', 'ক্যাশ']], ['stockcount', 'form/36-1', ['স্টক গণনা', 'Stock count', 'Stock count'], ['count stock', 'stock count', '36-1', 'স্টক গণনা']],
+  ['grn', 'form/13-1', ['মাল গ্রহণ', 'Receive goods', 'মাল গ্রহণ (GRN)'], ['receive', 'grn', '13-1', 'মাল গ্রহণ']], ['issue', 'form/18-1', ['সরবরাহ দেওয়া', 'Issue material', 'Issue'], ['issue', '18-1', 'সরবরাহ']],
+  ['expense', 'form/11-1', ['খরচ', 'Expense', 'খরচ'], ['expense', 'খরচ', '11-1']], ['transfer', 'form/39-1', ['স্থানান্তর', 'Transfer', 'Transfer'], ['transfer', 'challan', '39-1', 'স্থানান্তর']],
+  ['daily', 'form/12-1', ['দৈনিক উৎপাদন শিট', 'Daily production sheet', 'Daily sheet'], ['daily sheet', '12-1', 'উৎপাদন']], ['reqmat', 'form/28-1', ['কাঁচামাল চাওয়া', 'Request material', 'Material request'], ['request material', '28-1']],
+  ['handover', 'form/33-1', ['হস্তান্তর', 'Handover', 'Handover'], ['handover', '33-1', 'হস্তান্তর']], ['digital', 'form/07-1', ['ডিজিটাল মেলানো', 'Digital reconcile', 'Digital reconcile'], ['reconcile', '07-1', 'digital']],
+  ['hubcash', 'form/03-1', ['হাব ক্যাশ', 'Hub cash', 'Hub cash'], ['hub cash', '03-1']],
 ].map(([id, route, label, verbs]) => ({ id, route, label, verbs, aliases: [], icon: 'doc', i3: FORM_I3[id] || 'doc', ok: FORM(route.slice(5)), form: route.slice(5) }));
 const doRecs = () => IA.filter((r) => r.verbs.length && r.status === 'live').map((r) => ({ id: r.id, route: r.route, label: r.label, verbs: r.verbs, aliases: r.aliases, icon: r.icon, i3: r.i3, ok: r.ok, rec: r })).concat(DOF);
 const doLabel = (d) => (d.rec ? labelOf(d.rec) : lab(L(d.label[0], d.label[1], d.label[2])));
@@ -439,7 +439,7 @@ function bottom(c) {
   return IA.filter((r) => r.status === 'live' && r.mob >= 1 && r.mob <= 2 && r.id !== 'pos' && visible(r, c)).sort((a, b) => a.mob - b.mob).slice(0, 1);
 }
 // ---------- Home tiles: base list per mode, topped up with role-relevant live screens (priority) ----------
-const HOME_FORMS = { biz: [['f:14-1', 4], ['f:03-1', 5], ['f:04-1', 6]], acc: [['f:10-1', 1], ['f:10-2', 2], ['f:10-4', 3]] };
+const HOME_FORMS = { biz: [['f:06-1', 4], ['f:39-1', 5], ['f:13-1', 6]], acc: [['f:03-1', 1], ['f:11-1', 2], ['f:04-1', 3]] };
 const HOME_LABEL = { 'r:stock': { biz: 'stockbal' }, 'r:biz': { acc: 'pl' }, 'r:payables': { acc: 'payables' }, 'r:daybook': { acc: 'daybook' } };
 function homeKeys(mode) {
   const base = IA.filter((r) => r.home && r.home[mode]).map((r) => [r.home[mode], 'r:' + r.route]).concat(HOME_FORMS[mode].map(([k, n]) => [n, k])).sort((a, b) => a[0] - b[0]);

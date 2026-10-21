@@ -53,7 +53,8 @@ MARKER_REL = 'tools/numbering_applied.json'
 BANGLA_MARKER_REL = 'tools/numbering_applied_bangla.json'
 BN_DIGITS = '০১২৩৪৫৬৭৮৯'   # Bangla digits 0-9
 BN_TO_ASCII = str.maketrans(BN_DIGITS, '0123456789')
-BN_FORM_RE = re.compile('(?<![0-9' + BN_DIGITS + 'A-Za-z_.:/-])([' + BN_DIGITS + ']{2}-[' + BN_DIGITS + '])(?![0-9' + BN_DIGITS + 'A-Za-z_.:/-])')
+# Bangla-digit form code. Same context rule as FORM_RE (see there).
+BN_FORM_RE = re.compile('(?<![0-9' + BN_DIGITS + 'A-Za-z_.\\-])([' + BN_DIGITS + ']{2}-[' + BN_DIGITS + '])(?![0-9' + BN_DIGITS + 'A-Za-z_\\-]|\\.[' + BN_DIGITS + '0-9])')
 SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json', MARKER_REL, BANGLA_MARKER_REL,
               'tests/py/test_renumber_forms.py'}   # the tool's own test keeps the old codes it asserts on
 FIRST_TOUCHED = 479          # phases below this number are never renamed or edited
@@ -70,7 +71,10 @@ FROZEN_FORM_NAMES = ('AUDIT', 'LOG', 'ROADMAP', 'PLAN', 'FORM_SEQUENCE', 'FORM_N
 
 HEAD_RE = re.compile(r'\bphases?[ _]?(\d{3})(?!\d)', re.I)
 LIST_RE = re.compile(r'\s*(?:,|/|\+|&|-|–|\band\b|\bor\b|\bto\b)\s*(?:phase[ _]?)?(\d{3})(?!\d)', re.I)
-FORM_RE = re.compile(r'(?<![\w.:/-])\d{2}-\d(?![\w.:/-]|\d)', re.ASCII)   # NN-N, ASCII digits only
+# NN-N, ASCII digits. Not inside a word, number, file name part or range: no letter, digit, '_', '-' or '.'
+# just before it, and no letter, digit, '_', '-' or '.digit' just after it. A colon or a slash may surround a code
+# ('field:10-2:x', '#/entry/new/10-2/1'), so these are matched too.
+FORM_RE = re.compile(r'(?<![0-9A-Za-z_.\-])\d{2}-\d(?![0-9A-Za-z_\-]|\.\d)', re.ASCII)
 # internal ids that carry a code (f04_1, form_20_4, salary_sheet_02_2): stored in SQL and contracts, never changed
 UNDERSCORE_RE = re.compile(r'(?<![A-Za-z0-9])(f|form_|sheet_)(\d{2})_(\d)(?![0-9])', re.ASCII)
 ROW_QUOTED_RE = re.compile(r"""['"]\d{2}-\d['"]""", re.ASCII)
