@@ -28,7 +28,7 @@ const X = {
   t_journal: L('জার্নাল বই', 'Journal book', 'Journal book'), t_parties: L('কাস্টমার / সাপ্লায়ারের খাতা', 'Customer / supplier books', 'Customer / Supplier খাতা'),
   t_chart: L('হিসাবের তালিকা', 'Chart of accounts', 'Hisaber talika (Chart)'), t_new: L('নতুন জার্নাল', 'New journal', 'নতুন Journal'),
   t_opening: L('শুরুর জের', 'Opening balances', 'শুরুর জের (Opening)'), t_settings: L('সেটিংস ও ম্যাপিং', 'Settings & mappings', 'Settings ও Mapping'),
-  loc: L('জায়গা', 'Place', 'Place'), all: L('সব জায়গা', 'All places', 'সব Place'), from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), asof: L('এই তারিখে', 'As of', 'As of'),
+  loc: L('জায়গা', 'Place', 'Place'), all: L('সব জায়গা', 'All places', 'সব Place'), from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), asof: L('এই ডেটে', 'As of', 'As of'),
   print: L('প্রিন্ট', 'Print', 'Print'), csv: L('CSV', 'CSV', 'CSV'), show: L('দেখান', 'Show', 'Show'), none: L('কিছু নেই', 'Nothing here', 'কিছু নেই'),
   need: L('তথ্য লাগবে', 'Data needed', 'Data লাগবে'),
   needH: L('হিসাব শুরুর ডেট দেওয়া হয়নি। ডেট দিন, তারপর শুরুর জের লিখুন, তারপর অ্যাকাউন্টিং চালু করুন।', 'The accounting start date has not been set. Set it, enter the opening balances, then switch accounting on.', 'Accounting শুরুর date দেওয়া হয়নি। Date দিন, তারপর opening balance, তারপর accounting on করুন।'),

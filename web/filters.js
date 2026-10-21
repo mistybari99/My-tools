@@ -16,7 +16,7 @@ const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩�
 const X = {
   title: L('ফিল্টার', 'Filters', 'Filter'), apply: L('প্রয়োগ করুন', 'Apply', 'Apply করুন'), reset: L('রিসেট', 'Reset', 'Reset'), cancel: L('বন্ধ', 'Close', 'Close'),
   clear: L('সব মুছুন', 'Clear all', 'সব Clear'), remove: L('বাদ দিন', 'Remove', 'Remove'),
-  s_date: L('তারিখ', 'Date', 'Date (তারিখ)'), s_loc: L('লোকেশন', 'Location', 'Location'), s_brand: L('ব্র্যান্ড', 'Brand', 'Brand'), s_staff: L('কর্মী', 'Staff', 'Staff (কর্মী)'),
+  s_date: L('ডেট', 'Date', 'Date (Date)'), s_loc: L('লোকেশন', 'Location', 'Location'), s_brand: L('ব্র্যান্ড', 'Brand', 'Brand'), s_staff: L('কর্মী', 'Staff', 'Staff (কর্মী)'),
   s_itype: L('আইটেমের ধরন', 'Item type', 'Item type'), s_item: L('আইটেম', 'Item', 'Item'), s_cat: L('ক্যাটাগরি', 'Category', 'Category'), s_mode: L('পেমেন্ট ধরন', 'Payment mode', 'Payment mode'),
   s_cust: L('গ্রাহক', 'Customer', 'Customer (গ্রাহক)'), s_type: L('খুচরা / পাইকারি', 'Sale type', 'Sale type (খুচরা/পাইকারি)'), s_amt: L('টাকার পরিমাণ', 'Amount range', 'Amount (টাকা)'),
   s_status: L('অবস্থা', 'Status', 'Status'), s_search: L('খুঁজুন', 'Search', 'Search'),

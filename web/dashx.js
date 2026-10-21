@@ -22,7 +22,7 @@ const X = {
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), period: L('সময়', 'Period', 'Period'), from: L('শুরু', 'From', 'From'), to: L('শেষ', 'To', 'To'), loc_all: L('সব লোকেশন', 'All locations', 'সব location'),
   loc: L('লোকেশন', 'Location', 'Location'), rename: L('নাম বদলান', 'Rename', 'Rename'), remove: L('সরান', 'Remove', 'Remove'), dup: L('কপি করুন', 'Duplicate', 'Duplicate'), size: L('আকার', 'Size', 'Size'),
   full: L('পুরো স্ক্রিন', 'Full screen', 'Full screen'), close: L('বন্ধ করুন', 'Close', 'Close'), target: L('লক্ষ্য / সীমা (গেজ ও বুলেটের জন্য)', 'Target / limit (for gauge and bullet)', 'Target / limit (gauge ও bullet-এর জন্য)'),
-  name: L('নাম', 'Name', 'Name'), save: L('সংরক্ষণ', 'Save', 'Save'), metric: L('কী দেখাবে', 'Choose what to show', 'কী দেখাবে'), tile_menu: L('টাইলের মেনু', 'Tile menu', 'Tile menu'),
+  name: L('নাম', 'Name', 'Name'), save: L('সেভ', 'Save', 'Save'), metric: L('কী দেখাবে', 'Choose what to show', 'কী দেখাবে'), tile_menu: L('টাইলের মেনু', 'Tile menu', 'Tile menu'),
   up: L('উপরে সরান', 'Move up', 'Move up'), down: L('নিচে সরান', 'Move down', 'Move down'), vs: L('আগের সময়ের তুলনায়', 'vs previous period', 'আগের সময়ের তুলনায়'),
   saved: L('সংরক্ষিত', 'Saved', 'Saved'), local: L('শুধু এই ফোনে সংরক্ষিত', 'Saved on this phone only', 'শুধু এই phone-এ saved'), max: L('সর্বোচ্চ ১২টি টাইল', 'Up to 12 tiles', 'সর্বোচ্চ 12টি tile'),
   nocharts: L('চার্ট লোড হয়নি', 'Charts are not loaded', 'Charts load হয়নি'), search: L('খুঁজুন…', 'Search…', 'Search…'), kpi: L('সংখ্যা (KPI)', 'KPI number', 'KPI number'),

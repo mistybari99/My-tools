@@ -31,7 +31,7 @@ const X = {
   intro: L('প্রতিটি হিসাব খাতার (জার্নাল) সাথে মেলানো। খালি জায়গা মানে "তথ্য দরকার" — শূন্য নয়।', 'Every figure is tied to the books (journal). A dash means "data needed", not zero.', 'প্রতিটি হিসাব books-এর সাথে মেলানো। "—" মানে data দরকার, শূন্য নয়।'),
   off: L('এই রিপোর্টগুলো এখন বন্ধ। মালিক সুইচবোর্ড থেকে "rpt131_on" চালু করলে খুলবে।', 'These reports are switched off. The owner turns on "rpt131_on" in the switchboard.', 'এই report এখন বন্ধ। মালিক switchboard-এ "rpt131_on" চালু করলে খুলবে।'),
   noperm: L('এই রিপোর্ট দেখার অনুমতি নেই', 'You are not allowed to see this report', 'এই report দেখার permission নেই'),
-  report: L('রিপোর্ট', 'Report', 'Report'), filters: L('ফিল্টার', 'Filters', 'Filter'), from: L('শুরু', 'From', 'From'), to: L('শেষ', 'To', 'To'), asof: L('এই তারিখ পর্যন্ত', 'As of', 'As of'),
+  report: L('রিপোর্ট', 'Report', 'Report'), filters: L('ফিল্টার', 'Filters', 'Filter'), from: L('শুরু', 'From', 'From'), to: L('শেষ', 'To', 'To'), asof: L('এই ডেট পর্যন্ত', 'As of', 'As of'),
   outlet: L('আউটলেট', 'Outlet', 'Outlet'), alloutlets: L('সব (আমার)', 'All (mine)', 'সব (আমার)'), group: L('ভাগ করুন', 'Group by', 'Group by'), status: L('স্ট্যাটাস', 'Status', 'Status'),
   category: L('ক্যাটাগরি', 'Category', 'Category'), anycat: L('সব ক্যাটাগরি', 'All categories', 'সব category'), item: L('আইটেম', 'Item', 'Item'), itemph: L('কোড বা নাম লিখুন…', 'Type code or name…', 'Code বা নাম লিখুন…'),
   search: L('খুঁজুন', 'Search', 'Search'), searchph: L('এই ফলাফলে খুঁজুন…', 'Search these results…', 'এই result-এ খুঁজুন…'), apply: L('দেখান', 'Show', 'Show'), clear: L('মুছুন', 'Clear', 'Clear'),

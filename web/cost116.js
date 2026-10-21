@@ -20,7 +20,7 @@ const $ = (s, el) => (el || document).querySelector(s);
 
 const X = {
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), place: L('জায়গা', 'Place', 'Place'), from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), month: L('মাস', 'Month', 'Month'),
-  show: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই', 'Nothing to show', 'কিছু নেই'), item: L('আইটেম', 'Item', 'Item'), date: L('তারিখ', 'Date', 'Date'), total: L('মোট', 'Total', 'Total'),
+  show: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই', 'Nothing to show', 'কিছু নেই'), item: L('আইটেম', 'Item', 'Item'), date: L('ডেট', 'Date', 'Date'), total: L('মোট', 'Total', 'Total'),
   nocost: L('খরচের হিসাব দেখার অনুমতি নেই', 'You do not have the cost right to see this page', 'Cost দেখার permission নেই'),
   noaccess: L('এই কাজের অনুমতি নেই', 'You are not allowed to do this', 'এই কাজের permission নেই'),
   fail: L('আনা যায়নি', 'Could not load', 'Load করা যায়নি'), notinstalled: L('এই অংশের ডেটাবেস এখনও চালু হয়নি', 'The database part is not installed yet', 'Database অংশ এখনও চালু হয়নি'),
@@ -30,8 +30,8 @@ const X = {
   t_var: L('স্ট্যান্ডার্ড বনাম আসল', 'Standard vs actual', 'Standard বনাম actual'), t_queue: L('খরচের অপেক্ষা', 'Cost queue', 'Cost-এর অপেক্ষা'), t_gl: L('পুল বনাম খাতা', 'Pool vs books', 'Pool বনাম books'),
   t_drv: L('ভাগের ভিত্তি', 'Overhead drivers', 'Overhead driver'), t_stage: L('ধাপ অনুযায়ী খরচ', 'Stage cost', 'Stage cost'),
   // switches
-  sw_var: L('স্ট্যান্ডার্ড নিজে থেকে সংরক্ষণ (std_snapshot_auto116)', 'Automatic standard snapshot (std_snapshot_auto116)', 'Standard নিজে থেকে save (std_snapshot_auto116)'),
-  sw_varHow: L('বন্ধ থাকলে নতুন রান-এর স্ট্যান্ডার্ড নিজে সংরক্ষণ হয় না; শুধু হাতে সংরক্ষিত স্ট্যান্ডার্ডের রান তুলনা হবে।', 'While it is off no standard is stored by itself; only runs that have a standard saved by hand can be compared.', 'বন্ধ থাকলে standard নিজে save হয় না; শুধু হাতে save করা standard-এর run তুলনা হবে।'),
+  sw_var: L('স্ট্যান্ডার্ড নিজে থেকে সেভ (std_snapshot_auto116)', 'Automatic standard snapshot (std_snapshot_auto116)', 'Standard নিজে থেকে save (std_snapshot_auto116)'),
+  sw_varHow: L('বন্ধ থাকলে নতুন রান-এর স্ট্যান্ডার্ড নিজে সেভ হয় না; শুধু হাতে সংরক্ষিত স্ট্যান্ডার্ডের রান তুলনা হবে।', 'While it is off no standard is stored by itself; only runs that have a standard saved by hand can be compared.', 'বন্ধ থাকলে standard নিজে save হয় না; শুধু হাতে save করা standard-এর run তুলনা হবে।'),
   sw_queue: L('অস্থায়ী ওভারহেড (conv_provisional116)', 'Provisional overhead (conv_provisional116)', 'Provisional overhead (conv_provisional116)'),
   sw_queueHow: L('বন্ধ থাকলে পুল না থাকা মাসের রান অস্থায়ী দামে যায় না; অপূর্ণ রানগুলোই তালিকায় আসবে।', 'While it is off a month with no pool is not given a provisional cost; only runs with an incomplete cost are listed.', 'বন্ধ থাকলে pool না থাকা মাসের run provisional দামে যায় না; অপূর্ণ run-ই তালিকায় আসবে।'),
   sw_recost: L('খরচ সরবরাহ গড়ে যাক (cost_supply_to_avg116)', 'Supplied cost reaches the average (cost_supply_to_avg116)', 'Supplied cost গড়ে যাক (cost_supply_to_avg116)'),
@@ -39,7 +39,7 @@ const X = {
   sw_gl: L('পুল খাতায় পোস্ট (pool_gl_post117)', 'Pool posted to the books (pool_gl_post117)', 'Pool books-এ post (pool_gl_post117)'),
   sw_glHow: L('বন্ধ থাকলে ওভারহেড পুল খাতায় খরচ হিসেবে যায় না; "খাতায় খরচ" শূন্য দেখালে এটাই কারণ হতে পারে।', 'While it is off the overhead pool is not an expense in the books; that may be why "expense in books" shows zero.', 'বন্ধ থাকলে overhead pool books-এ expense হয় না; "books-এ খরচ" শূন্য দেখালে এটাই কারণ হতে পারে।'),
   sw_drv: L('পুলের ভাগের ভিত্তি (pool_drivers116)', 'Pool drivers (pool_drivers116)', 'Pool driver (pool_drivers116)'),
-  sw_drvHow: L('বন্ধ থাকলে নিচের পছন্দ সংরক্ষণ হয় কিন্তু হিসাবে কাজ করে না; ওভারহেড আগের নিয়মেই ভাগ হয়।', 'While it is off your choice below is saved but not used; overhead is spread the old way.', 'বন্ধ থাকলে নিচের choice save হয় কিন্তু কাজ করে না; overhead আগের নিয়মেই ভাগ হয়।'),
+  sw_drvHow: L('বন্ধ থাকলে নিচের পছন্দ সেভ হয় কিন্তু হিসাবে কাজ করে না; ওভারহেড আগের নিয়মেই ভাগ হয়।', 'While it is off your choice below is saved but not used; overhead is spread the old way.', 'বন্ধ থাকলে নিচের choice save হয় কিন্তু কাজ করে না; overhead আগের নিয়মেই ভাগ হয়।'),
   sw_stage: L('তৈরি পণ্য উপকরণ (semi_finished_ingredient116)', 'Semi-finished as ingredient (semi_finished_ingredient116)', 'Semi-finished ingredient (semi_finished_ingredient116)'),
   sw_stageHow: L('বন্ধ থাকলে তৈরি পণ্য রেসিপির উপকরণ হতে পারে না, তাই ধাপ ভাগ সাধারণত খালি।', 'While it is off a finished good cannot be an ingredient, so the stage split is normally empty.', 'বন্ধ থাকলে finished good ingredient হতে পারে না, তাই stage split সাধারণত খালি।'),
   // variance
@@ -90,7 +90,7 @@ const X = {
   d_batches: L('ব্যাচ', 'Batches', 'Batches'), d_labour_hours: L('শ্রম ঘণ্টা', 'Labour hours', 'Labour hours'),
   d_byPlace: L('জায়গা অনুযায়ী', 'By place', 'Place অনুযায়ী'), d_byType: L('খরচের ধরন অনুযায়ী', 'By cost type', 'Cost type অনুযায়ী'), d_driver: L('ভিত্তি', 'Driver', 'Driver'),
   d_nUnits: L('স্বাভাবিক মাসিক সংখ্যা', 'Normal monthly units', 'Normal monthly units'), d_nBatches: L('স্বাভাবিক মাসিক ব্যাচ', 'Normal monthly batches', 'Normal monthly batches'), d_nHours: L('স্বাভাবিক মাসিক ঘণ্টা', 'Normal monthly hours', 'Normal monthly hours'),
-  d_save: L('সংরক্ষণ', 'Save', 'Save'), d_saved: L('সংরক্ষিত', 'Saved', 'Saved'), d_bad: L('সংখ্যা ঠিক নয়', 'The number is not valid', 'সংখ্যা ঠিক নয়'),
+  d_save: L('সেভ', 'Save', 'Save'), d_saved: L('সংরক্ষিত', 'Saved', 'Saved'), d_bad: L('সংখ্যা ঠিক নয়', 'The number is not valid', 'সংখ্যা ঠিক নয়'),
   // stage
   st_intro: L('একটি রেসিপির উপকরণ খরচ: কতটা তৈরি-পণ্য (আগের ধাপ) থেকে, কতটা অন্য উপকরণ থেকে, আর আগের ধাপের শেষ রানের খরচ কত।', 'The material cost of one recipe: how much comes from semi-finished goods (an earlier stage), how much from other ingredients, and what the earlier stage cost on its last run.', 'একটি recipe-এর material cost: কত semi-finished (আগের stage) থেকে, কত অন্য ingredient থেকে, আর আগের stage-এর শেষ run-এর cost কত।'),
   st_recipe: L('রেসিপি', 'Recipe', 'Recipe'), st_pick: L('রেসিপি বাছুন', 'Pick a recipe', 'Recipe বাছুন'), st_semi: L('তৈরি-পণ্য থেকে', 'From semi-finished', 'Semi-finished থেকে'), st_other: L('অন্য উপকরণ', 'Other ingredients', 'Other ingredients'),

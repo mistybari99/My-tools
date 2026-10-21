@@ -53,7 +53,7 @@ const T = (k) => lab(X[k]);
 const ERR = {
   not_allowed: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), bad_days: L('দিনের সংখ্যা ঠিক নেই', 'Days must be 1-365', 'Days 1-365 হতে হবে'), bad_range: L('ডেটের সীমা ঠিক নেই', 'Date range is wrong', 'Date range ঠিক নেই'),
   batch_no_exists: L('এই ব্যাচ নম্বর আগে আছে', 'This batch no already exists for the item', 'এই batch no আগে আছে'), more_than_received: L('বিলে যত এসেছে তার বেশি ব্যাচ করা যায় না', 'More than the bill received', 'Bill-এর চেয়ে বেশি'),
-  more_than_on_hand: L('হাতে এত মাল নেই', 'More than the stock on hand', 'হাতে এত নেই'), bad_expiry: L('মেয়াদ আজ বা পরের তারিখ হতে হবে', 'Expiry must be today or later', 'Expiry আজ বা পরে হতে হবে'),
+  more_than_on_hand: L('হাতে এত মাল নেই', 'More than the stock on hand', 'হাতে এত নেই'), bad_expiry: L('মেয়াদ আজ বা পরের ডেট হতে হবে', 'Expiry must be today or later', 'Expiry আজ বা পরে হতে হবে'),
   bad_batch_no: L('ব্যাচ নম্বর লিখুন (৪০ অক্ষরের মধ্যে)', 'Enter a batch no (max 40 characters)', 'Batch no লিখুন'), item_not_in_source: L('এই আইটেম ওই উৎসে নেই', 'The item is not on that source', 'Item-টা source-এ নেই'),
   source_not_found: L('উৎস পাওয়া যায়নি (জমা/পোস্ট হতে হবে)', 'Source not found (it must be submitted / posted)', 'Source পাওয়া যায়নি'), qc_blocked: L('কোয়ালিটিতে আটক — নতুন ব্যাচ হবে না', 'Held by quality — no new batch', 'Quality hold — নতুন batch না'),
   pass_has_failed_check: L('ব্যর্থ আইটেম থাকলে পাস দেওয়া যায় না', 'A pass cannot have a failed check', 'Failed check থাকলে pass না'), note_required: L('আটক/বাতিলে নোট লিখুন', 'Write a note for hold / reject', 'Hold/reject-এ note লিখুন'),

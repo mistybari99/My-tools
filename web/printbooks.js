@@ -10,10 +10,10 @@ const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dha
 const X = {
   title: L('প্রিন্ট ও বই', 'Print & books', 'Print ও books'), notes: L('প্রিন্টের নোট (পরের ছাপায় যা বদলাতে হবে)', 'Print notes (what to change at the next print)', 'Print note (পরের ছাপায় যা বদলাতে হবে)'),
   books: L('বইয়ের নিবন্ধন', 'Book register', 'Book register'), loc: L('জায়গা', 'Place', 'Place'), form: L('ফর্ম', 'Form', 'Form'), first: L('প্রথম সিরিয়াল', 'First serial', 'First serial'),
-  last: L('শেষ সিরিয়াল', 'Last serial', 'Last serial'), prefix: L('অক্ষর/উপসর্গ (ঐচ্ছিক)', 'Prefix (optional)', 'Prefix (optional)'), holder: L('কার কাছে', 'Held by', 'Held by'), issued: L('দেওয়ার তারিখ', 'Issued on', 'Issued on'),
+  last: L('শেষ সিরিয়াল', 'Last serial', 'Last serial'), prefix: L('অক্ষর/উপসর্গ (ঐচ্ছিক)', 'Prefix (optional)', 'Prefix (optional)'), holder: L('কার কাছে', 'Held by', 'Held by'), issued: L('দেওয়ার ডেট', 'Issued on', 'Issued on'),
   add: L('বই যোগ', 'Add book', 'Book যোগ'), save: L('সেভ', 'Save', 'Save'), noBooks: L('এই ফর্ম/জায়গায় কোনো বই নেই', 'No books for this form / place', 'কোনো book নেই'),
   gap: L('ফাঁক', 'Gap', 'Gap'), overlap: L('মিলে গেছে', 'Overlap', 'Overlap'), cont: L('অ্যাপ চালু রাখবে', 'The app continues from', 'App চালু রাখবে'), none: L('কোনো নোট নেই', 'No notes', 'কোনো note নেই'),
-  open: L('খোলা', 'Open', 'Open'), cleared: L('শেষ', 'Cleared', 'Cleared'), printed: L('প্রিন্টের তারিখ', 'Printed on', 'Printed on'), clear: L('নতুন প্রিন্ট লিখুন', 'Record the new print', 'নতুন print লিখুন'),
+  open: L('খোলা', 'Open', 'Open'), cleared: L('শেষ', 'Cleared', 'Cleared'), printed: L('প্রিন্টের ডেট', 'Printed on', 'Printed on'), clear: L('নতুন প্রিন্ট লিখুন', 'Record the new print', 'নতুন print লিখুন'),
   addNote: L('নোট যোগ', 'Add note', 'Note যোগ'), reason: L('কী বদলেছে', 'What changed', 'কী বদলেছে'), change: L('পরের ছাপায় কী করতে হবে', 'What to do at the next print', 'পরের print-এ কী করতে হবে'),
   allForms: L('সব ফর্ম', 'All forms', 'সব form'), void: L('ভয়েড', 'Void', 'Void'), used: L('শেষ হয়েছে', 'Used up', 'Used up'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), why: L('কারণ', 'Why', 'কারণ'),
   e_books_overlap: L('এই সিরিয়ালগুলো আগের বইয়ের সাথে মিলে গেছে', 'These serials overlap an earlier book', 'আগের book-এর সাথে মিলে গেছে'), e_bad_range: L('সিরিয়ালের সীমা ঠিক নয়', 'The serial range is not valid', 'সিরিয়ালের সীমা ঠিক নয়'),

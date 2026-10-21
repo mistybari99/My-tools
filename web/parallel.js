@@ -13,7 +13,7 @@ const X = {
   pairs: L('তুলনার জোড়া (মালিক ঠিক করেন)', 'Comparison pairs (named by the owner)', 'তুলনার জোড়া (owner ঠিক করেন)'), noPair: L('এখনও কোনো জোড়া নেই — মালিক একটি নাম দিন', 'No pair yet - the owner must name one', 'এখনও কোনো জোড়া নেই'),
   addPair: L('নতুন জোড়া', 'New pair', 'নতুন জোড়া'), nameBn: L('নাম (বাংলা)', 'Name (Bangla)', 'নাম (বাংলা)'), nameEn: L('নাম (ইংরেজি)', 'Name (English)', 'নাম (English)'),
   howPaper: L('কাগজের অঙ্ক কোথা থেকে পড়া হয়', 'Where the paper figure is read', 'কাগজের অঙ্ক কোথা থেকে'), howApp: L('অ্যাপের অঙ্ক কোথা থেকে', 'Where the app figure is read', 'App-এর অঙ্ক কোথা থেকে'),
-  save: L('সেভ', 'Save', 'Save'), day: L('তারিখ', 'Day', 'Day'), paper: L('কাগজের অঙ্ক', 'Paper figure', 'কাগজের অঙ্ক'), app: L('অ্যাপের অঙ্ক', 'App figure', 'App-এর অঙ্ক'),
+  save: L('সেভ', 'Save', 'Save'), day: L('ডেট', 'Day', 'Day'), paper: L('কাগজের অঙ্ক', 'Paper figure', 'কাগজের অঙ্ক'), app: L('অ্যাপের অঙ্ক', 'App figure', 'App-এর অঙ্ক'),
   recPaper: L('কাগজের অঙ্ক লিখুন (রক্ষক)', 'Record the paper figure (keeper)', 'কাগজের অঙ্ক লিখুন (keeper)'), recApp: L('অ্যাপের অঙ্ক লিখুন (অন্য জন)', 'Record the app figure (someone else)', 'App-এর অঙ্ক লিখুন (অন্য জন)'),
   month: L('এই মাসের অবস্থা', 'This month', 'এই মাসের অবস্থা'), days: L('দিন', 'Days', 'Days'), match: L('মিলেছে', 'Match', 'Match'), differ: L('মেলেনি', 'Differ', 'Differ'), waiting: L('অপেক্ষায়', 'Waiting', 'Waiting'),
   explain: L('কারণ ও ঠিক করার ব্যবস্থা', 'Reason and fix', 'কারণ ও fix'), reason: L('কারণ', 'Reason', 'কারণ'), fix: L('ঠিক করার ব্যবস্থা', 'Fix', 'Fix'),

@@ -37,7 +37,7 @@ const X = {
   needQty: L('Qty ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), needWaste: L('অপচয় % ০–১০০ হতে হবে', 'Waste % must be 0–100', 'Waste % ০–১০০ হতে হবে'), needLines: L('অন্তত একটি উপকরণ লাগবে', 'Add at least one ingredient', 'অন্তত একটি ingredient'),
   location: L('জায়গা', 'Location', 'Location'), recipe: L('রেসিপি', 'Recipe', 'Recipe'), batches: L('ব্যাচ সংখ্যা', 'Number of batches', 'Batch সংখ্যা'), madeAt: L('তৈরির সময়', 'Made at', 'Made at'),
   pTitle: L('উৎপাদন (রেসিপি দিয়ে)', 'Production (from a recipe)', 'Production (recipe দিয়ে)'), preview: L('কী কী লাগবে', 'What will be used', 'কী কী লাগবে'), need: L('লাগবে', 'Need', 'Need'), have: L('আছে', 'On hand', 'On hand'),
-  short: L('কম', 'Short', 'Short'), willMake: L('তৈরি হবে', 'Will make', 'তৈরি হবে'), post: L('উৎপাদন সংরক্ষণ', 'Post production', 'Production post'), nothing: L('রেসিপি বাছুন ও ব্যাচ লিখুন', 'Choose a recipe and the batches', 'Recipe বাছুন, batch লিখুন'),
+  short: L('কম', 'Short', 'Short'), willMake: L('তৈরি হবে', 'Will make', 'তৈরি হবে'), post: L('উৎপাদন সেভ', 'Post production', 'Production post'), nothing: L('রেসিপি বাছুন ও ব্যাচ লিখুন', 'Choose a recipe and the batches', 'Recipe বাছুন, batch লিখুন'),
   shortWarn: L('কাঁচামাল কম — সেটিং অনুযায়ী উৎপাদন আটকে যেতে পারে', 'Raw material is short — the setting may refuse this production', 'Raw material কম — setting অনুযায়ী আটকাতে পারে'),
   notTracked: L('স্টক ট্র্যাক বন্ধ / একক অজানা', 'Not tracked / unit unknown', 'Track বন্ধ / unit অজানা'), done: L('উৎপাদন সেভ হয়েছে — কাঁচামাল বাদ গেছে', 'Production saved — raw material taken out', 'Production saved — raw material বাদ'),
   useRecipe: L('রেসিপি দিয়ে উৎপাদন', 'Produce from a recipe', 'Recipe দিয়ে production'),

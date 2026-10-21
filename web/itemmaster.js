@@ -69,7 +69,7 @@ const X = {
   ty_appr: L('নতুন আইটেমে অ্যাপ্রুভ লাগবে', 'New items need approval', 'নতুন Item-এ approval লাগবে'), ty_fixed: L('স্থায়ী নিয়ম', 'fixed rule', 'fixed rule'), ty_rules: L('সব নিয়ম: নিয়ম ও অপশন', 'All rules: Rules & options', 'সব rule: Rules ও Option'),
   // assets
   as_title: L('সম্পদ-খাতা', 'Asset register', 'Asset register'), as_add: L('সম্পদ যোগ', 'Add asset', 'Asset যোগ'), as_tag: L('ট্যাগ', 'Tag', 'Tag'), as_loc: L('লোকেশন', 'Location', 'Location'), as_cond: L('অবস্থা', 'Condition', 'Condition'),
-  as_status: L('স্ট্যাটাস', 'Status', 'Status'), as_bought: L('কেনার তারিখ', 'Bought on', 'Bought on'), as_cost: L('কস্ট ৳', 'Cost ৳', 'Cost ৳'), as_note: L('নোট', 'Note', 'Note'), as_maint: L('মেইনটেন্যান্স রেকর্ড (08-1)', 'Maintenance record (08-1)', 'Maintenance record (08-1)'),
+  as_status: L('স্ট্যাটাস', 'Status', 'Status'), as_bought: L('কেনার ডেট', 'Bought on', 'Bought on'), as_cost: L('কস্ট ৳', 'Cost ৳', 'Cost ৳'), as_note: L('নোট', 'Note', 'Note'), as_maint: L('মেইনটেন্যান্স রেকর্ড (08-1)', 'Maintenance record (08-1)', 'Maintenance record (08-1)'),
   as_qty: L('কয়টি', 'How many', 'কয়টি'), as_item: L('সম্পদের আইটেম', 'Asset item', 'Asset item'), as_edit: L('বদলান', 'Edit', 'Edit'), as_retire: L('বন্ধ করুন (বিক্রি / হারানো / বাতিল)', 'Retire (sold / lost / scrapped)', 'Retire (sold / lost / scrapped)'),
   as_react: L('আবার চালু', 'Reactivate', 'Reactivate'), as_none: L('কোনো সম্পদ নেই', 'No assets', 'কোনো asset নেই'), as_all: L('সব', 'All', 'All'), as_retired: L('বন্ধগুলোও দেখান', 'Show retired too', 'Retired-ও দেখান'),
   as_noitem: L('আগে "সম্পদ" ধরনের আইটেম যোগ করুন', 'First add an item of type Asset', 'আগে "Asset" type-এর item যোগ করুন'), as_auto: L('ক্রয় বিল থেকে', 'from a purchase bill', 'purchase bill থেকে'),

@@ -135,7 +135,7 @@ def main():
         case('(iv) button removed -> fails', 1, r, ['MISSING', 'ctl:dues.js:button:du_limit'])
 
         r = make_tree(tmp)
-        edit(r, 'web/dues.js', replace_once("save: L('সংরক্ষণ', 'Save', 'Save')", "save: L('সংরক্ষণ', 'Store', 'Store')"))
+        edit(r, 'web/dues.js', replace_once("save: L('সেভ', 'Save', 'Save')", "save: L('সেভ', 'Store', 'Store')"))
         case('(iv) button label renamed -> fails', 1, r, ['RENAMED', 'ctl:dues.js:button:du_limit'])
 
         # an input/select (screen option) removed
@@ -190,12 +190,12 @@ def main():
 
         # label alias
         r = make_tree(tmp)
-        edit(r, 'web/dues.js', replace_once("save: L('সংরক্ষণ', 'Save', 'Save')", "save: L('সংরক্ষণ', 'Store', 'Store')"))
+        edit(r, 'web/dues.js', replace_once("save: L('সেভ', 'Save', 'Save')", "save: L('সেভ', 'Store', 'Store')"))
         al3 = os.path.join(tmp, 'aliases_label.json')
         json.dump({'aliases': repo_aliases() + [{'type': 'label', 'id': 'ctl:dues.js:button:du_limit', 'lang': 'texts',
-                                'from': 'L:সংরক্ষণ|Save|Save', 'to': 'L:সংরক্ষণ|Store|Store', 'reason': 'self-test: intended label change'},
+                                'from': 'L:সংরক্ষণ|Save|Save', 'to': 'L:সেভ|Store|Store', 'reason': 'self-test: intended label change'},
                                {'type': 'label', 'id': 'ctl:dues.js:button:du_limit', 'lang': 'texts',
-                                'from': 'L:সংরক্ষণ|Save|Save', 'to': 'L:সংরক্ষণ|Store|Store', 'reason': 'duplicate is harmless'}]}, open(al3, 'w'))
+                                'from': 'L:সংরক্ষণ|Save|Save', 'to': 'L:সেভ|Store|Store', 'reason': 'duplicate is harmless'}]}, open(al3, 'w'))
         rc, out = run(r, aliases=al3)
         # other buttons share the same text table key 'save' in dues.js, so each needs its own alias; the one aliased item must no longer be listed
         listed = 'ctl:dues.js:button:du_limit' in out.split('NOTES')[0]

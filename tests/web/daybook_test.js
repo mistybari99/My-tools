@@ -104,7 +104,7 @@ const base = C.baseData(SP), srv = C.serve(PORT);
   p = await open({ db: { hidden: true } }, '#/daybook'); ok(await p.locator('#db_salhid').count() === 1, 'salary-hidden notice'); await p.close();
 
   // ---------- Bangla mode ----------
-  p = await open({ lang: 'bn' }, '#/daybook'); ok(/দিনের খাতা/.test(await p.textContent('header.top h1')), 'Bangla title'); ok(/শুরুর তারিখ/.test(await p.textContent('#db_needstart')), 'Bangla Data-needed note'); await p.screenshot({ path: SP + '/db_bn.png' }); await noOverflow(p, 'bn'); await p.close();
+  p = await open({ lang: 'bn' }, '#/daybook'); ok(/দিনের খাতা/.test(await p.textContent('header.top h1')), 'Bangla title'); ok(/শুরুর ডেট/.test(await p.textContent('#db_needstart')), 'Bangla Data-needed note'); await p.screenshot({ path: SP + '/db_bn.png' }); await noOverflow(p, 'bn'); await p.close();
 
   // ---------- home tile + drawer + hub link ----------
   p = await open({}, '#/home'); await p.click('[data-act=hv_mode][data-v=acc]'); await wait(p, 300);

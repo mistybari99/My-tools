@@ -23,7 +23,7 @@ const X = {
   s_issue: L('মাল ইস্যু (04-2)', 'Goods issued (04-2)', 'মাল ইস্যু (04-2)'), s_prod: L('উৎপাদন (রেসিপি)', 'Production (recipes)', 'Production (recipe)'), s_dispatch: L('দোকানে চালান (03-1)', 'Dispatch to shops (03-1)', 'দোকানে চালান (03-1)'),
   s_wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), s_days: L('সব দোকানের সব দিনের দিন-শেষ জমা', 'Every shop-day closed (14-1)', 'সব দোকানের দিন-শেষ জমা'), s_pending: L('অপেক্ষার অ্যাপ্রুভ ও গরমিল শূন্য', 'No pending approvals or open exceptions', 'Pending ও exception শূন্য'),
   s_count: L('এই মাসে স্টক কাউন্ট (04-3)', 'Stock count this month (04-3)', 'এই মাসে stock count (04-3)'), s_pay: L('সাপ্লায়ারের বাকি ও ক্রয় মিলানো', 'Supplier payables and purchases', 'Supplier বাকি ও purchase'),
-  s_salary: L('বেতনের শিট', 'Salary sheet', 'Salary sheet'), s_reports: L('রিপোর্ট ও লাভ-ক্ষতি', 'Reports and profit & loss', 'Reports ও P&L'), s_lock: L('"হিসাব বন্ধ" তারিখ বসান (মালিক)', 'Set "books closed until" (owner)', '"Books closed" তারিখ (owner)'),
+  s_salary: L('বেতনের শিট', 'Salary sheet', 'Salary sheet'), s_reports: L('রিপোর্ট ও লাভ-ক্ষতি', 'Reports and profit & loss', 'Reports ও P&L'), s_lock: L('"হিসাব বন্ধ" ডেট বসান (মালিক)', 'Set "books closed until" (owner)', '"Books closed" Date (owner)'),
   e_note_required: L('কারণ লিখুন', 'Write a reason', 'কারণ লিখুন'),
 };
 const T = (k) => lab(X[k]);

@@ -31,7 +31,7 @@ const X = {
   vat: L('ভ্যাট প্রযোজ্য', 'VAT applicable', 'VAT applicable'), source: L('পণ্যের উৎস', 'Product source', 'Product source'), trk: L('স্টক ট্র্যাক করুন', 'Track stock', 'Stock track করুন'),
   actv: L('সক্রিয়', 'Active', 'Active'), images: L('ছবি (সর্বোচ্চ ৫)', 'Images (max 5)', 'Image (max ৫)'), addimg: L('ছবি যোগ', 'Add image', 'Image যোগ'), barcode: L('বারকোড', 'Barcode', 'Barcode'), scan: L('স্ক্যান', 'Scan', 'Scan'),
   newcat: L('নতুন ক্যাটাগরির নাম', 'New category name', 'নতুন Category নাম'), newsub: L('নতুন সাব-ক্যাটাগরির নাম', 'New sub-category name', 'নতুন Sub-category নাম'), plus: L('নতুন', 'New', 'New'),
-  note: L('বদলের কারণ (ঐচ্ছিক)', 'Reason (optional)', 'বদলের reason (ঐচ্ছিক)'), save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'),
+  note: L('বদলের কারণ (ঐচ্ছিক)', 'Reason (optional)', 'বদলের reason (ঐচ্ছিক)'), save: L('সেভ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'),
   needname: L('পণ্যের নাম লিখুন', 'Enter the product name', 'Product নাম লিখুন'), badprice: L('দাম ঠিক নয়', 'Price is not valid', 'Price ঠিক নয়'), needsell: L('বিক্রয়মূল্য লিখুন', 'Enter the selling price', 'Selling price লিখুন'),
   needwh: L('পাইকারি দাম লিখুন', 'Enter the wholesale price', 'Wholesale price লিখুন'), needmin: L('ন্যূনতম স্টক লিখুন', 'Enter the minimum stock', 'Minimum stock লিখুন'),
   dupbc: L('এই বারকোড অন্য পণ্যে আছে', 'This barcode is already used by another product', 'এই barcode অন্য product-এ আছে'),

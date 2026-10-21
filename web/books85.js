@@ -64,10 +64,10 @@ const T = (k) => lab(X[k]);
 
 /* the warning texts of docs/briefs_p2p3/step_D_REPORT.md, in 3 languages (English has no Bangla) */
 const W = {
-  backlog: L('সতর্কতা: সুইচ চালু করলে হিসাব শুরুর তারিখ (বা নিচের শুরুর তারিখ) পর্যন্ত পুরোনো stock movement আসল তারিখে খাতায় উঠে যায়। বন্ধ মাসের তারিখ আটকে থাকে (মালিক ছাড়া)। তা না চাইলে আগে নিচের শুরুর তারিখ দিন।',
+  backlog: L('সতর্কতা: সুইচ চালু করলে হিসাব শুরুর ডেট (বা নিচের শুরুর ডেট) পর্যন্ত পুরোনো stock movement আসল ডেটে খাতায় উঠে যায়। বন্ধ মাসের ডেট আটকে থাকে (মালিক ছাড়া)। তা না চাইলে আগে নিচের শুরুর ডেট দিন।',
     'WARNING: turning a switch on posts the backlog back to the accounting start (or the "stock movements from" date) at the original dates. Dates inside a closed period are held (locked) except for the owner. Set the from-date below first if that is not wanted.',
-    'সতর্কতা: Switch চালু করলে accounting start (বা নিচের from-date) পর্যন্ত backlog আসল তারিখে post হয়। Closed period-এর তারিখ আটকে থাকে (owner ছাড়া)। না চাইলে আগে নিচের from-date দিন।'),
-  opening: L('সতর্কতা: স্টক যদি আগেই শুরুর জের (acct_opening) এর মধ্যে থাকে, এটি চালু রাখবেন না; নইলে একই স্টক দুইবার গোনা হবে। শুধু হিসাব শুরুর তারিখ বা তার পরের opening ধরা হয়।',
+    'সতর্কতা: Switch চালু করলে accounting start (বা নিচের from-date) পর্যন্ত backlog আসল Dateে post হয়। Closed period-এর Date আটকে থাকে (owner ছাড়া)। না চাইলে আগে নিচের from-date দিন।'),
+  opening: L('সতর্কতা: স্টক যদি আগেই শুরুর জের (acct_opening) এর মধ্যে থাকে, এটি চালু রাখবেন না; নইলে একই স্টক দুইবার গোনা হবে। শুধু হিসাব শুরুর ডেট বা তার পরের opening ধরা হয়।',
     'WARNING: keep this OFF if the opening stock is already inside the opening balance (acct_opening), or it is counted twice. Only openings dated on or after the accounting start are posted.',
     'সতর্কতা: Opening stock আগেই acct_opening-এ থাকলে এটা OFF রাখুন, নইলে দুইবার গোনা হবে। শুধু accounting start-এর পরের opening ধরা হয়।'),
   transit: L('সতর্কতা: "গ্রহণকারী" দিলে ক্ষতি গ্রহণকারীর জায়গায় বসে; মালিক মিটিয়ে না দেওয়া পর্যন্ত clearing খাতায় প্রেরক +V ও গ্রহণকারী −V দেখা যাবে। "প্রেরক" একটি বিকল্প।',
@@ -108,7 +108,7 @@ const SW = [
   { key: 'acct_purchase_variance', kind: 'switch', label: L('কেনা ফেরতের দামের পার্থক্য', 'Post purchase return variance', 'Purchase return variance'),
     what: L('ফেরতে গড় কস্ট আর বিলের প্রাইসের পার্থক্য আলাদা খাতে।', 'The difference between average cost and bill price on a return goes to its own account.', 'Return-এ avg cost ও bill price-এর difference আলাদা খাতে।'),
     rec: () => true, why: L('না হলে ফেরতের পর স্টকের মান আর খাতা মিলবে না।', 'Without it, stock value and books differ after a return.', 'না হলে return-এর পর stock value ও books মিলবে না।'), warn: ['variance', 'backlog'] },
-  { key: 'acct_stock_moves_from', kind: 'text', label: L('স্টক এন্ট্রি শুরুর তারিখ', 'Stock movements from', 'Stock movement শুরুর date'),
+  { key: 'acct_stock_moves_from', kind: 'text', label: L('স্টক এন্ট্রি শুরুর ডেট', 'Stock movements from', 'Stock movement শুরুর date'),
     what: L('এর আগের stock movement খাতায় তোলা হবে না।', 'Older stock movements are left out.', 'এর আগের stock movement তোলা হবে না।'),
     rec: () => '', why: L('সুইচ দেরিতে চালালে বড় backlog এড়াতে একটা ডেট দিন। না দিলে হিসাব শুরু থেকে।', 'If you turn switches on late, set a date to avoid a big backlog. Blank = from the accounting start.', 'দেরিতে switch চালালে backlog এড়াতে date দিন। ফাঁকা = accounting start থেকে।'), warn: [] },
 ];

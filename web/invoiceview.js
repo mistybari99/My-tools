@@ -311,7 +311,7 @@ Object.assign(A.H, {
 // ---------- a small page: today's / any day's invoices, to view or send again (#/invoiceview) ----------
 const PG = { day: '' };
 X.pgTitle = L('ইনভয়েস দেখুন ও পাঠান', 'View and send invoices', 'Invoice দেখুন ও পাঠান');
-X.pgIntro = L('একটি তারিখের সেল — যেটায় চাপবেন সেটার ইনভয়েস খুলবে, সেখান থেকে প্রিন্ট, Email, SMS, WhatsApp।', 'The sales of one day. Tap one to open its invoice, with Print, Email, SMS and WhatsApp.', 'একটি তারিখের sale — যেটায় চাপবেন সেটার invoice খুলবে, সেখান থেকে Print, Email, SMS, WhatsApp।');
+X.pgIntro = L('একটি ডেটের সেল — যেটায় চাপবেন সেটার ইনভয়েস খুলবে, সেখান থেকে প্রিন্ট, Email, SMS, WhatsApp।', 'The sales of one day. Tap one to open its invoice, with Print, Email, SMS and WhatsApp.', 'একটি Dateের sale — যেটায় চাপবেন সেটার invoice খুলবে, সেখান থেকে Print, Email, SMS, WhatsApp।');
 X.pgNone = L('এই দিনে কোনো সেল নেই', 'No sales on this day', 'এই দিনে কোনো sale নেই');
 async function page() {
   const d0 = PG.day || dhakaDate(new Date().toISOString());

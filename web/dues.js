@@ -19,7 +19,7 @@ const X = {
   title: L('বাকি ও গ্রাহক', 'Dues & customers', 'Due ও Customer'), search: L('নাম বা মোবাইল দিয়ে খুঁজুন', 'Search by name or mobile', 'নাম বা mobile দিয়ে খুঁজুন'), total: L('মোট বাকি', 'Total due', 'মোট Due'),
   none: L('কারও বাকি নেই ✓', 'Nobody owes anything ✓', 'কারও Due নেই ✓'), since: L('দিন আগে থেকে', 'days since', 'দিন আগে থেকে'), wholesale: L('পাইকারি', 'Wholesale', 'Wholesale'),
   ledger: L('হিসাব খাতা', 'Ledger', 'Ledger'), collect: L('বাকি আদায়', 'Collect payment', 'Due আদায়'), balance: L('এখন বাকি', 'Balance now', 'এখন Due'), limit: L('বাকির সীমা (৳)', 'Credit limit (৳)', 'Credit limit (৳)'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), collected: L('আদায় হয়েছে', 'Collected', 'আদায় হয়েছে'), noteph: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
+  save: L('সেভ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), collected: L('আদায় হয়েছে', 'Collected', 'আদায় হয়েছে'), noteph: L('নোট (ঐচ্ছিক)', 'Note (optional)', 'Note (ঐচ্ছিক)'),
   opening: L('পুরনো বাকি', 'Opening due', 'Opening due'),   // W1-A: the first ledger row when the opening due is linked
   sale: L('বিক্রি', 'Sale', 'Sale'), paid: L('পরিশোধ', 'Paid', 'Paid'), coll: L('আদায়', 'Collection', 'আদায়'), back: L('ফিরুন', 'Back', 'Back'), close: L('বন্ধ', 'Close', 'Close'),
   voidwhy: L('বাতিলের কারণ লিখুন', 'Reason for reversing', 'Reverse এর কারণ লিখুন'), advance: L('আগাম', 'in credit', 'আগাম'),

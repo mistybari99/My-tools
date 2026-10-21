@@ -169,7 +169,7 @@ function optsHTML(options, cur, code) { if (cur && String(cur).startsWith('other
 
 const SUPX = { ph: L('সাপ্লায়ার বাছুন বা লিখুন', 'Pick or type a supplier', 'Supplier বাছুন বা লিখুন'), add: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'),
   listed: L('তালিকার সাপ্লায়ার ✓', 'Listed supplier ✓', 'তালিকার Supplier ✓'), free: L('তালিকায় নেই — লেখা নামই থাকবে', 'Not in the list — the typed name is kept', 'তালিকায় নেই — typed নামই থাকবে'),
-  title: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'), name: L('নাম', 'Name', 'নাম'), mobile: L('মোবাইল (ঐচ্ছিক)', 'Mobile (optional)', 'Mobile (ঐচ্ছিক)'), save: L('সংরক্ষণ', 'Save', 'Save'), need: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
+  title: L('নতুন সাপ্লায়ার', 'New supplier', 'নতুন Supplier'), name: L('নাম', 'Name', 'নাম'), mobile: L('মোবাইল (ঐচ্ছিক)', 'Mobile (optional)', 'Mobile (ঐচ্ছিক)'), save: L('সেভ', 'Save', 'Save'), need: L('নাম লিখুন', 'Enter the name', 'নাম লিখুন') };
 function inputHTML(fd, path, w, ed) {
   const val = curVal(fd, path, w), a = `data-w="${w}" data-p="${esc(path)}" ${ed ? '' : 'disabled'}`;
   switch (fd.type) {

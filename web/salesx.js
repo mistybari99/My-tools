@@ -36,7 +36,7 @@ const X = {
   pickSale: L('কোন সেল', 'Which sale', 'কোন sale'), done: L('হয়ে গেছে', 'Done', 'Done'), from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), show: L('দেখুন', 'Show', 'Show'),
   unl: L('সেলের সাথে জোড়া হয়নি', 'Not linked to a sale', 'Sale-এর সাথে জোড়া হয়নি'), lnk: L('জোড়া আছে', 'Linked', 'Linked'), cand: L('সম্ভাব্য সেল', 'Candidate sales', 'Candidate sales'),
   doLink: L('জুড়ুন', 'Link', 'Link'), unlink: L('জোড়া খুলুন', 'Unlink', 'Unlink'), diff: L('অঙ্কের তফাত', 'Amount difference', 'Amount তফাত'), customer: L('কাস্টমার', 'Customer', 'Customer'),
-  asof: L('যে তারিখের হিসাবে', 'As of', 'As of'), ben: L('সুবিধার তালিকা', 'Grants', 'Grants'), miss: L('পাওনা কিন্তু দেওয়া হয়নি', 'Eligible but not granted', 'Eligible, grant নেই'),
+  asof: L('যে ডেটের হিসাবে', 'As of', 'As of'), ben: L('সুবিধার তালিকা', 'Grants', 'Grants'), miss: L('পাওনা কিন্তু দেওয়া হয়নি', 'Eligible but not granted', 'Eligible, grant নেই'),
   endIt: L('সুবিধা শেষ করুন', 'End this grant', 'Grant শেষ করুন'), notyet: L('এখনো প্রাপ্য নয়', 'Not yet eligible', 'Not yet'), eligible: L('প্রাপ্য', 'Eligible', 'Eligible'), ended: L('শেষ', 'Ended', 'Ended'),
   paid: L('বেতনের সাথে', 'Paid in payroll', 'Payroll-এ'), val: L('মাসিক মূল্য', 'Value / month', 'Value / month'), reportOnly: L('শুধু রিপোর্ট — বেতনের হিসাব বদলায় না।', 'Report only - payroll maths is not changed.', 'শুধু report - payroll হিসাব বদলায় না।'),
   addGrant: L('সুবিধা দিন', 'Grant a benefit', 'Benefit দিন'), emp: L('কর্মচারী', 'Employee', 'Employee'), type: L('ধরন', 'Type', 'Type'), fromD: L('শুরুর ডেট', 'From date', 'From date'),

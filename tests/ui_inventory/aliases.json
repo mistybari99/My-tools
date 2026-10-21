@@ -1762,6 +1762,638 @@
    "from": "ctl:trace.js:button:rc_csv",
    "to": "ctl:trace.js:button:rcl_csv",
    "reason": "Union merge: the advanced recipe-cost reconciliation (web/recon118.js) defines a handler rc_csv too; the later script overwrote the recall CSV button of the trace screen. The recall CSV action is renamed rcl_csv; same button, same file, same behaviour."
+  },
+  {
+   "type": "label",
+   "id": "ctl:accounts.js:input:ac_asof",
+   "lang": "texts",
+   "from": "L:এই তারিখে|As of|As of",
+   "to": "L:এই ডেটে|As of|As of",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:app.js:action:openform",
+   "lang": "texts",
+   "from": "{...} · {...} L:শীঘ্রই|Soon|শীঘ্রই {...} L:এন্ট্রি|Entry|Entry L:দেখা|View|View {...} L:অনুমোদন|Approve|Approve {...}",
+   "to": "{...} · {...} L:শীঘ্রই|Soon|শীঘ্রই {...} L:এন্ট্রি|Entry|Entry L:দেখা|View|View {...} L:অ্যাপ্রুভ|Approve|Approve {...}",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:app.js:button:itemdecide",
+   "lang": "texts",
+   "from": "L:অনুমোদন দিন|Approve|Approve করুন",
+   "to": "L:অ্যাপ্রুভ দিন|Approve|Approve করুন",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:app.js:button:itemsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:app.js:button:setsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:app.js:button:setstatus",
+   "lang": "texts",
+   "from": "L:অনুমোদন দিন|Approve|Approve করুন L:আবার চালু করুন|Re-enable|আবার Enable করুন {...}",
+   "to": "L:অ্যাপ্রুভ দিন|Approve|Approve করুন L:আবার চালু করুন|Re-enable|আবার Enable করুন {...}",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:cheques127.js:input:ch_cd",
+   "lang": "texts",
+   "from": "L:চেকের তারিখ|Cheque date|Cheque date",
+   "to": "L:চেকের ডেট|Cheque date|Cheque date",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:cheques127.js:input:ch_dd",
+   "lang": "texts",
+   "from": "L:জমার তারিখ (খালি = চেকের তারিখ)|Due date (empty = cheque date)|Due date (খালি = cheque date)",
+   "to": "L:জমার ডেট (খালি = চেকের ডেট)|Due date (empty = cheque date)|Due date (খালি = cheque date)",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:connect.js:button:x1_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:cost116.js:button:c6_dloc",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:cost116.js:button:c6_dtype",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:input:cr_eff",
+   "lang": "texts",
+   "from": "L:কার্যকর তারিখ|Effective from|Effective from",
+   "to": "L:কার্যকর ডেট|Effective from|Effective from",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:costsources.js:input:cs_eff",
+   "lang": "texts",
+   "from": "L:কার্যকর তারিখ|Effective from|Effective from",
+   "to": "L:কার্যকর ডেট|Effective from|Effective from",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_coupons.js:button:cpn_savego",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_feedback.js:button:cf_ask_go",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save {...}",
+   "to": "L:সেভ|Save|Save {...}",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_loyalty.js:button:hk_newgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:crm_loyalty.js:button:sv_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:dashx.js:button:dx_mensave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:delegation.js:input:dg_u",
+   "lang": "texts",
+   "from": "L:শেষ তারিখ|Until|শেষ তারিখ",
+   "to": "L:শেষ ডেট|Until|শেষ Date",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:dues.js:button:du_limit",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:entry.js:button:ls_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:entry.js:button:ls_savefam",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:entry.js:button:rl_decide",
+   "lang": "texts",
+   "from": "L:অনুমোদন দিন|Approve|Approve করুন",
+   "to": "L:অ্যাপ্রুভ দিন|Approve|Approve করুন",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:impexp124.js:input:ie_eta",
+   "lang": "texts",
+   "from": "L:পৌঁছানোর আনুমানিক তারিখ|Expected arrival|Expected arrival",
+   "to": "L:পৌঁছানোর আনুমানিক ডেট|Expected arrival|Expected arrival",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:impexp124.js:input:ie_rd",
+   "lang": "texts",
+   "from": "L:কার্যকর তারিখ|Valid from|Valid from",
+   "to": "L:কার্যকর ডেট|Valid from|Valid from",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:impexp124.js:input:ie_sd",
+   "lang": "texts",
+   "from": "L:শিপমেন্টের তারিখ|Shipment date|Shipment date",
+   "to": "L:শিপমেন্টের ডেট|Shipment date|Shipment date",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:invoice.js:button:iv_dev_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:invoice.js:button:iv_prof_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:invoice.js:button:iv_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemimg.js:button:img_hours_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:itemmaster.js:input:af_date",
+   "lang": "texts",
+   "from": "L:কেনার তারিখ|Bought on|Bought on",
+   "to": "L:কেনার ডেট|Bought on|Bought on",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:items2.js:button:p2_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_newgo",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_qadd_go",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:lists.js:button:ls2_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:input:e_open",
+   "lang": "texts",
+   "from": "L:পরিকল্পিত খোলার তারিখ (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)",
+   "to": "L:পরিকল্পিত খোলার ডেট (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:input:sh_eff",
+   "lang": "texts",
+   "from": "L:কার্যকর তারিখ|Effective from|Effective from",
+   "to": "L:কার্যকর ডেট|Effective from|Effective from",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:locations.js:input:w_open",
+   "lang": "texts",
+   "from": "L:পরিকল্পিত খোলার তারিখ (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)",
+   "to": "L:পরিকল্পিত খোলার ডেট (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)|Planned opening (YYYY-MM-DD)",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:nav.js:action:openform",
+   "lang": "texts",
+   "from": "{...} · {...} L:শীঘ্রই|Soon|শীঘ্রই {...} L:এন্ট্রি|Entry|Entry L:দেখা|View|View {...} L:অনুমোদন|Approve|Approve {...}",
+   "to": "{...} · {...} L:শীঘ্রই|Soon|শীঘ্রই {...} L:এন্ট্রি|Entry|Entry L:দেখা|View|View {...} L:অ্যাপ্রুভ|Approve|Approve {...}",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:optionsx.js:button:opx_defsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:optionsx.js:button:opx_num",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:org122.js:input:og_from",
+   "lang": "texts",
+   "from": "L:শুরুর তারিখ|Effective from|শুরুর তারিখ",
+   "to": "L:শুরুর ডেট|Effective from|শুরুর Date",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:otherincome.js:button:*",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:otherincome.js:button:oi_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:otherincome.js:button:w1_setsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:profitcheck.js:button:pc_text",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:purchase.js:button:pu_save",
+   "lang": "texts",
+   "from": "L:খসড়া সংরক্ষণ|Save draft|Draft save",
+   "to": "L:খসড়া সেভ|Save draft|Draft save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:purchase.js:input:pe_date",
+   "lang": "texts",
+   "from": "L:বিলের তারিখ|Bill date|Bill date",
+   "to": "L:বিলের ডেট|Bill date|Bill date",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:recipes.js:button:rc_post",
+   "lang": "texts",
+   "from": "L:উৎপাদন সংরক্ষণ|Post production|Production post",
+   "to": "L:উৎপাদন সেভ|Post production|Production post",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:reports.js:button:rp_vsave",
+   "lang": "texts",
+   "from": "L:ভিউ সংরক্ষণ|Save this view|Save this View",
+   "to": "L:ভিউ সেভ|Save this view|Save this View",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:reports131.js:input:r131_asof",
+   "lang": "texts",
+   "from": "L:এই তারিখ পর্যন্ত|As of|As of",
+   "to": "L:এই ডেট পর্যন্ত|As of|As of",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:rules.js:button:em_decide",
+   "lang": "texts",
+   "from": "L:এবার অনুমোদন|Approve this time|এবার অনুমোদন ( {...} L:মিনিট|min|min )",
+   "to": "L:এবার অ্যাপ্রুভ|Approve this time|এবার Approve ( {...} L:মিনিট|min|min )",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:rules.js:button:em_send",
+   "lang": "texts",
+   "from": "L:জরুরি অনুমোদন চাই|Ask for emergency approval|জরুরি অনুমোদন চাই",
+   "to": "L:জরুরি অ্যাপ্রুভ চাই|Ask for emergency approval|জরুরি Approve চাই",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:rules.js:button:rh_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:salesx.js:input:bx_asof",
+   "lang": "texts",
+   "from": "L:যে তারিখের হিসাবে|As of|As of",
+   "to": "L:যে ডেটের হিসাবে|As of|As of",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:button:s2_ac_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:button:s2_cv_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:button:s2_fy_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:button:s2_num_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:button:s2_sh_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:button:s2_su_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:settings2.js:input:sh_t_date",
+   "lang": "texts",
+   "from": "L:তারিখ|Date|Date",
+   "to": "L:ডেট|Date|Date",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:statements.js:button:st_clsave",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:statements.js:button:st_thr_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:variants125.js:input:vr_from",
+   "lang": "texts",
+   "from": "L:শুরুর তারিখ|Valid from|Valid from",
+   "to": "L:শুরুর ডেট|Valid from|Valid from",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:variants125.js:input:vr_to",
+   "lang": "texts",
+   "from": "L:শেষ তারিখ (খালি = চলবে)|Valid to (empty = open)|Valid to (খালি = open)",
+   "to": "L:শেষ ডেট (খালি = চলবে)|Valid to (empty = open)|Valid to (খালি = open)",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "ctl:xc_summary.js:button:xs_save",
+   "lang": "texts",
+   "from": "L:সংরক্ষণ|Save|Save",
+   "to": "L:সেভ|Save|Save",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "route:staff",
+   "lang": "bn",
+   "from": "স্টাফ ও অনুমোদন",
+   "to": "স্টাফ ও অ্যাপ্রুভ",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:approve",
+   "lang": "bn",
+   "from": "অনুমোদন দিন",
+   "to": "অ্যাপ্রুভ দিন",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:can_approve",
+   "lang": "bn",
+   "from": "অনুমোদন",
+   "to": "অ্যাপ্রুভ",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:err_own_entry",
+   "lang": "bn",
+   "from": "নিজের এন্ট্রি নিজে অনুমোদন করা যায় না",
+   "to": "নিজের এন্ট্রি নিজে অ্যাপ্রুভ করা যায় না",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:err_own_request",
+   "lang": "bn",
+   "from": "নিজের অনুরোধ নিজে অনুমোদন করা যায় না",
+   "to": "নিজের অনুরোধ নিজে অ্যাপ্রুভ করা যায় না",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:needs_approval",
+   "lang": "bn",
+   "from": "এই বদল মালিক বা অনুমোদনকারীর অনুমোদন পেলে তবেই কার্যকর হবে",
+   "to": "এই বদল মালিক বা অনুমোদনকারীর অ্যাপ্রুভ পেলে তবেই কার্যকর হবে",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:pending_text",
+   "lang": "bn",
+   "from": "আপনার অ্যাকাউন্ট খোলা হয়েছে। মালিক অনুমোদন দিলে কাজ শুরু করতে পারবেন।",
+   "to": "আপনার অ্যাকাউন্ট খোলা হয়েছে। মালিক অ্যাপ্রুভ দিলে কাজ শুরু করতে পারবেন।",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:save",
+   "lang": "bn",
+   "from": "সংরক্ষণ",
+   "to": "সেভ",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:save_draft",
+   "lang": "bn",
+   "from": "খসড়া সংরক্ষণ",
+   "to": "খসড়া সেভ",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:self_approve",
+   "lang": "bn",
+   "from": "নিজের এন্ট্রি নিজে অনুমোদন করতে পারবে",
+   "to": "নিজের এন্ট্রি নিজে অ্যাপ্রুভ করতে পারবে",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:staff",
+   "lang": "bn",
+   "from": "স্টাফ ও অনুমোদন",
+   "to": "স্টাফ ও অ্যাপ্রুভ",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
+  },
+  {
+   "type": "label",
+   "id": "text:status_pending",
+   "lang": "bn",
+   "from": "অনুমোদন বাকি",
+   "to": "অ্যাপ্রুভ বাকি",
+   "reason": "owner word list (Save = সেভ, Date = ডেট, Approve = অ্যাপ্রুভ) applied to older screens on purpose; meaning unchanged"
   }
  ]
 }
