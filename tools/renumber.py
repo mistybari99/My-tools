@@ -1,19 +1,32 @@
 #!/usr/bin/env python3
-"""Renumber phase files and phase references from tools/numbering_map.json.
+"""Renumber phase files, phase references and printed form codes from tools/numbering_map.json.
 
-Dry run by default: prints every file and line that would change, with counts, and writes nothing.
+Dry run by default: prints every file and count, and writes nothing.
 --apply writes, and only when every guard passes. Python standard library only.
 
 What may change
   - phase file names (supabase/phaseNNN.sql and _test pair) for the map's pending renames
-  - phase numbers in text, in the scope below
-  - form codes (08-1 style), only when the map says form_groups_approved = true
+  - phase numbers in text, in the phase scope (comment rule for supabase/*.sql, see below)
+  - printed form codes (NN-N, e.g. 02-4) from the map's form_codes list (the mapping in
+    docs/FORM_SEQUENCE.md). Only when form_groups_approved = true. The map is applied in ONE pass
+    per line, so a code is never mapped twice (02-4 -> 01-1 never continues to 40-1).
+    Form codes are changed only in the form scope: app code, tests/web, tools, docs (except the
+    frozen names below) and web/data/info.json.
 
 What never changes
   - phases 8 to 478 (the tool refuses any number below 479)
-  - a line of supabase/*.sql that is not a SQL comment (starts with --): such a line is
+  - a line of supabase/*.sql that is not a SQL comment (starts with --) and carries a phase number:
     reported as BLOCKED and --apply refuses. The owner decides those lines by hand.
-  - the files in SELF_FILES (this tool, check_numbering.py, the map)
+  - form codes in supabase/ and tests/sql/ (frozen SQL: a new code goes only in a NEW phase file),
+    in generated docs and history/audit docs (FROZEN_FORM_PREFIXES, FROZEN_FORM_NAMES): reported as FROZEN
+  - the files in SELF_FILES (this tool, check_numbering.py, the map, the applied marker)
+
+Guards for form codes
+  - form_groups_approved must be true
+  - the applied marker tools/numbering_applied.json must not exist: a second apply would shift
+    the codes again. --apply writes the marker after the files.
+  - every form-code-shaped token (NN-N, NN 01..41, N 1..9, ASCII digits) on a row line (a markdown table row or a line with a quoted code)
+    must be a code the map knows (old or new). An unknown code refuses the apply.
 
 Phase numbers are matched with word boundaries (phase480 never matches phase4800) and
 replaced in one pass, so a chain such as 481 -> 480 -> 479 cannot happen.
@@ -26,6 +39,8 @@ usage:
   python3 tools/renumber.py --apply    apply (see docs/NUMBERING.md for the steps first)
 """
 import argparse
+import datetime
+import hashlib
 import json
 import os
 import re
@@ -34,15 +49,26 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAP_PATH = os.path.join(ROOT, 'tools', 'numbering_map.json')
-SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json'}
+MARKER_REL = 'tools/numbering_applied.json'
+SELF_FILES = {'tools/renumber.py', 'tools/check_numbering.py', 'tools/numbering_map.json', MARKER_REL}
 FIRST_TOUCHED = 479          # phases below this number are never renamed or edited
 PHASE_RANGE = (479, 498)     # the sequence the map must land in
 TEXT_EXT = ('.sql', '.sh', '.txt', '.py', '.js', '.json', '.md')
-SCOPE_GIT_PATHS = ['supabase', 'tests/sql', 'docs/PASTE_ORDER.md', 'docs/integration', 'tools', 'web/data/info.json']
+SCOPE_GIT_PATHS = ['supabase', 'tests', 'tools', 'web', 'docs', 'web/data/info.json']
+FORM_EXT = ('.js', '.html', '.json', '.md', '.py', '.sh', '.txt', '.css', '.ts', '.yml', '.yaml', '.xml', '.kt', '.java', '.swift')
+# form codes: frozen paths are reported, never changed
+FROZEN_FORM_PREFIXES = ('supabase/', 'tests/sql/', 'docs/paste_parts/', 'docs/inputs/', 'docs/audit2/',
+                        'docs/audit_rpt/', 'docs/briefs_p2p3/', 'docs/plan_v2/', 'web/data/kb.json',
+                        'tests/ui_inventory/')
+FROZEN_FORM_NAMES = ('AUDIT', 'LOG', 'ROADMAP', 'PLAN', 'FORM_SEQUENCE', 'FORM_NAMES_PROPOSAL', 'NUMBERING',
+                     'HANDOFF', 'VERIFY', 'RECOVERY')
 
 HEAD_RE = re.compile(r'\bphases?[ _]?(\d{3})(?!\d)', re.I)
 LIST_RE = re.compile(r'\s*(?:,|/|\+|&|-|–|\band\b|\bor\b|\bto\b)\s*(?:phase[ _]?)?(\d{3})(?!\d)', re.I)
-FORM_RE = re.compile(r'(?<![\w.:/-])(\d{2})-(\d{1,2})(?![\w.:/-]|\d)')
+FORM_RE = re.compile(r'(?<![\w.:/-])\d{2}-\d(?![\w.:/-]|\d)', re.ASCII)   # NN-N, ASCII digits only
+# internal ids that carry a code (f04_1, form_20_4, salary_sheet_02_2): stored in SQL and contracts, never changed
+UNDERSCORE_RE = re.compile(r'(?<![A-Za-z0-9])(f|form_|sheet_)(\d{2})_(\d)(?![0-9])', re.ASCII)
+ROW_QUOTED_RE = re.compile(r"""['"]\d{2}-\d['"]""", re.ASCII)
 SRC_RE = re.compile(r'\s*"src"\s*:')
 
 
@@ -65,14 +91,46 @@ def load_map():
             problems.append(f"map: {p['old']}->{p['new']} touches a phase below {FIRST_TOUCHED}")
         if not (PHASE_RANGE[0] <= p['new'] <= PHASE_RANGE[1]):
             problems.append(f"map: new number {p['new']} is outside {PHASE_RANGE}")
-    forms = data.get('form_groups', [])
-    fold = [f['old'] for f in forms]
-    fnew = [f['new'] for f in forms]
-    if len(set(fnew)) != len(fnew):
-        problems.append('map: two form groups get the same new code')
-    if len(set(fold)) != len(fold):
-        problems.append('map: a form group old code appears twice')
+    problems.extend(check_form_codes(data.get('form_codes', [])))
     return data, problems
+
+
+def check_form_codes(rows):
+    """Problems in the per-code map. Rules: 41 sorted rows, A-Z by English short name (case-insensitive),
+    sort n -> NN-1 with NN = n, old and new codes each unique, and the fixed row 0-1 maps to itself."""
+    problems = []
+    if not rows:
+        return problems
+    fixed = [r for r in rows if r.get('sort') is None]
+    sorted_rows = [r for r in rows if r.get('sort') is not None]
+    if len(fixed) != 1 or fixed[0].get('old') != '0-1' or fixed[0].get('new') != '0-1':
+        problems.append('form map: exactly one fixed row, 0-1 -> 0-1, is required')
+    if [r['sort'] for r in sorted_rows] != list(range(1, len(sorted_rows) + 1)):
+        problems.append('form map: sort numbers must run 1..n in order')
+    for r in sorted_rows:
+        if r['new'] != f"{r['sort']:02d}-1":
+            problems.append(f"form map: {r['old']} sort {r['sort']} must map to {r['sort']:02d}-1, not {r['new']}")
+        if not r.get('en') or not r.get('bn'):
+            problems.append(f"form map: {r['old']} needs an English and a Bangla short name")
+    names = [r.get('en', '').lower() for r in sorted_rows]
+    if names != sorted(names):
+        problems.append('form map: rows are not in A-Z order by English short name')
+    olds = [r['old'] for r in rows]
+    news = [r['new'] for r in rows]
+    if len(set(olds)) != len(olds):
+        problems.append('form map: an old code appears twice')
+    if len(set(news)) != len(news):
+        problems.append('form map: a new code appears twice')
+    return problems
+
+
+def form_map_of(data):
+    """{old: new} for every code that changes (the fixed 0-1 is not in it)."""
+    return {r['old']: r['new'] for r in data.get('form_codes', []) if r['old'] != r['new']}
+
+
+def known_form_codes(data):
+    return {c for r in data.get('form_codes', []) for c in (r['old'], r['new'])}
 
 
 def phase_spans(line):
@@ -96,7 +154,7 @@ def phase_spans(line):
 
 
 def iter_scope():
-    """Yields (relative path, kind). kind: 'sql' (comment rule), 'text', or 'info_src' (only src lines)."""
+    """Phase scope. Yields (relative path, kind). kind: 'sql' (comment rule), 'text', or 'info_src' (only src lines)."""
     sup = os.path.join(ROOT, 'supabase')
     for name in sorted(os.listdir(sup)):
         if name.endswith('.sql'):
@@ -113,6 +171,30 @@ def iter_scope():
     yield 'web/data/info.json', 'info_src'
 
 
+def form_status(rel):
+    """Form scope: 'change', 'frozen' or None (not scanned)."""
+    if rel in SELF_FILES or rel.endswith('.png'):
+        return None
+    if rel.startswith(FROZEN_FORM_PREFIXES):
+        return 'frozen'
+    base = os.path.basename(rel)
+    if rel.startswith('docs/') and any(k in base.upper() for k in FROZEN_FORM_NAMES):
+        return 'frozen'
+    if rel.endswith(FORM_EXT) and rel.split('/')[0] in ('web', 'tests', 'tools', 'docs', 'supabase'):
+        return 'change'
+    return None
+
+
+def form_files():
+    """Tracked text files of the form scope (git ls-files), so untracked scratch files are never touched."""
+    code, out = git('ls-files')
+    if code != 0:
+        raise SystemExit('git ls-files failed: the form scope needs a git checkout')
+    for rel in out.splitlines():
+        if form_status(rel):
+            yield rel
+
+
 def phase_state(p):
     sup = os.path.join(ROOT, 'supabase')
     old_files = [f for f in (f"phase{p['old']}.sql", f"phase{p['old']}_test.sql") if os.path.exists(os.path.join(sup, f))]
@@ -124,15 +206,17 @@ def phase_state(p):
     return 'collision', old_files, new_files
 
 
-def transform(body, phase_map, form_map):
+def transform(body, phase_map, form_map=None):
+    """Returns (new_body, kinds). Every edit is computed on the original text and applied together."""
     edits = []
     for s, e, n in phase_spans(body):
         if n in phase_map:
             edits.append((s, e, f'{phase_map[n]:03d}', 'phase'))
-    for m in FORM_RE.finditer(body):
-        code = m.group(1)
-        if code in form_map and form_map[code] != code:
-            edits.append((m.start(1), m.end(1), form_map[code], 'form'))
+    if form_map:
+        for m in FORM_RE.finditer(body):
+            code = m.group(0)
+            if code in form_map:
+                edits.append((m.start(), m.end(), form_map[code], 'form'))
     if not edits:
         return body, []
     kinds = [k for *_, k in edits]
@@ -142,31 +226,69 @@ def transform(body, phase_map, form_map):
     return out, kinds
 
 
-def scan(phase_map, form_map):
-    """Returns (changes, file_texts). changes: dicts with path, line, old, new, kinds, comment, blocked."""
-    changes, texts = [], {}
-    for rel, kind in iter_scope():
-        path = os.path.join(ROOT, rel)
-        try:
-            with open(path, encoding='utf-8', newline='') as fh:
-                raw_lines = fh.read().splitlines(keepends=True)
-        except UnicodeDecodeError:
+def is_row(line):
+    s = line.strip()
+    return s.startswith('|') or bool(ROW_QUOTED_RE.search(line))
+
+
+def is_form_shape(token):
+    """NN-N with NN in 01..41 and N in 1..9: the shape of a printed form code (14-0 and 2026-1 are not)."""
+    nn, n = int(token[:2]), int(token[3])
+    return 1 <= nn <= 41 and 1 <= n <= 9
+
+
+def unmapped_row_codes(lines, known):
+    """(line number, token) for every form-code token on a row line that the map does not know."""
+    bad = []
+    for i, line in enumerate(lines, 1):
+        if not is_row(line):
             continue
+        for m in FORM_RE.finditer(line):
+            if m.group(0) not in known and is_form_shape(m.group(0)):
+                bad.append((i, m.group(0)))
+    return bad
+
+
+def scan(phase_map, form_map):
+    """Returns (changes, texts, frozen, unmapped). One pass per file, so every edit is computed on the
+    original text. changes: dicts with path, line, old, new, kinds, comment, blocked.
+    frozen: (path, line, token) for form codes that would change in a frozen path (never changed).
+    unmapped: (path, line, token) for form-code tokens on row lines that the map does not know."""
+    changes, texts, frozen, unmapped = [], {}, [], []
+    phase_kinds = {rel: kind for rel, kind in iter_scope()}
+    known = known_form_codes(DATA) if form_map else set()
+    for rel in dict.fromkeys(list(phase_kinds) + (list(form_files()) if form_map else [])):
+        kind = phase_kinds.get(rel)
+        fstat = form_status(rel) if form_map else None
+        if kind is None and fstat is None:
+            continue
+        try:
+            with open(os.path.join(ROOT, rel), encoding='utf-8', newline='') as fh:
+                raw_lines = fh.read().splitlines(keepends=True)
+        except (UnicodeDecodeError, FileNotFoundError, IsADirectoryError):
+            continue
+        if fstat == 'change':
+            unmapped.extend((rel, i, t) for i, t in unmapped_row_codes(raw_lines, known))
         new_lines = list(raw_lines)
         for i, raw in enumerate(raw_lines, 1):
             body = raw.rstrip('\r\n')
-            if kind == 'info_src' and not SRC_RE.match(body):
-                continue
-            new_body, kinds = transform(body, phase_map, form_map)
+            phase_here = phase_map if kind and not (kind == 'info_src' and not SRC_RE.match(body)) else {}
+            if fstat == 'frozen':
+                frozen.extend((rel, i, m.group(0)) for m in FORM_RE.finditer(body) if m.group(0) in form_map)
+            form_here = form_map if fstat == 'change' else None
+            new_body, kinds = transform(body, phase_here, form_here)
             if new_body == body:
                 continue
             is_comment = kind == 'sql' and body.lstrip().startswith('--')
             changes.append({'path': rel, 'line': i, 'old': body, 'new': new_body, 'kinds': kinds,
-                            'comment': is_comment, 'blocked': kind == 'sql' and not is_comment})
+                            'comment': is_comment, 'blocked': kind == 'sql' and 'phase' in kinds and not is_comment})
             new_lines[i - 1] = new_body + raw[len(body):]
         if new_lines != raw_lines:
             texts[rel] = ''.join(new_lines)
-    return changes, texts
+    return changes, texts, frozen, unmapped
+
+
+DATA = {}
 
 
 def ambiguous_refs(ambig):
@@ -186,14 +308,33 @@ def ambiguous_refs(ambig):
     return per_file
 
 
+def marker_problem(root=ROOT):
+    """A message when the applied marker exists (a second apply would shift the codes again), else None."""
+    path = os.path.join(root, MARKER_REL)
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding='utf-8') as fh:
+        m = json.load(fh)
+    return (f"applied marker {MARKER_REL} exists (applied {m.get('applied_on', '?')}, "
+            f"mapping {str(m.get('mapping_sha256', ''))[:12]}): the form codes are already renamed; "
+            "a second apply would shift them again")
+
+
+def mapping_sha(data):
+    rows = [(r['old'], r['new']) for r in data.get('form_codes', [])]
+    return hashlib.sha256(json.dumps(rows).encode('utf-8')).hexdigest()
+
+
 def git(*args):
     r = subprocess.run(['git', '-C', ROOT, *args], capture_output=True, text=True)
     return r.returncode, r.stdout
 
 
 def main():
+    global DATA
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--apply', action='store_true', help='write the changes (default: dry run only)')
+    ap.add_argument('--show-lines', action='store_true', help='print every changed line (default: per-file counts)')
     args = ap.parse_args()
 
     data, problems = load_map()
@@ -203,8 +344,8 @@ def main():
     for p in phases:
         st, old_files, new_files = phase_state(p)
         states[p['old']] = (st, old_files, new_files)
-        if st == 'collision':
-            blockers.append(f"phase {p['old']} -> {p['new']}: target phase{p['new']} already exists, state cannot be told apart")
+        # a collision (both old and new file exist) is reported in the phase list, not a blocker:
+        # the phase map leaves such a phase out, so no phase number changes for it
 
     new_set = {p['new'] for p in phases}
     old_set = {p['old'] for p in phases}
@@ -215,8 +356,10 @@ def main():
         if st == 'pending' or (st == 'applied' and p['old'] not in new_set):
             phase_map[p['old']] = p['new']
 
-    form_map = {f['old']: f['new'] for f in data.get('form_groups', []) if f['old'] != f['new']}
+    form_map = form_map_of(data)
+    DATA = data
     approved = bool(data.get('form_groups_approved', False))
+    marker = marker_problem()
 
     print(f"renumber: map {os.path.relpath(MAP_PATH, ROOT)}  mode={'APPLY' if args.apply else 'DRY RUN'}")
     print('\nPhase files')
@@ -233,42 +376,72 @@ def main():
             print(f"  COLLISION {label}: old {', '.join(old_files)}, new {', '.join(new_files)}")
     print(f"  pending renames: {len(pending_renames)}")
 
-    changes, texts = scan(phase_map, form_map)
+    changes, texts, frozen, unmapped = scan(phase_map, form_map)
     phase_changes = [c for c in changes if 'phase' in c['kinds']]
     form_changes = [c for c in changes if 'form' in c['kinds']]
     blocked_phase = [c for c in phase_changes if c['blocked']]
-    blocked_form = [c for c in form_changes if c['blocked']]
 
     print(f"\nText references to old phase numbers (scanned: {', '.join(str(k) for k in sorted(phase_map)) or 'none'})")
-    for c in changes:
-        if 'phase' not in c['kinds']:
-            continue
+    for c in phase_changes:
         tag = 'BLOCKED (SQL, not a comment)' if c['blocked'] else ('comment' if c['comment'] else 'text')
         print(f"  {c['path']}:{c['line']} [{tag}]")
-        print(f"      - {c['old'].strip()[:160]}")
-        print(f"      + {c['new'].strip()[:160]}")
+        if args.show_lines:
+            print(f"      - {c['old'].strip()[:160]}")
+            print(f"      + {c['new'].strip()[:160]}")
     files_with_phase = len({c['path'] for c in phase_changes})
     print(f"  lines that would change: {len(phase_changes)} in {files_with_phase} files; "
           f"comment lines: {sum(1 for c in phase_changes if c['comment'])}; "
           f"BLOCKED SQL lines: {len(blocked_phase)}")
 
-    print(f"\nForm codes (form_groups_approved = {str(approved).lower()})")
+    print(f"\nForm codes (form_groups_approved = {str(approved).lower()}, mapping {mapping_sha(data)[:12]})")
+    per_dir = {}
     for c in form_changes:
-        print(f"  {c['path']}:{c['line']}")
-        print(f"      - {c['old'].strip()[:160]}")
-        print(f"      + {c['new'].strip()[:160]}")
-    print(f"  lines with form-code changes: {len(form_changes)} in {len({c['path'] for c in form_changes})} files; "
-          f"BLOCKED (non-comment SQL): {len(blocked_form)}")
+        key = '/'.join(c['path'].split('/')[:2])
+        per_dir[key] = per_dir.get(key, 0) + 1
+        if args.show_lines:
+            print(f"  {c['path']}:{c['line']}")
+            print(f"      - {c['old'].strip()[:160]}")
+            print(f"      + {c['new'].strip()[:160]}")
+    for k in sorted(per_dir):
+        print(f"  {per_dir[k]:5d} lines in {k}")
+    frozen_files = {}
+    for rel, _, _ in frozen:
+        frozen_files[rel] = frozen_files.get(rel, 0) + 1
+    print(f"  lines with form-code changes: {len(form_changes)} in {len({c['path'] for c in form_changes})} files")
+    print(f"  FROZEN (not changed; SQL data needs a new phase, history/generated docs keep old codes): "
+          f"{len(frozen)} codes in {len(frozen_files)} files")
+    for rel in sorted(frozen_files):
+        print(f"      frozen {rel}: {frozen_files[rel]}")
+    internal = []
+    for rel in sorted(set(c['path'] for c in changes) | set(form_files())):
+        if form_status(rel) != 'change':
+            continue
+        try:
+            with open(os.path.join(ROOT, rel), encoding='utf-8') as fh:
+                for i, line in enumerate(fh, 1):
+                    for m in UNDERSCORE_RE.finditer(line):
+                        if f'{m.group(2)}-{m.group(3)}' in form_map:
+                            internal.append((rel, i, m.group(0)))
+        except (UnicodeDecodeError, FileNotFoundError):
+            continue
+    print(f"  internal ids with an old code, kept (SQL and contracts use them; review by hand): {len(internal)} "
+          f"in {len({r for r, _, _ in internal})} files")
+    print(f"  unknown codes on row lines (refuse): {len(unmapped)}")
+    for rel, i, t in unmapped[:50]:
+        print(f"      {rel}:{i}: {t}")
 
     amb = ambiguous_refs(ambig) if ambig else {}
     print(f"\nNot changed: numbers both old and new {sorted(ambig)}: {sum(amb.values())} references in {len(amb)} files "
           f"(check with tools/check_numbering.py)")
 
-    if blocked_phase or blocked_form:
-        blockers.append(f"{len(blocked_phase)} phase and {len(blocked_form)} form-code line(s) in supabase/*.sql "
-                        "are not SQL comments (owner decides by hand)")
+    if blocked_phase:
+        blockers.append(f"{len(blocked_phase)} phase line(s) in supabase/*.sql are not SQL comments (owner decides by hand)")
     if form_changes and not approved:
         blockers.append(f"{len(form_changes)} form-code line(s) would change but form_groups_approved is false")
+    if unmapped:
+        blockers.append(f"{len(unmapped)} form-code token(s) on row lines are not in the map (add them to the map or fix the row)")
+    if marker:
+        blockers.append(marker)
 
     if args.apply:
         _, status = git("status", "--porcelain", "--", *SCOPE_GIT_PATHS)
@@ -306,7 +479,14 @@ def main():
             dst = os.path.join(ROOT, 'supabase', f"phase{p['new']}{suffix}")
             if os.path.exists(src):
                 os.rename(src, dst)
-    print(f"\nAPPLIED: {len(texts)} files written, {len(pending_renames)} phase renames.")
+    if form_changes:
+        marker_data = {'applied_on': datetime.date.today().isoformat(), 'mapping_sha256': mapping_sha(data),
+                       'form_code_lines': len(form_changes), 'files': len(texts)}
+        with open(os.path.join(ROOT, MARKER_REL), 'w', encoding='utf-8') as fh:
+            json.dump(marker_data, fh, indent=2)
+            fh.write('\n')
+    print(f"\nAPPLIED: {len(texts)} files written, {len(pending_renames)} phase renames, "
+          f"{len(form_changes)} form-code lines.")
     print('Next: python3 tools/check_numbering.py, then python3 tools/check_no_demo_leak.py, then the web suite.')
     return 0
 
