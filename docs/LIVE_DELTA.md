@@ -277,3 +277,18 @@ Every replaced text is in `public._union_fn_backup` (`def` = the full `create or
 - **Effect today:** none. With the switch OFF the trigger returns at once; the local fingerprint of the scenario is the same with and without phase 545.
 - **Steps (owner):** 1. backup (Home > Backup). 2. paste `supabase/phase545.sql` once in the SQL editor (it is paste-twice safe). 3. run `select * from public._i2_state() where not present;` (must return no rows). 4. leave the switch OFF, or switch it on in Rules after your own test.
 - **Rollback:** `drop trigger landed_costs_price_freight545 on public.landed_costs;` and `delete from public.rules where key = 'price_check_include_freight';` (no data is changed by the phase itself).
+
+## Phase 546 (25 Oct 2026): stock_transfer carries both lines again (fix of phase 544)
+
+- **Why:** phase 544 re-created `stock_transfer` from the phase 499 text, so after a paste of 544 the phase 533 merge was lost: `transfer_needs_stock` (bos114) and `transfer_notify_receiver` (bos115) did nothing even when switched on.
+- **What it changes:** `stock_transfer` only (same signature) = the phase 533 text plus the phase 544 reused-id check. No new rule; every switch keeps its value.
+- **Effect today:** none while the three switches are OFF (default).
+- **Steps (owner):** 1. backup (Home > Backup). 2. paste `supabase/phase546.sql` once, AFTER phase 545 (it is paste-twice safe). Paste it even if phase 544 was never pasted live.
+- **Rollback:** restore the backup from step 1 (or paste phase 544 again, which brings back the bug).
+
+## Phase 547 (25 Oct 2026): daily summary reads job_runs.ok (fix of phase 494)
+
+- **Why:** `xc_summary_compose` (phase 494) counted failed jobs with `job_runs.status = 'failed'`; `job_runs` (phase 479) has `ok` and `finished_at`, no `status`. Every summary run raised `column "status" does not exist`.
+- **What it changes:** `xc_summary_compose(date, integer)` only (same signature). No new rule.
+- **Steps (owner):** paste `supabase/phase547.sql` once, AFTER phase 546 (paste-twice safe).
+- **Rollback:** none needed; pasting phase 494 again brings back the bug.

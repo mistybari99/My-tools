@@ -1,6 +1,7 @@
 // Item photos decorator (web/itemimg.js, phase102 step Img) in Chromium with a mocked sb.storage / rpc.
 // bos111: the mocked picture host is mock.supabase.co (the CSP of index.html allows images from *.supabase.co only); it was mock.local.
 // Run: node tests/web/itemimg_test.js <abs tests/web dir>      (serves ../../web of this checkout)
+require('./_paths'); // sets BOS_REPO_DIR for the smoke.js data block
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
 const SP = process.argv[2] || __dirname, ROOT = path.join(SP, '..', '..', 'web');

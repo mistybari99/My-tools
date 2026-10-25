@@ -139,7 +139,7 @@ Not changed: any web file (except `info.json`), any live database, any grant, an
 ### 2.10 Earlier design work carried over (from docs/HANDOFF.md section 4)
 
 66. **OWNER / TODO** – Two-state layout (Default / all optional parts on / revert): design debated by two architects; the owner has not chosen. Not started.
-67. **OWNER** – Form-code sequencing: `tools/numbering_map.json` has `form_groups_approved: false`. No form code is changed. The owner must approve the map before any form code moves (BUILD-RULES rule 2).
+67. **DONE (phase 543)** – Form-code sequencing: the owner approved the clean sequence on 21 Oct 2026 (`form_groups_approved: true`, `docs/FORM_SEQUENCE.md`); phase 543 applies it. [Updated 25 Oct 2026.]
 68. **OWNER** – Phase numbers in SQL text: the phase 487 seed description says "phase 490" (a line the renumber tool will not change). The owner edits it.
 69. **TODO** – Info entries: `related` fields for `cake_spec` and `cake_price_manage` (these two have no entry yet). The other seven were done (section 0).
 70. **OWNER** – X3 social screen: needs the Meta / WhatsApp account and the public media URL decisions. Not started.

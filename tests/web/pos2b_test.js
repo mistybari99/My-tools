@@ -1,3 +1,4 @@
+require('./_paths'); // sets BOS_REPO_DIR for the smoke.js data block
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
 const SP = process.argv[2], ROOT = process.env.WEB_ROOT || '/home/user/My-tools/web';

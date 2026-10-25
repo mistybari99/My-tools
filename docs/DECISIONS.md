@@ -35,3 +35,7 @@ Source: owner answers in chat, 11 Oct 2026. Scope: all 42 forms of BOS Build Kit
 - Hosting: web/ goes to a separate PUBLIC repo (free GitHub Pages). This private repo keeps schema, data, docs. Costs/prices never go in the public repo.
 - Cost price is a separate permission (ITEM_COST view / enter). Owner switches it per role in the matrix. Hidden roles cannot read it even through the API.
 - Item and price changes by anyone except the owner are requests: they wait for the owner or a role with ITEMS "approve". The requester cannot approve own request unless the owner allows it for that role. Owner's own changes apply at once. All changes are logged.
+
+## Update 21 Oct 2026
+- Printed form codes: the clean sequence NN-1, A-Z by English short name (Option B), final. 0-1 keeps its code. This replaces BUILD-RULES rule 2 ("never renumber") for printed form codes only; the rule is `docs/FORM_SEQUENCE.md`, applied by phase 543, changed only through `tools/renumber.py` and a numbered phase.
+- Freight is an option in the purchase price check (phase 545, switch `price_check_include_freight`, OFF).
