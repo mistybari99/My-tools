@@ -1,5 +1,6 @@
 // items2_b_test.js = items2_test.js with the upload assertion adapted: step Img (bos103) uploads a ~160px copy at <path>.t.jpg right after the photo. Everything else is identical.
 // Products v2 (items2.js) + supplier picker (entry.js SUP field). Run: node items2_test.js <scratchpad>
+require('./_paths'); // sets BOS_REPO_DIR for the smoke.js data block
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
 const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
