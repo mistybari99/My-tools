@@ -1,0 +1,84 @@
+# X1 automation: the scheduled jobs that already exist in tools/ (SMS queue, intake retry, heartbeat), each recorded in job_runs.
+# DRY RUN BY DEFAULT: a scheduled run and a manual run without "live" only ask the database for permission, record the attempt and report what it would do.
+# A live run needs BOTH: the manual input "live" = true (or the repository variable X1_AUTOMATION_LIVE = true), AND the database switch automation_on = ON.
+# The database can refuse everything (automation_on OFF, automation_pause_until in force, or the connection switched off): then the run is recorded as skipped.
+# Setup: docs/integration/X1.md. Scheduled workflows only run from the DEFAULT branch.
+# Minutes: a private repo on the free plan has 2,000 Actions minutes a month. notify.yml already uses about 1,450. This file at every 30 minutes adds about
+#   48 short runs a day. If the total is too high, change the cron below to '17 */2 * * *' (every 2 hours).
+name: automation
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'                # every 30 min (dry run unless X1_AUTOMATION_LIVE = true)
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Which job'
+        type: choice
+        options: [all, heartbeat, notify_sms, intake_retry]
+        default: all
+      live:
+        description: 'Live: act (needs automation_on ON in the database as well). Empty = dry run.'
+        type: boolean
+        default: false
+
+concurrency:
+  group: automation
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  automation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      NOTIFY_BOT_EMAIL: ${{ secrets.NOTIFY_BOT_EMAIL }}
+      NOTIFY_BOT_PASSWORD: ${{ secrets.NOTIFY_BOT_PASSWORD }}
+      BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
+      SMS_PROVIDER_URL: ${{ secrets.SMS_PROVIDER_URL }}
+      SMS_PROVIDER_TOKEN: ${{ secrets.SMS_PROVIDER_TOKEN }}
+      SMS_SEND_ENABLED: ${{ vars.SMS_SEND_ENABLED }}
+    steps:
+      - name: Refuse to run in a public repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          private=$(gh api "repos/${GITHUB_REPOSITORY}" --jq .private)
+          if [ "$private" != "true" ]; then
+            echo "::error::This repository is not private. This job reads sales, costs and salaries and must never run in a public repository."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Decide live or dry run
+        id: mode
+        env:
+          MANUAL_LIVE: ${{ github.event.inputs.live }}
+          VAR_LIVE: ${{ vars.X1_AUTOMATION_LIVE }}
+        run: |
+          LIVE=""
+          if [ "$MANUAL_LIVE" = "true" ] || [ "$VAR_LIVE" = "true" ]; then LIVE="--live"; fi
+          echo "live=$LIVE" >> "$GITHUB_OUTPUT"
+          echo "mode: ${LIVE:-dry run}"
+
+      - name: Heartbeat
+        if: github.event.inputs.job == '' || github.event.inputs.job == 'all' || github.event.inputs.job == 'heartbeat' || github.event_name == 'schedule'
+        run: python3 tools/x1_job.py --job heartbeat ${{ steps.mode.outputs.live }}
+
+      - name: SMS queue (notify_sms.py)
+        if: github.event.inputs.job == '' || github.event.inputs.job == 'all' || github.event.inputs.job == 'notify_sms' || github.event_name == 'schedule'
+        continue-on-error: true
+        run: python3 tools/x1_job.py --job notify_sms ${{ steps.mode.outputs.live }}
+
+      - name: Intake retry (intake_retry_due)
+        if: github.event.inputs.job == '' || github.event.inputs.job == 'all' || github.event.inputs.job == 'intake_retry' || github.event_name == 'schedule'
+        continue-on-error: true
+        run: python3 tools/x1_job.py --job intake_retry ${{ steps.mode.outputs.live }}

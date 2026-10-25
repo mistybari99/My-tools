@@ -26,8 +26,7 @@ import ops_common as oc  # noqa: E402
 import restore_drill as rd  # noqa: E402
 
 PG = shlex.split(os.environ.get('BOS_PG_CMD', 'psql -h /tmp -p 5544 -U postgres'))
-ORDER = ('phase8 phase9 phase10 phase11 phase12 phase13 phase14 phase15 phase16 phase17 phase18 phase19 phase20 phase21 phase22 phase23 phase24 phase25 phase26 phase27 phase28 '
-         'phase40 phase41 phase42 phase43 phase44 phase45 phase46 phase47 phase48 phase49 phase50 phase51 phase52 phase53 phase54 phase60 phase61 phase62 phase70')
+ORDER = ' '.join(w for ln in open(os.path.join(ROOT, 'tests', 'sql', 'ORDER.txt'), encoding='utf-8') if not ln.startswith('#') for w in ln.split())   # the owner paste order, phase 8 to the last (phase 99)
 OWNER, BOT = '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-0000000000b0'
 SEED = f"""
 insert into auth.users (id,email,raw_user_meta_data) values ('{OWNER}','owner1@s.app','{{"full_name":"Owner"}}'),('{BOT}','bot@s.app','{{}}') on conflict do nothing;

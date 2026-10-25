@@ -28,6 +28,7 @@ const X = {
   amount: L('টাকার পরিমাণ', 'Amount', 'Amount'), what: L('কী বিক্রি (ঐচ্ছিক)', 'What was sold (optional)', 'কী বিক্রি (ঐচ্ছিক)'), all: L('সব', 'All', 'All'), freq: L('বেশি বিক্রি', 'Frequent', 'Frequent'),
   scan: L('বারকোড স্ক্যান', 'Scan barcode', 'Barcode স্ক্যান'), search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), qty: L('পরিমাণ', 'Quantity', 'Quantity'), add: L('কার্টে দিন', 'Add to cart', 'Add to Cart'),
   receipt: L('রসিদ', 'Receipt', 'Receipt'), done: L('সেল হয়েছে', 'Sale done', 'Sale হয়েছে'), queued: L('নেট নেই — সেল জমা আছে, নেট এলে পাঠানো হবে', 'No network — sale saved, will be sent when online', 'Net নেই — Sale জমা আছে, Online হলে যাবে'),
+  held: L('মালিকের জন্য ধরা আছে — এখনও রসিদ নেই', 'Held for the owner — no receipt yet', 'মালিকের জন্য Held — এখনও receipt নেই'),   // W1-B: a late offline sale parked by late_sale_policy = park
   pending: L('পাঠানো বাকি', 'waiting to send', 'পাঠানো বাকি'), void: L('বাতিল', 'Void', 'Void'), voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), voidwhy: L('বাতিলের কারণ (লিখতেই হবে)', 'Reason for voiding (required)', 'Void এর কারণ (লিখতেই হবে)'),
   day: L('আজকের মোট', "Today's total", 'Today মোট'), count: L('টি সেল', 'sales', 'sales'), nodata: L('এখনও কোনো সেল নেই', 'No sales yet', 'এখনও কোনো sale নেই'),
   back: L('ফিরুন', 'Back', 'Back'), close: L('বন্ধ', 'Close', 'Close'), lines: L('আইটেম', 'Items', 'Items'), by: L('বিক্রেতা', 'Sold by', 'Sold by'),
@@ -38,7 +39,7 @@ const X = {
   custReq: L('বাকি বা পাইকারি সেলে গ্রাহকের মোবাইল নম্বর আর নাম লাগবেই', 'A customer mobile number and name are required for a due or wholesale sale', 'Due বা Wholesale sale এ Customer এর mobile number আর নাম লাগবেই'),
   known: L('পুরনো গ্রাহক', 'Existing customer', 'পুরনো Customer'), newc: L('নতুন গ্রাহক — নাম লিখুন', 'New customer — enter the name', 'নতুন Customer — নাম লিখুন'),
   owes: L('এখন বাকি', 'Owes now', 'এখন Due'), limit: L('বাকির সীমা', 'Credit limit', 'Credit limit'),
-  unit: L('একক', 'Unit', 'Unit'), convHow: L('অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)', 'Sell in another unit too? (e.g. 1 pc = 0.2 kg)', 'অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)'), save: L('সংরক্ষণ', 'Save', 'Save'), convSaved: L('এককের হিসাব সংরক্ষিত', 'Unit conversion saved', 'Unit conversion saved'),
+  unit: L('একক', 'Unit', 'Unit'), convHow: L('অন্য এককেও বিক্রি করতে চান? (যেমন ১ পিস = ০.২ কেজি)', 'Sell in another unit too? (e.g. 1 pc = 0.2 kg)', 'অন্য unit-এও বিক্রি? (যেমন ১ pc = ০.২ kg)'), save: L('সেভ', 'Save', 'Save'), convSaved: L('ইউনিট কনভার্সন সেভ হয়েছে', 'Unit conversion saved', 'Unit conversion save হয়েছে'),
   other: L('অন্য আইটেম (তালিকায় নেই)', 'Other item (not in the list)', 'অন্য Item (list এ নেই)'), oname: L('আইটেমের নাম', 'Item name', 'Item এর নাম'), ounit: L('একক (কেজি, পিস…)', 'Unit (kg, piece…)', 'Unit (kg, piece…)'), oprice: L('একক দাম (৳)', 'Unit price (৳)', 'Unit price (৳)'),
   ohint: L('এটা মালিকের কাছে "তালিকায় নেই" হিসেবে যাবে, যাতে তালিকায় যোগ হয়।', 'The owner is told it is not in the list so it can be added.', 'Owner কে "list এ নেই" হিসেবে জানানো হবে, যাতে list এ যোগ হয়।'),
   newitem: L('＋ নতুন আইটেম', '＋ New item', '＋ নতুন Item'), full: L('নগদে সম্পন্ন', 'Done — cash', 'Cash এ Done'), more: L('মোবাইল / বাকি / ভাগ…', 'Mobile / due / split…', 'Mobile / Due / ভাগ…'),
@@ -55,10 +56,10 @@ const ERRS = {
   customer_inactive: L('এই গ্রাহক বন্ধ করা আছে', 'This customer is switched off', 'এই Customer বন্ধ করা আছে'), bad_discount: L('ডিসকাউন্ট মোটের বেশি হতে পারে না (শতাংশ ১০০ এর বেশি নয়)', 'Discount cannot exceed the total (percent at most 100)', 'Discount মোটের বেশি হতে পারে না (percent 100 এর বেশি নয়)'),
   discount_mode_off: L('এই ধরনের ডিসকাউন্ট বন্ধ আছে (নিয়ম)', 'This kind of discount is switched off (rule)', 'এই ধরনের Discount বন্ধ (নিয়ম)'),
   unlisted_blocked: L('তালিকায় নেই এমন আইটেম বিক্রি বন্ধ আছে (নিয়ম)', 'Selling an item that is not in the list is switched off (rule)', 'List এ নেই এমন item বিক্রি বন্ধ (নিয়ম)'), paper_no_required: L('কাগজের ছাপা নম্বর লাগবে', 'The printed paper number is required', 'কাগজের ছাপা number লাগবে'),
-  period_closed: L('এই তারিখের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
-  expired_stock_blocked: L('মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ আছে (মালিকের সেটিং) — বিক্রি হয়নি', 'Selling expired stock is blocked (owner setting) — the sale was not made', 'মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ (owner setting) — বিক্রি হয়নি'),
+  period_closed: L('এই ডেটের হিসাব বন্ধ — শুধু মালিক বদলাতে পারবেন', 'This date is closed — only the owner can change it', 'এই date এর হিসাব বন্ধ — শুধু Owner বদলাতে পারবেন'),
+  expired_stock_blocked: L('মেয়াদ শেষ স্টক বিক্রি বন্ধ আছে (মালিকের সেটিং) — সেল হয়নি', 'Selling expired stock is blocked (owner setting) — the sale was not made', 'মেয়াদ শেষ stock বিক্রি বন্ধ (owner setting) — sale হয়নি'),
   insufficient_stock: L('মজুতে এত নেই — বিক্রি করা গেল না', 'Not enough stock on hand — the sale was not made', 'Stock-এ এত নেই — বিক্রি হয়নি'),
-  item_not_sellable: L('এই আইটেম বিক্রির জন্য নয় বা দাম দেওয়া নেই (Data needed)', 'This item is not for sale or has no selling price (Data needed)', 'এই Item বিক্রির জন্য নয় বা দাম নেই (Data needed)'),
+  item_not_sellable: L('এই আইটেম সেলের জন্য নয় বা প্রাইস দেওয়া নেই (তথ্য লাগবে)', 'This item is not for sale or has no selling price (Data needed)', 'এই item sale-এর জন্য নয় বা price নেই (Data লাগবে)'),
   wallet_needed: L('মোবাইল পেমেন্টে বিকাশ/নগদ ইত্যাদি বাছুন', 'Choose bKash / Nagad etc. for a mobile payment', 'Mobile payment এ bKash/Nagad বাছুন'), name_required: L('আইটেমের নাম লিখুন', 'Enter the item name', 'Item এর নাম লিখুন'),
 };
 const T2 = (e) => { const m = (e && e.message) || String(e || ''); for (const k of Object.keys(ERRS)) if (m.includes(k)) return lab(ERRS[k]); return null; };
@@ -72,7 +73,7 @@ const queue = () => jget(QK(), []);
 const setQueue = (q) => store.set(QK(), JSON.stringify(q));
 const failedQ = () => jget(XK(), []);
 const setFailed = (q) => store.set(XK(), JSON.stringify(q));
-const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable)/;
+const BUSINESS = /^(no_lines|bad_mode|bad_qty|bad_price|bad_amount|bad_discount|bad_discount_kind|discount_mode_off|no_price|item_not_found|due_needs_customer|not allowed|customer_required|customer_name_required|bad_mobile|overpaid|over_credit_limit|override_needs_approval|discount_needs_approval|customer_inactive|bad_sale_type|bad_payments|name_required|period_closed|unlisted_blocked|paper_no_required|insufficient_stock|expired_stock_blocked|item_not_sellable|unit_unknown|production_negative_reason_needed|client_id_taken)/;
 const freq = () => jget(FKEY, {});
 const bump = (id) => { const f = freq(); f[id] = (f[id] || 0) + 1; store.set(FKEY, JSON.stringify(f)); };
 const perms = () => S.ctx.perms.POS || {};
@@ -100,25 +101,55 @@ const discIn = () => Math.max(0, nnum(($('#cart_disc') || {}).value || 0));     
 const discVal = () => { const v = discIn(); return P.dk === 'percent' ? r2(cartSub() * Math.min(v, 100) / 100) : v; };               // the amount that comes off
 const netTotal = () => Math.max(0, r2(cartSub() - discVal()));
 
-async function load() {
-  await B.loadStatic();
-  // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
-  let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
-  if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
-  if (it.error) throw it.error;
-  try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = []; }
-  P.items = it.data.filter((i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material');
+const SELLABLE = (i) => i.sell_price !== null && i.sellable !== false && !i.hidden && i.item_type !== 'asset' && i.item_type !== 'raw_material';
+/* bos114 (WebLoad): the item list, the unit conversions and the static data (locations, rules ...) are read AT THE SAME TIME (they were one after the other = 3-5 round trips on mobile data).
+   Stale-while-revalidate: when this phone already has the list (opened POS before, or the saved copy of the last good load), the POS draws from it at once and the fresh list replaces it
+   as soon as it arrives (redraw only if something changed). The server prices every sale, so a card is never the authority on a price. */
+function fetchItems() {
+  return (async () => {
+    // item master (phase14): only sellable types with a selling price are offered; hidden items stay out of the picker. An older database has no such columns: the plain list is used.
+    let it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode,sellable,hidden,item_type').eq('is_active', true).order('code'));
+    if (it.error) it = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,category,category_bn,sub_category,unit,sell_price,is_active,barcode').eq('is_active', true).order('code'));
+    if (it.error && B.cs && isNet(it.error)) { const c = B.cs.itemsLoad(); if (c) it = { data: c, error: null }; }   // bos112: no internet: the item list saved by the last good load
+    if (it.error) throw it.error;
+    if (B.cs && !it.error && it.data && it.data.length) B.cs.itemsSave(it.data);   // bos112
+    return it.data.filter(SELLABLE);
+  })();
+}
+async function fetchConv() {
+  try { const cv = await sb.from('unit_conversions').select('item_id,from_unit,to_unit,factor,active').eq('active', true); P.conv = cv.error ? (JSON.parse(store.get('bos_pos_conv') || '[]')) : (cv.data || []); if (!cv.error) store.set('bos_pos_conv', JSON.stringify(P.conv)); } catch (e) { P.conv = P.conv || JSON.parse(store.get('bos_pos_conv') || '[]'); }
+}
+const itemsSig = (l) => l.length + '|' + l.map((i) => [i.id, i.sell_price, i.name_bn, i.name_en, i.name_mix, i.category, i.sub_category, i.unit, i.barcode].join('~')).join('|');
+function setLocs() {
   const all = B.liveLocs ? B.liveLocs(B.ENV.locs) : B.ENV.locs;
   P.locs = S.ctx.is_owner || S.ctx.roles.includes('management') ? all : all.filter((l) => S.ctx.locations.includes(l.id));
   if (!P.loc || !P.locs.find((l) => l.id === P.loc)) P.loc = store.get('bos_pos_loc') ? Number(store.get('bos_pos_loc')) : (P.locs[0] || {}).id;
   if (!P.locs.find((l) => l.id === P.loc)) P.loc = (P.locs[0] || {}).id;
+}
+async function load() {
+  const fresh = fetchItems(), conv = fetchConv(), stat = B.loadStatic();
+  let early = null;
+  if (navigator.onLine !== false && !S.offline) {
+    early = P.items.length ? P.items : ((B.cs && B.cs.itemsLoad && B.cs.itemsLoad()) || []).filter(SELLABLE);
+    if (!early.length) early = null;
+  }
+  fresh.catch(() => {}); conv.catch(() => {});   // handled below (awaited) or ignored on the early path
+  await stat;
+  if (early) {
+    P.items = early; if (!P.conv) P.conv = JSON.parse(store.get('bos_pos_conv') || '[]'); setLocs(); B.pay.loadWallets();
+    Promise.all([fresh, conv]).then(([l]) => {
+      if (itemsSig(l) === itemsSig(P.items)) return;
+      P.items = l; if (P.tab === 'sell' && $('#pos_items') && !$('#sheet')) { drawSell(perms().enter || S.ctx.is_owner); } }).catch(() => { /* the list on screen stays */ });
+    return;
+  }
+  P.items = await fresh; await conv; setLocs();
   B.pay.loadWallets();
 }
 
 // ---------- page ----------
 async function viewPos() {
   if (!perms().view && !S.ctx.is_owner) return (location.hash = '#/home');
-  shell(T('title'), `<p class="muted">${esc(t('loading'))}</p>`, true);
+  shell(T('title'), `<p class="muted" role="status">${esc(t('loading'))}</p><div class="pos-grid" aria-hidden="true">${'<div class="sk-card"></div>'.repeat(8)}</div>`, true);   // bos114: skeleton cards while the list loads
   try { await load(); } catch (e) { return fail(e); }
   if (!P.loc) return shell(T('title'), `<div class="notice bad">${esc(T('noloc'))}</div>`, true);
   drawPos();
@@ -139,12 +170,13 @@ function drawPos() {
 // ---------- sell ----------
 function drawSell(can) {
   const cats = [...new Set(P.items.map((i) => i.category).filter(Boolean))];
-  const cn = (c) => lab(CATS[c]) || (P.items.find((i) => i.category === c) || {}).category_bn || c;
+  const cn = (c) => (B.catpick && B.catpick.nameIfKnown(c)) /* bos100 */ || lab(CATS[c]) || (P.items.find((i) => i.category === c) || {}).category_bn || c;
   const canNew = S.ctx.is_owner || (S.ctx.perms.ITEMS && S.ctx.perms.ITEMS.enter);
   $('#pos_body').innerHTML = `
     <div class="row"><input id="pos_q" placeholder="${esc(T('search'))}" value="${esc(P.q)}" style="flex:1"><button data-act="pos_scan" aria-label="${esc(T('scan'))}" ${can ? '' : 'disabled'}>▮▮</button><button class="primary" data-act="pos_quick" ${can ? '' : 'disabled'}>⚡ ${esc(T('quick'))}</button></div>
     <div class="row wrap" style="margin:10px 0" id="pos_cats" data-ctl="select" data-title="${esc(lab(L('ক্যাটাগরি', 'Category', 'Category')))}">${[['', T('all')], ['_f', T('freq')], ...cats.map((c) => [c, cn(c)])].map(([c, l]) =>
       `<button class="tog ${P.cat === c ? 'on' : ''}" data-act="pos_cat" data-v="${esc(c)}">${esc(l)}</button>`).join('')}</div>
+    ${B.catpick ? B.catpick.subChips(P.items, P.cat, P.sub, 'pos_sub') : ''}<!-- bos100: Sub-category chips -->
     <div class="row wrap" style="margin-bottom:10px"><button class="tog" data-act="pos_other" ${can ? '' : 'disabled'}>${esc(T('other'))}</button>${canNew ? `<button class="tog" data-act="pos_newitem">${esc(T('newitem'))}</button>` : ''}</div>
     <div class="pos-grid" id="pos_items"></div><div style="height:96px"></div>
     <div class="pos-bar" id="pos_bar"></div>`;
@@ -152,14 +184,32 @@ function drawSell(can) {
 }
 function visibleItems() {
   const q = P.q.trim().toLowerCase(), f = freq();
-  let l = P.items.filter((i) => (!P.cat || P.cat === '_f' || i.category === P.cat) && (!q || [i.name_bn, i.name_en, i.name_mix, i.code].some((x) => (x || '').toLowerCase().includes(q))));
+  let l = P.items.filter((i) => (!P.cat || P.cat === '_f' || i.category === P.cat) && (!P.sub || P.cat === '_f' || i.sub_category === P.sub) /* bos100 */ && (!q || [i.name_bn, i.name_en, i.name_mix, i.code].some((x) => (x || '').toLowerCase().includes(q))));
   if (P.cat === '_f') l = l.filter((i) => f[i.id]).sort((a, z) => f[z.id] - f[a.id]).slice(0, 24);
   return l;
 }
+/* bos114 (WebLoad): 1369 items drew 1369 buttons in one go (a 2.5 s freeze on a mid-range phone). The first cards are drawn at once, the rest follow in small chunks
+   (a new search / category / redraw cancels the old chunks); a tap on a card only updates that card (no full redraw, no scroll jump). Same cards, same order, same markup. */
+const CARD_FIRST = 72, CARD_STEP = 72;
+const cardHtml = (i, inCart, can) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-cat="${esc(i.category || '')}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
+      <span class="pn">${esc(nm(i))}</span><span class="pp"><span class="cur">৳</span>${fmt(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`;
+const cartMap = () => new Map(P.cart.filter((l) => l.kind === 'item').map((l) => [l.item_id, l.qty]));
 function drawItems(can) {
-  const inCart = new Map(P.cart.filter((l) => l.kind === 'item').map((l) => [l.item_id, l.qty]));
-  $('#pos_items').innerHTML = visibleItems().map((i) => `<button class="pos-item ${inCart.has(i.id) ? 'in' : ''}" data-cat="${esc(i.category || '')}" data-act="pos_add" data-v="${i.id}" ${can ? '' : 'disabled'}>
-      <span class="pn">${esc(nm(i))}</span><span class="pp"><span class="cur">৳</span>${fmt(i.sell_price)}<small> / ${esc(unitL(i.unit))}</small></span>${inCart.has(i.id) ? `<span class="pq">${fmt(inCart.get(i.id))}</span>` : ''}</button>`).join('') || `<p class="muted center">—</p>`;
+  const host = $('#pos_items'); if (!host) return;
+  const list = visibleItems(), tok = (P.dtok = (P.dtok || 0) + 1); P.shown = list;
+  if (P.io) { P.io.disconnect(); P.io = null; } const old = $('#pos_more'); if (old) old.remove();
+  if (!list.length) { host.innerHTML = `<p class="muted center">—</p>`; return; }
+  host.innerHTML = list.slice(0, CARD_FIRST).map((i) => cardHtml(i, cartMap(), can)).join('');
+  let k = CARD_FIRST; if (list.length <= k) return;
+  // the rest is drawn as the list is scrolled (a sentinel under the grid); without IntersectionObserver the chunks follow on a timer
+  const sent = document.createElement('div'); sent.id = 'pos_more'; sent.setAttribute('aria-hidden', 'true'); sent.style.cssText = 'height:1px'; host.after(sent);
+  const more = () => {
+    if (tok !== P.dtok || !host.isConnected) return;
+    host.insertAdjacentHTML('beforeend', list.slice(k, k + CARD_STEP).map((i) => cardHtml(i, cartMap(), can)).join('')); k += CARD_STEP;
+    if (k >= list.length) { if (P.io) { P.io.disconnect(); P.io = null; } sent.remove(); return; }
+    if (P.io) { P.io.unobserve(sent); P.io.observe(sent); } else setTimeout(more, 0);
+  };
+  if (window.IntersectionObserver) { P.io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) more(); }, { rootMargin: '900px 0px' }); P.io.observe(sent); } else setTimeout(more, 0);
 }
 function drawBar(can) {
   const n = P.cart.length, sub = cartSub();
@@ -167,7 +217,16 @@ function drawBar(can) {
   b.innerHTML = `<div><div class="muted" style="font-size:.8rem">${n ? n + ' · ' + esc(T('lines')) : esc(T('cart'))}</div><b style="font-size:1.25rem">${money(sub)}</b></div>
     <button class="primary" data-act="pos_cart" ${n && can ? '' : 'disabled'}>${esc(T('pay'))} →</button>`;
 }
-function refreshSell() { if (P.tab !== 'sell' || !$('#pos_items')) return; drawItems(true); drawBar(true); }
+function refreshSell() {
+  if (P.tab !== 'sell' || !$('#pos_items')) return;
+  const vis = visibleItems(), cur = P.shown;
+  if (cur && cur.length === vis.length && vis.every((x, n) => x === cur[n])) {   // same cards: only the "in cart" mark and quantity change (bos114)
+    const inCart = cartMap();
+    $('#pos_items').querySelectorAll('.pos-item').forEach((b) => { const q = inCart.get(b.getAttribute('data-v')), has = inCart.has(b.getAttribute('data-v')), old = b.querySelector('.pq');
+      b.classList.toggle('in', has); if (!has) { if (old) old.remove(); } else if (old) old.textContent = fmt(q); else { const sp = document.createElement('span'); sp.className = 'pq'; sp.textContent = fmt(q); b.appendChild(sp); } });
+  } else drawItems(true);
+  drawBar(true);
+}
 // scan (camera or device) or a typed code + Enter in the search box: add the item whose items.barcode matches
 function scanAdd(code) {
   const i = B.barcode && B.barcode.find(code, P.items);
@@ -213,11 +272,13 @@ function otherSheet() {
 // ---------- cart / pay ----------
 function cartSheet() {
   const dm = dmodes(); P.dk = dm.a ? 'amount' : dm.p ? 'percent' : null;
-  P.st = B.pay.create(netTotal, updDue);
+  P.st = B.pay.create(netTotal, updDue); if (B.pay.receipt) B.pay.receipt(P.st, 'pos_split_payment');   // W1-F: bank / cheque rows only when receipt_bank_on is ON
   openSheet(`<h2>${esc(T('cart'))}</h2><div id="cart_lines" class="stack"></div>
     <div class="row wrap" style="margin:8px 0"><button class="tog ${P.type === 'retail' ? 'on' : ''}" data-act="pos_type" data-v="retail">${esc(T('retail'))}</button><button class="tog ${P.type === 'wholesale' ? 'on' : ''}" data-act="pos_type" data-v="wholesale">${esc(T('wholesale'))}</button></div>
     ${dm.a || dm.p ? `<div class="row" style="align-items:flex-end"><div style="flex:1"><label id="cart_disc_l"></label><input id="cart_disc" inputmode="decimal"></div>${dm.a && dm.p ? `<div class="row" id="cart_dk" role="group" style="gap:6px"><button class="tog" data-act="pos_dk" data-v="amount" aria-label="${esc(T('discL'))} ৳">৳</button><button class="tog" data-act="pos_dk" data-v="percent" aria-label="${esc(T('discL'))} %">%</button></div>` : ''}</div>
     <div class="muted" id="cart_disc_calc" style="font-size:.9rem;min-height:1.4em"></div>` : ''}
+    ${B.mkt && B.mkt.posBox ? B.mkt.posBox() : ''}
+    ${B.crmf && B.crmf.posBox ? B.crmf.posBox() : ''}
     <div class="row between" style="margin:10px 0"><span>${esc(T('total'))}</span><b style="font-size:1.4rem" id="cart_total"></b></div>
     <div id="cart_pay"></div><div id="cart_cust"></div>
     <div style="margin-top:8px"><label>${esc(T('note'))}</label><input id="cart_note"></div>
@@ -243,7 +304,7 @@ function drawCust() {
   el.innerHTML = `<div class="card" style="margin:8px 0"><b>${esc(T('cust'))}${need ? ' *' : ''}</b>${need ? `<div class="muted" style="font-size:.85rem">${esc(T('custReq'))}</div>` : ''}
     <label>${esc(T('mobile'))}</label><input id="cu_mobile" inputmode="tel" value="${esc(c.mobile)}" placeholder="01XXXXXXXXX">
     ${m && f && f.found ? `<div class="notice ok"><b>${esc(f.name)}</b> · ${esc(T('known'))}${Number(f.balance) > 0 ? ` · ${esc(T('owes'))}: ${money(f.balance)}` : ''}${f.credit_limit !== null && f.credit_limit !== undefined ? ` · ${esc(T('limit'))}: ${money(f.credit_limit)}` : ''}</div>${tierBlock()}`
-      : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}</div>`;
+      : m ? `<label>${esc(T('cname'))} — ${esc(T('newc'))}</label><input id="cu_name" value="${esc(c.name)}">` : ''}${B.crmConsent ? B.crmConsent.posStrip(c.mobile) : ''}</div>`;
   if (keepFocus === 'cu_mobile') { const i = $('#cu_mobile'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
 }
 // phase43: the customer's tier chip + perks, a one-tap "apply the tier discount" button and a gift reminder (all from customer_pos_info; nothing here decides a right)
@@ -263,8 +324,9 @@ function lookup() {
   lookTimer = setTimeout(async () => {
     const r = await sb.rpc('find_customer', { p_mobile: m }); if (r.error) return;
     if (normMobile(P.cust.mobile) !== m) return;
+    let mm = m; if (r.data && !r.data.found && B.crm && B.crm.findAny) { const a = await B.crm.findAny(m); if (a) { r.data = a; mm = a.mobile; P.cust.mobile = a.mobile; } }   // CRM-A: second phone
     P.cust.found = r.data; if (r.data && r.data.found) P.cust.name = r.data.name;
-    P.cust.info = null; if (r.data && r.data.found) { try { const ri = await sb.rpc('customer_pos_info', { p_mobile: m }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === m) P.cust.info = ri.data; } catch (e) { /* database without tiers: no tier line */ } }   // phase43: tier chip, perks, tier discount, gifts due
+    P.cust.info = null; if (r.data && r.data.found) { try { const ri = await sb.rpc('customer_pos_info', { p_mobile: mm }); if (!ri.error && ri.data && normMobile(P.cust.mobile) === mm) P.cust.info = ri.data; } catch (e) { /* database without tiers: no tier line */ } }   // phase43: tier chip, perks, tier discount, gifts due
     drawCust();
   }, 250);
 }
@@ -308,8 +370,8 @@ function build(o) {
 }
 const clean = (p) => { const { _t, _total, _paid, ...r } = p; return r; };
 const NOFN = /record_sale2|Could not find the function|PGRST202|schema cache/i;
-async function send(p) {
-  let r = await sb.rpc('record_sale2', clean(p));
+async function send(p, replay) {
+  let r = await ((replay && B.posfail) ? B.posfail.sendOffline(clean(p)) : sb.rpc('record_sale2', clean(p)));   // bos83: a queue replay goes through record_sale_offline when posfail.js is loaded
   if (r.error && NOFN.test(r.error.message || '') && 'p_discount_kind' in p) { const { p_discount_kind, p_discount_input, ...old } = clean(p); r = await sb.rpc('record_sale2', old); }   // database without the new pair: same sale, old shape
   if (r.error && NOFN.test(r.error.message || '')) {
     // database not updated yet: only a full single-mode payment can still be recorded the old way
@@ -325,18 +387,25 @@ async function submitSale(p, change) {
   if (P.busy) return; P.busy = true;
   const btn = $('#cart_ok') || $('[data-act="pos_qs_cash"]'); if (btn) btn.disabled = true;
   try {
+    if (B.drawer) B.drawer.beforeSale(p);   // bos95: cash drawer (rule cash_drawer_mode, off = nothing happens, never blocks the sale)
     const { data, error } = await send(p);
     if (error) {
-      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); return afterSale(); }
+      if (isNet(error)) { setQueue([...queue(), p]); closeSheet(); resetCart(); toast(T('queued')); if (B.mkt && B.mkt.queued) B.mkt.queued(p.p_client); if (B.invoiceview) B.invoiceview.afterSale({ p, pending: true }); /* bos92 */ if (B.drawer) B.drawer.afterSale(p); /* bos95 */ return afterSale(); }   // RPT-C3: remember the campaign tag of a queued sale
       if (btn) btn.disabled = false;
       const m = T2(error);
       if (m) { const g = B.emergency && B.emergency.grantFor(error.message); if (g) return B.emergency.offer({ grant: g, loc: P.loc, context: g === 'discount_over_limit' ? { amount: p.p_discount, total: p._total } : g === 'credit_over_limit' ? { amount: Math.max(0, Math.round((p._total - p._paid) * 100) / 100), total: p._total } : { total: p._total }, message: m }); return toast(m); }
       if (/^LEGACY: /.test(error.message || '')) return toast(error.message.slice(8));
       return fail(error);
     }
+    if (data && data.parked) { closeSheet(); resetCart(); toast(T('held')); return afterSale(); }   // W1-B (phase89): answer {parked:true, held_id}: the sale is held for the owner and counts as sent (no retry, no receipt)
     closeSheet(); resetCart();
     toast(`${T('done')} · ${T('receipt')} ${data.receipt} · ${money(data.total)}${change > 0 ? ' · ' + lab(L('ফেরত', 'Change', 'Change')) + ' ' + money(change) : ''}${data.due > 0 ? ' · ' + T('dueword') + ' ' + money(data.due) : ''}`);
     if (B.invoice && B.invoice.offer) B.invoice.offer(data.id, p.p_loc);
+    if (B.invoiceview) B.invoiceview.afterSale({ p, data, change });   // bos92: invoice on screen (rule pos_show_invoice_after_sale; never = nothing happens)
+    if (B.drawer) B.drawer.afterSale(p);   // bos95
+    if (B.crmConsent && B.crmConsent.afterSale) B.crmConsent.afterSale(p.p_customer_mobile);
+    if (B.crmf && B.crmf.afterSale) B.crmf.afterSale(data.id);   // bosCRMF: record a coupon typed at the till
+    if (B.mkt && B.mkt.afterSale) B.mkt.afterSale(data.id);   // RPT-C3: optional campaign / offer code tag (silent when campaigns.js is not loaded)
     afterSale();
   } finally { P.busy = false; }
 }
@@ -350,7 +419,7 @@ async function flush() {
   const done = new Set(), bad = [], tried = new Map();
   try {
     for (const p of q) {
-      const { error } = await send(p);
+      const { error } = await send(p, true);   // bos83: replay flag
       if (!error) { done.add(p.p_client); continue; }
       const m = (error && error.message) || '';
       if (BUSINESS.test(m)) { done.add(p.p_client); bad.push({ ...p, _err: T2(error) || m }); continue; }   // refused by the rules: kept visible, never lost
@@ -360,7 +429,7 @@ async function flush() {
     }
   } finally {
     setQueue(queue().filter((x) => !done.has(x.p_client)).map((x) => tried.get(x.p_client) || x));
-    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); }
+    if (bad.length) { setFailed([...failedQ(), ...bad]); toast(T('failedmsg')); if (B.posfail) B.posfail.report(bad); /* bos83 */ }
     flushing = false;
   }
   if (bad.length && location.hash.startsWith('#/pos')) drawPos();
@@ -384,7 +453,8 @@ async function drawToday() {
   $('#pos_body').innerHTML = `<div class="card"><div class="row between"><span>${esc(T('day'))}</span><b style="font-size:1.5rem">${money(tot)}</b></div>
     <div class="muted">${ok.length} ${esc(T('count'))}</div>
     <div class="row wrap" style="margin-top:6px">${['cash', 'mobile', 'card'].map((m) => `<span class="chip">${esc(lab(MODEL[m]))} ${money(by(m))}</span>`).join('')}<span class="chip warn">${esc(T('dueword'))} ${money(dueT)}</span>${coll ? `<span class="chip ok">${esc(T('collect'))} ${money(coll)}</span>` : ''}</div></div>
-    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button></div></div>`).join('')}
+    ${failedQ().filter((x) => x.p_loc === P.loc).map((x) => `<div class="notice bad"><b>${esc(T('failed'))}</b> · ${money(x._total || 0)} · ${esc(x._err || '')}<div class="row" style="margin-top:6px"><button class="full" data-act="pos_discard" data-v="${esc(x.p_client)}">${esc(T('discard'))}</button>${B.posfail ? B.posfail.buttons(x) : ''/* bos83 */}</div></div>`).join('')}
+    ${B.drawer ? B.drawer.noSaleButton(P.loc) : ''/* bos95 */}
     ${pend.length ? `<div class="notice warn">${pend.length} ${esc(T('pending'))}: ${money(pend.reduce((a, p) => a + (p._total || 0), 0))}</div>` : ''}
     ${P.day.length ? P.day.map((s) => `<div class="card item" data-act="pos_open" data-v="${s.id}" style="${s.status === 'void' ? 'opacity:.55' : ''}"><div><div class="nm">#${s.receipt} · ${hhmm(s.sold_at)} ${s.quick ? '⚡' : ''}${s.sale_type === 'wholesale' ? ' ◆' : ''}</div>
         <div class="muted" style="font-size:.85rem">${esc(lab(MODEL[s.pay_mode]))} · ${esc(s.created_staff || '')}${s.customer ? ' · ' + esc(s.customer) : ''}</div></div>
@@ -392,10 +462,12 @@ async function drawToday() {
 }
 function receiptText(s, pays, cust) {
   const loc = B.ENV.locs.find((l) => l.id === s.location_id) || {}, lines = (s.lines || []).map((l) => `${l.name}${l.item_id || l.custom ? ` ${fmt(l.qty)} × ${fmt(l.price)}` : ''} = ${fmt(l.amount)}`);
-  return [`${A.BRAND_TEXT || 'ইসলামিয়া মিষ্টি ঘর'}`, `ISLAMIYA MISTY GHAR`, `${nm(loc)}`, `${T('receipt')} ${loc.code || ''}-${s.receipt} · ${s.sale_date} ${hhmm(s.sold_at)}`, '—', ...lines,
+  const bd = B.biz ? B.biz.brandFor(s.location_id) : { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };   // bizctx: the business of the sale's place; legacy name when none is set
+  const rc = B.biz && B.biz.receipt ? B.biz.receipt(s.location_id) : { header: '', footer: '', address: '', phone: '' };   // phase134 profile
+  return [`${A.BRAND_TEXT || bd.bn}`, `${bd.en}`, rc.header || null, rc.address || null, rc.phone || null, `${nm(loc)}`, `${T('receipt')} ${loc.code || ''}-${s.receipt} · ${s.sale_date} ${hhmm(s.sold_at)}`, '—', ...lines,
     Number(s.discount) ? `${lab(L('ডিসকাউন্ট', 'Discount', 'Discount'))}: -${fmt(s.discount)}` : null, `${T('total')}: ${fmt(s.total)}`,
     ...(pays || []).map((p) => `${lab(MODEL[p.mode])}${p.wallet ? ' (' + p.wallet + ')' : ''}: ${fmt(p.amount)}`), Number(s.due_amount) > 0 ? `${T('dueword')}: ${fmt(s.due_amount)}` : null,
-    cust ? `${T('cust')}: ${cust.name} ${cust.mobile}` : null, lab(L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'))].filter(Boolean).join('\n');
+    cust ? `${T('cust')}: ${cust.name} ${cust.mobile}` : null, rc.footer || lab(L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'))].filter(Boolean).join('\n');
 }
 async function saleSheet(id) {
   const s = P.day.find((x) => x.id === id); if (!s) return;
@@ -411,6 +483,7 @@ async function saleSheet(id) {
       ${Number(s.due_amount) > 0 && s.status === 'done' ? `<div class="notice warn">${esc(T('dueword'))}: <b>${money(s.due_amount)}</b></div>` : ''}
       <div class="muted">${esc(T('by'))}: ${esc(s.created_staff || '')}${cu.data ? ' · ' + esc(cu.data.name) + ' ' + esc(cu.data.mobile) : s.customer ? ' · ' + esc(s.customer) : ''}${s.note ? ' · ' + esc(s.note) : ''}</div>
       ${s.status === 'void' ? `<div class="notice bad">${esc(T('voided'))}: ${esc(s.void_note || '')} (${esc(s.void_staff || '')})</div>` : ''}
+      ${B.invoiceview ? `<button class="full" data-act="iv92_open" data-v="${s.id}">${esc(B.invoiceview.T('openHist'))}</button>` : ''}   <!-- bos92 -->
       <button class="full" data-act="pos_share">${esc(T('share'))}</button>
       ${B.invoice && B.invoice.printSaleId ? `<button class="full" data-act="pos_print" data-v="${s.id}">${esc(T('print'))}</button>` : ''}
       ${B.saleReturn && s.status === 'done' ? `<button class="full" data-act="pos_return" data-v="${s.id}">${esc(lab(L('মাল ফেরত নিন', 'Return goods', 'মাল return নিন')))}</button>` : ''}
@@ -421,7 +494,8 @@ async function saleSheet(id) {
 // ---------- handlers ----------
 Object.assign(A.H, {
   pos_tab: (a) => { P.tab = a.dataset.v; drawPos(); },
-  pos_cat: (a) => { P.cat = a.dataset.v; drawSell(true); },
+  pos_cat: (a) => { P.cat = a.dataset.v; P.sub = ''; /* bos100 */ drawSell(true); },
+  pos_sub: (a) => { P.sub = a.dataset.v; drawSell(true); },   // bos100
   pos_add: (a) => { const i = itemById(a.dataset.v); bump(i.id); if (i.unit === 'pc') addItem(i.id, 1); else qtySheet(i.id); },
   pos_q_set: (a) => { $('#pos_qty').value = a.dataset.n; },
   pos_q_unit: (a) => qtySheet(a.dataset.v, a.dataset.u),
@@ -477,7 +551,7 @@ Object.assign(A.H, {
   pos_open: (a) => saleSheet(a.dataset.v),
   pos_share: async () => { const txt = P.shareText || ''; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('✓'); } } catch (e) { /* cancelled */ } },
   pos_print: (a) => B.invoice.printSaleId(a.dataset.v, P.loc),
-  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); drawToday(); },
+  pos_discard: (a) => { setFailed(failedQ().filter((x) => x.p_client !== a.dataset.v)); if (B.posfail) B.posfail.discarded(a.dataset.v); /* bos83 */ drawToday(); },
   pos_return: (a) => { closeSheet(); B.saleReturn.open(a.dataset.v); },
   pos_void: async (a) => { const n = ($('#void_note').value || '').trim(); if (!n) return toast(T('needNote'));
     const { error } = await sb.rpc('void_sale', { p_id: a.dataset.v, p_note: n }); if (error) return fail(error); closeSheet(); toast(T('voided')); drawToday(); },
@@ -497,5 +571,5 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('change', (e) => { if (e.target.id === 'pos_loc') { P.loc = Number(e.target.value); store.set('bos_pos_loc', String(P.loc)); resetCart(); drawPos(); } });
 
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { pos: viewPos });
-B.pos = { flush, normMobile };
+B.pos = { flush, normMobile, ctx: () => ({ loc: P.loc, lines: linesOf(), sub: cartSub(), customerId: (P.cust.info && P.cust.info.id) || null, setDiscount: (v) => { P.dk = 'amount'; const i = $('#cart_disc'); if (i) i.value = String(v); discChanged(); drawDisc(); } }) };   // bosCRMF
 })();

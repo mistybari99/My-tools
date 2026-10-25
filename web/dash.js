@@ -4,6 +4,8 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, t, esc, shell, nm, fmt, fail } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
+const rpcDues = () => (duesFn() === 'customer_dues_net113' ? sb.rpc('customer_dues_net113') : sb.rpc('customer_dues'));   // both names written out, so the screen inventory and a code search see them
 const $ = (s, el = document) => el.querySelector(s);
 const L = B.L, lab = B.lab;
 const money = (n) => '৳ ' + fmt(n);
@@ -46,11 +48,11 @@ async function render() {
     anyApprove ? q(sb.from('entries').select('id,form_code,created_by').eq('status', 'submitted').limit(200)) : { data: [] },
     q(sb.from('entries').select('id', { count: 'exact', head: true }).eq('status', 'draft').eq('created_by', me)),
     canPos ? q(sb.rpc('sales_summary', { p_from: from })) : { data: [] },
-    (owner || (perms['14-1'] && perms['14-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '14-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
+    (owner || (perms['06-1'] && perms['06-1'].view)) ? q(sb.from('entries').select('location_id,status').eq('form_code', '06-1').eq('entry_date', td).neq('status', 'draft')) : { data: null },
     owner ? q(sb.from('location_settings').select('location_id,value')) : { data: null },
     anyApprove ? q(sb.rpc('number_audit_summary')) : { data: null },
     canPos ? q(sb.rpc('payments_summary', { p_from: td })) : { data: null },
-    canPos ? q(sb.rpc('customer_dues')) : { data: null },
+    canPos ? q(rpcDues()) : { data: null },
     owner ? q(sb.from('emergency_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')) : { count: 0 },
     q(sb.rpc('my_emergency')),
     q(sb.rpc('needs_you_oldest', { p_limit: 6 })),
@@ -69,7 +71,7 @@ async function render() {
   const rows = [
     [reds, 'bad', T('red'), 'exceptions'], [yel, 'warn', T('yellow'), 'exceptions'], [rel.count, 'bad', T('release'), 'releases'], [mineToApprove, 'warn', T('pending'), 'pending'],
     [stf.count, 'warn', T('staff'), 'staff'], [itm.count, 'warn', T('itemreq'), 'itemreq'], [voids, 'warn', T('void'), 'pos'],
-    [noSheet.length, 'warn', T('nosheet') + (noSheet.length ? ': ' + noSheet.map((l) => nm(l)).join(', ') : ''), 'form/14-1'],
+    [noSheet.length, 'warn', T('nosheet') + (noSheet.length ? ': ' + noSheet.map((l) => nm(l)).join(', ') : ''), 'form/06-1'],
     [(gaps.data || []).reduce((s, g) => s + Number(g.missing_count || 0), 0), 'warn', T('gaps'), 'numaudit'],
     [emp.count, 'bad', T('emreq'), 'emergency'],
     [(mine.data || []).filter((x) => x.status === 'approved').length, 'info', T('emok'), null],

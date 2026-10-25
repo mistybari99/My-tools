@@ -1,10 +1,11 @@
 // Module D web piece: #/partners (owner only) - overview, parties, ventures, the deed editor with the rule builder, trial calculation, settlements, capital ledger, party statement.
 // Run: node partners_test.js <abs tests/web dir>      (web/partners.js is injected into index.html here; the lead adds the <script> tag for real)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8356, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA44 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
  c.rpc = async (fn, args) => {

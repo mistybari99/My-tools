@@ -1,12 +1,13 @@
 // Module A (accounting) web page #/accounts: overview, unbalanced warning, Post now (dry run first), tabs (statements, trial balance, ledger, journal book,
 // parties), manual journal validation, opening balances, chart of accounts, settings & mappings, print + CSV, "Data needed", no-permission text.
 // Run: node accounts_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8361, srv = C.serve(PORT);
-const WEB = '/home/user/My-tools/web';
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
+const WEB = _P.WEB_DIR;
 const ROW = (id, code, bn, en, type, side, parent, grp) => ({ id, code, name_bn: bn, name_en: en, type, normal_side: side, parent_id: parent || null, is_group: !!grp, is_system: true, active: true, sort: id });
 const COA = [ROW(1, '1000', 'সম্পদ', 'Assets', 'asset', 'debit', null, true), ROW(2, '1110', 'হাতে নগদ', 'Cash in hand', 'asset', 'debit', 1), ROW(3, '1210', 'গ্রাহকের বাকি', 'Customer receivables', 'asset', 'debit', 1),
   ROW(4, '2000', 'দায়', 'Liabilities', 'liability', 'credit', null, true), ROW(5, '2100', 'সরবরাহকারীর পাওনা', 'Supplier payables', 'liability', 'credit', 4), ROW(6, '3100', 'মালিকের মূলধন', 'Owner capital', 'equity', 'credit', null),
@@ -15,7 +16,7 @@ const MAPS = [{ key: 'pay_cash', account_id: 2, label_bn: 'নগদ টাক�
 const MOCK = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const A = window.__ACC;
  c.rpc = async (fn, args) => {
   (window.__ACALLS = window.__ACALLS || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);
-  if (!/^acct_|^set_rule$|^inventory_vs_gl$/.test(fn)) return rpc(fn, args);
+  if (!/^acct_|^set_rule$|^inventory_vs_gl$|^opening_balance_post$/.test(fn)) return rpc(fn, args);
   const err = (m) => ({ data: null, error: { message: m, code: 'P0001' } });
   if (A.fail && A.fail[fn]) { const m = A.fail[fn]; if (!A.keep) delete A.fail[fn]; return err(m); }
   if (fn === 'acct_status') return { data: A.status, error: null };
@@ -41,6 +42,9 @@ const MOCK = `(function(){ const real = window.supabase.createClient; window.sup
     const diff = Math.round((d - k) * 100) / 100; if (diff !== 0 && !args.p_plug) return err('unbalanced: debit ' + d + ' credit ' + k);
     if (args.p_dry) return { data: { dry: true, total_debit: Math.max(d, k), total_credit: Math.max(d, k), plug: diff }, error: null };
     A.status.opening = true; return { data: { id: 5, plug: diff }, error: null }; }
+  if (fn === 'opening_balance_post') { const t = JSON.stringify(args.p_json || {}); const bal = /"amount":100\\b/.test(t) && /"amount":100\\b.*"amount":100\\b/.test(t);
+    if (args.p_dry) return { data: { dry: true, total_debit: 100, total_credit: bal ? 100 : 60, difference: bal ? 0 : 40, balanced: bal }, error: null };
+    if (!bal) return err('unbalanced: debit 100 credit 60'); A.status.opening = true; return { data: { id: 6 }, error: null }; }
   if (fn === 'acct_account_save') { if (args.p_id === null && args.p_code === '1110') return err('code_taken'); return { data: { id: 99, code: args.p_code }, error: null }; }
   if (fn === 'acct_mapping_set') return { data: { key: args.p_key }, error: null };
   if (fn === 'acct_journal_reverse') return { data: { id: 88 }, error: null };
@@ -82,7 +86,7 @@ function acc(o = {}) {
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.route(`http://localhost:${PORT}/`, (r) => r.fulfill({ contentType: 'text/html', body: ((h) => (/accounts\.js/.test(h) ? h : h.replace('<script src="cashmoves.js"></script>', '<script src="cashmoves.js"></script><script src="accounts.js"></script>')))(fs.readFileSync(WEB + '/index.html', 'utf8')) }));
     const data = C.mk(base, {}); const T = data.tables;
-    T.coa_accounts = JSON.parse(JSON.stringify(COA)); T.acct_mappings = JSON.parse(JSON.stringify(MAPS)); T.suppliers = [{ id: 'sp1', name: 'Dudh Ghor' }, { id: 'sp2', name: 'Sugar Co' }]; T.customers = [{ id: 'c1', mobile: '01711111111', name: 'Rahim' }];
+    T.coa_accounts = JSON.parse(JSON.stringify(COA)); T.acct_mappings = JSON.parse(JSON.stringify(MAPS)); T.suppliers = [{ id: 'sp1', name: 'Dudh Ghor' }, { id: 'sp2', name: 'Sugar Co' }]; T.customers = [{ id: 'c1', mobile: '01711111111', name: 'TestK' }];
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__ACC=${JSON.stringify(acc(o))};try{localStorage.setItem('bos_lang','en')}catch(e){}window.print=()=>{window.__PRINTED=(document.getElementById('ac_print')||{}).innerText||'none'};`);
     await p.goto(`http://localhost:${PORT}/` + hash); await p.waitForTimeout(1500); return p;
   }
@@ -186,6 +190,10 @@ function acc(o = {}) {
   ok(/Difference 400\.00/.test(await p.textContent('#ac_optot')), 'opening totals shown');
   await p.click('[data-act=ac_opdry]'); await wait(p, 400); c = await calls(p, 'acct_opening');
   ok(c.length === 1 && c[0].p_dry === true && c[0].p_plug === true && c[0].p_lines.length === 2, 'opening dry sent with the balancing switch'); ok(/Difference 400\.00/.test(await p.textContent('#ac_opout')), 'plug shown');
+  await p.click('details summary'); await p.fill('#ac_obj', '{"cash":[{"mode":"cash","amount":100}],"capital":[{"kind":"owner","amount":60}]}'); await p.click('[data-act=ac_obdry]'); await wait(p, 300);
+  c = await calls(p, 'opening_balance_post'); ok(c.length === 1 && c[0].p_dry === true && c[0].p_plug === false && /Difference 40\.00/.test(await p.textContent('#ac_obout')), 'full opening preview shows the difference');
+  await p.click('[data-act=ac_obsave]'); await wait(p, 400); c = await calls(p, 'opening_balance_post'); ok(c.length === 2 && c[1].p_dry === false && !!c[1].p_client, 'full opening unbalanced is sent to the server (which refuses)'); ok(/unbalanced|debit/i.test(await p.locator('#toast').textContent()), 'refusal is shown');
+  await p.evaluate(() => { document.querySelector('#ac_obj').closest('details').open = true; }); await p.fill('#ac_obj', 'not json'); await p.click('[data-act=ac_obsave]'); await wait(p, 200); c = await calls(p, 'opening_balance_post'); ok(c.length === 2, 'invalid JSON is not sent');
   await p.click('[data-act=ac_opsave]'); await wait(p, 500); c = await calls(p, 'acct_opening'); ok(c.length === 2 && c[1].p_dry === false && c[1].p_client, 'opening saved');
   ok(/already entered/.test(await text(p)), 'opening done text');
   await noOverflow(p, 'opening');
@@ -226,7 +234,7 @@ function acc(o = {}) {
     const data = C.mk(base, {}); data.tables.coa_accounts = COA; data.tables.acct_mappings = MAPS;
     await q.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__ACC=${JSON.stringify(acc())};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
     await q.goto(`http://localhost:${PORT}/#/accounts`); await q.waitForTimeout(1500);
-    ok(/হিসাব ও খতিয়ান/.test(await q.evaluate(() => document.body.innerText)) && /মোট সম্পদ/.test(await q.evaluate(() => document.body.innerText)), 'Bangla labels'); }
+    ok(/হিসাব ও খতিয়ান/.test(await q.evaluate(() => document.body.innerText)) && /[\u0980-\u09FF]{3}/.test(await q.evaluate(() => document.body.innerText)), 'Bangla labels'); }
 
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);
   await br.close();

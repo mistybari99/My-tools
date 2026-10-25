@@ -16,8 +16,8 @@ const norm = (v) => String(v ?? '').replace(/[০-৯]/g, (d) => '০১২৩�
 const X = {
   title: L('ফিল্টার', 'Filters', 'Filter'), apply: L('প্রয়োগ করুন', 'Apply', 'Apply করুন'), reset: L('রিসেট', 'Reset', 'Reset'), cancel: L('বন্ধ', 'Close', 'Close'),
   clear: L('সব মুছুন', 'Clear all', 'সব Clear'), remove: L('বাদ দিন', 'Remove', 'Remove'),
-  s_date: L('তারিখ', 'Date', 'Date (তারিখ)'), s_loc: L('লোকেশন', 'Location', 'Location'), s_brand: L('ব্র্যান্ড', 'Brand', 'Brand'), s_staff: L('কর্মী', 'Staff', 'Staff (কর্মী)'),
-  s_item: L('আইটেম', 'Item', 'Item'), s_cat: L('ক্যাটাগরি', 'Category', 'Category'), s_mode: L('পেমেন্ট ধরন', 'Payment mode', 'Payment mode'),
+  s_date: L('ডেট', 'Date', 'Date (Date)'), s_loc: L('লোকেশন', 'Location', 'Location'), s_brand: L('ব্র্যান্ড', 'Brand', 'Brand'), s_staff: L('কর্মী', 'Staff', 'Staff (কর্মী)'),
+  s_itype: L('আইটেমের ধরন', 'Item type', 'Item type'), s_item: L('আইটেম', 'Item', 'Item'), s_cat: L('ক্যাটাগরি', 'Category', 'Category'), s_mode: L('পেমেন্ট ধরন', 'Payment mode', 'Payment mode'),
   s_cust: L('গ্রাহক', 'Customer', 'Customer (গ্রাহক)'), s_type: L('খুচরা / পাইকারি', 'Sale type', 'Sale type (খুচরা/পাইকারি)'), s_amt: L('টাকার পরিমাণ', 'Amount range', 'Amount (টাকা)'),
   s_status: L('অবস্থা', 'Status', 'Status'), s_search: L('খুঁজুন', 'Search', 'Search'),
   from: L('শুরু', 'From', 'From'), to: L('শেষ', 'To', 'To'), min: L('সর্বনিম্ন', 'Min', 'Min'), max: L('সর্বোচ্চ', 'Max', 'Max'),
@@ -69,15 +69,18 @@ async function loadPresets(force) {
 const presetRange = (k) => (PRE && PRE[k]) || null;
 
 // ---------- option sources (cached for the session) ----------
-const OPT = { brands: null, cats: null, custs: null };
+const OPT = { brands: null, cats: null, custs: null, types: null };
+window.addEventListener('bos:biz', () => { OPT.brands = null; });   // bizctx: the brand list follows the chosen business
+
 const accessLocs = () => ((B.ENV && B.ENV.locs) || []).filter((l) => S.ctx.is_owner || (S.ctx.roles || []).includes('management') || (S.ctx.locations || []).includes(l.id));
 async function preload(allow) {
   const a = new Set(allow || []);
   const jobs = [B.loadStatic ? B.loadStatic() : null, loadPresets()];
   if (a.has('brands') && !OPT.brands) jobs.push(sb.from('report_brand_map').select('*').then((r) => {
-    const m = new Map(); (r.data || []).forEach((x) => { if (!m.has(x.brand_code)) m.set(x.brand_code, x); }); OPT.brands = [...m.values()]; }, () => { OPT.brands = []; }));
+    const m = new Map(); const mine = new Set(((B.ENV && B.ENV.locs) || []).map((l) => l.id)); (r.data || []).forEach((x) => { if ((!B.biz || !B.biz.multi() || mine.has(x.location_id)) && !m.has(x.brand_code)) m.set(x.brand_code, x); }); OPT.brands = [...m.values()]; }, () => { OPT.brands = []; }));
   if (a.has('categories') && !OPT.cats) jobs.push(window.BOS_ALL(sb.from('items').select('category,category_bn').order('code')).then((r) => {
     const m = new Map(); (r.data || []).forEach((x) => { if (x.category && !m.has(x.category)) m.set(x.category, x.category_bn || null); }); OPT.cats = [...m.entries()].map(([c, bn]) => ({ code: c, bn })); }, () => { OPT.cats = []; }));
+  if (a.has('item_types') && !OPT.types) jobs.push(sb.from('item_types').select('code,label_bn,label_en,sort').eq('active', true).order('sort').then((r) => { OPT.types = r.data || []; }, () => { OPT.types = []; }));
   if (a.has('customer') && !OPT.custs) jobs.push(sb.from('customers').select('id,name,mobile').order('name').limit(1000).then((r) => { OPT.custs = r.data || []; }, () => { OPT.custs = []; }));
   await Promise.all(jobs.map((j) => Promise.resolve(j).catch(() => null)));
 }
@@ -89,7 +92,7 @@ const nameOf = (st, k, id) => (st._n && st._n[k] && st._n[k][id]) || id;
 const setName = (st, k, id, name) => { st._n = st._n || {}; st._n[k] = st._n[k] || {}; if (name) st._n[k][id] = name; };
 
 // ---------- state helpers ----------
-const ARR = ['locations', 'brands', 'staff', 'items', 'categories', 'modes', 'customer'];
+const ARR = ['locations', 'brands', 'staff', 'items', 'categories', 'item_types', 'modes', 'customer'];
 const clone = (o) => JSON.parse(JSON.stringify(o || {}));
 const defaults = (needsDate = true) => (needsDate ? { preset: DEFAULT_PRESET } : {});
 function clean(st) {            // what the server may see
@@ -113,6 +116,7 @@ function chipList(st, allow, needsDate = true) {
   arr('staff', T('s_staff'), staffName);
   arr('items', T('s_item'), (v) => { const i = itemList().find((x) => x.id === v); return nameOf(st, 'items', v) !== v ? nameOf(st, 'items', v) : i ? nm(i) : v; });
   arr('categories', T('s_cat'), catLabel);
+  arr('item_types', T('s_itype'), (v) => { const t = (OPT.types || []).find((x) => x.code === v); return t ? (S.lang === 'en' ? (t.label_en || t.label_bn) : t.label_bn) : v; });
   arr('modes', T('s_mode'), modeLabel);
   arr('customer', T('s_cust'), (v) => nameOf(st, 'customer', v));
   if (a.has('sale_type') && st.sale_type) out.push({ k: 'sale_type', v: '', text: `${T('s_type')}: ${X['t_' + st.sale_type] ? T('t_' + st.sale_type) : st.sale_type}` });
@@ -181,6 +185,7 @@ function bodyHTML() {
   if (has('sale_type')) s.push(sec('sale_type', T('s_type'), W.st.sale_type ? 1 : '', `<div class="fl-chipset">${['retail', 'wholesale'].map((m) => tog(W.st.sale_type === m, `data-act="fl_one" data-k="sale_type" data-v="${m}"`, T('t_' + m))).join('')}</div>`, false));
   if (has('staff')) s.push(sec('staff', T('s_staff'), cnt('staff'), listSec('staff', staffList().map((x) => ({ v: x.staff_id, label: x.full_name || x.staff_id, sub: x.staff_id })), staffList().length > 6), false));
   if (has('categories')) s.push(sec('categories', T('s_cat'), cnt('categories'), `<div class="fl-chipset">${(OPT.cats || []).map((c) => tog(isOn('categories', c.code), `data-act="fl_t" data-k="categories" data-v="${esc(c.code)}"`, CATN[c.code] ? lab(CATN[c.code]) : (c.bn || c.code))).join('') || `<span class="muted">${esc(T('none'))}</span>`}</div>`, false));
+  if (has('item_types')) s.push(sec('item_types', T('s_itype'), cnt('item_types'), `<div class="fl-chipset">${(OPT.types || []).map((x) => tog(isOn('item_types', x.code), `data-act="fl_t" data-k="item_types" data-v="${esc(x.code)}"`, S.lang === 'en' ? (x.label_en || x.label_bn) : x.label_bn)).join('') || `<span class="muted">${esc(T('none'))}</span>`}</div>`, true));
   if (has('items')) s.push(sec('items', T('s_item'), cnt('items'), listSec('items', itemList().map((i) => ({ v: i.id, label: nm(i), sub: i.code })), true), false));
   if (has('customer')) s.push(sec('customer', T('s_cust'), cnt('customer'), listSec('customer', (OPT.custs || []).map((c) => ({ v: c.id, label: c.name, sub: c.mobile || '' })), true), false));
   if (has('min_amount')) s.push(sec('amount', T('s_amt'), (W.st.min_amount !== undefined || W.st.max_amount !== undefined) ? 1 : '', `<div class="row"><div style="flex:1"><label for="fl_min">${esc(T('min'))}</label><input id="fl_min" inputmode="decimal" value="${esc(W.st.min_amount ?? '')}"></div>

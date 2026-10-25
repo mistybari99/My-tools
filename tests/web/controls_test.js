@@ -1,7 +1,8 @@
-// Collapsed control kit (web/controls.js + controls.css). Run: node controls_test.js /home/user/My-tools/tests/web
+// Collapsed control kit (web/controls.js + controls.css). Run: node controls_test.js tests/web
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web', PORT = 8167;
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR, PORT = _P.freePort();
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const data = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
 const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'text/plain' }); r.end(b); }); }).listen(PORT);

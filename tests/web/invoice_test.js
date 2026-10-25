@@ -1,12 +1,14 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
 const R = (key, module, kind, def, bn, extra = {}) => ({ key, module, kind, value: null, default_value: def, label_bn: bn, label_en: bn, label_mix: bn, sort: 1, ...extra });
 data.tables.rules = [R('vat_on', 'settings', 'switch', false, 'vat'), R('vat_rate', 'settings', 'number', null, 'vr')];
 data.tables.invoice_templates = [{ id: 1, name: 'Shop 80', kind: 'thermal80', header: { bn: 'ঢাকা, বাংলাদেশ' }, footer: { bn: 'আবার আসবেন' }, show_flags: {}, logo_ref: null, vat_line_on: true, paper_width_mm: 80, margins: { top: 4, right: 4, bottom: 4, left: 4 }, font_scale: 1, location_id: null, is_default: true, active: true }];
 data.tables.print_profiles = []; data.tables.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'R', status: 'active' }];
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8092);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; window.__CALLS = []; const T = window.__DATA.tables;
  c.rpc = async (fn, args) => { window.__CALLS.push([fn, args]);
   if (fn === 'has_grant') return { data: true, error: null };
@@ -26,7 +28,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const go = async (h) => { await p.evaluate((x) => { location.hash = x; }, h); await p.waitForTimeout(500); };
   const noOverflow = async (m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
   // code128 self check: every symbol sums to 11 modules, stop 13; known checksum for "A"
-  await p.goto('http://localhost:8092/#/invoice'); await p.waitForTimeout(900);
+  await p.goto('http://localhost:' + PORT + '/#/invoice'); await p.waitForTimeout(900);
   const c = await p.evaluate(() => { const b = window.BOS.invoice; return { a: b.code128('A'), n: b.code128('Pj') }; });
   ok(c.a === '211214' + '211412'.replace(/.*/, '') + '' || true, 'noop'); // pattern string check below
   log('code128("A") modules:', c.a.length, '| sum', [...c.a].reduce((s, d) => s + +d, 0)); ok([...c.a].reduce((s, d) => s + +d, 0) === 46, 'A = start+A+check+stop modules');

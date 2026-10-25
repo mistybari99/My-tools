@@ -1,0 +1,206 @@
+{
+ "package": "RPT-B1",
+ "note": "Text for the (i) info button of each setting, column, notice and report added by RPT-B1. English; the three-mode versions follow the usual dictionary.",
+ "entries": [
+  {
+   "key": "reports_cost_basis",
+   "kind": "setting",
+   "title": "Report cost basis",
+   "what_it_does": "Chooses where item sales, category sales, sales summary, combined sales and the business page take the cost of goods from.",
+   "why_it_matters": "Two cost bases made the same item show \"-\" in one report and a margin in another. One setting makes them agree.",
+   "default": "price_list: only the cost typed in the item master, exactly as before.",
+   "what_changes_if_switched": "ledger_first: the cost from the stock ledger (what the goods really cost) first; the typed cost only where the ledger has none, and that part is called an estimate. Lines with no cost anywhere stay empty, never 0.",
+   "who_can_change": "Only the owner (Settings)."
+  },
+  {
+   "key": "report_top_customers_n",
+   "kind": "setting",
+   "title": "How many top customers are listed",
+   "what_it_does": "Number of customers shown in \"What the top customers buy\".",
+   "why_it_matters": "Keeps the list short enough for a phone.",
+   "default": "Blank = 10.",
+   "what_changes_if_switched": "A number from 1 to 200 changes the length of the list.",
+   "who_can_change": "Only the owner (Settings)."
+  },
+  {
+   "key": "reports_net_of_returns",
+   "kind": "setting",
+   "title": "Sales figures are net of sale returns (existing setting, now also used here)",
+   "what_it_does": "The new \"after returns\" columns, the festival comparison and the top-customer list follow this setting.",
+   "why_it_matters": "One rule for every report.",
+   "default": "On.",
+   "what_changes_if_switched": "Off: the \"after returns\" columns equal the old columns and a note says returns are shown only for information.",
+   "who_can_change": "Only the owner (Settings)."
+  },
+  {
+   "key": "profit_one_number_on",
+   "kind": "setting",
+   "title": "One profit number (existing setting)",
+   "what_it_does": "Not changed. The branch profit reports now NAME the losses (wastage, count shrink, transit loss, cash short) that are left out while it is off.",
+   "why_it_matters": "The owner sees what is missing before deciding.",
+   "default": "Off.",
+   "what_changes_if_switched": "On: those losses are counted in the profit and are no longer named as left out.",
+   "who_can_change": "Only the owner (Settings)."
+  },
+  {
+   "key": "col_returns_amt",
+   "kind": "column",
+   "title": "Returns",
+   "what_it_does": "Value of goods taken back in the period (the sale discount share already taken off), counted on the day of the return.",
+   "why_it_matters": "The same day showed two different sales figures because returns were ignored.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_net_after_returns",
+   "kind": "column",
+   "title": "Sales after returns",
+   "what_it_does": "Sales minus returns. Equals the dashboard figure. With the setting \"net of returns\" off it equals Sales.",
+   "why_it_matters": "Lets the sales reports agree with the dashboard and the profit reports.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_returns_qty",
+   "kind": "column",
+   "title": "Returned quantity",
+   "what_it_does": "Quantity taken back, per item.",
+   "why_it_matters": "Shows how many pieces really stayed sold.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_qty_after_returns",
+   "kind": "column",
+   "title": "Quantity after returns",
+   "what_it_does": "Quantity sold minus quantity returned.",
+   "why_it_matters": "The quantity that stayed sold.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_refund_paid",
+   "kind": "column",
+   "title": "Refunds paid out",
+   "what_it_does": "Money handed back to customers for sale returns, by payment mode and day. A return settled against a customer due is not a payout.",
+   "why_it_matters": "Cash that left the drawer must be visible in the payment report.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_net_after_refunds",
+   "kind": "column",
+   "title": "Amount after refunds",
+   "what_it_does": "Amount taken by the mode minus refunds paid out by the same mode.",
+   "why_it_matters": "The real money by payment mode.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_refund_cash",
+   "kind": "column",
+   "title": "Cash refunds paid out",
+   "what_it_does": "POS day close: cash handed back to customers that day.",
+   "why_it_matters": "The drawer cash was shown too high because refunds were ignored.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_expected_cash_after_refunds",
+   "kind": "column",
+   "title": "Expected cash in drawer after refunds",
+   "what_it_does": "POS day close: expected cash minus cash refunds. The old \"expected cash\" column is unchanged.",
+   "why_it_matters": "This is the figure to compare with the counted drawer.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_actual_status",
+   "kind": "column",
+   "title": "Actual measured?",
+   "what_it_does": "Raw material report: measured, partly or not captured.",
+   "why_it_matters": "The report used to show 0.00 % difference although nothing was measured.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_conversion_status",
+   "kind": "column",
+   "title": "Conversion cost not captured",
+   "what_it_does": "Costing runs: shows \"Not costed\" when the place method is off (no 0).",
+   "why_it_matters": "A zero looked like a real cost.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_actual_cost_status",
+   "kind": "column",
+   "title": "Actual cost not captured",
+   "what_it_does": "Costing runs: shows \"Not captured\" when no actual yield was typed (no copy of the standard).",
+   "why_it_matters": "Actual equal to standard was misleading.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "col_gaps_losses",
+   "kind": "column",
+   "title": "Losses left out of the profit (gaps column)",
+   "what_it_does": "Branch profit reports name wastage, count shrink, transit loss and cash short/over that exist but are not counted.",
+   "why_it_matters": "The profit looked complete when it was not.",
+   "default": "Shown (new column or notice).",
+   "what_changes_if_switched": "Cannot be switched off. Old columns are unchanged.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "report_y1_daily_sellout",
+   "kind": "report",
+   "title": "Daily sell-out / unsold at closing",
+   "what_it_does": "Per day, outlet and item: opening, produced, received, returned, sold, wasted, sent, other, what is left at closing, sell-through % and the cost of the wastage. Tap a row for the stock movements behind it.",
+   "why_it_matters": "Answers a question a sweets business asks and no existing report answers.",
+   "default": "Visible.",
+   "what_changes_if_switched": "Open to the roles that already hold the report group right. Read-only.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "report_y2_festival_compare",
+   "kind": "report",
+   "title": "Festival / season comparison",
+   "what_it_does": "The same items over the chosen dates against the same dates one year earlier (or other dates in \"Compare with\"). Says \"no previous data\" when nothing was sold then. Tap a row for the sales.",
+   "why_it_matters": "Answers a question a sweets business asks and no existing report answers.",
+   "default": "Visible.",
+   "what_changes_if_switched": "Open to the roles that already hold the report group right. Read-only.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "report_y3_customer_items",
+   "kind": "report",
+   "title": "What the top customers buy",
+   "what_it_does": "The top customers by sales (after returns) and their items. Walk-in sales without a customer are counted and named. Tap a row for the sales.",
+   "why_it_matters": "Answers a question a sweets business asks and no existing report answers.",
+   "default": "Visible.",
+   "what_changes_if_switched": "Open to the roles that already hold the report group right. Read-only.",
+   "who_can_change": "Anyone who may open the report."
+  },
+  {
+   "key": "report_reports_map",
+   "kind": "report",
+   "title": "Reports map",
+   "what_it_does": "Lists the 14 sections of the report master list: the state of every report and one link to open it. Static list from the audits.",
+   "why_it_matters": "One place to see what exists, what is incomplete and what is missing.",
+   "default": "Visible.",
+   "what_changes_if_switched": "Open to the roles that already hold the report group right. Read-only.",
+   "who_can_change": "Anyone who may open the report."
+  }
+ ]
+}

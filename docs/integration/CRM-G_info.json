@@ -1,0 +1,197 @@
+{
+  "package": "CRM-G",
+  "title": "Party and gift enquiries, follow-up tasks",
+  "note": "Plain-English texts for the (i) info sheet of each setting and right. Every entry says what it does, why it matters, the default, what changes if it is switched, and who can change it. English only. Keys are the rule keys of supabase/phase323.sql and the grant codes.",
+  "entries": [
+    {
+      "key": "crm_lead_on",
+      "kind": "setting",
+      "label": "Track party, wholesale, corporate and gift enquiries",
+      "what_it_does": "Lets staff write down an enquiry, send a quote with items and a valid-until date, follow it up, and mark it won or lost. A won enquiry can be turned into the normal order or a draft party form.",
+      "why_it_matters": "Big orders are won by following up. Without a list, quotes are forgotten and nobody learns why orders were lost.",
+      "default": "Off. The enquiry screen shows a short note and nothing else.",
+      "if_switched": "On: the Party and gift enquiries screen works for people who may use it. Nothing is posted to the books, no message is sent to a customer, and no order is made until a manager turns a won enquiry into one.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_task_on",
+      "kind": "setting",
+      "label": "Use follow-up tasks and the My tasks list",
+      "what_it_does": "Lets staff add a task with a due date and time, tick it done, snooze it, or skip it with a reason. Overdue tasks are listed first on My tasks.",
+      "why_it_matters": "A reminder with a name and a time gets done. A thing everybody should do is done by nobody.",
+      "default": "Off. No task can be added.",
+      "if_switched": "On: staff keep their own list and managers can give tasks to others (if allowed). A task never posts to the books and never messages a customer.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_lost_by",
+      "kind": "setting",
+      "label": "Who may close an enquiry as lost",
+      "what_it_does": "Chooses whether only managers, or also the person the enquiry is assigned to, may close it as lost. A lost reason from the list is always needed.",
+      "why_it_matters": "Closing as lost ends the follow-up. A manager check stops a good enquiry from being dropped quietly.",
+      "default": "Manager: only the owner or a holder of the right Manage enquiries.",
+      "if_switched": "Assignee: the person it is assigned to can also close it, still with a reason from the list.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_reopen_mode",
+      "kind": "setting",
+      "label": "Reopening a lost enquiry",
+      "what_it_does": "Decides who may bring a lost enquiry back. Every reopen needs a written reason and appears on the Exceptions list.",
+      "why_it_matters": "Customers sometimes come back. Reopening keeps the old history instead of starting again, but it should be visible.",
+      "default": "Reason: a manager may reopen with a written reason.",
+      "if_switched": "Owner: only the owner may reopen. Off: a lost enquiry can never be reopened; a new enquiry must be started.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_win_needs_quote",
+      "kind": "setting",
+      "label": "An enquiry can be won only after a quote was sent",
+      "what_it_does": "Asks for a sent quote before an enquiry can be marked won.",
+      "why_it_matters": "A quote is the written price the customer agreed to. Without it, disputes about price are hard to settle.",
+      "default": "Off. An enquiry can be won without a quote.",
+      "if_switched": "On: staff must send a quote first. A manager can still win it without one by writing a reason, which goes to the Exceptions list.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_quote_valid_days",
+      "kind": "setting",
+      "label": "Quote validity: default number of days",
+      "what_it_does": "Fills in the valid-until date of a quote as today plus this many days.",
+      "why_it_matters": "A quote that never ends can be used months later at an old price.",
+      "default": "Blank. The person must type the valid-until date; a quote without one cannot be sent.",
+      "if_switched": "With a number: the date is filled in automatically and can still be changed.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_quote_min_lead_days",
+      "kind": "setting",
+      "label": "Late quote: least days between the quote and the event",
+      "what_it_does": "Treats a quote as late when the event is closer than this many days, or the valid-until date is already past.",
+      "why_it_matters": "Cakes and party orders need time to make. A late quote is a promise that may not be kept.",
+      "default": "Blank. No check on the event date. A valid-until date in the past is always treated as late.",
+      "if_switched": "With a number: a late quote needs a written reason and appears on the Exceptions list. It is not blocked.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_stale_days",
+      "kind": "setting",
+      "label": "Flag an open enquiry as stale after this many days of silence",
+      "what_it_does": "Marks an open enquiry with no note, quote, task or stage change for this many days.",
+      "why_it_matters": "Enquiries go cold when nobody touches them. A flag shows which ones to call first.",
+      "default": "Blank. No stale flag.",
+      "if_switched": "With a number: a Stale flag shows on the board and the report, and counts in the in-app reminder if reminders are on.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_list_add_mode",
+      "kind": "setting",
+      "label": "Who may add a lost reason, source or occasion to the lists",
+      "what_it_does": "Chooses who can add or retire entries in the three lists. The entry Other can never be removed.",
+      "why_it_matters": "Clean lists make the win and loss report readable. Many near-duplicate reasons make it useless.",
+      "default": "Owner only.",
+      "if_switched": "Manager: a holder of the right Manage enquiries can also add and retire entries.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_task_default_due_hours",
+      "kind": "setting",
+      "label": "Task due time when none is typed",
+      "what_it_does": "Fills in the due time of a new task as now plus this many hours when the person leaves it empty.",
+      "why_it_matters": "A task with no due time never becomes overdue and is easy to forget.",
+      "default": "Blank. The person must type a due date and time.",
+      "if_switched": "With a number: the due time is filled in; it can be changed.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_task_snooze_max_days",
+      "kind": "setting",
+      "label": "Longest snooze for a task",
+      "what_it_does": "Limits how far into the future a task can be snoozed.",
+      "why_it_matters": "Snoozing again and again is a way to avoid a task. A limit keeps it in view.",
+      "default": "Blank. No limit.",
+      "if_switched": "With a number: a longer snooze is refused with a message.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_order_task_days",
+      "kind": "setting",
+      "label": "Add a delivery task when an enquiry becomes an order",
+      "what_it_does": "When a won enquiry is turned into an order that has a delivery date, adds a task for the assigned person this many days before the delivery. It closes by itself when the order is delivered or cancelled.",
+      "why_it_matters": "A reminder before delivery protects the biggest orders from being missed.",
+      "default": "Blank. No task is added.",
+      "if_switched": "With a number (0 = on the day): the task appears on My tasks. Needs tasks switched on.",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_task_reminder_on",
+      "kind": "setting",
+      "label": "Send staff an in-app reminder for due tasks and stale enquiries",
+      "what_it_does": "Lets the 30-minute notify job add one in-app line per person per day with counts of overdue tasks, tasks due today and enquiries to follow up.",
+      "why_it_matters": "Staff who do not open My tasks still hear that something is waiting.",
+      "default": "Off. Nothing is sent; staff see their list when they open My tasks.",
+      "if_switched": "On: one line per person per day, counts only (no customer name or phone). It never messages a customer. It works only after the notify job is told to call it (see the integration note).",
+      "who_can_change": "Only the owner, in Settings."
+    },
+    {
+      "key": "crm_lead_manage",
+      "kind": "right",
+      "label": "Manage enquiries of my outlets",
+      "what_it_does": "Lets a person see every enquiry of the outlets they work at, give an enquiry to someone, close one as lost, reopen one, and turn a won one into an order or form.",
+      "why_it_matters": "This is the manager's right. Without it, a person sees only the enquiries they started or were given.",
+      "default": "Given to nobody. Only the owner has it.",
+      "if_switched": "Given to a role or a person: they get these powers inside their own outlets only.",
+      "who_can_change": "Only the owner, under Roles and permissions."
+    },
+    {
+      "key": "crm_lead_all",
+      "kind": "right",
+      "label": "See and work on the enquiries of every outlet",
+      "what_it_does": "Removes the outlet limit: the person sees and works on enquiries of all outlets.",
+      "why_it_matters": "A showroom manager should see only their own outlet's enquiries. Head office may need all of them.",
+      "default": "Given to nobody. Only the owner has it.",
+      "if_switched": "Given to a person: they see every outlet's enquiries and the report for all outlets.",
+      "who_can_change": "Only the owner, under Roles and permissions."
+    },
+    {
+      "key": "crm_task_assign",
+      "kind": "right",
+      "label": "Give tasks to other people",
+      "what_it_does": "Lets a person add a task for a colleague.",
+      "why_it_matters": "A task with a named person is done; a task for everybody is not.",
+      "default": "Given to nobody. Only the owner has it.",
+      "if_switched": "Given to a person: they can choose who a task goes to, among people who work at the same outlet.",
+      "who_can_change": "Only the owner, under Roles and permissions."
+    },
+    {
+      "key": "crm_task_all",
+      "kind": "right",
+      "label": "See the tasks of every person",
+      "what_it_does": "Lets a person see all tasks in the Team view of My tasks.",
+      "why_it_matters": "A supervisor needs to see what is overdue across the team.",
+      "default": "Given to nobody. Only the owner has it.",
+      "if_switched": "Given to a person: the Team view shows every task.",
+      "who_can_change": "Only the owner, under Roles and permissions."
+    },
+    {
+      "key": "screen_crmleads",
+      "kind": "screen",
+      "label": "Party and gift enquiries",
+      "what_it_does": "The board of enquiries by stage (Enquiry, Quoted, Following up, Won, Lost), the enquiry sheet with notes, quotes and history, the win and loss report, and the three lists.",
+      "why_it_matters": "It is the one place where a big order is followed from the first question to the delivered cake.",
+      "default": "Visible, but it says that tracking is switched off until the owner switches it on.",
+      "if_switched": "Turning enquiry tracking on makes the board work. Nothing starts by itself.",
+      "who_can_change": "Only the owner switches it on."
+    },
+    {
+      "key": "screen_crmtasks",
+      "kind": "screen",
+      "label": "My tasks",
+      "what_it_does": "Overdue tasks first, then due today, later and snoozed. Done, snooze or skip with one tap.",
+      "why_it_matters": "It is the staff member's daily to-do list for customers and orders.",
+      "default": "Visible, but it says that tasks are switched off until the owner switches them on.",
+      "if_switched": "Turning tasks on makes the list work.",
+      "who_can_change": "Only the owner switches it on."
+    }
+  ]
+}

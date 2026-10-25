@@ -168,7 +168,7 @@ set role authenticated; select tt.as(:'o');
 select stock_production_in(:'ic'::uuid,1,30,now()-interval '30 hours',null,'old tray') ->> 'batch_id' as bt1 \gset
 select stock_production_in(:'ic'::uuid,1,10,now(),null,'fresh tray') ->> 'batch_id' as bt2 \gset
 select tt.as(:'s');
-select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":4,"price":260,"unit":"kg"}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":540}]','01711111111','Rahim','retail',null,false) ->> 'id' as sa \gset
+select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":4,"price":260,"unit":"kg"}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":540}]','01711111111','TestK','retail',null,false) ->> 'id' as sa \gset
 select id as cu from customers where mobile='01711111111' \gset
 select tt.chk('T7 setup: sale 1040, customer owes 500, fresh batch 6 left', tt.custbal(:'cu'::uuid)=500 and (select qty_remaining from stock_batches where id=:bt2)=6);
 select tt.err('T7 salesperson has no sale_return grant', format($$select sale_return(null,%L,'[{"item_id":"%s","qty":1}]'::jsonb,'damaged')$$, :'sa', :'ic'), 'not allowed');
@@ -203,7 +203,7 @@ set role authenticated; select tt.as(:'o');
 select void_sale(:'sa'::uuid, 'test');
 select tt.chk('T7 with returns voided the sale can be voided; stock reversed once', (select qty_remaining from stock_batches where id=:bt2)=10 and (select qty from stock_balance where item_id=:'ic'::uuid and location_id=1)=40);
 select set_rule('sale_return_due_first','false');
-select tt.as(:'s'); select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":100}]','01711111111','Rahim','retail',null,false) ->> 'id' as sb \gset
+select tt.as(:'s'); select record_sale2(gen_random_uuid(),1,format('[{"item_id":"%s","qty":1,"price":260,"unit":"kg"}]',:'ic')::jsonb,0,'[{"mode":"cash","amount":100}]','01711111111','TestK','retail',null,false) ->> 'id' as sb \gset
 select tt.as(:'m'); select sale_return(null, :'sb'::uuid, format('[{"item_id":"%s","qty":1}]',:'ic')::jsonb, 'quality', null, 'cash') ->> 'id' as sr3 \gset
 select tt.chk('T7 rule off: the whole value is refunded, the due is not touched', (select credit_amount=0 and refund_amount=260 from sale_returns where id=:'sr3'::uuid));
 select tt.as(:'o'); select set_rule('sale_return_due_first',null);

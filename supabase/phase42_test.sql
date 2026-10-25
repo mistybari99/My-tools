@@ -35,11 +35,11 @@ grant select on tt.wd to authenticated;
 
 -- people (fixtures written as the database owner; the module functions are tested below)
 insert into employees (id, full_name_bn, full_name_en, primary_location_id, status, joining_date, device_user_id, profile_id) values
- ('e0000000-0000-0000-0000-000000000001', 'করিম', 'Karim', 1, 'active', '2025-01-01', '101', null),
- ('e0000000-0000-0000-0000-000000000002', 'রহিম', 'Rahim', 2, 'active', '2025-01-01', '202', null),
+ ('e0000000-0000-0000-0000-000000000001', 'করিম', 'TestF', 1, 'active', '2025-01-01', '101', null),
+ ('e0000000-0000-0000-0000-000000000002', 'রহিম', 'TestK', 2, 'active', '2025-01-01', '202', null),
  ('e0000000-0000-0000-0000-000000000003', 'নাইট গার্ড', 'Night Guard', 1, 'active', '2025-01-01', '303', null),
- ('e0000000-0000-0000-0000-000000000005', 'সালমা', 'Salma', 1, 'on_leave', '2025-01-01', null, :'p'),
- ('e0000000-0000-0000-0000-000000000006', 'জামাল', 'Jamal', 1, 'active', '2024-01-01', null, null),
+ ('e0000000-0000-0000-0000-000000000005', 'সালমা', 'TestM', 1, 'on_leave', '2025-01-01', null, :'p'),
+ ('e0000000-0000-0000-0000-000000000006', 'জামাল', 'TestE', 1, 'active', '2024-01-01', null, null),
  ('e0000000-0000-0000-0000-000000000008', 'নতুন', 'Newcomer', 1, 'active', (:'m0'::date + 15), null, null),
  ('e0000000-0000-0000-0000-000000000009', 'খসড়া', 'Draft', 1, 'draft', '2025-01-01', '909', null);
 \set e1 'e0000000-0000-0000-0000-000000000001'
@@ -178,7 +178,7 @@ select tt.err('T5 a wrong token is refused', $$select attendance_punch_push('x00
 select tt.err('T5 a short token is refused', $$select attendance_punch_push('abc', '[]')$$, 'bad_token');
 select attendance_punch_push(:'tok', format('[{"user_id":"101","ts":"%s","dir":"0","verify":1},{"user_id":"999","ts":"%s"},{"user_id":"101","ts":"%s"},{"user_id":"bad id!","ts":"%s"},{"user_id":"101","ts":"garbage"},{"user_id":"101","ts":"2001-01-01 10:00:00"}]', :'pt', :'pt2', :'pt', :'pt')::jsonb) as pu1 \gset
 select tt.chk('T5 push: 2 new, 1 duplicate, 3 rejected, 1 unmapped', (:'pu1'::jsonb ->> 'new')::int=2 and (:'pu1'::jsonb ->> 'duplicates')::int=1 and (:'pu1'::jsonb ->> 'rejected')::int=3 and (:'pu1'::jsonb ->> 'unmapped')::int=1);
-select tt.chk('T5 push answer reveals no employee data', not (:'pu1'::jsonb ? 'employees') and not (:'pu1'::jsonb ? 'unmapped_ids') and :'pu1' not like '%Karim%');
+select tt.chk('T5 push answer reveals no employee data', not (:'pu1'::jsonb ? 'employees') and not (:'pu1'::jsonb ? 'unmapped_ids') and :'pu1' not like '%TestF%');
 select attendance_punch_push(:'tok', format('[{"user_id":"101","ts":"%s"},{"user_id":"999","ts":"%s"}]', :'pt', :'pt2')::jsonb) as pu2 \gset
 select tt.chk('T5 sending the same punches again inserts nothing (idempotent)', (:'pu2'::jsonb ->> 'new')::int=0 and (:'pu2'::jsonb ->> 'duplicates')::int=2);
 select tt.err('T5 anon cannot read punches', $$select count(*) from attendance_punches$$, 'permission denied');

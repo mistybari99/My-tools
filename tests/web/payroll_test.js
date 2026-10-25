@@ -1,12 +1,13 @@
 // Module B2 web: payroll month flow Preview (trial) -> Create -> Adjust -> Approve -> Pay, calculation trail, payslip print, CSV export,
 // month summary by place, advances, festival bonus, final settlement, salary privacy (no salary right = nothing is even fetched), friendly errors.
 // Run: timeout 250 node payroll_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const ROOT = '/home/user/My-tools/web';
-const base = C.baseData(SP), PORT = 8443;
+const ROOT = _P.WEB_DIR;
+const base = C.baseData(SP), PORT = _P.freePort();
 const srv = http.createServer((q, r) => {
   const u = q.url.split('?')[0]; const f = path.join(ROOT, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f);
@@ -14,7 +15,7 @@ const srv = http.createServer((q, r) => {
     r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 
 // the worked example of supabase/phase42_test.sql (basic 20000, 2 absent, 3 lates, 10 OT hours, Eid bonus, advance 1500 -> net 27750)
-const LINE1 = { employee_id: 'e1', employee_no: 'E-0001', name: 'করিম', name_en: 'Karim', location_id: 1, pay_basis: 'monthly', basic: 20000, basic_amount: 20000, allowances: [], allowance_total: 0, structure_deductions: [], structure_deduction_total: 0,
+const LINE1 = { employee_id: 'e1', employee_no: 'E-0001', name: 'করিম', name_en: 'TestF', location_id: 1, pay_basis: 'monthly', basic: 20000, basic_amount: 20000, allowances: [], allowance_total: 0, structure_deductions: [], structure_deduction_total: 0,
   days_in_month: 30, employed_days: 30, paid_days: 28, absent_days: 2, half_days: 0, unpaid_leave_days: 0, paid_leave_days: 1, off_days: 4, holiday_days: 0, late_count: 3, late_minutes: 90, late_deduction: 666.67, absent_deduction: 1333.33,
   unpaid_deduction: 0, not_employed_deduction: 0, ot_minutes: 600, ot_amount: 1250, bonus: [{ name: 'Eid', amount: 10000, auto: true }], advance_recovery: 1500, advances: [{ advance_id: 1, amount: 1500 }], other_deductions: [], adjustments: [],
   gross: 31250, deductions: 3500, round_adj: 0, net: 27750, warnings: ['unapproved_days:1'],
@@ -55,7 +56,7 @@ const EXTRA42P = `(function(){ const real = window.supabase.createClient; window
     p.on('dialog', (d) => d.accept('typed by mistake')); await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA42P }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const data = C.mk(base, {}); const T = data.tables;
-    T.employees = [['e1', 'E-0001', 'করিম', 'Karim', 1], ['e8', 'E-0008', 'নতুন', 'Newcomer', 1], ['e2', 'E-0002', 'রহিম', 'Rahim', 2]].map((r) => ({ id: r[0], employee_no: r[1], full_name_bn: r[2], full_name_en: r[3], primary_location_id: r[4], status: 'active', joining_date: '2025-01-01' }));
+    T.employees = [['e1', 'E-0001', 'করিম', 'TestF', 1], ['e8', 'E-0008', 'নতুন', 'Newcomer', 1], ['e2', 'E-0002', 'রহিম', 'TestK', 2]].map((r) => ({ id: r[0], employee_no: r[1], full_name_bn: r[2], full_name_en: r[3], primary_location_id: r[4], status: 'active', joining_date: '2025-01-01' }));
     T.payroll_runs = o.runs || []; T.payroll_lines = o.lines || []; T.payroll_bonus_events = [];
     T.employee_advances = [{ id: 1, employee_id: 'e1', adv_date: '2026-09-01', amount: 3000, instalment: 1500, mode: 'cash', recover_from: '2026-09-01', note: 'phone', status: 'active' }];
     T.employee_advance_recoveries = [{ advance_id: 1, amount: 1500, status: 'active' }];
@@ -108,7 +109,7 @@ const EXTRA42P = `(function(){ const real = window.supabase.createClient; window
   c = await calls(p, 'payroll_pay'); ok(c.length === 2 && c[1].p_lines === null && c[1].p_mode === 'cash' && c[1].p_amount === null && c[1].p_client !== c[0].p_client, 'pay everyone unpaid in cash');
   ok(/Paid/.test(await text(p)) && await p.locator('[data-act=pr_payall]').count() === 0, 'run paid');
   await p.click('[data-act=pr_line][data-i="0"]'); await wait(p, 300); await p.click('.sheet [data-act=ln_slip]'); await wait(p, 300);
-  let pr = await p.evaluate(() => window.__PRINTED || ''); ok(/Payslip/.test(pr) && /Karim/.test(pr) && /28,250/.test(pr) && /Advance recovery/.test(pr) && /Received by/.test(pr), 'payslip printed');
+  let pr = await p.evaluate(() => window.__PRINTED || ''); ok(/Payslip/.test(pr) && /TestF/.test(pr) && /28,250/.test(pr) && /Advance recovery/.test(pr) && /Received by/.test(pr), 'payslip printed');
   await p.click('.sheet [data-act=closesheet]'); await p.click('[data-act=pr_csv]'); await wait(p, 500);
   const csv = await p.evaluate(() => window.__CSV || ''); if (process.env.DBG) console.log(JSON.stringify(csv)); ok(/^\uFEFF?employee_no,name,/.test(csv) && /E-0001,করিম/.test(csv) && csv.trim().split('\n').length === 3, 'CSV export with a header and 2 lines');
   await noOverflow(p, 'run'); await p.screenshot({ path: SP + '/pay_run.png', fullPage: true });
@@ -124,7 +125,7 @@ const EXTRA42P = `(function(){ const real = window.supabase.createClient; window
   // ---------- advances, bonus, settlement ----------
   p = await open('#/payroll', { acct: true });
   await p.click('[data-act=pr_tab][data-v=adv]'); await wait(p, 600);
-  t = await text(p); ok(/Karim/.test(t) && /Owed ৳ 1,500/.test(t), 'advance with what is still owed');
+  t = await text(p); ok(/TestF/.test(t) && /Owed ৳ 1,500/.test(t), 'advance with what is still owed');
   await p.click('[data-act=adv_new]'); await wait(p, 300); await p.selectOption('#av_e', 'e8'); await p.fill('#av_a', '2000'); await p.fill('#av_i', '500'); await p.click('[data-act=av_save]'); await wait(p, 600);
   c = await calls(p, 'staff_advance_add'); ok(c.length === 1 && c[0].p_emp === 'e8' && c[0].p_amount === 2000 && c[0].p_instalment === 500 && c[0].p_mode === 'cash' && /-01$/.test(c[0].p_recover_from) && c[0].p_client, 'advance given with instalments');
   await p.click('[data-act=pr_tab][data-v=more]'); await wait(p, 600);

@@ -43,6 +43,7 @@ const ERR = {
   'not allowed': L('শুধু মালিক এটা করতে পারেন', 'Only the owner can do this'), module_off: L('এই মডিউল বন্ধ (সুইচবোর্ডে চালু করুন)', 'This module is switched off (turn it on in the Switchboard)'),
   name_required: L('নাম লিখুন', 'A name is needed'), split_not_100: L('ভাগের যোগফল ঠিক ১০০% হতে হবে', 'The shares must add up to exactly 100%'), slab_order: L('ধাপগুলো ছোট থেকে বড় হতে হবে, শেষটা ফাঁকা (বাকি সব)', 'Slabs must go up, and only the last may be open-ended'),
   bad_config: L('এই ধাপের তথ্য ঠিক নয়', 'This step is not filled in correctly'), period_overlap: L('এই সময়ের মধ্যে আগেই হিসাব হয়ে গেছে', 'This period overlaps an earlier settlement'),
+  base_estimated: L('লাভের ভিত্তিতে অনুমানের কস্ট আছে (সেটিং: আটকানো) - নিজে ভিত্তি অঙ্ক লিখুন', 'The profit base contains an estimated cost (setting: refuse) - type a manual base', 'Profit base-এ অনুমানের cost আছে (setting: refuse) - নিজে base লিখুন'),
   calc_incomplete: L('হিসাব অসম্পূর্ণ - হাতে ভিত্তি অঙ্ক লিখুন', 'The calculation is incomplete - type a manual base'), outside_deed_dates: L('সময়টা চুক্তির তারিখের বাইরে', 'The period is outside the deed dates'),
   bad_date: L('তারিখ ঠিক নয়', 'The date is not valid'), bad_range: L('তারিখের সীমা ঠিক নয়', 'The date range is not valid'), bad_amount: L('অঙ্ক ঠিক নয়', 'The amount is not valid'),
   exceeds_capital: L('ফেরত দেওয়া অঙ্ক পুঁজির বেশি', 'More than the capital held'), overpay: L('পাওনার চেয়ে বেশি দেওয়া যায় না', 'Cannot pay more than is due'), not_approved: L('আগে অনুমোদন করুন', 'Approve it first'),
@@ -388,7 +389,7 @@ css.textContent = `#pt_body select,#pt_body input,#pt_body textarea,.sheet selec
 document.head.appendChild(css);
 
 // ---------------- handlers ----------------
-const photoPick = async (file, setter, hintSel) => { try { const loc = ((LOCS()[0]) || {}).id; const path = await U.uploadPhoto(file, ['STOCK', '04-1', '04-2'], loc); setter(path); const h = $(hintSel); if (h) h.textContent = '✓'; } catch (e) { fail(e); } };
+const photoPick = async (file, setter, hintSel) => { try { const loc = ((LOCS()[0]) || {}).id; const path = await U.uploadPhoto(file, ['STOCK', '13-1', '18-1'], loc); setter(path); const h = $(hintSel); if (h) h.textContent = '✓'; } catch (e) { fail(e); } };
 document.addEventListener('change', (e) => {
   const id = e.target.id;
   if (id === 'pt_tab') { D.tab = e.target.value; D.deed = null; D.calc = null; paint(); }
@@ -452,18 +453,18 @@ Object.assign(H, {
     <p class="muted">${esc(t3('বাকি', 'Remaining'))}: ${money(num(l.amount) - num(l.paid_amount))}</p>
     ${fld('pp_amt', t3('অঙ্ক', 'Amount'), inp('pp_amt', r2(num(l.amount) - num(l.paid_amount)), 'inputmode="decimal"'))}
     ${fld('pp_mode', t3('কীভাবে', 'How'), `<select id="pp_mode">${['cash', 'bank', 'mobile'].map((k) => opt(k, lb(MODES, k), '')).join('')}</select>`)}
-    ${fld('pp_date', t3('তারিখ', 'Date'), inp('pp_date', today(), 'type="date"'))}${fld('pp_ref', t3('রেফারেন্স', 'Reference'), inp('pp_ref', ''))}
+    ${B.moneySrc ? B.moneySrc.slot('pp', 'partner_payout') : ''}${fld('pp_date', t3('তারিখ', 'Date'), inp('pp_date', today(), 'type="date"'))}${fld('pp_ref', t3('রেফারেন্স', 'Reference'), inp('pp_ref', ''))}
     <button class="full primary" data-act="pt_paysave" data-v="${l.id}">${esc(lab(X.save))}</button></div>`); },
   pt_paysave: async (a) => { const amt = nnum($('#pp_amt').value); if (!(amt > 0)) return toast(eText('bad_amount'));
-    const r = await rpc('partner_settlement_pay', { p_line: Number(a.dataset.v), p_amount: amt, p_mode: $('#pp_mode').value, p_date: $('#pp_date').value, p_ref: $('#pp_ref').value || null, p_client: (D.cpay = D.cpay || rid()) }); if (!r) return; D.cpay = null; closeSheet(); toast(lab(X.saved)); await refresh(); },
+    const r = await rpc('partner_settlement_pay', { p_line: Number(a.dataset.v), p_amount: amt, p_mode: $('#pp_mode').value, p_date: $('#pp_date').value, p_ref: (B.moneySrc ? B.moneySrc.tag('pp', $('#pp_ref').value || null) : $('#pp_ref').value) || null, p_client: (D.cpay = D.cpay || rid()) }); if (!r) return; D.cpay = null; closeSheet(); toast(lab(X.saved)); await refresh(); },
   pt_capnew: () => { const aps = deedParties(D.capd || (D.deeds.find((d) => d.status === 'active') || {}).id); openSheet(`<h2>${esc(t3('পুঁজির লেনদেন', 'Capital entry'))}</h2><div class="stack">
     ${fld('ck_p', t3('পক্ষ', 'Party'), `<select id="ck_p">${aps.map((x) => opt(x.party_id, pname(x.party_id) + ' (' + lb(ROLES, x.role) + ')', '')).join('')}</select>`)}
     ${fld('ck_k', t3('কী ধরনের', 'Kind'), `<select id="ck_k">${Object.keys(CKIND).map((k) => opt(k, lb(CKIND, k), '')).join('')}</select>`)}
     ${fld('ck_a', t3('অঙ্ক', 'Amount'), inp('ck_a', '', 'inputmode="decimal"'))}${fld('ck_d', t3('তারিখ', 'Date'), inp('ck_d', today(), 'type="date"'))}
-    ${fld('ck_m', t3('কীভাবে', 'How'), `<select id="ck_m">${Object.keys(MODES).map((k) => opt(k, lb(MODES, k), '')).join('')}</select>`)}${fld('ck_n', t3('বিবরণ', 'Description'), inp('ck_n', ''))}${fld('ck_r', t3('রেফারেন্স', 'Reference'), inp('ck_r', ''))}
+    ${fld('ck_m', t3('কীভাবে', 'How'), `<select id="ck_m">${Object.keys(MODES).map((k) => opt(k, lb(MODES, k), '')).join('')}</select>`)}${B.moneySrc ? B.moneySrc.slot('ck', 'partner_capital') : ''}${fld('ck_n', t3('বিবরণ', 'Description'), inp('ck_n', ''))}${fld('ck_r', t3('রেফারেন্স', 'Reference'), inp('ck_r', ''))}
     <button class="full primary" data-act="pt_capsave">${esc(lab(X.save))}</button></div>`); },
   pt_capsave: async () => { const amt = nnum($('#ck_a').value); if (!(amt > 0)) return toast(eText('bad_amount'));
-    const r = await rpc('partner_capital_add', { p_agr: Number(D.capd || (D.deeds.find((d) => d.status === 'active') || {}).id), p_party: Number($('#ck_p').value), p_kind: $('#ck_k').value, p_amount: amt, p_date: $('#ck_d').value, p_mode: $('#ck_m').value, p_desc: $('#ck_n').value || null, p_ref: $('#ck_r').value || null, p_client: (D.ccap = D.ccap || rid()) });
+    const r = await rpc('partner_capital_add', { p_agr: Number(D.capd || (D.deeds.find((d) => d.status === 'active') || {}).id), p_party: Number($('#ck_p').value), p_kind: $('#ck_k').value, p_amount: amt, p_date: $('#ck_d').value, p_mode: $('#ck_m').value, p_desc: $('#ck_n').value || null, p_ref: (B.moneySrc ? B.moneySrc.tag('ck', $('#ck_r').value || null) : $('#ck_r').value) || null, p_client: (D.ccap = D.ccap || rid()) });
     if (!r) return; D.ccap = null; closeSheet(); toast(lab(X.saved)); await refresh(); },
   pt_capvoid: async (a) => { const n = window.prompt(lab(X.why)); if (!n) return; const r = await rpc('partner_capital_void', { p_id: Number(a.dataset.v), p_reason: n }); if (r) await refresh(); },
   pt_stmt: (a) => { D.tab = 'stmt'; D.stmt = null; D.stmtArgs = { party: Number(a.dataset.v) }; paint(); },

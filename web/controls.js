@@ -16,7 +16,7 @@ const A = window.BOS_APP, B = window.BOS;
 const { S, esc } = A;
 const L = B.L, lab = B.lab;
 const X = {
-  apply: L('প্রয়োগ', 'Apply', 'Apply'), all: L('সব বাছুন', 'Select all', 'Select all'), clear: L('মুছুন', 'Clear', 'Clear'), close: L('বন্ধ', 'Close', 'Close'),
+  apply: L('অ্যাপ্লাই', 'Apply', 'Apply'), all: L('সব বাছুন', 'Select all', 'Select all'), clear: L('মুছুন', 'Clear', 'Clear'), close: L('বন্ধ', 'Close', 'Close'),
   search: L('খুঁজুন', 'Search', 'Search'), none: L('— বাছুন —', '— choose —', '— বাছুন —'), noval: L('(কিছু নয়)', '(none)', '(কিছু নয়)'), more: L('আরও', 'More', 'আরও'),
   nsel: L('টি বাছা', 'selected', 'selected'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'Nothing found'), cur: L('বর্তমান', 'current', 'current'),
 };
@@ -182,7 +182,7 @@ function rebuild(container, sig, build) {
   const s = container._ctl; if (s && s.sig === sig && s.trg.isConnected) return false;
   if (s) { s.trg.remove(); }
   const trg = build(); container._ctl = { sig, trg, mo: container._ctlmo };
-  container.classList.add('ctl-grp'); const gn = [...container.children].filter((c) => c.matches && c.matches('button.tog')); gn.forEach((c) => c.classList.add('ctl-hid')); spread(gn); container.prepend(trg); return true;
+  /* add only what is missing: classList.add of a class already there still queues an attribute mutation, which the group observer below read as an outside change and rebuilt the trigger forever */ if (!container.classList.contains('ctl-grp')) container.classList.add('ctl-grp'); const gn = [...container.children].filter((c) => c.matches && c.matches('button.tog')); gn.forEach((c) => { if (!c.classList.contains('ctl-hid')) c.classList.add('ctl-hid'); }); spread(gn); container.prepend(trg); return true;
 }
 function groupCfg(container, btns, multiMode) {
   const k0 = btns[0], isPick = k0.dataset.act === 'pick', ro = btns.every((b) => b.disabled);
@@ -225,7 +225,7 @@ function readonlyValue(container, btns) {
   const cur = btns.find(isOn); const txt = cur ? btnLabel(cur) : (container.dataset.cur ? String(container.dataset.cur).replace(/^other:/, '') : '—');
   const sig = 'R' + txt + btns.length; const s = container._ctl;
   if (s && s.sig === sig && s.trg.isConnected) return;
-  if (s) s.trg.remove(); const v = el('span', 'ctl-roval', esc(txt)); container._ctl = { sig, trg: v }; container.classList.add('ctl-grp'); const gn = [...container.children].filter((c) => c.matches && c.matches('button.tog')); gn.forEach((c) => c.classList.add('ctl-hid')); spread(gn); container.prepend(v);
+  if (s) s.trg.remove(); const v = el('span', 'ctl-roval', esc(txt)); container._ctl = { sig, trg: v }; /* add only what is missing: classList.add of a class already there still queues an attribute mutation, which the group observer below read as an outside change and rebuilt the trigger forever */ if (!container.classList.contains('ctl-grp')) container.classList.add('ctl-grp'); const gn = [...container.children].filter((c) => c.matches && c.matches('button.tog')); gn.forEach((c) => { if (!c.classList.contains('ctl-hid')) c.classList.add('ctl-hid'); }); spread(gn); container.prepend(v);
 }
 
 function enhanceChecks(root) {
@@ -288,7 +288,7 @@ function schedule() {
 }
 function run() { if (busy) return; busy = true; last = Date.now(); try { enhance(document.body); } catch (e) { /* never break the app */ if (window.console) console.warn('ctl', e && e.message); } busy = false; }
 function start() {
-  sync(); const mo = new MutationObserver((recs) => { if (!on()) { sync(); return; } if (recs.every((r) => r.target.closest && r.target.closest('.ctl-bg'))) return; schedule(); });
+  sync(); const mo = new MutationObserver((recs) => { if (!on()) { sync(); return; } if (recs.every((r) => r.target.closest && r.target.closest('.ctl-bg,#pos_items'))) return; schedule(); });   /* bos114: POS cards (drawn in chunks) hold nothing to enhance */
   mo.observe(document.body, { childList: true, subtree: true }); run();
 }
 

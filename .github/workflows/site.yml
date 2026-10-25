@@ -1,0 +1,61 @@
+# X2 storefront packaging and (optional) GitHub Pages deploy.
+# OFF BY DEFAULT: it runs only when someone starts it by hand (Actions > site > Run workflow). No push, no schedule.
+# It uses only the PUBLIC values in web/config.js (publishable key). It never reads a secret.
+# Steps: validate + lint, package to dist/site, upload as an artifact. Deploy to GitHub Pages only when `deploy` is true
+# (and the repository's Pages source is set to "GitHub Actions" once; see docs/WEBSITE_DEPLOY.md).
+name: site
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Final https address of the site (for sitemap.xml). Leave empty for a test build.'
+        required: false
+        default: ''
+      deploy:
+        description: 'Also deploy to GitHub Pages (true / false)'
+        required: false
+        default: 'false'
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Validate config and lint site/
+        run: python3 tools/build_site.py --check
+      - name: Package
+        run: |
+          if [ -n "${{ inputs.base_url }}" ]; then
+            python3 tools/build_site.py --out dist/site --base-url "${{ inputs.base_url }}" --zip
+          else
+            python3 tools/build_site.py --out dist/site --zip
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist/site
+  pages:
+    if: ${{ inputs.deploy == 'true' }}
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist/site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/site
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -19,10 +19,10 @@ const X = {
   title: L('রিপোর্ট', 'Reports', 'Report'), search: L('রিপোর্ট খুঁজুন…', 'Search reports…', 'Report খুঁজুন…'), all: L('সব', 'All', 'All'),
   g_sales: L('বিক্রি', 'Sales', 'Sales (বিক্রি)'), g_pos: L('POS ও ক্যাশিয়ার', 'POS & cashier', 'POS ও Cashier'), g_cash: L('ক্যাশ ও পেমেন্ট', 'Cash & payments', 'Cash ও Payment'),
   g_customers: L('গ্রাহক ও বাকি', 'Customers & dues', 'Customer ও বাকি'),
-  g_stock: L('স্টক ও অপচয়', 'Stock & wastage', 'Stock ও অপচয়'), g_purchase: L('ক্রয় ও সরবরাহকারী', 'Purchases & suppliers', 'Purchase ও Supplier'), g_expense: L('খরচ', 'Expenses', 'খরচ'),
+  g_stock: L('স্টক ও অপচয়', 'Stock & wastage', 'Stock ও অপচয়'), g_purchase: L('ক্রয় ও সাপ্লায়ার', 'Purchases & suppliers', 'Purchase ও Supplier'), g_expense: L('খরচ', 'Expenses', 'খরচ'),
   g_profit: L('লাভ-ক্ষতি ও বেতন', 'Profit, loss & payroll', 'লাভ-ক্ষতি ও Salary'), g_quality: L('মান ও পরিচ্ছন্নতা', 'Quality & hygiene', 'মান ও hygiene'), g_marketing: L('মার্কেটিং', 'Marketing', 'Marketing'), g_orders: L('অর্ডার ও ডেলিভারি', 'Orders & delivery', 'Order ও delivery'),
-  g_staff: L('কর্মীর হাজিরা', 'Staff attendance', 'Staff হাজিরা'), g_control: L('ব্যতিক্রম', 'Exceptions', 'Exception'),
-  views: L('আমার ভিউ', 'My views', 'My Views'), views_s: L('সংরক্ষিত ভিউ', 'Saved views', 'Saved Views'), noviews: L('এখনও কোনো ভিউ সংরক্ষণ করা হয়নি', 'No saved views yet', 'এখনও কোনো View save করা হয়নি'),
+  g_staff: L('স্টাফের হাজিরা', 'Staff attendance', 'Staff হাজিরা'), g_control: L('ব্যতিক্রম', 'Exceptions', 'Exception'),
+  views: L('আমার ভিউ', 'My views', 'My Views'), views_s: L('সংরক্ষিত ভিউ', 'Saved views', 'Saved Views'), noviews: L('এখনও কোনো ভিউ সেভ করা হয়নি', 'No saved views yet', 'এখনও কোনো View save করা হয়নি'),
   shared: L('শেয়ার করা', 'Shared', 'Shared'), mine: L('আমার', 'Mine', 'Mine'),
   pages_s: L('আলাদা পাতা', 'Other pages', 'আলাদা Page'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'),
   engine: L('রিপোর্ট ইঞ্জিন এখনও চালু হয়নি — ডেটাবেসে phase9.sql চালাতে হবে', 'The report engine is not installed yet — phase9.sql must be run on the database', 'Report engine চালু হয়নি — database-এ phase9.sql চালাতে হবে'),
@@ -34,12 +34,14 @@ const X = {
   compare: L('আগের সাথে তুলনা', 'Compare', 'Compare (তুলনা)'), c_prev: L('আগের সময়', 'Previous period', 'Previous period'), c_week: L('গত সপ্তাহ', 'Last week', 'Last week'), c_year: L('গত বছর', 'Last year', 'Last year'),
   vs: L('তুলনা', 'vs', 'vs'), new_: L('নতুন', 'new', 'new'),
   more: L('আরও দেখান', 'Show more', 'আরও দেখান'), of: L('/', 'of', '/'), rows: L('সারি', 'rows', 'rows'),
-  totalrow: L('মোট', 'Total', 'Total'), back: L('আগের অবস্থায় ফিরুন', 'Back to previous view', 'আগের View-তে ফিরুন'),
+  nocap: L('সংগ্রহ হয়নি', 'Not captured', 'Not captured'), totalrow: L('মোট', 'Total', 'Total'), back: L('আগের অবস্থায় ফিরুন', 'Back to previous view', 'আগের View-তে ফিরুন'),
   period: L('সময়', 'Period', 'Period'), drillhint: L('সারিতে চাপলে সেই অংশের ফিল্টার বসে', 'Tap a row to filter to it', 'Row-তে চাপলে সেই অংশের Filter বসে'),
+  srchint: L('সারিতে চাপলে মূল লেনদেনগুলো দেখা যাবে', 'Tap a row to see the transactions behind it', 'Row-তে চাপলে মূল লেনদেন দেখা যাবে'), srcnone: L('এই সারির মূল লেনদেন পাওয়া যায়নি', 'No source transactions found for this row', 'এই row-র মূল লেনদেন পাওয়া যায়নি'),
+  cmpw: L('এর সাথে তুলনা (ঐচ্ছিক, না দিলে গত বছরের একই ডেট)', 'Compare with (optional; blank = the same dates last year)', 'Compare with (ঐচ্ছিক; না দিলে গত বছরের একই Date)'),
   nodrill: L('এই সারিতে আর গভীরে যাওয়া যায় না', 'No deeper view for this row', 'এই row-তে আর deeper view নেই'),
   empty: L('তথ্য দরকার: এই সময়/ফিল্টারে কিছু নেই', 'Data needed: nothing matches this period / filters', 'Data দরকার: এই সময়/ফিল্টারে কিছু নেই'),
-  need: L('তথ্য দরকার', 'Data needed', 'Data দরকার'),
-  save: L('ভিউ সংরক্ষণ', 'Save this view', 'Save this View'), name: L('ভিউয়ের নাম', 'View name', 'View-এর নাম'), share: L('সবার সাথে শেয়ার করুন', 'Share with everyone', 'সবার সাথে Share করুন'),
+  need: L('তথ্য দরকার', 'Data needed', 'Data দরকার'), nc: L('ধরা হয়নি', 'Not captured', 'ধরা হয়নি / Not captured'),
+  save: L('ভিউ সেভ', 'Save this view', 'Save this View'), name: L('ভিউয়ের নাম', 'View name', 'View-এর নাম'), share: L('সবার সাথে শেয়ার করুন', 'Share with everyone', 'সবার সাথে Share করুন'),
   saved: L('ভিউ সংরক্ষিত', 'View saved', 'View saved'), loaded: L('ভিউ খোলা হয়েছে', 'View loaded', 'View খোলা হয়েছে'), del: L('মুছুন', 'Delete', 'Delete'), delq: L('এই ভিউ মুছবেন?', 'Delete this view?', 'এই View মুছবেন?'),
   needname: L('ভিউয়ের নাম লিখুন', 'Enter a view name', 'View-এর নাম লিখুন'), deleted: L('মুছে ফেলা হয়েছে', 'Deleted', 'Deleted'), open: L('খুলুন', 'Open', 'Open'),
   csv: L('CSV', 'CSV', 'CSV'), print: L('প্রিন্ট / PDF', 'Print / PDF', 'Print / PDF'), exp_lock: L('এক্সপোর্টের অনুমতি নেই', 'Export not allowed', 'Export-এর permission নেই'),
@@ -59,7 +61,7 @@ const X = {
   e_filter: L('ফিল্টারের মান ঠিক নেই', 'A filter value is not valid', 'Filter-এর value ঠিক নেই'),
   e_slow: L('অনেক তথ্য — ফিল্টার ছোট করে আবার চেষ্টা করুন', 'Too much data — narrow the filters and retry', 'অনেক data — Filter ছোট করে আবার চেষ্টা করুন'),
   e_off: L('ইন্টারনেট নেই — রিপোর্ট দেখতে অনলাইন লাগবে', 'You are offline — reports need a connection', 'Internet নেই — Report দেখতে online লাগবে'),
-  retry: L('আবার চেষ্টা', 'Retry', 'Retry'),
+  retry: L('আবার চেষ্টা', 'Retry', 'Retry'), notcap: L('লেখা হয়নি', 'not captured', 'not captured'),
 };
 const T = (k) => lab(X[k]);
 const dimLabel = (d) => lab({ bn: d.label_bn, en: d.label_en || d.label_bn, mix: d.label_bn });
@@ -210,6 +212,7 @@ function drawTop() {
     <div class="rp-sel">${isAgg ? `<div><label for="rp_g1">${esc(T('group'))}</label><select id="rp_g1"><option value="" ${V.group === null ? 'selected' : ''}>${esc(T('dflt'))}</option><option value="total" ${V.group === 'total' ? 'selected' : ''}>${esc(T('total'))}</option>${dims.map((x) => optDim(x, V.group)).join('')}</select></div>` : ''}
       <div><label for="rp_s1">${esc(T('sort'))}</label><select id="rp_s1"><option value="">${esc(T('dflt'))}</option>${sortOpts}</select></div>
       ${isAgg && d.kind === 'agg' && eg.length === 1 && V.group !== 'total' ? `<div><label for="rp_g2">${esc(T('then'))}</label><select id="rp_g2"><option value="">${esc(T('none'))}</option>${dims.map((x) => optDim(x, V.group2, eg[0])).join('')}</select></div>` : ''}</div>
+    ${V.key === 'y2_festival_compare' ? `<div class="rp-prev" id="rp_prev"><label for="rp_pf">${esc(T('cmpw'))}</label><div class="row"><input type="date" id="rp_pf" value="${esc(V.f.prev_from || '')}" aria-label="${esc(T('cmpw'))}"><input type="date" id="rp_pt" value="${esc(V.f.prev_to || '')}" aria-label="${esc(T('cmpw'))}"></div></div>` : ''}
     ${isAgg && d.compare ? `<div class="rp-cmp"><button class="tog ${V.compare ? 'on' : ''}" data-act="rp_cmp" aria-pressed="${!!V.compare}">${esc(T('compare'))}</button>
       ${V.compare ? `<div class="seg rp-seg" role="group">${['prev', 'week', 'year'].map((m) => `<button data-act="rp_cm" data-v="${m}" aria-pressed="${V.compare === m}">${esc(T('c_' + m))}</button>`).join('')}</div>` : ''}</div>` : ''}`;
   drawMeta();
@@ -233,7 +236,7 @@ function callRun(page) {
 }
 async function run(append) {
   const tok = ++V.tok; V.loading = true; V.err = null;
-  if (!append) { V.page = 1; V.res = null; V.rows = []; } else V.page += 1;
+  if (!append) { V.page = 1; V.res = null; V.rows = []; V.cn = []; } else V.page += 1;
   drawRes();
   let r; try { r = await callRun(V.page); } catch (e) { r = { error: e }; }
   if (tok !== V.tok) return; V.loading = false;
@@ -242,8 +245,15 @@ async function run(append) {
   V.rows = append ? V.rows.concat(res.rows || []) : (res.rows || []);
   if (append && V.res) { res.compare = V.res.compare; res.totals = res.totals || V.res.totals; }
   V.res = res;
+  if (!append) loadNotes(tok);      /* RPT-C1 hook 1: the basis lines of this report (report_notes, phase 440) */
   if (V.sort && !(res.columns || []).some((c) => c.key === V.sort.replace(/^-/, ''))) V.sort = null;
   drawTop(); drawRes();
+}
+
+// RPT-C1 hook 1 (see docs/integration/RPT-C1.md): never blocks the report; an old database or a report without topics answers []
+function loadNotes(tok) {
+  if (!B.reportnotes || !V.res) return;
+  B.reportnotes.load(V.key, F.clean(V.f), (V.res.columns || []).map((c) => c.key)).then((n) => { if (tok !== V.tok || !n.length) return; V.cn = n; drawRes(); }, () => {});
 }
 
 // ---------- result drawing ----------
@@ -258,7 +268,7 @@ const RAW_INT = new Set(['fiscal_year', 'hour', 'dow', 'receipt']);
 function fmtVal(c, row, money_ = false) {
   let v = row[c.key];
   if (c.en && S.lang === 'en' && row[c.en] !== null && row[c.en] !== undefined && row[c.en] !== '') v = row[c.en];
-  if (v === null || v === undefined || v === '') return '—';
+  if (v === null || v === undefined || v === '') return row && Array.isArray(row._nc) && row._nc.includes(c.key) ? T('notcap') : '—';
   switch (c.type) {
     case 'money': return money_ ? money(v) : fmt(Math.round(Number(v) * 100) / 100);
     case 'pct': return Number(v).toFixed(1) + '%';
@@ -285,6 +295,7 @@ function noteText(n) {
   if (map[c]) return T(map[c]);
   if (c === 'filter_ignored' || c === 'group_ignored' || c === 'sort_ignored' || c === 'compare_mode_ignored') return `${T('n_ign')}${n.what ? ': ' + (Array.isArray(n.what) ? n.what.join(', ') : n.what) : ''}`;
   if (c === 'data_needed') return `${T('need')}: ${n.what || ''} — ${pick() || ''}`;
+  if (c === 'not_captured') return `${T('nc')}: ${pick() || ''}`;
   return pick() || c || '';
 }
 function drawRes(errTxt) {
@@ -294,7 +305,7 @@ function drawRes(errTxt) {
   const res = V.res; if (!res) { box.innerHTML = ''; return; }
   const cols = shownCols(), all = res.columns || [], cmp = res.compare, d = V.def;
   const notes = (res.notes || []).filter((n) => n.code !== 'no_data');
-  const noteH = notes.map((n) => `<div class="rp-note mk ${/^(data_needed|truncated)$/.test(n.code) ? 'warn' : 'info'}">${esc(noteText(n))}</div>`).join('');
+  const noteH = notes.map((n) => `<div class="rp-note mk ${/^(data_needed|truncated|not_captured|cost_unknown|losses_not_counted)$/.test(n.code) ? 'warn' : 'info'}">${esc(noteText(n))}</div>`).join('');
   const empty = res.data_needed && !(V.rows || []).length;
   const tot = res.totals || null;
   // summary strip: first four money / count measures
@@ -312,17 +323,20 @@ function drawRes(errTxt) {
     tbl = `<div class="scrollx rp-tw"><table class="rp-t" id="rp_tbl"><thead><tr>${cols.map((c) => `<th class="${c.role === 'measure' || ['money', 'int', 'num', 'pct'].includes(c.type) && c.role !== 'dim' ? 'n' : ''}"><button class="rp-th" data-act="rp_sortcol" data-k="${esc(c.key)}" aria-label="${esc(T('sort') + ': ' + colLabel(c))}">${esc(colLabel(c))}${sk === c.key ? `<i>${sd === 'desc' ? '↓' : '↑'}</i>` : ''}</button></th>`).join('')}</tr></thead>
       <tbody>${(V.rows || []).map((row, i) => {
         const pr = cmp ? pmap.get(sigOf(all, row)) : null;
-        return `<tr ${drillable ? `class="tap" data-act="rp_drill" data-i="${i}"` : ''}>${cols.map((c, ci) => {
+        const go = !drillable && typeof row.drill === 'string' && row.drill.startsWith('#/');
+        return `<tr ${drillable ? `class="tap" data-act="rp_drill" data-i="${i}"` : row && row._drill ? `class="tap" data-act="rp_src" data-i="${i}"` : go ? `class="tap" data-act="rp_rowgo" data-i="${i}"` : ''}>${cols.map((c, ci) => {
           const num = c.role !== 'dim' && ['money', 'int', 'num', 'pct'].includes(c.type);
           const dl = cmp && c.role === 'measure' && (c.type === 'money' || c.type === 'int' || c.type === 'num') ? deltaHTML(c.key, row[c.key], pr ? pr[c.key] : 0) : '';
           return `<${ci === 0 ? 'th scope="row"' : 'td'} class="${num ? 'n' : ''}">${esc(fmtVal(c, row))}${dl}</${ci === 0 ? 'th' : 'td'}>`; }).join('')}</tr>`; }).join('')}</tbody>
-      ${tot ? `<tfoot><tr>${cols.map((c, ci) => `<${ci === 0 ? 'th' : 'td'} class="${ci && c.role !== 'dim' ? 'n' : ''}">${ci === 0 ? esc(T('totalrow')) : tot[c.key] !== undefined && tot[c.key] !== null ? esc(fmtVal(c, tot)) : ''}</${ci === 0 ? 'th' : 'td'}>`).join('')}</tr></tfoot>` : ''}</table></div>
-      ${drillable ? `<div class="muted rp-hint">${esc(T('drillhint'))}</div>` : ''}`;
+      ${tot ? `<tfoot><tr>${cols.map((c, ci) => `<${ci === 0 ? 'th' : 'td'} class="${ci && c.role !== 'dim' ? 'n' : ''}">${ci === 0 ? esc(T('totalrow')) : tot[c.key] !== undefined && tot[c.key] !== null ? esc(fmtVal(c, tot)) : tot[c.key] === null && c.role !== 'dim' ? `<small class="muted">${esc(T('nocap'))}</small>` : ''}</${ci === 0 ? 'th' : 'td'}>`).join('')}</tr></tfoot>` : ''}</table></div>
+      ${drillable || (V.rows || []).some((r) => r && r._drill) ? `<div class="muted rp-hint">${esc(T(drillable ? 'drillhint' : 'srchint'))}</div>` : ''}`;
   }
   const pg = res.page || {}, shown = (V.rows || []).length;
   const more = res.has_more ? `<button class="full" data-act="rp_more" ${V.loading ? 'disabled' : ''}>${esc(T('more'))} · ${shown} ${esc(T('of'))} ${esc(String(Math.min(pg.groups || shown, pg.cap || 500)))}</button>` : '';
   const exp = (ok, act, label) => (ok ? `<button data-act="${act}">${esc(label)}</button>` : noperm() === 'lock' ? `<button disabled aria-label="${esc(label + ' · ' + T('exp_lock'))}">${LOCK.replace('<svg', '<svg width="16" height="16"')} ${esc(label)}</button>` : '');
-  box.innerHTML = `${noteH}${stats}${empty ? `<div class="notice warn mk warn">${esc(T('empty'))}</div>` : ''}${tbl}${more}
+  const subH = (res.subtotals || []).map((sc) => `<div class="hsec">${esc(lab({ bn: sc.title_bn, en: sc.title_en || sc.title_bn, mix: sc.title_bn }))}</div><div class="scrollx rp-tw"><table class="rp-t"><thead><tr>${(sc.columns || []).map((c) => `<th class="${c.type === 'text' ? '' : 'n'}">${esc(colLabel(c))}</th>`).join('')}</tr></thead><tbody>${(sc.rows || []).map((rw) => `<tr>${(sc.columns || []).map((c, ci) => { const v = c.key === 'name' && S.lang === 'en' && rw.name_en ? rw.name_en : rw[c.key]; return `<${ci === 0 ? 'th scope="row"' : 'td'} class="${c.type === 'text' ? '' : 'n'}">${esc(v === null || v === undefined ? '—' : c.type === 'money' ? fmt(Math.round(Number(v) * 100) / 100) : c.type === 'text' ? String(v) : fmt(v))}</${ci === 0 ? 'th' : 'td'}>`; }).join('')}</tr>`).join('')}</tbody></table></div>`).join('');
+  const cnH = B.reportnotes && V.cn ? B.reportnotes.html(V.cn) : '';      /* RPT-C1 hook 2 */
+  box.innerHTML = `${noteH}${cnH}${stats}${empty ? `<div class="notice warn mk warn">${esc(T('empty'))}</div>` : ''}${tbl}${more}${subH}
     ${!empty ? `<div class="rp-foot">${exp(V.exp, 'rp_csv', T('csv'))}${exp(V.exp, 'rp_print', T('print'))}</div>` : ''}`;
 }
 
@@ -362,6 +376,32 @@ function drill(i) {
   V.sort = null; persist(); drawTop(); run(false);
 }
 
+// ---------- source drill-down (engine-3 rows that carry _drill): the transactions behind one row ----------
+let SRC = null;
+async function srcDrill(i) {
+  const row = V.rows[i]; if (!row || !row._drill) return;
+  const r = await sb.rpc('report_drill', { p_key: V.key, p_ref: row._drill });
+  if (r.error || !r.data) return fail(r.error || new Error('drill'));
+  SRC = r.data; drawSrc();
+}
+function drawSrc() {
+  const d = SRC, cols = (d.columns || []).filter((c) => c.type !== 'id'), rows = d.rows || [];
+  const nt = (d.notes || []).map((n) => `<div class="rp-note mk info">${esc(noteText(n))}</div>`).join('');
+  openSheet(`<h2 style="margin-top:0">${esc(lab({ bn: d.title_bn, en: d.title_en || d.title_bn, mix: d.title_bn }))}</h2>${nt}
+    ${rows.length ? `<div class="scrollx rp-tw"><table class="rp-t" id="rp_srct"><thead><tr>${cols.map((c) => `<th class="${['money', 'int', 'num', 'pct'].includes(c.type) ? 'n' : ''}">${esc(colLabel(c))}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map((r) => `<tr>${cols.map((c, ci) => `<${ci === 0 ? 'th scope="row"' : 'td'} class="${['money', 'int', 'num', 'pct'].includes(c.type) ? 'n' : ''}">${esc(fmtVal({ ...c, role: 'col' }, r))}</${ci === 0 ? 'th' : 'td'}>`).join('')}</tr>`).join('')}</tbody></table></div>` : `<p class="muted">${esc(T('srcnone'))}</p>`}
+    <div class="row" style="margin-top:12px">${rows.length && V.exp ? `<button data-act="rp_srccsv">${esc(T('csv'))}</button>` : ''}<button class="primary full" data-act="closesheet">${esc(T('close'))}</button></div>`);
+}
+function srcCSV() {
+  const d = SRC; if (!d) return;
+  const cols = (d.columns || []).filter((c) => c.type !== 'id'), t = { type: 'text', key: '_' };
+  const out = [cols.map((c) => csvCell(t, colLabel(c))).join(',')];
+  (d.rows || []).forEach((r) => out.push(cols.map((c) => csvCell({ ...c, role: 'col' }, r[c.key])).join(',')));
+  out.push(''); out.push(csvCell(t, lab({ bn: d.title_bn, en: d.title_en || d.title_bn, mix: d.title_bn })));
+  (d.notes || []).forEach((n) => out.push(csvCell(t, noteText(n))));
+  download(`report-${V.key}-source.csv`, '﻿' + out.join('\r\n') + '\r\n', 'text/csv;charset=utf-8'); logExport('csv', (d.rows || []).length); toast(T('exp_done'));
+}
+
 // ---------- export ----------
 async function fetchAll() {
   let rows = V.rows.slice(), page = V.page, more = V.res && V.res.has_more, last = V.res;
@@ -384,8 +424,10 @@ function buildCSV(rows, res) {
   const cols = shownCols(), tot = res.totals;
   const out = [cols.map((c) => csvCell({ type: 'text', key: '_' }, colLabel(c))).join(',')];
   rows.forEach((r) => out.push(cols.map((c) => csvCell(c, (c.en && S.lang === 'en' && r[c.en]) ? r[c.en] : r[c.key])).join(',')));
-  if (tot) out.push(cols.map((c, i) => (i === 0 ? csvCell({ type: 'text', key: '_' }, T('totalrow')) : tot[c.key] !== undefined ? csvCell(c, tot[c.key]) : '')).join(','));
+  if (tot) out.push(cols.map((c, i) => (i === 0 ? csvCell({ type: 'text', key: '_' }, T('totalrow')) : tot[c.key] === null && c.role !== 'dim' ? csvCell({ type: 'text', key: '_' }, 'not captured') : tot[c.key] !== undefined ? csvCell(c, tot[c.key]) : '')).join(','));
   out.push(''); expMeta(res).forEach((m) => out.push(m.map((x) => csvCell({ type: 'text', key: '_' }, x)).join(',')));
+  (res.notes || []).filter((n) => n.code !== 'no_data').forEach((n) => out.push(csvCell({ type: 'text', key: '_' }, noteText(n))));      // the notes travel with the numbers: a blank cell in the file is explained
+  if (B.reportnotes && V.cn && V.cn.length) { out.push(''); B.reportnotes.csvRows(V.cn).forEach((m) => out.push(m.map((x) => csvCell({ type: 'text', key: '_' }, x)).join(','))); }      // RPT-C1 hook 3: the basis lines travel with the file
   return '﻿' + out.join('\r\n') + '\r\n';
 }
 function download(name, text, type) {
@@ -451,6 +493,9 @@ Object.assign(A.H, {
   rp_retry: () => run(false),
   rp_sortcol: (a) => { const k = a.dataset.k; V.sort = V.sort === k ? '-' + k : V.sort === '-' + k ? null : k; persist(); drawTop(); run(false); },
   rp_drill: (a) => drill(Number(a.dataset.i)),
+  rp_src: (a) => srcDrill(Number(a.dataset.i)),
+  rp_srccsv: srcCSV,
+  rp_rowgo: (a) => { const r = (V.rows || [])[Number(a.dataset.i)]; if (r && typeof r.drill === 'string' && r.drill.startsWith('#/')) location.hash = r.drill; },
   rp_back: () => { const s = V.stack.pop(); if (!s) return; V.f = s.f; V.group = s.group; V.group2 = s.group2; V.sort = s.sort; persist(); drawTop(); run(false); },
   rp_cols: colsSheet,
   rp_coltog: (a) => { const k = a.dataset.k; if (V.hidden.has(k)) V.hidden.delete(k); else V.hidden.add(k); a.classList.toggle('on', !V.hidden.has(k)); a.setAttribute('aria-pressed', !V.hidden.has(k)); persist(); drawTop(); drawRes(); },
@@ -479,6 +524,7 @@ document.addEventListener('change', (e) => {
   const id = e.target.id;
   if (id === 'rp_g1') { V.group = e.target.value === '' ? null : e.target.value; V.group2 = null; V.sort = null; V.stack = []; persist(); drawTop(); run(false); }
   else if (id === 'rp_g2') { V.group2 = e.target.value || null; V.sort = null; persist(); drawTop(); run(false); }
+  else if (id === 'rp_pf' || id === 'rp_pt') { const k = id === 'rp_pf' ? 'prev_from' : 'prev_to'; if (e.target.value) V.f[k] = e.target.value; else delete V.f[k]; V.page = 1; persist(); run(false); }
   else if (id === 'rp_s1') { V.sort = e.target.value || null; persist(); run(false); }
 });
 
@@ -543,14 +589,14 @@ table.rp-t{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-nume
 const Y = {
   bp_title: L('ব্র্যান্ড অনুযায়ী লাভ-ক্ষতি', 'Brand-level P&L', 'Brand-level P&L'), dc_title: L('ডিসকাউন্ট ও অনুমোদনকারী', 'Discounts and approvers', 'Discounts ও approver'),
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), brand: L('ব্র্যান্ড অনুযায়ী', 'By brand', 'By brand'), comb: L('সব মিলিয়ে', 'Combined', 'Combined'),
-  rev: L('বিক্রি', 'Sales', 'Sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('বাতিল বিক্রি', 'Voided sales', 'Voided sales'), cogs: L('পণ্যের ক্রয়মূল্য', 'Cost of goods', 'Cost of goods'),
-  gp: L('মোট লাভ (খরচ জানা অংশে)', 'Gross profit (costed part)', 'Gross profit (costed part)'), gpp: L('লাভ %', 'GP %', 'GP %'), unc: L('ক্রয়মূল্যহীন বিক্রির অংশ', 'Share of sales without a cost', 'Share without a cost'),
-  places: L('লোকেশন', 'places', 'places'), bills: L('বিল', 'bills', 'bills'), nocost: L('খরচের তথ্য আপনার জন্য বন্ধ', 'Cost figures are hidden for your role', 'Cost figures are hidden'),
+  rev: L('সেল', 'Sales', 'Sales'), disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), voids: L('ভয়েড সেল', 'Voided sales', 'Voided sales'), cogs: L('পণ্যের ক্রয়মূল্য', 'Cost of goods', 'Cost of goods'),
+  gp: L('মোট লাভ (খরচ জানা অংশে)', 'Gross profit (costed part)', 'Gross profit (costed part)'), gpp: L('লাভ %', 'GP %', 'GP %'), unc: L('ক্রয়মূল্যহীন সেলের অংশ', 'Share of sales without a cost', 'Share without a cost'),
+  places: L('লোকেশন', 'places', 'places'), bills: L('বিল', 'bills', 'bills'), nocost: L('কস্টের তথ্য আপনার জন্য বন্ধ', 'Cost figures are hidden for your role', 'Cost figures are hidden'),
   note: L('ব্র্যান্ড ঠিক করা আছে "রিপোর্ট ব্র্যান্ড ম্যাপ"-এ (মালিক বদলাতে পারেন)। কোনো সংখ্যা অনুমান করা হয়নি।', 'The brand of a place comes from the report brand map (the owner can change it). No figure is estimated.', 'Brand comes from the report brand map. Nothing is estimated.'),
   none: L('এই সময়ে কিছু নেই', 'Nothing in this period', 'Nothing in this period'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), place: L('লোকেশন', 'Place', 'Place'), allp: L('সব লোকেশন', 'All places', 'All places'),
-  onlyap: L('শুধু অনুমোদিত', 'Approved only', 'Approved only'), count: L('ডিসকাউন্টের বিক্রি', 'Discounted sales', 'Discounted sales'), total: L('মোট ডিসকাউন্ট', 'Total discount', 'Total discount'),
-  seller: L('বিক্রেতা', 'Seller', 'Seller'), appr: L('অনুমোদনকারী', 'Approver', 'Approver'), k_grant: L('ভূমিকার অনুমতিতে', 'by role right', 'by role right'), k_emergency: L('জরুরি অনুমোদনে', 'by emergency approval', 'by emergency approval'),
-  within: L('সীমার ভেতরে / রেকর্ড নেই', 'within the limit / not recorded', 'within the limit / not recorded'), void: L('বাতিল', 'void', 'void'), recno: L('রসিদ', 'Receipt', 'Receipt'),
+  onlyap: L('শুধু অ্যাপ্রুভড', 'Approved only', 'Approved only'), count: L('ডিসকাউন্টের সেল', 'Discounted sales', 'Discounted sales'), total: L('টোটাল ডিসকাউন্ট', 'Total discount', 'Total discount'),
+  seller: L('বিক্রেতা', 'Seller', 'Seller'), appr: L('অনুমোদনকারী', 'Approver', 'Approver'), k_grant: L('রোলের অনুমতিতে', 'by role right', 'by role right'), k_emergency: L('জরুরি অ্যাপ্রুভে', 'by emergency approval', 'by emergency approval'),
+  within: L('সীমার ভেতরে / রেকর্ড নেই', 'within the limit / not recorded', 'within the limit / not recorded'), void: L('ভয়েড', 'void', 'void'), recno: L('রসিদ', 'Receipt', 'Receipt'),
 };
 const Ty = (k) => lab(Y[k]);
 const dhakaToday = () => new Date(Date.now() + 6 * 3600 * 1000).toISOString().slice(0, 10);

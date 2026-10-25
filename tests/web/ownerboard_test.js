@@ -1,10 +1,11 @@
 // Module E: Home cleanup (no Recent, no star marks, favourites in the ⋮ menu) + Owner mode board (#/owner).
 // Run: node ownerboard_test.js <abs tests/web dir>      (server state lives in node: SRV, shared by every page this test opens)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8197, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const dh = (n = 0) => { const d = new Date(Date.now() + n * 86400000); return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' }); };
 const TD = dh(0), YD = dh(-1), WD = dh(-7);
 const R = (key, def) => ({ key, module: 'ui', kind: 'switch', value: null, default_value: def, label_bn: key, label_en: key, label_mix: key, sort: 1 });
@@ -56,7 +57,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     pay: [{ total_payable: 9000, suppliers_owed: 2, overdue: 2500, overdue_suppliers: 1, oldest: dh(-20), credit_total: 0 }],
     levels: [{ item_id: 'i0', below_min: true }, { item_id: 'i1', below_min: true }, { item_id: 'i2', below_min: true }],
     expiry: [{ batch_id: 1, expired: false, hours_left: 5 }, { batch_id: 2, expired: true, hours_left: -2 }],
-    ny: [{ kind: 'entry', id: 'e1', label: '10-2 #9002', since: new Date(Date.now() - 9 * 3600e3).toISOString(), route: 'entry/e1' }],
+    ny: [{ kind: 'entry', id: 'e1', label: '11-1 #9002', since: new Date(Date.now() - 9 * 3600e3).toISOString(), route: 'entry/e1' }],
   }, o);
   async function open(hash, o = {}) {
     const ctx = o.ctx || await br.newContext({ viewport: { width: 360, height: 780 } }); const p = await ctx.newPage();
@@ -68,11 +69,11 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
     const data = JSON.parse(JSON.stringify(base)); const T = data.tables;
     T.rules = [R('ui_noperm_mode', 'lock')].concat(o.ruleOff ? [R('owner_board_on', false)] : []);
     T.user_favourites = JSON.parse(JSON.stringify(SRV.fav)); T.role_favourites = [];
-    T.entries = [{ id: 'd1', form_code: '14-1', location_id: 1, entry_date: TD, status: 'submitted' }];
+    T.entries = [{ id: 'd1', form_code: '06-1', location_id: 1, entry_date: TD, status: 'submitted' }];
     T.exceptions = [{ id: 1, flag_code: 'cash_short_over', level: 'red', status: 'open', amount: -700, entry_date: TD, created_at: TD + 'T10:00:00Z' }, { id: 2, flag_code: 'x', level: 'yellow', status: 'open', amount: 1, entry_date: YD, created_at: YD + 'T10:00:00Z' }];
     T.stock_wastage = [{ id: 'w1', qty: 2.5, made_at: TD + 'T09:00:00+06:00' }];
     T.sales = [{ id: 's1', sale_date: TD, status: 'done', lines: [{ name: 'Rosogolla', qty: 4, amount: 800 }, { name: 'Sandesh', qty: 2, amount: 300 }] }];
-    T.form_rollout = [{ form_code: '14-1', location_id: 2, mode: 'paper' }];
+    T.form_rollout = [{ form_code: '06-1', location_id: 2, mode: 'paper' }];
     await p.addInitScript(`${o.init || ''}window.__DATA=${JSON.stringify(data)};window.__OB=${JSON.stringify(Object.assign(OBD(), o.ob || {}))};${o.owner === false ? 'window.__OWNER=false;' : ''}${o.refreshMs ? 'window.__OB_REFRESH_MS=' + o.refreshMs + ';' : ''}try{if(!localStorage.getItem('bos_lang'))localStorage.setItem('bos_lang','en')}catch(e){}`);
     await p.goto(`http://localhost:${PORT}/` + hash); await wait(p, o.settle || 1500); return p;
   }
@@ -156,7 +157,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   ok(/5,000/.test(await wt('sales_vs')) && /\+25%/.test(await wt('sales_vs')) && /\+11%/.test(await wt('sales_vs')), 'sales vs yesterday / last week: ' + (await wt('sales_vs')).replace(/\s+/g, ' '));
   ok(/700/.test(await wt('cash_short')) && (await W('cash_short').getAttribute('class')).includes('bad'), 'cash short today is red: ' + (await wt('cash_short')).replace(/\s+/g, ' '));
   ok(/1\/1/.test(await wt('day_close')), 'day close: shop 2 is on paper, shop 1 closed -> 1/1: ' + (await wt('day_close')).replace(/\s+/g, ' '));
-  ok(/1/.test(await wt('needs_you')) && /10-2 #9002/.test(await wt('needs_you')), 'needs you shows the oldest: ' + (await wt('needs_you')).replace(/\s+/g, ' '));
+  ok(/1/.test(await wt('needs_you')) && /11-1 #9002/.test(await wt('needs_you')), 'needs you shows the oldest: ' + (await wt('needs_you')).replace(/\s+/g, ' '));
   ok(/Open red[\s\S]*1/.test(await wt('exceptions')), 'open exceptions: ' + (await wt('exceptions')).replace(/\s+/g, ' '));
   ok(/2,000/.test(await wt('cust_dues')) && /1,500/.test(await wt('cust_dues')), 'customer dues total + overdue: ' + (await wt('cust_dues')).replace(/\s+/g, ' '));
   ok(/9,000/.test(await wt('supp_dues')) && /2,500/.test(await wt('supp_dues')), 'supplier dues: ' + (await wt('supp_dues')).replace(/\s+/g, ' '));

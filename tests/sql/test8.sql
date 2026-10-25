@@ -10,7 +10,7 @@ select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000005'
 select record_sale2(gen_random_uuid(),1,'[{"amount":650,"name":"x"}]',0,'[{"mode":"cash","amount":650,"tendered":1000}]',null,null,'retail',null,true);
 \echo T2 partial without customer -> refused ; with customer ok
 select record_sale2(gen_random_uuid(),1,'[{"amount":650}]',0,'[{"mode":"cash","amount":300}]',null,null,'retail',null,true);
-select record_sale2(gen_random_uuid(),1,'[{"amount":650}]',0,'[{"mode":"cash","amount":300}]','+880 1712-345678','Karim','retail',null,true);
+select record_sale2(gen_random_uuid(),1,'[{"amount":650}]',0,'[{"mode":"cash","amount":300}]','+880 1712-345678','TestF','retail',null,true);
 \echo T2b bad mobile / new customer without name
 select record_sale2(gen_random_uuid(),1,'[{"amount":650}]',0,'[{"mode":"cash","amount":300}]','12345','X','retail',null,true);
 select record_sale2(gen_random_uuid(),1,'[{"amount":10}]',0,'[]','01911222333',null,'retail',null,true);

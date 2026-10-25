@@ -1,0 +1,14 @@
+{
+  "appId": "com.example.bos",
+  "appName": "BOS",
+  "webDir": "../web",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "plugins": {
+    "BarcodeScanner": {
+      "formats": ["EAN_13", "EAN_8", "CODE_128", "CODE_39", "QR_CODE", "UPC_A"]
+    }
+  }
+}

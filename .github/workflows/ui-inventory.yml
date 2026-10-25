@@ -1,0 +1,20 @@
+name: ui-inventory
+on:
+  push:
+  pull_request:
+jobs:
+  no-loss:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      # Python standard library only. The extractor also uses the node that is preinstalled on ubuntu-latest
+      # (tools/ui_inventory_runtime.js, no npm packages) to read the route and form registries.
+      - name: node is available
+        run: node --version
+      - name: Nothing in the UI may be lost or renamed silently
+        run: python3 tools/check_ui_inventory.py
+      - name: The check itself must still fail when something is lost
+        run: python3 tools/test_ui_inventory.py

@@ -1,10 +1,12 @@
 // Stock hub carry-over (phase12): category labels, unit lists, name search, row menus, barcode scan on stock actions, photo prefix STOCK,
 // wastage maker-checker (pending result + approvals tab). Run: node stock3_test.js <dir with smoke.js, stub.js>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), srv = C.serve(8311);
+const base = C.baseData(SP), srv = C.serve(PORT);
 const IT = base.tables.items;
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
@@ -15,7 +17,7 @@ const IT = base.tables.items;
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(C.mkData(base, o))};window.__M0=${JSON.stringify(o.m || {})};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8311/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__M.calls.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const wait = (p, n = 300) => p.waitForTimeout(n);
@@ -24,7 +26,7 @@ const IT = base.tables.items;
   const lv = (i, id, code, bn, en, cat, bu, q, min) => ({ item_id: id, code, name_bn: bn, name_en: en, category: cat, base_unit: bu, location_id: 1, qty: q, min_stock: min, below_min: min !== null && q < min, avg_cost: null, value: null });
   const levels = [lv(0, IT[0].id, 'I-001', 'সাদা মিষ্টি', 'White sweet', 'sweet_kg', 'kg', 3.5, 5), lv(1, IT[1].id, 'I-002', 'কালো মিষ্টি', 'Black sweet', 'sweet_kg', 'kg', 8, null), lv(2, IT[2].id, 'I-003', 'রসমালাই', 'Rasmalai', 'sweet_pc', 'piece', 40, 10)];
   const patch = [{ sell_units: ['kg', 'box'], name_mix: 'Shada Mishti', barcode: '8801' }, {}, { barcode: '8803' }];
-  const wa = [{ id: 'w1', item_id: IT[0].id, code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', location_id: 1, qty: 10, base_unit: 'kg', reason_code: 'spoiled', note: 'tray fell', photo: null, status: 'pending', requested_staff: 'karim02', requested_at: '2026-10-11T05:00:00Z', mine: false, can_decide: true, decision_note: null }];
+  const wa = [{ id: 'w1', item_id: IT[0].id, code: 'I-001', name_bn: 'সাদা মিষ্টি', name_en: 'White sweet', location_id: 1, qty: 10, base_unit: 'kg', reason_code: 'spoiled', note: 'tray fell', photo: null, status: 'pending', requested_staff: 'testf02', requested_at: '2026-10-11T05:00:00Z', mine: false, can_decide: true, decision_note: null }];
 
   // ---------- category labels, unit lists, search, row menu ----------
   let p = await open({ itemPatch: patch, m: { levels } }, '#/stock');
@@ -68,7 +70,7 @@ const IT = base.tables.items;
   let up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^STOCK\/1\/[0-9a-f-]+\.jpg$/.test(up[0][0]), 'wastage photo goes to the STOCK prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
   p = await open({ photoAbove: 5, m: { levels, upFail: 'STOCK/' } }, '#/stock'); await p.click('[data-act=s2_actions]'); await wait(p, 300); await p.click('[data-act=s2_do][data-v=waste]'); await wait(p, 300);
   await p.setInputFiles('#a_file', SP + '/pic.png'); await wait(p, 700);
-  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^04-1\/1\//.test(up[0][0]), 'database without phase12: falls back to the old form prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
+  up = await p.evaluate(() => window.__UP); ok(up.length === 1 && /^13-1\/1\//.test(up[0][0]), 'database without phase12: falls back to the old form prefix: ' + JSON.stringify(up[0] && up[0][0])); await p.close();
 
   // ---------- wastage above the owner limit: pending ----------
   p = await open({ m: { levels, pendingWaste: true, wa } }, '#/stock'); await p.click('[data-act=s2_actions]'); await wait(p, 300); await p.click('[data-act=s2_do][data-v=waste]'); await wait(p, 300);
@@ -86,7 +88,7 @@ const IT = base.tables.items;
   await p.fill('#a_note', 'not wasted'); await p.click('[data-act=s2_wa_go_no]'); await wait(p, 500); wd = await calls(p, 'wastage_decide'); ok(wd.length === 2 && wd[1].p_approve === false && wd[1].p_note === 'not wasted', 'reject call with the note');
   await p.close();
   // the maker sees own request, cannot decide, can take it back
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
   const mine = [{ ...wa[0], mine: true, can_decide: false }];
   p = await open({ init: NO, m: { levels, wa: mine, grants: ['wastage_write_off'], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock');
   ok(await p.locator('.ptabs [data-v=wa]').count() === 1, 'a maker with a waiting request sees the tab'); await p.click('.ptabs [data-v=wa]'); await wait(p, 500);

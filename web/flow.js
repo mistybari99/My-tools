@@ -11,28 +11,28 @@ const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dha
 const X = {
   title: L('দিনের কাজ (ধাপে ধাপে)', 'Guided routines', 'দিনের কাজ (ধাপে ধাপে)'), loc: L('জায়গা', 'Place', 'Place'),
   open: L('দোকান খোলা', 'Open shop', 'দোকান খোলা'), close: L('দিন শেষ', 'Close day', 'দিন শেষ'), factory: L('কারখানার দিন', 'Factory day', 'কারখানার দিন'), month: L('মাস শেষ', 'Month-end', 'মাস শেষ'),
-  of: L('এর মধ্যে', 'of', 'এর মধ্যে'), left: L('বাকি', 'left', 'বাকি'), done: L('হয়েছে', 'Done', 'Done'), todo: L('বাকি', 'To do', 'বাকি'), progress: L('খসড়া আছে', 'Draft', 'Draft'), unknown: L('নিজে দেখে নিন', 'Check manually', 'নিজে দেখে নিন'),
+  of: L('এর মধ্যে', 'of', 'এর মধ্যে'), left: L('বাকি', 'left', 'বাকি'), done: L('হয়েছে', 'Done', 'Done'), todo: L('বাকি', 'To do', 'বাকি'), progress: L('ড্রাফট আছে', 'Draft', 'Draft'), unknown: L('নিজে দেখে নিন', 'Check manually', 'নিজে দেখে নিন'),
   skipped: L('বাদ (নোট সহ)', 'Skipped (note)', 'Skipped'), skip: L('বাদ দিন…', 'Skip…', 'Skip…'), why: L('কেন বাদ দিচ্ছেন (অন্তত ৩ অক্ষর)', 'Why skip (3+ letters)', 'কেন skip (৩+ অক্ষর)'), open_: L('খুলুন', 'Open', 'Open'),
-  back: L('সব রুটিন', 'All routines', 'সব routine'), refresh: L('আবার দেখুন', 'Refresh', 'Refresh'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
-  s_drawer: L('ড্রয়ারের ক্যাশ গোনা (14-1)', 'Count the drawer (14-1)', 'Drawer cash গোনা (14-1)'), s_attend: L('হাজিরা (02-1)', 'Attendance (02-1)', 'হাজিরা (02-1)'),
+  back: L('সব রুটিন', 'All routines', 'সব routine'), refresh: L('আবার দেখুন', 'Refresh', 'Refresh'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
+  s_drawer: L('ড্রয়ারের ক্যাশ গোনা (06-1)', 'Count the drawer (06-1)', 'Drawer cash গোনা (06-1)'), s_attend: L('হাজিরা (19-1)', 'Attendance (19-1)', 'হাজিরা (19-1)'),
   s_stock: L('স্টক কম / মেয়াদ দেখা', 'Look at low stock and expiry', 'Stock কম / expiry দেখা'), s_exc: L('গতকালের সমস্যা (খোলা গরমিল ০ হলে ঠিক)', 'Yesterday\'s problems (done when none are open)', 'গতকালের সমস্যা'),
   s_pos: L('বিক্রি শুরু (POS)', 'Open the POS', 'POS খুলুন'), s_release: L('লাল নিয়ন্ত্রণ থাকলে ছাড়ের অনুরোধ', 'Release request if a red control is open', 'Red control থাকলে release'),
-  s_hub: L('হাবে ক্যাশ হস্তান্তর (10-1)', 'Hand the cash to the hub (10-1)', 'Hub-এ cash handover (10-1)'), s_dig: L('ডিজিটাল মিলানো (10-3)', 'Digital reconcile (10-3)', 'Digital মিলানো (10-3)'),
-  s_deposit: L('ব্যাংকে জমা', 'Bank deposit', 'Bank জমা'), s_exp: L('আজকের খরচ (10-2)', 'Today\'s expenses (10-2)', 'আজকের খরচ (10-2)'), s_outbox: L('ফোনে জমা থাকা কিছু নেই', 'Nothing waiting on this phone', 'Phone-এ কিছু জমা নেই'),
-  s_summary: L('দিনের খাতা দেখুন', 'Look at the day book', 'Day book দেখুন'), s_daily: L('কারখানার দৈনিক শিট (05-1)', 'Factory daily sheet (05-1)', 'Factory daily sheet (05-1)'), s_grn: L('মাল গ্রহণ (04-1)', 'Goods received (04-1)', 'মাল গ্রহণ (04-1)'),
-  s_issue: L('মাল ইস্যু (04-2)', 'Goods issued (04-2)', 'মাল ইস্যু (04-2)'), s_prod: L('উৎপাদন (রেসিপি)', 'Production (recipes)', 'Production (recipe)'), s_dispatch: L('দোকানে চালান (03-1)', 'Dispatch to shops (03-1)', 'দোকানে চালান (03-1)'),
-  s_wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), s_days: L('সব দোকানের সব দিনের দিন-শেষ জমা', 'Every shop-day closed (14-1)', 'সব দোকানের দিন-শেষ জমা'), s_pending: L('অপেক্ষার অনুমোদন ও গরমিল শূন্য', 'No pending approvals or open exceptions', 'Pending ও exception শূন্য'),
-  s_count: L('এই মাসে স্টক কাউন্ট (04-3)', 'Stock count this month (04-3)', 'এই মাসে stock count (04-3)'), s_pay: L('সরবরাহকারীর বাকি ও ক্রয় মিলানো', 'Supplier payables and purchases', 'Supplier বাকি ও purchase'),
-  s_salary: L('বেতনের শিট', 'Salary sheet', 'Salary sheet'), s_reports: L('রিপোর্ট ও লাভ-ক্ষতি', 'Reports and profit & loss', 'Reports ও P&L'), s_lock: L('"হিসাব বন্ধ" তারিখ বসান (মালিক)', 'Set "books closed until" (owner)', '"Books closed" তারিখ (owner)'),
+  s_hub: L('হাবে ক্যাশ হস্তান্তর (03-1)', 'Hand the cash to the hub (03-1)', 'Hub-এ cash handover (03-1)'), s_dig: L('ডিজিটাল মিলানো (07-1)', 'Digital reconcile (07-1)', 'Digital মিলানো (07-1)'),
+  s_deposit: L('ব্যাংকে জমা', 'Bank deposit', 'Bank জমা'), s_exp: L('আজকের খরচ (11-1)', 'Today\'s expenses (11-1)', 'আজকের খরচ (11-1)'), s_outbox: L('ফোনে জমা থাকা কিছু নেই', 'Nothing waiting on this phone', 'Phone-এ কিছু জমা নেই'),
+  s_summary: L('দিনের খাতা দেখুন', 'Look at the day book', 'Day book দেখুন'), s_daily: L('কারখানার দৈনিক শিট (12-1)', 'Factory daily sheet (12-1)', 'Factory daily sheet (12-1)'), s_grn: L('মাল গ্রহণ (13-1)', 'Goods received (13-1)', 'মাল গ্রহণ (13-1)'),
+  s_issue: L('মাল ইস্যু (18-1)', 'Goods issued (18-1)', 'মাল ইস্যু (18-1)'), s_prod: L('উৎপাদন (রেসিপি)', 'Production (recipes)', 'Production (recipe)'), s_dispatch: L('দোকানে চালান (39-1)', 'Dispatch to shops (39-1)', 'দোকানে চালান (39-1)'),
+  s_wastage: L('নষ্ট মাল', 'Wastage', 'Wastage'), s_days: L('সব দোকানের সব দিনের দিন-শেষ জমা', 'Every shop-day closed (06-1)', 'সব দোকানের দিন-শেষ জমা'), s_pending: L('অপেক্ষার অ্যাপ্রুভ ও গরমিল শূন্য', 'No pending approvals or open exceptions', 'Pending ও exception শূন্য'),
+  s_count: L('এই মাসে স্টক কাউন্ট (36-1)', 'Stock count this month (36-1)', 'এই মাসে stock count (36-1)'), s_pay: L('সাপ্লায়ারের বাকি ও ক্রয় মিলানো', 'Supplier payables and purchases', 'Supplier বাকি ও purchase'),
+  s_salary: L('বেতনের শিট', 'Salary sheet', 'Salary sheet'), s_reports: L('রিপোর্ট ও লাভ-ক্ষতি', 'Reports and profit & loss', 'Reports ও P&L'), s_lock: L('"হিসাব বন্ধ" ডেট বসান (মালিক)', 'Set "books closed until" (owner)', '"Books closed" Date (owner)'),
   e_note_required: L('কারণ লিখুন', 'Write a reason', 'কারণ লিখুন'),
 };
 const T = (k) => lab(X[k]);
 // step kinds: entry:<code> (today, this place) | month_entry:<code> | none_open (exceptions) | outbox | link (unknown) | days_closed | no_pending | lock
 const FLOWS = {
-  open: [['drawer', 'entry:14-1', 'form/14-1'], ['attend', 'link', 'form/02-1'], ['stock', 'link', 'stock'], ['exc', 'none_open', 'exceptions'], ['pos', 'link', 'pos']],
-  close: [['drawer', 'entry:14-1', 'form/14-1'], ['release', 'none_red', 'releases'], ['hub', 'entry:10-1', 'form/10-1'], ['dig', 'entry:10-3', 'form/10-3'], ['deposit', 'link', 'cashmoves'], ['exp', 'entry:10-2', 'form/10-2'], ['outbox', 'outbox', 'outbox'], ['summary', 'link', 'daybook']],
-  factory: [['daily', 'entry:05-1', 'form/05-1'], ['grn', 'entry:04-1', 'form/04-1'], ['issue', 'entry:04-2', 'form/04-2'], ['prod', 'link', 'recipes'], ['wastage', 'link', 'stock'], ['dispatch', 'entry:03-1', 'form/03-1']],
-  month: [['days', 'days_closed', 'daybook'], ['pending', 'no_pending', 'pending'], ['count', 'month_entry:04-3', 'form/04-3'], ['pay', 'link', 'payables'], ['salary', 'link', 'salary'], ['reports', 'link', 'reports'], ['lock', 'lock', 'settings']],
+  open: [['drawer', 'entry:06-1', 'form/06-1'], ['attend', 'link', 'form/19-1'], ['stock', 'link', 'stock'], ['exc', 'none_open', 'exceptions'], ['pos', 'link', 'pos']],
+  close: [['drawer', 'entry:06-1', 'form/06-1'], ['release', 'none_red', 'releases'], ['hub', 'entry:03-1', 'form/03-1'], ['dig', 'entry:07-1', 'form/07-1'], ['deposit', 'link', 'cashmoves'], ['exp', 'entry:11-1', 'form/11-1'], ['outbox', 'outbox', 'outbox'], ['summary', 'link', 'daybook']],
+  factory: [['daily', 'entry:12-1', 'form/12-1'], ['grn', 'entry:13-1', 'form/13-1'], ['issue', 'entry:18-1', 'form/18-1'], ['prod', 'link', 'recipes'], ['wastage', 'link', 'stock'], ['dispatch', 'entry:39-1', 'form/39-1']],
+  month: [['days', 'days_closed', 'daybook'], ['pending', 'no_pending', 'pending'], ['count', 'month_entry:36-1', 'form/36-1'], ['pay', 'link', 'payables'], ['salary', 'link', 'salary'], ['reports', 'link', 'reports'], ['lock', 'lock', 'settings']],
 };
 const D = { loc: null, skips: [], res: {} };
 const LOCS = () => (B.liveLocs || ((a) => a))((S.ctx.is_owner || (S.ctx.roles || []).includes('management')) ? ((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []).filter((l) => (S.ctx.locations || []).includes(l.id)));
@@ -52,7 +52,7 @@ async function check(kind) {
     if (kind === 'no_pending') { const [a, b] = await Promise.all([sb.from('entries').select('id', { count: 'exact', head: true }).eq('status', 'submitted').eq('location_id', loc), sb.from('exceptions').select('id', { count: 'exact', head: true }).eq('status', 'open').eq('location_id', loc)]);
       return a.error || b.error ? 'unknown' : (a.count || 0) + (b.count || 0) === 0 ? 'done' : 'todo'; }
     if (kind === 'days_closed') {
-      const r = await sb.from('entries').select('entry_date,status').eq('form_code', '14-1').eq('location_id', loc).gte('entry_date', monthStart()).lte('entry_date', td); if (r.error) return 'unknown';
+      const r = await sb.from('entries').select('entry_date,status').eq('form_code', '06-1').eq('location_id', loc).gte('entry_date', monthStart()).lte('entry_date', td); if (r.error) return 'unknown';
       const have = new Set((r.data || []).filter((x) => x.status === 'submitted' || x.status === 'approved').map((x) => x.entry_date)); const last = new Date(td + 'T00:00:00Z'); let miss = 0;
       for (let d = new Date(monthStart() + 'T00:00:00Z'); d < last; d.setUTCDate(d.getUTCDate() + 1)) { if (!have.has(d.toISOString().slice(0, 10))) miss++; }
       return miss === 0 ? 'done' : 'todo';

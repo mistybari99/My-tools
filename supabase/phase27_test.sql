@@ -47,13 +47,13 @@ insert into entries (form_code,location_id,serial,entry_date,status,data,flags,c
  ('10-2',1,9711,:'td','approved','{"lines":[{"head":"transport","amount":"25"},{"head":"transport","amount":75}]}','[]',:'s','st'),
  ('10-2',1,9712,:'td','draft','{"lines":[{"head":"transport","amount":5000}]}','[]',:'s','st'),
  ('10-2',2,9713,:'td','submitted','{"lines":[{"head":"other","amount":40}]}','[]',:'s','st'),
- ('02-2',1,9721,:'td','approved','{"pay":[{"name":"Rahim - Cook","due":1000,"overtime":100,"adv_ded":200},{"name":"Karim - Clerk","due":"800","other":50,"other_ded":30},{"name":""}]}','[]',:'s','st'),
- ('02-2',1,9722,:'td','draft','{"pay":[{"name":"Rahim - Cook","due":99999}]}','[]',:'s','st'),
- ('02-3',1,9731,:'td','approved',format('{"staff":"Rahim - Cook","adv":[{"date":"%s","amount":500,"ded_now":100,"balance":400},{"date":"%s","amount":300,"ded_now":0,"balance":300}]}',:'td',:'td')::jsonb,'[]',:'s','st'),
- ('02-3',1,9732,(:'m1'::date - 40),'approved','{"staff":"Rahim - Cook","adv":[{"date":"2020-01-01","amount":9000,"balance":999}]}','[]',:'s','st'),
+ ('02-2',1,9721,:'td','approved','{"pay":[{"name":"TestK - Cook","due":1000,"overtime":100,"adv_ded":200},{"name":"TestF - Clerk","due":"800","other":50,"other_ded":30},{"name":""}]}','[]',:'s','st'),
+ ('02-2',1,9722,:'td','draft','{"pay":[{"name":"TestK - Cook","due":99999}]}','[]',:'s','st'),
+ ('02-3',1,9731,:'td','approved',format('{"staff":"TestK - Cook","adv":[{"date":"%s","amount":500,"ded_now":100,"balance":400},{"date":"%s","amount":300,"ded_now":0,"balance":300}]}',:'td',:'td')::jsonb,'[]',:'s','st'),
+ ('02-3',1,9732,(:'m1'::date - 40),'approved','{"staff":"TestK - Cook","adv":[{"date":"2020-01-01","amount":9000,"balance":999}]}','[]',:'s','st'),
  ('02-3',1,9733,:'td','approved',format('{"staff":"Zed","adv":[{"date":"2020-02-02","amount":70,"balance":50}]}')::jsonb,'[]',:'s','st'),
- ('02-3',1,9734,:'td','draft','{"staff":"Karim - Clerk","adv":[{"date":"2020-02-02","amount":777,"balance":777}]}','[]',:'s','st');
--- the 02-2 names are "name - post"; the 02-3 staff for Rahim is written the same so that the name match works
+ ('02-3',1,9734,:'td','draft','{"staff":"TestF - Clerk","adv":[{"date":"2020-02-02","amount":777,"balance":777}]}','[]',:'s','st');
+-- the 02-2 names are "name - post"; the 02-3 staff for TestK is written the same so that the name match works
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
  ('01-2',1,9741,:'td','approved',format('{"month":"%s","scope":"loc","sales":330,"open_stock":100,"purchases":500,"close_stock":400,"x_rent":50,"x_misc":50,"salary":1950,"bank_charges":10}',:'tm')::jsonb,'[]',:'s','st'),
  ('01-2',1,9742,:'td','draft',format('{"month":"%s","scope":"loc","sales":1}',:'tm')::jsonb,'[]',:'s','st'),
@@ -128,11 +128,11 @@ select tt.chk('L5 loc1: uncosted 15.15%, gm 42.86%, fixed 3100, break-even 7233.
 select tt.chk('L5 loc2 without fixed cost: gm 40%, break-even null', (tt.row(:'j'::jsonb,'location_id','2')->>'gm_pct')::numeric=40 and tt.row(:'j'::jsonb,'location_id','2')->'be_sales'='null'::jsonb and tt.row(:'j'::jsonb,'location_id','2')->'fixed_month'='null'::jsonb);
 -- T3
 select report_run2('t3_payroll', :'per'::jsonb) as j \gset
-select tt.chk('T3 three people (Rahim, Karim, Zed); drafts out', jsonb_array_length(:'j'::jsonb->'rows')=3);
-select tt.chk('T3 Rahim: gross 1100, adv ded 200, net 900, advance given 800, register ded 100, outstanding 700 (latest page, older page ignored)',
-  (tt.row(:'j'::jsonb,'person','Rahim - Cook')->>'gross_pay')::numeric=1100 and (tt.row(:'j'::jsonb,'person','Rahim - Cook')->>'adv_deducted')::numeric=200 and (tt.row(:'j'::jsonb,'person','Rahim - Cook')->>'net_pay')::numeric=900
-  and (tt.row(:'j'::jsonb,'person','Rahim - Cook')->>'adv_given')::numeric=800 and (tt.row(:'j'::jsonb,'person','Rahim - Cook')->>'adv_register_deduction')::numeric=100 and (tt.row(:'j'::jsonb,'person','Rahim - Cook')->>'adv_outstanding')::numeric=700);
-select tt.chk('T3 Karim: gross 850, other ded 30, net 820, no advance register page', (tt.row(:'j'::jsonb,'person','Karim - Clerk')->>'net_pay')::numeric=820 and (tt.row(:'j'::jsonb,'person','Karim - Clerk')->>'other_deducted')::numeric=30 and tt.row(:'j'::jsonb,'person','Karim - Clerk')->'adv_outstanding'='null'::jsonb);
+select tt.chk('T3 three people (TestK, TestF, Zed); drafts out', jsonb_array_length(:'j'::jsonb->'rows')=3);
+select tt.chk('T3 TestK: gross 1100, adv ded 200, net 900, advance given 800, register ded 100, outstanding 700 (latest page, older page ignored)',
+  (tt.row(:'j'::jsonb,'person','TestK - Cook')->>'gross_pay')::numeric=1100 and (tt.row(:'j'::jsonb,'person','TestK - Cook')->>'adv_deducted')::numeric=200 and (tt.row(:'j'::jsonb,'person','TestK - Cook')->>'net_pay')::numeric=900
+  and (tt.row(:'j'::jsonb,'person','TestK - Cook')->>'adv_given')::numeric=800 and (tt.row(:'j'::jsonb,'person','TestK - Cook')->>'adv_register_deduction')::numeric=100 and (tt.row(:'j'::jsonb,'person','TestK - Cook')->>'adv_outstanding')::numeric=700);
+select tt.chk('T3 TestF: gross 850, other ded 30, net 820, no advance register page', (tt.row(:'j'::jsonb,'person','TestF - Clerk')->>'net_pay')::numeric=820 and (tt.row(:'j'::jsonb,'person','TestF - Clerk')->>'other_deducted')::numeric=30 and tt.row(:'j'::jsonb,'person','TestF - Clerk')->'adv_outstanding'='null'::jsonb);
 select tt.chk('T3 Zed: advance outstanding 50 with no salary sheet (net pay null)', (tt.row(:'j'::jsonb,'person','Zed')->>'adv_outstanding')::numeric=50 and tt.row(:'j'::jsonb,'person','Zed')->'net_pay'='null'::jsonb);
 select tt.chk('T3 totals', (:'j'::jsonb->'totals'->>'gross_pay')::numeric=1950 and (:'j'::jsonb->'totals'->>'net_pay')::numeric=1720 and (:'j'::jsonb->'totals'->>'adv_outstanding')::numeric=750 and (:'j'::jsonb->'totals'->>'adv_given')::numeric=800);
 -- T4

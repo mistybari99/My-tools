@@ -15,19 +15,19 @@ const MODS = {
 };
 const X = {
   title: L('নিয়ম ও অপশন', 'Rules & options', 'নিয়ম ও Option'), tabRules: L('নিয়ম', 'Rules', 'Rules'), tabGrants: L('কে কী পারবে', 'Who may do what', 'কে কী পারবে'), tabMore: L('অন্যান্য অপশন', 'More options', 'অন্যান্য Option'),
-  on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), dflt: L('ডিফল্ট', 'default', 'default'), reset: L('ডিফল্টে ফেরান', 'Back to default', 'Default এ ফেরান'),
-  badv: L('মান ঠিক নয়', 'The value is not valid', 'মান ঠিক নয়'), baddate: L('তারিখ YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30', 'Write the date as YYYY-MM-DD, e.g. 2026-09-30', 'Date YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30'),
+  on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), save: L('সেভ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), dflt: L('ডিফল্ট', 'default', 'default'), reset: L('ডিফল্টে ফেরান', 'Back to default', 'Default এ ফেরান'),
+  badv: L('মান ঠিক নয়', 'The value is not valid', 'মান ঠিক নয়'), baddate: L('ডেট YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30', 'Write the date as YYYY-MM-DD, e.g. 2026-09-30', 'Date YYYY-MM-DD ফরম্যাটে লিখুন, যেমন 2026-09-30'),
   grantHint: L('মালিক সবসময় পারেন। নিচে যে ভূমিকায় টিক থাকবে সে এই কাজ নিজে করতে পারবে। বাকিরা আটকে গেলে "জরুরি অনুরোধ" পাঠাবে।', 'The owner always may. A role that is switched on can do the action itself. Others who are blocked send an emergency request.', 'Owner সবসময় পারেন। যে role এ On থাকবে সে নিজে করতে পারবে। বাকিরা আটকে গেলে "জরুরি request" পাঠাবে।'),
-  once: L('জরুরি অনুমোদন একবারের জন্য', 'an emergency approval works once', 'জরুরি অনুমোদন একবারের জন্য'), window: L('জরুরি অনুমোদন অল্প সময় চলে', 'an emergency approval lasts a short time', 'জরুরি অনুমোদন অল্প সময় চলে'),
+  once: L('জরুরি অ্যাপ্রুভ একবারের জন্য', 'an emergency approval works once', 'জরুরি Approve একবারের জন্য'), window: L('জরুরি অ্যাপ্রুভ অল্প সময় চলে', 'an emergency approval lasts a short time', 'জরুরি Approve অল্প সময় চলে'),
   // emergency
   emTitle: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), pending: L('অপেক্ষায়', 'Waiting', 'অপেক্ষায়'), recent: L('সাম্প্রতিক সিদ্ধান্ত', 'Recent decisions', 'সাম্প্রতিক সিদ্ধান্ত'),
-  approve: L('এবার অনুমোদন', 'Approve this time', 'এবার অনুমোদন'), reject: L('বাতিল', 'Reject', 'বাতিল'), note: L('নোট (বাতিলে লাগবে)', 'Note (needed to reject)', 'Note (বাতিলে লাগবে)'),
+  approve: L('এবার অ্যাপ্রুভ', 'Approve this time', 'এবার Approve'), reject: L('বাতিল', 'Reject', 'বাতিল'), note: L('নোট (বাতিলে লাগবে)', 'Note (needed to reject)', 'Note (বাতিলে লাগবে)'),
   none: L('কোনো অনুরোধ নেই ✓', 'No requests ✓', 'কোনো request নেই ✓'), who: L('কে', 'Who', 'কে'), why: L('কারণ', 'Reason', 'কারণ'), after: L('এরপর "কে কী পারবে" থেকে ঠিক করুন কাকে স্থায়ীভাবে দেবেন।', 'Afterwards decide in "Who may do what" who gets it for good.', 'এরপর "কে কী পারবে" থেকে ঠিক করুন কাকে স্থায়ীভাবে দেবেন।'),
   decided: L('সিদ্ধান্ত হয়েছে', 'Decided', 'সিদ্ধান্ত হয়েছে'), mins: L('মিনিট', 'min', 'min'),
   st_pending: L('অপেক্ষায়', 'waiting', 'অপেক্ষায়'), st_approved: L('অনুমোদিত — এখন আবার চেষ্টা করুন', 'approved — try again now', 'অনুমোদিত — এখন আবার চেষ্টা করুন'), st_rejected: L('বাতিল', 'rejected', 'বাতিল'), st_used: L('ব্যবহার হয়েছে', 'used', 'ব্যবহার হয়েছে'), st_expired: L('মেয়াদ শেষ', 'expired', 'মেয়াদ শেষ'), st_cancelled: L('ফিরিয়ে নেওয়া', 'cancelled', 'ফিরিয়ে নেওয়া'),
   // staff sheet
   blocked: L('এই কাজ করতে আপনার অনুমতি নেই', 'You do not have permission for this', 'এই কাজ করতে আপনার অনুমতি নেই'), reason: L('কারণ লিখুন (মালিক এটা দেখবেন)', 'Write the reason (the owner will read it)', 'কারণ লিখুন (Owner দেখবেন)'),
-  ask: L('জরুরি অনুমোদন চাই', 'Ask for emergency approval', 'জরুরি অনুমোদন চাই'), sent: L('অনুরোধ গেছে — মালিক অনুমোদন দিলে আবার চেষ্টা করুন', 'Request sent — try again once the owner approves', 'Request গেছে — Owner অনুমোদন দিলে আবার চেষ্টা করুন'),
+  ask: L('জরুরি অ্যাপ্রুভ চাই', 'Ask for emergency approval', 'জরুরি Approve চাই'), sent: L('অনুরোধ গেছে — মালিক অ্যাপ্রুভ দিলে আবার চেষ্টা করুন', 'Request sent — try again once the owner approves', 'Request গেছে — Owner Approve দিলে আবার চেষ্টা করুন'),
   notAvail: L('এই কাজের জন্য জরুরি অনুরোধ বন্ধ আছে — মালিককে ফোন করুন', 'Emergency requests are off for this — call the owner', 'এই কাজের জন্য জরুরি request বন্ধ — Owner কে ফোন করুন'),
   mine: L('আমার অনুরোধ', 'My requests', 'আমার Request'), close: L('বন্ধ', 'Close', 'Close'), needreason: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (at least 3 letters)', 'কারণ লিখুন (কমপক্ষে ৩ অক্ষর)'),
   ctx: L('কী করতে গিয়েছিলেন', 'What was attempted', 'কী করতে গিয়েছিলেন'),
@@ -35,7 +35,7 @@ const X = {
   lnLists: L('তালিকা সম্পাদনা — খরচের খাত, মার্কেটিং খাত, বিকাশ/নগদ', 'Edit lists — expense heads, marketing heads, bKash/Nagad', 'List Edit — খরচের খাত, Marketing খাত, bKash/Nagad'),
   lnLoc: L('লোকেশন সীমা — ক্যাশ গরমিল, খরচ, ডিসকাউন্ট ইত্যাদির সীমা', 'Location limits — cash gap, expense, discount etc.', 'Location limit — Cash গরমিল, খরচ, Discount ইত্যাদির limit'),
   lnForm: L('ফর্মের নিয়ম — আগে গোনা, লাল-নিয়ন্ত্রণ, চালু/বন্ধ', 'Form rules — count first, red control, on/off', 'Form এর নিয়ম — আগে গোনা, Red control, On/Off'),
-  lnMatrix: L('ভূমিকা × ফর্ম অনুমতি', 'Role × form permissions', 'Role × Form অনুমতি'), lnStaff: L('স্টাফ ও অনুমোদন (ভূমিকা, লোকেশন)', 'Staff & approval (roles, locations)', 'Staff ও অনুমোদন (Role, Location)'),
+  lnMatrix: L('ভূমিকা × ফর্ম অনুমতি', 'Role × form permissions', 'Role × Form অনুমতি'), lnStaff: L('স্টাফ ও অ্যাপ্রুভ (ভূমিকা, লোকেশন)', 'Staff & approval (roles, locations)', 'Staff ও Approve (Role, Location)'),
   lnSet: L('সাধারণ সেটিংস', 'General settings', 'সাধারণ Settings'), lnLog: L('পরিবর্তনের লগ', 'Change log', 'পরিবর্তনের Log'), lnBackup: L('ব্যাকআপ', 'Backup', 'Backup'),
   lnNum: L('নম্বরের ফাঁক-অডিট', 'Number gap audit', 'Number ফাঁক-Audit'), lnBiz: L('ব্যবসার হিসাব', 'Business analysis', 'ব্যবসার Analysis'),
 };

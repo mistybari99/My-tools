@@ -1,9 +1,11 @@
 // POS: sell in another unit (Kg / Pc) + bigger item names. Run: node pos_units_test.js <abs tests/web dir>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const data = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : f.endsWith('.css') ? 'text/css' : 'text/html' }); r.end(b); }); }).listen(8086);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : f.endsWith('.css') ? 'text/css' : 'text/html' }); r.end(b); }); }).listen(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; window.__CALLS = [];
  c.rpc = async (fn, args) => { window.__CALLS.push([fn, args]); if (fn === 'record_sale2') { window.__LAST = args; return { data: { id: 's1', receipt: 1, total: 0, paid: 0, due: 0 }, error: null }; } if (['find_customer','customer_dues','payments_summary','sales_summary'].includes(fn)) return { data: fn === 'find_customer' ? null : [], error: null }; return rpc(fn, args); }; return c; }; })();`;
 (async () => {
@@ -16,7 +18,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
   await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
   await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','en');}catch(e){}`);
-  await p.goto('http://localhost:8086/#/pos'); await p.waitForTimeout(1000);
+  await p.goto('http://localhost:' + PORT + '/#/pos'); await p.waitForTimeout(1000);
   const fs1 = await p.evaluate((id) => parseFloat(getComputedStyle(document.querySelector(`.pos-item[data-v="${id}"] .pn`)).fontSize), kg.id); ok(fs1 >= 18, 'item name font is at least 18px (was ' + fs1 + ')');
   // a kg item that also has a pc conversion: the sheet offers both units
   await p.click(`.pos-item[data-v="${kg.id}"]`); await p.waitForTimeout(200);
@@ -32,7 +34,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('#cart_ok'); await p.waitForTimeout(600);
   const last = await p.evaluate(() => window.__LAST); ok(last && last.p_lines[0].item_id === kg.id && Math.abs(last.p_lines[0].qty - 2) < 1e-9, 'the server gets the quantity in the item unit (4 pc x 0.5 = 2 kg): ' + JSON.stringify(last && last.p_lines[0]));
   // a piece item without any conversion still adds with one tap
-  await p.goto('http://localhost:8086/#/pos'); await p.reload(); await p.waitForTimeout(900);
+  await p.goto('http://localhost:' + PORT + '/#/pos'); await p.reload(); await p.waitForTimeout(900);
   await p.click(`.pos-item[data-v="${pc.id}"]`); await p.waitForTimeout(150);
   ok(await p.locator('[data-act=pos_q_unit]').count() === 0 && /1/.test(await p.textContent('#pos_bar')), 'a piece item with no conversion adds at once');
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);

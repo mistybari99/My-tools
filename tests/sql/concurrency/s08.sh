@@ -1,0 +1,33 @@
+#!/bin/bash
+# S08 card_settle: same client twice (x N), and N different settlements of the same 600 receivable
+. "$(dirname "$0")/lib.sh"; N=${N:-20}
+prep() { newdb $1; local a; a=$(itm $1 FG-BULK)
+  sq $1 $SP "select record_sale2(gen_random_uuid(),1,'[{\"item_id\":\"$a\",\"qty\":12,\"price\":50}]'::jsonb,0,'[{\"mode\":\"card\",\"amount\":600}]',null,null,'retail',null,false)->>'id'" >/dev/null
+  sq $1 $O "select acct_post_pending(false)" >/dev/null; }
+# a) same client id
+id=S08a; db=cc_s08a; prep $db; cid=$(cat /proc/sys/kernel/random/uuid); d0=$(deadlocks $db); lm=$(logmark)
+race $db $N $O "select 'C|'||coalesce(card_settle(1,(now() at time zone 'Asia/Dhaka')::date,600,12,'batch','$cid'::uuid)->>'dup','fresh');" $id
+ck $id.a "card_settle same client_id x$N: exactly one settlement row" $db "select count(*)=1 from card_settlements85 where client_id='$cid'" "select 'rows='||count(*)||' fresh='||$(cnt_out $id 'C|fresh')||' dup='||$(cnt_out $id 'C|true')||' errors='||$(cat $OUT/$id/*.err | grep -c ERROR) from card_settlements85 where client_id='$cid'"
+inv $db $id
+ck $id.card "card receivable (1140) is 0 after one settlement of 600 posted" $db "select (select coalesce(sum(l.debit-l.credit),0) from journal_lines l join coa_accounts a on a.id=l.account_id where a.code='1140')=0"
+[ "$(( $(deadlocks $db) - d0 ))" = 0 ] && rec $id.dl "no deadlock" PASS "dl_log=$(logdl $lm)" || rec $id.dl "no deadlock" FAIL "$(( $(deadlocks $db) - d0 ))"
+# phase109: rule card_settle_over_mode off (default = today) | warn | refuse. Before phase109 the rule does not exist, set_rule fails and the checks below FAIL (that is the F6 evidence).
+# o) default off: behaviour unchanged (the over flag is blind to settlements not yet booked)
+id=S08o; db=cc_s08o; prep $db
+for k in 1 2 3; do sq $db $O "select card_settle(1,(now() at time zone 'Asia/Dhaka')::date,600,12,'serial',gen_random_uuid())->>'over'"; done | tr '\n' ' ' > $OUT/s08o.over
+rec $id "default (off): 3 settlements of 600 against a 600 receivable are saved exactly as before: over flags false false false" $( [ "$(cat $OUT/s08o.over)" = "false false false " ] && echo PASS || echo FAIL ) "over flags: $(cat $OUT/s08o.over)"
+# b) serial control then concurrent: different client ids, each 600 against a 600 receivable
+id=S08s; db=cc_s08s; prep $db
+sq $db $O "select set_rule('card_settle_over_mode','\"warn\"')" >/dev/null
+for k in 1 2 3; do sq $db $O "select card_settle(1,(now() at time zone 'Asia/Dhaka')::date,600,12,'serial',gen_random_uuid())->>'over'"; done | tr '\n' ' ' > $OUT/s08s.over
+rec $id "warn: 3 serial settlements of 600 against a 600 receivable (no posting between calls): over flags false true true" $( [ "$(cat $OUT/s08s.over)" = "false true true " ] && echo PASS || echo FAIL ) "over flags: $(cat $OUT/s08s.over)"
+ck $id.exc "warn: 3 settlements saved, 2 yellow exceptions card_settle_over" $db "select (select count(*) from card_settlements85)=3 and (select count(*) from exceptions where flag_code='card_settle_over' and level='yellow')=2"
+id=S08b; db=cc_s08b; prep $db
+sq $db $O "select set_rule('card_settle_over_mode','\"refuse\"')" >/dev/null
+d0=$(deadlocks $db); lm=$(logmark)
+race $db $N $O "select 'C|'||coalesce(card_settle(1,(now() at time zone 'Asia/Dhaka')::date,600,12,'batch',gen_random_uuid())->>'over','?');" $id
+sq $db $O "select acct_post_pending(false)" >/dev/null
+ck $id.a "different client ids: over-settlement must be refused or flagged: GL card receivable must not go negative" $db "select (select coalesce(sum(l.debit-l.credit),0) from journal_lines l join coa_accounts a on a.id=l.account_id where a.code='1140')>=0" "select 'settlements='||(select count(*) from card_settlements85)||' over=true:'||$(cnt_out $id 'C|true')||' over=false:'||$(cnt_out $id 'C|false')||' receivable='||(select coalesce(sum(l.debit-l.credit),0) from journal_lines l join coa_accounts a on a.id=l.account_id where a.code='1140')"
+ck $id.one "refuse: exactly one of the $N settlements of 600 is accepted (the rest are over_settlement)" $db "select count(*)=1 from card_settlements85" "select 'saved='||count(*)||' refused='||$(cat $OUT/$id/*.err | grep -c over_settlement) from card_settlements85"
+[ "$(( $(deadlocks $db) - d0 ))" = 0 ] && rec $id.dl "no deadlock" PASS "dl_log=$(logdl $lm)" || rec $id.dl "no deadlock" FAIL "$(( $(deadlocks $db) - d0 ))"
+inv $db $id

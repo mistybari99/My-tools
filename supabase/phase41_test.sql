@@ -58,7 +58,7 @@ select tt.err('T1 unknown place', $$select employee_save(null, gen_random_uuid()
 select employee_save(null, null, '{"full_name_bn":"ড্রাই","primary_location_id":1}', true) ->> 'dry' as dr \gset
 select tt.chk('T1 dry run answers and writes nothing', :'dr'='true' and (select count(*) from employees)=0);
 select '11111111-1111-1111-1111-111111111111' as c1 \gset
-select employee_save(null, :'c1'::uuid, '{"full_name_bn":"আব্দুল করিম","full_name_en":"Abdul Karim","primary_location_id":1,"mobile":"+8801711000001","nid_no":"1990123456789","gender":"male","blood_group":"B+"}') as a1 \gset
+select employee_save(null, :'c1'::uuid, '{"full_name_bn":"আব্দুল করিম","full_name_en":"Abdul TestF","primary_location_id":1,"mobile":"+8801711000001","nid_no":"1990123456789","gender":"male","blood_group":"B+"}') as a1 \gset
 select (:'a1'::jsonb ->> 'id') as aid, (:'a1'::jsonb ->> 'status') as ast \gset
 select tt.chk('T1 draft saved, no number yet', :'ast'='draft' and (:'a1'::jsonb ->> 'employee_no') is null);
 select tt.chk('T1 same client key = same row (idempotent)', (employee_save(null, :'c1'::uuid, '{"full_name_bn":"আব্দুল করিম","primary_location_id":1}') ->> 'id') = :'aid' and (select count(*) from employees)=1);
@@ -71,7 +71,7 @@ select tt.as(:'o'); select set_rule('employees_module_on','true'::jsonb) is null
 select tt.as(:'s');
 select tt.err('T2 joining date needed to finish', format($$select employee_submit(%L::uuid)$$, :'aid'), 'joining_date_required');
 select employee_save(:'aid'::uuid, null, format('{"joining_date":"%s","designation":"cashier","employment_type":"permanent","department":"showroom","primary_role_code":"cashier","probation_end":"%s"}', :'dm60', :'dp30')::jsonb) is not null as u1 \gset
-select tt.chk('T2 partial update keeps other fields', (select full_name_en from employees where id=:'aid'::uuid)='Abdul Karim' and (select designation from employees where id=:'aid'::uuid)='cashier');
+select tt.chk('T2 partial update keeps other fields', (select full_name_en from employees where id=:'aid'::uuid)='Abdul TestF' and (select designation from employees where id=:'aid'::uuid)='cashier');
 select employee_submit(:'aid'::uuid) ->> 'employee_no' as n1 \gset
 select tt.chk('T2 first number is E-0001', :'n1'='E-0001');
 select tt.chk('T2 submit again is a no-op', (employee_submit(:'aid'::uuid) ->> 'employee_no')='E-0001' and (employee_submit(:'aid'::uuid) ->> 'repeat')='true');
@@ -80,7 +80,7 @@ select employee_discard(:'dd'::uuid, 'typo') ->> 'status' as dst \gset
 select tt.chk('T2 a draft can be discarded (kept, status discarded)', :'dst'='discarded' and (select count(*) from employees where status='discarded')=1);
 select tt.err('T2 a registered person cannot be discarded', format($$select employee_discard(%L::uuid)$$, :'aid'), 'not_a_draft');
 select tt.as(:'o');
-select employee_save(null, gen_random_uuid(), format('{"full_name_bn":"সালমা বেগম","full_name_en":"Salma Begum","primary_location_id":2,"mobile":"01811000002","nid_no":"19901234567890123","joining_date":"%s","designation":"salesperson","department":"showroom","gender":"female"}', :'dm60')::jsonb) ->> 'id' as bid \gset
+select employee_save(null, gen_random_uuid(), format('{"full_name_bn":"সালমা বেগম","full_name_en":"TestM Begum","primary_location_id":2,"mobile":"01811000002","nid_no":"19901234567890123","joining_date":"%s","designation":"salesperson","department":"showroom","gender":"female"}', :'dm60')::jsonb) ->> 'id' as bid \gset
 select employee_submit(:'bid'::uuid) ->> 'employee_no' as n2 \gset
 select tt.chk('T2 numbers keep counting, no gap after a discarded draft', :'n2'='E-0002');
 reset role;
@@ -255,14 +255,14 @@ select tt.err('T9 amount clause must be a number', $$select deed_template_save(n
 
 \echo == deeds
 select tt.as(:'s');
-select deed_save(null, gen_random_uuid(), :'aid'::uuid, :'tid2'::bigint, 'cashier', null, null, :'dm5'::date, :'dp10'::date, 90, 30, 5000, 'Rahim Uddin', '01911000003', '1990123456000') as dd1 \gset
+select deed_save(null, gen_random_uuid(), :'aid'::uuid, :'tid2'::bigint, 'cashier', null, null, :'dm5'::date, :'dp10'::date, 90, 30, 5000, 'TestK Uddin', '01911000003', '1990123456000') as dd1 \gset
 select (:'dd1'::jsonb->>'id')::bigint as did1 \gset
 select tt.chk('T10 draft deed copies the template clauses and title', (select jsonb_array_length(clauses) from employee_deeds where id=:'did1')=4 and (select title from employee_deeds where id=:'did1')='ক্যাশিয়ার চুক্তি' and (select status from employee_deeds where id=:'did1')='draft');
 select tt.err('T10 the manager without deed right cannot put a deed in force', format($$select deed_activate(%L::bigint)$$, :'did1'), 'not allowed');
 select tt.err('T10 template for another role refused', format($$select deed_save(null, gen_random_uuid(), %L::uuid, %L::bigint, 'guard', null, null, %L::date, null, null, null, null, null, null, null)$$, :'aid', :'tid2', :'dm5'), 'template_role_mismatch');
 select tt.err('T10 end before start refused', format($$select deed_save(null, gen_random_uuid(), %L::uuid, null, 'guard', 'x', '[{"text_en":"x"}]', %L::date, %L::date, null, null, null, null, null, null)$$, :'aid', :'td', :'dm5'), 'bad_date');
 select tt.err('T10 negative deposit refused', format($$select deed_save(null, gen_random_uuid(), %L::uuid, null, 'guard', 'x', '[{"text_en":"x"}]', %L::date, null, null, null, -1, null, null, null)$$, :'aid', :'td'), 'bad_amount');
-select deed_save(:'did1'::bigint, null, null, :'tid2'::bigint, 'cashier', 'Cashier deed v2', null, :'dm5'::date, :'dp10'::date, 90, 30, 6000, 'Rahim Uddin', '01911000003', null) is not null as dsv \gset
+select deed_save(:'did1'::bigint, null, null, :'tid2'::bigint, 'cashier', 'Cashier deed v2', null, :'dm5'::date, :'dp10'::date, 90, 30, 6000, 'TestK Uddin', '01911000003', null) is not null as dsv \gset
 select tt.chk('T10 a draft can be edited', (select security_deposit from employee_deeds where id=:'did1')=6000 and (select title from employee_deeds where id=:'did1')='Cashier deed v2');
 select tt.as(:'o'); select set_user_grant(:'h'::uuid,'deed_manage') is null as g5 \gset
 select deed_activate(:'did1'::bigint, :'td'::date, 'EMPDOC/1/deed1.jpg') ->> 'status' as das \gset
@@ -280,7 +280,7 @@ select deed_revise(:'did1'::bigint) as rv \gset
 select (:'rv'::jsonb->>'id')::bigint as rid \gset
 select tt.chk('T10 revision is a new draft: revision 2 supersedes the active deed', (:'rv'::jsonb->>'revision_no')::int=2 and (select supersedes_id from employee_deeds where id=:'rid')=:'did1' and (select status from employee_deeds where id=:'did1')='active');
 select tt.err('T10 only one open revision', format($$select deed_revise(%L::bigint)$$, :'did1'), 'revision_already_open');
-select deed_save(:'rid'::bigint, null, null, :'tid2'::bigint, 'cashier', 'Cashier deed v2 rev2', null, :'dm5'::date, :'dp10'::date, 90, 45, 6000, 'Rahim Uddin', '01911000003', null) is not null as e2 \gset
+select deed_save(:'rid'::bigint, null, null, :'tid2'::bigint, 'cashier', 'Cashier deed v2 rev2', null, :'dm5'::date, :'dp10'::date, 90, 45, 6000, 'TestK Uddin', '01911000003', null) is not null as e2 \gset
 select tt.as(:'h');
 select deed_activate(:'rid'::bigint, :'td'::date, null) ->> 'revision_no' as ar \gset
 select tt.chk('T10 activating the revision supersedes the old deed; still one active per role', :'ar'='2' and (select status from employee_deeds where id=:'did1')='superseded' and (select count(*) from employee_deeds where employee_id=:'aid'::uuid and role_code='cashier' and status='active')=1 and (select notice_days from employee_deeds where id=:'did1')=30);

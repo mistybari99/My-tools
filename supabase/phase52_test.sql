@@ -45,7 +45,7 @@ select acct_set_start(tt.today() - 1) is not null as st \gset
 select set_rule('accounting_on','true') is null as on1 \gset
 
 \echo == T1 payroll payments
-insert into employees (employee_no, full_name_bn) values ('E52','Rahim') returning id as emp \gset
+insert into employees (employee_no, full_name_bn) values ('E52','TestK') returning id as emp \gset
 with x as (insert into payroll_runs (month, location_id, status) values (date_trunc('month', tt.today())::date, 1, 'approved') returning id) select id as run1 from x \gset
 with x as (insert into payroll_lines (run_id, month, employee_id, location_id, net, advance_recovery, gross) values (:'run1', date_trunc('month', tt.today())::date, :'emp', 1, 1000, 200, 1200) returning id) select id as ln1 from x \gset
 select payroll_pay(:'run1'::bigint, array[:'ln1'::bigint], 'cash', tt.today(), 'r1', null, gen_random_uuid(), 600) is not null as pay1 \gset
@@ -71,7 +71,7 @@ select tt.chk('T1 void re-post is idempotent', (acct_post_pending(false) ->> 're
 
 \echo == T2 payroll shadow (02-2 sheet is the record): the run posts nothing
 select path_switch_set('payroll',1,true,true,'b') is not null as sw \gset
-insert into employees (employee_no, full_name_bn) values ('E52b','Karim') returning id as emp2 \gset
+insert into employees (employee_no, full_name_bn) values ('E52b','TestF') returning id as emp2 \gset
 with x as (insert into payroll_runs (month, location_id, status) values ((date_trunc('month', tt.today()) - interval '1 month')::date, 1, 'approved') returning id) select id as run2 from x \gset
 insert into entries (form_code,location_id,serial,entry_date,status,data,flags,created_by,created_staff) values
  ('02-2',1,9301,(date_trunc('month', tt.today()) - interval '1 month')::date + 5,'approved',jsonb_build_object('month', extract(month from (date_trunc('month', tt.today()) - interval '1 month'))::int::text, 'year', extract(year from (date_trunc('month', tt.today()) - interval '1 month'))::int::text),'[]',:'s','st') returning id as f22 \gset

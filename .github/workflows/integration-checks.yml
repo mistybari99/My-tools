@@ -1,0 +1,31 @@
+name: integration-checks
+on:
+  push:
+  pull_request:
+jobs:
+  generated-files-and-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      # Python standard library only. No database is touched (the SQL suites run on a local throwaway Postgres: tests/sql/run_all_sql.sh).
+      - name: phase477 (re-patch all) is what its generator writes from the package hook files
+        run: python3 tools/build_phase477.py --check
+      - name: the report registry (all 193 reports) is what its builder writes from the audits
+        run: python3 tools/build_report_registry.py --check
+      - name: every rule and grant added since phase 80 has an (i) entry
+        run: python3 tools/check_info_coverage.py
+      - name: no demo or roster names
+        run: python3 tools/check_no_demo_leak.py
+      - name: test-project files are never in the paste order
+        run: python3 tools/test_testonly_files.py
+      - name: database dumps never reach a public place (backup guard first, no data artifacts, only backup pushes)
+        run: python3 tools/check_backup_guard.py
+      - name: the phase numbering and the paste order (union of the two lines)
+        run: |
+          python3 tools/check_numbering.py
+          python3 tools/check_paste_order.py
+      - name: the owner paste parts are what the generator writes from the phase files
+        run: python3 tools/build_paste_parts.py --check

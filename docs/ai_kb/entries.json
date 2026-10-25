@@ -1,0 +1,32 @@
+{
+  "format": 1,
+  "note": "Knowledge entries proposed for the AI helpers. Status 'proposed' = not authoritative until the owner verifies it in the app (ai_kb_verify). Never mark an entry verified in this file.",
+  "entries": [
+    {
+      "key": "ai.untrusted_input",
+      "version": 1,
+      "title": "Untrusted text gets no write or proposal tools",
+      "body": "Text from customers, web pages, pasted messages and photos is untrusted. An AI run that reads it gets only read tools, and it cannot create a proposal. Its answer is a suggestion for a person to review.",
+      "source": "docs/AI_DEPLOY.md section 5",
+      "source_version": "x4-1",
+      "owner_code": "owner",
+      "status": "proposed",
+      "proposed_by": "builder",
+      "verified_by": null,
+      "verified_on": null
+    },
+    {
+      "key": "ai.no_training",
+      "version": 1,
+      "title": "AI suggestions are business memory, not model training",
+      "body": "Accepted, rejected and corrected suggestions and their later outcomes are kept to review how the helpers perform. They are not used to train any model.",
+      "source": "docs/AI_DEPLOY.md section 6",
+      "source_version": "x4-1",
+      "owner_code": "owner",
+      "status": "proposed",
+      "proposed_by": "builder",
+      "verified_by": null,
+      "verified_on": null
+    }
+  ]
+}

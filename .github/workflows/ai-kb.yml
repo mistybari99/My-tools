@@ -1,0 +1,20 @@
+name: ai-kb
+# X4 knowledge check. OFF by default: the job runs only when the repository variable AI_KB_REBUILD is set to 'true' (Settings > Variables).
+# Check only: it never writes to the repository. It fails when the knowledge entries are malformed or web/data/kb.json is stale.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['docs/ai_kb/**', 'tools/ai_kb_check.py', 'tools/build_kb.py', 'web/data/kb.json']
+jobs:
+  ai-kb:
+    if: ${{ vars.AI_KB_REBUILD == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: knowledge entries are well formed (no key-like text, no self-verification)
+        run: python3 tools/ai_kb_check.py
+      - name: web/data/kb.json is what tools/build_kb.py writes (check mode)
+        run: python3 tools/build_kb.py --check

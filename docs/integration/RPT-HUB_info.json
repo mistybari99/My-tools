@@ -1,0 +1,62 @@
+{
+  "package": "RPT-HUB",
+  "title": "Business Memory: see what happened, find a report, ask a spend question",
+  "language": "English only (the owner adds Bangla later)",
+  "note": "No setting and no switch: nothing here changes a figure. Every screen shows only what your own report rights allow.",
+  "entries": [
+    {
+      "key": "rpt_hub_day",
+      "label": "Day replay",
+      "what_it_does": "Shows, in time order, everything recorded on one date (optionally one outlet): sales, voids, returns, collections, expenses, purchases, production, transfers, wastage, counts, cash short, approvals, exceptions, period locks, staff exits. Each line says when, who, how much, and opens the record.",
+      "why_it_matters": "When you wonder what happened on a day, you can read it like a story instead of opening ten reports.",
+      "default": "Always available to signed-in people; each kind of line appears only if you hold the matching report right",
+      "what_changes_if_switched": "Nothing to switch. The sales figures are compared with the daily summary; if they differ the page says so and shows both numbers.",
+      "who_can_change": "Nobody changes it. It only reads."
+    },
+    {
+      "key": "rpt_hub_entity",
+      "label": "Timeline of one thing",
+      "what_it_does": "Every event for one item, customer, supplier, staff member, outlet or batch in a date range, with a running quantity (item, batch) or running balance (customer, supplier).",
+      "why_it_matters": "You can see how a balance or a stock figure got to where it is.",
+      "default": "Available; limited by your rights and your outlets",
+      "what_changes_if_switched": "Nothing to switch.",
+      "who_can_change": "Nobody changes it."
+    },
+    {
+      "key": "rpt_hub_compare",
+      "label": "What changed",
+      "what_it_does": "Puts two periods side by side (this month and last month, for example) with the change, the percent and the outlets that moved most. Tap a figure to see the transactions behind it.",
+      "why_it_matters": "It answers 'why did this number change' with real transactions, not a guess.",
+      "default": "Available; figures you may not see are left out and named",
+      "what_changes_if_switched": "Nothing to switch.",
+      "who_can_change": "Nobody changes it."
+    },
+    {
+      "key": "rpt_hub_spend",
+      "label": "Spend finder and question box",
+      "what_it_does": "Finds money spent by person, place, head (for example staff meals, electricity), memo words, account, payment source and period. Shows the total, month by month, and every source transaction. You can type the question in Bangla or English; the page always shows what it understood as editable chips and never guesses a number.",
+      "why_it_matters": "Answers questions like 'what did one branch pay for electricity in the last 8 months' from the real records.",
+      "default": "Available; staff pay, advances, meals and labour rows need the payroll right",
+      "what_changes_if_switched": "Nothing to switch. If an expense does not say which person it was for, it is counted apart as 'not linked to a person' and the missing field is named; nothing is guessed.",
+      "who_can_change": "Nobody changes it."
+    },
+    {
+      "key": "rpt_hub_trail",
+      "label": "Record trail",
+      "what_it_does": "For one record: who created it, posted it, changed or voided it, what the stock and the books did about it, which exceptions it raised. Anything the system did not record is listed as 'not recorded'.",
+      "why_it_matters": "Shows who did what without anyone having to remember.",
+      "default": "Available; the audit log lines are shown to the owner only",
+      "what_changes_if_switched": "Nothing to switch.",
+      "who_can_change": "Nobody changes it."
+    },
+    {
+      "key": "rpt_hub_my",
+      "label": "Favourites, recently opened, saved views",
+      "what_it_does": "Each person can star reports, see the ones opened lately and save a named view of any hub tool. Only you see your own list.",
+      "why_it_matters": "Your usual questions are one tap away.",
+      "default": "Empty until you use it",
+      "what_changes_if_switched": "Nothing to switch.",
+      "who_can_change": "Each person, for their own list."
+    }
+  ]
+}

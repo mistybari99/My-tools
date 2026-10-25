@@ -1,12 +1,13 @@
 // Module B2 web: attendance board (mark / approve / OT / recompute), month grid, device file import (preview first, batch, undo), unmapped ids,
 // devices (token shown once), shifts and holidays, leave requests / approvals / balances, app check-in, friendly errors, no overflow at 360px.
 // Run: timeout 250 node attendance_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const ROOT = '/home/user/My-tools/web';
-const base = C.baseData(SP), PORT = 8442;
+const ROOT = _P.WEB_DIR;
+const base = C.baseData(SP), PORT = _P.freePort();
 // the lead adds the script tags to index.html (docs/regs/attendance.md); the test injects them so it does not depend on that edit
 const srv = http.createServer((q, r) => {
   const u = q.url.split('?')[0]; const f = path.join(ROOT, u === '/' ? 'index.html' : u);
@@ -54,7 +55,7 @@ const EXTRA42 = `(function(){ const real = window.supabase.createClient; window.
     p.on('dialog', (d) => d.accept('wrong file loaded')); await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA + C.EXTRA5 + C.EXTRA6 + EXTRA42 }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const data = C.mk(base, {}); const T = data.tables;
-    T.employees = [['e1', 'E-0001', 'করিম', 'Karim', 1, '101'], ['e2', 'E-0002', 'রহিম', 'Rahim', 1, '102'], ['e3', 'E-0003', 'জামাল', 'Jamal', 1, null], ['e5', 'E-0005', 'সালমা', 'Salma', 1, null], ['e8', 'E-0008', 'অন্য', 'Other place', 2, null]]
+    T.employees = [['e1', 'E-0001', 'করিম', 'TestF', 1, '101'], ['e2', 'E-0002', 'রহিম', 'TestK', 1, '102'], ['e3', 'E-0003', 'জামাল', 'TestE', 1, null], ['e5', 'E-0005', 'সালমা', 'TestM', 1, null], ['e8', 'E-0008', 'অন্য', 'Other place', 2, null]]
       .map((r) => ({ id: r[0], employee_no: r[1], full_name_bn: r[2], full_name_en: r[3], primary_location_id: r[4], device_user_id: r[5], status: 'active', profile_id: r[0] === 'e5' ? 'u1' : null }));
     T.attendance_devices = [{ id: 3, name: 'Gate ZK', location_id: 1, vendor: 'zkteco', serial: 'SN9', active: true, last_seen: '2026-10-13T04:00:00Z', pushed_rows: 120 }];
     T.attendance_import_batches = [{ id: 'b1', location_id: 1, file_name: 'old.dat', rows_new: 40, rows_dup: 2, rows_unmapped: 0, status: 'active', created_at: '2026-10-10T05:00:00Z' }];
@@ -65,10 +66,10 @@ const EXTRA42 = `(function(){ const real = window.supabase.createClient; window.
       { id: 12, employee_id: 'e3', leave_type: 'casual', from_date: '2026-10-02', to_date: '2026-10-02', days: 1, reason: null, status: 'approved' }, { id: 13, employee_id: 'e8', leave_type: 'casual', from_date: '2026-10-02', to_date: '2026-10-02', days: 1, status: 'pending' }];
     if (o.appPunch) T.rules.push({ key: 'app_punch_on', module: 'people', kind: 'switch', value: true, default_value: false, label_bn: 'x', label_en: 'x', label_mix: 'x', sort: 9 });
     const board = { day: '2026-10-13', rows: [
-      { employee_id: 'e1', employee_no: 'E-0001', name_bn: 'করিম', name_en: 'Karim', status: 'late', first_in: '2026-10-13T03:40:00Z', last_out: null, late_minutes: 40, ot_minutes: 0, source: 'manual', pending: true, reason: 'device down', single_punch: true },
-      { employee_id: 'e2', employee_no: 'E-0002', name_bn: 'রহিম', name_en: 'Rahim', status: 'present', first_in: '2026-10-13T02:55:00Z', last_out: '2026-10-13T14:00:00Z', late_minutes: 0, ot_minutes: 120, ot_approved: false, source: 'auto', pending: false },
-      { employee_id: 'e3', employee_no: 'E-0003', name_bn: 'জামাল', name_en: 'Jamal', status: 'absent', source: 'auto', pending: false },
-      { employee_id: 'e5', employee_no: 'E-0005', name_bn: 'সালমা', name_en: 'Salma', status: 'leave', leave_type: 'sick', source: 'auto', pending: false }],
+      { employee_id: 'e1', employee_no: 'E-0001', name_bn: 'করিম', name_en: 'TestF', status: 'late', first_in: '2026-10-13T03:40:00Z', last_out: null, late_minutes: 40, ot_minutes: 0, source: 'manual', pending: true, reason: 'device down', single_punch: true },
+      { employee_id: 'e2', employee_no: 'E-0002', name_bn: 'রহিম', name_en: 'TestK', status: 'present', first_in: '2026-10-13T02:55:00Z', last_out: '2026-10-13T14:00:00Z', late_minutes: 0, ot_minutes: 120, ot_approved: false, source: 'auto', pending: false },
+      { employee_id: 'e3', employee_no: 'E-0003', name_bn: 'জামাল', name_en: 'TestE', status: 'absent', source: 'auto', pending: false },
+      { employee_id: 'e5', employee_no: 'E-0005', name_bn: 'সালমা', name_en: 'TestM', status: 'leave', leave_type: 'sick', source: 'auto', pending: false }],
       counts: { total: 4, present: 2, late: 1, absent: 1, leave: 1, off: 0, pending: 1 } };
     const m0 = o.staff ? { grants: [], ctx: { is_owner: false, roles: ['salesperson'], locations: [1] } } : {};
     await p.addInitScript(`window.__DATA=${JSON.stringify(data)};window.__M0=${JSON.stringify(m0)};window.__OWNER=${o.staff ? 'false' : 'true'};window.__BOARD=${JSON.stringify(board)};window.__UNM=${JSON.stringify([{ device_user_id: '999', device_id: 3, device_name: 'Gate ZK', punches: 4, first_at: '2026-10-11T03:00:00Z', last_at: '2026-10-12T12:00:00Z' }])};window.__ERR42={};try{localStorage.setItem('bos_lang','en')}catch(e){};`);
@@ -128,7 +129,7 @@ const EXTRA42 = `(function(){ const real = window.supabase.createClient; window.
   ok(await p.locator('#im_batches .card').count() === 2, 'new batch listed');
   await p.click('#im_batches [data-act=im_undo] >> nth=0'); await wait(p, 600);
   c = await calls(p, 'attendance_import_void'); ok(c.length === 1 && c[0].p_batch === 'b2' && c[0].p_reason === 'wrong file loaded', 'undo sends the reason');
-  await p.fill('#im_paste', 'AC-No.,Name,Time,State\n101,Karim,01/10/2026 08:55,C/In\n102,Rahim,2026-10-01 09:20:00,C/In\n'); await wait(p, 1200);
+  await p.fill('#im_paste', 'AC-No.,Name,Time,State\n101,TestF,01/10/2026 08:55,C/In\n102,TestK,2026-10-01 09:20:00,C/In\n'); await wait(p, 1200);
   ok(await p.locator('#im_cu').count() === 1 && await p.inputValue('#im_cu') === '0' && await p.inputValue('#im_ct') === '2', 'CSV columns found and offered for mapping');
   await p.click('[data-act=im_prev]'); await wait(p, 600);
   c = await calls(p, 'attendance_import'); ok(c[2].p_rows.length === 2 && c[2].p_rows[0].ts === '2026-10-01 08:55:00' && c[2].p_rows[1].user_id === '102', 'CSV rows normalised (day/month/year)');
@@ -163,7 +164,7 @@ const EXTRA42 = `(function(){ const real = window.supabase.createClient; window.
   // ---------- leave ----------
   p = await open('#/leave');
   ok(await p.locator('#lv_list .card').count() === 2, 'requests of this place only');
-  t = await text(p); ok(/Rahim/.test(t) && /Pending/.test(t) && /2026-10-20 – 2026-10-21/.test(t) && /wedding/.test(t), 'request details');
+  t = await text(p); ok(/TestK/.test(t) && /Pending/.test(t) && /2026-10-20 – 2026-10-21/.test(t) && /wedding/.test(t), 'request details');
   await p.click('[data-act=lv_dec][data-ok="1"]'); await wait(p, 500); c = await calls(p, 'leave_decide'); ok(c.length === 1 && c[0].p_id === 11 && c[0].p_approve === true, 'approve leave');
   await p.click('[data-act=lv_new]'); await wait(p, 300); await p.selectOption('#lr_e', 'e3'); await p.fill('#lr_f', '2026-10-25'); await p.fill('#lr_to', '2026-10-26'); await p.fill('#lr_r', 'fever');
   await p.evaluate(() => { window.__ERR42 = { leave_request_save: 'leave_balance_short' }; }); await p.click('[data-act=lr_save]'); await wait(p, 400);

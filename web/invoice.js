@@ -19,13 +19,13 @@ const KL = { common: L('সাধারণ (A4 / যেকোনো প্রি
   thermal80: L('থার্মাল ৮০ মিমি', 'Thermal 80 mm', 'Thermal 80 mm'), label: L('বারকোড লেবেল', 'Barcode label', 'Barcode Label') };
 const KW = { common: 210, a4: 210, thermal58: 58, thermal80: 80, label: 210 };
 const FLAGS = { brand: L('প্রতিষ্ঠানের নাম', 'Business name', 'Business নাম'), logo: L('লোগো', 'Logo', 'Logo'), location: L('শাখার নাম', 'Branch name', 'Branch নাম'), receipt_no: L('রসিদ নম্বর', 'Receipt number', 'Receipt number'),
-  datetime: L('তারিখ ও সময়', 'Date and time', 'Date ও Time'), cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), customer: L('গ্রাহক', 'Customer', 'Customer'), item_code: L('আইটেম কোড', 'Item code', 'Item code'),
+  datetime: L('ডেট ও সময়', 'Date and time', 'Date ও Time'), cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), customer: L('গ্রাহক', 'Customer', 'Customer'), item_code: L('আইটেম কোড', 'Item code', 'Item code'),
   unit_price: L('একক দাম', 'Unit price', 'Unit price'), discount: L('ডিসকাউন্ট', 'Discount', 'Discount'), payments: L('পেমেন্টের ধরন', 'Payment lines', 'Payment lines'), due: L('বাকি', 'Due', 'Due'), barcode: L('রসিদে বারকোড', 'Barcode on receipt', 'Receipt এ Barcode') };
 const LFLAGS = { l_name: L('আইটেমের নাম', 'Item name', 'Item নাম'), l_price: L('দাম', 'Price', 'Price'), l_code: L('বারকোডের নিচে নম্বর', 'Number under the barcode', 'Barcode এর নিচে number') };
 const dflFlags = (k) => (k === 'label' ? { l_name: true, l_price: true, l_code: true, label_w: 50, label_h: 30, cols: 4 }
   : { brand: true, logo: k !== 'thermal58', location: true, receipt_no: true, datetime: true, cashier: true, customer: true, item_code: k === 'a4', unit_price: true, discount: true, payments: true, due: true, barcode: false });
 const X = {
-  title: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), edit: L('বদলান', 'Edit', 'Edit'), del: L('মুছুন', 'Delete', 'Delete'), add: L('＋ নতুন', '＋ New', '＋ New'),
+  title: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), save: L('সেভ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), edit: L('বদলান', 'Edit', 'Edit'), del: L('মুছুন', 'Delete', 'Delete'), add: L('＋ নতুন', '＋ New', '＋ New'),
   on: L('চালু', 'On', 'On'), off: L('বন্ধ', 'Off', 'Off'), need: L('তথ্য লাগবে', 'Data needed', 'Data লাগবে'), back: L('সব টেমপ্লেট', 'All templates', 'সব Template'),
   noacc: L('এই পাতা দেখতে ইনভয়েস-সেটিংসের অনুমতি লাগবে।', 'The invoice-settings permission is needed for this page.', 'এই page এর জন্য Invoice-settings permission লাগবে।'),
   sql: L('এই অংশ চালু করতে নতুন SQL চালাতে হবে।', 'The new SQL must be run to switch this part on.', 'এই অংশ চালু করতে নতুন SQL চালাতে হবে।'),
@@ -45,7 +45,7 @@ const X = {
   // labels page
   lb_tpl: L('লেবেল টেমপ্লেট', 'Label template', 'Label template'), lb_items: L('আইটেম বাছুন', 'Choose items', 'Item বাছুন'), lb_copies: L('প্রতিটির কপি', 'Copies each', 'Copies each'), lb_search: L('আইটেম খুঁজুন', 'Search item', 'Item খুঁজুন'), lb_none: L('অন্তত একটি আইটেম বাছুন', 'Choose at least one item', 'অন্তত একটি item বাছুন'), lb_sel: L('বাছাই করা', 'selected', 'selected'),
   // document words
-  d_receipt: L('রসিদ', 'Receipt', 'Receipt'), d_invoice: L('ইনভয়েস', 'Invoice', 'Invoice'), d_date: L('তারিখ', 'Date', 'Date'), d_cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), d_customer: L('গ্রাহক', 'Customer', 'Customer'), d_item: L('আইটেম', 'Item', 'Item'), d_qty: L('পরিমাণ', 'Qty', 'Qty'), d_price: L('দাম', 'Price', 'Price'), d_amount: L('টাকা', 'Amount', 'Amount'),
+  d_receipt: L('রসিদ', 'Receipt', 'Receipt'), d_invoice: L('ইনভয়েস', 'Invoice', 'Invoice'), d_date: L('ডেট', 'Date', 'Date'), d_cashier: L('বিক্রেতা', 'Cashier', 'Cashier'), d_customer: L('গ্রাহক', 'Customer', 'Customer'), d_item: L('আইটেম', 'Item', 'Item'), d_qty: L('পরিমাণ', 'Qty', 'Qty'), d_price: L('দাম', 'Price', 'Price'), d_amount: L('টাকা', 'Amount', 'Amount'),
   d_sub: L('মোট (ছাড়ের আগে)', 'Subtotal', 'Subtotal'), d_disc: L('ডিসকাউন্ট', 'Discount', 'Discount'), d_total: L('সর্বমোট', 'Total', 'Total'), d_due: L('বাকি', 'Due', 'Due'), d_vat: L('ভ্যাট', 'VAT', 'VAT'), d_incl: L('অন্তর্ভুক্ত', 'included', 'included'), d_thanks: L('ধন্যবাদ', 'Thank you', 'ধন্যবাদ'),
   m_cash: L('নগদ', 'Cash', 'Cash'), m_mobile: L('মোবাইল', 'Mobile', 'Mobile'), m_card: L('কার্ড', 'Card', 'Card'),
   // offer
@@ -71,7 +71,7 @@ function barcodeSvg(text, h = 40) {
 }
 
 // ---------- document rendering ----------
-const SAMPLE = { loc: { bn: 'ইসলামিয়া মিষ্টি ঘর — প্রধান শাখা', en: 'Islamiya Misty Ghar — Main branch' }, receipt: 'M-1042', date: '2026-10-11', time: '18:42', cashier: 'karim02', customer: 'Rafiq · 01711111111',
+const SAMPLE = { loc: { bn: 'ইসলামিয়া মিষ্টি ঘর — প্রধান শাখা', en: 'Islamiya Misty Ghar — Main branch' }, receipt: 'M-1042', date: '2026-10-11', time: '18:42', cashier: 'cashier01', customer: 'Sample customer · 01711111111',
   lines: [{ code: 'S-01', name: { bn: 'রসগোল্লা', en: 'Rasgolla' }, qty: 1.5, unit: 'kg', price: 520, amount: 780 }, { code: 'S-14', name: { bn: 'সন্দেশ', en: 'Sandesh' }, qty: 0.5, unit: 'kg', price: 640, amount: 320 }, { code: 'D-02', name: { bn: 'মিষ্টি দই', en: 'Sweet doi' }, qty: 2, unit: 'pc', price: 90, amount: 180 }],
   subtotal: 1280, discount: 80, total: 1200, pays: [{ mode: 'cash', amount: 1000 }, { mode: 'mobile', amount: 100 }], due: 100 };
 function vatInfo(tpl, total) {
@@ -95,7 +95,7 @@ function renderDoc(tpl, d, lang) {
   const loc = typeof d.loc === 'string' ? d.loc : wl(d.loc, lang);
   return `<div class="ivdoc ${th ? 'ivth' : 'iva4'}" style="width:${w}mm;padding:${m.top ?? 4}mm ${m.right ?? 4}mm ${m.bottom ?? 4}mm ${m.left ?? 4}mm;font-size:${fs}px">
     ${fl.logo !== false && tpl.logo_ref ? `<div class="ivc"><img class="ivlogo" src="${esc(tpl.logo_ref)}" alt=""></div>` : ''}
-    ${fl.brand !== false ? `<div class="ivc ivbrand">${esc(lang === 'en' ? BRAND.en : BRAND.bn)}</div>` : ''}
+    ${fl.brand !== false ? `<div class="ivc ivbrand">${esc(lang === 'en' ? ((B.biz && B.biz.brand()) || BRAND).en : ((B.biz && B.biz.brand()) || BRAND).bn)}</div>` : ''}
     ${invoice ? `<div class="ivc ivtitle">${l('d_invoice')}</div>` : ''}
     ${head ? `<div class="ivc ivtxt">${head}</div>` : ''}${fl.location !== false && loc ? `<div class="ivc">${esc(loc)}</div>` : ''}
     <div class="ivmeta">${metaRows.map((x) => `<div>${x}</div>`).join('')}</div><div class="ivhr"></div>${lines}<div class="ivhr"></div>
@@ -324,6 +324,8 @@ function pickLogo(file) {
 // ----- barcode label sheet -----
 const LB = { tpl: null, sel: {}, q: '', items: [], tpls: [] };
 async function labelsPage() {
+  // bos98: warm the template choice cache; offline = the labels as before. Keep block comments out of this file below the logo file input: the UI inventory extractor reads from its accept pattern to the next closing one.
+  try { if (B.tpl && B.tpl.ensure) B.tpl.ensure(sb); } catch (e) { void e; }
   await loadAll(); if (V.err) return shell(T('title'), `<div class="notice bad">${esc(T('sql'))}</div>`, true);
   const ir = await window.BOS_ALL(sb.from('items').select('id,code,name_bn,name_en,name_mix,sell_price,barcode,is_active').eq('is_active', true).order('code'));
   LB.items = (ir.data || []); LB.tpls = V.tpls.filter((x) => x.kind === 'label' && x.active);
@@ -331,6 +333,19 @@ async function labelsPage() {
   drawLabels();
 }
 const labTpl = () => LB.tpl || BUILTIN('label');
+// bos98: barcode labels through the chosen barcode_label template (cached owner choice; nothing chosen / B.tpl absent / any problem = today's label sheet). Name, barcode and SELLING price only.
+function tplLabels(items) {
+  try {
+    const o = { lang: S.lang, shop: {} }; if (B.tpl.ensure) B.tpl.ensure(sb);
+    const uniq = []; items.forEach((x) => { const u = uniq.find((z) => z.code === String(x.barcode ?? '') && z.name === x.name); if (u) u.copies++; else uniq.push({ name: x.name, code: String(x.barcode ?? ''), price: x.price, copies: 1 }); });
+    const parts = uniq.map((u) => B.tpl.render('barcode_label', u, undefined, o)); if (!parts.length || parts.some((h) => !h)) return false;   // null = nothing chosen
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
+    f.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}</style></head><body>' + parts.join('') + '</body></html>';   // concatenated, not a template literal: the UI inventory extractor mis-reads a whole-document template
+    f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { void e; } setTimeout(() => f.remove(), 2000); };   // a blocked print is ignored
+    return true;
+  } catch (e) { return false; }
+}
+
 const labItems = () => LB.items.filter((i) => LB.sel[i.id]).flatMap((i) => Array.from({ length: Math.max(1, Math.floor(Number(($('#lb_copies') || {}).value) || 1)) }, () => ({ name: nm(i), barcode: i.barcode || i.code, price: i.sell_price })));
 function drawLabels() {
   const q = LB.q.toLowerCase(), list = LB.items.filter((i) => !q || [i.code, i.name_bn, i.name_en, i.name_mix].some((x) => (x || '').toLowerCase().includes(q))).slice(0, 80);
@@ -374,7 +389,7 @@ Object.assign(A.H, {
     const row = { name, location_id: val('#pf_loc') === '' ? null : Number(val('#pf_loc')), device_key: val('#pf_dev').trim() || null, printer_type: val('#pf_type'), paper_size: val('#pf_size').trim() || null, paper_width_mm: w, template_id: val('#pf_tpl') === '' ? null : Number(val('#pf_tpl')), active: $('#pf_active').classList.contains('on'), updated_by: S.ctx.profile.id };
     const r = a.dataset.id ? await sb.from('print_profiles').update(row).eq('id', idv(a.dataset.id)) : await sb.from('print_profiles').insert(row); if (r.error) return denied(r.error); closeSheet(); toast(T('saved')); listPage(); },
   iv_prof_del: async (a) => { const { error } = await sb.from('print_profiles').update({ active: false }).eq('id', idv(a.dataset.id)); if (error) return denied(error); closeSheet(); listPage(); },
-  iv_lb_print: () => { const items = labItems(); if (!items.length) return toast(T('lb_none')); const tp = labTpl(); printHtml(renderLabels(tp, items, S.lang), Number(tp.paper_width_mm) || 210, false); },
+  iv_lb_print: () => { const items = labItems(); if (!items.length) return toast(T('lb_none')); if (B.tpl && tplLabels(items)) return; const tp = labTpl(); printHtml(renderLabels(tp, items, S.lang), Number(tp.paper_width_mm) || 210, false); },
 });
 document.addEventListener('input', (e) => {
   const id = e.target.id || '';

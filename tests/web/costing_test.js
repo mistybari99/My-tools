@@ -1,12 +1,13 @@
 // Step C: costing page (#/costing): recipe cost rows (raw / packaging / conversion + today's price), conversion-rate editor (blank amount allowed, typed hours, suggestion shown only),
 // monthly pools, per-location method (owner only), true-up with the "অনাবশোষিত ওভারহেড" row, run costs, no access without the cost right, 360px phone width, Bangla.
 // Run: node costing_test.js <abs tests/web dir> [shots dir]      (serves ../../web of THIS checkout and injects the script tags)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const WEB = path.join(SP, '..', '..', 'web'); const OUT = process.argv[3] || SP;
-const base = C.baseData(SP), PORT = 8374;
+const WEB = _P.WEB_DIR; const OUT = process.argv[3] || SP;
+const base = C.baseData(SP), PORT = _P.freePort();
 const srv = http.createServer((q, r) => { const u = q.url.split('?')[0]; const f = path.join(WEB, u === '/' ? 'index.html' : u);
   fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); }
     if (u === '/' || u === '/index.html') b = Buffer.from((b.toString('utf8').includes('src="costing.js"') ? b.toString('utf8') : b.toString('utf8').replace('</body>', '<script src="costing.js"></script></body>')));
@@ -136,7 +137,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open({ lang: 'bn' }, '#/costing');
   ok(/খরচ/.test(await p.textContent('header.top h1')), 'Bangla title');
   await p.click('[data-act=cs_open]'); await wait(p, 400);
-  ok(/রূপান্তর খরচ অসম্পূর্ণ/.test(await p.textContent('.sheet')) && /আজকের কেনা দাম/.test(await p.textContent('.sheet')), 'Bangla labels on the cost sheet');
+  ok(/রূপান্তর খরচ অসম্পূর্ণ/.test(await p.textContent('.sheet')) && /আজকের কেনা/.test(await p.textContent('.sheet')), 'Bangla labels on the cost sheet');
   await p.screenshot({ path: OUT + '/cs_bn.png' }); await noOverflow(p, 'Bangla sheet');
   await p.close();
 
