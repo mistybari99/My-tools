@@ -1,6 +1,6 @@
-/* Islamia BOS · Salary report (#/salary): monthly summary per person from forms 02-2 (salary sheet), 02-3 (advances) and 02-1 (attendance).
+/* Islamia BOS · Salary report (#/salary): monthly summary per person from forms 21-1 (salary sheet), 35-1 (advances) and 19-1 (attendance).
    For the owner and holders of the grant salary_view only (server: salary_report in phase13.sql). Only what the forms contain is shown:
-   gross = due + overtime + other, net = gross - advance deduction - other deduction (the exact formulas of form 02-2). No rate or rule is invented.
+   gross = due + overtime + other, net = gross - advance deduction - other deduction (the exact formulas of form 21-1). No rate or rule is invented.
    Export (CSV / print) needs the grant export_data; the server check runs first and leaves an audit row. Loaded after daybook.js. */
 (() => {
 'use strict';
@@ -25,11 +25,11 @@ const X = {
   workDays: L('কাজের দিন', 'Working days', 'Working days'), absent: L('অনুপস্থিত', 'Absent days', 'Absent days'), leave: L('ছুটি', 'Leave days', 'Leave days'),
   paid: L('প্রাপ্তি স্বীকারে নিট', 'Net on receipt list', 'Receipt-এ net'), signed: L('স্বাক্ষর', 'Signed', 'Signed'), yes: L('হ্যাঁ', 'Yes', 'Yes'), no: L('না', 'No', 'No'),
   sheet: L('শিট নং', 'Sheet no.', 'Sheet no.'), status: L('অবস্থা', 'Status', 'Status'),
-  need: L('তথ্য দরকার', 'Data needed', 'Data দরকার'), noSheet: L('এই মাসের জন্য কোনো বেতন শিট (02-2) জমা নেই — তাই কোনো সংখ্যা নেই', 'No salary sheet (02-2) has been submitted for this month, so there are no figures', 'এই মাসের কোনো Salary sheet (02-2) জমা নেই — তাই কোনো সংখ্যা নেই'),
-  secSheet: L('বেতন শিট (02-2)', 'Salary sheet (02-2)', 'Salary sheet (02-2)'), secAdv: L('অ্যাডভান্স (02-3)', 'Advances (02-3)', 'Advance (02-3)'), secAtt: L('হাজিরা (02-1)', 'Attendance (02-1)', 'Hajira (02-1)'),
+  need: L('তথ্য দরকার', 'Data needed', 'Data দরকার'), noSheet: L('এই মাসের জন্য কোনো বেতন শিট (21-1) জমা নেই — তাই কোনো সংখ্যা নেই', 'No salary sheet (21-1) has been submitted for this month, so there are no figures', 'এই মাসের কোনো Salary sheet (21-1) জমা নেই — তাই কোনো সংখ্যা নেই'),
+  secSheet: L('বেতন শিট (21-1)', 'Salary sheet (21-1)', 'Salary sheet (21-1)'), secAdv: L('অ্যাডভান্স (35-1)', 'Advances (35-1)', 'Advance (35-1)'), secAtt: L('হাজিরা (19-1)', 'Attendance (19-1)', 'Hajira (19-1)'),
   given: L('এ মাসে দেওয়া', 'Given this month', 'এ মাসে দেওয়া'), deducted: L('এ মাসে কর্তন', 'Deducted this month', 'এ মাসে কর্তন'), outstanding: L('বাকি (ফর্মের যোগফল)', 'Outstanding (form total)', 'বাকি (form-এর total)'),
   present: L('উপস্থিত', 'Present', 'Present'), late: L('দেরি', 'Late', 'Late'), otH: L('ওভারটাইম ঘণ্টা', 'Overtime hours', 'OT hours'), lu: L('বিনা বেতনের ছুটি', 'Unpaid leave', 'Unpaid leave'), lp: L('সবেতন ছুটি', 'Paid leave', 'Paid leave'),
-  note: L('শুধু জমা/অনুমোদিত ফর্মের তথ্য; খসড়া ধরা হয় না। হিসাব ফর্ম 02-2-এর সূত্র অনুযায়ী — নিজে থেকে কোনো হার বা নিয়ম বসানো হয় না।', 'Only submitted / approved forms; drafts are not counted. Figures follow the formulas of form 02-2 — no rate or rule is added.', 'শুধু submitted/approved form; draft ধরা হয় না। Form 02-2-এর সূত্র অনুযায়ী — কোনো rate/rule নিজে বসানো হয় না।'),
+  note: L('শুধু জমা/অ্যাপ্রুভড ফর্মের তথ্য; ড্রাফট ধরা হয় না। হিসাব ফর্ম 02-2-এর সূত্র অনুযায়ী — নিজে থেকে কোনো হার বা নিয়ম বসানো হয় না।', 'Only submitted / approved forms; drafts are not counted. Figures follow the formulas of form 21-1 — no rate or rule is added.', 'শুধু submitted/approved form; draft ধরা হয় না। Form 02-2-এর সূত্র অনুযায়ী — কোনো rate/rule নিজে বসানো হয় না।'),
   menu: L('আরও', 'More', 'More'), csv: L('CSV এক্সপোর্ট', 'Export CSV', 'CSV Export'), print: L('প্রিন্ট / PDF', 'Print / PDF', 'Print / PDF'), refresh: L('নতুন করে আনুন', 'Refresh', 'Refresh'),
   openForm: L('ফর্ম খুলুন', 'Open the form', 'Form খুলুন'), expLock: L('এক্সপোর্টের অনুমতি নেই', 'Export not allowed', 'Export-এর permission নেই'), expDone: L('ফাইল তৈরি হয়েছে', 'File created', 'File তৈরি হয়েছে'),
   noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), lockedPage: L('বেতন রিপোর্ট দেখার অনুমতি নেই — মালিক "বেতন দেখা" অনুমতি দিতে পারেন', 'You may not see salaries — the owner can give you the "See salaries" permission', 'Salary report দেখার permission নেই — Owner "Salary দেখা" permission দিতে পারেন'),
@@ -130,9 +130,9 @@ function buildCSV() {
   const out = [line(['sheet', 'location', 'name', 'monthly_salary', 'working_days', 'absent_days', 'leave_days', 'salary_due', 'overtime', 'other', 'gross', 'advance_deduction', 'other_deduction', 'net', 'receipt_net', 'signed', 'remark', 'same_name_more_than_once'])];
   (d.rows || []).forEach((r) => out.push(line([r.serial, locName(r.loc), r.name, r.salary, r.work_days, r.absent, r.leave, r.due, r.overtime, r.other, r.gross, r.adv_ded, r.other_ded, r.net, r.paid, r.signed === null || r.signed === undefined ? '' : (r.signed ? 'yes' : 'no'), r.remark, r.ambiguous ? 'yes' : ''])));
   const t = d.totals || {}; out.push(line(['TOTAL', '', '', '', '', '', '', t.due, t.overtime, t.other, t.gross, t.adv_ded, t.other_ded, t.net]));
-  if ((d.advances || []).length) { out.push(''); out.push(line(['advances (02-3)', 'location', 'name', 'post', 'given_this_month', 'deducted_this_month', 'outstanding']));
+  if ((d.advances || []).length) { out.push(''); out.push(line(['advances (35-1)', 'location', 'name', 'post', 'given_this_month', 'deducted_this_month', 'outstanding']));
     d.advances.forEach((a) => out.push(line([a.serial, locName(a.loc), a.name, a.post, a.given, a.deducted, a.outstanding]))); }
-  if ((d.attendance || []).length) { out.push(''); out.push(line(['attendance (02-1)', 'location', 'name', 'present', 'absent', 'late', 'unpaid_leave', 'paid_leave', 'overtime_hours']));
+  if ((d.attendance || []).length) { out.push(''); out.push(line(['attendance (19-1)', 'location', 'name', 'present', 'absent', 'late', 'unpaid_leave', 'paid_leave', 'overtime_hours']));
     d.attendance.forEach((a) => out.push(line([a.serial, locName(a.loc), a.name, a.present, a.absent, a.late, a.leave_unpaid, a.leave_paid, a.ot_hours]))); }
   const p = (S.ctx && S.ctx.profile) || {};
   out.push(''); [[T('title'), D.month], [T('location'), D.loc === null ? T('allLoc') : locName(D.loc)], [T('by'), p.full_name || p.staff_id || ''], [T('at'), new Date().toLocaleString('en-GB', { timeZone: 'Asia/Dhaka' }) + ' (Asia/Dhaka)']].forEach((m) => out.push(line(m)));
@@ -176,7 +176,7 @@ Object.assign(H, {
   sa_m: async (a) => { D.month = shiftMonth(D.month, Number(a.dataset.v)); await reload(); },
   sa_row: (a) => rowSheet(Number(a.dataset.i)),
   sa_rmenu: (a) => { const r = D.shown[Number(a.dataset.i)]; if (!r) return; openSheet(`<h2 style="margin-top:0">${esc(r.name)}</h2><div class="stack">
-      <button class="full" data-act="sa_openform" data-v="${esc(r.entry_id)}">${esc(T('openForm'))} (02-2 #${esc(String(r.serial))})</button><button class="full" data-act="sa_back" data-i="${a.dataset.i}">${esc(T('close'))}</button></div>`); },
+      <button class="full" data-act="sa_openform" data-v="${esc(r.entry_id)}">${esc(T('openForm'))} (21-1 #${esc(String(r.serial))})</button><button class="full" data-act="sa_back" data-i="${a.dataset.i}">${esc(T('close'))}</button></div>`); },
   sa_back: (a) => rowSheet(Number(a.dataset.i)),
   sa_openform: (a) => { closeSheet(); location.hash = '#/entry/' + a.dataset.v; },
   sa_menu: pageMenu, sa_csv: () => { closeSheet(); return doCSV(); }, sa_print: () => { closeSheet(); return doPrint(); }, sa_refresh: async () => { closeSheet(); await reload(); },

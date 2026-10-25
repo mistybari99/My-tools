@@ -1,7 +1,9 @@
 // Products v2 (items2.js) + supplier picker (entry.js SUP field). Run: node items2_test.js <scratchpad>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const base = dataFn(fs);
 const R = (key, kind, def, extra = {}) => ({ key, module: 'settings', kind, value: null, default_value: def, label_bn: key, label_en: key, label_mix: key, sort: 1, ...extra });
 function mkData(o = {}) {
@@ -28,7 +30,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
  c.storage = { from: () => ({ upload: async (p, b) => { window.__UP.push([p, b.size, b.type]); return { error: null }; },
    createSignedUrls: async (ps) => ({ data: ps.map((p) => ({ path: p, signedUrl: '${GIF}' })), error: null }), createSignedUrl: async () => ({ data: { signedUrl: '${GIF}' }, error: null }) }) };
  return c; }; })();`;
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8197);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -38,7 +40,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(mkData(o))};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8197/' + hash); await p.waitForTimeout(900); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(900); return p;
   }
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
   const calls = (p, fn) => p.evaluate((f) => window.__CALLS.filter((c) => c[0] === f).map((c) => c[1]), fn);
@@ -118,18 +120,18 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.close();
 
   // ---------- non-owner: approval path, no cost ----------
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:true,approve:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   ok(!/Cost/.test(await p.textContent('#p2_list')), 'no cost on rows without ITEM_COST'); ok(/Wholesale/.test(await p.textContent('#p2_list')), 'wholesale still visible');
   await p.click('.p2-row'); await p.waitForTimeout(600); ok(await p.locator('#p_cost').count() === 0, 'no cost field'); ok(await p.locator('.notice.warn').count() >= 1, 'needs-approval notice'); ok(await p.locator('[data-act=p2_newbox]').count() === 0, 'no add-category for non-owner');
   ok(await p.locator('a[href^="#/settings2/units/"]').count() === 0, 'no conversion edit link for non-owner'); await p.fill('#p_sell', '999'); await p.click('[data-act=p2_save]'); await p.waitForTimeout(500);
   ok(/approval/i.test(await p.textContent('#toast')), 'sent for approval toast'); const np = (await calls(p, 'submit_item_change'))[0].p_patch; ok(!('cost_price' in np) && np.sell_price === 999, 'non-owner patch has no cost');
   await p.close();
   // read-only role: rows are not clickable
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/items');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={ITEMS:{view:true,enter:false}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/items');
   ok(await p.locator('[data-act=itemnew]').count() === 0 && await p.locator('.p2-row[data-act]').count() === 0, 'view-only: no add, rows not editable'); await p.close();
 
-  // ---------- supplier picker (goods received 04-1 / quotation 06-2) ----------
-  p = await open({}, '#/entry/new/04-1/1');
+  // ---------- supplier picker (goods received 13-1 / quotation 29-1) ----------
+  p = await open({}, '#/entry/new/13-1/1');
   ok(await p.locator('input[data-sup]').count() >= 1, 'supplier field is a picker'); ok(await p.locator('#dl_sup option').count() === 2, 'datalist has 2 suppliers');
   const sup = p.locator('input[data-sup]').first(); await sup.fill('dudh ghor'); await sup.dispatchEvent('change'); await p.waitForTimeout(200); ok(/Listed supplier/.test(await p.textContent('.supwrap + .hint')), 'listed supplier hint');
   await p.screenshot({ path: SP + '/it_supplier.png' }); await noOverflow(p, 'supplier form');
@@ -138,13 +140,13 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   const ss = await calls(p, 'save_supplier'); ok(ss.length === 1 && ss[0].p_id === null && ss[0].p_patch.name === 'Nobo Supplier' && ss[0].p_patch.mobile === '01712345678', 'save_supplier called'); ok((await p.locator('input[data-sup]').first().inputValue()) === 'Nobo Supplier', 'new supplier filled in');
   const saveBtn = p.locator('[data-act=savedraft], [data-act=save]').first(); log('save btn count', await p.locator('[data-act=savedraft], [data-act=save]').count());
   await p.close();
-  p = await open({}, '#/entry/new/04-1/1'); const s2 = p.locator('input[data-sup]').first(); await s2.fill('Dudh Ghor'); await s2.dispatchEvent('change');
+  p = await open({}, '#/entry/new/13-1/1'); const s2 = p.locator('input[data-sup]').first(); await s2.fill('Dudh Ghor'); await s2.dispatchEvent('change');
   const acts = await p.locator('[data-act]').evaluateAll((els) => [...new Set(els.map((e) => e.dataset.act))].filter((x) => /save|draft|submit/i.test(x))); log('entry actions:', acts.join(','));
   if (acts.length) { await p.click(`[data-act=${acts[0]}]`); await p.waitForTimeout(500); const sv = await p.evaluate(() => window.__SAVED); log('saved supplier:', sv && JSON.stringify([sv.data.supplier, sv.data.supplier_id])); ok(sv && sv.data.supplier === 'Dudh Ghor' && sv.data.supplier_id === 'sp1', 'stored name + supplier_id'); }
   await s2.fill('Random Shop'); await s2.dispatchEvent('change'); await p.waitForTimeout(150); ok(/Not in the list/.test(await p.textContent('.supwrap + .hint')), 'free text keeps working');
   await p.close();
   // without supplier_manage: no add button; unknown rpc: free text only
-  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"04-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};' }, '#/entry/new/04-1/1');
+  p = await open({ init: 'window.__GRANT=false;window.__OWNER=false;window.__PERMS={"13-1":{view:true,enter:true}};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};' }, '#/entry/new/13-1/1');
   ok(await p.locator('.supnew').count() === 0, 'no add-new without supplier_manage'); ok(await p.locator('input[data-sup]').count() >= 1, 'picker still shown');
   await p.close();
 

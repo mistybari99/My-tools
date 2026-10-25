@@ -25,23 +25,28 @@ const X = {
   draft: L('খসড়া', 'Draft', 'Draft'), posted: L('পোস্ট হয়েছে', 'Posted', 'Posted'), void_: L('বাতিল', 'Void', 'Void'), allLoc: L('সব জায়গা', 'All locations', 'সব Location'),
   none: L('কোনো বিল নেই', 'No bills', 'কোনো bill নেই'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), lockedPage: L('ক্রয়ের হিসাব দেখার অনুমতি আপনার নেই', 'You are not allowed to see purchases', 'Purchase দেখার permission নেই'),
   due: L('বাকি', 'Due', 'Due'), paid: L('দেওয়া', 'Paid', 'Paid'), total: L('মোট', 'Total', 'Total'), subtotal: L('উপমোট', 'Subtotal', 'Subtotal'), discount: L('ছাড় ৳', 'Discount ৳', 'Discount ৳'),
-  billNo: L('সাপ্লায়ারের বিল নম্বর', "Supplier's bill no.", 'Supplier-এর bill no.'), date: L('বিলের তারিখ', 'Bill date', 'Bill date'), supPh: L('সাপ্লায়ারের নাম লিখুন বা বাছুন', 'Type or choose a supplier', 'Supplier-এর নাম লিখুন বা বাছুন'),
+  billNo: L('সাপ্লায়ারের বিল নম্বর', "Supplier's bill no.", 'Supplier-এর bill no.'), date: L('বিলের ডেট', 'Bill date', 'Bill date'), supPh: L('সাপ্লায়ারের নাম লিখুন বা বাছুন', 'Type or choose a supplier', 'Supplier-এর নাম লিখুন বা বাছুন'),
   lines: L('মালের লাইন', 'Lines', 'Lines'), nLines: L('লাইন', 'lines', 'lines'), addLine: L('লাইন যোগ', 'Add line', 'Line যোগ'), item: L('পণ্য', 'Item', 'Item'), itemph: L('কোড বা নাম (ঐচ্ছিক)', 'Code or name (optional)', 'Code বা নাম (ঐচ্ছিক)'),
   desc: L('অথবা লিখে বিবরণ (গ্যাস, ভাড়া…)', 'Or a free-text description (gas, transport…)', 'অথবা description (gas, transport…)'), qty: L('পরিমাণ', 'Qty', 'Qty'), unit: L('একক', 'Unit', 'Unit'), itemUnit: L('(পণ্যের)', '(item)', '(item-এর)'),
+  lotNo: L('সাপ্লায়ারের লট / ব্যাচ নম্বর', 'Supplier lot / batch no', 'Supplier lot / batch no'), lotExp: L('লটের মেয়াদ', 'Lot expiry date', 'Lot expiry'),
+  lotHint: L('ঐচ্ছিক। এক লাইনে এক লট; দুই লট হলে দুই লাইন করুন। কাগজের ফর্মের কোড: মালিক দেবেন।', 'Optional. One lot per line; for two lots use two lines. Paper form code: to be given by owner.', 'Optional। এক line এ এক lot; দুই lot হলে দুই line। Paper form code: owner দেবেন।'),
+  lotNeed: L('এই লাইনে সাপ্লায়ারের লট নম্বর লাগবে (মালিকের নিয়ম)', 'This line needs the supplier lot number (owner setting)', 'এই line এ supplier lot no লাগবে (owner setting)'), expNeed: L('এই লাইনে লটের মেয়াদ লাগবে (মালিকের নিয়ম)', 'This line needs the lot expiry date (owner setting)', 'এই line এ lot expiry লাগবে (owner setting)'),
+  lotsTitle: L('সাপ্লায়ারের লট', 'Supplier lots', 'Supplier lots'), lotStaged: L('লট লেখা আছে কিন্তু স্টকে ব্যাচ হয়নি', 'Lot written but no stock batch made yet', 'Lot লেখা আছে কিন্তু batch হয়নি'), lotApply: L('এখনই ব্যাচ বানান', 'Make the batches now', 'এখনই batch বানান'), lotNoStock: L('স্টকে মাল নেই বলে ব্যাচ হয়নি', 'No batch: the stock was no longer there', 'Stock নেই তাই batch হয়নি'), lotNone: L('এই বিলে কোনো লট লেখা হয়নি', 'No lot was written on this bill', 'এই bill এ কোনো lot লেখা হয়নি'), lotBatch: L('ব্যাচ', 'Batch', 'Batch'),
   ucost: L('একক দাম ৳', 'Unit cost ৳', 'Unit cost ৳'), amount: L('টাকা', 'Amount', 'Amount'), note: L('নোট', 'Note', 'Note'), photo: L('বিলের ছবি', 'Bill photo', 'Bill-এর photo'), addPhoto: L('ছবি তুলুন / বাছুন', 'Take / choose photo', 'Photo তুলুন / বাছুন'),
   upl: L('ছবি আপলোড হচ্ছে…', 'Uploading photo…', 'Photo upload হচ্ছে…'), reason: L('ফেরতের কারণ', 'Return reason', 'Return-এর reason'), againstBill: L('কোন বিলের বিপরীতে (ঐচ্ছিক)', 'Against bill (optional)', 'কোন bill-এর বিপরীতে (ঐচ্ছিক)'),
   payNow: L('এখনই পেমেন্ট', 'Pay now', 'Pay now'), payHint: L('কিছু না দিলে পুরো টাকা সাপ্লায়ারের পাওনা থাকবে', 'If you pay nothing the whole amount stays owed to the supplier', 'কিছু না দিলে পুরো amount supplier-এর payable থাকবে'),
-  saveDraft: L('খসড়া সংরক্ষণ', 'Save draft', 'Draft save'), post: L('পোস্ট করুন', 'Post bill', 'Post করুন'), postRet: L('ফেরত পোস্ট করুন', 'Post return', 'Return post করুন'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ', 'Close', 'Close'),
+  saveDraft: L('খসড়া সেভ', 'Save draft', 'Draft save'), post: L('পোস্ট করুন', 'Post bill', 'Post করুন'), postRet: L('ফেরত পোস্ট করুন', 'Post return', 'Return post করুন'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ', 'Close', 'Close'),
   saved: L('খসড়া সংরক্ষিত', 'Draft saved', 'Draft saved'), posted_ok: L('পোস্ট হয়েছে', 'Posted', 'Posted'), dup: L('আগেই সংরক্ষিত — আবার হয়নি', 'Already saved — nothing was added twice', 'আগেই saved — আবার হয়নি'),
   voidBill: L('বিল বাতিল', 'Void bill', 'Bill void'), voidDraft: L('খসড়া বাতিল', 'Cancel draft', 'Draft cancel'), voidWhy: L('বাতিলের কারণ (আবশ্যক)', 'Reason for voiding (required)', 'Void-এর reason (আবশ্যক)'),
   voidWarn: L('মাল স্টক থেকে উল্টে যাবে এবং বিলের সাথের পেমেন্ট বাতিল হবে।', 'The stock is reversed and payments made with the bill are voided.', 'Stock reverse হবে এবং bill-এর payment void হবে।'),
   voided: L('বাতিল হয়েছে', 'Voided', 'Voided'), edit: L('বদলান', 'Edit', 'Edit'), returnVs: L('মাল ফেরত', 'Return goods', 'মাল return'), paySup: L('সাপ্লায়ারকে টাকা দিন', 'Pay the supplier', 'Supplier-কে টাকা দিন'),
-  needSup: L('সাপ্লায়ার বাছুন', 'Choose a supplier', 'Supplier বাছুন'), needDate: L('তারিখ লিখুন', 'Enter the date', 'Date লিখুন'), needLine: L('অন্তত একটি পূর্ণ লাইন লিখুন', 'Enter at least one complete line', 'অন্তত একটি complete line লিখুন'),
+  needSup: L('সাপ্লায়ার বাছুন', 'Choose a supplier', 'Supplier বাছুন'), needDate: L('ডেট লিখুন', 'Enter the date', 'Date লিখুন'), needLine: L('অন্তত একটি পূর্ণ লাইন লিখুন', 'Enter at least one complete line', 'অন্তত একটি complete line লিখুন'),
   badLine: L('লাইনের পরিমাণ বা দাম ঠিক নয়', 'A line has a wrong quantity or cost', 'Line-এর qty বা cost ঠিক নয়'), needReason: L('ফেরতের কারণ বাছুন', 'Choose the return reason', 'Return reason বাছুন'), badDisc: L('ছাড় মোটের বেশি', 'Discount is more than the subtotal', 'Discount subtotal-এর বেশি'),
   needNote: L('কারণ লিখুন', 'Write the reason', 'Reason লিখুন'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), by: L('লিখেছেন', 'By', 'By'), mode: { cash: L('নগদ', 'Cash', 'Cash'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), card: L('কার্ড', 'Card', 'Card'), bank: L('ব্যাংক', 'Bank', 'Bank') },
   // payables
   totPay: L('মোট পাওনা', 'Total payable', 'Total payable'), overdue: L('সময় পেরিয়েছে', 'Overdue', 'Overdue'), nSup: L('জন সাপ্লায়ার', 'suppliers', 'suppliers'), oldest: L('সবচেয়ে পুরনো', 'Oldest', 'Oldest'),
-  adv: L('সাপ্লায়ারের কাছে অগ্রিম', 'Advance with suppliers', 'Supplier-এর কাছে advance'), creditDays: L('দিন ক্রেডিট', 'credit days', 'credit days'), noDues: L('কোনো সাপ্লায়ারকে দেওয়ার নেই ✓', 'You owe no supplier ✓', 'কোনো supplier-কে দেওয়ার নেই ✓'),
+  adv: L('সাপ্লায়ারের কাছে অগ্রিম', 'Advance with suppliers', 'Supplier-এর কাছে advance'), noCredit: L('বাকির মেয়াদ বসানো নেই', 'credit days not set', 'credit days বসানো নেই'), noCreditNote: L('যাদের বাকির মেয়াদ (দিন) বসানো নেই তাদের মেয়াদ-পার অঙ্ক হিসাব করা যায় না; ০ নয়, "বসানো নেই" ধরুন।', 'Where credit days are not set the overdue amount cannot be worked out: read it as not set, not as 0.', 'যেখানে credit days বসানো নেই সেখানে overdue হিসাব করা যায় না: ০ নয়, "বসানো নেই"।'),
+  creditDays: L('দিন ক্রেডিট', 'credit days', 'credit days'), noDues: L('কোনো সাপ্লায়ারকে দেওয়ার নেই ✓', 'You owe no supplier ✓', 'কোনো supplier-কে দেওয়ার নেই ✓'),
   daysOld: L('দিনের পুরনো', 'days old', 'days old'), ledger: L('সাপ্লায়ারের হিসাব খাতা', 'Supplier ledger', 'Supplier ledger'), balance: L('এখন পাওনা', 'Balance owed', 'Balance owed'), openBills: L('খোলা বিল (পুরনো আগে)', 'Open bills (oldest first)', 'Open bills (পুরনো আগে)'),
   opening: L('শুরুর হিসাব', 'Opening', 'Opening'), kBill: L('বিল', 'Bill', 'Bill'), kReturn: L('ফেরত', 'Return', 'Return'), kPayment: L('পেমেন্ট', 'Payment', 'Payment'), kPaid: L('বিলের সাথে দেওয়া', 'Paid with bill', 'Bill-এর সাথে paid'),
   payTitle: L('সাপ্লায়ারকে পেমেন্ট', 'Pay the supplier', 'Supplier payment'), payOldest: L('টাকা পুরনো বিল থেকে আগে মেটানো হবে।', 'The money clears the oldest bills first.', 'টাকা পুরনো bill থেকে আগে মিটবে।'),
@@ -51,16 +56,16 @@ const X = {
   openPay: L('পেমেন্টের অনুমতি নেই', 'No permission to pay', 'Pay-এর permission নেই'),
   mode_: L('ধরন', 'Mode', 'Mode'), scan: L('স্ক্যান', 'Scan', 'Scan'), more: L('আরও অপশন', 'More options', 'আরও option'), open: L('খুলুন', 'Open', 'Open'),
   // stock-effect preview
-  pvUntracked: L('এই পণ্যের স্টক ট্র্যাক বন্ধ — স্টকে প্রভাব নেই', 'Stock tracking is off for this item — no stock effect', 'এই item-এ stock track বন্ধ — stock-এ effect নেই'),
-  pvStock: L('স্টক', 'stock', 'stock'), pvAt: L('এ', 'at', 'at'), pvAvg: L('নতুন গড় দাম', 'new average cost', 'নতুন average cost'),
-  pvNeed: L('তথ্য লাগবে', 'Data needed', 'Data needed'), pvUnit: L('এককের রূপান্তর জানা নেই', 'unit conversion unknown', 'unit conversion জানা নেই'), pvCost: L('গড় দাম দেখার অনুমতি/তথ্য নেই', 'average cost not available', 'average cost দেখার permission/data নেই'),
+  pvUntracked: L('এই আইটেমের স্টক ট্র্যাক বন্ধ — স্টকে প্রভাব নেই', 'Stock tracking is off for this item — no stock effect', 'এই item-এ stock track বন্ধ — stock-এ effect নেই'),
+  pvStock: L('স্টক', 'stock', 'stock'), pvAt: L('এ', 'at', 'at'), pvAvg: L('নতুন গড় কস্ট', 'new average cost', 'নতুন average cost'),
+  pvNeed: L('তথ্য লাগবে', 'Data needed', 'Data needed'), pvUnit: L('এককের রূপান্তর জানা নেই', 'unit conversion unknown', 'unit conversion জানা নেই'), pvCost: L('গড় কস্ট দেখার অনুমতি/তথ্য নেই', 'average cost not available', 'average cost দেখার permission/data নেই'),
   pvLoad: L('স্টক দেখা হচ্ছে…', 'Checking stock…', 'Stock দেখা হচ্ছে…'),
   // supplier refund
   refund: L('সাপ্লায়ারের কাছ থেকে টাকা ফেরত পাওয়া', 'Refund received from the supplier', 'Supplier-এর কাছ থেকে refund পাওয়া'), refundSheet: L('সাপ্লায়ারের টাকা ফেরত', 'Supplier refund', 'Supplier refund'),
   credit: L('সাপ্লায়ারের কাছে জমা', 'Credit held by the supplier', 'Supplier-এর কাছে credit'), creditList: L('যে সাপ্লায়ারের কাছে আমাদের টাকা জমা আছে', 'Suppliers that hold our credit', 'যে supplier-এর কাছে আমাদের credit আছে'),
   refundOk: L('রিফান্ড লেখা হয়েছে', 'Refund recorded', 'Refund recorded'), refundAmt: L('ফেরত পাওয়া টাকা', 'Amount received back', 'ফেরত পাওয়া amount'), refundRef: L('রেফারেন্স / ট্রান্সঅ্যাকশন', 'Reference / transaction', 'Reference / transaction'),
   refundMax: L('জমার চেয়ে বেশি হবে না', 'Cannot be more than the credit', 'Credit-এর বেশি হবে না'), noCredit: L('এই সাপ্লায়ারের কাছে জমা নেই', 'This supplier holds no credit', 'এই supplier-এর কাছে credit নেই'),
-  kRefund: L('ফেরত পাওয়া', 'Refund received', 'Refund received'), voidRef: L('রিফান্ড বাতিল', 'Void refund', 'Refund void'), refVoided: L('রিফান্ড বাতিল হয়েছে', 'Refund voided', 'Refund voided'), wallet: L('ওয়ালেট (বিকাশ/নগদ…)', 'Wallet (bKash / Nagad…)', 'Wallet (bKash/Nagad…)'),
+  kRefund: L('ফেরত পাওয়া', 'Refund received', 'Refund received'), voidRef: L('রিফান্ড ভয়েড', 'Void refund', 'Refund void'), refVoided: L('রিফান্ড ভয়েড হয়েছে', 'Refund voided', 'Refund voided'), wallet: L('ওয়ালেট (বিকাশ/নগদ…)', 'Wallet (bKash / Nagad…)', 'Wallet (bKash/Nagad…)'),
   reasonOpt: L('কারণ (ঐচ্ছিক)', 'Reason (optional)', 'Reason (ঐচ্ছিক)'),
 };
 const T = (k) => lab(X[k]);
@@ -96,7 +101,7 @@ const lockPage = (title, back) => shell(title, `<div class="lockcard">${LOCK}<sp
     return h.replace('<button type="button" class="tog ', `<button type="button" class="tog" data-act="pay_add" data-m="bank">＋ ${esc(T('addBank'))}</button><button type="button" class="tog `);
   };
 })();
-const newPay = (getTotal) => { const st = B.pay.create(getTotal); st.rows = []; st.bank = true; return st; };       // purchases start "all on credit"
+const newPay = (getTotal) => { const st = B.pay.create(getTotal); st.rows = []; st.bank = true; st.moneyEvent = 'purchase_payment'; if (B.moneySrc) B.moneySrc.prefetch('purchase_payment', null); return st; };       // purchases start "all on credit"
 
 // ================= bills list =================
 async function listView() {
@@ -142,9 +147,10 @@ async function editor(o) {
   let b = null;
   if (o.id) { const r = await sb.rpc('purchase_get', { p_id: o.id }); if (r.error) { if (/not allowed/.test(r.error.message || '')) return lockPage(T('title'), 'purchase'); return errToast(r.error); } b = r.data; if (b.status !== 'draft') { location.hash = '#/purchase/' + o.id; return; } }
   const kind = b ? b.kind : o.kind;
+  let stagedLots = []; if (b && b.kind === 'bill') { try { const lr = await sb.rpc('receipt_lots_get', { p_bill: b.id }); if (lr && !lr.error) stagedLots = (lr.data || []).filter((x) => x.status === 'staged'); } catch (e) { stagedLots = []; } }
   F = { id: b ? b.id : null, client: b ? null : rid(), kind, loc: b ? b.location_id : defLoc(), supplier: b ? b.supplier_id : '', supName: b ? ((supById(b.supplier_id) || {}).name || b.supplier_name || '') : '', billNo: b ? b.bill_no || '' : '', date: b ? b.bill_date : today(),
     discount: b ? String(b.discount || '') : '', note: b ? b.note || '' : '', photo: b ? b.photo || null : null, reason: b ? b.reason_code || '' : '', ref: b ? b.ref_bill_id || '' : (o.ref || ''), busy: false, refBills: [],
-    lines: b ? (b.lines || []).map((l) => { const it = ITEMS_ALL.find((i) => i.id === l.item_id); return { item_id: l.item_id || null, item: it ? U.itemText(it) : '', desc: l.description || '', qty: String(l.qty), unit: l.unit || '', cost: String(l.unit_cost) }; }) : [{ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }] };
+    lines: b ? (b.lines || []).map((l) => { const it = ITEMS_ALL.find((i) => i.id === l.item_id); const lt = stagedLots.find((x, ix) => x.line_no === (b.lines || []).indexOf(l) + 1); return { item_id: l.item_id || null, item: it ? U.itemText(it) : '', desc: l.description || '', qty: String(l.qty), unit: l.unit || '', cost: String(l.unit_cost), lot: lt ? lt.lot_no || '' : '', lotexp: lt && lt.expiry ? String(lt.expiry).slice(0, 10) : '' }; }) : [{ item_id: null, item: '', desc: '', qty: '', unit: '', cost: '' }] };
   F.canPay = kind === 'bill' && await grant('supplier_pay', F.loc);
   F.pay = newPay(() => totals().total);
   await loadConvP();
@@ -157,11 +163,13 @@ function lineHTML(l, i) {
   const items = ITEMS_ALL, it = l.item_id ? items.find((x) => x.id === l.item_id) : null; l._ri = !!it;
   return `<div class="rowcard" data-li="${i}"><div class="rc-h"><b>#${i + 1}</b>${F.lines.length > 1 ? `<button type="button" class="mini" data-act="pu_delline" data-i="${i}" aria-label="✕">✕</button>` : ''}</div><div class="stack">
     <div><label>${esc(T('item'))}</label><div class="p2-inl"><input data-ln="${i}.item" list="pu_dl" autocomplete="off" value="${esc(l.item)}" placeholder="${esc(T('itemph'))}">${scanOn() ? `<button type="button" class="mini" data-act="pu_scan" data-i="${i}" aria-label="${esc(T('scan'))}">▮▮ ${esc(T('scan'))}</button>` : ''}</div></div>
-    ${it && it.item_type === 'asset' ? `<div class="hint">${esc(lab(L('সম্পদ: স্টকে নয়, সম্পদ-খাতায় যোগ হবে', 'Asset: goes to the asset register, not to stock', 'Asset: stock এ নয়, asset register এ যোগ হবে')))}</div>` : ''}
+    ${it && it.item_type === 'asset' ? `<div class="hint">${esc(lab(L('সম্পদ: স্টকে নয়, সম্পদ-খাতায় যোগ হবে', 'Asset: goes to the asset register, not to stock', 'Asset: stock-এ নয়, asset register-এ যোগ হবে')))}</div>` : ''}
     ${it ? '' : `<div><label>${esc(T('desc'))}</label><input data-ln="${i}.desc" autocomplete="off" value="${esc(l.desc)}"></div>`}
     <div class="row"><div style="flex:1"><label>${esc(T('qty'))}</label><input data-ln="${i}.qty" inputmode="decimal" value="${esc(l.qty)}"></div>
       <div style="flex:1"><label>${esc(T('unit'))}</label><select data-ln="${i}.unit"><option value="">${esc(it ? unitLabel(it.unit) || T('itemUnit') : T('itemUnit'))}</option>${optHTML(lists('units').map((r) => [r.value_code, lab(rowL(r))]), l.unit)}</select></div>
       <div style="flex:1"><label>${esc(T('ucost'))}</label><input data-ln="${i}.cost" inputmode="decimal" value="${esc(l.cost)}"></div></div>
+    ${it && F.kind === 'bill' && it.tracked && it.item_type !== 'asset' ? `<div class="row"><div style="flex:1"><label>${esc(T('lotNo'))}${B.rule('receipt_lot_required', false) === true ? ' *' : ''}</label><input data-ln="${i}.lot" maxlength="40" autocomplete="off" value="${esc(l.lot || '')}"></div>
+      <div style="flex:1"><label>${esc(T('lotExp'))}${B.rule('receipt_expiry_required', false) === true ? ' *' : ''}</label><input data-ln="${i}.lotexp" type="date" value="${esc(l.lotexp || '')}"></div></div><div class="hint">${esc(T('lotHint'))}</div>` : ''}
     <div class="row between"><span class="muted">${esc(T('amount'))}</span><b data-amt="${i}">${nnum(l.qty) > 0 && nnum(l.cost) >= 0 ? esc(money(r2(nnum(l.qty) * nnum(l.cost)))) : '—'}</b></div>
     <div class="hint s2-pv" data-pv="${i}" aria-live="polite"></div></div></div>`;
 }
@@ -174,7 +182,7 @@ function drawEditor() {
     <div class="row"><div style="flex:1"><label for="pe_no">${esc(T('billNo'))}</label><input id="pe_no" autocomplete="off" value="${esc(F.billNo)}"></div><div style="flex:1"><label for="pe_date">${esc(T('date'))}</label><input id="pe_date" type="date" value="${esc(F.date)}"></div></div>
     ${ret ? `<div><label for="pe_reason">${esc(T('reason'))} *</label><select id="pe_reason"><option value="">—</option>${optHTML(reasons, F.reason)}</select></div><div><label for="pe_ref">${esc(T('againstBill'))}</label><select id="pe_ref"><option value="">—</option></select></div>` : ''}
     <datalist id="pu_dl">${ITEMS_ALL.map((i) => `<option value="${esc(U.itemText(i))}"></option>`).join('')}</datalist>
-    <h3 style="margin:6px 0 0">${esc(T('lines'))}</h3><div id="pe_lines">${F.lines.map(lineHTML).join('')}</div><button type="button" class="full" data-act="pu_addline">＋ ${esc(T('addLine'))}</button>${!ret && B.itemMaster && B.itemMaster.canNew() ? `<button type="button" class="full" data-act="pu_newitem">＋ ${esc(lab(L('নতুন আইটেম (সম্পদ) তালিকায় যোগ', 'New item (asset) added to the item list', 'নতুন Item (Asset) list এ যোগ')))}</button>` : ''}
+    <h3 style="margin:6px 0 0">${esc(T('lines'))}</h3><div id="pe_lines">${F.lines.map(lineHTML).join('')}</div><button type="button" class="full" data-act="pu_addline">＋ ${esc(T('addLine'))}</button>${!ret && B.itemMaster && B.itemMaster.canNew() ? `<button type="button" class="full" data-act="pu_newitem">＋ ${esc(lab(L('নতুন আইটেম (সম্পদ) তালিকায় যোগ', 'New item (asset) added to the item list', 'নতুন Item (Asset) list-এ যোগ')))}</button>` : ''}
     <div><label for="pe_disc">${esc(T('discount'))}</label><input id="pe_disc" inputmode="decimal" value="${esc(F.discount)}"></div>
     <div class="card stack" id="pe_tot">${totHTML(tt)}</div>
     ${F.canPay && !ret ? `<h3 style="margin:6px 0 0">${esc(T('payNow'))}</h3><div id="pe_pay">${B.pay.html(F.pay)}</div><div class="hint">${esc(T('payHint'))}</div>` : ''}
@@ -253,16 +261,23 @@ function payload() {
   syncFixed();
   if (!F.supplier) { toast(T('needSup')); return null; } if (!F.date) { toast(T('needDate')); return null; }
   if (F.kind === 'return' && !F.reason) { toast(T('needReason')); return null; }
-  const lines = [];
+  const lines = [], lotsOut = [];
   for (const l of F.lines) {
     const it = l.item_id ? ITEMS_ALL.find((x) => x.id === l.item_id) : null, hasAny = l.item_id || l.desc.trim() || l.qty || l.cost; if (!hasAny) continue;
     const q = nnum(l.qty), c = nnum(l.cost);
     if (!(q > 0) || !(c >= 0)) { toast(T('badLine')); return null; }
     if (!it && !l.desc.trim()) { toast(T('needLine')); return null; }
     const o = { qty: q, unit_cost: c }; if (it) o.item_id = it.id; else o.description = l.desc.trim(); if (l.unit) o.unit = l.unit; lines.push(o);
+    if (F.kind === 'bill' && it && it.tracked && it.item_type !== 'asset') {          // RPT-B3: the supplier lot and expiry of this stock line (optional unless the owner switched them on)
+      const lot = (l.lot || '').trim(), lx = l.lotexp || '';
+      if (B.rule('receipt_lot_required', false) === true && !lot) { toast(T('lotNeed') + ' · ' + it.code); return null; }
+      if (B.rule('receipt_expiry_required', false) === true && !lx) { toast(T('expNeed') + ' · ' + it.code); return null; }
+      if (lot || lx) lotsOut.push({ line_no: lines.length, lot_no: lot || null, expiry: lx || null });
+    }
   }
   if (!lines.length) { toast(T('needLine')); return null; }
   const tt = totals(); if (tt.disc > tt.sub) { toast(T('badDisc')); return null; }
+  F._lots = lotsOut;
   return lines;
 }
 async function saveDraft(post) {
@@ -271,6 +286,12 @@ async function saveDraft(post) {
     p_kind: F.kind, p_ref_bill: F.kind === 'return' ? (F.ref || null) : null, p_reason: F.kind === 'return' ? F.reason : null });
   if (r.error) { errToast(r.error, { grant: F.kind === 'return' ? 'purchase_return' : 'purchase_entry', loc: F.loc, context: { action: 'save_purchase' } }); return null; }
   F.id = r.data.id; F.client = null;            // later saves are updates of this draft by id (a client id would just return the old draft)
+  if (F.kind === 'bill') {                      // RPT-B3: stage the lots (an empty list clears old ones); a database without phase 430 simply has no such function
+    try {
+      const lr = await sb.rpc('receipt_lots_stage', { p_bill: F.id, p_lots: F._lots || [] });
+      if (lr && lr.error && !/PGRST202|Could not find|does not exist/i.test(String(lr.error.code || '') + ' ' + (lr.error.message || ''))) { toast((lr.error.message || '').replace(/^.*?:\s*/, '')); return null; }
+    } catch (e) { /* lots are optional */ }
+  }
   return r.data;
 }
 async function doSave(btn) {
@@ -288,6 +309,7 @@ async function doPost(btn) {
 async function postBill(id, list, kind, loc) {
   const r = await sb.rpc('post_purchase', { p_id: id, p_payments: list.length ? list : null });
   if (r.error) { errToast(r.error, { grant: list.length && /not allowed/.test(r.error.message || '') && kind === 'bill' ? 'supplier_pay' : kind === 'return' ? 'purchase_return' : 'purchase_entry', loc, context: { action: 'post_purchase', bill: id } }); return false; }
+  if (kind === 'bill') { try { await sb.rpc('receipt_lots_apply', { p_bill: id }); } catch (e) { /* phase 430 not installed, or nothing staged */ } }      // RPT-B3: makes the stock batches of the lots (idempotent; the server hook may already have)
   toast(r.data && r.data.dup ? T('dup') : T('posted_ok')); closeSheet(); const target = '#/purchase/' + id, same = location.hash === target; location.hash = target; if (same) detail(id); return true;
 }
 
@@ -300,6 +322,7 @@ async function detail(id) {
   const r = await sb.rpc('purchase_get', { p_id: id });
   if (r.error) { if (/not allowed/.test(r.error.message || '')) return lockPage(T('title'), 'purchase'); errToast(r.error); return; }
   const b = r.data; CUR = b;
+  let lots = []; if (b.kind === 'bill') { try { const lr = await sb.rpc('receipt_lots_get', { p_bill: b.id }); if (lr && !lr.error) lots = lr.data || []; } catch (e) { lots = []; } }
   const [gv, gr, ge, gp] = await Promise.all([grant('purchase_void', b.location_id), grant('purchase_return', b.location_id), grant('purchase_entry', b.location_id), grant('supplier_pay', b.location_id)]);
   const mode = npMode(), ret = b.kind === 'return';
   const act = (ok, a, label, cls, extra = '') => ok ? `<button class="${cls || ''}" data-act="${a}" ${extra}>${esc(label)}</button>` : mode === 'lock' ? `<button disabled>${LOCK.replace('<svg', '<svg width="16" height="16"')} ${esc(label)}</button>` : '';
@@ -316,6 +339,9 @@ async function detail(id) {
       ${Number(b.discount) ? `<div class="row between"><span>${esc(T('discount'))}</span><b>− ${esc(money(b.discount))}</b></div>` : ''}
       <div class="row between"><span>${esc(T('total'))}</span><b class="mnum">${esc(money(b.total))}</b></div>
       ${b.status === 'posted' && !ret ? `<div class="row between"><span>${esc(T('paid'))}</span><b>${esc(money(b.paid))}</b></div><div class="row between"><span>${esc(T('due'))}</span><b class="${Number(b.due) > 0 ? 'amt-bad' : ''}">${esc(money(b.due))}</b></div>` : ''}</div>
+    ${lots.length ? `<div class="card" data-lots="1"><h3>${esc(T('lotsTitle'))}</h3>${lots.map((x) => { const li = (b.lines || [])[x.line_no - 1], it2 = li && ITEMS_ALL && li.item_id ? ITEMS_ALL.find((y) => y.id === li.item_id) : null;
+        return `<div class="s2-led"><div>${esc(it2 ? nm(it2) : '#' + x.line_no)}<div class="sub">${x.lot_no ? esc(x.lot_no) : esc(lab(L('লট নম্বর লেখা নেই', 'lot number: data not captured', 'lot no লেখা নেই')))} · ${x.expiry ? esc(String(x.expiry).slice(0, 10)) : esc(lab(L('মেয়াদ লেখা নেই', 'expiry: data not captured', 'expiry লেখা নেই')))}${x.status === 'applied' ? ' · ' + esc(T('lotBatch')) + ' #' + esc(x.batch_id) : x.status === 'no_stock' ? ' · ' + esc(T('lotNoStock')) : ' · ' + esc(T('lotStaged'))}</div></div><div class="q">${x.qty_base ? U.q4(x.qty_base) : ''}</div></div>`; }).join('')}
+      ${b.status === 'posted' && lots.some((x) => x.status === 'staged') ? `<button class="full" data-act="pu_lotapply" data-v="${esc(b.id)}">${esc(T('lotApply'))}</button>` : ''}</div>` : (b.status === 'posted' && b.kind === 'bill' ? `<div class="muted">${esc(T('lotNone'))}</div>` : '')}
     ${(b.payments || []).length ? `<div class="card"><h3>${esc(T('paid'))}</h3>${b.payments.map((p) => `<div class="s2-led"><div>${esc(modeL(p.mode))}${p.wallet ? ' · ' + esc(p.wallet) : ''}${p.voided ? ` <span class="chip bad">${esc(T('void_'))}</span>` : ''}<div class="sub">${esc(dt(p.paid_at))}${p.ref ? ' · ' + esc(p.ref) : ''}</div></div><div class="q">${esc(money(p.amount))}</div></div>`).join('')}</div>` : ''}
     ${b.photo ? `<div class="card"><img id="pd_img" alt="" style="width:100%;border-radius:12px"></div>` : ''}
     <div class="s2-bar" style="flex-wrap:wrap">${bar.join('')}</div>`, 'purchase');
@@ -355,10 +381,11 @@ function drawPayables(miss) {
     ${miss ? `<div class="notice bad">${esc(T('sqlMissing'))}</div>` : ''}
     <div class="plate"><div class="pl-k">${esc(T('totPay'))}</div><div class="pl-v"><span class="cur">৳</span>${Number(s.total_payable || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div><div class="pl-s">${s.suppliers_owed || 0} ${esc(T('nSup'))}${s.oldest ? ' · ' + esc(T('oldest')) + ' ' + esc(dshort(s.oldest)) : ''}</div></div>
     <div class="s2-sum">${Number(s.overdue) > 0 ? `<div class="stat mk bad"><div class="k">${esc(T('overdue'))} · ${s.overdue_suppliers || 0}</div><div class="v amt-bad">${esc(money(s.overdue))}</div></div>` : ''}${Number(s.credit_total) > 0 ? `<div class="stat"><div class="k">${esc(T('adv'))}</div><div class="v">${esc(money(s.credit_total))}</div></div>` : ''}</div>
+    ${PY.rows.some((x) => x.credit_days === null || x.credit_days === undefined) ? `<div class="notice warn" id="py_nocredit">${esc(T('noCreditNote'))}</div>` : ''}
     <div id="py_list">${PY.rows.map((x, i) => { const od = Number(x.overdue) > 0;
       return `<div class="card item mk ${od ? 'bad' : ''}" data-act="py_open" data-i="${i}" role="button" tabindex="0"><div><div class="nm">${esc(x.name)}</div>
         <div class="muted" style="font-size:.85rem">${esc(x.mobile || '')}${x.oldest ? ` · ${days(x.oldest)} ${esc(T('daysOld'))}` : ''}</div>
-        <div>${x.credit_days !== null && x.credit_days !== undefined ? `<span class="chip">${x.credit_days} ${esc(T('creditDays'))}</span> ` : ''}${od ? `<span class="chip bad">${esc(T('overdue'))} ${esc(money(x.overdue))}</span>` : ''}</div></div>
+        <div>${x.credit_days !== null && x.credit_days !== undefined ? `<span class="chip">${x.credit_days} ${esc(T('creditDays'))}</span> ` : `<span class="chip warn">${esc(T('noCredit'))}</span> `}${od ? `<span class="chip bad">${esc(T('overdue'))} ${esc(money(x.overdue))}</span>` : ''}</div></div>
         <div class="pr"><button type="button" class="mini s2-dots" data-act="py_menu" data-i="${i}" aria-label="${esc(T('more'))}">⋮</button><b>${esc(money(x.balance))}</b></div></div>`; }).join('') || `<p class="muted center">${esc(T('noDues'))}</p>`}</div>
     ${PY.credits.length ? `<h3 style="margin:14px 0 6px">${esc(T('creditList'))}</h3><div id="py_credits">${PY.credits.map((x, i) => `<div class="card item mk ok" data-act="py_copen" data-i="${i}" role="button" tabindex="0"><div><div class="nm">${esc(x.name)}</div><div class="muted" style="font-size:.85rem">${esc(x.mobile || '')}</div></div>
       <div class="pr"><button type="button" class="mini s2-dots" data-act="py_cmenu" data-i="${i}" aria-label="${esc(T('more'))}">⋮</button><b>${esc(money(x.credit))}</b></div></div>`).join('')}</div>` : ''}`, true);
@@ -371,7 +398,7 @@ async function ledger(i, fromCredit) {
   const rows = lr.data || [], open = ob.error ? [] : (ob.data || []);
   const canVoid = {}; for (const l of [...new Set(rows.filter((e) => e.kind === 'payment' || e.kind === 'refund').map((e) => e.location_id))]) canVoid[l] = await grant('purchase_void', l);
   const bal = Number(x.balance), mode = npMode();
-  PY.st = B.pay.create(() => bal); PY.st.rows = [{ mode: 'cash', amount: '', wallet: '', ref: '', given: '', auto: false }]; PY.st.bank = true;
+  PY.st = B.pay.create(() => bal); PY.st.rows = [{ mode: 'cash', amount: '', wallet: '', ref: '', given: '', auto: false }]; PY.st.bank = true; PY.st.moneyEvent = 'supplier_payment'; if (B.moneySrc) await B.moneySrc.prefetch('supplier_payment', null);
   if (B.pay.loadWallets) B.pay.loadWallets();
   const KL = { opening: 'opening', bill: 'kBill', return: 'kReturn', payment: 'kPayment', paid: 'kPaid', refund: 'kRefund' };
   openSheet(`<h2>${esc(x.name)}</h2><div class="muted">${esc(x.mobile || '')}</div>
@@ -395,7 +422,7 @@ async function doPaySupplier(btn) {
   try {
     const r = await sb.rpc('pay_supplier', { p_supplier: PY.cur.supplier_id, p_loc: loc, p_payments: list, p_client: PY.client, p_note: (($('#py_note') || {}).value || '').trim() || null });
     if (r.error) { errToast(r.error, { grant: 'supplier_pay', loc, context: { supplier: PY.cur.supplier_id } }); return; }
-    PY.client = rid(); closeSheet(); toast(r.data && r.data.dup ? T('dup') : T('paidOk') + (r.data && r.data.balance !== undefined ? ' · ' + T('balance') + ' ' + money(r.data.balance) : '')); payables();
+    PY.client = rid(); closeSheet(); toast(r.data && r.data.pending ? B.lab(B.L('অনুমোদনের অপেক্ষায়', 'Waiting for the approver', 'Approver-এর অপেক্ষায়')) : r.data && r.data.dup ? T('dup') : T('paidOk') + (r.data && r.data.balance !== undefined ? ' · ' + T('balance') + ' ' + money(r.data.balance) : '')); payables();
   } catch (e) { fail(e); } finally { PY.busy = false; btn.disabled = false; }
 }
 
@@ -407,6 +434,7 @@ function refundSheet(sup, credit) {
     ${locs2()}
     <div><label for="rf_amt">${esc(T('refundAmt'))}</label><input id="rf_amt" inputmode="decimal" autocomplete="off"><div class="hint">${esc(T('refundMax'))}</div></div>
     <div><label for="rf_mode">${esc(T('mode_'))}</label><select id="rf_mode">${['cash', 'mobile', 'card', 'bank'].map((m) => `<option value="${m}">${esc(modeL(m))}</option>`).join('')}</select></div>
+    ${B.moneySrc ? B.moneySrc.slot('rf', 'supplier_refund', { locSel: '#py_loc2' }) : ''}
     <div id="rf_w" hidden><label for="rf_wallet">${esc(T('wallet'))}</label><input id="rf_wallet" autocomplete="off"></div>
     <div><label for="rf_ref">${esc(T('refundRef'))}</label><input id="rf_ref" autocomplete="off"></div>
     ${reasons.length ? `<div><label for="rf_reason">${esc(T('reasonOpt'))}</label><select id="rf_reason"><option value="">—</option>${optHTML(reasons, '')}</select></div>` : ''}
@@ -418,9 +446,9 @@ async function doRefund(btn) {
   const amt = nnum(($('#rf_amt') || {}).value), credit = Number(btn.dataset.credit);
   if (!(amt > 0) || !(amt <= credit + 0.00001)) return toast(T('refundMax'));
   const mode = ($('#rf_mode') || {}).value, wallet = (($('#rf_wallet') || {}).value || '').trim();
-  if (mode === 'mobile' && !wallet) return toast(T('walletNeeded'));
+  if (mode === 'mobile' && !wallet && !(B.moneySrc && B.moneySrc.get('rf'))) return toast(T('walletNeeded'));
   const loc = Number(($('#py_loc2') || {}).value) || defLoc(), sup = PY.cur;
-  await U.submit(btn, () => sb.rpc('supplier_refund', { p_supplier: sup.supplier_id, p_loc: loc, p_amount: r2(amt), p_mode: mode, p_wallet: wallet || null, p_ref: (($('#rf_ref') || {}).value || '').trim() || null,
+  await U.submit(btn, () => sb.rpc('supplier_refund', { p_supplier: sup.supplier_id, p_loc: loc, p_amount: r2(amt), p_mode: mode, p_wallet: (B.moneySrc ? B.moneySrc.tag('rf', wallet || null) : wallet) || null, p_ref: (($('#rf_ref') || {}).value || '').trim() || null,
     p_reason: (($('#rf_reason') || {}).value) || null, p_note: (($('#rf_note') || {}).value || '').trim() || null, p_client: PY.rclient }),
     () => { PY.rclient = rid(); toast(T('refundOk')); payables(); }, { grant: 'supplier_pay', loc, context: { supplier: sup.supplier_id } });
 }
@@ -496,6 +524,7 @@ Object.assign(H, {
   py_pay: doPaySupplier,
   py_void: (a) => { U.sheetStart('pvoid'); const pid = Number(a.dataset.v);
     openSheet(`<h2>${esc(T('voidPay'))}</h2><div><label for="vn_note">${esc(T('voidWhy'))}</label><input id="vn_note" autocomplete="off"></div><div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="py_voidgo" data-v="${pid}">${esc(T('voidPay'))}</button></div>`); },
+  pu_lotapply: async (a) => { const r = await sb.rpc('receipt_lots_apply', { p_bill: a.dataset.v }); if (r.error) return errToast(r.error); toast(T('saved')); detail(a.dataset.v); },
   py_voidgo: async (a) => { const note = (($('#vn_note') || {}).value || '').trim(); if (!note) return toast(T('needNote')); const pid = Number(a.dataset.v);
     await U.submit(a, () => sb.rpc('void_supplier_payment', { p_id: pid, p_note: note }), () => { toast(T('payVoided')); payables(); }, { grant: 'purchase_void', loc: PY.loc === undefined ? null : PY.loc, context: { payment: pid } }); },
 });
@@ -519,7 +548,7 @@ document.addEventListener('change', (e) => {
   if (el.id === 'rf_mode') { const w = $('#rf_w'); if (w) w.hidden = el.value !== 'mobile'; }
   if (el.id === 'pe_loc' && F) { F.loc = Number(el.value) || F.loc; drawPreviews(); }
   if (el.id === 'py_loc') { PY.loc = el.value === '' ? null : Number(el.value); payables(); }
-  if (el.id === 'pe_file' && F) { const f = el.files && el.files[0]; if (f) { toast(T('upl')); U.uploadPhoto(f, ['PURCHASE', '06-4', '04-1', '06-3'], F.loc).then((p) => { F.photo = p; drawEdPhoto(); }, fail); } }
+  if (el.id === 'pe_file' && F) { const f = el.files && el.files[0]; if (f) { toast(T('upl')); U.uploadPhoto(f, ['PURCHASE', '02-1', '13-1', '27-1'], F.loc).then((p) => { F.photo = p; drawEdPhoto(); }, fail); } }
 });
 window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { purchase: view, payables });
 })();

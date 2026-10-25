@@ -1,10 +1,11 @@
 // P3 slice b web: online orders (#/onlineorders), forms 20-x <-> sales (#/saleforms), benefits report (#/benefitsx), BI export (#/biexport).
 // Run: timeout 250 node salesx_test.js <abs tests/web dir>      (the test injects <script src="salesx.js"> into index.html; the lead adds the real tag)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), PORT = 8361, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
  const SX = window.__SX = Object.assign({ orders: [], fail: {}, forms: [], linked: [], grants: [], missing: [], exportRes: null }, window.__SX0 || {});
@@ -22,7 +23,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   if (fn === 'online_order_deliver') { const o = SX.orders.find((x) => x.id === args.p_id); o.status = 'delivered'; return { data: { status: 'delivered', sale_id: 's9', receipt: 77 }, error: null }; }
   if (fn === 'online_order_link_sale') { SX.orders.find((x) => x.id === args.p_id).status = 'delivered'; return { data: { status: 'delivered' }, error: null }; }
   if (fn === 'unlinked_sale_forms') return { data: SX.forms, error: null };
-  if (fn === 'sale_form_link') { T.sale_form_links.push({ id: 5, sale_id: args.p_sale, entry_id: args.p_entry, form_code: '20-1', amount_diff: 0, location_id: 1, state: 'active', linked_at: 'x' }); SX.forms = SX.forms.filter((f) => f.entry_id !== args.p_entry); return { data: { id: 5, amount_diff: 0 }, error: null }; }
+  if (fn === 'sale_form_link') { T.sale_form_links.push({ id: 5, sale_id: args.p_sale, entry_id: args.p_entry, form_code: '05-1', amount_diff: 0, location_id: 1, state: 'active', linked_at: 'x' }); SX.forms = SX.forms.filter((f) => f.entry_id !== args.p_entry); return { data: { id: 5, amount_diff: 0 }, error: null }; }
   if (fn === 'sale_form_unlink') { T.sale_form_links.length = 0; return { data: { state: 'void' }, error: null }; }
   if (fn === 'benefits_report') return { data: { as_of: args.p_as_of, grants: SX.grants, missing: SX.missing, paid_in_payroll_monthly_visible: 0 }, error: null };
   if (fn === 'employee_benefit_grant') { SX.grants.push({ id: 9, employee_id: args.p_emp, employee_name: 'এমপ ১', type_code: args.p_type, from_date: args.p_from, eligible_from: args.p_from, to_date: null, state: 'eligible', paid_in_payroll: false, value_per_month: null }); return { data: { id: 9 }, error: null }; }
@@ -34,7 +35,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
-  const html = fs.readFileSync('/home/user/My-tools/web/index.html', 'utf8').replace('</body>', '<script src="salesx.js"></script></body>');
+  const html = fs.readFileSync(_P.WEB_DIR + '/index.html', 'utf8').replace('</body>', '<script src="salesx.js"></script></body>');
   async function open(hash, o = {}) {
     const ctx = await br.newContext({ viewport: { width: 360, height: 780 } }); const p = await ctx.newPage();
     p.on('pageerror', (e) => errors.push('pageerror: ' + e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|code: P0001|status of 4/.test(m.text()) && !/^Error: /.test(m.text())) errors.push('console: ' + m.text()); });
@@ -95,7 +96,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   p = await open('#/onlineorders', { lang: 'bn' }); ok(/অনলাইন অর্ডার/.test(await txt(p)), 'Bangla mode');
 
   // ---- forms <-> sales ----
-  p = await open('#/saleforms', { sx: { forms: [{ entry_id: 'en1', form_code: '20-1', serial: 4, entry_date: '2026-10-13', location_id: 1, customer: 'Rina', form_total: 330, candidate_sales: ['s1'] }, { entry_id: 'en2', form_code: '20-4', serial: 5, entry_date: '2026-10-13', location_id: 1, customer: 'Party A', form_total: null, candidate_sales: [] }] } });
+  p = await open('#/saleforms', { sx: { forms: [{ entry_id: 'en1', form_code: '05-1', serial: 4, entry_date: '2026-10-13', location_id: 1, customer: 'Rina', form_total: 330, candidate_sales: ['s1'] }, { entry_id: 'en2', form_code: '24-1', serial: 5, entry_date: '2026-10-13', location_id: 1, customer: 'Party A', form_total: null, candidate_sales: [] }] } });
   ok(/Not linked to a sale \(2\)/.test(await txt(p)) && /#12/.test(await txt(p)) && /Rina/.test(await txt(p)), 'unlinked forms with the candidate sale receipt');
   await noOverflow(p, 'saleforms'); await p.screenshot({ path: SP + '/sx_forms.png', fullPage: true });
   await p.evaluate(() => { window.__SX.fail.sale_form_link = 'path_locked: x'; }); await p.click('[data-act=sf_link]'); await wait(p, 500);

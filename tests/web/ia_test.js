@@ -1,10 +1,11 @@
 // Information architecture (web/ia.js): registry integrity, drawer reachability, role filtering, search sections, breadcrumb, recent, old URLs, phone width, Increment A acceptance A1-A7.
 // Run: node ia_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5_common.js');
-const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -38,8 +39,8 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
 
   // ---------- owner: every live drawer screen reachable from the drawer ----------
   p = await open({}, '#/home'); await openDrawer(p);
-  const miss = await p.evaluate(() => window.BOS.IA.filter((r) => r.status === 'live' && r.drawer).filter((r) => !document.querySelector('#nav_body .dr-it[data-v="' + r.route + '"]')).map((r) => r.route));
-  ok(miss.length === 0, 'owner: every live drawer screen is in the drawer: ' + miss);
+  const miss = await p.evaluate(() => window.BOS.IA.filter((r) => r.status === 'live' && r.drawer && !['variants', 'cheques', 'schemes', 'tinting', 'impexp'].includes(r.route)).filter((r) => !document.querySelector('#nav_body .dr-it[data-v="' + r.route + '"]')).map((r) => r.route));
+  ok(miss.length === 0, 'owner: every live drawer screen is in the drawer (announce / todo / shifts included while their switch is OFF; other-trade screens are gated by business template): ' + miss);
   ok(await p.locator('.dr-g').count() >= 10, 'owner sees the categories: ' + await p.locator('.dr-g').count());
   for (const r of ['bulkitems', 'itemmap', 'itemimport', 'assets', 'recipes', 'rollout', 'changes', 'outbox', 'locations', 'control', 'daybook', 'salary', 'brandpnl', 'discounts', 'ledgerlinks', 'salereturn']) ok(await p.locator(`#nav_body .dr-it[data-v="${r}"]`).count() === 1, 'reachable from the drawer: ' + r);
   // every group has the "everything in this category" page and it lists screens
@@ -52,7 +53,7 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
   const staffSees = await p.locator('#nav_body .dr-it').evaluateAll((e) => e.map((x) => x.dataset.v));
   ok(staffSees.includes('pos') && staffSees.includes('dues'), 'cashier sees POS + dues: ' + staffSees);
   ok(await p.locator('#nav_body .dr-i.lock').count() <= 8, 'lock mode: at most 8 summary lines: ' + await p.locator('#nav_body .dr-i.lock').count());
-  ok(await p.evaluate(() => 'রহিম আলী'.replace(/[^\p{L}\p{M}\p{N} ]/gu, ' ') === 'রহিম আলী') && fs.readFileSync(SP + '/../../web/nav.js', 'utf8').includes('\\p{L}\\p{M}\\p{N}'), 'Bangla marks survive the customer-search sanitiser (রহিম আলী)');
+  ok(await p.evaluate(() => 'রহিম আলী'.replace(/[^\p{L}\p{M}\p{N} ]/gu, ' ') === 'রহিম আলী') && fs.readFileSync(_P.WEB_DIR + '/nav.js', 'utf8').includes('\\p{L}\\p{M}\\p{N}'), 'Bangla marks survive the customer-search sanitiser (রহিম আলী)');
   ok(!['staff', 'matrix', 'rules', 'settings', 'backup', 'control', 'locations', 'bulkitems', 'rulehub', 'logs', 'releases', 'emergency'].some((r) => staffSees.includes(r)), 'cashier sees no owner-only screens: ' + staffSees);
   await p.context().close();
 
@@ -61,7 +62,7 @@ const base = C.baseData(SP), PORT = 8472, srv = C.serve(PORT);
   const sr = (q) => p.evaluate((x) => { const c = { own: true, roles: [], P: () => true, GF: {}, locOk: () => true, canPos: () => true, anyApprove: () => true, ctlOk: () => true, formLive: () => true }; const s = window.BOS.ia.searchSections(x, c); return { do: s.do.map((d) => d.route), go: s.go.map((r) => r.route), set: s.settings.map((r) => r.route) }; }, q);
   ok((await sr('দাম')).go.includes('items'), 'Bangla keyword দাম finds items'); ok((await sr('price')).go.includes('items'), 'English keyword price finds items');
   ok((await sr('বেতন')).go.includes('salary') && (await sr('payroll')).go.includes('salary'), 'salary by Bangla and English');
-  ok((await sr('sell')).do.includes('pos') && (await sr('বিক্রি')).do.includes('pos'), 'verb sell / বিক্রি -> POS (Do)'); ok((await sr('stock count')).do.includes('form/04-3'), 'stock count -> form 04-3');
+  ok((await sr('sell')).do.includes('pos') && (await sr('বিক্রি')).do.includes('pos'), 'verb sell / বিক্রি -> POS (Do)'); ok((await sr('stock count')).do.includes('form/36-1'), 'stock count -> form 36-1');
   ok((await sr('fiscal')).set.includes('settings2/fiscal'), 'Settings section finds fiscal'); ok((await sr('pay supplier')).do.includes('payables'), 'pay supplier -> payables');
   await p.fill('#nav_q', 'bulk'); await wait(p, 400);
   ok(await p.locator('#nav_body .dr-it[data-v=bulkitems]').count() === 1 && /Items & Master Data/.test(await p.textContent('#nav_body')), 'search result shows its category line');

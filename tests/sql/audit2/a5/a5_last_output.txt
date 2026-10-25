@@ -1,0 +1,297 @@
+psql:/tmp/a5_run_a5run.sql:14: NOTICE:  table "ea" does not exist, skipping
+== mode = def
+== S0 setup
+
+
+
+psql:/tmp/a5_run_a5run.sql:86: NOTICE:  PASS P1 factory qty after production = 100 exp=100 act=100.0000
+
+psql:/tmp/a5_run_a5run.sql:87: NOTICE:  PASS P2 factory avg cost = 35 (3500/100) exp=35 act=35.000000
+
+psql:/tmp/a5_run_a5run.sql:88: NOTICE:  PASS P3 batches created at the factory for the output (count>=1) exp=1 act=1
+
+== M1 send 60 -> A, 30 -> B
+psql:/tmp/a5_run_a5run.sql:93: NOTICE:  PASS M1 factory after send = 10 exp=10 act=10.0000
+
+psql:/tmp/a5_run_a5run.sql:94: NOTICE:  PASS M2 A has nothing yet (goods in transit, not at A) exp=0 act=0
+
+psql:/tmp/a5_run_a5run.sql:95: NOTICE:  PASS M3 in-transit total = 90 exp=90 act=90
+
+psql:/tmp/a5_run_a5run.sql:96: NOTICE:  PASS M4 ledger transfer_out unit_cost at send = 35 exp=35 act=35.000000
+
+
+psql:/tmp/a5_run_a5run.sql:98: NOTICE:  PASS G1 after send, clearing 1230 at factory = Dr 3150 exp=3150 act=3150.00
+
+== M2 receive: A 58 (short 2), B 30
+
+
+psql:/tmp/a5_run_a5run.sql:105: NOTICE:  PASS M5 A qty after receive 58 exp=58 act=58.0000
+
+psql:/tmp/a5_run_a5run.sql:106: NOTICE:  PASS M6 B qty after receive 30 exp=30 act=30.0000
+
+psql:/tmp/a5_run_a5run.sql:107: NOTICE:  PASS M7 A avg cost carried = 35 exp=35 act=35.000000
+
+psql:/tmp/a5_run_a5run.sql:108: NOTICE:  PASS M8 short returned by receive = 2 exp=2 act=2
+
+psql:/tmp/a5_run_a5run.sql:109: NOTICE:  PASS M9 in-transit now 0 exp=0 act=0
+
+psql:/tmp/a5_run_a5run.sql:110: NOTICE:  PASS M10 yellow exception transit_short raised at A 
+
+
+psql:/tmp/a5_run_a5run.sql:112: NOTICE:  PASS M11 transit_short_open lists 1 short row = 2 kg exp=2 act=2
+
+psql:/tmp/a5_run_a5run.sql:113: NOTICE:  PASS M12 transit_short_open value = 2 x 35 = 70 exp=70 act=70.0000000000000000
+
+== M3 A sells 40, returns 3 to factory, wastes 2; B sells 25
+
+
+
+psql:/tmp/a5_run_a5run.sql:123: NOTICE:  PASS Q1 A remaining 13 exp=13 act=13.0000
+
+psql:/tmp/a5_run_a5run.sql:124: NOTICE:  PASS Q2 B remaining 5 exp=5 act=5.0000
+
+psql:/tmp/a5_run_a5run.sql:125: NOTICE:  PASS Q3 factory remaining 13 (10 + 3 returned) exp=13 act=13.0000
+
+psql:/tmp/a5_run_a5run.sql:126: NOTICE:  PASS Q4 company total 31 exp=31 act=31.0000
+
+psql:/tmp/a5_run_a5run.sql:127: NOTICE:  PASS Q5 company: made 100 - sold 65 - short 2 - waste 2 = 31 exp=31 act=31
+
+
+psql:/tmp/a5_run_a5run.sql:129: NOTICE:  PASS G2 clearing 1230 at factory = Dr 3045 exp=3045 act=3045.00
+
+psql:/tmp/a5_run_a5run.sql:130: NOTICE:  PASS G3 clearing 1230 at A = Cr 1995 exp=-1995 act=-1995.00
+
+psql:/tmp/a5_run_a5run.sql:131: NOTICE:  PASS G4 clearing 1230 at B = Cr 1050 exp=-1050 act=-1050.00
+
+psql:/tmp/a5_run_a5run.sql:132: NOTICE:  PASS G5 clearing 1230 company-wide = 0 exp=0 act=0.00
+
+psql:/tmp/a5_run_a5run.sql:133: NOTICE:  PASS G6 transit loss 5130 = Dr 70 exp=70 act=70.00
+
+psql:/tmp/a5_run_a5run.sql:134: NOTICE:  PASS G7 transit loss booked at the receiving branch A (loc 2) exp=70 act=70.00
+
+psql:/tmp/a5_run_a5run.sql:135: NOTICE:  PASS G8 unbalanced entries = 0 exp=0 act=0
+
+INVENTORY_VS_GL: {"note": "Read only: nothing is posted. Reasons are movements the books or the stock ledger do not have; \"unexplained\" is what is left.", "rows": [{"gl": 1085.00, "key": "inv_finished", "code": "1310", "diff": 0.00, "name_bn": "মজুত: তৈরি পণ্য", "name_en": "Inventory: finished goods", "reasons": [], "valuation": 1085.00, "unexplained": 0.00, "ledger_value": 1085.00}, {"gl": 5500.00, "key": "inv_raw", "code": "1320", "diff": 0.00, "name_bn": "মজুত: কাঁচামাল", "name_en": "Inventory: raw materials", "reasons": [], "valuation": 5500.00, "unexplained": 0.00, "ledger_value": 5500.00}, {"gl": 0.00, "key": "inv_pack", "code": "1330", "diff": 0.00, "name_bn": "মজুত: প্যাকেজিং", "name_en": "Inventory: packaging", "reasons": [], "valuation": 0.00, "unexplained": 0.00, "ledger_value": 0.00}], "agree": true, "as_of": "2026-10-14", "start": "2026-10-09", "total": {"gl": 6585.00, "diff": 0.00, "valuation": 6585.00, "unexplained": 0.00}, "location_id": null, "accounting_on": true, "valuation_basis": "average_cost"}
+
+IS_A: {"to": "2026-10-14", "cogs": 1400.00, "from": "2026-10-14", "income": [{"id": 29, "code": "4000", "amount": 16000.00, "name_bn": "আয়", "name_en": "Income", "is_group": true, "parent_id": null}, {"id": 30, "code": "4100", "amount": 16000.00, "name_bn": "বিক্রয়", "name_en": "Sales", "is_group": false, "parent_id": 29}], "expense": [{"id": 34, "code": "5000", "amount": 1400.00, "name_bn": "বিক্রীত পণ্যের খরচ (COGS)", "name_en": "Cost of goods sold", "is_group": false, "parent_id": null}, {"id": 35, "code": "5100", "amount": 70.00, "name_bn": "নষ্ট মালের ক্ষতি", "name_en": "Wastage loss", "is_group": false, "parent_id": null}, {"id": 55, "code": "5130", "amount": 70.00, "name_bn": "পথে কম পৌঁছানো মাল (transit loss)", "name_en": "Stock short in transit", "is_group": false, "parent_id": null}], "net_profit": 14460.00, "location_id": 2, "provisional": false, "cogs_missing": 0, "gross_profit": 14600.00, "total_income": 16000.00, "total_expense": 1540.00, "unknown_cost_rev": 0.00, "cogs_estimate_missing": 0.00}
+IS_B: {"to": "2026-10-14", "cogs": 875.00, "from": "2026-10-14", "income": [{"id": 29, "code": "4000", "amount": 10000.00, "name_bn": "আয়", "name_en": "Income", "is_group": true, "parent_id": null}, {"id": 30, "code": "4100", "amount": 10000.00, "name_bn": "বিক্রয়", "name_en": "Sales", "is_group": false, "parent_id": 29}], "expense": [{"id": 34, "code": "5000", "amount": 875.00, "name_bn": "বিক্রীত পণ্যের খরচ (COGS)", "name_en": "Cost of goods sold", "is_group": false, "parent_id": null}], "net_profit": 9125.00, "location_id": 3, "provisional": false, "cogs_missing": 0, "gross_profit": 9125.00, "total_income": 10000.00, "total_expense": 875.00, "unknown_cost_rev": 0.00, "cogs_estimate_missing": 0.00}
+
+1|100.0000|3|3|0|0|90|0|0|13.0000
+2|0|60|58|2|0|3|40.0000|2.0000|13.0000
+3|0|30|30|0|0|0|25.0000|0|5.0000
+psql:/tmp/a5_run_a5run.sql:163: NOTICE:  PASS ST-A1 A sent_in exp=60 act=60
+
+psql:/tmp/a5_run_a5run.sql:164: NOTICE:  PASS ST-A2 A received exp=58 act=58
+
+psql:/tmp/a5_run_a5run.sql:165: NOTICE:  PASS ST-A3 A short exp=2 act=2
+
+psql:/tmp/a5_run_a5run.sql:166: NOTICE:  PASS ST-A4 A returned to factory exp=3 act=3
+
+psql:/tmp/a5_run_a5run.sql:167: NOTICE:  PASS ST-A5 A sold exp=40 act=40.0000
+
+psql:/tmp/a5_run_a5run.sql:168: NOTICE:  PASS ST-A6 A wasted exp=2 act=2.0000
+
+psql:/tmp/a5_run_a5run.sql:169: NOTICE:  PASS ST-A7 A identity: received - returned - sold - wasted = remaining exp=13 act=13.0000
+
+psql:/tmp/a5_run_a5run.sql:170: NOTICE:  PASS ST-B1 B identity exp=5 act=5.0000
+
+psql:/tmp/a5_run_a5run.sql:171: NOTICE:  PASS ST-F1 factory identity: made - sent out + returned in = remaining exp=13 act=13.0000
+
+psql:/tmp/a5_run_a5run.sql:172: NOTICE:  PASS ST-C1 company: made - sold - short - wasted = sum of remaining (31) exp=31 act=31.0000
+
+psql:/tmp/a5_run_a5run.sql:173: NOTICE:  PASS ST-C2 sum of remaining exp=31 act=31.0000
+
+== E0 setup items Y (ladoo, 100 @ 50 at the factory)
+
+== E1 repeated partial receives: 20 sent, A receives 8, later 12 more. Business expectation: A=20 and nothing short. Code: first receive closes the transfer.
+
+
+psql:/tmp/a5_run_a5run.sql:189: NOTICE:  PASS E1a A holds 8 after the first receive exp=8 act=8.0000
+
+psql:/tmp/a5_run_a5run.sql:191: NOTICE:  PASS E1b second receive answers dup=true (ignored, no stock added) exp=true act=true
+
+psql:/tmp/a5_run_a5run.sql:192: NOTICE:  FAIL E1c EXPECTED A=20 once the remaining 12 arrive (partial receipts accumulate) exp=20 act=8.0000
+
+psql:/tmp/a5_run_a5run.sql:193: NOTICE:  PASS E1d transfer row shows received_qty 8 (short 12 stays "short" for ever) exp=8 act=8
+
+== E2 receive without send / wrong place / cancel rights
+psql:/tmp/a5_run_a5run.sql:195: NOTICE:  PASS E2a receive an id that was never sent (not found)
+
+
+
+psql:/tmp/a5_run_a5run.sql:199: NOTICE:  PASS E2b branch-4 manager cannot receive goods meant for branch 2 (not allowed for this location)
+
+
+psql:/tmp/a5_run_a5run.sql:201: NOTICE:  PASS E2c receiving branch cannot cancel the sender's transfer (not allowed for this location)
+
+
+psql:/tmp/a5_run_a5run.sql:204: NOTICE:  PASS E2d sender cancels while in transit exp=cancelled act=cancelled
+
+
+psql:/tmp/a5_run_a5run.sql:206: NOTICE:  PASS E2e receive after cancel is refused (not_in_transit)
+
+
+psql:/tmp/a5_run_a5run.sql:208: NOTICE:  PASS E2f cancel after receive is refused (e1 already received) (not_in_transit)
+
+== E3 over-receive, negative, zero
+
+psql:/tmp/a5_run_a5run.sql:212: NOTICE:  PASS E3a receive 11 of 10 sent (over_received)
+
+psql:/tmp/a5_run_a5run.sql:213: NOTICE:  PASS E3b receive -1 (bad_qty)
+
+psql:/tmp/a5_run_a5run.sql:215: NOTICE:  PASS E3c receive 0 is accepted: whole 10 short, transfer closed exp=10 act=10
+
+== E4 location access: outsider sends; send to a place the sender cannot see; send to a CLOSED place
+
+psql:/tmp/a5_run_a5run.sql:218: NOTICE:  PASS E4a branch-4 manager sends FROM factory (no access to loc 1) (not allowed for this location)
+
+
+psql:/tmp/a5_run_a5run.sql:221: NOTICE:  PASS E4b factory may send to loc 4 although fm has no access there (by design; receiver must be loc-4 staff) 
+
+
+
+psql:/tmp/a5_run_a5run.sql:226: NOTICE:  PASS E4c send to a CLOSED location is refused (trigger _loc_closed_guard) (location_paused:closed)
+
+psql:/tmp/a5_run_a5run.sql:228: NOTICE:  FAIL E4c2 send to a PAUSED location: EXPECTED refused or warned accepted
+
+psql:/tmp/a5_run_a5run.sql:229: NOTICE:  PASS E4d send to the same place (bad_location)
+
+psql:/tmp/a5_run_a5run.sql:230: NOTICE:  PASS E4e send qty 0 (bad_qty)
+
+== E5 duplicate client_id
+psql:/tmp/a5_run_a5run.sql:235: NOTICE:  PASS E5a same client id twice returns the same transfer id exp=b589c85d-7765-40ea-a1c8-23c433314e74 act=b589c85d-7765-40ea-a1c8-23c433314e74
+
+psql:/tmp/a5_run_a5run.sql:236: NOTICE:  PASS E5b only one transfer row for that client id exp=1 act=1
+
+
+psql:/tmp/a5_run_a5run.sql:239: NOTICE:  PASS E5c another user replaying the same client id gets the first user's transfer id back (no client_id_taken, unlike wastage) same id
+
+== E6 sending more than the factory holds / selling at a branch whose goods are still in transit
+
+psql:/tmp/a5_run_a5run.sql:244: NOTICE:  FAIL E6a send 5000 kg while the factory holds 66.0000: EXPECTED refused accepted (factory now negative)
+
+
+psql:/tmp/a5_run_a5run.sql:247: NOTICE:  FAIL E6b branch B sold 2 kg Y while B holds -2.0000 (goods in transit): EXPECTED refused accepted (negative stock)
+
+
+== E7 mode=loss: 10 sent, 7 received -> expected transit loss 3 x 50 = 150 booked ONCE, clearing nets to 0
+
+
+
+psql:/tmp/a5_run_a5run.sql:258: NOTICE:  PASS E7a A stock grew by 7 only exp=7 act=7.0000
+
+psql:/tmp/a5_run_a5run.sql:259: NOTICE:  PASS E7b ledger has a transit_loss row of -3 at A exp=-3 act=-3.0000
+
+
+psql:/tmp/a5_run_a5run.sql:261: NOTICE:  FAIL E7c GL 5130 grew by 150 (3 x 50) exp=150 act=0.00
+
+psql:/tmp/a5_run_a5run.sql:262: NOTICE:  PASS E7d clearing 1230 company-wide unchanged (nets 0) exp=0 act=0.00
+
+psql:/tmp/a5_run_a5run.sql:263: NOTICE:  FAIL E7e waiting cost_missing rows after posting (expect 0) exp=0 act=1
+
+psql:/tmp/a5_run_a5run.sql:264: NOTICE:  PASS E2g cancelled transfer e2 (out + reversal) nets to 0 on clearing 1230 in the GL exp=0 act=0.00
+
+psql:/tmp/a5_run_a5run.sql:265: NOTICE:  PASS E2h the cancel produced GL entries (2 = out + reversal) 
+
+psql:/tmp/a5_run_a5run.sql:266: NOTICE:  PASS E7f unbalanced entries exp=0 act=0
+
+psql:/tmp/a5_run_a5run.sql:267: NOTICE:  FAIL E7g inventory_vs_gl total diff CHANGE caused by a loss-mode short (expect 0; baseline -5000.00 is the unbooked Y opening) exp=0 act=150.00
+
+psql:/tmp/a5_run_a5run.sql:268: NOTICE:  FAIL E7h inventory (finished goods) GL minus stock valuation, by place 2 (expect 0) exp=0 act=150.00
+
+== E8 mode=keep_in_transit then transit_short_resolve: booked once
+
+
+
+
+psql:/tmp/a5_run_a5run.sql:277: NOTICE:  PASS E8a resolve returns short 4 exp=4 act=4
+
+
+psql:/tmp/a5_run_a5run.sql:279: NOTICE:  PASS E8b 5130 unchanged by the resolve (already booked at receive: 4 x 50 = 200 once) exp=0 act=0.00
+
+psql:/tmp/a5_run_a5run.sql:280: NOTICE:  FAIL E8c clearing unchanged by the resolve exp=0 act=-200.00
+
+psql:/tmp/a5_run_a5run.sql:281: NOTICE:  PASS E8d transit_short_open no longer lists e8 exp=0 act=0
+
+psql:/tmp/a5_run_a5run.sql:282: NOTICE:  FAIL E8f inventory_vs_gl diff change since baseline after E7+E8 (expect 0; E7 phantom 150 + E8 phantom 200 = 350) exp=0 act=350.00
+
+psql:/tmp/a5_run_a5run.sql:283: NOTICE:  FAIL E8e waiting cost_missing after resolve (expect 0) exp=0 act=1
+
+== E9 ageing of goods in transit
+
+
+psql:/tmp/a5_run_a5run.sql:291: NOTICE:  PASS E9a open list ageing hours = 30 exp=30 act=30.0
+
+psql:/tmp/a5_run_a5run.sql:292: NOTICE:  PASS E9b over_limit flag true 
+
+psql:/tmp/a5_run_a5run.sql:294: NOTICE:  PASS E9c urgent_alerts carries a transit_open item for the owner (count 1) 
+
+
+psql:/tmp/a5_run_a5run.sql:296: NOTICE:  PASS E9d neither stock_transfer nor stock_receive_transfer calls _notif_add (the receiving branch is never told that goods are on the way) 
+
+
+== E10 cost drift: Z factory 20 @ 50, branch A 10 @ 80 ; send 10 to A -> A avg 65; A returns 4 -> factory avg (500+260)/14 = 54.2857
+
+
+
+psql:/tmp/a5_run_a5run.sql:305: NOTICE:  PASS E10a A blended avg after receiving 10 @50 onto 10 @80 exp=65 act=65.000000
+
+
+psql:/tmp/a5_run_a5run.sql:308: NOTICE:  PASS E10b factory avg after taking 4 back @65 onto 10 @50 (branch cost leaks into factory cost) exp=54.2857 act=54.285714
+
+psql:/tmp/a5_run_a5run.sql:309: NOTICE:  PASS E10c there is no transfer-price / mark-up column anywhere (stock_transfers has no price column) 
+
+== E11 batches and expiry travel with the goods; branch expiry write-off
+
+
+
+
+psql:/tmp/a5_run_a5run.sql:319: NOTICE:  PASS E11a A holds 8 kg of E in ONE batch exp=8 act=8
+
+psql:/tmp/a5_run_a5run.sql:320: NOTICE:  PASS E11b same expiry and made-at as the factory batch 
+
+psql:/tmp/a5_run_a5run.sql:322: NOTICE:  PASS E11c expiry_list at A shows 1 expired batch of 8 exp=8 act=8
+
+psql:/tmp/a5_run_a5run.sql:324: NOTICE:  PASS E11d A stock of E after write-off = 0 exp=0 act=0.0000
+
+
+psql:/tmp/a5_run_a5run.sql:326: NOTICE:  PASS E11e GL wastage account 5100 at A includes 8 x 40 = 320 more (70 earlier + 320 = 390) exp=390 act=390.00
+
+== E12 form 03-1 (transfer challan) vs screen: default primary = screen, form is a reference
+
+psql:/tmp/a5_run_a5run.sql:329: NOTICE:  PASS E12-0 forms_post_to_ledger is OFF by default exp=false act=false
+
+psql:/tmp/a5_run_a5run.sql:333: NOTICE:  PASS E12a approved 03-1 with the switch OFF moves no stock (0 ledger posts) exp=0 act=0
+
+psql:/tmp/a5_run_a5run.sql:335: NOTICE:  PASS E12b with the switch ON the path_primary for stock_transfer flips to b (form posts) exp=b act=b
+
+psql:/tmp/a5_run_a5run.sql:341: NOTICE:  PASS E12c form with sent 10 / received 7 puts +7 at A at once (one-step challan) exp=7 act=7.0000
+
+psql:/tmp/a5_run_a5run.sql:342: NOTICE:  PASS E12d the form short (3) is listed by transit_short_open exp=1 act=1
+
+psql:/tmp/a5_run_a5run.sql:343: NOTICE:  PASS E12e no yellow transit_short exception raised by the form path (screen path raises one) exp=0 act=0
+
+psql:/tmp/a5_run_a5run.sql:344: NOTICE:  PASS E12f an approved form is 2 taps apart from the receiver: receiver count is typed by the APPROVER, not by the branch (no receiver login needed) exp=1 act=1
+
+== E13 reconcile + reports that exist
+psql:/tmp/a5_run_a5run.sql:347: NOTICE:  PASS E13a stock_reconcile finds 0 differences (ledger vs cache) exp=0 act=0
+
+TRANSFERS_GAP: {"meta": {"to": "2026-10-14", "dir": "desc", "from": "2026-10-14", "sort": "sent_day", "group": [], "today": "2026-10-14", "cost_shown": true}, "page": {"n": 1, "cap": 500, "size": 50, "groups": 11}, "rows": [{"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 2.000, "sent_day": "2026-10-14", "sent_qty": 60, "item_code": "A5-SW", "item_name": "Sweet", "sent_staff": "fm", "item_name_en": "Sweet", "received_qty": 58, "received_staff": "ma"}, {"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 3.000, "sent_day": "2026-10-14", "sent_qty": 10, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "o", "item_name_en": "Ladoo", "received_qty": 7, "received_staff": "o"}, {"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 4.000, "sent_day": "2026-10-14", "sent_qty": 10, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": 6, "received_staff": "ma"}, {"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 3.000, "sent_day": "2026-10-14", "sent_qty": 10, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": 7, "received_staff": "ma"}, {"to_bn": "মিষ্টি বাড়ি", "to_en": "MISTY BARI", "status": "sent", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": null, "sent_day": "2026-10-14", "sent_qty": 5000, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": null, "received_staff": null}, {"to_bn": "মিষ্টি বাড়ি", "to_en": "MISTY BARI", "status": "sent", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": null, "sent_day": "2026-10-14", "sent_qty": 1, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": null, "received_staff": null}, {"to_bn": "গোডাউন (ইসলামিয়ার পাশের গলি)", "to_en": "Godown (lane beside ISLAMIYA MISTY GHAR)", "status": "sent", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": null, "sent_day": "2026-10-14", "sent_qty": 1, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": null, "received_staff": null}, {"to_bn": "AL-CAKIZ (বাসার নিচে)", "to_en": "AL-CAKIZ (below the residence)", "status": "sent", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": null, "sent_day": "2026-10-14", "sent_qty": 2, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": null, "received_staff": null}, {"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 10.000, "sent_day": "2026-10-14", "sent_qty": 10, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": 0, "received_staff": "ma"}, {"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 12.000, "sent_day": "2026-10-14", "sent_qty": 20, "item_code": "A5-Y", "item_name": "Ladoo", "sent_staff": "fm", "item_name_en": "Ladoo", "received_qty": 8, "received_staff": "ma"}, {"to_bn": "ইসলামিয়া মিষ্টি ঘর — ২য় শাখা", "to_en": "ISLAMIYA MISTY GHAR — 2nd Branch", "status": "received", "from_bn": "ইসলামিয়া মিষ্টি ঘর — মেইন শোরুম ও মেইন (মিষ্টি) কারখানা", "from_en": "ISLAMIYA MISTY GHAR — Main Showroom & Main (Sweet) Factory", "diff_qty": 2.000, "sent_day": "2026-10-14", "sent_qty": 10, "item_code": "A5-E", "item_name": "Rasgulla", "sent_staff": "fm", "item_name_en": "Rasgulla", "received_qty": 8, "received_staff": "ma"}], "notes": [], "report": "transfers_gap", "totals": {"transfers": 11, "not_received": 4, "short_received": 7}, "columns": [{"key": "sent_day", "cost": false, "role": "dim", "type": "date", "label_bn": "পাঠানো", "label_en": "Sent"}, {"key": "from_bn", "cost": false, "role": "dim", "type": "text", "label_bn": "কোথা থেকে", "label_en": "From"}, {"key": "from_en", "cost": false, "role": "dim", "type": "text", "label_bn": "From (EN)", "label_en": "From (EN)"}, {"key": "to_bn", "cost": false, "role": "dim", "type": "text", "label_bn": "কোথায়", "label_en": "To"}, {"key": "to_en", "cost": false, "role": "dim", "type": "text", "label_bn": "To (EN)", "label_en": "To (EN)"}, {"key": "item_code", "cost": false, "role": "dim", "type": "text", "label_bn": "কোড", "label_en": "Code"}, {"key": "item_name", "cost": false, "role": "dim", "type": "text", "label_bn": "আইটেম", "label_en": "Item"}, {"key": "item_name_en", "cost": false, "role": "dim", "type": "text", "label_bn": "Item (EN)", "label_en": "Item (EN)"}, {"key": "sent_qty", "cost": false, "role": "measure", "type": "num", "label_bn": "পাঠানো পরিমাণ", "label_en": "Sent qty"}, {"key": "received_qty", "cost": false, "role": "measure", "type": "num", "label_bn": "পৌঁছেছে", "label_en": "Received qty"}, {"key": "diff_qty", "cost": false, "role": "measure", "type": "num", "label_bn": "পার্থক্য", "label_en": "Difference"}, {"key": "status", "cost": false, "role": "dim", "type": "text", "label_bn": "অবস্থা", "label_en": "Status"}, {"key": "sent_staff", "cost": false, "role": "dim", "type": "text", "label_bn": "পাঠিয়েছে", "label_en": "Sent by"}, {"key": "received_staff", "cost": false, "role": "dim", "type": "text", "label_bn": "গ্রহণ করেছে", "label_en": "Received by"}], "compare": null, "has_more": false, "data_needed": false}
+psql:/tmp/a5_run_a5run.sql:350: NOTICE:  PASS E13b transfers_gap is an exception list only: columns have no sold / remaining / value 
+
+psql:/tmp/a5_run_a5run.sql:351: NOTICE:  PASS E13c transfers_gap has no per-branch grouping (one row per transfer); totals keys = transfers/not_received/short_received 
+
+STATEMENT_FUNCTIONS_FOUND: :stm
+== RESULT
+PASS=90 FAIL=11
+E1c EXPECTED A=20 once the remaining 12 arrive (partial receipts accumulate)|20|8.0000
+E4c2 send to a PAUSED location: EXPECTED refused or warned|refused|accepted
+E6a send 5000 kg while the factory holds 66.0000: EXPECTED refused|refused|accepted (factory now negative)
+E6b branch B sold 2 kg Y while B holds -2.0000 (goods in transit): EXPECTED refused|refused|accepted (negative stock)
+E7c GL 5130 grew by 150 (3 x 50)|150|0.00
+E7e waiting cost_missing rows after posting (expect 0)|0|1
+E7g inventory_vs_gl total diff CHANGE caused by a loss-mode short (expect 0; baseline -5000.00 is the unbooked Y opening)|0|150.00
+E7h inventory (finished goods) GL minus stock valuation, by place 2 (expect 0)|0|150.00
+E8c clearing unchanged by the resolve|0|-200.00
+E8f inventory_vs_gl diff change since baseline after E7+E8 (expect 0; E7 phantom 150 + E8 phantom 200 = 350)|0|350.00
+E8e waiting cost_missing after resolve (expect 0)|0|1

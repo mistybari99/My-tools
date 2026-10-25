@@ -1,0 +1,207 @@
+{
+ "package": "RPT-B4",
+ "title": "Reports: production capture and reports, targets and KPI, capacity and labour, factory vs retail - info sheet entries",
+ "language": "English",
+ "entries": [
+  {
+   "key": "kpi_alert_sales_drop_pct",
+   "kind": "setting",
+   "title": "Alert when a day's sales fall by more than this %",
+   "what_it_does": "Compares a place's sales of one day with the average of the previous 4 same weekdays (at least 2 are needed) and lists the day as an alert when it is lower by more than this percentage.",
+   "why_it_matters": "A quiet day that nobody noticed is often the first sign of a problem at one shop.",
+   "default": "Blank. No sales-drop alert is shown.",
+   "what_changes_if_switched": "The KPI trend (Targets, KPI & comparison, tab KPI) lists the alert days. Nothing is blocked, posted or sent; it only draws a list.",
+   "who_can_change": "The owner (Settings, rules)."
+  },
+  {
+   "key": "kpi_alert_discount_pct",
+   "kind": "setting",
+   "title": "Alert when a day's discount is more than this % of the sales before discount",
+   "what_it_does": "Lists a place and day as an alert when the discount given was above this share of the sales before discount.",
+   "why_it_matters": "Heavy discounting on one day is easy to miss in a daily total.",
+   "default": "Blank. No discount alert.",
+   "what_changes_if_switched": "The KPI tab lists the alert days. Display only.",
+   "who_can_change": "The owner (Settings, rules)."
+  },
+  {
+   "key": "kpi_alert_void_n",
+   "kind": "setting",
+   "title": "Alert when a place voids more than this many sales in one day",
+   "what_it_does": "Lists a place and day as an alert when the number of voided sales is above this count. 0 means any void is listed.",
+   "why_it_matters": "Voids are where cash can go missing.",
+   "default": "Blank. No void alert.",
+   "what_changes_if_switched": "The KPI tab lists the alert days. Display only.",
+   "who_can_change": "The owner (Settings, rules)."
+  },
+  {
+   "key": "transfer_valuation_basis",
+   "kind": "setting",
+   "title": "How goods moved from the factory to the shops are valued (reports only)",
+   "what_it_does": "Decides the value shown for transfers in the factory-vs-retail report: none (not valued), cost (the factory's ledger cost) or price_pct (a percentage of the selling price, set in transfer_price_pct).",
+   "why_it_matters": "Without a value for transfers the factory result and the shop result cannot be told apart. The choice is the owner's, not the software's.",
+   "default": "none. The report says 'not valued' and shows quantities and the ledger cost only.",
+   "what_changes_if_switched": "Only the factory-vs-retail report changes. No stock, journal or price is touched. The shop gross profit stays at ledger cost and is never netted with the transfer value.",
+   "who_can_change": "The owner (Settings, rules)."
+  },
+  {
+   "key": "transfer_price_pct",
+   "kind": "setting",
+   "title": "Transfer value = this % of the selling price (only for price_pct)",
+   "what_it_does": "The percentage of the item's selling price used as the value of goods moved between units, when the basis is price_pct.",
+   "why_it_matters": "A blank number blocks the basis that needs it: no value is guessed.",
+   "default": "Blank. With price_pct the report says 'percentage not set'.",
+   "what_changes_if_switched": "Transfers get a value in the factory-vs-retail report and the factory margin on transfers is worked out. An item with no selling price stays 'not valued'.",
+   "who_can_change": "The owner (Settings, rules)."
+  },
+  {
+   "key": "sales_target_manage",
+   "kind": "grant",
+   "title": "Set sales targets",
+   "what_it_does": "Lets a role or person enter, change and retire the monthly sales target of a place.",
+   "why_it_matters": "A target is a decision about money. It is the owner's unless he hands it on.",
+   "default": "Held by nobody but the owner.",
+   "what_changes_if_switched": "The holder sees the 'Set a target' button on Targets, KPI & comparison, and the server accepts the entry for his own places.",
+   "who_can_change": "The owner (permission matrix)."
+  },
+  {
+   "key": "capacity_manage",
+   "kind": "grant",
+   "title": "Set production lines and rated capacity",
+   "what_it_does": "Lets a role or person add production lines and set the rated capacity (batches a day, working days a week) of a place or line.",
+   "why_it_matters": "The capacity-utilization report is only as good as the rating behind it.",
+   "default": "Held by nobody but the owner.",
+   "what_changes_if_switched": "The holder sees the set-up tab on Labour & capacity and may change it for his own places.",
+   "who_can_change": "The owner (permission matrix)."
+  },
+  {
+   "key": "prodplan",
+   "kind": "feature",
+   "title": "Production: plan, orders & runs",
+   "what_it_does": "Digital entry screens: a plan line per day, place and item; production orders with a due day; and, for each finished run, the real use of ingredients, reject / rework with a reason, the labour hours, the line, and the plan or order it belongs to.",
+   "why_it_matters": "These are the figures the plan-vs-actual, real-use, loss, labour and order reports need. They were never captured before.",
+   "default": "Always available to the owner and to holders of the production grant (stock_production). Nothing is required; a run without these records simply shows 'data not captured' in the reports.",
+   "what_changes_if_switched": "Nothing moves stock or money. The production screen booked the recipe quantity; these records say what really happened. The paper form code of these entries is to be given by the owner.",
+   "who_can_change": "The owner and holders of stock_production (orders can also be raised by the outlet's stock-transfer staff)."
+  },
+  {
+   "key": "prod_real_use",
+   "kind": "feature",
+   "title": "Real use of ingredients (blind entry)",
+   "what_it_does": "For a finished run you type the quantity of each ingredient really used. The recipe quantity of a line is shown only after you saved your own.",
+   "why_it_matters": "The recipe quantity is what the production screen booked; the report real-use-vs-recipe and the usage variance need what was really used.",
+   "default": "Empty. A run without a record is 'not captured' and is left out of every total.",
+   "what_changes_if_switched": "The reports consumption, cost variance and the price/usage/yield split can then be worked out for that run. Stock is not moved: an extra use is a record, to be corrected through the stock count if wanted.",
+   "who_can_change": "The owner and holders of stock_production."
+  },
+  {
+   "key": "prodreports",
+   "kind": "feature",
+   "title": "Production reports",
+   "what_it_does": "Eight read-only reports: plan vs actual, order status and pending orders, made-sent-received-in transit-short, standard vs actual cost with the price/usage/yield split, real use against the recipe, run-level yield, reject and rework, wastage by batch and run. Each has a CSV and every row opens its source.",
+   "why_it_matters": "Answers whether plans were met, where material and yield were lost and what the batch really cost.",
+   "default": "Open to the owner, holders of the stock report right and the people who may read recipes or production, for their own places. Money columns need the cost right.",
+   "what_changes_if_switched": "Nothing changes; it only reads. A figure that was never captured is shown as 'data not captured: <field>', never 0 and never an estimate.",
+   "who_can_change": "Anyone with the report right."
+  },
+  {
+   "key": "cost_variance",
+   "kind": "report",
+   "title": "Standard vs actual cost and the variance split",
+   "what_it_does": "For each run: price variance, usage variance and yield variance of the material, and their sum. Standard quantity is what the production screen booked, real quantity is what was typed, standard price is the owner's price list, standard output is the recipe yield, real output is the typed yield.",
+   "why_it_matters": "Separates 'we paid more' from 'we used more' from 'we got less out'.",
+   "default": "Each part is shown only when all of its inputs exist. The three parts add up exactly to the total.",
+   "what_changes_if_switched": "Nothing; read only. Conversion cost has no standard in the system and is shown as booked, not split. Needs the cost right.",
+   "who_can_change": "Anyone with the stock report right and the cost right."
+  },
+  {
+   "key": "dispatch_recon",
+   "kind": "report",
+   "title": "Production to dispatch",
+   "what_it_does": "Per day, producing place and item: quantity made, sent to shops, received, still in transit and short, and the quantity on hand now.",
+   "why_it_matters": "Shows whether what the factory made reached the shops.",
+   "default": "Quantities only, no money. Sent = received + in transit + short always ties; a row that does not tie is flagged.",
+   "what_changes_if_switched": "Nothing; read only. On hand is the balance today, not the end of the period.",
+   "who_can_change": "Anyone with the stock report right or the right to move stock."
+  },
+  {
+   "key": "target_report",
+   "kind": "report",
+   "title": "Target vs achievement",
+   "what_it_does": "Per place and month: the owner's target, the net sales so far (after returns, like the dashboard), the pace, the shortfall, and the gross-profit % against its target when the reader has the cost right.",
+   "why_it_matters": "Shows early which outlet is behind, instead of at month end.",
+   "default": "A place with no target says 'target not set' and still shows its sales.",
+   "what_changes_if_switched": "Nothing; read only. The owner board has a tile with the same figures.",
+   "who_can_change": "Anyone with the sales report right, for their own places."
+  },
+  {
+   "key": "kpi_trend",
+   "kind": "report",
+   "title": "KPI trends and alerts",
+   "what_it_does": "A daily series of sales, bills, average bill, discount %, voids and production yield from daily snapshots, plus the alerts of the three owner limits and the count of open exceptions.",
+   "why_it_matters": "History of how the business is running, not only today's numbers.",
+   "default": "Days without a snapshot are listed as missing, never drawn as 0. A blank limit means no alert of that kind.",
+   "what_changes_if_switched": "Taking snapshots stores a copy of figures already recorded for closed days (up to yesterday); existing days are not changed unless the owner asks to redo them. Nothing else moves.",
+   "who_can_change": "The owner, holders of the sales report right, and the scheduler account that runs notify_scan."
+  },
+  {
+   "key": "factory_vs_retail",
+   "kind": "report",
+   "title": "Factory vs retail",
+   "what_it_does": "Three blocks side by side: what the factory produced and what it cost, what it sent to the shops (quantity, cost, and value under the owner's basis), and what each shop sold with its cost of goods and gross profit.",
+   "why_it_matters": "Tells whether the factory or the shops make the money.",
+   "default": "Transfers are 'not valued' until the owner picks a basis. Shop gross profit is at ledger cost and is never netted with a transfer value.",
+   "what_changes_if_switched": "Nothing; read only. Cost columns need the cost right at that place.",
+   "who_can_change": "Anyone with the sales report right or the stock report right, for their own places."
+  },
+  {
+   "key": "labour_productivity",
+   "kind": "report",
+   "title": "Output per labour hour",
+   "what_it_does": "Per run: the output and the labour hours recorded for it (people x hours each, summed over the crews) and the output per hour; totals per item and per place.",
+   "why_it_matters": "Shows how productive each run and place is.",
+   "default": "A run with no labour record is 'labour not captured' and is left out of the totals. Output of different items is never added.",
+   "what_changes_if_switched": "Nothing; read only.",
+   "who_can_change": "Anyone with the stock report right."
+  },
+  {
+   "key": "capacity_utilization",
+   "kind": "report",
+   "title": "Capacity utilization",
+   "what_it_does": "Batches made against the rated capacity of a place or line. The capacity of a day is batches per day x working days per week / 7, from the rating in force that day.",
+   "why_it_matters": "Shows whether the factory is idle or stretched.",
+   "default": "No rating = 'rated capacity not captured'. Days without a rating are not judged; batches made on them are shown apart.",
+   "what_changes_if_switched": "Nothing; read only. The owner sets the rating in the set-up tab.",
+   "who_can_change": "Anyone with the stock report right; ratings are set by the owner or a holder of capacity_manage."
+  },
+  {
+   "key": "production_loss",
+   "kind": "feature",
+   "title": "Reject and rework",
+   "what_it_does": "A record per run: reject or rework quantity with a reason from the existing wastage-reason list, or 'checked, none'.",
+   "why_it_matters": "Without 'checked, none' a run with no record cannot be told from a run with no loss.",
+   "default": "Empty. A run with no record is 'not captured'.",
+   "what_changes_if_switched": "Nothing moves in stock: the output of the run stays as booked. Stock written off is recorded through the existing wastage screen.",
+   "who_can_change": "The owner and holders of stock_production."
+  },
+  {
+   "key": "production_labour",
+   "kind": "feature",
+   "title": "Labour hours of a run",
+   "what_it_does": "Records how many people worked on a run and for how many hours each (more than one crew = more than one line).",
+   "why_it_matters": "Attendance exists only at day level; output per labour hour needs the hours of the run.",
+   "default": "Empty. A run with no entry is 'labour not captured'.",
+   "what_changes_if_switched": "Nothing; it is a record. A wrong line is voided with a reason, never deleted.",
+   "who_can_change": "The owner and holders of stock_production."
+  },
+  {
+   "key": "owner_board_target_vs",
+   "kind": "feature",
+   "title": "Owner board tile: this month's target vs achievement",
+   "what_it_does": "A widget for the owner board showing the total achievement % of the month against the targets, the pace, and the outlets that are behind.",
+   "why_it_matters": "One look in the morning.",
+   "default": "Not on the board until the owner adds it (Edit board, Add widget). With no target set it says 'Sales target not set'.",
+   "what_changes_if_switched": "Nothing else changes.",
+   "who_can_change": "The owner."
+  }
+ ]
+}

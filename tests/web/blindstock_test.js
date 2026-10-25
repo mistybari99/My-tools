@@ -1,10 +1,11 @@
-// B2: blind stock count (04-3) and GRN (04-1) UI. The mock answers stock_blind_active / count_lines_state / count_lines_seal.
+// B2: blind stock count (36-1) and GRN (13-1) UI. The mock answers stock_blind_active / count_lines_state / count_lines_seal.
 // Run: node blindstock_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8352, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc;
  const S = window.__SB = window.__SB || { on: true, sealed: false, err: null };
  c.rpc = async (fn, args) => {
@@ -31,9 +32,9 @@ const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.s
   const calls = (p, fn) => p.evaluate((f) => (window.__AC7 || []).filter((c) => c[0] === f).map((c) => c[1]), fn);
   const openAll = (p) => p.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); });
 
-  // 04-3 blind ON
-  let p = await open({ on: true, sealed: false }, '#/entry/new/04-3/1'); await openAll(p);
-  ok((await calls(p, 'stock_blind_active')).length === 1, '04-3 asks the server');
+  // 36-1 blind ON
+  let p = await open({ on: true, sealed: false }, '#/entry/new/36-1/1'); await openAll(p);
+  ok((await calls(p, 'stock_blind_active')).length === 1, '36-1 asks the server');
   ok(await p.locator('[data-p="rows.0.count"]').count() === 1, 'count field present');
   await p.fill('[data-p="rows.0.count"]', '7'); await wait(p, 200);
   ok(!(await p.locator('[data-p="rows.0.book"]').first().isVisible()), 'book field is not on the screen while blind');
@@ -47,23 +48,23 @@ const EXTRA7 = `(function(){ const real = window.supabase.createClient; window.s
   ok(!(await p.locator('[data-p="rows.0.book"]').first().isVisible()), 'book still hidden after sealing (the system adds it at submit)');
   await p.screenshot({ path: SP + '/bs_043.png', fullPage: true });
 
-  // 04-3 blind OFF
-  p = await open({ on: false }, '#/entry/new/04-3/1'); await openAll(p);
+  // 36-1 blind OFF
+  p = await open({ on: false }, '#/entry/new/36-1/1'); await openAll(p);
   await p.fill('[data-p="rows.0.count"]', '7'); await wait(p, 200);
   ok(await p.locator('[data-p="rows.0.book"]').first().isVisible() && await p.locator('[data-act=e_seal]').count() === 0, 'switch OFF: old behaviour (book field, no lock button)');
 
-  // 04-1 blind ON: memo hidden until counted are locked
-  p = await open({ on: true, sealed: false }, '#/entry/new/04-1/1'); await openAll(p);
-  ok(await p.locator('[data-p="lines.0.counted"]').count() === 1 && !(await p.locator('[data-p="lines.0.memo"]').first().isVisible()), '04-1: memo hidden before the lock');
+  // 13-1 blind ON: memo hidden until counted are locked
+  p = await open({ on: true, sealed: false }, '#/entry/new/13-1/1'); await openAll(p);
+  ok(await p.locator('[data-p="lines.0.counted"]').count() === 1 && !(await p.locator('[data-p="lines.0.memo"]').first().isVisible()), '13-1: memo hidden before the lock');
   await p.fill('[data-p="lines.0.counted"]', '10'); await p.click('[data-act=e_seal]'); await wait(p, 600);
-  ok(await p.locator('[data-p="lines.0.memo"]').first().isVisible(), '04-1: memo appears after the lock');
-  ok(await p.locator('[data-p="lines.0.counted"][disabled]').count() === 1, '04-1: counted read-only after the lock');
+  ok(await p.locator('[data-p="lines.0.memo"]').first().isVisible(), '13-1: memo appears after the lock');
+  ok(await p.locator('[data-p="lines.0.counted"][disabled]').count() === 1, '13-1: counted read-only after the lock');
   // error text
-  p = await open({ on: true, sealed: false, err: 'count_missing' }, '#/entry/new/04-1/1'); await openAll(p);
+  p = await open({ on: true, sealed: false, err: 'count_missing' }, '#/entry/new/13-1/1'); await openAll(p);
   await p.fill('[data-p="lines.0.counted"]', '10'); await p.click('[data-act=e_seal]'); await wait(p, 600);
   const bt = await p.evaluate(() => document.body.innerText); ok(/Type the count/.test(bt), 'friendly text for count_missing ' + bt.slice(-200).replace(/\n/g,' '));
   // other forms never ask
-  p = await open({ on: true }, '#/entry/new/10-2/1'); ok((await calls(p, 'stock_blind_active')).length === 0, 'other forms do not ask');
+  p = await open({ on: true }, '#/entry/new/11-1/1'); ok((await calls(p, 'stock_blind_active')).length === 0, 'other forms do not ask');
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'no horizontal overflow');
   console.log('errors:', errors.length ? errors.join('\n') : 'none'); console.log('assert failures:', bad);
   await br.close();

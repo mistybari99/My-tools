@@ -12,14 +12,14 @@ const X = {
   intro: L('একই কাজ দুই পথে (দ্রুত ট্যাব / কাগজের ফর্ম) করা গেলে একটাই মূল রেকর্ড গোনা হয়; অন্যটি লক করা শ্যাডো কপি।', 'When one job can be entered two ways (quick tab / paper form), only ONE record is counted; the other is a locked shadow copy.', 'একই কাজ দুই পথে করা গেলে একটাই record গোনা হয়; অন্যটা locked shadow copy।'),
   open: L('খোলা', 'Open', 'Open'), locked: L('লক', 'Locked', 'Locked'), primary: L('মূল রেকর্ড', 'Primary record', 'Primary record'),
   pa: L('পথ ক (অ্যাপ/দ্রুত)', 'Path A (app / quick)', 'Path A'), pb: L('পথ খ (ফর্ম)', 'Path B (form)', 'Path B'),
-  pfirst: L('যেটা আগে', 'Whichever is first', 'Whichever first'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  pfirst: L('যেটা আগে', 'Whichever is first', 'Whichever first'), save: L('সেভ', 'Save', 'Save'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'),
   pending: L('শ্যাডো কপি বাকি', 'Shadow copies owed', 'Shadow copy বাকি'), rep: L('রিপোর্ট (শুধু দেখা)', 'Reports (read only)', 'Reports (read only)'),
   dvj: L('ডে-বুক বনাম জার্নাল', 'Day book vs journal', 'Day book vs journal'), dup: L('ডুপ্লিকেট সন্দেহ', 'Duplicate suspects', 'Duplicate suspects'),
   from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), run: L('দেখুন', 'Show', 'Show'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
   qtitle: L('দ্রুত খরচ এন্ট্রি', 'Quick expense', 'Quick expense'), head: L('খাত', 'Head', 'Head'), to2: L('কাকে / কী বাবদ', 'Paid to / for', 'Paid to / for'),
   amt: L('টাকা', 'Amount', 'Amount'), mode: L('মাধ্যম', 'Mode', 'Mode'), rcpt: L('রসিদ আছে', 'Receipt', 'Receipt'), add: L('যোগ করুন', 'Add', 'Add'),
-  close: L('দিন শেষ — ১০-২ ফর্ম বানান', 'Day end - make the 10-2 form', 'Day end - 10-2 form বানান'), void: L('বাতিল', 'Void', 'Void'),
-  total: L('আজকের মোট', "Today's total", "Today's total"), owed: L('ফর্মে বাকি', 'Not yet in a form', 'ফর্মে বাকি'), place: L('লোকেশন', 'Place', 'Place'),
+  close: L('দিন শেষ — ১১-১ ফর্ম বানান', 'Day end - make the 11-1 form', 'Day end - 11-1 form বানান'), void: L('ভয়েড', 'Void', 'Void'),
+  total: L('আজকের টোটাল', "Today's total", "Today's total"), owed: L('ফর্মে বাকি', 'Not yet in a form', 'ফর্মে বাকি'), place: L('লোকেশন', 'Place', 'Place'),
   made: L('ফর্ম তৈরি', 'Form made', 'Form তৈরি'), why: L('কারণ লিখুন', 'Write the reason', 'কারণ লিখুন'), alo: L('সব জায়গা', 'All places', 'All places'),
 };
 const T = (k) => lab(X[k]);
@@ -50,6 +50,7 @@ function drawSw() {
 }
 async function setSw(dom, patch) {
   const d = D.sw.find((x) => x.domain === dom), c = Object.assign({}, d.cfg, patch);
+  if (patch.primary && window.BOS.freshness && !(await window.BOS.freshness.confirmSwitch('path:' + dom, patch.primary))) return;   // bos98 (W1-G)
   const r = await sb.rpc('path_switch_set', { p_domain: dom, p_loc: 0, p_a_open: c.a_open !== false, p_b_open: c.b_open !== false, p_primary: c.primary, p_note: null });
   if (r.error) return fail(r.error);
   toast(T('saved')); await loadSw(); drawSw();
@@ -86,17 +87,18 @@ function drawQx() {
     <div class="row wrap"><select id="qx_head">${HEADS.map((h) => `<option value="${h[0]}">${esc(lab({ bn: h[1], mix: h[1], en: h[2] }))}</option>`).join('')}</select>
       <input id="qx_to" placeholder="${esc(T('to2'))}" maxlength="120"><input id="qx_amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="${esc(T('amt'))}" style="max-width:8rem">
       <select id="qx_mode"><option value="cash">cash</option><option value="bank">bank</option><option value="mobile">mobile</option></select>
+      ${B.moneySrc ? B.moneySrc.slot('qx', 'quick_expense', { locSel: '#qx_loc' }) : ''}
       <label class="row"><input type="checkbox" id="qx_rc"> ${esc(T('rcpt'))}</label><button type="button" class="btn primary" data-act="qx_add">${esc(T('add'))}</button></div></div>
     <div class="card stack"><div class="row between"><b>${esc(T('total'))}: ৳ ${esc(String(d.total))}</b><span class="chip ${d.owed ? 'warn' : ''}">${esc(T('owed'))}: ${d.owed}</span></div>
       ${(d.rows || []).map((r) => `<div class="row between"${r.status === 'void' ? ' style="opacity:.5;text-decoration:line-through"' : ''}><span>${esc(r.head)} · ${esc(r.paid_to || '')} · ${esc(r.mode)}${r.receipt ? ' 🧾' : ''}</span><b>৳ ${esc(String(r.amount))}</b>
-        ${r.status === 'done' && !r.form ? `<button type="button" class="mini" data-act="qx_void" data-id="${esc(r.id)}">${esc(T('void'))}</button>` : r.form ? '<span class="chip">10-2</span>' : ''}</div>`).join('')}
+        ${r.status === 'done' && !r.form ? `<button type="button" class="mini" data-act="qx_void" data-id="${esc(r.id)}">${esc(T('void'))}</button>` : r.form ? '<span class="chip">11-1</span>' : ''}</div>`).join('')}
       ${d.owed ? `<button type="button" class="btn primary" data-act="qx_close">${esc(T('close'))}</button>` : ''}</div>`;
 }
 const refreshQx = async () => { await loadQx(); drawQx(); };
 Object.assign(H, {
   qx_add: async () => {
     const amt = Number($('#qx_amt').value); if (!(amt > 0)) return toast(T('amt'));
-    const r = await sb.rpc('quick_expense_add', { p_loc: D.q.loc, p_date: D.q.day, p_head: $('#qx_head').value, p_to: $('#qx_to').value, p_amount: amt, p_mode: $('#qx_mode').value, p_receipt: $('#qx_rc').checked, p_note: null, p_client: crypto.randomUUID() });
+    const r = await sb.rpc('quick_expense_add', { p_loc: D.q.loc, p_date: D.q.day, p_head: $('#qx_head').value, p_to: $('#qx_to').value, p_amount: amt, p_mode: $('#qx_mode').value, p_receipt: $('#qx_rc').checked, p_note: B.moneySrc ? B.moneySrc.tag('qx', null) : null, p_client: crypto.randomUUID() });
     if (r.error) return fail(r.error); toast(T('saved')); await refreshQx();
   },
   qx_void: async (a) => { const why = window.prompt(T('why')); if (!why) return; const r = await sb.rpc('quick_expense_void', { p_id: a.dataset.id, p_note: why }); if (r.error) return fail(r.error); await refreshQx(); },

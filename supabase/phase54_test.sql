@@ -32,9 +32,9 @@ select to_char((date_trunc('month', tt.today()) - interval '1 month')::date, 'YY
 select to_char(:'m0'::date + 3, 'YYYY-MM-DD') as d1, to_char(:'m0'::date + 4, 'YYYY-MM-DD') as d2, to_char(:'m0'::date + 5, 'YYYY-MM-DD') as d3 \gset
 select to_char(date_trunc('month', tt.today())::date, 'YYYY-MM-DD') as mc, extract(month from :'m0'::date)::int as mm0, extract(year from :'m0'::date)::int as yy0 \gset
 insert into employees (id, full_name_bn, full_name_en, employee_no, primary_location_id, status, joining_date, profile_id) values
- ('e0000000-0000-0000-0000-000000000001', 'করিম', 'Karim', 'E01', 1, 'active', '2025-01-01', null),
- ('e0000000-0000-0000-0000-000000000002', 'রহিম', 'Rahim', 'E02', 2, 'active', '2025-01-01', null),
- ('e0000000-0000-0000-0000-000000000005', 'সালমা', 'Salma', 'E05', 3, 'active', '2025-01-01', :'p'),
+ ('e0000000-0000-0000-0000-000000000001', 'করিম', 'TestF', 'E01', 1, 'active', '2025-01-01', null),
+ ('e0000000-0000-0000-0000-000000000002', 'রহিম', 'TestK', 'E02', 2, 'active', '2025-01-01', null),
+ ('e0000000-0000-0000-0000-000000000005', 'সালমা', 'TestM', 'E05', 3, 'active', '2025-01-01', :'p'),
  ('e0000000-0000-0000-0000-000000000007', 'আনিস', 'Anis', 'E07', 3, 'active', '2025-01-01', :'a'),
  ('e0000000-0000-0000-0000-000000000010', 'স্টোর', 'Storeman', 'E10', 3, 'active', '2025-01-01', :'k'),
  ('e0000000-0000-0000-0000-000000000011', 'ম্যানেজার', 'Manager Emp', 'E11', 1, 'active', '2025-01-01', :'s');
@@ -166,14 +166,14 @@ select tt.err('T6 a month in an approved payroll cannot be re-marked', format($$
 \echo == T7 two paths counted once
 select tt.as(:'o');
 select count(*) as cnt_before from entries where form_code='02-1' \gset
-select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"Karim","present":2,"late":0,"absent":1,"ot_hours":2}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f1 \gset
+select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"TestF","present":2,"late":0,"absent":1,"ot_hours":2}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f1 \gset
 select submit_entry(:'f1'::uuid) is not null as sub_f1 \gset
 select tt.chk('T7 submitted 02-1 for a month that path A holds is a locked shadow (primary a)', tt.is_shadow('entries', :'f1') and (select count(*) from shadow_links where domain='attendance' and state='confirmed')=1);
 reset role;
 select tt.err('T7 the shadow cannot be changed or re-opened', format($$update entries set status='draft' where id='%s'$$, :'f1'), 'shadow_locked');
 set role authenticated; select tt.as(:'o');
 select attendance_count_once(1, :'m0'::date) as co \gset
-select tt.chk('T7 report: counted = attendance record, form listed as shadow, Karim matches (2 present, 1 absent, 2 OT hours)',
+select tt.chk('T7 report: counted = attendance record, form listed as shadow, TestF matches (2 present, 1 absent, 2 OT hours)',
   (:'co'::jsonb ->> 'counted')='attendance_record' and (:'co'::jsonb -> 'forms' -> 0 ->> 'is_shadow')='true' and (:'co'::jsonb ->> 'mismatches')='0'
   and ((:'co'::jsonb -> 'rows' -> 0 -> 'device' ->> 'present')::numeric)=2 and ((:'co'::jsonb -> 'rows' -> 0 -> 'form' ->> 'present')::numeric)=2);
 select save_entry(null,'02-1',1,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"করিম","present":5,"late":0,"absent":0}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f2 \gset
@@ -184,7 +184,7 @@ select tt.chk('T7 report flags a difference between path A and the second regist
 select tt.as(:'k'); select tt.err('T7 report needs attendance rights at the place', $$select attendance_count_once(1, current_date)$$, 'not allowed');
 select tt.as(:'o');
 -- month with nothing on path A: stays the record; later link-run picks it up
-select save_entry(null,'02-1',1,tt.today(),format('{"month":"%s","year":"%s","staff":[{"name":"Karim","present":1,"absent":0}]}', extract(month from tt.today())::int, extract(year from tt.today())::int)::jsonb,'[]') ->> 'id' as f3 \gset
+select save_entry(null,'02-1',1,tt.today(),format('{"month":"%s","year":"%s","staff":[{"name":"TestF","present":1,"absent":0}]}', extract(month from tt.today())::int, extract(year from tt.today())::int)::jsonb,'[]') ->> 'id' as f3 \gset
 select submit_entry(:'f3'::uuid) is not null as sub_f3 \gset
 select tt.chk('T7 path A has no record for the current month yet: the form is NOT a shadow (it is the only record)', not tt.is_shadow('entries', :'f3'));
 select tt.as(:'s'); select attendance_mark_others(:'e1'::uuid, tt.today(), 'present', '09:00', '19:00', 30, 'manual', 'today entry') is not null as mkt \gset
@@ -194,7 +194,7 @@ select attendance_form_link_run(1, :'mc'::date) -> 'result' ->> 'already' as lr2
 select tt.chk('T7 link-run links it now; running again changes nothing', :'lr'='1' and tt.is_shadow('entries', :'f3') and :'lr2'='1');
 -- primary b
 select path_switch_set('attendance',0,true,true,'b') is not null as sw5 \gset
-select save_entry(null,'02-1',3,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"Salma","present":3}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f4 \gset
+select save_entry(null,'02-1',3,:'d3'::date, format('{"month":"%s","year":"%s","staff":[{"name":"TestM","present":3}]}', :'mm0', :'yy0')::jsonb, '[]') ->> 'id' as f4 \gset
 select submit_entry(:'f4'::uuid) is not null as sub_f4 \gset
 select tt.chk('T7 primary=b: the form stays the record (no shadow) and the report says so', not tt.is_shadow('entries', :'f4') and (attendance_count_once(3, :'m0'::date) ->> 'counted')='form_02_1');
 -- path B locked

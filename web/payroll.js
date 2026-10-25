@@ -17,17 +17,17 @@ const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dha
 const prevMonth = () => { const d = new Date(today() + 'T00:00:00Z'); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() - 1); return d.toISOString().slice(0, 7); };
 const X = {
   title: L('বেতন শিট', 'Payroll', 'Payroll'), place: L('জায়গা', 'Place', 'Place'), month: L('মাস', 'Month', 'Month'), summary: L('সব জায়গা - মাসের সারাংশ', 'All places - month summary', 'সব জায়গা - summary'),
-  s1: L('১ আগে দেখুন', '1 Preview', '১ Preview'), s2: L('২ শিট তৈরি', '2 Create', '২ Create'), s3: L('৩ সমন্বয়', '3 Adjust', '৩ Adjust'), s4: L('৪ অনুমোদন', '4 Approve', '৪ Approve'), s5: L('৫ বেতন দিন', '5 Pay', '৫ Pay'),
+  s1: L('১ আগে দেখুন', '1 Preview', '১ Preview'), s2: L('২ শিট তৈরি', '2 Create', '২ Create'), s3: L('৩ সমন্বয়', '3 Adjust', '৩ Adjust'), s4: L('৪ অ্যাপ্রুভ', '4 Approve', '৪ Approve'), s5: L('৫ বেতন দিন', '5 Pay', '৫ Pay'),
   preview: L('আগে দেখুন (ট্রায়াল - কিছু লেখা হবে না)', 'Preview (trial - nothing is saved)', 'Preview (trial - কিছু save হবে না)'), trial: L('ট্রায়াল: কিছু লেখা হয়নি', 'Trial: nothing was saved', 'Trial: কিছু save হয়নি'),
-  create: L('বেতন শিট তৈরি করুন (খসড়া)', 'Create the payroll (draft)', 'Payroll তৈরি (draft)'), refresh: L('হাজিরা থেকে আবার হিসাব', 'Recalculate from attendance', 'Attendance থেকে আবার হিসাব'),
-  approve: L('অনুমোদন ও মাস বন্ধ', 'Approve and lock the month', 'Approve ও মাস lock'), approveQ: L('অনুমোদনের পর এই মাসের হাজিরা ও বেতন আর বদলানো যাবে না। অনুমোদন করবেন?', 'After approval this month\'s attendance and pay cannot change. Approve?', 'Approve করলে মাস lock হবে। করবেন?'),
-  pay: L('বেতন দিন', 'Pay', 'Pay'), payAll: L('বাকি সবাইকে বেতন দিন', 'Pay everyone still unpaid', 'বাকি সবাইকে pay'), voidRun: L('শিট বাতিল', 'Void this payroll', 'Payroll বাতিল'), csv: L('CSV নামান', 'Export CSV', 'CSV export'),
+  create: L('বেতন শিট তৈরি করুন (ড্রাফট)', 'Create the payroll (draft)', 'Payroll তৈরি (draft)'), refresh: L('হাজিরা থেকে আবার হিসাব', 'Recalculate from attendance', 'Attendance থেকে আবার হিসাব'),
+  approve: L('অ্যাপ্রুভ ও মাস বন্ধ', 'Approve and lock the month', 'Approve ও মাস lock'), approveQ: L('অ্যাপ্রুভের পর এই মাসের হাজিরা ও বেতন আর বদলানো যাবে না। অ্যাপ্রুভ করবেন?', 'After approval this month\'s attendance and pay cannot change. Approve?', 'Approve করলে মাস lock হবে। করবেন?'),
+  pay: L('বেতন দিন', 'Pay', 'Pay'), payAll: L('বাকি সবাইকে বেতন দিন', 'Pay everyone still unpaid', 'বাকি সবাইকে pay'), voidRun: L('শিট ভয়েড', 'Void this payroll', 'Payroll void'), csv: L('CSV নামান', 'Export CSV', 'CSV export'),
   people: L('জন', 'people', 'জন'), gross: L('মোট আয়', 'Gross', 'Gross'), ded: L('কর্তন', 'Deductions', 'Deductions'), net: L('হাতে পাবেন', 'Net pay', 'Net'), paid: L('দেওয়া হয়েছে', 'Paid', 'Paid'),
-  draft: L('খসড়া', 'Draft', 'Draft'), approved: L('অনুমোদিত', 'Approved', 'Approved'), pstatus: L('পরিশোধিত', 'Paid', 'Paid'), void: L('বাতিল', 'Void', 'Void'), unpaid: L('বাকি', 'Unpaid', 'Unpaid'), partly: L('আংশিক', 'Part paid', 'Part paid'),
+  draft: L('ড্রাফট', 'Draft', 'Draft'), approved: L('অ্যাপ্রুভড', 'Approved', 'Approved'), pstatus: L('পরিশোধিত', 'Paid', 'Paid'), void: L('ভয়েড', 'Void', 'Void'), unpaid: L('বাকি', 'Unpaid', 'Unpaid'), partly: L('আংশিক', 'Part paid', 'Part paid'),
   noRun: L('এই মাসের শিট এখনো হয়নি', 'No payroll for this month yet', 'এই মাসের payroll হয়নি'), noperm: L('বেতন দেখার অনুমতি নেই', 'You are not allowed to see pay', 'Salary দেখার permission নেই'),
   payslip: L('পে-স্লিপ', 'Payslip', 'Payslip'), print: L('প্রিন্ট', 'Print', 'Print'), addBonus: L('＋ বোনাস', '＋ Bonus', '＋ Bonus'), addDed: L('＋ কর্তন', '＋ Deduction', '＋ Deduction'), adjust: L('± সমন্বয়', '± Adjustment', '± Adjust'),
-  name: L('নাম', 'Name', 'Name'), amount: L('টাকা', 'Amount', 'Amount'), reason: L('কারণ (জরুরি)', 'Reason (required)', 'কারণ (জরুরি)'), save: L('সংরক্ষণ', 'Save', 'Save'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), remove: L('বাদ', 'Remove', 'Remove'),
-  mode: L('কীভাবে', 'Paid by', 'Paid by'), cash: L('নগদ', 'Cash', 'Cash'), bank: L('ব্যাংক', 'Bank', 'Bank'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), date: L('তারিখ', 'Date', 'Date'), ref: L('রেফারেন্স', 'Reference', 'Reference'), note: L('নোট', 'Note', 'Note'),
+  name: L('নাম', 'Name', 'Name'), amount: L('টাকা', 'Amount', 'Amount'), reason: L('কারণ (জরুরি)', 'Reason (required)', 'কারণ (জরুরি)'), save: L('সেভ', 'Save', 'Save'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), remove: L('বাদ', 'Remove', 'Remove'),
+  mode: L('কীভাবে', 'Paid by', 'Paid by'), cash: L('ক্যাশ', 'Cash', 'Cash'), bank: L('ব্যাংক', 'Bank', 'Bank'), mobile: L('মোবাইল', 'Mobile', 'Mobile'), date: L('ডেট', 'Date', 'Date'), ref: L('রেফারেন্স', 'Reference', 'Reference'), note: L('নোট', 'Note', 'Note'),
   why: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন'), trail: L('হিসাবের ধাপ', 'How it was calculated', 'হিসাবের ধাপ'), warnings: L('সতর্কতা', 'Warnings', 'Warnings'),
   earn: L('আয়', 'Earnings', 'Earnings'), basic: L('মূল বেতন', 'Basic', 'Basic'), allow: L('ভাতা', 'Allowances', 'Allowances'), ot: L('ওভারটাইম', 'Overtime', 'Overtime'), bonus: L('বোনাস', 'Bonus', 'Bonus'),
   absent: L('অনুপস্থিতি', 'Absence', 'Absence'), late: L('দেরি', 'Late arrivals', 'Late'), unpaidD: L('বিনা বেতনের দিন', 'Unpaid days', 'Unpaid days'), notEmp: L('চাকরির বাইরের দিন', 'Days not employed', 'চাকরির বাইরের দিন'),
@@ -35,16 +35,16 @@ const X = {
   days: L('দিন', 'Days', 'Days'), paidDays: L('বেতনের দিন', 'Paid days', 'Paid days'), lateCount: L('দেরি (বার)', 'Lates', 'Lates'), otH: L('ওভারটাইম (ঘণ্টা)', 'OT hours', 'OT hours'), sign: L('গ্রহীতার সই', 'Received by', 'Received by'), round: L('পূর্ণ টাকায়', 'Rounding', 'Rounding'),
   tRun: L('বেতন শিট', 'Payroll', 'Payroll'), tAdv: L('অগ্রিম', 'Advances', 'Advances'), tMore: L('বোনাস ও চূড়ান্ত হিসাব', 'Bonus & settlement', 'Bonus ও settlement'),
   addAdv: L('＋ অগ্রিম দিন', '＋ Give an advance', '＋ Advance'), who: L('কর্মচারী', 'Employee', 'Employee'), inst: L('মাসে কত করে কাটা (ফাঁকা = এক বারে)', 'Monthly instalment (empty = all at once)', 'মাসে কত কাটা (ফাঁকা = একবারে)'),
-  recFrom: L('কোন মাস থেকে কাটা', 'Recover from month', 'কোন মাস থেকে কাটা'), outst: L('বাকি', 'Owed', 'Owed'), none: L('কিছু নেই', 'Nothing yet', 'কিছু নেই'), modeNone: L('টাকা আগে দেওয়া (০২-৩ ফর্মে লেখা)', 'Already paid out (written on form 02-3)', 'আগে দেওয়া (০২-৩)'),
+  recFrom: L('কোন মাস থেকে কাটা', 'Recover from month', 'কোন মাস থেকে কাটা'), outst: L('বাকি', 'Owed', 'Owed'), none: L('কিছু নেই', 'Nothing yet', 'কিছু নেই'), modeNone: L('টাকা আগে দেওয়া (৩৫-১ ফর্মে লেখা)', 'Already paid out (written on form 35-1)', 'আগে দেওয়া (৩৫-১)'),
   festival: L('এই মাসে উৎসব বোনাস', 'Festival bonus paid this month', 'এই মাসে festival bonus'), festName: L('বোনাসের নাম (বেতন কাঠামোর মতো, যেমন Eid)', 'Bonus name (as in the pay structures, e.g. Eid)', 'Bonus নাম (যেমন Eid)'),
   settle: L('চূড়ান্ত হিসাব (চাকরি ছাড়লে)', 'Final settlement (leaving)', 'Final settlement'), lastDay: L('শেষ কাজের দিন', 'Last working day', 'শেষ কাজের দিন'), show: L('দেখুন (কিছু লেখা হবে না)', 'Show (nothing is saved)', 'দেখুন'),
   advLeft: L('পরেও বাকি থাকবে অগ্রিম', 'Advance still owed after this', 'পরেও বাকি advance'), due: L('বাকি পাওনা', 'Due', 'Due'),
-  w_no_pay_structure: L('বেতন কাঠামো নেই - শিটে আসবে না', 'No pay structure - left out', 'Pay structure নেই'), w_no_joining_date: L('যোগদানের তারিখ নেই', 'No joining date', 'Joining date নেই'),
+  w_no_pay_structure: L('বেতন কাঠামো নেই - শিটে আসবে না', 'No pay structure - left out', 'Pay structure নেই'), w_no_joining_date: L('যোগদানের ডেট নেই', 'No joining date', 'Joining date নেই'),
   w_days_not_computed: L('দিনের হাজিরা হিসাব হয়নি (বেতনসহ ধরা হলো)', 'days without attendance (counted as paid)', 'দিনের হাজিরা নেই'), w_month_not_finished: L('দিন এখনো বাকি (মাস শেষ হয়নি)', 'days still to come', 'দিন বাকি'),
-  w_unapproved_days: L('দিন হাতে লেখা, অনুমোদন বাকি', 'manual days waiting approval', 'manual দিন approval বাকি'), w_single_punch_days: L('দিন একবার আঙুল', 'days with one punch', 'দিন একবার punch'),
-  w_ot_waiting_approval_min: L('মিনিট ওভারটাইম অনুমোদনের অপেক্ষায় (ধরা হয়নি)', 'OT minutes waiting approval (not paid)', 'OT মিনিট approval বাকি'), w_ot_not_paid_no_rule: L('ওভারটাইম আছে কিন্তু নিয়ম নেই', 'Overtime but no OT rule', 'OT আছে, rule নেই'),
+  w_unapproved_days: L('দিন হাতে লেখা, অ্যাপ্রুভ অপেক্ষায়', 'manual days waiting approval', 'manual দিন approval অপেক্ষায়'), w_single_punch_days: L('দিন একবার আঙুল', 'days with one punch', 'দিন একবার punch'),
+  w_ot_waiting_approval_min: L('মিনিট ওভারটাইম অ্যাপ্রুভের অপেক্ষায় (ধরা হয়নি)', 'OT minutes waiting approval (not paid)', 'OT মিনিট approval অপেক্ষায়'), w_ot_not_paid_no_rule: L('ওভারটাইম আছে কিন্তু নিয়ম নেই', 'Overtime but no OT rule', 'OT আছে, rule নেই'),
   w_bonus_not_eligible: L('বোনাসের যোগ্য নয় (চাকরির মেয়াদ কম)', 'not eligible for bonus (service too short)', 'Bonus-এর যোগ্য নয়'), w_advance_recovery_capped: L('বেতন কম, অগ্রিম পুরো কাটা যায়নি', 'Pay too low to recover the full instalment', 'পুরো advance কাটা যায়নি'),
-  w_negative_net: L('হাতে পাওয়া ঋণাত্মক!', 'Net pay is negative!', 'Net negative!'), w_register_02_3_advance: L('০২-৩ রেজিস্টারে অগ্রিম বাকি - এখানে যোগ করলে কাটা হবে', 'advance owed in register 02-3 - add it here to recover', '০২-৩-এ advance বাকি'),
+  w_negative_net: L('হাতে পাওয়া মাইনাস!', 'Net pay is negative!', 'Net negative!'), w_register_02_3_advance: L('৩৫-১ রেজিস্টারে অগ্রিম বাকি - এখানে যোগ করলে কাটা হবে', 'advance owed in register 35-1 - add it here to recover', '০২-৩-এ advance বাকি'),
   w_already_in_run: L('আগেই একটি শিটে আছে', 'Already in a payroll', 'আগেই payroll-এ'),
   k_basic: L('মূল বেতন', 'Basic', 'Basic'), k_days: L('চাকরির দিন / মাসের দিন', 'Days employed / in month', 'Days employed / month'), k_day_rate: L('এক দিনের বেতন', 'One day\'s pay', 'Day rate'),
   k_not_employed: L('চাকরির বাইরের দিন', 'Days not employed', 'Not employed'), k_absent: L('অনুপস্থিত', 'Absent', 'Absent'), k_unpaid: L('বিনা বেতনের দিন', 'Unpaid days', 'Unpaid'), k_daily_pay: L('দৈনিক মজুরি', 'Daily pay', 'Daily pay'),
@@ -54,12 +54,12 @@ const X = {
 const T = (k) => lab(X[k]);
 const ERR = {
   'not allowed': L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), payroll_off: L('বেতন শিট এখন বন্ধ (সুইচবোর্ড)', 'Payroll is switched off (Switchboard)', 'Payroll বন্ধ'), bad_month: L('মাস ঠিক নয় (ভবিষ্যতের মাস নয়)', 'Month is not valid (not a future month)', 'মাস ঠিক নয়'),
-  run_exists: L('এই মাস ও জায়গার শিট আগেই আছে', 'A payroll for this month and place already exists', 'Payroll আগেই আছে'), payroll_locked: L('শিট অনুমোদিত - আর বদলানো যাবে না', 'The payroll is approved - it cannot change', 'Payroll lock'),
-  run_not_approved: L('আগে অনুমোদন লাগবে', 'Approve it first', 'আগে approve'), nothing_to_pay: L('দেওয়ার মতো কিছু বাকি নেই', 'Nothing left to pay', 'কিছু বাকি নেই'), more_than_due: L('পাওনার চেয়ে বেশি', 'More than is due', 'পাওনার চেয়ে বেশি'),
-  negative_net: X.w_negative_net, run_has_payments: L('বেতন দেওয়া হয়ে গেছে - আগে পেমেন্ট বাতিল করুন', 'Salaries were paid - void the payments first', 'আগে payment বাতিল'), run_empty: L('শিটে কেউ নেই', 'Nobody in this payroll', 'Payroll খালি'),
-  reason_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন'), bad_amount: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'), bad_mode: L('নগদ / ব্যাংক / মোবাইল বাছুন', 'Choose cash / bank / mobile', 'Mode বাছুন'),
-  bad_date: L('তারিখ ঠিক নয়', 'Date is not valid', 'Date ঠিক নয়'), name_required: L('নাম লিখুন', 'Write the name', 'নাম লিখুন'), advance_partly_recovered: L('অগ্রিম থেকে কাটা শুরু হয়ে গেছে', 'Recovery has started on this advance', 'Advance কাটা শুরু হয়েছে'),
-  advance_changed_refresh: L('অগ্রিম বদলেছে - আগে আবার হিসাব করুন', 'Advances changed - recalculate first', 'আগে আবার হিসাব'), period_closed: L('এই তারিখের হিসাব বন্ধ', 'This date is closed', 'Date বন্ধ'), bad_instalment: L('কিস্তি ঠিক নয়', 'Instalment is not valid', 'কিস্তি ঠিক নয়'),
+  run_exists: L('এই মাস ও জায়গার শিট আগেই আছে', 'A payroll for this month and place already exists', 'Payroll আগেই আছে'), payroll_locked: L('শিট অ্যাপ্রুভড - আর বদলানো যাবে না', 'The payroll is approved - it cannot change', 'Payroll lock'),
+  run_not_approved: L('আগে অ্যাপ্রুভ লাগবে', 'Approve it first', 'আগে approve'), nothing_to_pay: L('দেওয়ার মতো কিছু বাকি নেই', 'Nothing left to pay', 'কিছু বাকি নেই'), more_than_due: L('পাওনার চেয়ে বেশি', 'More than is due', 'পাওনার চেয়ে বেশি'),
+  negative_net: X.w_negative_net, run_has_payments: L('বেতন দেওয়া হয়ে গেছে - আগে পেমেন্ট ভয়েড করুন', 'Salaries were paid - void the payments first', 'আগে payment void'), run_empty: L('শিটে কেউ নেই', 'Nobody in this payroll', 'Payroll খালি'),
+  reason_required: L('কারণ লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a reason (3+ letters)', 'কারণ লিখুন'), bad_amount: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'), bad_mode: L('ক্যাশ / ব্যাংক / মোবাইল বাছুন', 'Choose cash / bank / mobile', 'Mode বাছুন'),
+  bad_date: L('ডেট ঠিক নয়', 'Date is not valid', 'Date ঠিক নয়'), name_required: L('নাম লিখুন', 'Write the name', 'নাম লিখুন'), advance_partly_recovered: L('অগ্রিম থেকে কাটা শুরু হয়ে গেছে', 'Recovery has started on this advance', 'Advance কাটা শুরু হয়েছে'),
+  advance_changed_refresh: L('অগ্রিম বদলেছে - আগে আবার হিসাব করুন', 'Advances changed - recalculate first', 'আগে আবার হিসাব'), period_closed: L('এই ডেটের হিসাব বন্ধ', 'This date is closed', 'Date বন্ধ'), bad_instalment: L('কিস্তি ঠিক নয়', 'Instalment is not valid', 'কিস্তি ঠিক নয়'),
 };
 const eText = (e) => { const m = String((e && e.message) || ''); const k = Object.keys(ERR).find((x) => m.includes(x)); return k ? lab(ERR[k]) : (m || 'error'); };
 const P = { loc: undefined, month: prevMonth(), tab: 'run', run: null, lines: [], pv: null, can: {}, emps: [], client: rid() };
@@ -204,6 +204,19 @@ function slipHTML(l) {
     <tr><td colspan="2"><b>${esc(T('ded'))}</b></td></tr>${ded}<tr><td><b>${esc(T('ded'))}</b></td><td><b>− ${esc(n2(l.deductions))}</b></td></tr>
     <tr><td><b>${esc(T('net'))}</b></td><td><b>${esc(n2(l.net))}</b></td></tr></table><div class="sig">${esc(T('sign'))}</div></div>`;
 }
+// bos98: the pay slip through the chosen pay_slip template; false (nothing chosen / no B.tpl / any error) = today's slip. Earnings and deductions the employee sees, no cost.
+async function tplSlip(l) {
+  try {
+    await B.tpl.ensure(sb); const r = (k, v) => (Number(v) ? [{ label: k, amount: Number(v) }] : []);
+    const earn = [...r(T('basic'), l.basic_amount), ...(l.allowances || []).flatMap((x) => r(x.name, x.amount)), ...r(T('ot'), l.ot_amount), ...(l.bonus || []).flatMap((x) => r(T('bonus') + ': ' + x.name, x.amount)), ...(l.adjustments || []).filter((x) => Number(x.amount) > 0).flatMap((x) => r(x.name, x.amount))];
+    const ded = [...r(T('notEmp'), l.not_employed_deduction), ...r(T('absent'), l.absent_deduction), ...r(T('unpaidD'), l.unpaid_deduction), ...r(T('late'), l.late_deduction), ...(l.structure_deductions || []).flatMap((x) => r(x.name, x.amount)), ...r(T('advance'), l.advance_recovery),
+      ...(l.other_deductions || []).flatMap((x) => r(x.name, x.amount)), ...(l.adjustments || []).filter((x) => Number(x.amount) < 0).flatMap((x) => r(x.name, -x.amount))];
+    const sum = (a) => a.reduce((t, x) => t + x.amount, 0);
+    const data = { employee: nameOf(l), emp_no: l.employee_no || '', month: P.month, days: l.days_in_month, sections: [{ title: T('earn'), rows: earn, total: sum(earn) }, { title: T('ded'), rows: ded, total: sum(ded) }], net: Number(l.net) };
+    const o = { lang: S.lang, loc: l.location_id, shop: {} };
+    return !!(B.tpl.printHTML('pay_slip', data, undefined, o) && B.tpl.print('pay_slip', data, undefined, o));
+  } catch (e) { return false; }
+}
 function printHTML(html) {
   const old = $('#pr_print'); if (old) old.remove();
   const d = document.createElement('div'); d.id = 'pr_print'; d.innerHTML = html; document.body.appendChild(d);
@@ -222,6 +235,7 @@ function lineSheet(i) {
 function paySheet(i) {
   const one = i != null ? P.lines[i] : null;
   openSheet(`<h3>${esc(T('pay'))}${one ? ': ' + esc(nameOf(one)) : ''}</h3><div class="stack"><div><label for="py_m">${esc(T('mode'))}</label><select id="py_m"><option value="cash">${esc(T('cash'))}</option><option value="bank">${esc(T('bank'))}</option><option value="mobile">${esc(T('mobile'))}</option></select></div>
+    ${B.moneySrc ? B.moneySrc.slot('py', 'salary_payment', { loc: P.loc }) : ''}
     <div><label for="py_d">${esc(T('date'))}</label><input id="py_d" type="date" value="${today()}" max="${today()}"></div>${one ? `<div><label for="py_a">${esc(T('amount'))}</label><input id="py_a" inputmode="decimal" value="${esc(Number(one.net) - Number(one.paid_amount))}"></div>` : ''}
     <div><label for="py_r">${esc(T('ref'))}</label><input id="py_r" autocomplete="off"></div><div><label for="py_n">${esc(T('note'))}</label><input id="py_n" autocomplete="off"></div>
     <button class="primary full" data-act="py_go" data-i="${i == null ? '' : i}">${esc(T('pay'))}</button></div>`);
@@ -230,7 +244,7 @@ function paySheet(i) {
 function csvOut(lines) {
   const cols = ['employee_no', 'name', 'location_id', 'days_in_month', 'paid_days', 'absent_days', 'late_count', 'ot_minutes', 'basic_amount', 'allowance_total', 'ot_amount', 'gross', 'absent_deduction', 'late_deduction', 'unpaid_deduction',
     'not_employed_deduction', 'structure_deduction_total', 'advance_recovery', 'deductions', 'net', 'payment_status', 'paid_amount'];
-  const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const q = (v) => { let s = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = "'" + s; /* spreadsheet formula guard */ return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const text = '﻿' + cols.join(',') + '\n' + lines.map((l) => cols.map((c) => q(l[c])).join(',')).join('\n') + '\n';
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = `payroll_${P.month}_${P.loc == null ? 'all' : P.loc}.csv`;
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
@@ -250,7 +264,7 @@ Object.assign(H, {
   pr_payall: () => paySheet(null),
   pr_csv: () => csvOut(P.loc == null ? (P.sumLines || []) : P.lines),
   pr_line: (a) => lineSheet(Number(a.dataset.i)),
-  ln_slip: (a) => printHTML(slipHTML(curLines()[Number(a.dataset.i)])),
+  ln_slip: async (a) => { const l = curLines()[Number(a.dataset.i)]; if (B.tpl && B.tpl.ensure && (await tplSlip(l))) return; printHTML(slipHTML(l)); },   // bos98
   ln_pay: (a) => paySheet(Number(a.dataset.i)),
   ln_adj: (a) => { const k = a.dataset.k; openSheet(`<h3>${esc(T(k === 'bonus' ? 'addBonus' : k === 'deduction' ? 'addDed' : 'adjust'))}</h3><div class="stack"><div><label for="aj_n">${esc(T('name'))}</label><input id="aj_n" autocomplete="off"></div>
       <div><label for="aj_a">${esc(T('amount'))}${k === 'adjust' ? ' (+ / −)' : ''}</label><input id="aj_a" inputmode="decimal" autocomplete="off"></div><div><label for="aj_r">${esc(T('reason'))}</label><input id="aj_r" autocomplete="off"></div>
@@ -262,15 +276,16 @@ Object.assign(H, {
   py_go: async (a) => { const i = a.dataset.i === '' ? null : Number(a.dataset.i); const one = i == null ? null : P.lines[i];
     const amt = one ? nnum(val('py_a')) : null; if (one && !(amt > 0)) return toast(lab(ERR.bad_amount));
     const due = one ? Number(one.net) - Number(one.paid_amount) : null;
-    const d = await rpc('payroll_pay', { p_run: P.run.id, p_lines: one ? [one.id] : null, p_mode: val('py_m'), p_date: val('py_d') || today(), p_ref: val('py_r') || null, p_note: val('py_n') || null, p_client: P.payClient, p_amount: one && amt !== due ? amt : null }, 'saved');
+    const d = await rpc('payroll_pay', { p_run: P.run.id, p_lines: one ? [one.id] : null, p_mode: val('py_m'), p_date: val('py_d') || today(), p_ref: (B.moneySrc ? B.moneySrc.tag('py', val('py_r') || null) : val('py_r')) || null, p_note: val('py_n') || null, p_client: P.payClient, p_amount: one && amt !== due ? amt : null }, 'saved');
     if (d) { closeSheet(); draw(); } },
   adv_new: async () => { if (!P.emps.length) await loadEmps(); openSheet(`<h3>${esc(T('addAdv'))}</h3><div class="stack"><div><label for="av_e">${esc(T('who'))}</label><select id="av_e">${P.emps.filter((e) => ['active', 'on_leave'].includes(e.status)).map((e) => `<option value="${esc(e.id)}">${esc(empName(e))} ${esc(e.employee_no || '')}</option>`).join('')}</select></div>
       <div><label for="av_d">${esc(T('date'))}</label><input id="av_d" type="date" value="${today()}" max="${today()}"></div><div><label for="av_a">${esc(T('amount'))}</label><input id="av_a" inputmode="decimal" autocomplete="off"></div>
       <div><label for="av_i">${esc(T('inst'))}</label><input id="av_i" inputmode="decimal" autocomplete="off"></div><div><label for="av_f">${esc(T('recFrom'))}</label><input id="av_f" type="month" value="${today().slice(0, 7)}"></div>
       <div><label for="av_m">${esc(T('mode'))}</label><select id="av_m"><option value="cash">${esc(T('cash'))}</option><option value="bank">${esc(T('bank'))}</option><option value="mobile">${esc(T('mobile'))}</option><option value="none">${esc(T('modeNone'))}</option></select></div>
+      ${B.moneySrc ? B.moneySrc.slot('av', 'salary_advance', { loc: P.loc }) : ''}
       <div><label for="av_n">${esc(T('note'))}</label><input id="av_n" autocomplete="off"></div><button class="primary full" data-act="av_save">${esc(T('save'))}</button></div>`); P.advClient = rid(); },
   av_save: async () => { const amt = nnum(val('av_a')); if (!(amt > 0)) return toast(lab(ERR.bad_amount)); const ins = val('av_i') ? nnum(val('av_i')) : null;
-    const d = await rpc('staff_advance_add', { p_emp: val('av_e'), p_date: val('av_d'), p_amount: amt, p_instalment: ins, p_mode: val('av_m'), p_recover_from: (val('av_f') || today().slice(0, 7)) + '-01', p_note: val('av_n') || null, p_client: P.advClient }, 'saved');
+    const d = await rpc('staff_advance_add', { p_emp: val('av_e'), p_date: val('av_d'), p_amount: amt, p_instalment: ins, p_mode: val('av_m'), p_recover_from: (val('av_f') || today().slice(0, 7)) + '-01', p_note: (B.moneySrc && val('av_m') !== 'none' ? B.moneySrc.tag('av', val('av_n') || null) : val('av_n')) || null, p_client: P.advClient }, 'saved');
     if (d) { closeSheet(); draw(); } },
   adv_void: async (a) => { const n = ask(); if (!n) return; const d = await rpc('staff_advance_void', { p_id: Number(a.dataset.v), p_reason: n }, 'saved'); if (d) draw(); },
   fb_save: async () => { if (!val('fb_n')) return toast(lab(ERR.name_required)); const d = await rpc('payroll_bonus_event_save', { p_month: m01(), p_name: val('fb_n'), p_loc: S.ctx.is_owner ? null : P.loc, p_active: true }, 'saved'); if (d) draw(); },

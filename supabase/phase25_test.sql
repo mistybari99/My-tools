@@ -140,10 +140,10 @@ select tt.ent('02-2',1,8003,date '2026-09-02','approved','{"receipts":[{"name":"
 -- W2 (2026-03-20..03-25)
 select tt.ent('10-1',1,9001,date '2026-03-20','approved','{"carrier":"Rafiq","count":{"n1000":5},"leave_float":500}','[]','{"rcount":{"n1000":4,"n500":1}}');
 select tt.ent('10-1',1,9002,date '2026-03-21','approved','{"carrier":"Rafiq","count":{"n1000":3},"leave_float":0}','[]','{"rcount":{"n1000":2,"n500":1}}');
-select tt.ent('10-1',1,9003,date '2026-03-22','submitted','{"carrier":"Karim","count":{"n500":4},"leave_float":0}');
+select tt.ent('10-1',1,9003,date '2026-03-22','submitted','{"carrier":"TestF","count":{"n500":4},"leave_float":0}');
 select tt.ent('10-1',2,9001,date '2026-03-23','approved','{"carrier":"Rafiq","count":{"n1000":1},"leave_float":0}','[]','{"rcount":{"n1000":1,"n200":1}}');
 select tt.ent('10-1',1,9004,date '2026-03-24','draft','{"carrier":"Rafiq","count":{"n1000":9},"leave_float":0}','[]','{"rcount":{"n1000":1}}');
-select tt.ent('10-1',1,9005,date '2026-03-25','approved','{"carrier":"Hasan","count":{"n1000":1},"leave_float":0}') as eh \gset
+select tt.ent('10-1',1,9005,date '2026-03-25','approved','{"carrier":"TestD","count":{"n1000":1},"leave_float":0}') as eh \gset
 insert into entry_counts (entry_id, section, counted_detail, counted, expected, diff, counted_by) values (:'eh','hub','{"n500":1,"n200":2,"n100":1}'::jsonb, 900, 1000, -100, :'s');
 
 select _r3_lockdown() as ld \gset
@@ -271,8 +271,8 @@ select tt.chk('W1 loc-1 user: cash in 1400 only', tt.num(:'j'::jsonb->'totals','
 \echo == W2
 select tt.as(:'o'); select tt.run('w2_handover_vs_hub','{"from":"2026-03-20","to":"2026-03-25"}') as j \gset
 select tt.chk('W2 loc1 Rafiq: 2 slips, handover 7500, hub 7000, diff -500, 1 short (draft excluded)', tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Rafiq"}'),'slips')=2 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Rafiq"}'),'handover')=7500 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Rafiq"}'),'hub_received')=7000 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Rafiq"}'),'diff')=-500 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Rafiq"}'),'short_slips')=1);
-select tt.chk('W2 Karim: not counted at hub -> hub and diff null, not_counted 1', (tt.pick(:'j','{"location_id":1,"carrier":"Karim"}')->'hub_received')='null'::jsonb and (tt.pick(:'j','{"location_id":1,"carrier":"Karim"}')->'diff')='null'::jsonb and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Karim"}'),'not_counted')=1 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Karim"}'),'handover')=2000);
-select tt.chk('W2 Hasan: hub count from entry_counts 900 vs 1000 = -100', tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Hasan"}'),'hub_received')=900 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"Hasan"}'),'diff')=-100);
+select tt.chk('W2 TestF: not counted at hub -> hub and diff null, not_counted 1', (tt.pick(:'j','{"location_id":1,"carrier":"TestF"}')->'hub_received')='null'::jsonb and (tt.pick(:'j','{"location_id":1,"carrier":"TestF"}')->'diff')='null'::jsonb and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"TestF"}'),'not_counted')=1 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"TestF"}'),'handover')=2000);
+select tt.chk('W2 TestD: hub count from entry_counts 900 vs 1000 = -100', tt.num(tt.pick(:'j','{"location_id":1,"carrier":"TestD"}'),'hub_received')=900 and tt.num(tt.pick(:'j','{"location_id":1,"carrier":"TestD"}'),'diff')=-100);
 select tt.chk('W2 loc2 Rafiq over by 200', tt.num(tt.pick(:'j','{"location_id":2,"carrier":"Rafiq"}'),'diff')=200 and tt.num(tt.pick(:'j','{"location_id":2,"carrier":"Rafiq"}'),'over_slips')=1);
 select tt.chk('W2 totals: diff -500-100+200 = -400, 5 slips', tt.num(:'j'::jsonb->'totals','diff')=-400 and tt.num(:'j'::jsonb->'totals','slips')=5);
 select tt.as(:'s'); select tt.run('w2_handover_vs_hub','{"from":"2026-03-20","to":"2026-03-25"}') as j \gset

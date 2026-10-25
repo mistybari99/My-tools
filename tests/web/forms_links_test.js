@@ -1,17 +1,19 @@
-// Forms <-> stock ledger links (forms_stock.js read views + #/ledgerlinks), 06-5 supplier_pick master column, 05-1 output table, brand P&L and discounts pages (reports.js).
-// Run: node forms_links_test.js /home/user/My-tools/tests/web
+// Forms <-> stock ledger links (forms_stock.js read views + #/ledgerlinks), 38-1 supplier_pick master column, 12-1 output table, brand P&L and discounts pages (reports.js).
+// Run: node forms_links_test.js tests/web
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), srv = C.serve(8321);
+const base = C.baseData(SP), srv = C.serve(PORT);
 // extra RPCs of phase20 on top of the phase10 mock
 const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables; const M = window.__M; const clone = (x) => JSON.parse(JSON.stringify(x === undefined ? null : x));
- const L2 = window.__L2 = Object.assign({ prob: [{ entry_id: 'e1', form_code: '04-2', serial: 7, location_id: 1, entry_date: '2026-10-10', failed: 2, skipped: 1, first_reason: 'insufficient_stock' }],
+ const L2 = window.__L2 = Object.assign({ prob: [{ entry_id: 'e1', form_code: '18-1', serial: 7, location_id: 1, entry_date: '2026-10-10', failed: 2, skipped: 1, first_reason: 'insufficient_stock' }],
    brand: [{ brand_code: 'islamiya', brand_bn: 'ইসলামিয়া', brand_en: 'ISLAMIYA', locations: 2, n: 10, revenue: 1000, discount: 50, void_n: 1, void_amt: 30, costed_rev: 800, cogs: 500, gross_profit: 300, gp_pct: 37.5 },
            { brand_code: 'misty_bari', brand_bn: 'মিষ্টি বাড়ি', brand_en: 'MISTY BARI', locations: 1, n: 4, revenue: 400, discount: 0, void_n: 0, void_amt: 0, costed_rev: 400, cogs: 100, gross_profit: 300, gp_pct: 75 }],
-   disc: [{ sale_id: 's1', location_id: 1, receipt: 12, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 150, discount_kind: 'percent', discount_input: 30, total: 350, seller_staff: 'karim02', approver_staff: 'owner1', approval: 'emergency', over_limit: true, customer: null },
-          { sale_id: 's2', location_id: 1, receipt: 11, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 50, discount_kind: 'amount', discount_input: 50, total: 450, seller_staff: 'karim02', approver_staff: null, approval: null, over_limit: false, customer: null }],
+   disc: [{ sale_id: 's1', location_id: 1, receipt: 12, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 150, discount_kind: 'percent', discount_input: 30, total: 350, seller_staff: 'testf02', approver_staff: 'owner1', approval: 'emergency', over_limit: true, customer: null },
+          { sale_id: 's2', location_id: 1, receipt: 11, sale_date: '2026-10-10', status: 'done', subtotal: 500, discount: 50, discount_kind: 'amount', discount_input: 50, total: 450, seller_staff: 'testf02', approver_staff: null, approval: null, over_limit: false, customer: null }],
    sup: [{ supplier_id: 'sp1', name: 'Dudh Ghor', balance: 600 }] }, window.__L20 || {});
  const OWN = ['ledger_post_problems', 'entry_post_ledger_retry', 'set_rule', 'forms_ledger_cfg_set', 'brand_pnl', 'discounts_report', 'report_catalog', 'report_presets'];
  c.rpc = async (fn, args) => { if (!OWN.includes(fn) || (fn === 'set_rule' && args.p_key !== 'forms_post_to_ledger')) return rpc(fn, args); M.calls.push([fn, clone(args || {})]);
@@ -36,24 +38,24 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     const d = C.mkData(base, o);
     d.tables.rules.push({ key: 'forms_post_to_ledger', module: 'stock', kind: 'switch', value: o.on ? true : null, default_value: false, label_bn: 'x', label_en: 'x', label_mix: 'x', sort: 1 });
-    d.tables.forms_ledger_cfg = ['04-1', '04-2', '04-3', '03-1', '05-1'].map((c) => ({ form_code: c, is_on: true }));
+    d.tables.forms_ledger_cfg = ['13-1', '18-1', '36-1', '39-1', '12-1'].map((c) => ({ form_code: c, is_on: true }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(d)};window.__M0=${JSON.stringify(o.m || {})};window.__NOCOST=${!!o.noCost};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8321/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__M.calls.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const wait = (p, n = 300) => p.waitForTimeout(n);
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
 
   // ---- switch OFF: the old paper form list stays ----
-  let p = await open({}, '#/form/04-4');
-  ok(await p.locator('#lk_loc').count() === 0 && await p.locator('[data-act=newentry]').count() === 1, 'switch off: 04-4 is the normal paper-form list with a new-entry button');
+  let p = await open({}, '#/form/37-1');
+  ok(await p.locator('#lk_loc').count() === 0 && await p.locator('[data-act=newentry]').count() === 1, 'switch off: 37-1 is the normal paper-form list with a new-entry button');
   await p.close();
-  p = await open({}, '#/form/06-5');
-  ok(await p.locator('#lk_loc').count() === 0 && await p.locator('[data-act=newentry]').count() === 1, 'switch off: 06-5 is the normal list');
+  p = await open({}, '#/form/38-1');
+  ok(await p.locator('#lk_loc').count() === 0 && await p.locator('[data-act=newentry]').count() === 1, 'switch off: 38-1 is the normal list');
   await p.close();
 
-  // ---- switch ON: 04-4 read view ----
-  p = await open({ on: true }, '#/form/04-4');
+  // ---- switch ON: 37-1 read view ----
+  p = await open({ on: true }, '#/form/37-1');
   ok(await p.locator('#lk_loc').count() === 1 && await p.locator('[data-act=newentry]').count() === 0, 'switch on: read view, no new-entry button');
   ok(await p.locator('.lk-row').count() === 3, 'three items listed from stock_levels');
   let lv = await calls(p, 'stock_levels'); ok(lv.length >= 1, 'stock_levels called'); await p.screenshot({ path: SP + '/fl_store.png' }); await noOverflow(p, 'store list');
@@ -66,33 +68,33 @@ const EXTRA2 = `(function(){ const real = window.supabase.createClient; window.s
   await p.click('[data-act=lk_paper]'); await wait(p, 500); ok(await p.locator('[data-act=newentry]').count() === 1 && await p.locator('#lk_loc').count() === 0, 'paper entries button opens the old list');
   await p.close();
 
-  // ---- 06-5 read view ----
-  p = await open({ on: true }, '#/form/06-5');
+  // ---- 38-1 read view ----
+  p = await open({ on: true }, '#/form/38-1');
   ok(await p.locator('[data-act=lk_sup]').count() === 2, 'suppliers with dues listed'); ok(/Dudh Ghor/.test(await p.textContent('#app')) && /600/.test(await p.textContent('#app')), 'balance shown'); await noOverflow(p, 'supplier list');
   await p.click('[data-act=lk_sup] >> nth=0'); await wait(p, 500);
   const sl = await calls(p, 'supplier_ledger'); ok(sl.length === 1 && sl[0].p_supplier === 'sp1', 'supplier_ledger requested for the picked supplier');
   ok(/Bill/.test(await p.textContent('#app')) && /Due now/.test(await p.textContent('#app')), 'ledger rows and the due now figure'); await p.screenshot({ path: SP + '/fl_supplier.png' }); await noOverflow(p, 'supplier ledger');
   await p.close();
 
-  // ---- 06-5 paper form: master list name column is the supplier picker ----
-  p = await open({}, '#/form/06-5'); await p.click('[data-act=newentry]'); await wait(p, 700);
+  // ---- 38-1 paper form: master list name column is the supplier picker ----
+  p = await open({}, '#/form/38-1'); await p.click('[data-act=newentry]'); await wait(p, 700);
   ok(await p.locator('input[data-sup]').count() >= 2, 'supplier pickers on the head and in the master list rows'); const mi = p.locator('[data-p^="master."][data-sup]'); ok(await mi.count() >= 1, 'master-list name cells use the supplier picker');
   await p.close();
 
-  // ---- 05-1: optional finished-goods table ----
-  p = await open({}, '#/form/05-1'); await p.click('[data-act=newentry]'); await wait(p, 700);
-  ok(await p.locator('[data-p^="output."][data-item]').count() >= 1, '05-1 has the optional finished-goods item rows'); await p.close();
+  // ---- 12-1: optional finished-goods table ----
+  p = await open({}, '#/form/12-1'); await p.click('[data-act=newentry]'); await wait(p, 700);
+  ok(await p.locator('[data-p^="output."][data-item]').count() >= 1, '12-1 has the optional finished-goods item rows'); await p.close();
 
   // ---- #/ledgerlinks ----
   p = await open({ on: true }, '#/ledgerlinks');
   ok(await p.locator('[data-act=lk_set]').count() === 12, 'master + 5 forms, on/off each'); ok(await p.locator('[data-act=lk_set][data-v="master:1"].on').count() === 1, 'master shows On');
   ok(await p.locator('[data-act=lk_retry]').count() === 1 && /2 failed/.test(await p.textContent('#app')) && /1 skipped/.test(await p.textContent('#app')), 'retry list with counts'); await p.screenshot({ path: SP + '/fl_links.png' }); await noOverflow(p, 'links');
-  await p.click('[data-act=lk_set][data-v="04-2:0"]'); await wait(p, 400); let cf = await calls(p, 'forms_ledger_cfg_set'); ok(cf.length === 1 && cf[0].p_form === '04-2' && cf[0].p_on === false, 'per-form switch sent');
+  await p.click('[data-act=lk_set][data-v="18-1:0"]'); await wait(p, 400); let cf = await calls(p, 'forms_ledger_cfg_set'); ok(cf.length === 1 && cf[0].p_form === '18-1' && cf[0].p_on === false, 'per-form switch sent');
   await p.click('[data-act=lk_set][data-v="master:0"]'); await wait(p, 400); let sr = await calls(p, 'set_rule'); ok(sr.length === 1 && sr[0].p_key === 'forms_post_to_ledger' && sr[0].p_value === false, 'master switch sent as a rule');
   await p.click('[data-act=lk_retry]'); await wait(p, 400); const rt = await calls(p, 'entry_post_ledger_retry'); ok(rt.length === 1 && rt[0].p_entry === 'e1', 'retry sent for the entry'); ok(await p.locator('[data-act=lk_retry]').count() === 0 && /No problems/.test(await p.textContent('#app')), 'list refreshed');
   await p.close();
   // non-owner: buttons disabled
-  p = await open({ on: true, init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};', m: { ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/ledgerlinks');
+  p = await open({ on: true, init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};', m: { ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/ledgerlinks');
   ok(await p.locator('[data-act=lk_set][disabled]').count() === 12, 'non-owner cannot change the switches'); await p.close();
 
   // ---- brand P&L ----

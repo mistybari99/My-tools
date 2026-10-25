@@ -87,7 +87,7 @@ select tt.chk('T5 switch OFF: pass needs no comparison rows', (parallel_month_de
 \echo == print and books
 select tt.as(:'s'); select tt.err('T6 a showroom manager cannot register books', $$select paper_book_add('14-1',1,1,50)$$, 'not allowed');
 select tt.as(:'h');
-select paper_book_add('14-1',1,1,50,null,current_date,'Karim') ->> 'id' as b1 \gset
+select paper_book_add('14-1',1,1,50,null,current_date,'TestF') ->> 'id' as b1 \gset
 select tt.err('T6 overlapping book refused', $$select paper_book_add('14-1',1,40,90)$$, 'books_overlap');
 select paper_book_add('14-1',1,61,100) is not null as b2 \gset
 select paper_books_check('14-1',1) as bc \gset

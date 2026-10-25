@@ -1,17 +1,18 @@
 // Groups A and B web pieces: cash moves page, switchboard, production void button, forms reading the locations table.
 // Run: node groupab_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8353, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;
  c.rpc = async (fn, args) => {
   (window.__AC8 = window.__AC8 || []).push([fn, JSON.parse(JSON.stringify(args || {}))]);
   if (fn === 'cash_move_add') { if (window.__ERR8) { const m = window.__ERR8; window.__ERR8 = null; return { data: null, error: { message: m, code: 'P0001' } }; } if (args.p_dry) return { data: { dry: true, daybook: 'cash out, bank in' }, error: null };
     T.cash_moves.unshift({ id: 'cm' + T.cash_moves.length, location_id: args.p_loc, kind: args.p_kind, mode: args.p_mode, amount: args.p_amount, move_date: args.p_date, ref: args.p_ref, note: args.p_note, status: 'done', customer_id: args.p_customer, created_at: '2026-10-13T10:00:00Z' }); return { data: { id: 'x' }, error: null }; }
   if (fn === 'cash_move_void') { const r = T.cash_moves.find((x) => x.id === args.p_id); if (r) r.status = 'void'; return { data: { status: 'void' }, error: null }; }
-  if (fn === 'customer_advances') return { data: [{ customer_id: 'c1', name: 'Karim', mobile: '01711', balance: 600 }], error: null };
+  if (fn === 'customer_advances') return { data: [{ customer_id: 'c1', name: 'TestF', mobile: '01711', balance: 600 }], error: null };
   if (fn === 'has_grant') return { data: true, error: null };
   if (fn === 'production_void') return { data: { status: 'void', reversed_lines: 4 }, error: null };
   if (fn === 'set_rule') { const r = T.rules.find((x) => x.key === args.p_key); if (r) r.value = args.p_value; return { data: null, error: null }; }
@@ -46,7 +47,7 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
   // ---- cash moves ----
   let p = await open('#/cashmoves');
   ok(await p.locator('#cm_body').count() === 1 && /Bank deposit/.test(await p.evaluate(() => document.body.innerText)), 'cash moves page lists the existing row');
-  ok(/Karim/.test(await p.evaluate(() => document.body.innerText)), 'customer advances held are shown');
+  ok(/TestF/.test(await p.evaluate(() => document.body.innerText)), 'customer advances held are shown');
   ok(await p.locator('#cm_modew').isHidden(), 'mode hidden for a bank deposit');
   await p.selectOption('#cm_kind', 'owner_topup'); await wait(p, 100);
   ok(await p.locator('#cm_modew').isVisible(), 'mode shown for an owner top-up');
@@ -78,8 +79,8 @@ const EXTRA8 = `(function(){ const real = window.supabase.createClient; window.s
   await p.click('.sw-row[data-key="pin_signature_on"] [data-act=sw_reset]'); await wait(p, 400);
   c = await calls(p, 'set_rule'); ok(c.length === 2 && c[1].p_value === null, 'back to default sends null');
   await p.evaluate(() => { document.querySelector('#sw_perform').open = true; }); await wait(p, 100);
-  await p.click('#sw_perform [data-act=sw_pin][data-f="04-3"]'); await wait(p, 400);
-  c = await calls(p, 'pin_sig_cfg_set'); ok(c.length === 1 && c[0].p_form === '04-3' && c[0].p_enabled === false, 'per-form PIN switch');
+  await p.click('#sw_perform [data-act=sw_pin][data-f="36-1"]'); await wait(p, 400);
+  c = await calls(p, 'pin_sig_cfg_set'); ok(c.length === 1 && c[0].p_form === '36-1' && c[0].p_enabled === false, 'per-form PIN switch');
   await noOverflow(p, 'switchboard'); await p.screenshot({ path: SP + '/ab_switch.png', fullPage: true });
   p = await open('#/switchboard'); await p.selectOption('#sw_mod', 'ui'); await wait(p, 150); ok(await p.locator('.sw-row').count() === 1, 'section filter');
 

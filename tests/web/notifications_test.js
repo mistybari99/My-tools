@@ -1,15 +1,16 @@
 // Module F web piece: the bell + #/notifications (list, filters, open + mark read, mark all read, friendly errors, backup card, 60 s poll, 360px width).
 // Run: node notifications_test.js <abs tests/web dir>      (web/notifications.js is injected into index.html here; the lead adds the real <script> tag, see docs/regs/notifications.md)
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8361, srv = C.serve(PORT);
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
 const iso = (minAgo) => new Date(Date.now() - minAgo * 60000).toISOString();
 const NOTES = () => [
   { id: 14, kind: 'red_exceptions', level: 'bad', title_bn: '৩টি লাল এক্সেপশন খোলা পড়ে আছে', title_en: '3 red exception(s) still open', body_bn: 'সবচেয়ে পুরনোটি ৩০ ঘণ্টা', body_en: 'The oldest has been open 30 hours', route: 'exceptions', location_id: null, created_at: iso(5), is_read: false },
   { id: 13, kind: 'low_stock', level: 'warn', title_bn: '২টি আইটেমের স্টক কম', title_en: '2 item(s) low in stock', body_bn: null, body_en: null, route: 'stock', location_id: 1, created_at: iso(125), is_read: false },
-  { id: 12, kind: 'parallel_decision', level: 'info', title_bn: '14-1: গত মাসের সিদ্ধান্ত বাকি', title_en: '14-1: last month decision waiting', body_bn: null, body_en: null, route: 'parallel', location_id: 1, created_at: iso(3000), is_read: true },
+  { id: 12, kind: 'parallel_decision', level: 'info', title_bn: '06-1: গত মাসের সিদ্ধান্ত বাকি', title_en: '06-1: last month decision waiting', body_bn: null, body_en: null, route: 'parallel', location_id: 1, created_at: iso(3000), is_read: true },
   { id: 11, kind: 'x', level: 'warn', title_bn: '<img src=x onerror=window.__XSS=1>', title_en: '<img src=x onerror=window.__XSS=1>', body_bn: null, body_en: null, route: '', location_id: null, created_at: iso(10), is_read: false },
 ];
 const EXTRA10 = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; const T = window.__DATA.tables;

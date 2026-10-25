@@ -1,9 +1,11 @@
 // Stock hub (stock2.js). Run: node stock2_test.js <scratchpad>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/s10_common.js');
-const base = C.baseData(SP), srv = C.serve(8094);
+const base = C.baseData(SP), srv = C.serve(PORT);
 (async () => { try {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const log = (...a) => console.log(...a); let bad = 0; const ok = (c, m) => { if (!c) { bad++; log('FAIL:', m); } };
@@ -13,7 +15,7 @@ const base = C.baseData(SP), srv = C.serve(8094);
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + C.EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(C.mkData(base, o))};window.__M0=${JSON.stringify(o.m || {})};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}');}catch(e){}`);
-    await p.goto('http://localhost:8094/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const noOverflow = async (p, m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
   const calls = (p, fn) => p.evaluate((f) => window.__M.calls.filter((c) => c[0] === f).map((c) => c[1]), fn);
@@ -59,7 +61,7 @@ const base = C.baseData(SP), srv = C.serve(8094);
   await p.click('[data-act=s2_xcancel] >> nth=1'); await wait(p, 300); await p.click('[data-act=s2_go_xcancel]'); await wait(p, 400); const cn = await calls(p, 'stock_cancel_transfer'); ok(cn.length === 1 && cn[0].p_id === 't2', 'cancel transfer called');
   await p.close();
   // non-owner: only the destination can receive; sender can take back own transfer
-  p = await open({ init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};', m: { grants: ['stock_transfer'], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock');
+  p = await open({ init: 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};', m: { grants: ['stock_transfer'], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock');
   await p.click('[data-v=tr]'); await wait(p, 500); ok(await p.locator('[data-act=s2_xrecv]').count() === 1, 'storekeeper receives only at own location'); ok(await p.locator('[data-act=s2_xcancel]').count() >= 1, 'sender sees take back'); await p.close();
 
   // ---------- actions: opening / idempotency / unit error ----------
@@ -110,9 +112,9 @@ const base = C.baseData(SP), srv = C.serve(8094);
 
   // ---------- reconcile (owner) ----------
   p = await open({ m: { recon: [{ item_id: 'i0', location_id: 1, ledger_qty: 3, cached_qty: 4, qty_diff: 1 }] } }, '#/stock'); await p.click('[data-act=s2_recon]'); await wait(p, 400);
-  ok(/Mismatch: 1/.test(await p.textContent('.sheet')), 'reconcile mismatch'); await p.screenshot({ path: SP + '/st_recon.png' }); await p.click('[data-act=s2_fix]'); await wait(p, 300); const rf = await calls(p, 'stock_reconcile'); ok(rf.length === 2 && rf[0].p_fix === false && rf[1].p_fix === true, 'fix only on request'); await p.close();
+  ok(/Mismatch: 1/.test(await p.textContent('.sheet')), 'reconcile mismatch'); await p.screenshot({ path: SP + '/st_recon.png' }); await p.click('[data-act=s2_fix]'); await wait(p, 300); await p.click('[data-act=s2_fix_go]'); await wait(p, 200); ok((await calls(p, 'stock_reconcile_fix')).length === 0, 'no repair without the typed word'); await p.fill('#s2_fixw', 'FIX'); await p.click('[data-act=s2_fix_go]'); await wait(p, 300); const rf = await calls(p, 'stock_reconcile'); const rfx = await calls(p, 'stock_reconcile_fix'); ok(rf.length === 1 && rf[0].p_fix === false && rfx.length === 1 && rfx[0].p_confirm === 'FIX', 'repair only through the confirmed call'); await p.close();
   p = await open({}, '#/stock'); await p.click('[data-act=s2_recon]'); await wait(p, 300); ok(/matches/.test(await p.textContent('.sheet')), 'reconcile ok'); await p.close();
-  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"karim02",full_name:"Karim",status:"active",lang:"en"};';
+  const NO = 'window.__OWNER=false;window.__PERMS={};window.__PROFILE={id:"u3",staff_id:"testf02",full_name:"TestF",status:"active",lang:"en"};';
   p = await open({ init: NO, m: { grants: [], ctx: { locations: [1], roles: ['storekeeper'] } } }, '#/stock'); ok(await p.locator('[data-act=s2_recon]').count() === 0, 'no reconcile for non-owner');
 
   // ---------- permissions: lock mode ----------

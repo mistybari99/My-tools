@@ -8,12 +8,12 @@
 //   POST : 1. reads the RAW body, checks the X-Hub-Signature-256 header (HMAC-SHA256 with the app secret META_APP_SECRET) - the secret never leaves this function;
 //          2. signs in as the intake bot (a normal, limited user marked in intake_bots) and calls the database function inbound_message_receive()
 //             for each message; the DATABASE stores it once per (channel, external id), and puts failures in the failed list for retry;
-//          3. a wrong signature is reported to the database as p_signature_ok=false (kept only as a "rejected" line, no body) and answered 403;
+//          3. a wrong signature is answered 403 before any sign-in or database call (bos94; nothing is stored);
 //          4. it never replies to the customer, never creates an order, never calls any AI.
 //   The retry worker for the failed list calls intake_retry_due() (same bot login) - a GitHub Actions cron or Supabase cron; not written here.
 //
 // Secrets (NAMES only - set with `supabase secrets set NAME=...`, never in the repo or chat):
-//   META_APP_SECRET, META_VERIFY_TOKEN, INTAKE_BOT_EMAIL, INTAKE_BOT_PASSWORD   (SUPABASE_URL and SUPABASE_ANON_KEY are provided by Supabase; service_role is NOT used)
+//   META_APP_SECRET, META_VERIFY_TOKEN, INTAKE_BOT_EMAIL, INTAKE_BOT_PASSWORD, INTAKE_PROOF_SECRET (optional, bos94)   (SUPABASE_URL and SUPABASE_ANON_KEY are provided by Supabase; service_role is NOT used)
 // Deploy (needs a computer):  supabase functions deploy meta-webhook --no-verify-jwt     (Meta cannot send a Supabase login token)
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -57,32 +57,45 @@ function parse(body: any): Msg[] {
   return out;
 }
 
+// bos94: the signed-in client is kept between calls of the same instance; dropped on a database error so the next call signs in again
+let botDb: any = null;
+async function bot() {
+  if (botDb) return botDb;
+  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { auth: { persistSession: false } });
+  const login = await db.auth.signInWithPassword({ email: Deno.env.get("INTAKE_BOT_EMAIL") || "", password: Deno.env.get("INTAKE_BOT_PASSWORD") || "" });
+  if (login.error) return null;
+  botDb = db; return db;
+}
+// bos94: optional proof for the database (secret INTAKE_PROOF_SECRET, the owner stores its hash with intake_proof_set94('meta', ...)). Not set = null = today's behaviour.
+async function proofHash(): Promise<string | null> {
+  const s = Deno.env.get("INTAKE_PROOF_SECRET");
+  return s ? hex(await crypto.subtle.digest("SHA-256", enc.encode(s))) : null;
+}
+
 Deno.serve(async (req: Request) => {
   const url = new URL(req.url);
   if (req.method === "GET") {
-    const ok = url.searchParams.get("hub.mode") === "subscribe" && url.searchParams.get("hub.verify_token") === Deno.env.get("META_VERIFY_TOKEN") && !!Deno.env.get("META_VERIFY_TOKEN");
+    const vt = Deno.env.get("META_VERIFY_TOKEN") || "", got = url.searchParams.get("hub.verify_token") || "";
+    let d = vt.length ^ got.length; for (let i = 0; i < Math.min(vt.length, got.length); i++) d |= vt.charCodeAt(i) ^ got.charCodeAt(i);   // bos94: constant time
+    const ok = url.searchParams.get("hub.mode") === "subscribe" && !!vt && d === 0;
     return ok ? new Response(url.searchParams.get("hub.challenge") ?? "", { status: 200 }) : new Response("forbidden", { status: 403 });
   }
   if (req.method !== "POST") return new Response("method", { status: 405 });
   const raw = await req.text();
   const good = await sigOk(raw, req.headers.get("x-hub-signature-256"));
+  // bos94: a wrong signature is answered 403 BEFORE any sign-in or database call, so a flood of forged calls cannot use up the bot login's Auth limit or fill the failed list
+  if (!good) return new Response("bad signature", { status: 403 });
 
-  const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { auth: { persistSession: false } });
-  const login = await db.auth.signInWithPassword({ email: Deno.env.get("INTAKE_BOT_EMAIL") || "", password: Deno.env.get("INTAKE_BOT_PASSWORD") || "" });
-  if (login.error) return new Response("bot_login", { status: 503 });           // Meta will retry
-
-  if (!good) {
-    await db.rpc("inbound_message_receive", { p_kind: "facebook", p_account_ref: null, p_external_id: "sig-" + crypto.randomUUID(), p_handle: null, p_name: null, p_text: null,
-      p_msg_time: null, p_attachment: null, p_signature_ok: false });
-    return new Response("bad signature", { status: 403 });
-  }
+  const db = await bot();
+  if (!db) return new Response("bot_login", { status: 503 });                   // Meta will retry
+  const proof = await proofHash();
   let body: any;
   try { body = JSON.parse(raw); } catch { return new Response("bad json", { status: 400 }); }
   let retry = false;
   for (const m of parse(body)) {
     const r = await db.rpc("inbound_message_receive", { p_kind: m.kind, p_account_ref: m.account, p_external_id: m.id, p_handle: m.handle, p_name: m.name, p_text: m.text,
-      p_msg_time: m.time, p_attachment: m.attachment, p_signature_ok: true });
-    if (r.error) retry = true;                                       // database unreachable / denied: ask Meta to send again
+      p_msg_time: m.time, p_attachment: m.attachment, p_signature_ok: true, p_proof_hash: proof });
+    if (r.error) { retry = true; botDb = null; }                                       // database unreachable / denied: ask Meta to send again
     else if (r.data?.off) retry = true;                              // switch is off: not stored; a 503 lets Meta retry later
     // r.data.queued = stored in the failed list, the database retries it itself (intake_retry_due)
   }

@@ -1,11 +1,13 @@
 // W3 shared list control (listctl.js) + lists admin page (lists.js ⋮ menus, Other queue, requests). Run: node listctl_test.js <abs tests/web dir>
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8');
 const baseData = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;')(fs);
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(b); }); }).listen(8097);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const HEADS = ['transport', 'fuel', 'repair', 'labour', 'hospitality', 'staff_meal', 'sourcing', 'tea', 'rent', 'phone'].map((c, i) => ({ list_code: 'expense_heads', value_code: c, label_bn: 'খাত ' + (i + 1), label_en: 'Head ' + c, sort: i + 1, active: true, extra: {} }));
 HEADS.push({ list_code: 'expense_heads', value_code: 'oldhead', label_bn: 'পুরনো খাত', label_en: 'Old head', sort: 11, active: false, extra: {}, retired_reason: 'not used', retired_at: '2026-10-01T00:00:00Z' });
 function mk(o = {}) {
@@ -21,7 +23,7 @@ function mk(o = {}) {
   T.list_defs = [d('expense_heads', 'open'), d('marketing_heads', 'approval'), d('units', 'owner'), d('wastage_reasons', 'open'), d('supplier_types', 'approval', { allow_other: false })].map((x) => ({ ...x, ...((o.defs || {})[x.list_code] || {}) }));
   T.rules = [{ key: 'ui_noperm_mode', module: 'x', kind: 'choice', value: null, default_value: 'lock', label_bn: 'x', sort: 1 }];
   T.location_settings = []; T.list_other_entries = o.other || []; T.option_requests = o.req || []; T.list_managers = [];
-  T.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'Rahim', status: 'active' }, { id: 'u2', staff_id: 'karim02', full_name: 'Karim', status: 'active' }];
+  T.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'TestK', status: 'active' }, { id: 'u2', staff_id: 'testf02', full_name: 'TestF', status: 'active' }];
   T.audit_log = [{ id: 1, at: '2026-10-02T00:00:00Z', staff_id: 'owner1', action: 'update', table_name: 'option_lists', record_id: 'expense_heads:oldhead', detail: { old: { active: true }, new: { active: false, retired_reason: 'not used' } } }];
   return data;
 }
@@ -48,14 +50,14 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
     await p.route('**/vendor/supabase.js', (r) => r.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(SP + '/stub.js', 'utf8') + EXTRA }));
     await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
     await p.addInitScript(`window.__DATA=${JSON.stringify(mk(o))};window.__X0=${JSON.stringify(o.x || {})};${o.init || ''};try{localStorage.setItem('bos_lang','${o.lang || 'en'}')}catch(e){}`);
-    await p.goto('http://localhost:8097/' + hash); await p.waitForTimeout(1000); return p;
+    await p.goto('http://localhost:' + PORT + '/' + hash); await p.waitForTimeout(1000); return p;
   }
   const calls = (p, fn) => p.evaluate((f) => window.__C.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const wait = (p, n = 300) => p.waitForTimeout(n);
   const opts = (p, sel) => p.$$eval(sel + ' option', (os) => os.map((o) => [o.value, o.textContent]));
 
-  // ---------- form 10-2 (open list): choices, Add new at once, similar warning, Other ----------
-  let p = await open({}, '#/entry/new/10-2/1');
+  // ---------- form 11-1 (open list): choices, Add new at once, similar warning, Other ----------
+  let p = await open({}, '#/entry/new/11-1/1');
   const S1 = 'select[data-p="lines.0.head"]';
   let o = await opts(p, S1);
   ok(o.some((x) => x[0] === '__add__:expense_heads' && /Add new/.test(x[1])), 'open list offers + Add new');
@@ -90,8 +92,8 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.screenshot({ path: SP + '/lc_form.png' });
   await p.close();
 
-  // ---------- approval list (18-1): request wording, request is filed, nothing selected ----------
-  p = await open({ init: 'window.__OWNER=false;', x: { add: { status: 'requested', request_id: 'r1' } }, lang: 'bn' }, '#/entry/new/18-1/1');
+  // ---------- approval list (17-1): request wording, request is filed, nothing selected ----------
+  p = await open({ init: 'window.__OWNER=false;', x: { add: { status: 'requested', request_id: 'r1' } }, lang: 'bn' }, '#/entry/new/17-1/1');
   const S2 = 'select[data-p="lines.0.head"]';
   o = await opts(p, S2);
   ok(o.some((x) => x[0] === '__add__:marketing_heads' && /অনুরোধ/.test(x[1])), 'approval list says request');
@@ -103,7 +105,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---------- owner-only list as a non-owner: message, no write ----------
-  p = await open({ init: 'window.__OWNER=false;', defs: { expense_heads: { add_rule: 'owner' } } }, '#/entry/new/10-2/1');
+  p = await open({ init: 'window.__OWNER=false;', defs: { expense_heads: { add_rule: 'owner' } } }, '#/entry/new/11-1/1');
   o = await opts(p, S1);
   ok(o.some((x) => x[0] === '__add__:expense_heads' && /owner only/.test(x[1])), 'owner-only list shows the (owner only) wording to others');
   await p.selectOption(S1, '__add__:expense_heads'); await wait(p, 400);
@@ -112,13 +114,13 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.close();
 
   // ---------- Other switched off for a list / list locked ----------
-  p = await open({ defs: { expense_heads: { allow_other: false, locked: true } } }, '#/entry/new/10-2/1');
+  p = await open({ defs: { expense_heads: { allow_other: false, locked: true } } }, '#/entry/new/11-1/1');
   o = await opts(p, S1);
   ok(!o.some((x) => x[0].startsWith('__other__')) && !o.some((x) => x[0].startsWith('__add__')), 'Other off and locked list: no special choices');
   await p.close();
 
   // ---------- offline Other is kept on the phone ----------
-  p = await open({ x: { fail: { option_other_log: 'Failed to fetch' } } }, '#/entry/new/10-2/1');
+  p = await open({ x: { fail: { option_other_log: 'Failed to fetch' } } }, '#/entry/new/11-1/1');
   await p.selectOption(S1, '__other__:expense_heads'); await wait(p, 200);
   await p.fill('.lp-pn input', 'অফলাইন খরচ'); await p.click('[data-lp-ok]'); await wait(p, 500);
   ok((await p.inputValue(S1)) === 'other:অফলাইন খরচ', 'offline: value still kept');
@@ -143,7 +145,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
 
   // ---------- lists admin: chips with badges, ⋮ menus ----------
   const counts = { requests: 1, other: 2, lists: { expense_heads: { requests: 1, other: 2 } } };
-  const other = [{ id: 'o1', list_code: 'expense_heads', text: 'ঠেলা ভাড়া', entered_by: 'u2', entered_at: '2026-10-10T05:00:00Z', form_code: '10-2', status: 'pending' }, { id: 'o2', list_code: 'expense_heads', text: 'Cart hire', entered_by: 'u2', entered_at: '2026-10-10T06:00:00Z', form_code: null, status: 'pending' }, { id: 'o3', list_code: 'expense_heads', text: 'old', entered_by: 'u2', entered_at: '2026-10-09T06:00:00Z', status: 'merged', resolved_option: 'transport' }];
+  const other = [{ id: 'o1', list_code: 'expense_heads', text: 'ঠেলা ভাড়া', entered_by: 'u2', entered_at: '2026-10-10T05:00:00Z', form_code: '11-1', status: 'pending' }, { id: 'o2', list_code: 'expense_heads', text: 'Cart hire', entered_by: 'u2', entered_at: '2026-10-10T06:00:00Z', form_code: null, status: 'pending' }, { id: 'o3', list_code: 'expense_heads', text: 'old', entered_by: 'u2', entered_at: '2026-10-09T06:00:00Z', status: 'merged', resolved_option: 'transport' }];
   const req = [{ id: 'q1', list_code: 'expense_heads', label_bn: 'ইন্টারনেট', label_en: 'Internet', status: 'pending', requested_by: 'u2', requested_at: '2026-10-10T07:00:00Z', similar_opts: [{ label_bn: 'ফোন' }] }];
   p = await open({ other, req, x: { counts } }, '#/lists');
   ok(await p.locator('[data-act=ls2_pick] .badge').count() === 1 && (await p.textContent('[data-act=ls2_pick][data-v=expense_heads] .badge')) === '3', 'list chip shows the waiting count');
@@ -185,7 +187,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   c = await calls(p, 'option_add'); ok(c.length === 1 && c[0].p_bn === 'বিবিধ', 'owner add uses option_add');
   // Other queue
   await p.click('[data-act=ls2_lmenu]'); await wait(p, 200); await p.click('.sheet [data-act=ls2_view][data-v=other]'); await wait(p, 400);
-  ok(await p.locator('[data-act=ls2_qmenu]').count() === 2, 'two pending Other entries have ⋮'); ok(/Karim/.test(await p.textContent('body')) && /10-2/.test(await p.textContent('body')), 'who and form code shown');
+  ok(await p.locator('[data-act=ls2_qmenu]').count() === 2, 'two pending Other entries have ⋮'); ok(/TestF/.test(await p.textContent('body')) && /11-1/.test(await p.textContent('body')), 'who and form code shown');
   await p.click('[data-act=ls2_qmenu][data-id=o1]'); await wait(p, 200);
   const qm = await p.textContent('.sheet'); ok(/Add as a new option/.test(qm) && /Merge into an existing option/.test(qm) && /Reject/.test(qm), 'queue menu: approve as new / merge / reject');
   await p.click('[data-act=ls2_qadd]'); await wait(p, 200); await p.click('[data-act=ls2_qadd_go]'); await wait(p, 400);
@@ -215,7 +217,7 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   ok(await p.locator('[data-act=ls2_lmenu]').count() === 0 && /not installed/.test(await p.textContent('body')), 'no phase15: notice, no list menu');
   ok(await p.locator('[data-act=ls2_omenu]').count() === 11, 'no phase15: option menus still there');
   await p.close();
-  p = await open({ init: 'window.__NOP15=1;' }, '#/entry/new/10-2/1'); await wait(p, 500);
+  p = await open({ init: 'window.__NOP15=1;' }, '#/entry/new/11-1/1'); await wait(p, 500);
   o = await opts(p, S1); ok(!o.some((x) => x[0].startsWith('__')), 'no phase15: the form shows the plain list only');
   await p.close();
 
@@ -235,11 +237,11 @@ const EXTRA = `;(function(){ const real = window.supabase.createClient; window.s
   await p.click('[data-act=p2_save]'); await wait(p, 400);
   ok(/Other/.test(await p.textContent('#toast')) && (await calls(p, 'submit_item_change')).length === 0, 'new item with an empty picker after Other is not saved');
   await p.close();
-  p = await open({ init: 'window.__NOP15=2;' }, '#/entry/new/10-2/1'); await wait(p, 600);
+  p = await open({ init: 'window.__NOP15=2;' }, '#/entry/new/11-1/1'); await wait(p, 600);
   o = await opts(p, S1); ok(o.some((x) => x[0].startsWith('__add__')) && !(await p.evaluate(() => window.BOS.listctl.state.missing)), 'network error is not "missing": choices stay, state not missing');
   await p.close();
   ok(fs.readFileSync(ROOT + '/entry.js', 'utf8').includes("startsWith('other:')"), 'entry.js renders stored other:<text> choices');
-  ok(/startsWith\('other:'\) \? 'other'/.test(fs.readFileSync(ROOT + '/forms_cash.js', 'utf8')), '18-1 maps other:* to one Other bucket');
+  ok(/startsWith\('other:'\) \? 'other'/.test(fs.readFileSync(ROOT + '/forms_cash.js', 'utf8')), '17-1 maps other:* to one Other bucket');
   const bk = fs.readFileSync(ROOT + '/app.js', 'utf8'); const bt = bk.slice(bk.indexOf('const BACKUP_TABLES'), bk.indexOf('function viewBackup'));
   for (const tname of ['list_defs', 'option_requests', 'list_other_entries', 'item_types', 'item_class_map', 'item_import_batches', 'item_mapping_review', 'item_master_links', 'assets', 'asset_costs']) ok(bt.includes("'" + tname + "'"), 'backup list has ' + tname);
   log('errors:', errors.length ? [...new Set(errors)] : 'none'); log('assert failures:', bad); await br.close(); srv.close();

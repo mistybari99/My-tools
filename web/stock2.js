@@ -22,7 +22,9 @@ const X = {
   all: L('সব', 'All', 'All'), allLoc: L('সব জায়গা', 'All locations', 'সব Location'), category: L('ক্যাটাগরি', 'Category', 'Category'), location: L('জায়গা', 'Location', 'Location'),
   belowMin: L('শুধু ন্যূনতমের নিচে', 'Only below minimum', 'শুধু Minimum-এর নিচে'), showZero: L('শূন্য মজুতও দেখান', 'Show zero stock too', 'Zero stock-ও দেখান'),
   nItems: L('টি পণ্য', 'items', 'items'), nBelow: L('ন্যূনতমের নিচে', 'Below minimum', 'Minimum-এর নিচে'), totalValue: L('মজুতের মূল্য', 'Stock value', 'Stock-এর value'),
-  avg: L('গড় দাম', 'avg cost', 'avg cost'), chipOut: L('শেষ', 'Out', 'Out'), chipLow: L('ন্যূনতমের নিচে', 'Below min', 'Min-এর নিচে'), min: L('ন্যূনতম', 'min', 'min'),
+  avg: L('গড় দাম', 'avg cost', 'avg cost'), chipOut: L('শেষ', 'Out', 'Out'), chipNeg: L('ঋণাত্মক', 'Negative', 'ঋণাত্মক'),
+  fixTitle: L('ক্যাশ ঠিক করা নিশ্চিত করুন', 'Confirm the cache repair', 'Cache ঠিক করা নিশ্চিত করুন'), fixHint: L('এটি ক্যাশ ব্যালান্স খাতা থেকে নতুন করে লিখবে এবং অডিট লগে লেখা হবে। নিশ্চিত করতে FIX লিখুন।', 'This rewrites the cached balance from the ledger and is written to the audit log. Type FIX to confirm.', 'এটি cache balance ledger থেকে নতুন করে লিখবে, audit log-এ লেখা হবে। Confirm করতে FIX লিখুন।'),
+  fixWord: L('FIX লিখুন', 'Type FIX', 'FIX লিখুন'), chipLow: L('ন্যূনতমের নিচে', 'Below min', 'Min-এর নিচে'), min: L('ন্যূনতম', 'min', 'min'),
   none: L('কোনো স্টক নেই', 'No stock to show', 'কোনো stock নেই'), noneHint: L('শুধু "স্টক ট্র্যাক" করা পণ্য এখানে আসে। পণ্যের অ্যাডভান্স অপশনে চালু করুন।', 'Only items marked "track stock" appear here. Turn it on in the product advance options.', 'শুধু "Stock track" করা product এখানে আসে। Product-এর Advance Option-এ চালু করুন।'),
   more: L('আরও দেখুন', 'Show more', 'আরও দেখুন'), actions: L('স্টকের কাজ', 'Stock actions', 'Stock-এর কাজ'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'),
   a_open: L('প্রারম্ভিক স্টক বসান', 'Opening balance', 'Opening balance'), a_waste: L('নষ্ট মাল বাদ দিন', 'Write off wastage', 'Wastage write-off'), a_count: L('গণনা অনুযায়ী ঠিক করুন', 'Adjust to a count', 'Count অনুযায়ী ঠিক'),
@@ -33,7 +35,7 @@ const X = {
   reason: L('কারণ', 'Reason', 'Reason'), photo: L('ছবি', 'Photo', 'Photo'), photoReq: L('এই পরিমাণে ছবি লাগবে', 'A photo is needed for this quantity', 'এই quantity-তে photo লাগবে'),
   addPhoto: L('ছবি তুলুন / বাছুন', 'Take / choose photo', 'Photo তুলুন / বাছুন'), upl: L('ছবি আপলোড হচ্ছে…', 'Uploading photo…', 'Photo upload হচ্ছে…'),
   madeAt: L('তৈরির সময়', 'Made at', 'Made at (তৈরির সময়)'), toLoc: L('কোথায় পাঠাবেন', 'Send to', 'কোথায় পাঠাবেন'), fromLoc: L('কোথা থেকে', 'From', 'From'),
-  save: L('সংরক্ষণ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ', 'Close', 'Close'), done: L('হয়েছে', 'Done', 'Done'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
+  save: L('সেভ', 'Save', 'Save'), cancel: L('বাতিল', 'Cancel', 'Cancel'), close: L('বন্ধ', 'Close', 'Close'), done: L('হয়েছে', 'Done', 'Done'), saved: L('সংরক্ষিত', 'Saved', 'Saved'),
   dup: L('আগেই সংরক্ষিত — আবার হয়নি', 'Already saved — nothing was added twice', 'আগেই saved — আবার হয়নি'),
   ledger: L('স্টকের খাতা', 'Stock ledger', 'Stock ledger'), noMoves: L('কোনো লেনদেন নেই', 'No movements', 'কোনো movement নেই'), onHand: L('এখন আছে', 'On hand now', 'এখন আছে'),
   expH: L('ঘণ্টার মধ্যে', 'hours ahead', 'hours-এর মধ্যে'), hLeft: L('ঘণ্টা বাকি', 'h left', 'h বাকি'), expiredAgo: L('মেয়াদ গেছে', 'Expired', 'Expired'), hAgo: L('ঘণ্টা আগে', 'h ago', 'h আগে'),
@@ -42,6 +44,8 @@ const X = {
   expOffHint: L('শুধু শেলফ-লাইফের নিয়ম থাকা পণ্যের ব্যাচে মেয়াদ বসে। নিয়ম ছাড়া পণ্যে মেয়াদের সুবিধা বন্ধ।', 'Only batches of items that have a shelf-life rule get an expiry. Items without a rule have expiry switched off.', 'Shelf-life rule থাকা item-এর batch-এ expiry বসে। Rule ছাড়া item-এ expiry বন্ধ।'),
   writeOff: L('বাদ দিন', 'Write off', 'Write off'), batchQty: L('ব্যাচে বাকি', 'In batch', 'Batch-এ বাকি'),
   trEmpty: L('পথে কোনো মাল নেই', 'Nothing in transit', 'Transit-এ কোনো মাল নেই'), receive: L('গ্রহণ', 'Receive', 'Receive'), cancelX: L('ফিরিয়ে নিন', 'Take back', 'Take back'),
+  dmgQty: L('এর মধ্যে ক্ষতিগ্রস্ত (ঐচ্ছিক — না দেখলে খালি রাখুন)', 'Of which damaged (optional - leave empty if not checked)', 'এর মধ্যে damaged (optional — না দেখলে খালি)'), dmgReason: L('ক্ষতির কারণ', 'Damage reason', 'ক্ষতির কারণ'),
+  dmgNote: L('ক্ষতিগ্রস্ত মাল স্টকে গোনা থাকে; নষ্ট ধরতে "নষ্ট মাল বাদ" ব্যবহার করুন। কাগজের ফর্মের কোড: মালিক দেবেন।', 'Damaged goods stay counted in stock; write them off with "Write off wastage". Paper form code: to be given by owner.', 'Damaged মাল stock এ গোনা থাকে; write-off "Wastage" থেকে। Paper form code: owner দেবেন।'), needDmgReason: L('ক্ষতির কারণ বাছুন', 'Choose the damage reason', 'ক্ষতির কারণ বাছুন'), dmgOver: L('ক্ষতিগ্রস্ত পরিমাণ গ্রহণের চেয়ে বেশি হতে পারে না', 'Damaged cannot be more than received', 'Damaged received এর চেয়ে বেশি হবে না'),
   recvQty: L('কত পেলেন (বেস এককে)', 'Quantity received (base unit)', 'কত পেলেন (base unit)'), sent: L('পাঠানো', 'Sent', 'Sent'), shortBy: L('কম পড়েছে — মালিককে জানানো হবে', 'Short — the owner will be told', 'কম — Owner-কে জানানো হবে'),
   confirmCancel: L('পাঠানো বাতিল করে মাল ফিরিয়ে নেবেন?', 'Cancel the transfer and take the goods back?', 'Transfer cancel করে মাল ফিরিয়ে নেবেন?'),
   recon: L('খাতা মেলান', 'Reconcile', 'Ledger মেলান'), reconOk: L('সব মিলেছে ✓', 'Everything matches ✓', 'সব মিলেছে ✓'), reconBad: L('মিলছে না', 'Mismatch', 'মিলছে না'),
@@ -49,12 +53,21 @@ const X = {
   needItem: L('পণ্য বাছুন', 'Choose an item', 'Item বাছুন'), needQty: L('পরিমাণ ঠিক নয়', 'Quantity is not valid', 'Quantity ঠিক নয়'), needNote: L('নোট লিখুন', 'Write a note', 'Note লিখুন'),
   needReason: L('কারণ বাছুন', 'Choose a reason', 'Reason বাছুন'), needTo: L('গন্তব্য বাছুন', 'Choose where to send', 'গন্তব্য বাছুন'), badCost: L('দাম ঠিক নয়', 'Cost is not valid', 'Cost ঠিক নয়'),
   delta: L('পার্থক্য', 'Difference', 'Difference'), countDone: L('গণনা মেলানো হয়েছে', 'Count posted', 'Count posted'), sentOk: L('পাঠানো হয়েছে — গ্রহণের অপেক্ষায়', 'Sent — waiting to be received', 'Sent — receive-এর অপেক্ষায়'),
-  wa: L('অনুমোদন', 'Approvals', 'Approval'), waEmpty: L('অনুমোদনের অপেক্ষায় কিছু নেই ✓', 'Nothing waiting for approval ✓', 'Approval-এর অপেক্ষায় কিছু নেই ✓'),
-  waTitle: L('বড় নষ্ট মাল বাদ — অনুমোদন', 'Large wastage write-off — approval', 'বড় wastage write-off — approval'), approve: L('অনুমোদন', 'Approve', 'Approve'), reject: L('নামঞ্জুর', 'Reject', 'Reject'),
-  takeBack: L('আমার অনুরোধ ফিরিয়ে নিন', 'Take my request back', 'আমার request ফিরিয়ে নিন'), sentApproval: L('অনুমোদনের জন্য পাঠানো হয়েছে — অনুমোদন হলে স্টক কমবে', 'Sent for approval — the stock falls when it is approved', 'Approval-এর জন্য পাঠানো — approve হলে stock কমবে'),
-  waNote: L('নামঞ্জুরের কারণ (আবশ্যক)', 'Reason for rejecting (required)', 'Reject-এর reason (আবশ্যক)'), waMine: L('আমার অনুরোধ', 'My request', 'আমার request'), waBy: L('অনুরোধ', 'Requested by', 'Request করেছেন'),
-  waDone: L('সিদ্ধান্ত হয়েছে', 'Decision saved', 'Decision saved'), waWho: L('অন্য কেউ অনুমোদন দেবেন', 'Someone else must approve', 'অন্য কেউ approve করবেন'), more2: L('আরও অপশন', 'More options', 'আরও option'),
+  wa: L('অ্যাপ্রুভ', 'Approvals', 'Approval'), waEmpty: L('অ্যাপ্রুভের অপেক্ষায় কিছু নেই ✓', 'Nothing waiting for approval ✓', 'Approval-এর অপেক্ষায় কিছু নেই ✓'),
+  waTitle: L('বড় নষ্ট মাল বাদ — অ্যাপ্রুভ', 'Large wastage write-off — approval', 'বড় wastage write-off — approval'), approve: L('অ্যাপ্রুভ', 'Approve', 'Approve'), reject: L('নামঞ্জুর', 'Reject', 'Reject'),
+  takeBack: L('আমার অনুরোধ ফিরিয়ে নিন', 'Take my request back', 'আমার request ফিরিয়ে নিন'), sentApproval: L('অ্যাপ্রুভের জন্য পাঠানো হয়েছে — অ্যাপ্রুভ হলে স্টক কমবে', 'Sent for approval — the stock falls when it is approved', 'Approval-এর জন্য পাঠানো — approve হলে stock কমবে'),
+  waNote: L('নামঞ্জুরের কারণ (লাগবেই)', 'Reason for rejecting (required)', 'Reject-এর reason (লাগবেই)'), waMine: L('আমার অনুরোধ', 'My request', 'আমার request'), waBy: L('অনুরোধ', 'Requested by', 'Request করেছেন'),
+  waDone: L('সিদ্ধান্ত হয়েছে', 'Decision saved', 'Decision saved'), waWho: L('অন্য কেউ অ্যাপ্রুভ দেবেন', 'Someone else must approve', 'অন্য কেউ approve করবেন'), more2: L('আরও অপশন', 'More options', 'আরও option'),
   scan: L('স্ক্যান', 'Scan', 'Scan'), buyU: L('কেনা', 'Buy', 'Buy'), sellU: L('বিক্রি', 'Sell', 'Sell'), ledgerOpen: L('স্টকের খাতা দেখুন', 'Open the ledger', 'Ledger দেখুন'),
+  printCh: L('চালান প্রিন্ট করুন', 'Print challan', 'Challan print করুন'), printFail: L('প্রিন্ট শুরু করা যায়নি', 'Could not start printing', 'Print শুরু করা যায়নি'),
+  chNo: L('চালান নং', 'Challan no.', 'Challan no.'), chVeh: L('গাড়ি', 'Vehicle', 'Vehicle'),
+  retTog: L('আগে পাওয়া মাল ফেরত', 'Return of goods received earlier', 'আগে পাওয়া মাল return'), retReason: L('ফেরতের কারণ', 'Reason for the return', 'Return-এর reason'),
+  retRef: L('মূল ট্রান্সফার (ঐচ্ছিক)', 'Original transfer (optional)', 'মূল transfer (optional)'), retNoRef: L('— কোনো লিংক নয় —', '— no link —', '— কোনো link নয় —'),
+  retOther: L('"অন্যান্য" হলে নোট লিখতে হবে।', 'A note is needed when the reason is Other.', '"Other" হলে note লিখতে হবে।'), needRet: L('ফেরতের কারণ বাছুন', 'Choose the reason for the return', 'Return-এর reason বাছুন'),
+  retSent: L('ফেরত পাঠানো হয়েছে — গ্রহণের অপেক্ষায়', 'Return sent — waiting to be received', 'Return sent — receive-এর অপেক্ষায়'),
+  rr_damaged: L('ক্ষতিগ্রস্ত', 'Damaged', 'Damaged'), rr_expired: L('মেয়াদ শেষ', 'Expired', 'Expired'), rr_excess: L('বাড়তি মাল', 'Excess stock', 'Excess stock'), rr_wrong_item: L('ভুল মাল', 'Wrong item', 'ভুল item'), rr_other: L('অন্যান্য', 'Other', 'Other'),
+  batchH: L('ব্যাচের হিসাব', 'Batch check', 'Batch check'), batchOk: L('ব্যাচ মিলেছে ✓', 'Batches match the stock ✓', 'Batch মিলেছে ✓'), batchBad: L('ব্যাচে গরমিল', 'Batch mismatch', 'Batch-এ গরমিল'),
+  balQty: L('মজুত', 'stock', 'stock'), batchSum: L('ব্যাচ', 'batches', 'batches'),
   loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), sqlMissing: L('স্টকের ডেটাবেস অংশ এখনও চালু হয়নি (phase10)', 'The stock database part is not installed yet (phase10)', 'Stock-এর database অংশ চালু হয়নি (phase10)'),
 };
 const T = (k) => lab(X[k]);
@@ -64,6 +77,9 @@ const RS = { opening: L('প্রারম্ভিক', 'Opening', 'Opening'),
   transfer_out: L('পাঠানো', 'Transfer out', 'Transfer out'), transfer_in: L('গ্রহণ', 'Transfer in', 'Transfer in'), wastage: L('নষ্ট', 'Wastage', 'Wastage'), count_adjust: L('গণনা ঠিক', 'Count', 'Count adjust'), reversal: L('উল্টানো', 'Reversal', 'Reversal') };
 // server error text -> friendly (shared with purchase.js). Order matters little: keys are whole words.
 const ERR = {
+  reason_required: L('ফেরতের কারণ বাছুন', 'Choose the reason for the return', 'Return-এর reason বাছুন'), note_needed: L('নোট লিখুন (কমপক্ষে ৩ অক্ষর)', 'Write a note (at least 3 letters)', 'Note লিখুন (কমপক্ষে ৩ অক্ষর)'),
+  bad_ref: L('মূল ট্রান্সফার মেলেনি', 'The original transfer does not match', 'মূল transfer মেলেনি'), return_exceeds_receipt: L('পাওয়া পরিমাণের বেশি ফেরত দেওয়া যায় না', 'Cannot return more than was received', 'পাওয়া quantity-র বেশি return হয় না'),
+  feature_off: L('এই সুবিধা চালু নেই', 'This feature is switched off', 'এই feature চালু নেই'),
   item_not_counted: L('এই আইটেম ব্যবসার হিসাবে ধরা নয় (সম্পদ / ভোগ্য / যন্ত্রপাতি) — স্টকে আসে না', 'This item is not counted in the business (asset / consumable / tool) — it has no stock', 'এই Item business-এর হিসাবে ধরা নয় — stock-এ আসে না'),
   asset_qty_too_large: L('এক লাইনে ২০০-র বেশি সম্পদ হয় না — লাইন ভাগ করুন', 'More than 200 assets on one line is not allowed — split the line', 'এক line-এ ২০০-র বেশি asset হয় না — line ভাগ করুন'),
   unit_unknown: L('এই এককের রূপান্তর জানা নেই — পণ্যের বেস এককে লিখুন বা রূপান্তর বসান', 'This unit has no conversion for the item — use the base unit or add a conversion', 'এই unit-এর conversion জানা নেই — base unit-এ লিখুন বা conversion বসান'),
@@ -73,7 +89,7 @@ const ERR = {
   opening_exists: L('এই পণ্যের প্রারম্ভিক স্টক আগেই বসানো — ভুল হলে "গণনা অনুযায়ী ঠিক" করুন', 'Opening stock is already set — fix mistakes with "Adjust to a count"', 'Opening stock আগেই set — ভুল হলে "Count adjust" করুন'),
   note_required: L('নোট আবশ্যক', 'A note is required', 'Note আবশ্যক'), bad_location: L('গন্তব্য ঠিক নয়', 'Destination is not valid', 'গন্তব্য ঠিক নয়'), over_received: L('পাঠানোর চেয়ে বেশি গ্রহণ করা যায় না', 'Cannot receive more than was sent', 'পাঠানোর চেয়ে বেশি receive হয় না'),
   not_in_transit: L('এটি আর পথে নেই', 'This is no longer in transit', 'এটি আর transit-এ নেই'), batch_empty: L('ব্যাচে কিছু বাকি নেই', 'The batch is empty', 'Batch-এ কিছু নেই'), batch_not_found: L('ব্যাচ পাওয়া যায়নি', 'Batch not found', 'Batch পাওয়া যায়নি'),
-  batch_short: L('ব্যাচে এত নেই', 'Not enough in that batch', 'Batch-এ এত নেই'), bad_date: L('তারিখ ঠিক নয়', 'Date is not valid', 'Date ঠিক নয়'),
+  batch_short: L('ব্যাচে এত নেই', 'Not enough in that batch', 'Batch-এ এত নেই'), bad_date: L('ডেট ঠিক নয়', 'Date is not valid', 'Date ঠিক নয়'),
   duplicate_bill: L('এই সাপ্লায়ারের এই বিল নম্বর আগেই আছে', 'This supplier already has this bill number', 'এই supplier-এর এই bill no. আগেই আছে'), client_id_taken: L('এই অনুরোধ অন্য কারও — আবার চেষ্টা করুন', 'This request belongs to someone else — try again', 'এই request অন্য কারও — আবার চেষ্টা করুন'),
   supplier_not_found: L('সাপ্লায়ার পাওয়া যায়নি', 'Supplier not found', 'Supplier পাওয়া যায়নি'), no_lines: L('অন্তত একটি লাইন লাগবে', 'Add at least one line', 'অন্তত একটি line লাগবে'), bad_discount: L('ছাড় ঠিক নয়', 'Discount is not valid', 'Discount ঠিক নয়'),
   description_required: L('লাইনে পণ্য বা বিবরণ লাগবে', 'Each line needs an item or a description', 'প্রতি line-এ item বা description লাগবে'), reason_required: L('ফেরতের কারণ বাছুন', 'Choose the return reason', 'Return reason বাছুন'),
@@ -85,11 +101,17 @@ const ERR = {
   return_needs_bill: L('ফেরতের জন্য মূল বিল বাছুন', 'Choose the original bill for a return', 'Return-এর জন্য মূল bill বাছুন'), return_exceeds_bill: L('ফেরত পরিমাণ মূল বিলের বাকির চেয়ে বেশি', 'The return is more than what is left on the original bill', 'Return quantity মূল bill-এর বাকির চেয়ে বেশি'),
   return_cost_above_bill: L('ফেরতের দাম মূল বিলের দামের চেয়ে বেশি', 'The return cost is above the bill cost', 'Return-এর দাম মূল bill-এর দামের চেয়ে বেশি'), purchase_return_unreferenced: L('এই ফেরতের মূল বিল নেই', 'This return has no original bill', 'এই return-এর মূল bill নেই'),
   bad_kind: L('ধরন ঠিক নয়', 'Kind is not valid', 'Kind ঠিক নয়'), already_void: L('আগেই বাতিল', 'Already voided', 'আগেই void'),
-  own_request: L('নিজের অনুরোধ নিজে অনুমোদন করা যায় না', 'You cannot approve your own request', 'নিজের request নিজে approve করা যায় না'), already_decided: L('এর সিদ্ধান্ত আগেই হয়ে গেছে', 'This was already decided', 'এর decision আগেই হয়ে গেছে'),
-  expired_stock_blocked: L('মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ আছে (মালিকের সেটিং)', 'Selling expired stock is blocked (owner setting)', 'মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ (owner setting)'),
-  refund_exceeds_credit: L('সাপ্লায়ারের কাছে এত জমা নেই', 'The supplier does not hold that much credit', 'Supplier-এর কাছে এত credit নেই'), sale_has_returns: L('এই বিক্রির ফেরত আছে — আগে ফেরত বাতিল করুন', 'This sale has returns — void the return first', 'এই sale-এর return আছে — আগে return void করুন'),
-  return_exceeds_sale: L('ফেরত পরিমাণ বিক্রির বাকির চেয়ে বেশি', 'More than what is left to return', 'Return quantity বাকির চেয়ে বেশি'), line_not_in_sale: L('এই পণ্য ওই বিক্রিতে নেই', 'That item is not in the sale', 'এই item ওই sale-এ নেই'),
-  sale_not_found: L('বিক্রি পাওয়া যায়নি', 'Sale not found', 'Sale পাওয়া যায়নি'), sale_not_done: L('এই বিক্রি বাতিল', 'This sale is voided', 'এই sale void'),
+  own_request: L('নিজের অনুরোধ নিজে অ্যাপ্রুভ করা যায় না', 'You cannot approve your own request', 'নিজের request নিজে approve করা যায় না'), already_decided: L('এর সিদ্ধান্ত আগেই হয়ে গেছে', 'This was already decided', 'এর decision আগেই হয়ে গেছে'),
+  client_id_taken: L('এই অনুরোধের নম্বর অন্য কেউ ব্যবহার করেছে — আবার চেষ্টা করুন', 'Another user already used this request id — try again', 'এই request id অন্য user আগেই use করেছে — আবার চেষ্টা করুন'),
+  grn_link_required: L('GRN source চালু: এই বিলের সাথে GRN জুড়ুন, তারপর post করুন', 'GRN is the stock source: link this bill to its GRN before posting', 'GRN source চালু: bill-এর সাথে GRN জুড়ে তারপর post করুন'),
+  void_has_return: L('এই বিলের বিপরীতে return আছে; আগে return ভয়েড করুন', 'A posted return refers to this bill; void the return first', 'এই bill-এর return আছে; আগে return void করুন'),
+  void_would_go_negative: L('মাল ব্যবহার/বিক্রি হয়ে গেছে, বিল ভয়েড করলে stock negative হবে', 'The goods were used or sold; voiding would make stock negative', 'মাল use/sale হয়ে গেছে, void করলে stock negative হবে'),
+  void_has_grn_batch: L('এই বিলের চালু GRN batch আছে', 'Live GRN batches exist for this bill', 'এই bill-এর live GRN batch আছে'),
+  production_negative_reason_needed: L('স্টকের বেশি উপকরণ নিতে কারণ লিখুন', 'Write a reason to use more ingredient than the stock on hand', 'Stock-এর বেশি ingredient নিতে reason লিখুন'),
+  expired_stock_blocked: L('মেয়াদ শেষ মাল বিক্রি বন্ধ আছে (মালিকের সেটিং)', 'Selling expired stock is blocked (owner setting)', 'মেয়াদোত্তীর্ণ মাল বিক্রি বন্ধ (owner setting)'),
+  refund_exceeds_credit: L('সাপ্লায়ারের কাছে এত জমা নেই', 'The supplier does not hold that much credit', 'Supplier-এর কাছে এত credit নেই'), sale_has_returns: L('এই সেলের ফেরত আছে — আগে ফেরত ভয়েড করুন', 'This sale has returns — void the return first', 'এই sale-এর return আছে — আগে return void করুন'),
+  return_exceeds_sale: L('ফেরত পরিমাণ বিক্রির বাকির চেয়ে বেশি', 'More than what is left to return', 'Return quantity বাকির চেয়ে বেশি'), line_not_in_sale: L('এই আইটেম ওই বিক্রিতে নেই', 'That item is not in the sale', 'এই item ওই sale-এ নেই'),
+  sale_not_found: L('সেল পাওয়া যায়নি', 'Sale not found', 'Sale পাওয়া যায়নি'), sale_not_done: L('এই সেল ভয়েড', 'This sale is voided', 'এই sale void'),
   refund_mode_required: L('ফেরতের টাকা কীভাবে দিলেন বাছুন', 'Choose how the money was handed back', 'Refund কীভাবে দিলেন বাছুন'),
 };
 const NOPERM = L('এই কাজের অনুমতি নেই', 'You are not allowed to do this', 'এই কাজের permission নেই');
@@ -124,12 +146,7 @@ async function grant(code, loc) {
 }
 const costOk = async (loc) => !!(S.ctx.is_owner || (S.ctx.perms.ITEM_COST && S.ctx.perms.ITEM_COST.view) || await grant('view_cost', loc));
 // photos: stored as a Storage path "<form>/<location>/<id>.jpg" (the bucket policy reads the first two parts); the database keeps only that path (<= 300 chars)
-function shrink(file, max = 1280, q = 0.72) {
-  return new Promise((res, rej) => { const img = new Image(), u = URL.createObjectURL(file);
-    img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k) || 1; c.height = Math.round(img.height * k) || 1;
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob((b) => (b ? res(b) : rej(new Error('image'))), 'image/jpeg', q); };
-    img.onerror = () => rej(new Error('image')); img.src = u; });
-}
+function shrink(file, max = 1280, q = 0.72) { return window.BOS.photo.shrink(file, { max: max, q: q }); }   // shared helper: web/photo.js (EXIF, type and size checks)
 const photoForm = (cands) => (S.ctx.is_owner ? cands[0] : (cands.find((c) => S.ctx.perms[c] && S.ctx.perms[c].enter) || cands[0]));
 // cands = storage prefixes in order of preference: the dedicated ones first (STOCK / PURCHASE, grant based, phase12), then the old form codes
 // (kept so a database that has not run phase12 yet keeps working: the first prefix the server accepts wins)
@@ -180,6 +197,7 @@ const unitSel = (id, cur) => `<div><label for="${id}">${esc(T('unit'))}</label><
 const locSel = (id, label, cur, rows) => (rows.length > 1 ? `<div><label for="${id}">${esc(label)}</label><select id="${id}">${optHTML(rows.map((l) => [l.id, nm(l)]), cur)}</select></div>` : `<input type="hidden" id="${id}" value="${rows[0] ? rows[0].id : ''}">`);
 const scanOn = () => { try { return !!(B.barcode && B.barcode.enabled()); } catch (e) { return false; } };
 const itemFld = (items, id, preset, label) => `<div><label for="${id}">${esc(label || T('item'))}</label><div class="p2-inl"><input id="${id}" list="${id}_dl" autocomplete="off" value="${esc(preset ? itemText(preset) : '')}" placeholder="${esc(T('itemph'))}">${scanOn() ? `<button type="button" class="mini" data-act="s2_scan" data-t="${id}" aria-label="${esc(T('scan'))}">▮▮ ${esc(T('scan'))}</button>` : ''}</div><datalist id="${id}_dl">${items.map((i) => `<option value="${esc(itemText(i))}"></option>`).join('')}</datalist><div class="hint" id="${id}_h">${preset ? esc(T('baseIs') + ': ' + unitLabel(baseOf(preset))) : ''}</div></div>`;
+document.addEventListener('change', (e) => { if ((e.target.id === 'a_to' || e.target.id === 'a_item') && isRet()) loadRetRefs(); });
 document.addEventListener('change', (e) => {
   const el = e.target; if (!el.id || !/^[a-z]+_item$/.test(el.id) || !ITEMS) return;
   const it = itemFrom(ITEMS, el.value), h = $('#' + el.id + '_h'); if (h) h.textContent = it ? T('baseIs') + ': ' + unitLabel(baseOf(it)) : '';
@@ -208,7 +226,7 @@ async function scanInto(id) {
 B.s2 = { X, T, ERR, scanInto, errToast, rid, shrink, uploadPhoto, thumb, grant, costOk, lists, rowL, unitLabel, unitSel, optHTML, locSel, LOCS, allLocs, npMode, trackedItems, itemFrom, itemFld, itemText, baseOf, nnum, norm, money, q4, dt, LOCK, SH, sheetStart, submit, photoForm };
 
 // ---------- hub state ----------
-const D = { loc: undefined, tab: 'levels', rows: [], cats: [], q: '', f: { category: '', below: false, zero: false }, shown: 50, expH: 24, exp: [], tr: [], wa: [], acts: null, sqlMissing: false, canApprove: false, nPending: 0 };
+const D = { loc: undefined, tab: 'levels', rows: [], cats: [], q: '', f: { category: '', below: false, zero: false }, shown: 50, expH: 24, exp: [], tr: [], wa: [], acts: null, sqlMissing: false, canApprove: false, nPending: 0, nIncoming: 0 };
 let CONV = [];
 const ACTS = [['open', 'stock_opening', 'a_open'], ['waste', 'wastage_write_off', 'a_waste'], ['count', 'stock_count_adjust', 'a_count'], ['issue', 'stock_issue', 'a_issue'], ['prod', 'stock_production', 'a_prod'], ['xfer', 'stock_transfer', 'a_xfer']];
 const actLoc = () => (D.loc !== undefined && D.loc !== null ? D.loc : (LOCS()[0] || {}).id);
@@ -221,7 +239,7 @@ async function view() {
   if (D.loc === undefined) D.loc = (LOCS()[0] || {}).id;       // one location first (zero-stock items show there); "all" is one tap away
   D.acts = null; GR.clear();
   await Promise.all([trackedItems(), refreshActs(), loadConv()]);
-  await loadPendingCount();
+  await loadPendingCount(); await loadIncoming();
   draw();
 }
 async function refreshActs() {
@@ -234,6 +252,12 @@ async function loadPendingCount() {
   try { const r = await sb.rpc('wastage_pending', { p_loc: D.loc === undefined ? null : D.loc, p_status: 'pending' }); D.wa = r && !r.error && r.data ? r.data : []; } catch (e) { D.wa = []; }
   D.nPending = D.wa.length;
 }
+// bos115 (transfer_notify_receiver): when on, the In transit tab shows how many transfers are waiting to be received at my places. Off or any problem = no number.
+async function loadIncoming() {
+  D.nIncoming = 0; if (B.rule('transfer_notify_receiver', false) !== true) return;
+  try { const r = await sb.rpc('stock_in_transit', { p_loc: null }); const mine = (S.ctx.locations || []);
+    D.nIncoming = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => allLocs() || mine.includes(x.to_location_id)).length : 0; } catch (e) { D.nIncoming = 0; }
+}
 // category label from the editable list (the code is only a fallback); units of an item from the conversions
 const catLabel = (code) => { if (!code) return ''; const r = lists('item_categories').find((x) => x.value_code === code); return r ? lab(rowL(r)) : code; };
 function unitLine(itemId, base) {
@@ -244,14 +268,15 @@ function unitLine(itemId, base) {
 }
 // one search for the list: code, Bangla / English / Bng-Eng name, category label (Bangla digits accepted)
 function rowsFor() {
-  const q = norm(D.q).toLowerCase(); if (!q) return D.rows;
-  return D.rows.filter((r) => { const it = (ITEMS || []).find((i) => i.id === r.item_id) || {}; return [r.code, r.name_bn, r.name_en, it.name_mix, catLabel(r.category), it.barcode].some((x) => String(x || '').toLowerCase().includes(q)); });
+  const base = D.f.sub && B.catfilter ? B.catfilter(D.rows, { cat: D.f.category, sub: D.f.sub }) : D.rows;   // bos100: Sub-category filter
+  const q = norm(D.q).toLowerCase(); if (!q) return base;
+  return base.filter((r) => { const it = (ITEMS || []).find((i) => i.id === r.item_id) || {}; return [r.code, r.name_bn, r.name_en, it.name_mix, catLabel(r.category), it.barcode].some((x) => String(x || '').toLowerCase().includes(q)); });
 }
 function draw() {
   const locs = LOCS(), filters = (D.f.category ? 1 : 0) + (D.f.below ? 1 : 0) + (D.f.zero ? 1 : 0);
   const anyAct = D.acts && Object.values(D.acts).some(Boolean), showActs = anyAct || npMode() === 'lock';
   shell(T('title'), `${locs.length > 1 || allLocs() ? `<div style="margin-bottom:8px"><select id="s2_loc" aria-label="${esc(T('location'))}">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(locs.map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}
-    <div class="ptabs s2t" role="tablist">${[['levels', 'levels'], ['exp', 'expiring'], ['tr', 'transit'], ...(D.canApprove || D.nPending ? [['wa', 'wa']] : [])].map(([k, l]) => `<button role="tab" data-act="s2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}${k === 'wa' && D.nPending ? ` <span class="cnt">${D.nPending}</span>` : ''}</button>`).join('')}</div>
+    <div class="ptabs s2t" role="tablist">${[['levels', 'levels'], ['exp', 'expiring'], ['tr', 'transit'], ...(D.canApprove || D.nPending ? [['wa', 'wa']] : [])].map(([k, l]) => `<button role="tab" data-act="s2_tab" data-v="${k}" aria-selected="${D.tab === k}">${esc(T(l))}${k === 'wa' && D.nPending ? ` <span class="cnt">${D.nPending}</span>` : ''}${k === 'tr' && D.nIncoming ? ` <span class="cnt" id="s2_incnt">${D.nIncoming}</span>` : ''}</button>`).join('')}</div>
     <div id="s2_main"></div>
     <div class="s2-bar">${showActs ? `<button class="primary" data-act="s2_actions">${esc(T('actions'))}</button>` : ''}${S.ctx.is_owner ? `<button class="sec" data-act="s2_recon">${esc(T('recon'))}</button>` : ''}</div>`, true);
   void filters; drawTab();
@@ -284,11 +309,11 @@ function paintRows(list) {
   const box = $('#s2_list'); if (!box) return;
   const showLoc = D.loc === null || D.loc === undefined;
   const html = list.slice(0, D.shown).map((r) => {
-    const i = D.rows.indexOf(r), out = Number(r.qty) <= 0, bar = out ? 'bad' : r.below_min ? 'warn' : '';
+    const i = D.rows.indexOf(r), neg = Number(r.qty) < 0, out = Number(r.qty) <= 0, bar = out ? 'bad' : r.below_min ? 'warn' : '';
     return `<div class="card item s2-row mk ${bar}" data-act="s2_item" data-i="${i}" role="button" tabindex="0"><div><div class="nm">${esc(nm(r))}</div>
       <div class="sub">${esc(r.code)}${r.category ? ' · ' + esc(catLabel(r.category)) : ''}${showLoc ? ' · ' + esc(locName(r.location_id)) : ''}${r.min_stock !== null && r.min_stock !== undefined ? ' · ' + esc(T('min')) + ' ' + q4(r.min_stock) : ''}</div>
       <div class="sub">${esc(unitLine(r.item_id, r.base_unit))}</div>
-      ${out ? `<span class="chip bad">${esc(T('chipOut'))}</span>` : r.below_min ? `<span class="chip warn">${esc(T('chipLow'))}</span>` : ''}</div>
+      ${neg ? `<span class="chip bad">${esc(T('chipNeg'))}</span>` : out ? `<span class="chip bad">${esc(T('chipOut'))}</span>` : r.below_min ? `<span class="chip warn">${esc(T('chipLow'))}</span>` : ''}</div>
       <div class="pr"><button type="button" class="mini s2-dots" data-act="s2_rowmenu" data-i="${i}" aria-label="${esc(T('more2'))}">⋮</button><b>${q4(r.qty)} ${esc(unitLabel(r.base_unit))}</b>${r.avg_cost !== null && r.avg_cost !== undefined ? `<small>${esc(T('avg'))} ${esc(money(r.avg_cost))}</small>` : ''}${r.value !== null && r.value !== undefined ? `<small>${esc(money(r.value))}</small>` : ''}</div></div>`;
   }).join('');
   box.innerHTML = (html || `<div class="card center"><p class="muted">${esc(T('none'))}</p><p class="muted" style="font-size:.85rem">${esc(T('noneHint'))}</p></div>`)
@@ -325,7 +350,7 @@ async function loadTransit() {
     const canR = g[x.to_location_id] && (allLocs() || (S.ctx.locations || []).includes(x.to_location_id)), canC = g[x.from_location_id] || x.sent_staff === me || S.ctx.is_owner;
     return `<div class="card stack mk info"><div class="row between"><b>${esc(nm(x))}</b><b>${q4(x.qty)} ${esc(u)}</b></div>
       <div class="sub muted" style="font-size:.85rem">${esc(x.code)} · ${esc(locName(x.from_location_id))} → ${esc(locName(x.to_location_id))} · ${esc(dt(x.sent_at))}${x.sent_staff ? ' · ' + esc(x.sent_staff) : ''}${x.note ? ' · ' + esc(x.note) : ''}</div>
-      <div class="row">${canC ? `<button class="full" data-act="s2_xcancel" data-i="${i}">${esc(T('cancelX'))}</button>` : ''}${canR ? `<button class="full" data-act="s2_xrecv" data-i="${i}">${esc(T('receive'))}</button>` : ''}</div></div>`;
+      <div class="row"><button class="full" data-act="s2_chal" data-i="${i}">${esc(T('printCh'))}</button></div><div class="row">${canC ? `<button class="full" data-act="s2_xcancel" data-i="${i}">${esc(T('cancelX'))}</button>` : ''}${canR ? `<button class="full" data-act="s2_xrecv" data-i="${i}">${esc(T('receive'))}</button>` : ''}</div></div>`;
   }).join('') || `<p class="muted center">${esc(T('trEmpty'))}</p>`;
 }
 
@@ -333,6 +358,7 @@ async function loadTransit() {
 function filterSheet() {
   openSheet(`<h2>${esc(T('filter'))}</h2><div class="stack">
     <div><label for="sf_cat">${esc(T('category'))}</label><select id="sf_cat"><option value="">${esc(T('all'))}</option>${optHTML(D.cats.map((c) => [c, catLabel(c)]), D.f.category)}</select></div>
+    ${B.catpick ? B.catpick.subSelect('sf_sub', D.f.category, D.f.sub, 'sf_cat') : ''}<!-- bos100 -->
     ${LOCS().length > 1 || allLocs() ? `<div><label for="sf_loc">${esc(T('location'))}</label><select id="sf_loc">${allLocs() ? `<option value="">${esc(T('allLoc'))}</option>` : ''}${optHTML(LOCS().map((l) => [l.id, nm(l)]), D.loc)}</select></div>` : ''}
     <button class="tog ${D.f.below ? 'on' : ''}" id="sf_below" data-act="sheettog" style="width:100%;justify-content:flex-start">${esc(T('belowMin'))}</button>
     <button class="tog ${D.f.zero ? 'on' : ''}" id="sf_zero" data-act="sheettog" style="width:100%;justify-content:flex-start">${esc(T('showZero'))}</button>
@@ -386,7 +412,7 @@ async function openAction(kind, preset) {
   } else if (kind === 'xfer') {
     const others = B.liveLocs ? B.liveLocs((B.ENV && B.ENV.locs) || []) : ((B.ENV && B.ENV.locs) || []);
     body = head('a_xfer') + `<div class="stack">${locSel('a_loc', T('fromLoc'), loc, locs)}<div><label for="a_to">${esc(T('toLoc'))}</label><select id="a_to"><option value="">—</option>${optHTML(others.filter((l) => l.id !== loc).map((l) => [l.id, nm(l)]), '')}</select></div>${itemFld(items, 'a_item', pit)}
-      <div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}</div>${foot('s2_go_xfer')}`;
+      <div class="row"><div style="flex:1"><label for="a_qty">${esc(T('qty'))}</label><input id="a_qty" inputmode="decimal"></div><div style="flex:1">${unitSel('a_unit')}</div></div>${note(false)}${retSection()}</div>${foot('s2_go_xfer')}`;
   }
   openSheet(body);
   if (kind === 'waste') { drawPhoto(); wireReason(); }
@@ -400,7 +426,7 @@ function drawPhoto() {
 }
 async function pickPhoto(file) {
   if (!file) return; toast(T('upl'));
-  try { SH.photo = await uploadPhoto(file, ['STOCK', '04-1', '04-2', '04-4'], Number(($('#a_loc') || {}).value) || actLoc()); drawPhoto(); const h = $('#a_ph_h'); if (h) { h.textContent = ''; h.classList.remove('s2-need'); } } catch (e) { fail(e); }
+  try { SH.photo = await uploadPhoto(file, ['STOCK', '13-1', '18-1', '37-1'], Number(($('#a_loc') || {}).value) || actLoc()); drawPhoto(); const h = $('#a_ph_h'); if (h) { h.textContent = ''; h.classList.remove('s2-need'); } } catch (e) { fail(e); }
 }
 document.addEventListener('change', (e) => { if (e.target.id === 'a_file') pickPhoto(e.target.files && e.target.files[0]); });
 
@@ -446,10 +472,70 @@ async function goProd(btn) {
   const m = ($('#a_made') || {}).value, loc = gloc(); const madeAt = m ? m + ':00+06:00' : null;
   await submit(btn, () => sb.rpc('stock_production_in', { p_item: it.id, p_loc: loc, p_qty: q, p_made_at: madeAt, p_unit: unitVal(), p_note: noteVal(), p_client: SH.client, p_unit_cost: c }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_production', loc, context: { item: it.code } });
 }
+// ----- marked return (bos115, rule transfer_return_marker) and the transfer challan print -----
+const RET_REASONS = ['damaged', 'expired', 'excess', 'wrong_item', 'other'];
+const retOn = () => { try { return B.rule('transfer_return_marker', false) === true; } catch (e) { return false; } };
+function retSection() {
+  if (!retOn()) return '';
+  return `<button type="button" class="tog" id="a_ret" data-act="s2_rettog" aria-pressed="false" style="width:100%;justify-content:flex-start">${esc(T('retTog'))}</button>
+    <div id="a_retbox" class="stack" hidden><div><label for="a_rreason">${esc(T('retReason'))}</label><select id="a_rreason"><option value="">—</option>${optHTML(RET_REASONS.map((c) => [c, T('rr_' + c)]), '')}</select></div>
+      <div><label for="a_rref">${esc(T('retRef'))}</label><select id="a_rref"><option value="">${esc(T('retNoRef'))}</option></select></div><div class="hint">${esc(T('retOther'))}</div></div>`;
+}
+const isRet = () => { const b = $('#a_ret'); return !!(b && b.classList.contains('on')); };
+// received transfers that sent this item from the chosen "to" place to this place (RLS shows only my places); nothing found / refused = no link choice, the return still works
+async function loadRetRefs() {
+  const sel = $('#a_rref'); if (!sel) return; const cur = sel.value;
+  const it = itemFrom(ITEMS || [], ($('#a_item') || {}).value), to = Number(($('#a_to') || {}).value), from = gloc();
+  let rows = [];
+  if (it && to && from) {
+    try { const r = await sb.from('stock_transfers').select('id,qty,received_qty,sent_at,kind').eq('item_id', it.id).eq('from_location_id', to).eq('to_location_id', from).eq('status', 'received').order('sent_at', { ascending: false }).limit(20);
+      rows = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => !x.kind) : []; } catch (e) { rows = []; }
+  }
+  const u = it ? unitLabel(baseOf(it)) : '';
+  sel.innerHTML = `<option value="">${esc(T('retNoRef'))}</option>` + rows.map((x) => `<option value="${esc(x.id)}">${esc(dt(x.sent_at) + ' · ' + q4(x.received_qty === null || x.received_qty === undefined ? x.qty : x.received_qty) + ' ' + u)}</option>`).join('');
+  if (cur && rows.some((x) => x.id === cur)) sel.value = cur;
+}
+const chNo = (id) => 'TR-' + String(id || '').replace(/-/g, '').slice(0, 8).toUpperCase();
+function chModel(m) { return { id: m.id, no: chNo(m.id), date: m.date, from: m.from, to: m.to, items: [{ code: m.code, name: m.name, qty: m.qty, unit: m.unit }], note: m.note || '' }; }
+function chBuiltin(d) {   // used only when no print template can be rendered; quantities only, no cost
+  const td = (v, r) => `<td style="border-bottom:1px solid #ccc;padding:4px 6px;text-align:${r ? 'right' : 'left'}">${esc(String(v ?? ''))}</td>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(d.no)}</title><style>html,body{margin:0;background:#fff}@page{margin:10mm}</style></head><body>
+    <div data-ch="builtin" style="font:14px system-ui,sans-serif;color:#111;max-width:760px;margin:0 auto;padding:8px"><div style="text-align:center;font-size:16px;font-weight:700;margin-bottom:8px">${esc(T('a_xfer'))}</div>
+    <div>${esc(T('chNo'))}: <b>${esc(d.no)}</b> · ${esc(d.date)}</div><div>${esc(d.from)} → <b>${esc(d.to)}</b></div>
+    <table style="width:100%;border-collapse:collapse;margin-top:8px"><tbody>${d.items.map((l) => `<tr>${td(l.code)}${td(l.name)}${td(q4(l.qty), 1)}${td(l.unit)}</tr>`).join('')}</tbody></table>
+    ${d.note ? `<div style="margin-top:8px">${esc(d.note)}</div>` : ''}</div></body></html>`;
+}
+async function printChallan(m) {
+  const d = chModel(m);
+  try {
+    if (B.tpl && B.tpl.printHTML) {
+      try { if (B.tpl.ensure) await B.tpl.ensure(sb); } catch (e) { void e; }   // no choice known: built-in sheet (line comment: a block comment here would hide the code above it from the UI inventory extractor, see the accept="image/..." input)
+      if (B.tpl.printHTML('stock_transfer', d, undefined, { lang: S.lang, loc: m.from_id, shop: {} }) && B.tpl.print('stock_transfer', d, undefined, { lang: S.lang, loc: m.from_id, shop: {} })) return true;
+    }
+  } catch (e) { void e; }   // fall through to the built-in sheet
+  try {
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
+    f.srcdoc = chBuiltin(d); f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { void e; } setTimeout(() => f.remove(), 2000); };
+    return true;
+  } catch (e) { toast(T('printFail')); return false; }
+}
+let LASTX = null;   // the transfer just sent from the sheet (for the Print challan button)
+function sentSheet(ret) {
+  openSheet(`<h2>${esc(T(ret ? 'retSent' : 'sentOk'))}</h2><p class="muted">${esc(LASTX.name)} · ${q4(LASTX.qty)} ${esc(LASTX.unit)} · ${esc(LASTX.from)} → ${esc(LASTX.to)}</p>
+    <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="primary full" id="s2_chbtn" data-act="s2_chal_last">${esc(T('printCh'))}</button></div>`);
+}
 async function goXfer(btn) {
   const items = await trackedItems(), it = readItem(items, 'a_item'); if (!it) return; const q = readQty('a_qty'); if (isNaN(q)) return;
   const to = Number(($('#a_to') || {}).value); if (!to) return toast(T('needTo')); const from = gloc();
-  await submit(btn, () => sb.rpc('stock_transfer', { p_from: from, p_to: to, p_item: it.id, p_qty: q, p_unit: unitVal(), p_note: noteVal(), p_client: SH.client }), () => { toast(T('sentOk')); afterWrite(); }, { grant: 'stock_transfer', loc: from, context: { item: it.code } });
+  const ret = retOn() && isRet(), unit = unitVal(), note = noteVal();
+  const keep = (r) => { LASTX = { id: r.id, code: it.code, name: nm(it), qty: q, unit: unitLabel(unit || baseOf(it)), from: locName(from), to: locName(to), from_id: from, date: dt(new Date().toISOString()), note: note || '' }; };
+  if (ret) {
+    const reason = ($('#a_rreason') || {}).value; if (!reason) return toast(T('needRet')); if (reason === 'other' && String(note || '').trim().length < 3) return toast(T('needNote'));
+    const ref = ($('#a_rref') || {}).value || null;
+    return submit(btn, () => sb.rpc('stock_return_transfer', { p_from: from, p_to: to, p_item: it.id, p_qty: q, p_reason: reason, p_ref: ref, p_unit: unit, p_note: note, p_client: SH.client }),
+      (r) => { toast(T('retSent')); afterWrite(); if (r && r.id) { keep(r); sentSheet(true); } }, { grant: 'stock_transfer', loc: from, context: { item: it.code } });
+  }
+  await submit(btn, () => sb.rpc('stock_transfer', { p_from: from, p_to: to, p_item: it.id, p_qty: q, p_unit: unit, p_note: note, p_client: SH.client }), (r) => { toast(T('sentOk')); afterWrite(); if (r && r.id) { keep(r); sentSheet(false); } }, { grant: 'stock_transfer', loc: from, context: { item: it.code } });
 }
 function afterWrite() { if ($('#s2_main')) drawTab(); }
 
@@ -497,12 +583,15 @@ function recvSheet(x) {
   sheetStart('recv'); const it = (ITEMS || []).find((y) => y.id === x.item_id), u = unitLabel(baseOf(it));
   openSheet(`<h2>${esc(T('receive'))} · ${esc(nm(x))}</h2><p class="muted">${esc(T('sent'))}: ${q4(x.qty)} ${esc(u)} · ${esc(locName(x.from_location_id))} → ${esc(locName(x.to_location_id))}</p><div class="stack">
     <div><label for="r_qty">${esc(T('recvQty'))}</label><input id="r_qty" inputmode="decimal" value="${esc(String(x.qty))}" data-sent="${esc(String(x.qty))}"></div><div class="notice warn" id="r_short" hidden>${esc(T('shortBy'))}</div>
+    <div><label for="r_dmg">${esc(T('dmgQty'))}</label><input id="r_dmg" inputmode="decimal" autocomplete="off"></div>
+    <div id="r_dmg_w" hidden><label for="r_dmg_r">${esc(T('dmgReason'))}</label><select id="r_dmg_r"><option value="">—</option>${optHTML(lists('transfer_damage_reasons').map((r) => [r.value_code, lab(rowL(r))]), '')}</select></div><div class="muted" style="font-size:.8rem">${esc(T('dmgNote'))}</div>
     <div><label for="a_note">${esc(T('note'))}</label><input id="a_note" autocomplete="off"></div></div>
     <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('cancel'))}</button><button class="primary full" data-act="s2_go_recv" data-i="${D.tr.indexOf(x)}">${esc(T('receive'))}</button></div>`);
 }
 document.addEventListener('input', (e) => {
   if (e.target.id === 's2_q') { D.q = e.target.value; D.shown = 50; paintRows(rowsFor()); }
   if (e.target.id === 'r_qty') { const v = nnum(e.target.value), s = Number(e.target.dataset.sent); const w = $('#r_short'); if (w) w.hidden = !(v >= 0 && v < s); }
+  if (e.target.id === 'r_dmg') { const v = nnum(e.target.value), w = $('#r_dmg_w'); if (w) w.hidden = !(v > 0); }
 });
 document.addEventListener('change', (e) => { if (e.target.id === 's2_loc') { D.loc = e.target.value === '' ? null : Number(e.target.value); refreshActs().then(draw); } });
 
@@ -512,7 +601,17 @@ async function reconSheet() {
   openSheet(`<h2>${esc(T('recon'))}</h2>${rows.length ? `<div class="notice bad">${esc(T('reconBad'))}: ${rows.length}</div>${rows.map((x) => { const it = items.find((i) => i.id === x.item_id);
     return `<div class="s2-led"><div>${esc(it ? nm(it) : x.item_id)}<div class="sub">${esc(locName(x.location_id))}</div></div><div class="q">${esc(T('ledgerQty'))} ${q4(x.ledger_qty)} / ${esc(T('cachedQty'))} ${q4(x.cached_qty)}</div></div>`; }).join('')}
     <button class="danger full" style="margin-top:10px" data-act="s2_fix">${esc(T('reconFix'))}</button>` : `<div class="notice ok">${esc(T('reconOk'))}</div>`}
-    <button class="full" style="margin-top:10px" data-act="closesheet">${esc(T('close'))}</button>`);
+    ${await batchBlock(items)}<button class="full" style="margin-top:10px" data-act="closesheet">${esc(T('close'))}</button>`);
+}
+// bos114 stock_batch_reconcile (owner, read-only here): batch sum vs balance. Function missing / refused / no answer = nothing is shown.
+async function batchBlock(items) {
+  if (!S.ctx.is_owner) return '';
+  try {
+    const r = await sb.rpc('stock_batch_reconcile', { p_fix: false }); if (!r || r.error || !Array.isArray(r.data)) return '';
+    if (!r.data.length) return `<div class="notice ok" id="s2_batchok" style="margin-top:10px">${esc(T('batchOk'))}</div>`;
+    return `<div id="s2_batchbad" style="margin-top:10px"><div class="notice bad">${esc(T('batchH'))} · ${esc(T('batchBad'))}: ${r.data.length}</div>${r.data.map((x) => { const it = items.find((i) => i.id === x.item_id);
+      return `<div class="s2-led"><div>${esc(it ? nm(it) : x.item_id)}<div class="sub">${esc(locName(x.location_id))}</div></div><div class="q">${esc(T('balQty'))} ${q4(x.balance)} / ${esc(T('batchSum'))} ${q4(x.batch_sum)}</div></div>`; }).join('')}</div>`;
+  } catch (e) { return ''; }
 }
 
 Object.assign(H, {
@@ -520,7 +619,7 @@ Object.assign(H, {
   s2_more: () => { D.shown += 50; paintRows(rowsFor()); },
   s2_filter: filterSheet,
   s2_freset: () => { D.f = { category: '', below: false, zero: false }; closeSheet(); loadLevels(); },
-  s2_fapply: () => { D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');
+  s2_fapply: () => { D.f.sub = ($('#sf_sub') || {}).value || ''; D.f.category = ($('#sf_cat') || {}).value || ''; D.f.below = $('#sf_below').classList.contains('on'); D.f.zero = $('#sf_zero').classList.contains('on');   // bos100
     const l = $('#sf_loc'); closeSheet(); if (l) { D.loc = l.value === '' ? null : Number(l.value); const s = $('#s2_loc'); if (s) s.value = l.value; refreshActs(); } loadLevels(); },
   s2_item: (a) => { const r = D.rows[Number(a.dataset.i)]; if (r) drill(r); },
   s2_actions: actionsSheet,
@@ -530,9 +629,16 @@ Object.assign(H, {
   s2_expwo: (a) => { const x = D.exp[Number(a.dataset.i)]; if (x) expireSheet(x); },
   s2_go_expwo: async (a) => { const x = D.exp[Number(a.dataset.i)]; if (!x) return;
     await submit(a, () => sb.rpc('stock_expire_batch', { p_batch: x.batch_id, p_reason: ($('#a_reason') || {}).value || 'expired', p_note: reasonNote(noteVal()), p_photo: SH.photo }), () => { toast(T('saved')); afterWrite(); }, { grant: 'wastage_write_off', loc: x.location_id, context: { batch: x.batch_id } }); },
+  s2_chal: (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; const it = (ITEMS || []).find((y) => y.id === x.item_id);
+    return printChallan({ id: x.id, code: x.code, name: nm(x), qty: x.qty, unit: unitLabel(baseOf(it)), from: locName(x.from_location_id), to: locName(x.to_location_id), from_id: x.from_location_id, date: dt(x.sent_at), note: x.note }); },
+  s2_chal_last: () => { if (LASTX) return printChallan(LASTX); },
+  s2_rettog: (a) => { const on = !a.classList.contains('on'); a.classList.toggle('on', on); a.setAttribute('aria-pressed', String(on)); const b = $('#a_retbox'); if (b) b.hidden = !on; if (on) loadRetRefs(); },
   s2_xrecv: (a) => { const x = D.tr[Number(a.dataset.i)]; if (x) recvSheet(x); },
   s2_go_recv: async (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; const v = nnum(($('#r_qty') || {}).value); if (!(v >= 0)) return toast(T('needQty'));
-    await submit(a, () => sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal() }), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.to_location_id, context: { transfer: x.id } }); },
+    const draw_ = norm(($('#r_dmg') || {}).value), dq = draw_ === '' ? null : nnum(draw_), dr = ($('#r_dmg_r') || {}).value || '';      // RPT-B3: damaged quantity is optional; blank = not captured (the 3-argument call, exactly as before)
+    if (dq !== null && !(dq >= 0)) return toast(T('needQty')); if (dq !== null && dq > v) return toast(T('dmgOver')); if (dq > 0 && !dr) return toast(T('needDmgReason'));
+    await submit(a, () => (dq === null ? sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal() })
+      : sb.rpc('stock_receive_transfer', { p_id: x.id, p_received_qty: v, p_note: noteVal(), p_damaged_qty: dq, p_damaged_reason: dq > 0 ? dr : null })), () => { toast(T('saved')); afterWrite(); }, { grant: 'stock_transfer', loc: x.to_location_id, context: { transfer: x.id } }); },
   s2_xcancel: (a) => { const x = D.tr[Number(a.dataset.i)]; if (!x) return; sheetStart('xcancel');
     openSheet(`<h2>${esc(T('cancelX'))} · ${esc(nm(x))}</h2><div class="notice warn">${esc(T('confirmCancel'))}</div><div><label for="a_note">${esc(T('note'))}</label><input id="a_note" autocomplete="off"></div>
       <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="s2_go_xcancel" data-i="${a.dataset.i}">${esc(T('cancelX'))}</button></div>`); },
@@ -551,7 +657,10 @@ Object.assign(H, {
   s2_wa_cancel: async (a) => { const x = D.wa[Number(a.dataset.i)]; if (!x) return;
     await submit(a, () => sb.rpc('wastage_cancel', { p_id: x.id }), () => { toast(T('waDone')); loadPendingCount().then(() => { if ($('#s2_main')) draw(); }); }, { context: { request: x.id } }); },
   s2_recon: reconSheet,
-  s2_fix: async () => { const r = await sb.rpc('stock_reconcile', { p_fix: true }); if (r.error) return errToast(r.error); closeSheet(); toast(T('saved')); afterWrite(); },
+  s2_fix: () => { openSheet(`<h2>${esc(T('fixTitle'))}</h2><div class="notice warn">${esc(T('fixHint'))}</div><div><label for="s2_fixw">${esc(T('fixWord'))}</label><input id="s2_fixw" autocomplete="off"></div>
+      <div class="row" style="margin-top:12px"><button class="full" data-act="closesheet">${esc(T('close'))}</button><button class="danger full" data-act="s2_fix_go">${esc(T('reconFix'))}</button></div>`); },
+  s2_fix_go: async () => { const w = (($('#s2_fixw') || {}).value || '').trim(); if (w !== 'FIX') return toast(T('fixWord'));
+    const r = await sb.rpc('stock_reconcile_fix', { p_confirm: w }); if (r.error) return errToast(r.error); closeSheet(); toast(T('saved')); afterWrite(); },
 });
 
 // exception flag codes -> readable titles (3 modes). Shown by the exceptions page next to the server text.
@@ -563,8 +672,8 @@ const FLAGS = {
   transit_short: L('পথে মাল কম', 'Short in transit', 'Transit-এ মাল কম'), purchase_price_jump: L('ক্রয়মূল্যে বড় বদল', 'Purchase price jump', 'Purchase price jump'),
   purchase_void: L('ক্রয় বিল বাতিল', 'Purchase voided', 'Purchase void'), supplier_payment_void: L('সাপ্লায়ার পেমেন্ট বাতিল', 'Supplier payment voided', 'Supplier payment void'),
   emergency_window_used: L('জরুরি অনুমোদনে কাজ', 'Emergency window used', 'Emergency window ব্যবহার'),
-  wastage_pending: L('বড় নষ্ট মাল — অনুমোদনের অপেক্ষায়', 'Large wastage — waiting for approval', 'বড় wastage — approval-এর অপেক্ষায়'), wastage_rejected: L('বড় নষ্ট মাল নামঞ্জুর', 'Large wastage rejected', 'বড় wastage reject'),
-  sale_return: L('বিক্রি ফেরত', 'Sale return', 'Sale return'), sale_return_void: L('বিক্রি ফেরত বাতিল', 'Sale return voided', 'Sale return void'), supplier_refund_void: L('সাপ্লায়ার রিফান্ড বাতিল', 'Supplier refund voided', 'Supplier refund void'),
+  wastage_pending: L('বড় নষ্ট মাল — অ্যাপ্রুভের অপেক্ষায়', 'Large wastage — waiting for approval', 'বড় wastage — approval-এর অপেক্ষায়'), wastage_rejected: L('বড় নষ্ট মাল নামঞ্জুর', 'Large wastage rejected', 'বড় wastage reject'),
+  sale_return: L('বিক্রি ফেরত', 'Sale return', 'Sale return'), sale_return_void: L('সেল ফেরত ভয়েড', 'Sale return voided', 'Sale return void'), supplier_refund_void: L('সাপ্লায়ার রিফান্ড ভয়েড', 'Supplier refund voided', 'Supplier refund void'),
 };
 B.flagChip = (code) => (FLAGS[code] ? `<span class="chip" style="margin-inline-end:6px">${esc(lab(FLAGS[code]))}</span>` : '');
 B.FLAGS_STOCK = FLAGS;

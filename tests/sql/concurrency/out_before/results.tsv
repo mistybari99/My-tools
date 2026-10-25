@@ -1,0 +1,57 @@
+S04ctl	serial control: 11 batches one after the other -> the 11th is refused (insufficient_stock)	PASS	refused=1
+S04default.neg	RM-P never below 0 (refuse must hold under concurrency): final qty	FAIL	got=f RM-P=-100.0000 runs_ok=20 (max allowed 10) FG-P=160.0000
+S04default.runs	runs == FG-P yield / 8 == consumed RM / 10 (ledger consistent with production_runs)	PASS	
+S04default.dl	no deadlock (stat + log)	PASS	dl_log=0
+S04default.recon	stock_balance == replay of ledger (qty and avg)	PASS	
+S04default.tb	trial balance: unbalanced entries 0, debit-credit diff 0	PASS	
+S04default.dupje	one journal entry per source (je_source_uq)	PASS	
+S04default.ap	GL supplier payable (2100) == sum of supplier balances (bills - payments)	PASS	gl=0 subledger=0
+S04default.gl	inventory_vs_gl unexplained = 0 (tolerance GLTOL, default 0.05 = rounding)	PASS	{"gl": 59700.00, "diff": 0.00, "valuation": 59700.00, "unexplained": 0.00}
+S04block.neg	RM-P never below 0 (refuse must hold under concurrency): final qty	PASS	RM-P=0.0000 runs_ok=10 (max allowed 10) FG-P=80.0000
+S04block.runs	runs == FG-P yield / 8 == consumed RM / 10 (ledger consistent with production_runs)	PASS	
+S04block.dl	no deadlock (stat + log)	PASS	dl_log=0
+S04block.recon	stock_balance == replay of ledger (qty and avg)	PASS	
+S04block.tb	trial balance: unbalanced entries 0, debit-credit diff 0	PASS	
+S04block.dupje	one journal entry per source (je_source_uq)	PASS	
+S04block.ap	GL supplier payable (2100) == sum of supplier balances (bills - payments)	PASS	gl=0 subledger=0
+S04block.gl	inventory_vs_gl unexplained = 0 (tolerance GLTOL, default 0.05 = rounding)	PASS	{"gl": 59700.00, "diff": 0.00, "valuation": 59700.00, "unexplained": 0.00}
+S08a.a	card_settle same client_id x20: exactly one settlement row	PASS	rows=1 fresh=1 dup=19 errors=0
+S08a.recon	stock_balance == replay of ledger (qty and avg)	PASS	
+S08a.tb	trial balance: unbalanced entries 0, debit-credit diff 0	PASS	
+S08a.dupje	one journal entry per source (je_source_uq)	PASS	
+S08a.ap	GL supplier payable (2100) == sum of supplier balances (bills - payments)	PASS	gl=0 subledger=0
+S08a.gl	inventory_vs_gl unexplained = 0 (tolerance GLTOL, default 0.05 = rounding)	PASS	{"gl": 59340.00, "diff": 0.00, "valuation": 59340.00, "unexplained": 0.00}
+S08a.card	card receivable (1140) is 0 after one settlement of 600 posted	PASS	
+S08a.dl	no deadlock	PASS	dl_log=0
+S08o	default (off): 3 settlements of 600 against a 600 receivable are saved exactly as before: over flags false false false	PASS	over flags: false false false 
+S08s	warn: 3 serial settlements of 600 against a 600 receivable (no posting between calls): over flags false true true	FAIL	over flags: false false false 
+S08s.exc	warn: 3 settlements saved, 2 yellow exceptions card_settle_over	FAIL	got=f 
+S08b.a	different client ids: over-settlement must be refused or flagged: GL card receivable must not go negative	FAIL	got=f settlements=20 over=true:0 over=false:20 receivable=-11400.00
+S08b.one	refuse: exactly one of the 20 settlements of 600 is accepted (the rest are over_settlement)	FAIL	got=f saved=20 refused=0
+S08b.dl	no deadlock	PASS	dl_log=0
+S08b.recon	stock_balance == replay of ledger (qty and avg)	PASS	
+S08b.tb	trial balance: unbalanced entries 0, debit-credit diff 0	PASS	
+S08b.dupje	one journal entry per source (je_source_uq)	PASS	
+S08b.ap	GL supplier payable (2100) == sum of supplier balances (bills - payments)	PASS	gl=0 subledger=0
+S08b.gl	inventory_vs_gl unexplained = 0 (tolerance GLTOL, default 0.05 = rounding)	PASS	{"gl": 59340.00, "diff": 0.00, "valuation": 59340.00, "unexplained": 0.00}
+S09b.a	all 12 scan_confirm(post) calls succeed (no deadlock victim)	FAIL	got=f ok=2 deadlocks=10 errors=10
+S09b.dl	no deadlock: scan_confirm(post) same supplier	FAIL	deadlocks=10 (victims retry-able, but the user sees an error)
+S09b.recon	stock_balance == replay of ledger (qty and avg)	PASS	
+S09b.tb	trial balance: unbalanced entries 0, debit-credit diff 0	PASS	
+S09b.dupje	one journal entry per source (je_source_uq)	PASS	
+S09b.ap	GL supplier payable (2100) == sum of supplier balances (bills - payments)	PASS	gl=150.00 subledger=150.00
+S09b.gl	inventory_vs_gl unexplained = 0 (tolerance GLTOL, default 0.05 = rounding)	PASS	{"gl": 59850.00, "diff": 0.00, "valuation": 59850.00, "unexplained": 0.00}
+S12a.a	same client_id x20: one batch row, one audit row, errors 0	PASS	batches=1 fresh=1 errors=0
+S12a.rules	end state of the rules == the serial run	PASS	
+S12a.rules2	final rules identical to serial run	PASS	
+S12a.dl	no deadlock	PASS	dl_log=0
+S12b.rules	final rules identical to serial run (N different client ids)	PASS	
+S12b.once	each rule is reported 'applied' by exactly one batch (setup_apply_lines81 has no rule twice)	FAIL	got=f production_requires_costx20
+S12b.err	no session error	PASS	
+S12b.dl	no deadlock	PASS	dl_log=0
+S13.reads	every read saw 0 or 200 overrides (a bulk set is atomic for readers)	PASS	
+S13.reads2	every read saw 0 or 200 overrides (bulk set atomic for readers)	PASS	reads=8
+S13.state	final state is uniform: all 200 keys hold the same mode (user level)	PASS	locked:200
+S13.state2	final state is uniform (role level)	PASS	locked:200
+S13.err	no session error (deadlock victims would show here)	FAIL	got=f      23 ERROR:  deadlock detected 
+S13.dl	no deadlock: two bulk sets with opposite key order	FAIL	deadlocks=23

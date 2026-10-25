@@ -1,0 +1,197 @@
+-- Phase 539 (UNION-11): the two stale overloads and the audit of the merged functions. Paste-twice safe. Earlier phase files are not edited.
+-- Paste AFTER phase538 and after phase 505.
+-- 1. inbound_message_receive(9 arguments) and web_order_submit(13 arguments): the advanced line replaced them by the same functions with one more argument (phase 520 / 516 era). A database that was
+--    built by pasting the advanced phases and then the early phases again has BOTH, and a call with the old number of arguments is then ambiguous ("function is not unique"). When both exist the
+--    old one is saved in public._union_fn_backup and dropped. Nothing happens when only the new one exists (the fresh build).
+-- 2. public._union_fn_expected / public._union_audit(): the md5 of the merged text of every function the UNION files 529 to 538 handle, and a read-only report that says for each function whether the
+--    database has exactly that text ("merged"), another text ("other": a hand fix or an older paste; look at public._union_fn_backup) or no such function ("missing").
+
+create table if not exists public._union_fn_backup (id bigserial primary key, fn text not null, saved_at timestamptz not null default now(), why text, def text not null);
+alter table public._union_fn_backup enable row level security;
+revoke all on public._union_fn_backup from anon, authenticated;
+
+do $u539$
+declare o record;
+begin
+  for o in select * from (values
+      ('public.inbound_message_receive(text,text,text,text,text,text,timestamp with time zone,text,boolean)', 'public.inbound_message_receive(text,text,text,text,text,text,timestamp with time zone,text,boolean,text)'),
+      ('public.web_order_submit(text,uuid,text,text,text,text,jsonb,text,text,text,text,text,boolean)', 'public.web_order_submit(text,uuid,text,text,text,text,jsonb,text,text,text,text,text,boolean,text)')) v(old_sig, new_sig) loop
+    if to_regprocedure(o.old_sig) is not null and to_regprocedure(o.new_sig) is not null then
+      insert into public._union_fn_backup (fn, why, def) values (o.old_sig, 'phase539: the old overload made a call with fewer arguments ambiguous; the new function (one more argument) stays', pg_get_functiondef(o.old_sig::regprocedure));
+      execute 'drop function ' || o.old_sig;
+    end if;
+  end loop;
+end $u539$;
+
+create table if not exists public._union_fn_expected (fn text primary key, md5_text text not null);
+alter table public._union_fn_expected enable row level security;
+revoke all on public._union_fn_expected from anon, authenticated;
+insert into public._union_fn_expected (fn, md5_text) values
+  ('public._acct_all()', 'dac0c957a08e06f7713dc781b3c908b7'),
+  ('public._acct_docs(date)', 'f5d492c5f91676781bc1c3da0cf804e5'),
+  ('public._acct_inv_split72(text[],text,text[],integer)', '3e84d6c8222d39629bd1cd6c2464b1ee'),
+  ('public._all_locs()', 'c680e730cf6f6d07deb50ed219fe4321'),
+  ('public._backup_tables()', '221b896a31d94f9fbaa979546b869594'),
+  ('public._c78_rows(date,date)', '430dd70337995269cafd3b0065393d91'),
+  ('public._cogs_lines72(date,date,integer[])', '512e75706693df14492bad04b7c84119'),
+  ('public._conv_cost(uuid,integer,numeric,numeric,date,text)', '0e2f0913a5fd66f364e143435ed67834'),
+  ('public._cs_push_pools(bigint)', '31370a2ef60c54fa250da2cdcd0cd00c'),
+  ('public._cust_bal(uuid)', '474ecdbc4675f9882054aa53c4786df2'),
+  ('public._daybook_lines(integer[],integer[],date,date)', '2e1ca2a48dd2bcc20f04b3224604361f'),
+  ('public._elp_post_line(entries,integer,text,jsonb)', '4de54a223aea81d283769e20f21611a9'),
+  ('public._entries_countseal_guard23()', '13124043708735f9aca3221d5c3bcc83'),
+  ('public._inb_insert_message(jsonb)', '98e802fefc2866406963c7953968b928'),
+  ('public._inb_pii_cols76()', 'bdfc9e203970d38b73000c3f3eac17fd'),
+  ('public._intake_fail(text,integer,text,text,jsonb,text)', 'c7cf0af4032bca5a928ba129b535e7f7'),
+  ('public._item_base(uuid)', '03385e3ae53398056384f3e2e8b79cc2'),
+  ('public._item_flags_apply(uuid,jsonb)', '1b66a7ea69915f84c95c30213e29a473'),
+  ('public._item_link(uuid,text,text,boolean)', '138fdc0a192b8b3555fc9f182f9c9747'),
+  ('public._item_master_classify(jsonb)', '4b4809d580465c1e8323e1aeef9375e6'),
+  ('public._ledger_item_guard()', 'ccc2e4e8a634cecfa392ae8d450e1fc5'),
+  ('public._notif_ok(uuid,text,integer)', '1529700f5f3af190f8113cb1b49cd2e1'),
+  ('public._oo_short77(uuid)', '58696c328ef13339c7452af9e385edd8'),
+  ('public._p27_pl(date,date,integer[])', '2de38bdd8c6142342aa63665cecd285e'),
+  ('public._post_purchase_p13(uuid,jsonb)', '5715f9e11473bdaa94e7f3a53862a54b'),
+  ('public._qc_latest60(text,uuid)', '1c3b77156ff3d04c067857d8c7c91438'),
+  ('public._r3q_l3_shop_pnl(date,date,integer[],jsonb)', '6357271ded442f542a7042143d54e616'),
+  ('public._recipe_approved_guard()', '009b0cdf821f84944c466ccff12d089e'),
+  ('public._recipe_frozen()', '66d8bd6bc93afc47415a4313b8c3bb6a'),
+  ('public._recipe_gate73(uuid)', 'baf4edaf682f17fc8191e535e7b51b71'),
+  ('public._recipe_lines_ok(uuid,jsonb)', '243d211ccd6cf4ee53ca5954718940c5'),
+  ('public._recipe_need(uuid,numeric,integer)', '2f0e30e6acd8156907f639c5fc99744d'),
+  ('public._recipe_set_artisan(uuid,integer,text)', '43f57bf11696ff7175be42b84391dbda'),
+  ('public._rv_log(uuid,text,jsonb,text,uuid)', '29079c1b19bd31c60bf5f979a8ff5016'),
+  ('public._sale_stock_out()', 'b25b51f222ee84f3206f79b36f983e61'),
+  ('public._stock_guard(uuid,integer,text,date)', 'b1d801de9011e70c1bcc4808f5db94d5'),
+  ('public._sup_balance(uuid)', 'c522b30b76455348bd0adac5f11304bc'),
+  ('public._void_purchase_p13(uuid,text)', '6f5f40d98ada3cc5d7feae353e73ee07'),
+  ('public._wastage_post(uuid,integer,numeric,text,text,text,bigint,uuid,uuid,text)', 'c93f68edd847f75f58e4ece7e91418a9'),
+  ('public.acct_account_save(bigint,text,text,text,text,bigint,boolean,integer,boolean)', '0580b3c0d953201269118ec4be7bc15d'),
+  ('public.acct_journal_post(date,integer,text,jsonb,uuid,text,boolean)', '511d8bebbc82c38c5fc4aa4a43604eac'),
+  ('public.acct_journal_post(date,integer,text,jsonb,uuid,text,boolean,text)', '339b89dd83278200bbe8a4991ed0e3b1'),
+  ('public.acct_mapping_set(text,bigint)', '5d33b57f91e83ba5eeea1e19749e690d'),
+  ('public.acct_opening(jsonb,boolean,text,uuid,boolean)', 'e54a5a3f1e6676cf3af6ed962809be40'),
+  ('public.acct_post_pending(boolean,integer)', 'a92316ebd9ba5a0c3a536e5d358bdc5d'),
+  ('public.acct_status()', '94ea46ad356974d59f7fafe1550154eb'),
+  ('public.artisan_list(boolean)', '995e3347a4227e59bd603c1474f2e722'),
+  ('public.assistant_health()', '54cf093d5efb4a1b4cf9aad5d0585478'),
+  ('public.bank_recon_candidates(bigint,integer)', 'ce00427ed41cd0a548d800a0cb075d34'),
+  ('public.bank_recon_lines(bigint,text,integer)', '6ec07311768687877f3366d7c89d75d5'),
+  ('public.bank_recon_match(bigint,bigint,integer,text)', '6cae75b638fbfd9297b9407d3fee2180'),
+  ('public.bank_recon_match_many(jsonb,boolean)', '66029b6273540a5008df2af5e20cfa9c'),
+  ('public.bank_recon_report(bigint,date,date)', '933ccaa5e45f62db9f8ea35389e5bdb2'),
+  ('public.bank_recon_suggest(bigint,date,date,integer)', 'f571419688a80398abe1585da61e4c04'),
+  ('public.bank_recon_unmatch(bigint,text)', 'a223fd11d9c63ab628ec501090823dc8'),
+  ('public.bank_stmt_import(bigint,jsonb,uuid,boolean)', 'e209e7693b546922b5d0a49c3311893e'),
+  ('public.biz_items(date,date,integer)', '2cbdbc98b5281fe21ec3749c68526345'),
+  ('public.blind_active(text,integer)', '452a1903c5d052b9e6a3ab439955350c'),
+  ('public.cash_move_add(integer,text,numeric,date,text,uuid,text,text,uuid,boolean)', '2e1526e444b15dcb9e60226ca9bb6ba9'),
+  ('public.control_counts()', '65fcd091672c0cf25861ca6235931531'),
+  ('public.cost_attrib_main_set(integer,date,text,uuid)', 'a55f79b3764dfdc8f3e1570b6635dfc8'),
+  ('public.cost_rule_approve(bigint,text)', 'c980dbff1ac1119905ac5005c7a333ea'),
+  ('public.cost_source_set_active(bigint,boolean,text)', '56d46508962a79db3e843ad5131fc164'),
+  ('public.count_lines_seal(uuid)', '4defda3fb7b923f8a65411e5ed0e9169'),
+  ('public.count_unsubmitted_scan()', '888fc199883188956d17fa7a8e54b3bb'),
+  ('public.customer_advances()', '8341abb1177673474349c7d33ea1f114'),
+  ('public.customer_balance(uuid)', 'e810728f6785c5637457086a75399a1f'),
+  ('public.customer_directory(integer)', '6cac1fd4f9224b8df97f7e7c4a0b3eed'),
+  ('public.customer_dues()', '1b0393afb8e38162d7e4be07638f6cda'),
+  ('public.customer_ledger(uuid)', '893ac2149cd2618bb88a8a4451636384'),
+  ('public.customer_points_adjust(uuid,integer,text,uuid)', 'bf73d622eda866a365a377fe996a35cd'),
+  ('public.customer_points_redeem(uuid,integer,text,uuid,boolean)', '2474bda8979ab4820ef3fff6340361dc'),
+  ('public.customer_pos_info(text)', '49abbb09a2a9e7649a787bb5d3141457'),
+  ('public.customer_profile(uuid)', 'd56376e61e16818c6c57df7e7c14e007'),
+  ('public.customer_save(uuid,jsonb,uuid)', '8c3f7014ec5d1529633feedae59b4efe'),
+  ('public.customer_set_tier(uuid,bigint,text,boolean)', '8e7b8e2eff25783bab3ea99b63764f1a'),
+  ('public.decide_emergency(bigint,boolean,text)', '6e1c79456e5eeec3451ac81d8b85e529'),
+  ('public.dup_suspects(date,date)', '862aa450026a3b9c081621d2676be9f4'),
+  ('public.fa_register(date)', 'b0ccb663d77c54bfa4a3cbd7e29bc1aa'),
+  ('public.fa_schedule(uuid)', '6c761fdbcf6baa997d0bc769a906b980'),
+  ('public.gift_claim(uuid,uuid,bigint,text,uuid)', '93eb8afe68c359f80725c5f7559c7e9b'),
+  ('public.gift_issue(uuid,text,text,numeric,date,text,uuid)', '8a7d0fa7116ea4c3eaface0c1fca691c'),
+  ('public.gifts_due(uuid)', '8bd7faf50de77f1edc8a65258ea64068'),
+  ('public.has_grant(text,integer)', '4ced154bbea4186e39d92600376792ad'),
+  ('public.inbox_board(integer)', 'be26968d5c65ac1551bb35b97f25a8a7'),
+  ('public.inbox_get(bigint)', 'de5af63bed889360700547b65ba3fa31'),
+  ('public.inbox_list(integer,text,integer)', 'f7e785151edaab76b397e839555df087'),
+  ('public.intake_failures_list(text,integer)', '29f5a7fe24a900eb85e2167e9e840d3c'),
+  ('public.inventory_vs_gl(date,integer)', 'f56c355e63a8259ddb7f8f887c07bdc9'),
+  ('public.item_apply(uuid,jsonb,text)', 'f3803082621c026b84c5bbde997efb01'),
+  ('public.item_dup_check(text,text,uuid)', '5a0e942c22ad0b60da55e475dd1fb20f'),
+  ('public.item_map_accept_confident(boolean)', '8a1130586d072f27319925af52592836'),
+  ('public.item_map_decide2(uuid,text,text,text,boolean)', 'c29519db04ffc5b179071b767da3d844'),
+  ('public.item_mapping_decide(uuid,text,text,text,boolean)', '46dd393d2319606d3fbf36b4b3dabe62'),
+  ('public.item_master_import_apply(jsonb,text,integer)', '8e67b4e63826a49c5d845e24d41c6827'),
+  ('public.item_new(jsonb,text)', '3781326f42ead5bfc5b24db564fcb852'),
+  ('public.items_with_cost()', 'e78fe39037f3b8e4426a4f073bb41e32'),
+  ('public.location_save(integer,jsonb)', '8931f5cc1a32e93a7fb92bb51f861223'),
+  ('public.lock_check(date)', 'fb77f334456aef9946c3c23a47feac2f'),
+  ('public.login_failed(text)', '9268eff5c96e25aa72e62dba59ad0e04'),
+  ('public.loyalty_award(uuid)', '183ebd12e0644d5bbc581e2c521ec9d0'),
+  ('public.notify_cancel(bigint)', 'e4edc805d33e97411bcd70bf75a02ee8'),
+  ('public.notify_enqueue(uuid,uuid,text,text,jsonb,text,text,text)', 'c7afcdaabdeb2823963a775bef9b57e5'),
+  ('public.notify_optin_set(uuid,text,boolean,text,text)', '9d845ac6ca474718f81e746dcff85f8a'),
+  ('public.notify_outbox_summary()', '584ae0ed362d6af80530a7ffb32f86e1'),
+  ('public.online_order_get(uuid)', '50e4a20313b646d211ba24d35fca213a'),
+  ('public.online_order_save(uuid,uuid,integer,text,text,text,text,jsonb,text,text,date,numeric,numeric,numeric,text,text,text)', 'de7dd3735dfa8e87b2c909d74a454f90'),
+  ('public.online_orders_list(integer,text,date,date,integer)', 'eb2b580648192da6c4e12cc24f79af77'),
+  ('public.packaging_set(uuid,uuid,numeric,text,boolean,text)', '4689ef04634ad8a460471cee6fc42624'),
+  ('public.partner_calculate(bigint,date,date,jsonb)', '745a4e87b710715dbafc13b96b1e581f'),
+  ('public.partner_settlement_save(bigint,date,date,jsonb,text,uuid)', '243851fc7e76e8404f30670b7a38b1e3'),
+  ('public.path_cfg(text,integer)', '25f179987453530bc695ffe78383fb60'),
+  ('public.pay_supplier(uuid,integer,jsonb,uuid,text)', 'b09944fc5f8f4f804379da0df53ebf1f'),
+  ('public.payment_intent_link(bigint,bigint)', '81883d1deee9b5be05269270c4e6df3e'),
+  ('public.pool_set(integer,date,text,numeric,text,boolean,text,uuid)', '5da66059139c270017608838f238c98d'),
+  ('public.production_can_make(integer)', '2a05ed1890c20734a0a40f8bea2d9678'),
+  ('public.production_post(integer,uuid,numeric,uuid,timestamp with time zone,text,numeric)', '14c2393161cd72dc97eb7c2c6cb82500'),
+  ('public.production_preview(integer,uuid,numeric)', 'd938798d15ee1097c0443a42aa4a6a8f'),
+  ('public.production_run_costs(integer,date,date)', 'a01638dde8c694bd337e04c22088b64a'),
+  ('public.production_void(uuid,text)', 'ae5735b19c16b8bb8698bb8f01d97938'),
+  ('public.profit_source_check(date,date,integer)', 'ba3a80e333a9823642b16f8d0aaf3504'),
+  ('public.purchase_get(uuid)', 'fe8ed542e411ebe02f06ed95b600a8dc'),
+  ('public.recipe_approve(uuid,text)', '2bd35a38670bf8959741789c08579efb'),
+  ('public.recipe_book(integer,boolean,integer)', '6d32e407143c06f28cee557153f28018'),
+  ('public.recipe_copy(uuid,uuid,boolean,uuid)', '65cab5275bffdfa712a6f5fede427b18'),
+  ('public.recipe_cost(uuid,integer)', 'e26acf5f5dc7e7f7a79bd5f1d7f7c6e0'),
+  ('public.recipe_cost_component_set(uuid,text,text,numeric,numeric,text,text,uuid)', 'ceca56b9c172b2d10dcb0c7a6d7606da'),
+  ('public.recipe_save(uuid,uuid,numeric,text,text,jsonb,uuid,boolean)', '5ebdf746b280e67daf9e8966e29ab567'),
+  ('public.recipe_steps_save(uuid,jsonb,uuid)', 'e72c2a759edad1f24645e4112f4f49f3'),
+  ('public.recipe_yield_suggestion(uuid)', 'f8ee9e811cc28a19f09fc30b84a3e44e'),
+  ('public.record_sale2(uuid,integer,jsonb,numeric,jsonb,text,text,text,text,boolean,timestamp with time zone,text,numeric)', '660e61d55ce3ae533daa7229977b77b9'),
+  ('public.rollout_mode(text,integer)', '9a66d23e0b28b04207191eafb49891e2'),
+  ('public.rpt_agg_sql(text,text,text,text[],text[],text,text,text,text,integer,integer,boolean,boolean,boolean)', '3e7e8752359360b7b087885c1457f9fc'),
+  ('public.sale_return(uuid,uuid,jsonb,text,text,text,text,text)', '133c835685ca7f0957333cb569036fa3'),
+  ('public.sales_channel_save(integer,text,text,text,text,integer,text,text,boolean)', '885671997cc553466d622da350b7ae94'),
+  ('public.save_purchase(uuid,uuid,uuid,integer,text,date,jsonb,numeric,text,text,text,uuid,text)', '0e5e20a398daccd1e79445a821929761'),
+  ('public.save_supplier(uuid,jsonb)', '12fe6a2cfb3b0813749200025709147e'),
+  ('public.sheet_sync_all()', '2cb0b11f011ec5f91ed24784f3dc6e2f'),
+  ('public.shelf_life_for(uuid,date)', '1e62264b116618ebc1802403cb61bdcf'),
+  ('public.stock_blind_active(text,integer)', '51ff614657ad74411e4d282dc3c088eb'),
+  ('public.stock_count_adjust(uuid,integer,numeric,text,text,uuid)', 'ddf597953fbb5114e13d51ffd7a97081'),
+  ('public.stock_opening(uuid,integer,numeric,numeric,text,text,uuid)', '8e56dafaca14a597ae2229366a2c45f9'),
+  ('public.stock_post(uuid,integer,numeric,text,text,text,numeric,bigint,timestamp with time zone,text,bigint,text,uuid,uuid)', 'eba13926cba30b077ad8fb9186eb006f'),
+  ('public.stock_receive_transfer(uuid,numeric,text)', '08738479abecae77129437d16dde2ae4'),
+  ('public.stock_receive_transfer(uuid,numeric,text,numeric,text)', 'a84da692ccf9b3d12c83f7dbc398c748'),
+  ('public.stock_reconcile(boolean)', 'dca972cf87c25d3c2e681a649b176c7f'),
+  ('public.stock_transfer(integer,integer,uuid,numeric,text,text,uuid)', 'e575c1bf5735e023ba468646fe9ac37a'),
+  ('public.supplier_pick()', '641b8815a18df23180206f4c6f75b48d'),
+  ('public.supplier_refund(uuid,integer,numeric,text,text,text,text,text,uuid)', 'cb871ea3419fb9604af6bb1c3c9abfb5'),
+  ('public.template_for(text,integer)', '4a79d1e8291fde01b5b87b6e65c0de3d'),
+  ('public.unit_factor(uuid,text,text)', '19dc88ca5fc6a25f2294a83d895dc00a'),
+  ('public.urgent_alerts(timestamp with time zone)', '2a28026ebd8fbf430796bd69fb3ef062'),
+  ('public.void_supplier_payment(bigint,text)', '80c4d63a1cb686838be8bbf78ad8b2fb'),
+  ('public.void_supplier_refund(bigint,text)', '6c03022e334dd5c67d45cffa192371e9'),
+  ('public.wastage_decide(uuid,boolean,text)', 'bed0dd5585a5b6486b2a70d55a7abb47'),
+  ('public.year_close_list()', 'fa84a2d5c54e899b6c4b2db46542312f')
+on conflict (fn) do update set md5_text = excluded.md5_text;
+
+create or replace function public._union_audit() returns table (fn text, state text, expected_md5 text, actual_md5 text)
+language sql stable security definer set search_path = public as $$
+  select e.fn,
+         case when to_regprocedure(e.fn) is null then 'missing'
+              when md5(rtrim(pg_get_functiondef(to_regprocedure(e.fn)), E'\n')) = e.md5_text then 'merged' else 'other' end,
+         e.md5_text,
+         case when to_regprocedure(e.fn) is null then null else md5(rtrim(pg_get_functiondef(to_regprocedure(e.fn)), E'\n')) end
+    from public._union_fn_expected e order by 2 desc, 1;
+$$;
+revoke all on function public._union_audit() from public, anon, authenticated;

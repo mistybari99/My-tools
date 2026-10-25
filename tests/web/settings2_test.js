@@ -1,6 +1,8 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
 const R = (key, module, kind, def, bn, extra = {}) => ({ key, module, kind, value: null, default_value: def, label_bn: bn, label_en: bn, label_mix: bn, sort: 1, ...extra });
 data.tables.rules = [R('fiscal_year_start_month', 'settings', 'number', null, 'fy'), R('fiscal_year_start_day', 'settings', 'number', null, 'fd'), R('week_start', 'settings', 'choice', null, 'ws'), R('vat_on', 'settings', 'switch', false, 'vat'), R('vat_rate', 'settings', 'number', null, 'vr'),
@@ -11,13 +13,13 @@ data.tables.unit_conversions = [{ id: 1, item_id: null, from_unit: 'kg', to_unit
 data.tables.shelf_life_rules = [{ id: 11, item_id: null, category: null, season_label: null, start_month: null, start_day: null, end_month: null, end_day: null, value: 3, unit: 'days', active: true },
   { id: 12, item_id: I1.id, category: null, season_label: 'Winter', start_month: 11, start_day: 15, end_month: 2, end_day: 15, value: 5, unit: 'days', active: true }];
 data.tables.suppliers = [{ id: 'sp1', name: 'Dudh Ghor', mobile: '01711111111', type_code: 'milk', credit_days: 7, opening_balance: null, active: true }];
-data.tables.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'Rahim Uddin', status: 'active' }, { id: 'u2', staff_id: 'karim02', full_name: 'Karim', status: 'active' }];
+data.tables.profiles = [{ id: 'u1', staff_id: 'owner1', full_name: 'TestK Uddin', status: 'active' }, { id: 'u2', staff_id: 'testf02', full_name: 'TestF', status: 'active' }];
 data.tables.user_grants = [{ id: 1, user_id: 'u2', grant_code: 'view_cost', location_id: null, valid_until: null, note: null }];
 data.tables.roles = [{ code: 'owner', name_bn: 'মালিক', name_en: 'Owner', active: true, sort: 1 }, { code: 'showroom_manager', name_bn: 'শোরুম ম্যানেজার', name_en: 'Showroom manager', active: true, sort: 2 }];
 data.tables.rule_grants = []; data.tables.grant_defs = [{ grant_code: 'view_cost', module: 'cost', sort: 20, label_bn: 'কস্ট', label_en: 'cost' }];
 data.tables.role_favourites = []; data.tables.user_favourites = [];
 data.tables.option_lists = [{ list_code: 'units', value_code: 'kg', label_bn: 'কেজি', sort: 1, active: true }, { list_code: 'units', value_code: 'gram', label_bn: 'গ্রাম', sort: 2, active: true }, { list_code: 'supplier_types', value_code: 'milk', label_bn: 'দুধ', label_en: 'Milk', sort: 1, active: true }];
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8091);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; window.__CALLS = []; const T = window.__DATA.tables;
  c.rpc = async (fn, args) => { window.__CALLS.push([fn, args]);
   if (fn === 'set_rule') { const r = T.rules.find((x) => x.key === args.p_key); if (r) r.value = args.p_value; return { data: null, error: null }; }
@@ -41,7 +43,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   const calls = (fn) => p.evaluate((f) => window.__CALLS.filter((c) => c[0] === f).map((c) => c[1]), fn);
   const go = async (h) => { await p.evaluate((x) => { location.hash = x; }, h); await p.waitForTimeout(450); };
   const noOverflow = async (m) => ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'horizontal overflow ' + m);
-  await p.goto('http://localhost:8091/#/settings2'); await p.waitForTimeout(900);
+  await p.goto('http://localhost:' + PORT + '/#/settings2'); await p.waitForTimeout(900);
   log('hub cards:', await p.locator('.s2card').count()); ok(await p.locator('.s2card').count() === 14, 'hub has 14 cards'); await p.screenshot({ path: SP + '/z_hub.png', fullPage: true }); await noOverflow('hub');
   // drawer entry
   await p.click('.hbtn[data-act=nav_open]'); await p.waitForTimeout(400);

@@ -1,0 +1,147 @@
+{
+  "entries": {
+    "feature:announce_bar": {
+      "title": "Headline bar (announcements)",
+      "does": "A slim moving line under the header shows the announcements addressed to the person. Tap it to read the full text and press I have read this. When nothing is addressed to the person the bar is not drawn at all.",
+      "why": "Staff see an instruction at once, and the poster can see who has read it.",
+      "default": "Off. No bar, no request to the server and no menu entry until the owner switches announce_on on.",
+      "change": "Switch announce_on on, then give the right announce_post to the people who may post. With reduced motion on the phone the line stands still and shows the first headline and a count.",
+      "who": "Everyone it is addressed to sees it. The owner and holders of announce_post post.",
+      "related": ["rule:announce_on", "grant:announce_post", "screen:announce"],
+      "verified": true,
+      "src": "phase130.sql; web/announce.js; R2.md"
+    },
+    "rule:announce_on": {
+      "title": "Announcements are on (headline bar at the top)",
+      "does": "Turns the whole announcement feature on or off. Off means no bar, no posting and no menu entry. On lets the owner or a designated person post to everyone, a role, a place or one person.",
+      "why": "A new feature should start only when the owner decides.",
+      "default": "Off. The app behaves exactly as before.",
+      "change": "Turning it on shows the bar to people who have an announcement addressed to them. Turning it off hides the bar at once and keeps every old announcement and read receipt.",
+      "who": "The owner changes the switch.",
+      "related": ["feature:announce_bar", "grant:announce_post", "screen:announce"],
+      "verified": true,
+      "src": "phase130.sql (announce_on); phase130_test.sql T1 and T11"
+    },
+    "grant:announce_post": {
+      "title": "Post announcements and instructions",
+      "does": "Lets a person or a role post an announcement. A right without a place can post to everyone, a role, a place or one person. A right limited to one place can post only to that place.",
+      "why": "The owner decides who may speak to the staff, not only himself.",
+      "default": "Nobody holds it. Only the owner can post until he gives it.",
+      "change": "Give it on the Delegation board to a role or to one person, with or without a place. Taking it away stops new posts but keeps the old ones.",
+      "who": "The owner gives and takes the right.",
+      "related": ["rule:announce_on", "feature:announce_bar", "screen:announce"],
+      "verified": true,
+      "src": "phase130.sql (announce_post, r2_announce_post); phase130_test.sql T2, T7, T8"
+    },
+    "screen:announce": {
+      "title": "Announcements screen",
+      "does": "Shows what is on the bar for me, with an I have read this button. A poster also sees what he posted, who has read each one, and can withdraw a message with a reason.",
+      "why": "One place to post, check the read receipts and stop a wrong message.",
+      "default": "The menu entry is hidden while announce_on is off.",
+      "change": "Switch announce_on on to see it. A withdrawn message stays in the list with its reason and is never deleted.",
+      "who": "Everyone reads. Holders of announce_post and the owner post and see the receipts of their own posts.",
+      "related": ["rule:announce_on", "grant:announce_post", "feature:announce_bar"],
+      "verified": true,
+      "src": "web/announce.js; phase130.sql; tests/web/announce_test.js"
+    },
+    "rule:todo_on": {
+      "title": "To-do list is on (extra tasks given to people)",
+      "does": "Turns the to-do list on or off. On lets the owner or a designated person give an extra task to one person or to a role, with a due date and a priority. The person sees only his own tasks and a small card on Home when he has some open.",
+      "why": "Extra duties get a name, a date and an answer instead of a spoken request.",
+      "default": "Off. No card on Home, no menu entry, and nothing can be given.",
+      "change": "Turning it on shows the list and the card. Turning it off hides them and keeps every task and note.",
+      "who": "The owner changes the switch.",
+      "related": ["grant:todo_assign", "rule:todo_repeat_on", "screen:todo"],
+      "verified": true,
+      "src": "phase131.sql (todo_on); phase131_test.sql T1 and T9"
+    },
+    "rule:todo_repeat_on": {
+      "title": "To-do: repeating duties (daily or weekly)",
+      "does": "Lets a task be given as daily or weekly. When the person marks a repeating task done, or cannot do, the next one is made for the same person.",
+      "why": "A routine duty should not have to be given again every day.",
+      "default": "Off. The repeat choice is not shown and the server refuses it.",
+      "change": "Turn it on after todo_on. The next due date is the later of the old due date and today, plus one day or seven days.",
+      "who": "The owner changes the switch.",
+      "related": ["rule:todo_on", "grant:todo_assign", "screen:todo"],
+      "verified": true,
+      "src": "phase131.sql (todo_repeat_on, _r2b_repeat_next); phase131_test.sql T7"
+    },
+    "grant:todo_assign": {
+      "title": "Give extra tasks and duties",
+      "does": "Lets a person or a role give a task to one person or to everyone holding a role. A task given to a role becomes one task for each person who holds the role at that moment.",
+      "why": "The owner can hand out extra work through a trusted person.",
+      "default": "Nobody holds it. Only the owner can give tasks until he gives the right.",
+      "change": "Give it on the Delegation board. A giver sees only the tasks he gave, never another giver's tasks.",
+      "who": "The owner gives and takes the right.",
+      "related": ["rule:todo_on", "rule:todo_repeat_on", "screen:todo"],
+      "verified": true,
+      "src": "phase131.sql (todo_assign, r2_todo_assign); phase131_test.sql T2 and T3"
+    },
+    "screen:todo": {
+      "title": "To-do list screen",
+      "does": "A person sees his own open tasks, with overdue ones in red, and marks each one done with an optional note or cannot do with a reason. A giver also sees every task he gave with its status and notes, and can cancel one with a reason or reopen it.",
+      "why": "Every extra task ends with a visible answer.",
+      "default": "The menu entry is hidden while todo_on is off.",
+      "change": "Switch todo_on on to see it. A cancelled or finished task stays in the giver's list and is never deleted.",
+      "who": "Each person sees only his own tasks. The giver and the owner see what they gave.",
+      "related": ["rule:todo_on", "grant:todo_assign", "rule:todo_repeat_on"],
+      "verified": true,
+      "src": "web/todo.js; phase131.sql; tests/web/todo_test.js"
+    },
+    "rule:shift_on": {
+      "title": "Shift schedule is on (who works which shift)",
+      "does": "Turns the shift schedule on or off. On lets staff see their own coming shifts and lets a designated person set the roster. Shift templates and the weekly pattern already in attendance are reused, not copied.",
+      "why": "Staff learn their shifts from the app and the owner can compare the plan with attendance.",
+      "default": "Off. No menu entry and no roster data, and attendance, leave and payroll work as before.",
+      "change": "Turning it on shows My shifts to everyone and the roster to schedulers. Turning it off hides them and keeps every roster row.",
+      "who": "The owner changes the switch.",
+      "related": ["grant:shift_manage", "rule:shift_mates_on", "screen:shifts", "feature:shift_report"],
+      "verified": true,
+      "src": "phase132.sql (shift_on); phase132_test.sql T1 and T10"
+    },
+    "rule:shift_mates_on": {
+      "title": "Staff see who else is on at their place",
+      "does": "Under each of my shifts it lists the colleagues working the same day at the same place, with their times. Only names and shift times are shown.",
+      "why": "A person can see who is working with him and plan swaps.",
+      "default": "On, but it matters only after shift_on is on.",
+      "change": "Switch it off and a person sees only his own shifts and no colleague names.",
+      "who": "The owner changes the switch.",
+      "related": ["rule:shift_on", "screen:shifts", "grant:shift_manage"],
+      "verified": true,
+      "src": "phase132.sql (shift_mates_on, r2_shift_my); phase132_test.sql T4"
+    },
+    "grant:shift_manage": {
+      "title": "Schedule shifts and the roster",
+      "does": "Lets a person or a role add and retire shift templates and set roster days for the people whose main place he holds the right for. It does not give access to attendance, leave or pay.",
+      "why": "A manager can plan the week without being given the attendance powers.",
+      "default": "Nobody holds it. Only the owner can schedule until he gives the right.",
+      "change": "Give it on the Delegation board, with a place. The attendance_manage right does not include it.",
+      "who": "The owner gives and takes the right.",
+      "related": ["rule:shift_on", "screen:shifts", "feature:shift_report"],
+      "verified": true,
+      "src": "phase132.sql (shift_manage, _r2c_ok); phase132_test.sql T2 and T3"
+    },
+    "screen:shifts": {
+      "title": "Shift schedule screen",
+      "does": "My shifts lists the next 14 days with shift, time, off-days, approved leave, holidays and notes. A scheduler also gets a weekly roster by place, where a tap on a day sets a template, an off-day or a leave or swap note, plus copy last week and the templates.",
+      "why": "One short screen for staff to read and for the planner to edit.",
+      "default": "The menu entry is hidden while shift_on is off.",
+      "change": "Switch shift_on on to see it. Clearing a day returns it to the weekly pattern, and the old row is kept in the change log.",
+      "who": "Everyone reads their own shifts. Holders of shift_manage and the owner edit the roster.",
+      "related": ["rule:shift_on", "grant:shift_manage", "rule:shift_mates_on", "feature:shift_report"],
+      "verified": true,
+      "src": "web/shifts.js; phase132.sql; tests/web/shifts_test.js"
+    },
+    "feature:shift_report": {
+      "title": "Roster versus attendance report",
+      "does": "Compares each rostered day with what attendance recorded: present, late, absent, leave, no record, or worked on an off-day. It only reads attendance and writes nothing.",
+      "why": "The owner sees where the plan and the real day differ.",
+      "default": "Visible to schedulers once shift_on is on. Without attendance data the screen says there is nothing to compare.",
+      "change": "There is no switch of its own. It never changes attendance, leave or payroll.",
+      "who": "The owner, and people holding shift_manage or attendance_manage for the place.",
+      "related": ["rule:shift_on", "grant:shift_manage", "screen:shifts"],
+      "verified": true,
+      "src": "phase132.sql (r2_shift_report); phase132_test.sql T8"
+    }
+  }
+}

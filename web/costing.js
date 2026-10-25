@@ -19,31 +19,36 @@ const owner = () => !!(S.ctx && S.ctx.is_owner);
 
 const X = {
   title: L('খরচ ও ওভারহেড', 'Costing & overhead', 'Costing ও overhead'), loading: L('লোড হচ্ছে…', 'Loading…', 'Loading…'), none: L('কিছু নেই ✓', 'Nothing ✓', 'কিছু নেই ✓'),
-  noperm: L('অনুমতি নেই — খরচ দেখার অধিকার লাগবে', 'Not allowed — the cost right is needed', 'অনুমতি নেই — cost right লাগবে'), saved: L('সংরক্ষিত', 'Saved', 'Saved'), save: L('সংরক্ষণ', 'Save', 'Save'),
-  tRec: L('রেসিপির রেট', 'Recipe rates', 'Recipe rate'), tPool: L('মাসিক পুল', 'Monthly pools', 'Monthly pool'), tLoc: L('জায়গা অনুযায়ী পদ্ধতি', 'Method per place', 'Place অনুযায়ী method'), tTrue: L('অনাবশোষিত', 'Unabsorbed', 'Unabsorbed'), tRuns: L('রান খরচ', 'Run costs', 'Run cost'),
+  noperm: L('অনুমতি নেই — কস্ট দেখার অনুমতি লাগবে', 'Not allowed — the cost right is needed', 'অনুমতি নেই — cost right লাগবে'), saved: L('সেভ হয়েছে', 'Saved', 'Saved'), save: L('সেভ', 'Save', 'Save'),
+  tRec: L('রেসিপির রেট', 'Recipe rates', 'Recipe rate'), tPool: L('মাসিক পুল', 'Monthly pools', 'Monthly pool'), tLoc: L('জায়গা অনুযায়ী পদ্ধতি', 'Method per place', 'Place অনুযায়ী method'), tTrue: L('অনাবশোষিত', 'Unabsorbed', 'Unabsorbed'), tRuns: L('রান কস্ট', 'Run costs', 'Run cost'),
   place: L('জায়গা', 'Place', 'Place'), month: L('মাস', 'Month', 'Month'), from: L('থেকে', 'From', 'From'), to: L('পর্যন্ত', 'To', 'To'), show: L('দেখুন', 'Show', 'Show'),
   open: L('খুলুন', 'Open', 'Open'), version: L('ভার্সন', 'Version', 'Version'),
   mode: L('খরচ ধরার পদ্ধতি', 'Costing method', 'Costing method'), mOff: L('বন্ধ (শুধু কাঁচামাল — আগের মতো)', 'Off (material only, as before)', 'Off (শুধু material, আগের মতো)'), mRec: L('রেসিপির রেট', 'Recipe rates', 'Recipe rate'), mPool: L('মাসিক পুল ÷ স্বাভাবিক উৎপাদন', 'Monthly pool ÷ normal output', 'Monthly pool ÷ normal output'),
-  normal: L('স্বাভাবিক মাসিক উৎপাদন (কেজি)', 'Normal monthly output (kg)', 'Normal monthly output (kg)'), ownerOnly: L('শুধু মালিক বদলাতে পারেন', 'Only the owner can change this', 'শুধু owner বদলাতে পারেন'), blankNote: L('ফাঁকা থাকলে পুল-পদ্ধতিতে খরচ অসম্পূর্ণ দেখাবে', 'Blank = the pool method shows the cost as incomplete', 'Blank হলে pool method-এ cost অসম্পূর্ণ'),
-  rows: L('খরচের সারি', 'Cost rows', 'Cost rows'), raw: L('কাঁচামাল', 'Raw material', 'Raw material'), pack: L('প্যাকেজিং', 'Packaging', 'Packaging'), conv: L('রূপান্তর খরচ', 'Conversion cost', 'Conversion cost'),
-  batch: L('এক ব্যাচ', 'One batch', 'One batch'), unit: L('প্রতি একক', 'Per unit', 'Per unit'), todayRow: L('আজকের কেনা দাম (শুধু দেখানো — হিসাবে ধরা হয় না)', "Today's purchase price (display only — not booked)", "আজকের কেনা দাম (display only)"),
-  gap: L('গড় ও আজকের ফারাক', 'Gap average vs today', 'Gap avg vs today'), gapWarn: L('ফারাক সীমার বেশি', 'Gap above the limit', 'Gap সীমার বেশি'), incomplete: L('রূপান্তর খরচ অসম্পূর্ণ', 'Conversion cost incomplete', 'রূপান্তর খরচ অসম্পূর্ণ'),
-  matIncomplete: L('কিছু উপকরণের দাম জানা নেই', 'Some ingredient costs are unknown', 'কিছু ingredient-এর cost অজানা'),
+  normal: L('স্বাভাবিক মাসিক উৎপাদন (কেজি)', 'Normal monthly output (kg)', 'Normal monthly output (kg)'), ownerOnly: L('শুধু মালিক বদলাতে পারেন', 'Only the owner can change this', 'শুধু owner বদলাতে পারেন'), blankNote: L('ফাঁকা থাকলে পুল-পদ্ধতিতে কস্ট অসম্পূর্ণ দেখাবে', 'Blank = the pool method shows the cost as incomplete', 'Blank হলে pool method-এ cost অসম্পূর্ণ'),
+  rows: L('কস্টের সারি', 'Cost rows', 'Cost rows'), raw: L('কাঁচামাল', 'Raw material', 'Raw material'), pack: L('প্যাকেজিং', 'Packaging', 'Packaging'), conv: L('রূপান্তর কস্ট', 'Conversion cost', 'Conversion cost'),
+  batch: L('এক ব্যাচ', 'One batch', 'One batch'), unit: L('প্রতি একক', 'Per unit', 'Per unit'), todayRow: L('আজকের কেনা প্রাইস (শুধু দেখানো — হিসাবে ধরা হয় না)', "Today's purchase price (display only — not booked)", "আজকের কেনা price (display only)"),
+  gap: L('গড় ও আজকের ফারাক', 'Gap average vs today', 'Gap avg vs today'), gapWarn: L('ফারাক সীমার বেশি', 'Gap above the limit', 'Gap সীমার বেশি'), incomplete: L('রূপান্তর কস্ট অসম্পূর্ণ', 'Conversion cost incomplete', 'রূপান্তর cost অসম্পূর্ণ'),
+  matIncomplete: L('কিছু উপকরণের কস্ট জানা নেই', 'Some ingredient costs are unknown', 'কিছু ingredient-এর cost অজানা'),
   rates: L('রূপান্তর রেট', 'Conversion rates', 'Conversion rate'), addRate: L('রেট যোগ / বদল', 'Add / change a rate', 'Rate যোগ / বদল'), type: L('ধরন', 'Type', 'Type'), typeNote: L('অন্য — কী লিখুন', 'Other — what is it', 'অন্য — কী'),
-  newType: L('☐ অন্য: নতুন ধরন যোগ', '☐ Other: add a new type', '☐ অন্য: নতুন type'), newTypeAsk: L('নতুন খরচের ধরনের নাম', 'Name of the new cost type', 'নতুন type-এর নাম'),
+  newType: L('☐ অন্য: নতুন ধরন যোগ', '☐ Other: add a new type', '☐ অন্য: নতুন type'), newTypeAsk: L('নতুন কস্টের ধরনের নাম', 'Name of the new cost type', 'নতুন type-এর নাম'),
   basis: L('হিসাবের ভিত্তি', 'Basis', 'Basis'), bBatch: L('প্রতি ব্যাচ', 'Per batch', 'Per batch'), bUnit: L('প্রতি কেজি (বেস একক)', 'Per kg (base unit)', 'Per kg (base unit)'), bHour: L('প্রতি শ্রম-ঘণ্টা', 'Per labour-hour', 'Per labour-hour'),
   amount: L('টাকা (ফাঁকা রাখা যায়)', 'Amount (may stay blank)', 'Amount (blank চলে)'), hours: L('প্রতি ব্যাচে ঘণ্টা (নিজে বসান)', 'Hours per batch (type it yourself)', 'Hours per batch (নিজে বসান)'),
-  sugg: L('অনুমান', 'Suggestion', 'Suggestion'), suggNote: L('ধাপ থেকে অনুমান — খরচে নিজে থেকে যোগ হয় না', 'from the steps — never added to cost by itself', 'steps থেকে — নিজে থেকে cost-এ যোগ হয় না'),
+  sugg: L('অনুমান', 'Suggestion', 'Suggestion'), suggNote: L('ধাপ থেকে অনুমান — কস্টে নিজে থেকে যোগ হয় না', 'from the steps — never added to cost by itself', 'steps থেকে — নিজে থেকে cost-এ যোগ হয় না'),
   retire: L('বন্ধ', 'Retire', 'Retire'), history: L('আগের মান সংরক্ষিত থাকে', 'Previous values are kept', 'আগের মান থাকে'),
-  poolHead: L('এই মাসের বাস্তব কারখানা খরচ', 'Actual factory cost of the month', 'এই মাসের actual factory cost'), yearly: L('বছরের খরচ (÷১২)', 'Yearly (÷12)', 'Yearly (÷12)'), oneOff: L('একবারের খরচ', 'One-off', 'One-off'),
-  poolNote: L('শো-রুম ও অ্যাডমিন খরচ এখানে নয় — সেগুলো শাখার লাভ-ক্ষতিতে যায়', 'Showroom and admin cost are not here — they go to the branch P&L', 'Showroom ও admin cost এখানে নয় — branch P&L-এ'),
+  poolHead: L('এই মাসের বাস্তব কারখানা কস্ট', 'Actual factory cost of the month', 'এই মাসের actual factory cost'), yearly: L('বছরের খরচ (÷১২)', 'Yearly (÷12)', 'Yearly (÷12)'), oneOff: L('একবারের খরচ', 'One-off', 'One-off'),
+  poolNote: L('শো-রুম ও অ্যাডমিন কস্ট এখানে নয় — সেগুলো শাখার লাভ-ক্ষতিতে যায়', 'Showroom and admin cost are not here — they go to the branch P&L', 'Showroom ও admin cost এখানে নয় — branch P&L-এ'),
   actual: L('বাস্তব', 'Actual', 'Actual'), absorbed: L('পণ্যে ধরা', 'Absorbed', 'Absorbed'), unabs: L('অনাবশোষিত ওভারহেড', 'Unabsorbed overhead', 'অনাবশোষিত ওভারহেড'), noActual: L('বাস্তব খরচ ঢোকানো নেই', 'no actual entered', 'actual ঢোকানো নেই'),
-  total: L('মোট', 'Total', 'Total'), runsHead: L('উৎপাদনের খরচ', 'Production costs', 'Production cost'), mat: L('কাঁচামাল', 'Material', 'Material'), std: L('স্ট্যান্ডার্ড', 'Standard', 'Standard'), act: L('আসল', 'Actual', 'Actual'), out: L('উৎপাদন', 'Output', 'Output'),
-  voided: L('বাতিল', 'Void', 'Void'), badNum: L('সংখ্যা ঠিক নয়', 'Number is not valid', 'Number ঠিক নয়'), sqlMissing: L('এই অংশের ডেটাবেস এখনও চালু হয়নি (phase74)', 'The database part is not installed yet (phase74)', 'Database অংশ চালু হয়নি (phase74)'),
+  total: L('টোটাল', 'Total', 'Total'), runsHead: L('উৎপাদনের কস্ট', 'Production costs', 'Production cost'), mat: L('কাঁচামাল', 'Material', 'Material'), std: L('স্ট্যান্ডার্ড', 'Standard', 'Standard'), act: L('আসল', 'Actual', 'Actual'), out: L('উৎপাদন', 'Output', 'Output'),
+  voided: L('ভয়েড', 'Void', 'Void'),
+  ncConv: L('খরচ ধরা হয়নি — এই জায়গার পদ্ধতি বন্ধ (জায়গা অনুযায়ী পদ্ধতি ট্যাবে বাছুন)', 'Not costed — the method of this place is off (choose it on the Method per place tab)', 'খরচ ধরা হয়নি — এই place-এর method বন্ধ (Method per place tab-এ বাছুন)'),
+  ncAct: L('ধরা হয়নি — আসল উৎপাদনের পরিমাণ লেখা হয়নি (উৎপাদন পোস্টে "আসল ফলন" ঘর দরকার)', 'Not captured — the actual quantity made was not typed (the "actual yield" field of production posting is needed)', 'ধরা হয়নি — আসল production-এর পরিমাণ লেখা হয়নি (production post-এ "actual yield" ঘর দরকার)'),
+  matOnly: L('একক খরচ = শুধু কাঁচামাল', 'Unit cost = material only', 'Unit cost = শুধু material'), csvB: L('CSV', 'CSV', 'CSV'), csvDone: L('ফাইল তৈরি', 'File ready', 'File তৈরি'),
+  hCode: L('কোড', 'Code', 'Code'), hDate: L('ডেট', 'Date', 'Date'), hStatus: L('অবস্থা', 'Status', 'Status'), hConv: L('রূপান্তর খরচ', 'Conversion cost', 'Conversion cost'), hUnit: L('একক খরচ', 'Unit cost', 'Unit cost'), hYs: L('স্ট্যান্ডার্ড ফলন', 'Standard yield', 'Standard yield'), hYa: L('আসল ফলন', 'Actual yield', 'Actual yield'), hYv: L('ফলনের পার্থক্য %', 'Yield difference %', 'Yield পার্থক্য %'), hNc: L('ধরা হয়নি', 'not captured', 'ধরা হয়নি / not captured'),
+ badNum: L('সংখ্যা ঠিক নয়', 'Number is not valid', 'Number ঠিক নয়'), sqlMissing: L('এই অংশের ডেটাবেস এখনও চালু হয়নি (phase74)', 'The database part is not installed yet (phase74)', 'Database অংশ চালু হয়নি (phase74)'),
 };
 const T = (k) => lab(X[k]);
 const TYPE_LBL = (t) => lab({ bn: t.label_bn, mix: t.label_bn, en: t.label_en || t.label_bn });
-const ERR = { type_note_needed: L('"অন্য" হলে কী তা লিখুন', 'For "Other" write what it is', '"অন্য" হলে কী তা লিখুন'), bad_cost: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'), recipe_not_approved: L('রেসিপি অনুমোদিত নয়', 'The recipe is not approved', 'Recipe approved নয়') };
+const ERR = { type_note_needed: L('"অন্য" হলে কী তা লিখুন', 'For "Other" write what it is', '"অন্য" হলে কী তা লিখুন'), bad_cost: L('টাকার অঙ্ক ঠিক নয়', 'Amount is not valid', 'Amount ঠিক নয়'), recipe_not_approved: L('রেসিপি অ্যাপ্রুভড নয়', 'The recipe is not approved', 'Recipe approved নয়') };
 const errMsg = (e) => { const m = (e && e.message) || ''; for (const k of Object.keys(ERR)) if (m.indexOf(k) >= 0) return toast(lab(ERR[k])); if (/not allowed/.test(m)) return toast(T('noperm')); if (/function .* does not exist|schema cache/i.test(m)) return toast(T('sqlMissing')); return fail(e); };
 const D = { tab: 'rec', locs: [], loc: null, month: today().slice(0, 7), types: [], recipes: [], items: {}, cfg: {}, pools: [], out: null, rc: null, runs: null, from: today().slice(0, 8) + '01', to: today() };
 
@@ -63,13 +68,34 @@ function draw() {
   const el = $('#cs_body'); if (!el) return;
   const tabs = [['rec', 'tRec'], ['pool', 'tPool'], ['loc', 'tLoc'], ['true', 'tTrue'], ['runs', 'tRuns']];
   el.innerHTML = `<div class="tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${tabs.map((t) => `<button type="button" data-act="cs_tab" data-v="${t[0]}" class="${D.tab === t[0] ? 'on' : ''}" style="min-width:0;flex:1 1 30%">${esc(T(t[1]))}</button>`).join('')}</div><div id="cs_pane">${pane()}</div>`;
+  if (D.tab === 'rec') loadGaps();
 }
 const pane = () => (D.tab === 'rec' ? paneRec() : D.tab === 'pool' ? panePool() : D.tab === 'loc' ? paneLoc() : D.tab === 'true' ? paneTrue() : paneRuns());
 const locSel = (id) => `<label>${esc(T('place'))}<select id="${id}">${locOpts()}</select></label>`;
 
 /* ---------- recipes ---------- */
 function paneRec() {
-  return `<div class="card stack">${locSel('cs_loc_r')}</div>` + (D.recipes.length ? D.recipes.map((r) => `<div class="card row between wrap"><b>${esc(itemName(r.item_id))} · v${r.version}${r.active ? '' : ' (off)'}</b><button type="button" class="btn" data-act="cs_open" data-id="${esc(r.id)}">${esc(T('open'))}</button></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`);
+  return `<div class="card stack">${locSel('cs_loc_r')}</div>` + (D.recipes.length ? D.recipes.map((r) => `<div class="card row between wrap"><b>${esc(itemName(r.item_id))} · v${r.version}${r.active ? '' : ' (off)'}</b><button type="button" class="btn" data-act="cs_open" data-id="${esc(r.id)}">${esc(T('open'))}</button></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`) + `<div id="cs_gaps"></div>`;
+}
+/* RPT-C1: the screen for d_recipe_cost_gaps (phase 83): ingredients and packaging of active recipes that have no cost under the chosen method. Read only; CSV through c1_export_log. English labels only. */
+const GAP = { rows: null, loc: null, err: null };
+const gapT = { title: 'Ingredients and packaging with no cost', intro: 'These materials are used by an active recipe at this place but have no cost under the chosen cost method, so the recipe cost is incomplete (it is shown as incomplete, never as 0).', none: 'Every material of the active recipes has a cost.', recipes: 'recipes', csv: 'CSV', kind: 'Kind', noperm: 'You may not see costs of this place.' };
+async function loadGaps() {
+  const el = $('#cs_gaps'); if (!el || D.tab !== 'rec' || !D.loc) return;
+  let r; try { r = await sb.rpc('d_recipe_cost_gaps', { p_loc: D.loc }); } catch (e) { r = { error: e }; }
+  const box = $('#cs_gaps'); if (!box) return;
+  if (r.error) { GAP.rows = null; box.innerHTML = /not allowed/.test(r.error.message || '') ? `<p class="muted">${esc(gapT.noperm)}</p>` : ''; return; }      // phase 83 not pasted: nothing to show
+  GAP.rows = r.data || []; GAP.loc = D.loc;
+  box.innerHTML = `<div class="card stack"><b>${esc(gapT.title)}</b><p class="muted">${esc(gapT.intro)}</p>${GAP.rows.length ? GAP.rows.map((g) => `<div class="row between wrap"><span>${esc(g.code)} · ${esc(lab({ bn: g.name_bn, mix: g.name_bn, en: g.name_en || g.name_bn }))} <small class="muted">${esc(g.kind)}${(g.roles || []).length ? ' · ' + esc(g.roles.join(', ')) : ''}</small></span><span class="chip warn">${esc(String(g.recipes))} ${esc(gapT.recipes)}</span></div>`).join('') : `<p class="notice ok">${esc(gapT.none)}</p>`}
+    ${GAP.rows.length ? `<button type="button" data-act="cs_gapcsv">${esc(gapT.csv)}</button>` : ''}</div>`;
+}
+async function gapCsv() {
+  const C = B.c1; if (!C || !GAP.rows) return;
+  if (!(await C.exportOk('recipe_cost_gaps', 'csv', { loc: GAP.loc }, GAP.rows.length))) return;
+  const out = [C.csvLine(['code', 'name', 'kind', 'roles', 'active_recipes', 'cost_method'])];
+  GAP.rows.forEach((g) => out.push(C.csvLine([g.code, g.name_en || g.name_bn, g.kind, (g.roles || []).join('; '), g.recipes, g.method])));
+  out.push(''); C.metaLines('Materials with no cost', [['Place', String(GAP.loc)]]).forEach((m) => out.push(C.csvLine(m)));
+  C.download('recipe-cost-gaps.csv', C.csvFile(out)); C.expDone();
 }
 function costBlock(c) {
   const rw = (c.rows || []).map((r) => `<tr><td>${esc(r.row === 'raw' ? T('raw') : r.row === 'packaging' ? T('pack') : T('conv'))}${r.row === 'conversion' && r.mode ? ` <span class="muted">(${esc(r.mode)})</span>` : ''}</td><td style="text-align:right">${money(r.amount)}${r.row === 'conversion' && r.complete === false ? ` <span class="chip warn">${esc(T('incomplete'))}</span>` : ''}</td></tr>`).join('');
@@ -140,8 +166,8 @@ function paneRuns() {
   const r = D.runs;
   return `<div class="card stack">${locSel('cs_loc_u')}<div class="row wrap"><label>${esc(T('from'))} <input type="date" id="cs_from" value="${esc(D.from)}"></label><label>${esc(T('to'))} <input type="date" id="cs_to" value="${esc(D.to)}"></label></div><button type="button" class="btn primary full" data-act="cs_runs">${esc(T('show'))}</button></div>` +
     (r ? (r.length ? r.map((x) => `<div class="card stack"${x.status === 'void' ? ' style="opacity:.55"' : ''}><div class="row between wrap"><b>${esc(x.code)} · ${esc(String(x.made_at).slice(0, 10))}${x.status === 'void' ? ' (' + esc(T('voided')) + ')' : ''}</b><span class="muted">${esc(T('out'))}: ${q(x.output)}</span></div>
-      <div>${esc(T('mat'))}: ${money(x.material_cost)} · ${esc(T('conv'))}: ${money(x.conversion_cost)}${x.conversion_complete === false ? ` <span class="chip warn">${esc(T('incomplete'))}</span>` : ''}</div>
-      <div>${esc(T('unit'))}: <b>${money(x.unit_cost)}</b> · ${esc(T('std'))}: ${money(x.std_cost)} · ${esc(T('act'))}: ${money(x.actual_cost)}</div></div>`).join('') : `<p class="muted">${esc(T('none'))}</p>`) : '');
+      <div>${esc(T('mat'))}: ${money(x.material_cost)} · ${esc(T('conv'))}: ${x.conversion_status === 'not_captured' ? `<span class="chip warn" data-nc="conv">${esc(T('ncConv'))}</span>` : money(x.conversion_cost)}${x.conversion_complete === false ? ` <span class="chip warn">${esc(T('incomplete'))}</span>` : ''}</div>
+      <div>${esc(T('unit'))}: <b>${money(x.unit_cost)}</b>${x.unit_cost_basis === 'material_only' ? ` <small class="muted">(${esc(T('matOnly'))})</small>` : ''} · ${esc(T('std'))}: ${money(x.std_cost)} · ${esc(T('act'))}: ${x.actual_status === 'not_captured' ? `<span class="chip warn" data-nc="act">${esc(T('ncAct'))}</span>` : money(x.actual_cost)}</div></div>`).join('') + `<button type="button" class="btn full" data-act="cs_runs_csv">${esc(T('csvB'))}</button>` : `<p class="muted">${esc(T('none'))}</p>`) : '');
 }
 
 /* ---------- handlers ---------- */
@@ -149,6 +175,7 @@ async function refresh() { try { await loadBase(); if (D.tab === 'pool') await l
 Object.assign(H, {
   cs_tab: async (a) => { D.tab = a.dataset.v; try { if (D.tab === 'pool') await loadPools(); } catch (e) { errMsg(e); } draw(); },
   cs_open: (a) => openRecipe(a.dataset.id).catch(errMsg),
+  cs_gapcsv: gapCsv,
   cs_rcnew: () => { D.rc.edit = null; rateForm(null); },
   cs_rcedit: (a) => { const x = (D.rc.rows || []).find((r) => String(r.id) === a.dataset.id); D.rc.edit = x || null; rateForm(x || null); },
   cs_rcret: async (a) => { const r = await sb.rpc('recipe_cost_component_retire', { p_id: Number(a.dataset.id) }); if (r.error) return errMsg(r.error); toast(T('saved')); openRecipe(D.rc.id).catch(errMsg); },
@@ -171,6 +198,16 @@ Object.assign(H, {
     if (r.error) return errMsg(r.error); toast(T('saved')); await refresh();
   },
   cs_true: async () => { const r = await sb.rpc('overhead_trueup', { p_loc: D.loc, p_month: D.month + '-01' }); if (r.error) return errMsg(r.error); D.out = r.data; draw(); },
+  cs_runs_csv: () => {
+    const r = D.runs || []; if (!r.length) return;
+    const cell = (v) => { if (v === null || v === undefined) return ''; let t = String(v); if (/^[=+@\t\r]/.test(t)) t = "'" + t; return /[",\r\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+    const nc = T('hNc'), head = [T('hCode'), T('hDate'), T('hStatus'), T('out'), T('mat'), T('hConv'), T('hUnit'), T('std'), T('act'), T('hYs'), T('hYa'), T('hYv')];
+    const rows = r.map((x) => [x.code, String(x.made_at).slice(0, 10), x.status, x.output, x.material_cost, x.conversion_status === 'not_captured' ? nc : x.conversion_cost, x.unit_cost, x.std_cost,
+      x.actual_status === 'not_captured' ? nc : x.actual_cost, x.yield_std, x.yield_actual === null || x.yield_actual === undefined ? nc : x.yield_actual, x.yield_var_pct]);
+    const txt = '\ufeff' + [head, ...rows].map((l) => l.map(cell).join(',')).join('\r\n') + '\r\n';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })); a.download = `production-costs-${D.from}_${D.to}.csv`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); toast(T('csvDone'));
+  },
   cs_runs: async () => { D.from = $('#cs_from').value || D.from; D.to = $('#cs_to').value || D.to; const r = await sb.rpc('production_run_costs', { p_loc: D.loc, p_from: D.from, p_to: D.to }); if (r.error) return errMsg(r.error); D.runs = r.data || []; draw(); },
 });
 document.addEventListener('change', async (e) => {

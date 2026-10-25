@@ -49,12 +49,12 @@ insert into supplier_payments (supplier_id,location_id,mode,amount,paid_at,voide
 insert into entries (form_code,location_id,serial,entry_date,status,data,created_by) values
  ('10-2',1,9001,'2026-10-05','approved','{"lines":[{"head":"transport","amount":"25"},{"head":"other","amount":10},{"head":"x","amount":"abc"}]}',:'s'),
  ('10-2',1,9002,'2026-10-05','draft','{"lines":[{"amount":500}]}',:'s'),
- ('10-1',1,9003,'2026-10-06','submitted','{"count":{"n1000":2,"n500":1,"coin":20},"leave_float":"500","carrier":"Karim"}',:'s'),
+ ('10-1',1,9003,'2026-10-06','submitted','{"count":{"n1000":2,"n500":1,"coin":20},"leave_float":"500","carrier":"TestF"}',:'s'),
  ('02-3',1,9004,'2026-10-05','approved','{"staff":"owner1","post":"cook","adv":[{"date":"2026-10-05","amount":"1000","method":"cash","ded_now":200,"balance":800},{"date":"2026-10-05","amount":300,"method":"goods","balance":300}]}',:'s'),
- ('02-2',1,9005,'2026-10-31','approved','{"month":"10","year":"2026","pay_method":"bank","pay_date":"2026-10-31","pay":[{"name":"Rahim cook","salary":10000,"due":"10000","overtime":500,"other":0,"adv_ded":1000,"other_ded":0},{"name":"Karim","salary":8000,"due":8000,"other":100,"other_ded":50,"remark":"x"}],"receipts":[{"name":"Rahim cook","net":9500,"date":"2026-10-05","method":"bank","signed":true},{"name":"Karim","net":8050,"method":"owner"}]}',:'s'),
+ ('02-2',1,9005,'2026-10-31','approved','{"month":"10","year":"2026","pay_method":"bank","pay_date":"2026-10-31","pay":[{"name":"TestK cook","salary":10000,"due":"10000","overtime":500,"other":0,"adv_ded":1000,"other_ded":0},{"name":"TestF","salary":8000,"due":8000,"other":100,"other_ded":50,"remark":"x"}],"receipts":[{"name":"TestK cook","net":9500,"date":"2026-10-05","method":"bank","signed":true},{"name":"TestF","net":8050,"method":"owner"}]}',:'s'),
  ('02-2',3,9006,'2026-10-31','approved','{"month":"10","year":"2026","pay":[{"name":"Far person","salary":5000,"due":5000,"adv_ded":0,"other_ded":0}],"receipts":[]}',:'s'),
  ('02-2',1,9007,'2026-09-30','approved','{"month":"9","year":"2026","pay":[{"name":"Old","due":1}]}',:'s'),
- ('02-1',1,9008,'2026-10-31','approved','{"month":"10","year":"2026","staff":[{"name":"Rahim cook","present":26,"absent":3,"late":2,"ot_hours":10}]}',:'s')
+ ('02-1',1,9008,'2026-10-31','approved','{"month":"10","year":"2026","staff":[{"name":"TestK cook","present":26,"absent":3,"late":2,"ot_hours":10}]}',:'s')
  on conflict do nothing;
 
 \echo == T1 owner: movements and numbers
@@ -239,12 +239,12 @@ select set_rule('daybook_mask_names','false'::jsonb);
 -- D9 two sheets for the same location+month, same-name people
 reset role;
 insert into entries (form_code,location_id,serial,entry_date,status,data,created_by) values
- ('02-2',1,9010,'2026-10-20','approved','{"month":"10","year":"2026","pay":[{"name":"Karim","due":500}],"receipts":[{"name":"Karim","net":500,"signed":true}]}',:'s');
+ ('02-2',1,9010,'2026-10-20','approved','{"month":"10","year":"2026","pay":[{"name":"TestF","due":500}],"receipts":[{"name":"TestF","net":500,"signed":true}]}',:'s');
 set role authenticated; select tt.as(:'o');
 select salary_report(1,'2026-10-02') as jz \gset
 select tt.chk('D9 duplicate sheets reported for loc 1', (:'jz'::jsonb#>>'{duplicate_sheets,0,loc}')::int=1 and (:'jz'::jsonb#>>'{duplicate_sheets,0,n}')::int=2);
-select tt.chk('D9 same name twice => ambiguous, paid/signed not guessed, totals still add every line', (select count(*) from jsonb_array_elements(:'jz'::jsonb->'rows') r where (r->>'ambiguous')::boolean and r->>'name'='Karim')=2
-   and not exists (select 1 from jsonb_array_elements(:'jz'::jsonb->'rows') r where r->>'name'='Karim' and r->'paid'<>'null'::jsonb) and (:'jz'::jsonb#>>'{totals,gross}')::numeric=19100);
+select tt.chk('D9 same name twice => ambiguous, paid/signed not guessed, totals still add every line', (select count(*) from jsonb_array_elements(:'jz'::jsonb->'rows') r where (r->>'ambiguous')::boolean and r->>'name'='TestF')=2
+   and not exists (select 1 from jsonb_array_elements(:'jz'::jsonb->'rows') r where r->>'name'='TestF' and r->'paid'<>'null'::jsonb) and (:'jz'::jsonb#>>'{totals,gross}')::numeric=19100);
 reset role;
 \echo == T4 re-run safety
 \i /home/user/My-tools/supabase/phase13.sql

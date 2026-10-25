@@ -4,6 +4,8 @@
 'use strict';
 const A = window.BOS_APP, B = window.BOS;
 const { sb, S, t, esc, nm, fmt, store, openSheet, closeSheet, fail } = A;
+const duesFn = () => { try { return B.rule && B.rule('dues_net_advance', 'off') === 'on' ? 'customer_dues_net113' : 'customer_dues'; } catch (e) { return 'customer_dues'; } };   // bos113: rule dues_net_advance = on -> the list net of the advance already used
+const rpcDues = () => (duesFn() === 'customer_dues_net113' ? sb.rpc('customer_dues_net113') : sb.rpc('customer_dues'));   // both names written out, so the screen inventory and a code search see them
 const H = A.H;
 const $ = (s, el = document) => el.querySelector(s);
 const L = B.L, lab = B.lab;
@@ -11,9 +13,10 @@ const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en:
 
 // ---------- labels (3 modes) ----------
 const X = {
-  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'),
+  sell: L('বিক্রি', 'Sell', 'Sell · বিক্রি'), theme: L('থিম', 'Theme', 'Theme'), th_dark: L('প্রিমিয়াম ডার্ক', 'Premium Dark', 'Premium Dark'), th_light: L('প্রিমিয়াম লাইট', 'Premium Light', 'Premium Light'), th_classic: L('ক্লাসিক', 'Classic', 'Classic'), /* bos109 */ th_glass_light: L('লিকুইড গ্লাস লাইট', 'Liquid Glass Light', 'Liquid Glass Light'), th_glass_dark: L('লিকুইড গ্লাস ডার্ক', 'Liquid Glass Dark', 'Liquid Glass Dark'),
   menu: L('মেনু', 'Menu', 'Menu'), me: L('আমি', 'Me', 'Me'), search: L('মেনু খুঁজুন…', 'Search menu…', 'Menu খুঁজুন…'), close: L('বন্ধ করুন', 'Close', 'Close'),
   nores: L('কিছু পাওয়া যায়নি', 'Nothing found', 'কিছু পাওয়া যায়নি'), noperm: L('অনুমতি নেই', 'Not allowed', 'Permission নেই'), soon: L('শীঘ্রই আসছে', 'Coming soon', 'Coming soon'),
+  foot_t: L('নিচের অংশ দেখান/লুকান', 'Show or hide menu options', 'Menu options দেখান/লুকান'),
   online: L('অনলাইন', 'Online', 'Online'), offline: L('অফলাইন', 'Offline', 'Offline'), pin: L('প্রিয়তে রাখুন', 'Pin to favourites', 'Favourite-এ রাখুন'), unpin: L('প্রিয় থেকে সরান', 'Unpin', 'Favourite থেকে সরান'),
   g_dash: L('ড্যাশবোর্ড', 'Dashboard', 'Dashboard'), g_acc: L('হিসাব', 'Accounting', 'Accounting (হিসাব)'), g_item: L('আইটেম', 'Items', 'Item'), g_cust: L('কাস্টমার', 'Customers', 'Customer'),
   g_supp: L('সরবরাহকারী', 'Suppliers', 'Supplier'), g_sale: L('বিক্রি', 'Sales', 'Sale (বিক্রি)'), g_purch: L('ক্রয়', 'Purchase', 'Purchase'), g_ops: L('স্টক ও কারখানা', 'Stock & factory', 'Stock ও Factory'),
@@ -34,20 +37,21 @@ const X = {
   today_sheet: L('শোরুমের দৈনিক শিট', 'Showroom daily sheet', 'Showroom-এর Daily Sheet'),
   period_note: L('বছর = অর্থবছরের শুরু থেকে (সেটিংসের নিয়ম; না থাকলে ১ জানুয়ারি)', 'Year = from the fiscal-year start (a setting; 1 January when none is set)', 'Year = fiscal year শুরু থেকে (setting; না থাকলে ১ জানুয়ারি)'),
   sheets: L('আজ যে শিটগুলো পূরণ করতে হবে', "Today's sheets to fill", 'আজ যে Sheet পূরণ করতে হবে'), sheets_none: L('আপনার জন্য কোনো শিট নেই', 'No sheets for you here', 'আপনার জন্য কোনো Sheet নেই'),
-  st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('বাকি', 'Pending', 'Pending'), st_draft: L('খসড়া', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
+  st_done: L('জমা হয়েছে', 'Done', 'Done'), st_pending: L('অপেক্ষায়', 'Pending', 'Pending'), st_draft: L('ড্রাফট', 'Draft', 'Draft'), st_rej: L('ফেরত — ঠিক করুন', 'Sent back — fix', 'ফেরত — ঠিক করুন'), st_paper: L('কাগজে', 'On paper', 'কাগজে'),
   sheets_of: L('জমা', 'done', 'done'), sheets_hint: L('মালিক চাইলে সেটিংসে "হোমে দৈনিক শিট" নিয়মে শুধু দৈনিক শিটগুলো বেছে দিতে পারেন', 'The owner can narrow this to the daily sheets with the rule "Daily sheets on home"', 'Owner চাইলে rule-এ শুধু দৈনিক Sheet বেছে দিতে পারেন'),
+  loc_up: L('লোকেশন ব্লক আরও উপরে নিন', 'Move the location block higher', 'Location block আরও উপরে নিন'), loc_dn: L('লোকেশন ব্লক আরও নিচে নিন', 'Move the location block lower', 'Location block আরও নিচে নিন'),
   locsw: L('লোকেশন', 'Location', 'Location'), all_loc: L('সব লোকেশন', 'All locations', 'সব Location'),
-  s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('গ্রাহক', 'Customers', 'Customer'), s_more: L('আইটেম ও গ্রাহক খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
+  s_screens: L('পাতা ও ফর্ম', 'Screens & forms', 'Page ও Form'), s_items: L('আইটেম', 'Items', 'Item'), s_cust: L('কাস্টমার', 'Customers', 'Customer'), s_more: L('আইটেম ও কাস্টমার খোঁজা হচ্ছে…', 'Searching items and customers…', 'Item ও Customer খোঁজা হচ্ছে…'),
   reset: L('প্রিয় ও ব্যবহারের হিসাব মুছুন', 'Clear my favourites & usage', 'Favourite ও Usage মুছুন'), logout: L('লগআউট', 'Log out', 'Logout'), roles: L('ভূমিকা', 'Roles', 'Role'),
-  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর গ্রাহক খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অনুমোদনের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('বিভাগ অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই বিভাগের সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
+  modules: L('সব মডিউল', 'All modules', 'সব Module'), recent: L('সাম্প্রতিক', 'Recent', 'Recent'), refresh: L('নতুন করে দেখুন', 'Refresh', 'Refresh'), s_do: L('করুন', 'Do', 'Do (করুন)'), s_set: L('সেটিংস', 'Settings', 'Settings'), find_off: L('অফলাইন — আইটেম আর কাস্টমার খোঁজা যাবে না; মেনু ও কাজ খোঁজা চলবে', 'Offline - items and customers cannot be searched; menu and actions still work', 'Offline — Item ও Customer খোঁজা যাবে না; Menu ও Do চলবে'), n_pend: L('অ্যাপ্রুভের অপেক্ষায় এন্ট্রি', 'Entries waiting for your approval', 'Approval-এর অপেক্ষায় Entry'), n_low: L('ন্যূনতমের নিচে আইটেম', 'Items below minimum', 'Minimum-এর নিচে Item'), all_clear: L('সব ঠিক আছে — এখন কিছু করার নেই', 'All clear. Nothing needs you now.', 'সব ঠিক আছে — এখন কিছু করার নেই'), see_all: L('সব দেখুন', 'See all', 'See all'), recent_empty: L('এখনও কিছু খোলা হয়নি', 'Nothing opened yet', 'এখনও কিছু খোলা হয়নি'), cats: L('ক্যাটাগরি অনুযায়ী', 'By category', 'Category অনুযায়ী'), all_in: L('এই ক্যাটাগরির সব', 'Everything in this category', 'এই Category-র সব'), qa: L('দ্রুত কাজ', 'Quick actions', 'Quick action'), emptyg: L('এই বিভাগে আপনার জন্য কিছু নেই', 'Nothing here for you', 'এই Category-তে আপনার জন্য কিছু নেই'),
   more: L('আরও', 'More', 'More'), fav_edit: L('সাজান', 'Edit', 'Edit'), fav_done: L('হয়েছে', 'Done', 'Done'), m_up: L('উপরে নিন', 'Move up', 'Move up'), m_down: L('নিচে নিন', 'Move down', 'Move down'), m_top: L('একদম উপরে', 'Move to top', 'Move to top'), m_bottom: L('একদম নিচে', 'Move to bottom', 'Move to bottom'),
   m_rename: L('নিজের নাম দিন', 'Rename label', 'নিজের নাম দিন'), m_hide: L('হোম থেকে লুকান', 'Hide from Home', 'Home থেকে লুকান'), m_open: L('খুলুন', 'Open', 'Open'), m_copy: L('লিংক কপি করুন', 'Copy link', 'Link copy করুন'), m_reset: L('প্রিয়র ক্রম আগের মতো করুন', 'Reset order', 'Favourite-এর order reset করুন'),
   m_unhide: L('লুকানো সব আবার দেখান', 'Show hidden again', 'Hidden সব আবার দেখান'), m_refresh: L('হোম নতুন করে দেখুন', 'Refresh Home', 'Home refresh'), copied: L('লিংক কপি হয়েছে', 'Link copied', 'Link copied'), rn_t: L('নিজের নাম (শুধু আপনার জন্য)', 'Your own label (only for you)', 'নিজের নাম (শুধু আপনার জন্য)'),
-  rn_h: L('খালি রাখলে আসল নাম ফিরবে', 'Leave empty to use the original name', 'খালি রাখলে আসল নাম ফিরবে'), rn_save: L('সংরক্ষণ', 'Save', 'Save'), added: L('যোগ করা হয়েছে', 'Added', 'Added'), omode: L('মালিকের বোর্ড', 'Owner mode', 'Owner mode'), omode_d: L('আজ যা দেখা দরকার', 'What to check today', 'আজ যা দেখা দরকার'),
+  rn_h: L('খালি রাখলে আসল নাম ফিরবে', 'Leave empty to use the original name', 'খালি রাখলে আসল নাম ফিরবে'), rn_save: L('সেভ', 'Save', 'Save'), added: L('যোগ করা হয়েছে', 'Added', 'Added'), omode: L('মালিকের বোর্ড', 'Owner mode', 'Owner mode'), omode_d: L('আজ যা দেখা দরকার', 'What to check today', 'আজ যা দেখা দরকার'),
   omode_on: L('হোমে মালিকের বোর্ড দেখান', 'Show the owner board as Home', 'Home-এ Owner board দেখান'), omode_off: L('সাধারণ হোমে ফিরুন', 'Back to the normal Home', 'Normal Home-এ ফিরুন'), omode_open: L('মালিকের বোর্ড খুলুন', 'Open the owner board', 'Owner board খুলুন'),
   em: L('জরুরি অনুরোধ', 'Emergency requests', 'জরুরি Request'), addprod: L('নতুন পণ্য যোগ', 'Add product', 'নতুন Product যোগ'), unitconv: L('একক রূপান্তর', 'Unit conversions', 'Unit conversion'),
   ctl: L('কন্ট্রোল সেন্টার', 'Control Center', 'Control Center'), ctl_d: L('লোকেশন, সীমা, তালিকা ও সেটিংস এক জায়গায়', 'Places, limits, lists and settings in one place', 'Location, limit, list ও settings এক জায়গায়'), locs: L('লোকেশন', 'Locations', 'Location'),
-  n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের খসড়া অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অনুমোদন বাকি', 'Wastage approvals waiting', 'Wastage approval বাকি'),
+  n_loc: L('নতুন লোকেশনের সেটআপ বাকি', 'New places still being set up', 'নতুন Location-এর setup বাকি'), n_sd: L('সেটিংস শিটের ড্রাফট অনুমোদনের অপেক্ষায়', 'Settings sheet drafts waiting', 'Settings sheet draft approval-এর অপেক্ষায়'), n_wst: L('নষ্টের অ্যাপ্রুভ অপেক্ষায়', 'Wastage approvals waiting', 'Wastage approval অপেক্ষায়'),
   set2: L('সেটিংস (সব অপশন)', 'Settings (all options)', 'Settings (সব Option)'), inv: L('ইনভয়েস ও প্রিন্ট', 'Invoice & print', 'Invoice ও Print'),
 };
 const T = (k) => lab(X[k]);
@@ -91,7 +95,7 @@ function entries() {
     const live = f.code === '0-1' ? isOwner() : !!(B.forms && B.forms[f.code]);
     out.push({ key: 'f:' + f.code, route: 'form/' + f.code, g: AREA_G[f.area], label: f.code + ' · ' + nm(f), icon: 'doc', ok: P(f.code, 'view'), live, kind: 'f', code: f.code, drawer: true });
   });
-  return out;
+  return B.optviews && B.optviews.apply ? B.optviews.apply(out) : out;   // bos91: owner's Hide / Locked choices (no data = unchanged)
 }
 const byKey = (k) => entries().find((e) => e.key === k);
 function keyOfHash() {
@@ -200,13 +204,15 @@ async function counts(force) {
   let pend = 0, pendOld = null, low = 0;   // Increment A: entries waiting for MY approval (same rule as #/pending) and items below minimum (stock_levels)
   if (ap) { try { const r = await sb.from('entries').select('form_code,entry_date').eq('status', 'submitted').order('entry_date', { ascending: true }).limit(200); const l = (r && !r.error ? r.data || [] : []).filter((e) => own || P(e.form_code, 'approve')); pend = l.length; pendOld = l.length ? l[0].entry_date : null; } catch (e) { /* table unreadable */ } }
   if (locOk()) { try { const cl = curLoc(); const r = await sb.rpc('stock_levels', { p_loc: cl === undefined ? null : cl, p_filters: { below_min: true } }); low = r && !r.error && Array.isArray(r.data) ? r.data.filter((x) => x.below_min !== false).length : 0; } catch (e) { low = 0; } }
+  let prq = 0;      // R1: pay requests waiting for me (inbox + due); the server returns 0 for everybody who is not an approver
+  try { const r = await sb.rpc('pay_request_counts'); if (r && !r.error && r.data) prq = (Number(r.data.inbox) || 0) + (Number(r.data.due) || 0); } catch (e) { /* phase120 not installed */ }
   const obx = (B.outbox && B.outbox.count) ? B.outbox.count() : 0;      // forms waiting on this phone (offline queue)
-  CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, pend, pendOld, low, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
+  CNT = { ex, rel, em, stf, itm, lq, loc, sd, wst, chg, obx, pend, pendOld, low, prq, ctl: (own ? ex + rel + em + stf + itm + lq + wst : 0) + loc + sd + (own ? 0 : lq) }; cntAt = Date.now(); return CNT;
 }
 async function loadGrantFlags() {
   if (!S.ctx || isOwner()) return;
   const locs = (S.ctx.locations || []).length ? [null, ...S.ctx.locations] : [null];
-  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use'];
+  const codes = locOk() ? ['view_daybook', 'cash_move', 'production_void', 'release_decide', 'print_books', 'employee_view', 'employee_manage', 'deed_manage', 'attendance_manage', 'payroll_manage', 'accounts_view', 'accounts_manage', 'customer_manage', 'assistant_use',  'salary_view', 'item_create', 'item_bulk', 'head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view', 'view_cost', 'view_stock_recon', 'view_branch_statement', 'view_net_profit', 'export_data'] : ['head_management', 'location_manage', 'settings_approve', 'list_manage', 'rollout_manage', 'change_approve', 'employee_view', 'attendance_manage', 'accounts_view', 'customer_manage', 'assistant_use', 'view_reports', 'report_marketing', 'report_control', 'report_sales', 'report_stock', 'report_cash', 'report_profit', 'crm_view', 'crm_settings_edit', 'crm_lead_manage', 'crm_lead_all', 'crm_loyalty_manage', 'crm_voucher_issue', 'crm_coupon_override', 'crm_merge', 'crm_complaint_log', 'crm_complaint_manage', 'crm_feedback_view'];
   await Promise.all(codes.map(async (code) => {
     let ok = false;
     for (const l of locs) { try { const r = await sb.rpc('has_grant', { p_code: code, p_loc: l }); if (r && !r.error && r.data === true) { ok = true; break; } } catch (e) { /* not granted */ } }
@@ -221,6 +227,7 @@ function ensureStatic() {
     if (!FORMS) { const r = await sb.from('forms').select('code,area,name_bn,name_mix,name_en,sort,enabled').order('sort'); FORMS = r && r.data ? r.data : []; }
     try { if (B.rule('ui_calm', true) === false) document.body.removeAttribute('data-ui'); } catch (e) { /* keep calm */ }
     syncFavs();
+    try { if (B.optviews && B.optviews.load) await B.optviews.load(); } catch (e) { /* views unavailable: everything shows as before */ }   // bos91
     await loadGrantFlags();
   })();
   return staticP;
@@ -242,12 +249,24 @@ function setCurLoc(id) {
   if (id !== null && id !== undefined) { try { store.set('bos_pos_loc', String(id)); } catch (e) { /* ignore */ } }   // the POS reads its own remembered place
   try { window.dispatchEvent(new CustomEvent('bos:loc', { detail: { id: id === undefined ? null : id } })); } catch (e) { /* old browser */ }
 }
+// position of the location block in the drawer, one choice per person (kept on this device under the person's own key; there is no generic per-user preference table, favourites use their own RPCs):
+// 0 = top of the drawer (always visible, under the search box), 1 / 2 / 3 = first / second / last block inside the collapsible footer (1 = how it always was)
+const LOCPOS_MAX = 3;
+const locPos = () => { let v = 1; try { v = parseInt(store.get('bos_locpos_' + uid()), 10); } catch (e) { v = 1; } return Number.isInteger(v) && v >= 0 && v <= LOCPOS_MAX ? v : 1; };
+const setLocPos = (n) => { try { store.set('bos_locpos_' + uid(), String(Math.max(0, Math.min(LOCPOS_MAX, n)))); } catch (e) { /* private window: lasts until reload */ } };
 function drawLocBox() {
   const box = $('#nav_locbox'); if (!box) return;
   const ch = locChoices(); if (ch.length < 2) { box.innerHTML = ''; return; }
   const cur = curLoc();
-  box.innerHTML = `<label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label>
+  const pos = locPos(), mv = (act, lbl, dis, ch2) => `<button type="button" class="loc-mv" data-act="${act}" aria-label="${esc(T(lbl))}" title="${esc(T(lbl))}" ${dis ? 'disabled' : ''}>${ch2}</button>`;
+  box.innerHTML = `<div class="loc-hd"><label for="nav_loc" style="font-size:.85rem;color:var(--muted)">${esc(T('locsw'))}</label><span class="loc-mvs">${mv('loc_up', 'loc_up', pos <= 0, '&#9650;')}${mv('loc_dn', 'loc_dn', pos >= LOCPOS_MAX, '&#9660;')}</span></div>
     <select id="nav_loc" aria-label="${esc(T('locsw'))}" style="width:100%;min-height:44px"><option value="all" ${cur === null ? 'selected' : ''}>${esc(T('all_loc'))}</option>${ch.map((l) => `<option value="${l.id}" ${cur === l.id ? 'selected' : ''}>${esc(nm(l))}</option>`).join('')}</select>`;
+}
+// business switch (bizctx): the drawer is redrawn, the open screen draws again with the new business' places
+function afterBiz() {
+  setDrawer(false); HS.data = null; try { sig = ''; if (drawerOpen) dr_body(); } catch (e) { /* drawer redraws on open */ }
+  if ((location.hash.replace(/^#\/?/, '') || 'home').split('/')[0] === 'home') loadStats(); else window.dispatchEvent(new HashChangeEvent('hashchange'));
+  if ($('#hv_sheets')) loadSheets();
 }
 document.addEventListener('change', (e) => {
   if (!e.target || e.target.id !== 'nav_loc') return;
@@ -300,11 +319,35 @@ function mount() {
   const bn = document.createElement('nav'); bn.className = 'bnav'; bn.id = 'bnav';
   document.body.append(sc, dr, bn); el.scrim = sc; el.drawer = dr; el.bnav = bn;
   if (!document.body.dataset.ui && store.get('bos_ui') !== 'off') document.body.dataset.ui = 'calm';
+  // desktop layout (docs/DESKTOP_LAYOUT.md 2.3): at >= 1024px the same drawer is a persistent sidebar (body.desk-sb, styled by desktop.css)
+  try {
+    deskMq = window.matchMedia('(min-width:1024px)');
+    const f = () => deskApply();
+    if (deskMq.addEventListener) deskMq.addEventListener('change', f); else if (deskMq.addListener) deskMq.addListener(f);
+    new MutationObserver(f).observe(document.documentElement, { attributes: true, attributeFilter: ['data-layout'] });   // bos_layout = phone switches the sidebar off at once
+  } catch (e) { /* no matchMedia: phone layout */ }
+  deskApply();
+}
+let deskMq = null, desk = false, deskLive = false;
+function deskApply() {
+  if (!el.drawer) return;
+  const want = !!(deskLive && deskMq && deskMq.matches && document.documentElement.getAttribute('data-layout') !== 'phone');
+  if (want === desk) return;
+  desk = want; document.body.classList.toggle('desk-sb', desk);
+  if (desk) {
+    el.drawer.setAttribute('role', 'navigation'); el.drawer.removeAttribute('aria-modal'); el.drawer.setAttribute('aria-label', T('menu'));
+    drawerOpen = true; el.drawer.classList.add('on'); el.scrim.classList.remove('on'); sig = '';
+    ensureStatic().then(() => { if (desk) renderDrawer(); }, () => {});
+  } else {
+    el.drawer.setAttribute('role', 'dialog'); el.drawer.setAttribute('aria-modal', 'true'); el.drawer.removeAttribute('aria-label');
+    drawerOpen = false; el.drawer.classList.remove('on'); el.scrim.classList.remove('on');
+  }
+  syncBnav();
 }
 const groupOpen = () => { if (!openGroups) { openGroups = jget('bos_navg_' + uid(), null); if (!openGroups) openGroups = { dash: true }; } return openGroups; };
 // ---------- theme control (Premium Dark / Premium Light / Classic): compact dropdown in the drawer footer and the Me sheet ----------
 const themeSel = (id) => { const TH = window.BOS_THEME; if (!TH) return ''; const cur = TH.get();
-  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic']].map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
+  return `<div class="th-row"><label for="${id}">${esc(T('theme'))}</label><select id="${id}" data-theme-pick aria-label="${esc(T('theme'))}">${[['dark', 'th_dark'], ['light', 'th_light'], ['classic', 'th_classic'], ['glass-light', 'th_glass_light'], ['glass-dark', 'th_glass_dark']]  /* bos109 */.map(([v, k]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${esc(T(k))}</option>`).join('')}</select></div>`; };
 document.addEventListener('change', (ev) => {
   const t0 = ev.target; if (!t0 || !t0.matches || !t0.matches('[data-theme-pick]') || !window.BOS_THEME) return;
   window.BOS_THEME.set(t0.value); sig = '';
@@ -317,15 +360,41 @@ function renderDrawer() {
   dr_shell();
   dr_body();
 }
+function fxBlocks() {   // footer blocks in the person's order: the location block sits at its position (1..3) among language and theme; position 0 draws it at the top of the drawer instead
+  const bl = [`<div class="me-lang">${A.langBar()}</div>`, themeSel('nav_theme')], pos = locPos();
+  if (pos >= 1) bl.splice(Math.min(pos - 1, bl.length), 0, '<div id="nav_locbox"></div>');
+  return bl.join('');
+}
 function dr_shell() {
-  const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : ''); if (s === sig && el.drawer.firstChild) return; sig = s;
+  const bz = B.biz ? B.biz.sig() : ''; const s = S.lang + '|' + uid() + '|' + (window.BOS_THEME ? window.BOS_THEME.get() : '') + '|' + bz + '|' + locPos(); if (s === sig && el.drawer.firstChild) return; sig = s;
   el.drawer.setAttribute('aria-label', T('menu'));
-  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(BRAND.bn)}</b><i>${esc(BRAND.en)}</i></div>
+  el.drawer.innerHTML = `<div class="dr-head"><img src="mark.svg" alt=""><div class="nm"><b>${esc(((B.biz && B.biz.brand()) || BRAND).bn)}</b><i>${esc(((B.biz && B.biz.brand()) || BRAND).en)}</i></div>
       <button class="hbtn" style="min-height:48px;min-width:48px;border:0;background:transparent;color:var(--ink)" data-act="nav_close" aria-label="${esc(T('close'))}">${IC.x.replace('<svg', '<svg width="22" height="22"')}</button></div>
+    ${B.biz ? B.biz.switcherHTML() : ''}
+    ${locPos() === 0 ? '<div class="dr-loctop" id="nav_locbox"></div>' : ''}
     <div class="dr-search"><input id="nav_q" type="search" autocomplete="off" placeholder="${esc(T('search'))}" aria-label="${esc(T('search'))}" value="${esc(q)}"></div>
     <div class="dr-body" id="nav_body"></div>
-    <div class="dr-foot"><div id="nav_locbox"></div><div class="me-lang">${A.langBar()}</div>${themeSel('nav_theme')}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
-      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div>`;
+    <div class="dr-foot${footOpen() ? ' open' : ''}" id="nav_foot"><div class="dr-fbar"><button type="button" class="dr-ftog" data-act="foot_tog" aria-expanded="${footOpen()}" aria-controls="nav_fx" aria-label="${esc(T('foot_t'))}" title="${esc(T('foot_t'))}">${IC.cv.replace('<svg', '<svg class="cv"')}</button><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net2"></span></span></div><div class="dr-fx" id="nav_fx"><div class="dr-fxi"${footOpen() ? '' : ' inert'}>${fxBlocks()}<div class="row"><span class="on-s"><span class="dot ${navigator.onLine === false ? 'bad' : 'ok'}" id="nav_net"></span><span id="nav_nett">${esc(navigator.onLine === false ? T('offline') : T('online'))}</span></span>
+      <button class="lo" data-act="logout">${esc(T('logout'))}</button></div></div></div></div>`;
+}
+// bos101: collapsible drawer footer (default collapsed, remembered per device)
+// default: collapsed, except when the person has 2 or more places (then the location choice is the first thing in the footer, so it opens expanded); the person's own toggle (1 / 0) always wins
+const footOpen = () => {
+  let v = null; try { v = localStorage.getItem('bos_navfoot'); } catch (e) { v = null; }
+  if (v === '1') return true; if (v === '0') return false;
+  try { return !!S.ctx && locChoices().length >= 2; } catch (e) { return false; }
+};
+document.addEventListener('click', (ev) => {
+  const b = ev.target && ev.target.closest && ev.target.closest('[data-act=foot_tog]'); if (!b) return;
+  const f = b.closest('.dr-foot'); if (!f) return; const on = !f.classList.contains('open');
+  f.classList.toggle('open', on); b.setAttribute('aria-expanded', String(on));
+  const fi = f.querySelector('.dr-fxi'); if (fi) { if (on) fi.removeAttribute('inert'); else fi.setAttribute('inert', ''); }
+  try { localStorage.setItem('bos_navfoot', on ? '1' : '0'); } catch (e) { /* private mode */ }
+});
+function locMove(d) {
+  const to = Math.max(0, Math.min(LOCPOS_MAX, locPos() + d)); if (to === locPos()) return;
+  setLocPos(to); sig = ''; renderDrawer(); try { dr_body(); } catch (e) { /* drawn on the next open */ }
+  const b = $(d < 0 ? '[data-act=loc_up]' : '[data-act=loc_dn]', el.drawer) || $('[data-act=loc_up],[data-act=loc_dn]', el.drawer); if (b && !b.disabled) b.focus(); else { const o = $('#nav_loc', el.drawer); if (o) o.focus(); }
 }
 const crumbOf = (e) => B.ia.groupLabel(e.g) + ' › ' + e.label;
 function dr_body() {
@@ -375,7 +444,7 @@ function dr_body() {
   }).join('');
 }
 function setDrawer(on) {
-  mount(); drawerOpen = on;
+  mount(); if (desk) on = true; drawerOpen = on;   // the desktop sidebar never closes
   el.scrim.classList.toggle('on', on); el.drawer.classList.toggle('on', on);
   syncBnav();
 }
@@ -388,17 +457,17 @@ async function openDrawer() {
   counts().then((c) => { if (drawerOpen) dr_body(); return c; }, () => {});
 }
 function closeDrawer() {
-  if (!drawerOpen) return;
+  if (!drawerOpen || desk) return;
   setDrawer(false);
   try { if (history.state && history.state.bosNav) history.back(); } catch (e) { /* ignore */ }
 }
 window.addEventListener('popstate', () => {
-  if (drawerOpen) setDrawer(false);                 // hardware Back: close the drawer first
+  if (drawerOpen && !desk) setDrawer(false);        // hardware Back: close the drawer first
   if (pendingRoute) { const r = pendingRoute; pendingRoute = null; location.hash = '#/' + r; }
 });
-window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen) setDrawer(false); syncBnav(); });
+window.addEventListener('hashchange', () => { countRoute(); if (drawerOpen && !desk) setDrawer(false); syncBnav(); });
 document.addEventListener('keydown', (e) => {
-  if (!drawerOpen) return;
+  if (!drawerOpen || desk) return;   // desktop sidebar: no Esc close, no Tab trap
   if (e.key === 'Escape') { closeDrawer(); return; }
   if (e.key === 'Tab') {   // keep focus inside the drawer
     const f = [...el.drawer.querySelectorAll('button:not([disabled]),input')].filter((x) => x.offsetParent !== null || x === document.activeElement);
@@ -408,7 +477,7 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('input', (e) => { if (e.target.id === 'nav_q') { q = e.target.value; queueSearch(); dr_body(); } if (e.target.id === 'pk_q') drawPicker(e.target.value); });
 window.addEventListener('online', netDot); window.addEventListener('offline', netDot);
-function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
+function netDot() { const d = $('#nav_net'), tx = $('#nav_nett'); if (!d) return; const on = navigator.onLine !== false; const d2 = $('#nav_net2'); if (d2) d2.className = 'dot ' + (on ? 'ok' : 'bad'); d.className = 'dot ' + (on ? 'ok' : 'bad'); tx.textContent = on ? T('online') : T('offline'); }
 
 // ---------- bottom nav ----------
 function hideBnav() {
@@ -456,7 +525,7 @@ function crumb() {
 }
 let syncUid = null;
 function sync(live) {
-  mount();
+  mount(); deskLive = !!live; deskApply();
   const who0 = live ? uid() : null;
   if (who0 !== syncUid) { syncUid = who0; ITEMS_ALL = null; ITEMS_AT = 0; SR.items = []; SR.cust = []; SR.q = ''; CNT = null; }   // other person / logged out: no cached item list
   if (!live) { setDrawer(false); document.body.classList.remove('has-bnav'); return; }
@@ -465,6 +534,7 @@ function sync(live) {
   if (drawerOpen) { sig = ''; renderDrawer(); }
   else sig = '';
   syncBnav();
+  if (B.announce && B.announce.tick) B.announce.tick();   // R2-A: the headline bar under the header (nothing at all while announce_on is OFF or nothing is addressed to this person)
 }
 
 // ---------- favourites: pin / unpin / order / label / hide - all from the ⋮ menus (no star buttons anywhere) ----------
@@ -614,7 +684,11 @@ async function home() {
   const ownBtn = ownerBoardOk() ? `<button class="hbig ownbig" data-act="go" data-v="owner" data-owner="1">${ico('control', 'sliders', 34)}<span class="sb-t"><b>${esc(T('omode'))}</b><small>${esc(T('omode_d'))}</small></span></button>` : '';
   const posBtn = sellBtn || ownBtn ? `<div class="hbigrow">${sellBtn}${ownBtn}</div>` : '';
   if (V2) setTimeout(() => loadOldest(), 0);
-  $('#hv_main').innerHTML = `${posBtn}${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
+  if (own || GF.accounts_view || GF.accounts_manage) setTimeout(() => { const el = $('#hv_fresh'); if (el && B.freshness) B.freshness.mount(el); }, 0);   // W1-G: the "last posted at" strip (silent when the server has no phase 98)
+  setTimeout(() => { const el = $('#hv_tasks'); if (el && B.crmTasks) B.crmTasks.stripHTML().then((h) => { if (h) el.innerHTML = h; }).catch(() => {}); }, 0);   // bos326 (CRM-G): the My tasks strip (silent while tasks are off or nothing is due)
+  const r2t = !!(B.rule && B.rule('todo_on', false) === true);   // R2-B: the small to-do card (only while todo_on is ON, and only drawn when the person has something open)
+  if (r2t) setTimeout(() => { const el = $('#hv_todo'); if (el && B.todo) B.todo.mount(el); }, 0);
+  $('#hv_main').innerHTML = `${posBtn}<div id="hv_tasks"></div>${attn}${V2 ? '<div id="hv_oldest"></div>' : ''}${r2t ? '<div id="hv_todo"></div>' : ''}${own || GF.accounts_view || GF.accounts_manage ? '<div id="hv_fresh"></div>' : ''}${V2 ? '<div id="hv_sheets"></div><div id="hv_qa"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>' : ''}
     <div class="seg" role="group" aria-label="${esc(T('biz') + ' / ' + T('acc'))}"><button data-act="hv_mode" data-v="biz" aria-pressed="${HS.mode === 'biz'}">${esc(T('biz'))}</button><button data-act="hv_mode" data-v="acc" aria-pressed="${HS.mode === 'acc'}">${esc(T('acc'))}</button></div>
     <div class="ptabs" role="tablist" id="hv_pt"></div><div id="hv_stats"></div>
     ${V2 ? '' : '<div id="hv_sheets"></div><div class="hsec">' + esc(T('fav')) + favEditBtn() + '</div><div id="hv_fav"></div>'}
@@ -681,7 +755,7 @@ async function loadStats() {
   box.innerHTML = `<p class="muted">${esc(t('loading'))}</p>`;
   if (!HS.data || HS.dataFrom !== key) {
     const qq = (x) => x.then((r) => (r && !r.error ? r.data || [] : []), () => []);
-    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(sb.rpc('customer_dues'))]);
+    const [s, pay, dues] = await Promise.all([qq(sb.rpc('sales_summary', { p_from: from })), qq(sb.rpc('payments_summary', { p_from: from })), qq(rpcDues())]);
     HS.data = { s, pay, dues }; HS.dataFrom = key;
   }
   drawStats();
@@ -812,6 +886,8 @@ window.BOS_PAGES = Object.assign(window.BOS_PAGES || {}, { group: viewGroup });
 Object.assign(H, {
   nav_open: () => openDrawer(),
   nav_close: () => closeDrawer(),
+  loc_up: () => locMove(-1),
+  loc_dn: () => locMove(1),
   nav_go: (a) => {
     const r = a.dataset.v;
     if (history.state && history.state.bosNav) { pendingRoute = r; closeDrawer(); } else { setDrawer(false); location.hash = '#/' + r; }
@@ -850,5 +926,5 @@ H.lang = (a) => { sig = ''; return prevLang(a); };
 })();
 
 B.curLoc = curLoc; B.setCurLoc = setCurLoc; B.fyStart = fyStart;
-window.BOS_NAV = { loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
+window.BOS_NAV = { afterBiz, loadSheets, curLoc, fyStart, grantFlags: () => GF, ctlOk, menuBtn, headExtra, crumb, sync, home, open: openDrawer, close: closeDrawer, pins, usage, togglePin, reorderFav, resetOrder, hideKey, hidden: hiddenKeys, labels: labelsMap, menuItems, setOwnerMode, ownerModeOn, entries: () => entries().filter((e) => e.live), syncFavs };
 })();

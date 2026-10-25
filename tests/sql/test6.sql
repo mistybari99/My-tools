@@ -8,7 +8,7 @@ begin
     for it in select id, sell_price, name_bn from items order by code limit 3 loop
       r := r + 1;
       insert into sales (location_id, receipt, sale_date, sold_at, lines, subtotal, discount, total, pay_mode, quick, created_by, created_staff, status)
-      values (1, r, current_date - d, now() - (d||' days')::interval, jsonb_build_array(jsonb_build_object('item_id',it.id,'qty',2,'price',it.sell_price,'amount',2*it.sell_price,'override',(d=5))), 2*it.sell_price, case when d=3 then 50 else 0 end, 2*it.sell_price - case when d=3 then 50 else 0 end, case when d%7=0 then 'due' else 'cash' end, false, sid, case when r%5=0 then 'karim02' else 'shop2' end, 'done');
+      values (1, r, current_date - d, now() - (d||' days')::interval, jsonb_build_array(jsonb_build_object('item_id',it.id,'qty',2,'price',it.sell_price,'amount',2*it.sell_price,'override',(d=5))), 2*it.sell_price, case when d=3 then 50 else 0 end, 2*it.sell_price - case when d=3 then 50 else 0 end, case when d%7=0 then 'due' else 'cash' end, false, sid, case when r%5=0 then 'testf02' else 'shop2' end, 'done');
     end loop;
     r := r + 1;
     insert into sales (location_id, receipt, sale_date, sold_at, lines, subtotal, discount, total, pay_mode, quick, created_by, created_staff, status)
