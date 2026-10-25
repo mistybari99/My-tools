@@ -334,6 +334,7 @@ Columns: # = paste position (1 = the first file after the foundation), file, lin
 | 215 | `phase543.sql` | form | FORM-543 | printed form codes: the clean sequence (NN-1, A-Z by English short name, owner 21 Oct 2026). Migrates forms.code, form_code in 20 tables, code literals in functions, triggers, one policy, one check and the label text. Tag FORM-CODE-CLEAN-SEQUENCE-543. Paste ONCE (a second paste is a no-op). Test: `phase543_test.sql` (local only). |
 | 216 | `phase544.sql` | ours | SW | SW-7 sweets transfers: a client id reused by another user refused (switch transfer_client_reuse_block, OFF) |
 | 217 | `phase545.sql` | ours | STEP1 | Purchase price check: freight counted when a landed cost is posted (switch price_check_include_freight, OFF; test phase545_test.sql) |
+| 218 | `phase546.sql` | ours | FIX | Sweets transfers: stock_transfer carries the phase 533 merge (bos114 transfer_needs_stock, bos115 transfer_notify_receiver) plus the phase 544 reused-id check; phase 544 had dropped the first two (test phase546_test.sql) |
 
 ## Old phase files: if you ever paste one again
 

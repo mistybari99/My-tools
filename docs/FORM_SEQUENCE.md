@@ -1,6 +1,6 @@
 # FORM_SEQUENCE: how printed form codes are ordered (rule file for Claude and contributors)
 
-Status: the owner chose **Option B** (sorted by short name). The mapping below is the proposal the owner must approve line by line before anything is applied. Until then the printed codes in the app and the database are the OLD codes, and `tools/numbering_map.json` keeps `form_groups_approved: false`.
+Status: the owner chose **Option B** (sorted by short name) and approved the mapping in section 4 on 21 Oct 2026 (final). `tools/numbering_map.json` has `form_groups_approved: true`; phase 543 applies the new codes. Short names are still to be reviewed by the owner.
 
 ## 1. The rule
 
@@ -19,7 +19,7 @@ Status: the owner chose **Option B** (sorted by short name). The mapping below i
 
 ## 3. Old codes are retired
 
-- After apply, the old code of every moved form is **retired**. It must not be reused for another form. Old codes stay in history (docs, phase files, the BUILD-LOG) unchanged.
+- After apply, the old code of every moved form is **retired**: it no longer names that form. Under the approved sequence the same string can be the new code of a different form (column "collision"); no code outside the sequence may be given to anything else. Old codes stay in history (docs, phase files, the BUILD-LOG) unchanged.
 - Old-code references in live code are changed in the same apply step; old-code references in history are left as they are, with the note "old code, see docs/FORM_SEQUENCE.md".
 - Some new codes are the same string as an old code of a different form (see section 4, column "collision"). Reading an old document with a new mind is therefore unsafe; always check the form name next to the code.
 

@@ -1,5 +1,7 @@
 # HANDOVER NEXT 6: Islamia Misty Ghar BOS (পরবর্তী সেশনের জন্য, প্রথমে এটি পড়ুন)
 
+> **সতর্কতা (25 Oct 2026):** এই handover পুরোনো line (phase 79 পর্যন্ত) থেকে লেখা। বর্তমান branch-এ union merge-এর পর paste order phase 546 পর্যন্ত (`tests/sql/ORDER.txt`, `docs/PASTE_ORDER.md`)। phase-এর অবস্থা জানতে `docs/PLAN_NEXT.md`, `docs/LIVE_DELTA.md` ও `docs/BUILD-LOG.md` দেখুন। demo উপাদান repo-তে নিষিদ্ধ (CLAUDE.md)।
+
 তারিখ: 2026-10-25। ভিত্তি: repo-তে থাকা কোড ও docs। কোনো live write করা হয়নি।
 ট্যাগ: `[code]` = repo-র কোড/SQL থেকে যাচাই; `[live]` = read-only SELECT-এ যাচাই (2026-10-16); `[owner]` = owner-এর পাঠানো "Success" বা নিশ্চিত তথ্য; `[unverified]` = যাচাই হয়নি।
 
@@ -38,7 +40,6 @@
 | লোকেশন | `#/locations`, `#/locset`, `#/locsheet`, `#/rollout` |
 | সেটিংস | `#/control`, `#/rulehub`, `#/owner`, `#/switchboard`, `#/paths`, `#/settings2`, `#/logs`, `#/backup`, `#/twofa`, `#/restoredrill`, `#/integrations`, `#/printbooks`, `#/delegation`, `#/partners`, `#/saleforms`, `#/parallel` |
 
-Form registry: ৪৬টি form code (`web/forms*.js`) `[code]`; বিস্তারিত `docs/DEMO_DAY_SCREENS_STORIES_LEDGER_EN.md` §3.3।
 
 ---
 
@@ -67,7 +68,6 @@ Form registry: ৪৬টি form code (`web/forms*.js`) `[code]`; বিস্�
 | Restore drill & 2FA | phase70 (restore drill), phase71 (TOTP, safe core) | `[unverified]` live |
 | Phase 72–79 integration | COGS single source, recipe master, costing/overhead, cost sources, sales channels & inbox, online order fixes, cost attribution, merged functions (phase79 LAST) | `[unverified]` live; test files present |
 | Read-only audit | `docs/SUPABASE_READONLY_AUDIT.md`, 265 public tables, RLS on | `[live]` |
-| Demo docs | 5 Bangla demo docs + `DEMO_DAY_SCREENS_STORIES_LEDGER_EN.md` (28 stories, ledger, balance sheet, 14 gaps) | docs only |
 
 ### বাকি (পুরোনো `REMAINING.md` ও `TODO.md` থেকে, এখনো অসম্পূর্ণ)
 
@@ -95,7 +95,6 @@ Form registry: ৪৬টি form code (`web/forms*.js`) `[code]`; বিস্�
 - phase22, phase23–28, phase48–54, phase60–62, phase70–79 — live DB-তে চালানো হয়েছে কি না নিশ্চিত নয়। শুধু phase3 + phase4 "Success" নিশ্চিত `[owner]`। **প্রথমে owner-কে জিজ্ঞেস করুন কোন phase কোন অবস্থায়।**
 - Switch সিদ্ধান্ত: `tools_stock_on`, `blind_count_on`, `pin_signature_on`, `forms_post_to_ledger`, `packaging_consume_on`। `[owner]`
 - Grants দেওয়া (see_expected, rollout_manage, change_approve, list_manage, location_manage)। live এ এখনো মাত্র owner + management একটি account `[live]`।
-- Staff account তৈরি (17 demo roster) — শুধু test project-এ।
 - `mishti_factory` (paused) পুনরায় চালু কি না — owner-এর সিদ্ধান্ত।
 - VAT/Mushak 6.3 OFF; adviser-এর rate প্রয়োজন। `[owner]`
 - `docs/DEVICE_CHECKLIST.md` — আসল ফোন ও প্রিন্টারে এখনো চালানো হয়নি। `[unverified]`
@@ -138,13 +137,11 @@ Form registry: ৪৬টি form code (`web/forms*.js`) `[code]`; বিস্�
 10. 18-1 marketing limit: মাসিক না প্রতি খরচ? (ROADMAP open)
 11. Leave-এ paid leave অন্তর্ভুক্ত কি না (ROADMAP open)।
 12. `hook_password_verification_attempt` চালু করবেন কি না।
-13. Demo-র সংখ্যা (price ৳800/kg সুইট A, ৳300/kg কেক B) — demo মাত্র, আসল price `items` টেবিল থেকে।
 
 ### ৩.৩ তথ্য-অসংগতি (সংশোধন দরকার)
 - Supabase region: `DECISIONS.md` বলছে Singapore; read-only audit বলছে `ap-southeast-2` (Sydney)। **কোনটি সঠিক owner-কে জিজ্ঞেস করুন।** (Dashboard থেকে নিশ্চিত করা যায়।)
 - `REMAINING.md` ও `TODO.md` পরস্পরবিরোধী (উদাহরণ: TODO-তে D1/B2 tick, REMAINING-এ খোলা)। TODO-কে সর্বশেষ ধরুন, তবে প্রতিটি code দিয়ে যাচাই করুন।
 - `HANDOVER_5.md`-এর branch `ccr-9ef9353a-q2wsec` এবং `ROADMAP.md`-র `ccr-78d03e25-k7ksyo` — পুরোনো; বর্তমান branch আলাদা।
-- Earlier demo doc (`DEMO_FULL_WORKFLOW_AND_LEDGER.md`) ভুল: opening Jamal দেয়, branch2 opening ৫ + transfer ৫ double count, transit 1 kg ভুল (C1–C6 দেখুন `DEMO_DAY_SCREENS_STORIES_LEDGER_EN.md` §১)।
 
 ---
 
@@ -196,4 +193,3 @@ Form registry: ৪৬টি form code (`web/forms*.js`) `[code]`; বিস্�
 - Live Supabase-এ কোন phase চলেছে তা জানা নেই (শুধু phase3+4 owner-এর "Success")।
 - কোনো web page আসল ফোনে পরীক্ষা হয়নি।
 - Supabase `get_project_url` MCP call permission denied; URL `web/config.js` থেকে নেওয়া।
-- Demo সংখ্যা ও ledger কোড থেকে নয়, হাতে বানানো demo।
