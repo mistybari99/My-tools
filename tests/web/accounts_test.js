@@ -1,12 +1,13 @@
 // Module A (accounting) web page #/accounts: overview, unbalanced warning, Post now (dry run first), tabs (statements, trial balance, ledger, journal book,
 // parties), manual journal validation, opening balances, chart of accounts, settings & mappings, print + CSV, "Data needed", no-permission text.
 // Run: node accounts_test.js <abs tests/web dir>
+const _P = require('./_paths');
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs');
-const SP = process.argv[2];
+const SP = process.argv[2] || _P.TESTS_DIR;
 const C = require(SP + '/w5b_common.js');
-const base = C.baseData(SP), PORT = 8361, srv = C.serve(PORT);
-const WEB = '/home/user/My-tools/web';
+const base = C.baseData(SP), PORT = _P.freePort(), srv = C.serve(PORT);
+const WEB = _P.WEB_DIR;
 const ROW = (id, code, bn, en, type, side, parent, grp) => ({ id, code, name_bn: bn, name_en: en, type, normal_side: side, parent_id: parent || null, is_group: !!grp, is_system: true, active: true, sort: id });
 const COA = [ROW(1, '1000', 'সম্পদ', 'Assets', 'asset', 'debit', null, true), ROW(2, '1110', 'হাতে নগদ', 'Cash in hand', 'asset', 'debit', 1), ROW(3, '1210', 'গ্রাহকের বাকি', 'Customer receivables', 'asset', 'debit', 1),
   ROW(4, '2000', 'দায়', 'Liabilities', 'liability', 'credit', null, true), ROW(5, '2100', 'সরবরাহকারীর পাওনা', 'Supplier payables', 'liability', 'credit', 4), ROW(6, '3100', 'মালিকের মূলধন', 'Owner capital', 'equity', 'credit', null),

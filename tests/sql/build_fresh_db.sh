@@ -1,5 +1,6 @@
-S=/home/user/My-tools/tests/sql
-R=/home/user/My-tools/supabase
+REPO=${REPO:-$(cd "$(dirname "$0")/../.." && pwd)}
+S=$REPO/tests/sql
+R=$REPO/supabase
 P="psql -h /tmp -p 5544 -U postgres -v ON_ERROR_STOP=1 -q"
 DB=$1; shift
 ORDER=${ORDER:-"phase8 phase9 phase10"}

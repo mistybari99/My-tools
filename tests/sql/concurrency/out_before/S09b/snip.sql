@@ -1,0 +1,1 @@
+select 'S|'||coalesce(scan_confirm(('00000000-0000-0000-0000-0000000000'||lpad(:i::text,2,'0'))::uuid, ('00000000-0000-0000-0000-0000000001'||lpad(:i::text,2,'0'))::uuid, true, true)->'result'->'posted'->>'status','?');

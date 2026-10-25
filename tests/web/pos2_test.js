@@ -1,8 +1,10 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8084);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc; window.__CALLS = [];
  const CU = window.__CUST = [{ id: 'c1', mobile: '01711111111', name: 'Rafiq', type: 'retail', credit_limit: null, balance: 350, oldest: '2026-10-01' }];
  c.rpc = async (fn, args) => {
@@ -32,7 +34,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
   await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','bn');}catch(e){}`);
   const toast = async () => (await p.textContent('#toast')).trim();
-  await p.goto('http://localhost:8084/#/pos'); await p.waitForTimeout(900);
+  await p.goto('http://localhost:' + PORT + '/#/pos'); await p.waitForTimeout(900);
   const pc = data.tables.items.find((i) => i.unit === 'pc'), kg = data.tables.items.find((i) => i.unit === 'kg');
   await p.click(`.pos-item[data-v="${pc.id}"]`); await p.click(`.pos-item[data-v="${pc.id}"]`);
   await p.click(`.pos-item[data-v="${kg.id}"]`); await p.click('[data-act=pos_q_set][data-n="0.5"]'); await p.click('[data-act=pos_q_ok]');
@@ -116,7 +118,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.click('[data-act=pos_tab][data-v=today]'); await p.waitForTimeout(500); await p.screenshot({ path: SP + '/q_today.png' });
   log('today rows:', await p.locator('#pos_body .card.item').count());
   // dues page
-  await p.goto('http://localhost:8084/#/dues'); await p.waitForTimeout(700);
+  await p.goto('http://localhost:' + PORT + '/#/dues'); await p.waitForTimeout(700);
   log('dues rows:', await p.locator('#du_list .card').count()); await p.screenshot({ path: SP + '/q_dues.png' });
   await p.click('#du_list .card >> nth=0'); await p.waitForTimeout(500); await p.screenshot({ path: SP + '/q_collect.png' });
   await p.fill('[data-pay="0.amount"]', '999'); await p.click('[data-act=du_collect]'); await p.waitForTimeout(300); log('overpay ->', await toast());

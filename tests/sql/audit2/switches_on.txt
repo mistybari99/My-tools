@@ -1,0 +1,55 @@
+# Recommended switches for the "switches ON" pass of run_all.sh --matrix.
+# Format:  rule_key = <json value>     (# comment).  The value becomes the rule DEFAULT in the scratch DB (rules.default_value),
+#          so scenarios that reset a rule to default still see it ON.  A key that does not exist (yet) is reported and skipped.
+# Directive:  @auto_new_switches on|off   (default on) = every rule that is NOT in rules_baseline.txt and has kind 'switch' is
+#          also turned ON (so batch phases 112+ are covered even before their key is listed here).  A line  !key  keeps one rule at its default.
+# Batch agents: append the rule names of your phase below (one per line).
+@auto_new_switches on
+
+# --- existing rules recommended by the audit reports (A1..A5) ---
+# production_requires_cost (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+recipe_waste_required = true             # A1 G15
+yield_variance_warn_pct = 5              # A1 G15
+# unit_conv_required (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+count_tolerance_pct = 2                  # A2 G12
+neg_grant_log = true                     # A2 G12
+# stock_negative_mode (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+transit_open_hours = 24                  # A5 GAP-6
+transit_short_mode = "loss"              # A5 GAP-4 (the defect case)
+acct_transfer_mode = "location_tagged"   # A5 GAP-16
+acct_transit_loss = true                 # A5 GAP-16
+cost_attrib_in_pl = true                 # A3 G6
+manual_journal_guard = "on"              # A4 G09
+# card_settle_over_mode (strict mode: the scenarios toggle it themselves; as a global default it breaks the scenario SETUP and cascades)
+
+# --- phases 112-118 (integration): every new rule with the value that switches it ON (defaults stay OFF in the files) ---
+profit_truth_mode = "on"                 # 112 batch 1a
+cost_share_prorate_mode = "on"           # 112
+items_net_of_returns = "on"              # 112
+drawer_short_post = "on"                 # 113 batch 1b
+dues_net_advance = "on"                  # 113
+period_lock_owner_mode = "warn"          # 113
+period_lock_late_warn = "on"             # 113
+daybook_align_mode = "on"                # 113
+bank_stmt_post_on = "on"                 # 113
+late_sale_follows_block = true           # 114 batch 2
+transfer_needs_stock = true              # 114
+return_uses_sale_rows = true             # 114
+item_unit_change_needs_zero = true       # 114
+item_lifecycle_needs_zero = true         # 114
+batch_for_adjustments = true             # 114
+batch_refill_cap = true                  # 114
+transfer_late_receive = true             # 115
+transfer_return_marker = true            # 115
+transfer_notify_receiver = true          # 115
+transit_loss_gl_fix = true               # 115
+semi_finished_ingredient116 = true       # 116 batch 3
+packaging_on_actual_yield116 = true      # 116
+std_cost_true116 = true                  # 116
+std_snapshot_auto116 = true              # 116
+pool_drivers116 = true                   # 116
+conv_provisional116 = true               # 116
+cost_supply_to_avg116 = true             # 116
+pool_gl_post117 = true                   # 117
+factory_labour_absorbed117 = true        # 117
+# phase118 (batch 4, read-only reports): profit_variable_heads and branch_stmt_ageing_hours are text parameters, not switches - they stay at their defaults.

@@ -1,8 +1,10 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8083);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 const EXTRA = `(function(){ const real = window.supabase.createClient; window.supabase.createClient = (...a) => { const c = real(...a); const rpc = c.rpc;
  c.rpc = async (fn, args) => {
   if (fn === 'biz_daily') return { data: [{ sale_date: '2026-10-10', location_id: 1, n: 9, revenue: 21000, discount: 500, void_n: 1, void_amt: 300, costed_rev: 18000, cogs: 16200 }, { sale_date: '2026-10-11', location_id: 1, n: 7, revenue: 19000, discount: 0, void_n: 0, void_amt: 0, costed_rev: 16000, cogs: 14400 }], error: null };
@@ -19,7 +21,7 @@ const EXTRA = `(function(){ const real = window.supabase.createClient; window.su
   await p.route('https://fonts.googleapis.com/**', (r) => r.fulfill({ contentType: 'text/css', body: '' }));
   data.tables.location_settings = [{ location_id: 1, key: 'fixed_cost_month', value: 300000 }, { location_id: 1, key: 'anomaly_ratio', value: 2 }];
   await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
-  await p.goto('http://localhost:8083/#/home'); await p.waitForTimeout(700);
+  await p.goto('http://localhost:' + PORT + '/#/home'); await p.waitForTimeout(700);
   console.log('tile:', await p.locator('.tile', { hasText: 'ব্যবসার হিসাব' }).count());
   await p.click('.tile >> text=ব্যবসার হিসাব'); await p.waitForTimeout(500);
   await p.selectOption('#bz_loc', '1'); await p.waitForTimeout(800);

@@ -1,6 +1,8 @@
+const _P = require('./_paths');
+const PORT = _P.freePort();
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const fs = require('fs'), path = require('path'), http = require('http');
-const SP = process.argv[2], ROOT = '/home/user/My-tools/web';
+const SP = process.argv[2] || _P.TESTS_DIR, ROOT = _P.WEB_DIR;
 const src = fs.readFileSync(SP + '/smoke.js', 'utf8'); const dataFn = new Function('fs', src.slice(src.indexOf('const csv'), src.indexOf('const srv')).replace(/const fs = require.*\n/, '') + ';return data;'); const data = dataFn(fs);
 data.tables.option_lists = [
  { list_code: 'marketing_heads', value_code: '1', label_bn: 'অনলাইন বিজ্ঞাপন', label_en: 'Online ads', sort: 1, active: true, extra: { limit_month: 5000 } },
@@ -8,7 +10,7 @@ data.tables.option_lists = [
  { list_code: 'expense_heads', value_code: 'transport', label_bn: 'যাতায়াত', label_en: 'Transport', sort: 1, active: true, extra: {} },
  { list_code: 'expense_heads', value_code: 'fuel', label_bn: 'জ্বালানি', label_en: 'Fuel', sort: 2, active: true, extra: {} }];
 data.tables.location_settings = [];
-const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(8091);
+const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split('?')[0] === '/' ? 'index.html' : q.url.split('?')[0]); fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); return r.end(); } const ext = path.extname(f); r.writeHead(200, { 'content-type': { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webp': 'image/webp' }[ext] || 'application/octet-stream' }); r.end(b); }); }).listen(PORT);
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errors = []; const ctx = await br.newContext({ viewport: { width: 390, height: 800 }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
@@ -18,7 +20,7 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.addInitScript(`window.__DATA=${JSON.stringify(data)};try{localStorage.setItem('bos_lang','bn')}catch(e){}`);
   const sleep = (n) => p.waitForTimeout(n);
   await p.setViewportSize({ width: 360, height: 760 });
-  await p.goto('http://localhost:8091/#/home'); await sleep(1200);
+  await p.goto('http://localhost:' + PORT + '/#/home'); await sleep(1200);
   await p.screenshot({ path: SP + '/n_home.png' });
   console.log('bnav visible home:', await p.locator('#bnav').isVisible(), '| header lang buttons:', await p.locator('header.top .lang').count());
   // mode toggle + period
@@ -51,15 +53,15 @@ const srv = http.createServer((q, r) => { const f = path.join(ROOT, q.url.split(
   await p.click('#navScrim', { position: { x: 345, y: 300 } }); await sleep(400);
   console.log('closed by scrim:', await p.locator('#navDrawer.on').count());
   // form page and POS: bnav hidden
-  await p.goto('http://localhost:8091/#/entry/new/10-2/1'); await sleep(1000);
+  await p.goto('http://localhost:' + PORT + '/#/entry/new/10-2/1'); await sleep(1000);
   console.log('bnav in entry:', await p.locator('#bnav').isVisible()); await p.screenshot({ path: SP + '/n_form.png' });
-  await p.goto('http://localhost:8091/#/pos'); await sleep(1200);
+  await p.goto('http://localhost:' + PORT + '/#/pos'); await sleep(1200);
   console.log('bnav in pos:', await p.locator('#bnav').isVisible()); await p.screenshot({ path: SP + '/n_pos.png' });
-  await p.goto('http://localhost:8091/#/form/10-1'); await sleep(900);
+  await p.goto('http://localhost:' + PORT + '/#/form/10-1'); await sleep(900);
   console.log('bnav in formlist:', await p.locator('#bnav').isVisible(), '| header dots', await p.locator('#hd_dots').count(), '| stars', await p.locator('.st[aria-pressed]').count());
   // non-owner, hide mode vs lock mode
   await p.addInitScript(`window.__OWNER=false;window.__PERMS={POS:{view:true,enter:true,approve:false}};`);
-  await p.evaluate(() => localStorage.setItem('bos_lang', 'bn')); await p.goto('http://localhost:8091/#/home'); await p.reload(); await sleep(1500);
+  await p.evaluate(() => localStorage.setItem('bos_lang', 'bn')); await p.goto('http://localhost:' + PORT + '/#/home'); await p.reload(); await sleep(1500);
   await p.screenshot({ path: SP + '/n_home_staff.png' });
   await p.click('header.top [data-act=nav_open]'); await sleep(500); await p.screenshot({ path: SP + '/n_drawer_staff.png' });
   console.log('staff locked rows:', await p.locator('.dr-i.lock').count());
