@@ -745,3 +745,8 @@ Checks run: infohint_test exit 0 (on a snapshot); crm_feedback_test and crm_lead
 - Found in a deep check of the branch: phase 544 re-created `stock_transfer` from the phase 499 text and dropped the phase 533 merge (bos114 `transfer_needs_stock`, bos115 `transfer_notify_receiver`). On a fresh build of the full chain through 545: phase114_test 47 pass / 5 fail (T2), phase115_test 44 pass / 3 fail (T3).
 - Phase 546 = phase 533 text + the phase 544 check. Fresh build through 545 + phase 546: phase546_test 5/5, phase114_test 52/0, phase115_test 47/0, phase544_test 12/12; phase 546 pasted twice with no error.
 - Not confirmed: whether phase 544 was pasted on the live project (owner).
+
+## 25 Oct 2026 - dry test of the full chain with every switch at default and every switch ON; phase 547
+- Full build of ORDER.txt through 546, each of the 282 `*_test.sql` once on its own clone. Default: 16143 pass / 1117 fail (suites written for a shorter chain). All switches ON (293 on; `crm_voucher_liability_on` and `marketing_post_on` refused by their own setup guards, as designed): no new database crash; the new errors are business refusals (path_locked, poster_must_differ, ...) and test-setup knock-ons.
+- Reports: every `report_defs3` key through `report_run3` and `report_run2` (46 + 46) and every `report_catalog` key through `report_run` (19) runs as the owner with no error, switches at default and all ON.
+- Real defect found: `xc_summary_compose` (phase 494) reads `job_runs.status` (no such column). Phase 547 reads `ok`. phase494_test: error at line 50 before, 38 of 38 after; phase 547 pasted twice with no error.

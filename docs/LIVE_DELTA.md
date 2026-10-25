@@ -285,3 +285,10 @@ Every replaced text is in `public._union_fn_backup` (`def` = the full `create or
 - **Effect today:** none while the three switches are OFF (default).
 - **Steps (owner):** 1. backup (Home > Backup). 2. paste `supabase/phase546.sql` once, AFTER phase 545 (it is paste-twice safe). Paste it even if phase 544 was never pasted live.
 - **Rollback:** restore the backup from step 1 (or paste phase 544 again, which brings back the bug).
+
+## Phase 547 (25 Oct 2026): daily summary reads job_runs.ok (fix of phase 494)
+
+- **Why:** `xc_summary_compose` (phase 494) counted failed jobs with `job_runs.status = 'failed'`; `job_runs` (phase 479) has `ok` and `finished_at`, no `status`. Every summary run raised `column "status" does not exist`.
+- **What it changes:** `xc_summary_compose(date, integer)` only (same signature). No new rule.
+- **Steps (owner):** paste `supabase/phase547.sql` once, AFTER phase 546 (paste-twice safe).
+- **Rollback:** none needed; pasting phase 494 again brings back the bug.
