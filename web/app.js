@@ -11,7 +11,7 @@ const store = {
 };
 // the brand name is fixed in every language: never translated, never re-spelled
 const BRAND = { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' };
-window.BOS = Object.assign(window.BOS || {}, { BRAND: { hub: { bn: 'ইসলামিয়া মিষ্টি ঘর', en: 'ISLAMIYA MISTY GHAR' }, bari: { bn: 'মিষ্টি বাড়ি', en: 'MISTY BARI' }, cakiz: { bn: 'AL-CAKIZ', en: 'AL-CAKIZ' } } });
+window.BOS = Object.assign(window.BOS || {}, {});   // bos B2: the old BRAND {hub,bari,cakiz} constant (unused) is gone; brands come from report_brand_map via B.biz.brandOpts
 const S = { offline: false, csNeeds: false, ctx: null, lang: store.get('bos_lang') || 'bn', items: [], itemQ: '', itemCat: '', matrixRole: null, logTable: '' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -55,7 +55,8 @@ function shell(title, body, back) {
   const pg = (location.hash.replace(/^#\/?/, '') || 'home').split('/')[0];
   const lead = back ? `<button data-act="go" data-v="${typeof back === 'string' ? back : 'home'}" aria-label="${esc(t('back'))}">←</button>`
     : (nav && pg !== 'home' ? `<button data-act="goback" aria-label="${esc(t('back'))}">←</button>` : '<img class="brand" src="mark.svg" alt="">');
-  const h1 = title === t('app') ? `<span class="bn">${esc(BRAND.bn)}</span><span class="lat">${esc(BRAND.en)}</span>` : esc(title);
+  const bnd = (window.BOS.biz && window.BOS.biz.brand()) || BRAND;   // bizctx: the chosen business name when the owner set one, else the legacy name
+  const h1 = title === t('app') ? `<span class="bn">${esc(bnd.bn)}</span><span class="lat">${esc(bnd.en)}</span>` : esc(title);
   $('#app').innerHTML = `<header class="top">${nav ? window.BOS_NAV.menuBtn() : ''}${lead}<h1 class="${title === t('app') ? 'brandh' : ''}">${h1}</h1>${nav ? window.BOS_NAV.headExtra() : langBar()}</header>${nav && window.BOS_NAV.crumb ? window.BOS_NAV.crumb() : ''}${body}`;
   if (window.BOS_NAV) window.BOS_NAV.sync(!!nav);
 }

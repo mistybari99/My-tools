@@ -1,0 +1,13 @@
+# Functions whose answer to a person of business A differs between "only A has data" and "B has data too" in the differential probe (tests/sql/c3_probe.sql), reviewed one by one.
+# name|reason. Anything NOT listed fails phase133_test T13. A function listed here that no longer differs is fine (phase132 / later work may close it).
+assistant_health|health findings also count people without a place and suppliers without credit days: people and suppliers are master / group data (Stage C2); the place findings are already limited to the caller's businesses (phase133)
+backup_manifest|backup bot (ops purpose backup) = group infrastructure: row counts of the whole database by design
+daily_digest|group digest = owner or the notify bot (group infrastructure); the per-business digest is daily_digest_biz133
+notify_config|notify bot / owner: reads the global notification settings and the clock (group infrastructure)
+category_save|item categories are master data (Stage C2 phase132 scopes them); the difference is the id sequence / list the call returns
+customer_save|customers are master data (Stage C2 phase132)
+save_supplier|suppliers are master data (Stage C2 phase132)
+recipe_cost_components_get|recipes are master data (Stage C2 phase132)
+sheet_draft|creating a draft returns the next sequence id (B created sheets too); not data of B
+submit_item_change|a request returns the next sequence id (B created requests too); not data of B
+shift_save|a generic integer id (the probe passes the id of a B row of some kind) can equal the id of a shift of the caller's own business: numeric collision, not a leak

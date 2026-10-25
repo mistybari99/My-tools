@@ -14,6 +14,9 @@ Everything here runs on a **scratch** Postgres 16 (socket `/tmp`, port 5544, use
 | `budget.py` | the phase110 time budget: median of 5, CPU and wall, optional before-phase110 and pre-phase-72 columns, exit 1 over budget |
 | `equality.sql` / `equality.sh` | **result equality**: md5 of every result of biz_daily, biz_items, _p27_pl, _cogs_lines72, items_with_cost, _item_cost_eff88, report_run (6 reports, rows / totals / columns), inventory_vs_gl, unmatched_forms, _acct_docs, _acct_stock_moves85, acct_post_pending (dry), inbox_list, the journal and trial balance after a real post - in all three cost modes. Run on a database before phase110 and on a clone after it; the EQ lines must be identical. |
 | `index_effect.py` | what each index buys: the target statement with the index, then with the index dropped inside a rolled-back transaction |
+| `seed_c4.sql` | (step C4) scales the seed to the owner's size: 1,369 items / 229 categories, +30,000 sales over 2 years (before the accounting start), +3,000 production runs, 5,963 transfers (returns, cancelled, in transit, short), give-backs, 15,000 quick expenses, card settlements, recipe standards, monthly cost pools. Run it after seed.sql + seed_post.sql (+ seed_pending / seed_inbox / seed_facts); works on a build with or without phases 112..118. |
+| `bench120.py` | (step C4) time + md5 of the phase112..118 reports for 1 day / 1 month / 1 year: `python3 bench120.py <db> <label> [filter]` |
+| `equality120.sh` | (step C4) md5 of stock_recon_statement / factory_branch_statement / stock_sales_unmatched / `_rc118_buckets` / `_rc118_gap` over a grid of periods, places, items and categories; run on a db before phase120 and on a clone after it, `diff` must be empty |
 | `ref_proposed_indexes.sql`, `ref_proposed_patches.sql`, `ref_results_review.json` | the review's proposals and raw numbers (reference only; phase110.sql is the shipped version) |
 
 ## Reproduce (about 15 minutes, most of it the old slow reports)

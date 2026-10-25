@@ -84,7 +84,7 @@ function envSave() {
   if (!(e.locs && e.locs.length) || !e.rules) return false;           // a half-failed load is never saved over a good one
   const rules = {}; Object.keys(e.rules).forEach((k) => { if (!SECRETISH.test(k)) rules[k] = e.rules[k]; });
   if (!Object.keys(rules).length) { const old = rd(PFX + 'env_' + u); if (old && old.env && Object.keys(old.env.rules || {}).length) return false; }   // a failed rules read never replaces a good snapshot
-  return wr(PFX + 'env_' + u, { env: { locs: e.locs, rules, lists: e.lists || {}, grantDefs: e.grantDefs || {}, items: (e.items || []).map((i) => ({ id: i.id, code: i.code, name_bn: i.name_bn, name_en: i.name_en, name_mix: i.name_mix, unit: i.unit, sell_price: i.sell_price, is_active: i.is_active })) } }, CAP.env);
+  return wr(PFX + 'env_' + u, { env: { locs: e.locsAll || e.locs, rules, lists: e.lists || {}, grantDefs: e.grantDefs || {}, items: (e.items || []).map((i) => ({ id: i.id, code: i.code, name_bn: i.name_bn, name_en: i.name_en, name_mix: i.name_mix, unit: i.unit, sell_price: i.sell_price, is_active: i.is_active })) } }, CAP.env);
 }
 function envApply() {                     // fill what the server could not give from the snapshot; mark ENV so it is re-read when the internet is back
   const e = E(), u = uidNow(), o = u && rd(PFX + 'env_' + u); if (!e || !o || !fresh(o) || !o.env) return false;

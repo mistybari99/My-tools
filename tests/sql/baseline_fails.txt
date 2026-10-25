@@ -117,7 +117,7 @@ phase115b 0 47
 phase121 0 34
 phase116 0 87
 phase117 0 36
-phase118 0 157
+phase118 1 156
 phase119 0 19
 phase89h 0 65
 phase94b 0 80
@@ -129,3 +129,6 @@ phase110b 0 45
 #   phase89g 2, phase103c 2 (re-paste of 89 / 103 changes functions that 112..117 re-create; phase109's guard also refuses production_post once it carries bos116);
 #   phase98b 1, phase98c 1 (re-paste of 98 puts _acct_docs back older than bos113); phase115 1 (T5: pasting 115 again puts stock_return_transfer back without the sec121 lock; replacement phase115b), phase113 1 (T9: pasting 113 again puts _acct_docs back without the b2s115 patch of 114/115).
 #   Replacements (same assertions + the repair tail 112..118): phase89h, phase98d, phase103d, phase113b, phase94b / phase98e / phase110b; phase119 proves the rule itself (hash compare against the fresh build for every re-paste of 89, 94, 96, 97, 98, 103, 105, 109, 110, 111). Never edit the old files.
+# C4 phase120 (report speed) integrated after phase118, before phase121:
+phase120 0 38
+# NOTE phase118_test V10 ('paste twice: no function body, rule, advisor row or grant row changes') is false BY DESIGN once phase120 is on top: re-pasting 118 puts the older bodies of _rc118_buckets, _rc118_gap and stock_sales_unmatched back (verified: 157/0 on a build without phase120, 156/1 with it). Baseline line above = 1 fail / 156 pass. The repair-tail replacement suites (phase89h 94b 98d 98e 103d 110b 119) now paste phase120 after phase118 and are 0-fail.

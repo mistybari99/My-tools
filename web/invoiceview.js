@@ -70,7 +70,7 @@ const okMail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim(
 const dhakaDate = (iso) => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Asia/Dhaka' });
 const dhakaTime = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Dhaka' });
 const lineName = (l) => (S.lang === 'en' ? l.name_en || l.name : S.lang === 'mix' ? l.name_mix || l.name : l.name) || '';
-const brandText = () => (S.lang === 'en' ? BRAND.en : BRAND.bn);
+const brandText = (locId) => { const b = B.biz ? (locId ? B.biz.brandFor(locId) : B.biz.brand()) : BRAND; return S.lang === 'en' ? b.en : b.bn; };   // bizctx: business name of the document's place
 
 // ---------- the model: from the server ----------
 function fromServer(j) {
@@ -102,8 +102,9 @@ function fromPayload(info) {
 // ---------- text for sharing ----------
 function text(d, short) {
   const loc = wl(d.loc), lines = d.lines.map((l) => `${lineName(l)}${l.qty !== 1 || l.unit ? ` ${fmt(l.qty)}${l.unit ? ' ' + l.unit : ''} × ${fmt(l.price)}` : ''} = ${fmt(l.amount)}`);
-  const head = [brandText(), loc, `${T('receipt')} ${d.receipt}${d.pending ? ' (' + T('prov') + ')' : ''} · ${d.date} ${d.time}`];
-  if (short) return [...head, `${T('total')}: ${fmt(d.total)}`, d.due > 0 ? `${T('due')}: ${fmt(d.due)}` : null, T('thanks')].filter(Boolean).join('\n');
+  const rc = B.biz && B.biz.receipt ? B.biz.receipt(d.loc_id) : {};   // phase134 profile of the business
+  const head = [brandText(d.loc_id), rc.header || null, rc.address || null, loc, `${T('receipt')} ${d.receipt}${d.pending ? ' (' + T('prov') + ')' : ''} · ${d.date} ${d.time}`];
+  if (short) return [...head, `${T('total')}: ${fmt(d.total)}`, d.due > 0 ? `${T('due')}: ${fmt(d.due)}` : null, rc.footer || T('thanks')].filter(Boolean).join('\n');
   return [...head, '—', ...lines, '—', d.discount > 0 ? `${T('discount')}: -${fmt(d.discount)}` : null,
     d.vat ? `${T('vat')} ${d.vat.rate}%${d.vat.included ? ' (' + T('incl') + ')' : ''}: ${fmt(d.vat.amount)}` : null, `${T('total')}: ${fmt(d.total)}`,
     ...d.pays.map((p) => `${lab(X['m_' + p.mode] || L(p.mode, p.mode, p.mode))}${p.wallet ? ' (' + p.wallet + ')' : ''}: ${fmt(p.amount)}`),
@@ -111,10 +112,11 @@ function text(d, short) {
 }
 
 // ---------- the card (what the customer would see on paper) ----------
+function rcH(d) { const rc = B.biz && B.biz.receipt ? B.biz.receipt(d.loc_id) : {}; return [rc.header, rc.address, rc.phone].filter(Boolean).map((x) => `<div class="iv92c">${esc(x)}</div>`).join(''); }
 function card(d) {
   const row = (k, v, b) => `<div class="iv92r${b ? ' iv92b' : ''}"><span>${k}</span><span>${v}</span></div>`;
   return `<div class="iv92doc" data-iv92="card">
-    <div class="iv92c iv92brand">${esc(brandText())}</div>${wl(d.loc) ? `<div class="iv92c">${esc(wl(d.loc))}</div>` : ''}
+    <div class="iv92c iv92brand">${esc(brandText(d.loc_id))}</div>${rcH(d)}${wl(d.loc) ? `<div class="iv92c">${esc(wl(d.loc))}</div>` : ''}
     <div class="iv92c">${esc(T('receipt'))} <b>${esc(d.receipt)}</b>${d.pending ? ` <span class="iv92tag">${esc(T('prov'))}</span>` : ''}</div>
     <div class="iv92c iv92m">${esc(d.date)} ${esc(d.time)}${d.cashier ? ' · ' + esc(d.cashier) : ''}${d.cust && d.cust.name ? ' · ' + esc(d.cust.name) : ''}</div>
     ${d.status === 'void' ? `<div class="iv92c iv92tag iv92void">${esc(T('voided'))}</div>` : ''}
@@ -127,7 +129,7 @@ function card(d) {
     ${d.pays.map((p) => row(`${modeName(p.mode)}${p.wallet ? ' · ' + esc(p.wallet) : ''}`, fmt(p.amount))).join('')}
     ${d.change > 0 ? row(esc(T('change')), fmt(d.change)) : ''}
     ${d.due > 0 ? row(esc(T('due')), money(d.due), true) : ''}
-    <div class="iv92hr"></div><div class="iv92c">${esc(T('thanks'))}</div></div>`;
+    <div class="iv92hr"></div><div class="iv92c">${esc((B.biz && B.biz.receipt && B.biz.receipt(d.loc_id).footer) || T('thanks'))}</div></div>`;
 }
 const CSS = `.iv92doc{background:#fff;color:#000;border:1px solid #bbb;border-radius:10px;padding:12px;max-width:100%;box-sizing:border-box;font-size:.92rem;line-height:1.35;word-break:break-word}
 .iv92c{text-align:center}.iv92brand{font-weight:700;font-size:1.15em}.iv92m{font-size:.85em;color:#444}.iv92hr{border-top:1px dashed #000;margin:7px 0}
@@ -227,7 +229,7 @@ function toDoc(d) {   // the shape B.invoice.renderDoc draws
 }
 // bos98: template system hooks. Every one is guarded: no B.tpl, no owner choice, or any error -> today's output, unchanged. No cost field ever goes in (the card has none).
 function tplReady() { try { if (B.tpl && B.tpl.ensure) B.tpl.ensure(sb); } catch (e) { /* offline-safe: nothing */ } }
-function tplOpts(d) { return { lang: S.lang, loc: d.loc_id, shop: { name: brandText() } }; }
+function tplOpts(d) { return { lang: S.lang, loc: d.loc_id, shop: { name: brandText(d.loc_id) } }; }
 function tplRecvData(d) {   // pos_receipt data: customer-facing numbers only
   return { no: d.receipt, date: d.date + ' ' + d.time, cashier: d.cashier, location: wl(d.loc), customer: d.cust ? { name: d.cust.name, phone: d.cust.mobile || '' } : null,
     items: d.lines.map((l) => ({ name: lineName(l), qty: l.qty, price: l.price, amount: l.amount })), subtotal: d.subtotal, discount: d.discount, vat: d.vat ? d.vat.amount : 0, total: d.total, paid: d.paid, change: d.change, due: d.due };
@@ -235,7 +237,7 @@ function tplRecvData(d) {   // pos_receipt data: customer-facing numbers only
 function tplMsg(d, channel) {   // msg_invoice text for sms / whatsapp / email, or null (nothing chosen)
   try {
     if (!B.tpl || !B.tpl.render) return null;
-    const t = B.tpl.render('msg_invoice', { customer: d.cust ? d.cust.name : '', no: d.receipt, date: d.date, total: d.total, paid: d.paid, due: d.due, shop: { name: brandText() },
+    const t = B.tpl.render('msg_invoice', { customer: d.cust ? d.cust.name : '', no: d.receipt, date: d.date, total: d.total, paid: d.paid, due: d.due, shop: { name: brandText(d.loc_id) },
       items: d.lines.map((l) => ({ name: lineName(l), qty: l.qty, amount: l.amount })) }, undefined, { lang: S.lang, loc: d.loc_id, channel });
     return typeof t === 'string' && t ? t : null;
   } catch (e) { return null; }
@@ -264,7 +266,7 @@ function doSms() { if (!need()) return; const n = phoneNum(); if (!n) return; co
 function doWa() { if (!need()) return; const n = phoneNum(); if (!n) return; logShare('whatsapp'); const wm = B.tpl && B.tpl.waUrl ? tplMsg(V.d, 'whatsapp') : null;   // bos98
   go(wm ? B.tpl.waUrl(wm).replace('https://wa.me/?', `https://wa.me/${n}?`) : `https://wa.me/${n}?text=${encodeURIComponent(text(V.d))}`, true); toast(T('opened')); }
 function doEmail() { if (!need()) return; const e = (($('#iv92_email') || {}).value || '').trim(); if (!okMail(e)) return toast(T('needMail'));
-  logShare('email'); let sj = `${brandText()} · ${T('receipt')} ${V.d.receipt}`, bd = text(V.d);
+  logShare('email'); let sj = `${brandText(V.d.loc_id)} · ${T('receipt')} ${V.d.receipt}`, bd = text(V.d);
   { const tm = B.tpl && tplMsg(V.d, 'email'), m = tm && /^Subject: ([^\n]*)\n\n([\s\S]*)$/.exec(tm); if (m) { sj = m[1]; bd = m[2]; } }   // bos98
   go(`mailto:${e}?subject=${encodeURIComponent(sj)}&body=${encodeURIComponent(bd)}`); toast(T('opened')); }
 async function copyText(txt) {

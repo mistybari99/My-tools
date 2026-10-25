@@ -29,6 +29,11 @@ select tt.chk('T1 older tags kept (bos99 object names, bos103 in setup_recommend
 \i supabase/phase111.sql
 \i supabase/phase109.sql
 \i supabase/phase111.sql
+\i supabase/phase131.sql
+\i supabase/phase132.sql
+\i supabase/phase133.sql
+\i supabase/phase134.sql
+\i supabase/phase135.sql
 select tt.chk('T2 no function changed by pasting 111, 109, 111 again', (select count(*) from pg_proc p join f0 on f0.fn = p.oid::regprocedure::text where p.pronamespace = 'public'::regnamespace and md5(pg_get_functiondef(p.oid)) <> f0.h) = 0);
 select tt.chk('T2 phase109 after 111 did not erase bos105/bos111', (select d ~ 'bos105' and d ~ 'bos111' from (select pg_get_functiondef('public._bp_pay99(text,text,text,numeric,text,uuid,text,boolean)'::regprocedure) d) x));
 \echo == T3 body guard: an unknown tag stops the paste (the error below is expected)

@@ -24,6 +24,11 @@ create table if not exists tt.fh (sig text primary key, h text);
 truncate tt.fh;
 insert into tt.fh select p.oid::regprocedure::text, md5(pg_get_functiondef(p.oid)) from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prokind = 'f';
 \i supabase/phase100.sql
+\i supabase/phase131.sql
+\i supabase/phase132.sql
+\i supabase/phase133.sql
+\i supabase/phase134.sql
+\i supabase/phase135.sql
 
 -- items whose id columns disagree with the text columns (must always be 0)
 create or replace function tt.inconsistent() returns bigint language sql stable security definer as $$
@@ -283,6 +288,11 @@ reset role;
 select count(*) as n_before from item_categories \gset
 select (select count(*) from item_categories) as n1, (select count(*) from rules where key='category_required_on_item') as r1 \gset
 \i supabase/phase100.sql
+\i supabase/phase131.sql
+\i supabase/phase132.sql
+\i supabase/phase133.sql
+\i supabase/phase134.sql
+\i supabase/phase135.sql
 select tt.chk('P1 second paste: master rows unchanged, rule kept once, no inconsistent item', (select count(*) from item_categories) = :'n1' and (select count(*) from rules where key='category_required_on_item') = 1 and tt.inconsistent() = 0);
 select tt.chk('P1 second paste: functions of other phases still identical to the snapshot', (select count(*) from tt.fh f join pg_proc p on p.oid::regprocedure::text = f.sig where md5(pg_get_functiondef(p.oid)) <> f.h) = 0);
 select tt.chk('P1 sweep: no negative cost, no unbalanced journal entry', (select count(*) from (select entry_id from journal_lines group by entry_id having sum(debit) <> sum(credit)) z) = 0);
