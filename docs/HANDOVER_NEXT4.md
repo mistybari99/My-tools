@@ -1,4 +1,6 @@
 # HANDOVER NEXT4 - full app handover (read first in a new session)
+> **NOTE (added at merge time, 2026-10-25):** this file describes the state at the end of the audit/fix session (last phase 121, branch tip 1298b58). The same branch later received other sessions' work: phases 122-135 (Group ERP stages: org scope switch `org_scope_on`, master data and permissions kept apart per business, one profile per business, create places of a business from the app), reports phase 131, integration 8, setup pages up to run 21. That work is NOT described or verified here - read the newest HANDOVER/REMAINING/TODO files on the branch and `git log` for it before acting. Sections 1-4 below are still correct for phases 72-121; the canonical paste order now continues past 121 (see docs/PASTE_ORDER.md).
+
 Date written: 2026-10-25. Supersedes nothing: HANDOVER_6.md has the detailed phase/test lists, HANDOFF_6.md has how-to-work rules; this file is the one-stop overview.
 Owner style: Bangla, phone only, short answers, MCQ for decisions. Backend, code and docs in English. Never put secrets or real person names in the repo. Never rewrite existing UI texts.
 
