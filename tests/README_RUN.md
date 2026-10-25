@@ -9,5 +9,13 @@
 
 ## SQL (`tests/sql`)
 * Needs a scratch Postgres on socket `/tmp` port `5544` (user `postgres`; env `PGSOCK`, `PGPORT`). Never a live database.
-* `bash tests/sql/run_all_sql.sh [suite ...]` builds one final DB in the order of `docs/PASTE_ORDER.md` (via `tests/sql/final_build.sh`, repo root = env `REPO`, default this checkout), runs every `supabase/*_test.sql` (or only the named suites, e.g. `phase8 phase72 phase89c phase99`) on its own clone, prints pass/fail per suite and compares the fail count with `tests/sql/baseline_fails.txt` (the 22 known failures of `docs/briefs_p2p3/step_INT3_REPORT.md` + the post-INT3 suites). Exit 0 only if every suite equals the baseline. Env: `TEMPLATE=<db>` reuse a built db, `KEEP=1`, `TIMEOUT`, `LOGDIR`.
+* Fresh cluster: `initdb -U postgres -A trust`, start it on `-k /tmp -p 5544`. The runner creates the roles `anon`, `authenticated`, `service_role` when they are missing.
+* `bash tests/sql/run_all_sql.sh [suite ...]` builds two databases with `tests/sql/final_build.sh`, both strictly in the order of `tests/sql/ORDER.txt`: **base** = ORDER.txt up to and including `phase87` (by position: 506-529 and 100-135 come before 80-87 there) and **final** = all of ORDER.txt. Every `supabase/*_test.sql` (or only the named suites, e.g. `phase8 phase113 phase543`) runs once on its own clone: base when its phase is inside the base part, final otherwise. It prints pass/fail per suite and compares the fail count with `tests/sql/baseline_fails.txt`. Exit 0 only if every suite equals the baseline; 1 if a suite differs, times out, prints no result or cannot be cloned; 2 if there is no connection, a role is missing or a build fails (fail closed: never a green run without a database). Env: `PGSOCK`, `PGPORT` (`PORT` is an alias), `JOBS`, `TIMEOUT`, `LOGDIR`, `KEEP=1`, `PFX`.
+* `tests/sql/run_all_union.sh` is the older chain runner (paste-twice check, every suite at its own position); `run_all_sql_adv.sh` runs everything on the final build only.
+
+### Known limits
+* A suite runs on base or final, not on the database through its own phase. Suites that assert "package X not installed yet" / "hooks not installed yet" therefore count those checks as fails on final; the numbers in `baseline_fails.txt` are measured that way, so a difference still means a change.
+* Suites that paste their own phase and need the chain WITHOUT it are listed in `PRE_OWN` in `run_all_sql.sh` (now `phase543`); the runner builds ORDER.txt minus that phase for each. `phase543_test.sql` stops with one FAIL (no foreign-key errors) when its phase is already on the database.
+* `phase84_test` gets `phase84_test_project_only.sql` pasted on its clone first; the test-project files are for TEST databases only and are never pasted on the live project.
+* Every database is a local throwaway; nothing here connects to the live Supabase project.
 * When a fix changes a baseline number, edit `baseline_fails.txt` in the same commit.

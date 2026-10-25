@@ -14,6 +14,13 @@ begin insert into t543.res values (p_name, coalesce(p_ok, false)); raise notice 
 \echo == T0 fixtures written with the OLD codes (before the phase)
 select t543.chk('T0a the database is the old sequence (forms 02-4 is the appointment letter)', exists (select 1 from forms where code = '02-4' and name_en like 'Appointment Letter%'));
 select t543.chk('T0b no test marker yet', to_regclass('public.form_code_migration_543') is null);
+-- On a build that already holds phase543 the old codes (02-2, 02-4 ...) are gone and the fixtures below would stop with foreign-key errors: stop here with one FAIL instead.
+select to_regclass('public.form_code_migration_543') is not null as t543_done \gset
+\if :t543_done
+\echo == STOP: phase543 is already on this database. Run this file on the chain WITHOUT phase543 (see the header; tests/sql/run_all_sql.sh builds it).
+select t543.chk('T0z the database is the chain without phase543 (stopped before the fixtures)', false);
+\q
+\endif
 insert into role_form_perms (role_code, form_code, can_view, can_enter, can_approve) values ('owner', '02-4', true, true, false), ('owner', '20-1', true, false, false) on conflict do nothing;
 insert into serials (form_code, location_id, last) values ('10-2', 1, 7) on conflict do nothing;
 insert into pin_sig_cfg (form_code, enabled) values ('14-1', true) on conflict do nothing;

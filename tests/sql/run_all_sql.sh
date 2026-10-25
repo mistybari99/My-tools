@@ -1,58 +1,89 @@
 #!/bin/bash
-# Runs the whole SQL test set on a local throwaway Postgres (never the live project). Port PORT (default 5570), database names start with PFX (default r99).
-#   1. base DB  = phases 8 to 87 in the owner order (tests/sql/ORDER.txt);  tN = the base plus every later phase of ORDER.txt (88 .. 99, 120, 130-132, 140-143, 300-329, 400-477), each pasted once on the
-#      database before it, then a second time on a copy (paste-twice check). The order is the file's order, so a phase that is added to ORDER.txt is built and tested without editing this script.
-#   2. every old suite (phase8 .. phase87) runs on a copy of the base AND on a copy of the final build; compare the two result folders: the failing lines must be the same (documented baseline)
-#   3. every new suite phaseN_test.sql (N from 88 on) runs on a copy of tN (the database through its own phase: the suites of the packages assert "hooks not installed yet" and "package X not installed";
-#      phase99_test.sql runs on t99). The suites of phases 477 and later need the whole build: they run on the final database copy.
-#      phase84_test.sql needs phase84_test_project_only.sql (a TEST project file) pasted first; phase84b_test.sql pastes the two test-project files itself.
-# usage: PORT=5570 bash tests/sql/run_all_sql.sh      -> results in $OUT (default /tmp/run_all_sql/<PFX>): <suite>.txt (FAIL / ERROR / RESULT lines), summary.txt
-HERE="$(cd "$(dirname "$0")" && pwd)"; R="$(cd "$HERE/../.." && pwd)"
-PORT=${PORT:-5570}; PFX=${PFX:-r99}; OUT=${OUT:-/tmp/run_all_sql/$PFX}; JOBS=${JOBS:-4}; mkdir -p $OUT/base $OUT/full $OUT/own $OUT/twice
-PSQL="psql -h /tmp -p $PORT -U postgres"; P="$PSQL -v ON_ERROR_STOP=1 -q"
-ALL=$(grep -v '^#' $HERE/ORDER.txt); OLD=""; NEW=""
-for w in $ALL; do n=${w#phase}; if [ "$n" -le 87 ]; then OLD="$OLD $w"; else NEW="$NEW $n"; fi; done
-LAST=$(echo $NEW | tr ' ' '\n' | tail -1)
-mk() { $PSQL -q -c "drop database if exists $1" -c "create database $1 template $2" 2>&1 | grep -v NOTICE; }
-# 1. build
-$PSQL -q -c "drop database if exists ${PFX}_t87" 2>&1 | grep -v NOTICE
-# build_fresh_db.sh finds its own checkout and takes the port from PGPORT
-ORDER="$OLD" PGPORT=$PORT bash $HERE/build_fresh_db.sh ${PFX}_t87 2>&1 | grep -E "FAIL|ERROR" | head
-run1() { # template label file
-  local t=$1 l=$2 f=$3 n; n=$(basename $f .sql); local db=${PFX}_x_${l}_$n
-  $PSQL -q -c "drop database if exists $db" -c "create database $db template $t" >/dev/null 2>&1
-  (cd $R && timeout 1500 $PSQL -d $db -qAt -f $f > $OUT/$l/$n.raw 2>&1)
-  grep -E 'FAIL|ERROR|RESULT|SUMMARY|^--- (FAILED|TOTAL)' $OUT/$l/$n.raw | sed 's/^psql:[^:]*:[0-9]*: //' > $OUT/$l/$n.txt
-  $PSQL -q -c "drop database if exists $db" >/dev/null 2>&1
-}
-prev=${PFX}_t87
-for n in $NEW; do
-  f=$R/supabase/phase$n.sql
-  mk ${PFX}_t$n $prev; (cd $R && $P -d ${PFX}_t$n -f $f 2>&1 | grep -E "ERROR|FATAL" | sed "s/^/phase$n paste 1: /")
-  mk ${PFX}_tw ${PFX}_t$n; (cd $R && $P -d ${PFX}_tw -f $f 2>&1 | grep -E "ERROR|FATAL" | sed "s/^/phase$n paste 2: /") | tee -a $OUT/twice/errors.txt
-  # a suite of a phase that needs the whole build (the last phase) runs on the final database below
-  if [ -f $R/supabase/phase${n}_test.sql ] && [ "$n" != "$LAST" ]; then run1 ${PFX}_t$n own $R/supabase/phase${n}_test.sql; fi
-  [ "$prev" != "${PFX}_t87" ] && $PSQL -q -c "drop database if exists $prev" >/dev/null 2>&1
-  prev=${PFX}_t$n
+# Runs the whole SQL test set on a local throwaway Postgres (never the live project).
+#   1. two databases, both built by tests/sql/final_build.sh strictly in the order of tests/sql/ORDER.txt (= FOUNDATION + NEW of paste_order.env, tools/check_paste_order.py checks it):
+#        base  = ORDER.txt from its first word up to and including phase87 (POSITION in the file, not number: 506-529 and 100-135 come before 80-87 there)
+#        final = the whole of ORDER.txt
+#   2. every supabase/<suite>_test.sql runs ONCE on its own fresh clone: on base when its phase (the number of the suite name, phase21b -> 21) is inside the base part
+#      of ORDER.txt, on final otherwise (also for a suite whose phase is not in ORDER.txt). Exceptions, both written below:
+#        PRE_OWN  suites that paste their own phase themselves and need the chain WITHOUT it (a third database is built for each: ORDER.txt minus that phase)
+#        phase84_test gets phase84_test_project_only.sql pasted on its clone first (TEST databases only); phase84b/84c_test paste the test-project files themselves
+#   3. the fail count of every suite is compared with tests/sql/baseline_fails.txt (column 2).
+# usage: bash tests/sql/run_all_sql.sh [suite ...]        e.g.  bash tests/sql/run_all_sql.sh phase8 phase72 phase113 phase543
+# env:   PGSOCK=/tmp PGPORT=5544 (same defaults as final_build.sh; PORT= is accepted as an alias of PGPORT)   REPO (default: this checkout)
+#        TIMEOUT=600 per-suite seconds   JOBS=4 suites in parallel   LOGDIR=<dir> psql output of each suite   KEEP=1 keep the built databases   PFX=rs  db name prefix
+# exit:  0 = every suite ran and equals the baseline; 1 = some suite differs, timed out, printed no result or could not be cloned; 2 = no connection / missing roles / a build failed
+HERE="$(cd "$(dirname "$0")" && pwd)"; REPO=${REPO:-$(cd "$HERE/../.." && pwd)}; export REPO
+PGSOCK=${PGSOCK:-/tmp}; PGPORT=${PGPORT:-${PORT:-5544}}; export PGSOCK PGPORT
+TIMEOUT=${TIMEOUT:-600}; JOBS=${JOBS:-4}; PFX=${PFX:-rs}; LOGDIR=${LOGDIR:-$(mktemp -d)}; mkdir -p "$LOGDIR"
+PSQL="psql -h $PGSOCK -p $PGPORT -U postgres -X"
+BASE_FILE="$HERE/baseline_fails.txt"
+PRE_OWN=" phase543 "
+die() { echo "ERROR: $*" >&2; exit 2; }
+# 0. fail closed: a scratch server must answer and have the three Supabase roles (a fresh cluster has none: create them there)
+$PSQL -qAt -c "select 1" >/dev/null 2>"$LOGDIR/connect.err" || die "cannot connect to Postgres at $PGSOCK:$PGPORT ($(head -1 "$LOGDIR/connect.err")); start a scratch server or set PGSOCK / PGPORT"
+for r in anon authenticated service_role; do
+  $PSQL -qAt -v ON_ERROR_STOP=1 -c "do \$\$ begin if not exists (select 1 from pg_roles where rolname = '$r') then create role $r nologin; end if; end \$\$" >/dev/null 2>&1 || die "role $r is missing and cannot be created"
 done
-$PSQL -q -c "drop database if exists ${PFX}_tw" 2>&1 | grep -v NOTICE
-FINAL=${PFX}_t$LAST
-[ -f $R/supabase/phase${LAST}_test.sql ] && run1 $FINAL own $R/supabase/phase${LAST}_test.sql
-mk ${PFX}_t87tp ${PFX}_t87; $P -d ${PFX}_t87tp -f $R/supabase/phase84_test_project_only.sql >/dev/null 2>&1; $P -d ${PFX}_t87tp -f $R/supabase/phase84b_test_project_only_wave1.sql >/dev/null 2>&1   # TEST databases only
-mk ${PFX}_tftp $FINAL; $P -d ${PFX}_tftp -f $R/supabase/phase84_test_project_only.sql >/dev/null 2>&1; $P -d ${PFX}_tftp -f $R/supabase/phase84b_test_project_only_wave1.sql >/dev/null 2>&1   # TEST databases only
-# 2. old suites: base (through 87) and the final build
-for f in $R/supabase/phase*_test.sql; do
-  b=$(basename $f .sql); [ "$b" = phase84_test_project_only ] && continue; [ "$b" = phase84b_test ] && continue   # phase84b_test runs a reset: below, on its own copy
-  n=${b#phase}; n=${n%_test}
-  [ "$n" -le 87 ] || continue
-  tb=${PFX}_t87; tf=$FINAL; [ "$n" = 84 ] && { tb=${PFX}_t87tp; tf=${PFX}_tftp; }
-  run1 $tb base $f & run1 $tf full $f &
-  while [ $(jobs -r | wc -l) -ge $JOBS ]; do sleep 1; done
+# 1. orders from ORDER.txt
+ALL=$(grep -v '^#' "$HERE/ORDER.txt" | tr -s ' \n' ' '); ALL=$(echo $ALL)
+echo " $ALL " | grep -q " phase87 " || die "phase87 is not in ORDER.txt"
+BASE_ORDER=$(echo $ALL | tr ' ' '\n' | sed '/^phase87$/q' | tr '\n' ' '); BASE_ORDER=$(echo $BASE_ORDER)
+for w in $ALL; do [ -f "$REPO/supabase/$w.sql" ] || die "ORDER.txt names $w but supabase/$w.sql does not exist"; done
+build() { # db order
+  bash "$HERE/final_build.sh" "$1" "$2" > "$LOGDIR/build_$1.log" 2>&1; local rc=$?
+  [ $rc -eq 0 ] && tail -1 "$LOGDIR/build_$1.log" | grep -qx "built $1" || { sed -n '1,20p' "$LOGDIR/build_$1.log" >&2; die "build of $1 failed (rc $rc), see $LOGDIR/build_$1.log"; }
+  echo "built $1 ($(echo $2 | wc -w) phases)"
+}
+dbs=""; cleanup() { [ -n "$KEEP" ] && return; for d in $dbs; do $PSQL -q -c "drop database if exists $d" >/dev/null 2>&1; done; }
+trap cleanup EXIT
+dbs="${PFX}_base ${PFX}_final"; build ${PFX}_base "$BASE_ORDER"; build ${PFX}_final "$ALL"
+# 2. suites and their template
+if [ $# -gt 0 ]; then SUITES="$*"; else SUITES=$(ls "$REPO"/supabase/*_test.sql | xargs -n1 basename | sed 's/_test\.sql$//' | sort -V); fi
+tpl_of() { # suite -> template db (builds the PRE_OWN databases on demand)
+  local s=$1 ph; ph=phase$(echo "$s" | sed -E 's/^phase([0-9]+).*/\1/')
+  case "$PRE_OWN" in *" $s "*)
+    local d=${PFX}_pre_${ph#phase}
+    if ! $PSQL -qAt -c "select 1 from pg_database where datname = '$d'" | grep -q 1; then
+      build $d "$(echo $ALL | tr ' ' '\n' | grep -vx "$ph" | tr '\n' ' ')" >&2 || return 1; fi
+    echo $d; return;; esac
+  case " $BASE_ORDER " in *" $ph "*) echo ${PFX}_base;; *) echo ${PFX}_final;; esac
+}
+run1() { # suite template -> one result line in $LOGDIR/<suite>.row
+  local s=$1 t=$2 f="$REPO/supabase/$1_test.sql" db=${PFX}_x_$(echo "$1" | tr -c 'a-z0-9\n' '_') rc p fl res
+  if ! $PSQL -q -v ON_ERROR_STOP=1 -c "drop database if exists $db" -c "create database $db template $t" >"$LOGDIR/$s.clone" 2>&1; then
+    echo "$s|$t|-|-|CLONE FAILED" > "$LOGDIR/$s.row"; return; fi
+  [ "$s" = phase84 ] && { (cd "$REPO" && $PSQL -q -v ON_ERROR_STOP=1 -d $db -f supabase/phase84_test_project_only.sql) >"$LOGDIR/$s.pre" 2>&1 || { echo "$s|$t|-|-|SETUP FAILED" > "$LOGDIR/$s.row"; return; }; }
+  (cd "$REPO" && timeout "$TIMEOUT" $PSQL -d $db -qAt -f "$f") > "$LOGDIR/$s.log" 2>&1; rc=$?
+  $PSQL -q -c "drop database if exists $db" >/dev/null 2>&1
+  res=$(grep -E '^RESULT [0-9]+ pass[ ,/]+[0-9]+ fail' "$LOGDIR/$s.log" | tail -1)   # 'RESULT 96 pass, 2 fail' / 'RESULT 65 pass / 0 fail' / 'RESULT 8 pass 1 fail'
+  if [ -n "$res" ]; then p=$(echo "$res" | sed -E 's/^RESULT ([0-9]+) pass[ ,\/]+([0-9]+) fail.*/\1/'); fl=$(echo "$res" | sed -E 's/^RESULT ([0-9]+) pass[ ,\/]+([0-9]+) fail.*/\2/')
+  else p=$(grep -cE '(^|NOTICE: +)PASS ' "$LOGDIR/$s.log"); fl=$(grep -cE '(^|NOTICE: +)FAIL ' "$LOGDIR/$s.log"); fi
+  if [ $rc -eq 124 ]; then echo "$s|$t|$p|$fl|TIMEOUT"
+  elif [ $rc -eq 2 ] || grep -qE '^psql: error|FATAL:|server closed the connection' "$LOGDIR/$s.log"; then echo "$s|$t|$p|$fl|CONNECTION LOST"
+  elif [ $((p + fl)) -eq 0 ]; then echo "$s|$t|0|0|NO RESULT"
+  else echo "$s|$t|$p|$fl|"; fi > "$LOGDIR/$s.row"
+}
+for s in $SUITES; do
+  [ -f "$REPO/supabase/${s}_test.sql" ] || { echo "$s|-|-|-|NO SUCH SUITE" > "$LOGDIR/$s.row"; continue; }
+  t=$(tpl_of $s) || exit 2
+  case "$PRE_OWN" in *" $s "*) dbs="$dbs $t";; esac
+  run1 $s $t &
+  while [ $(jobs -r | wc -l) -ge $JOBS ]; do sleep 0.2; done
 done; wait
-run1 $FINAL own $R/supabase/phase84b_test.sql      # TEST file: pastes the two test-project files itself and runs a reset in its own throwaway copy
-# summary + comparison of old suites base vs full
-{ echo "== new suites (own database)"; for f in $OUT/own/*.txt; do echo "$(basename $f .txt): $(grep -E 'RESULT|SUMMARY' $f | tail -1)"; done
-  echo "== paste-twice errors (empty = every phase from 88 on can be pasted twice)"; cat $OUT/twice/errors.txt
-  echo "== old suites: differences between the base (through 87) and the final build (through $LAST); empty = identical failing lines"
-  for f in $OUT/base/*.txt; do n=$(basename $f); cmp -s $f $OUT/full/$n || { echo "--- $n"; diff $f $OUT/full/$n; }; done; } > $OUT/summary.txt
-cat $OUT/summary.txt
+# 3. compare with the baseline
+bad=0; tp=0; tf=0
+printf '%-12s %-12s %6s %5s  %-8s %s\n' SUITE DATABASE PASS FAIL BASELINE VERDICT
+for s in $SUITES; do
+  IFS='|' read -r _ t p fl v < "$LOGDIR/$s.row"
+  b=$(awk -v s="$s" '$1==s{print $2}' "$BASE_FILE")
+  if [ -z "$v" ]; then
+    if [ -z "$b" ]; then [ "$fl" -eq 0 ] && v="ok (not in baseline)" || { v="NEW FAILS"; bad=$((bad+1)); }
+    elif [ "$fl" -eq "$b" ]; then v="ok (= baseline)"
+    elif [ "$fl" -lt "$b" ]; then v="IMPROVED (update baseline)"; bad=$((bad+1))
+    else v="REGRESSION"; bad=$((bad+1)); fi
+  else bad=$((bad+1)); fi
+  [ "$p" != - ] && tp=$((tp+p)) && tf=$((tf+fl))
+  printf '%-12s %-12s %6s %5s  %-8s %s\n' "$s" "${t#${PFX}_}" "$p" "$fl" "${b:--}" "$v"
+done
+echo "TOTAL pass=$tp fail=$tf  bad=$bad  (baseline total fail=$(awk '!/^#/{s+=$2} END{print s+0}' "$BASE_FILE") over all suites; compare only when running all)  logs: $LOGDIR"
+[ $bad -eq 0 ]
